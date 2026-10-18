@@ -2,11 +2,17 @@
 // pure function of time, so these are all deterministic: same t, same picture.
 
 const TAU = Math.PI * 2;
+
 const clamp = (x, a = 0, b = 1) => Math.max(a, Math.min(b, x));
+
 const lerp = (a, b, k) => a + (b - a) * k;
+
 const smooth = k => k * k * (3 - 2 * k);
+
 const easeOut = k => 1 - Math.pow(1 - k, 3);
+
 const easeIn = k => k * k * k;
+
 const easeInOut = k => (k < 0.5 ? 4 * k * k * k : 1 - Math.pow(-2 * k + 2, 3) / 2);
 
 // Integer hash to [0, 1).
@@ -17,6 +23,7 @@ function hash(n) {
   n ^= n >>> 16;
   return (n >>> 0) / 4294967296;
 }
+
 const hash2 = (a, b) => hash(Math.imul(a | 0, 374761393) + Math.imul(b | 0, 668265263));
 
 // Seeded generator for things built once (crack lines, fog blobs).
@@ -50,8 +57,10 @@ function env(t, keys) {
 
 // 0 before t0, 1 at t0, falling off with time constant tau.
 const decay = (t, t0, tau) => (t < t0 ? 0 : Math.exp(-(t - t0) / tau));
+
 // 0 -> 1 -> 0 over [t0, t0 + dur].
 const bump = (t, t0, dur) => { const k = (t - t0) / dur; return k < 0 || k > 1 ? 0 : Math.sin(Math.PI * k); };
+
 // 0 before t0, eases to 1 over dur.
 const ramp = (t, t0, dur) => smooth(clamp((t - t0) / dur));
 
@@ -67,7 +76,3 @@ function path(t, keys) {
   const z = keys[keys.length - 1];
   return [z[1], z[2]];
 }
-
-// How big someone standing at ground height y is drawn (1 = native HD frame).
-// The rail is about y 555 and the front of the deck about y 900.
-const depthScale = y => 0.52 + 0.00114 * (y - 555);

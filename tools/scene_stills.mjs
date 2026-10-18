@@ -5,7 +5,7 @@ import fs from "node:fs";
 import path from "node:path";
 
 const [outDir, ...times] = process.argv.slice(2);
-const html = path.resolve("dist/jester-night.html");
+const html = path.resolve(process.env.SCENE_HTML || "dist/jester-night.html");
 const wrapped = path.join(outDir, "_page.html");
 fs.mkdirSync(outDir, { recursive: true });
 fs.writeFileSync(wrapped, '<!doctype html><html><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><style>[hidden]{display:none!important}body{margin:0}</style></head><body>' + fs.readFileSync(html, "utf8") + "</body></html>");

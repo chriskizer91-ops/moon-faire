@@ -1,0 +1,154 @@
+{
+ "title": "A Fool's Mercy",
+ "intro": "Moon Faire. Two minutes in the night square: the Jester, all ten of her moves, and Envoi's lost souls. Every light, spell and sound is made in code, timed to her real frames.",
+ "footer": "<p>The square, its lamps and the cut-outs she walks behind are Envoi's night square (envoi-on-the-longest-night). The wisps, the Shadow Wraith and the great wraith are cut from Envoi's model and action sheets. The opening shot is the moonrise still from 20-min. The Jester's frames come from the Flip Book Art export, drawn on their anchors and played at the speeds Chris chose. All music and sound is synthesized in the browser.</p><p>Arrow keys skip 5 seconds. Space plays and pauses.</p>",
+ "out": "dist/jester-square.html",
+ "backdrop": "art/backdrops/night-square.webp",
+ "art": {
+  "moonrise": {
+   "src": "art/backdrops/town-moonrise.webp"
+  },
+  "wisp_idle": {
+   "src": "art/foes/wisp_idle.png",
+   "max": 360,
+   "q": 86
+  },
+  "wisp_flicker": {
+   "src": "art/foes/wisp_flicker.png",
+   "max": 360,
+   "q": 86
+  },
+  "wisp_cling": {
+   "src": "art/foes/wisp_cling.png",
+   "max": 360,
+   "q": 86
+  },
+  "wisp_gutter": {
+   "src": "art/foes/wisp_gutter.png",
+   "max": 360,
+   "q": 86
+  },
+  "wisp_wail": {
+   "src": "art/foes/wisp_wail.png",
+   "max": 360,
+   "q": 86
+  },
+  "wisp_hurt": {
+   "src": "art/foes/wisp_hurt.png",
+   "max": 360,
+   "q": 86
+  },
+  "wisp_released": {
+   "src": "art/foes/wisp_released.png",
+   "max": 360,
+   "q": 86
+  },
+  "wisp_moth": {
+   "src": "art/foes/wisp_moth.png",
+   "max": 360,
+   "q": 86
+  },
+  "great_front": {
+   "src": "art/foes/great_front.png",
+   "max": 520,
+   "q": 86
+  },
+  "great_sweep": {
+   "src": "art/foes/great_sweep.png",
+   "max": 520,
+   "q": 86
+  },
+  "great_swallow": {
+   "src": "art/foes/great_swallow.png",
+   "max": 520,
+   "q": 86
+  },
+  "great_breath": {
+   "src": "art/foes/great_breath.png",
+   "max": 520,
+   "q": 86
+  },
+  "great_released": {
+   "src": "art/foes/great_released.png",
+   "max": 520,
+   "q": 86
+  },
+  "wraith_idle": {
+   "src": "art/foes/wraith_idle.png",
+   "max": 520,
+   "q": 86
+  },
+  "wraith_idle_turn": {
+   "src": "art/foes/wraith_idle_turn.png",
+   "max": 520,
+   "q": 86
+  },
+  "wraith_side": {
+   "src": "art/foes/wraith_side.png",
+   "max": 520,
+   "q": 86
+  },
+  "wraith_back": {
+   "src": "art/foes/wraith_back.png",
+   "max": 520,
+   "q": 86
+  },
+  "wraith_raise": {
+   "src": "art/foes/wraith_raise.png",
+   "max": 520,
+   "q": 86
+  },
+  "wraith_sweep": {
+   "src": "art/foes/wraith_sweep.png",
+   "max": 520,
+   "q": 86
+  },
+  "wraith_sweep_low": {
+   "src": "art/foes/wraith_sweep_low.png",
+   "max": 520,
+   "q": 86
+  },
+  "wraith_cast": {
+   "src": "art/foes/wraith_cast.png",
+   "max": 520,
+   "q": 86
+  },
+  "wraith_reach": {
+   "src": "art/foes/wraith_reach.png",
+   "max": 520,
+   "q": 86
+  },
+  "wraith_aura": {
+   "src": "art/foes/wraith_aura.png",
+   "max": 520,
+   "q": 86
+  },
+  "wraith_heart": {
+   "src": "art/foes/wraith_heart.png",
+   "max": 520,
+   "q": 86
+  },
+  "wraith_kneel": {
+   "src": "art/foes/wraith_kneel.png",
+   "max": 520,
+   "q": 86
+  }
+ },
+ "meta": {
+  "foes": "art/foes/foes.json"
+ },
+ "code": [
+  "lib/util.js",
+  "jester-square/script.js",
+  "lib/fx.js",
+  "lib/jester.js",
+  "lib/stage.js",
+  "jester-square/world.js",
+  "jester-square/actors.js",
+  "jester-square/fx.js",
+  "jester-square/render.js",
+  "lib/audio.js",
+  "jester-square/score.js",
+  "lib/player.js"
+ ]
+}

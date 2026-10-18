@@ -18,6 +18,11 @@
 //  1:34  She walks away down the boardwalk; the airship crosses the moon.
 
 const DUR = 120;
+const W = 1448, H = 1086;   // the painting
+const POSTER = 13.0;        // the frame shown before Play: her walking in under the moon
+// How big someone standing at ground height y is drawn (1 = native HD frame).
+// The rail is about y 555 and the front of the deck about y 900.
+const depthScale = y => 0.52 + 0.00114 * (y - 555);
 const CLIPS = DATA.clips;
 const clipLen = c => CLIPS[c].n / CLIPS[c].fps;
 const releaseAt = (c, t0) => t0 + (CLIPS[c].release - 1) / CLIPS[c].fps;

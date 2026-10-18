@@ -10,6 +10,7 @@
   - `chriskizer91-ops/follow-me-down-witch-way`
 - When copying assets or code from a sibling repo, note the source repo and path in the commit message.
 - Moon Faire's own docs and lore outrank anything in a sibling repo. Don't bring a sibling's lore, tone rules or mechanics over them.
+- Chris asked (October 18) for Envoi's foes and town art in Moon Faire, and fewer airships. Envoi's retired lore stays out: the Drowned Mother, Old Snuff, the mandrakes and Mother's Hollow.
 
 ## Project
 
@@ -23,15 +24,18 @@
   python3 tools/build_demo.py       # dist/moon-faire-demo.html, everything in one file
   ```
   The demo is published at https://claude.ai/artifact/NvHGfCNmn7Y5eeGBsp94D3. Republish `dist/moon-faire-demo.html` to that link after a rebuild. Keep it under 16 MB so it stays a link; Chris accepts up to 30 MB as a file.
-- `art/backdrops/` holds the stage paintings, copied from `20-min/art/battle/`. `art/fonts/` holds Jacquard 24 (Google Fonts, open licence), embedded for titles.
-- `scenes/jester-night/` is *The Jester's Curtain Call*, a two-minute coded film of the Jester using all ten of her clips. `script.js` holds every time, place and cue, so re-cut the film there. Everything is a pure function of time; the sound is all Web Audio, with no sound files. To build and check it:
+- `art/backdrops/` holds the stage paintings: four from `20-min/art/battle/`, `night-square.webp` from Envoi's `art/backdrops/`, and `town-moonrise.webp` from `20-min/art/stills/moonrise.webp`. `art/fonts/` holds Jacquard 24 (Google Fonts, open licence), embedded for titles.
+- `scenes/` holds the coded films. `scenes/lib/` is shared: the Jester's drawing, effects, camera, the sound engine and the player page. Each film has its own folder: `script.js` (every time, place and cue, so re-cut a film there), `world.js`, `actors.js`, `fx.js`, `render.js`, `score.js`, and `scene.json` (title, words, pictures, code order). Everything is a pure function of time; the sound is all Web Audio, with no sound files.
+  - `jester-night/`: *The Jester's Curtain Call*, on the boardwalk. Published at https://claude.ai/artifact/7U5xf4Qm6iPbN6czP7n32K.
+  - `jester-square/`: *A Fool's Mercy*, in Envoi's night square against Envoi's foes (story: `docs/stories/a-fools-mercy.md`). Published at https://claude.ai/artifact/BdbuhgY9M4cixyJHbyrTmq.
   ```
-  python3 tools/build_scene.py                       # dist/jester-night.html
-  node tools/scene_stills.mjs <dir> 13 30.1 75.2     # stills at chosen seconds, to look at
-  node tools/scene_audio.mjs <file.wav>              # the soundtrack alone
-  node tools/render_video.mjs dist/jester-night.mp4  # the full MP4, about 4 minutes
+  python3 tools/build_scene.py jester-square                                  # dist/jester-square.html
+  SCENE_HTML=dist/jester-square.html node tools/scene_stills.mjs <dir> 30 80  # stills at chosen seconds
+  SCENE_HTML=dist/jester-square.html node tools/scene_audio.mjs <file.wav>    # the soundtrack alone
+  SCENE_HTML=dist/jester-square.html node tools/render_video.mjs dist/jester-square.mp4   # about 4 minutes
   ```
-  The page is published at https://claude.ai/artifact/7U5xf4Qm6iPbN6czP7n32K; republish after a rebuild. The node tools need Playwright (`ln -s /opt/node-tools/node_modules node_modules` in a cloud session).
+  Republish a film's page to its link after a rebuild. The node tools need Playwright (`ln -s /opt/node-tools/node_modules node_modules` in a cloud session).
+- `art/foes/` holds Envoi's foes as sprites, cut by `tools/cut_envoi_foes.py` from the sheets in `art/foes/envoi-sheets/` (copied from Envoi's `reference/art/`). `foes.json` gives each sprite's ground point and pixels per metre.
 - `art-pipeline/` holds the cut frames (`frames/` with `meta.json`), the scripts, the original sheets, the smoothing pack (finished October 18) and `frames_pre_smoothing/`. The scripts still carry paths from the old art workspace (`/home/claude/...`). `tools/hd_lossless.py` repeats `build.py`'s HD step; when a new frame prefix appears in `build.py`, add it there too.
 - Read clips from `manifest.json`. Draw every frame on its anchor, and fire gameplay on `release_frame`. Don't mirror spells, because the costumes are asymmetric.
 - Names for the four, the moon and the planets are still open, so keep text in data files.

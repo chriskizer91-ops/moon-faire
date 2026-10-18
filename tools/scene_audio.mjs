@@ -7,7 +7,7 @@ import path from "node:path";
 const outFile = process.argv[2];
 const dir = path.dirname(path.resolve(outFile));
 const wrapped = path.join(dir, "_audio_page.html");
-fs.writeFileSync(wrapped, '<!doctype html><html><head><meta charset="utf-8"></head><body>' + fs.readFileSync("dist/jester-night.html", "utf8") + "</body></html>");
+fs.writeFileSync(wrapped, '<!doctype html><html><head><meta charset="utf-8"></head><body>' + fs.readFileSync(process.env.SCENE_HTML || "dist/jester-night.html", "utf8") + "</body></html>");
 const browser = await chromium.launch({ executablePath: "/opt/pw-browsers/chromium" }).catch(() => chromium.launch());
 const page = await browser.newPage();
 const errors = [];

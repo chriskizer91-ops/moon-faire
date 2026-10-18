@@ -10,7 +10,7 @@ const fps = Number(process.argv[3] || 30), w = Number(process.argv[4] || 1280), 
 const work = path.join(path.dirname(outFile), "_render");
 fs.mkdirSync(work, { recursive: true });
 const wrapped = path.join(work, "page.html");
-fs.writeFileSync(wrapped, '<!doctype html><html><head><meta charset="utf-8"></head><body>' + fs.readFileSync("dist/jester-night.html", "utf8") + "</body></html>");
+fs.writeFileSync(wrapped, '<!doctype html><html><head><meta charset="utf-8"></head><body>' + fs.readFileSync(process.env.SCENE_HTML || "dist/jester-night.html", "utf8") + "</body></html>");
 
 const browser = await chromium.launch({ executablePath: "/opt/pw-browsers/chromium" }).catch(() => chromium.launch());
 const page = await browser.newPage();

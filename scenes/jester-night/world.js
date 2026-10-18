@@ -1,38 +1,5 @@
-// The stage: the painted boardwalk plus everything coded on top of it.
+// The boardwalk: the painting plus everything coded on top of it.
 // Drawn in painting pixels; the camera transform is already set.
-
-let FOG = null;
-function makeFog() {
-  const c = document.createElement("canvas");
-  c.width = 1024; c.height = 256;
-  const g = c.getContext("2d"), r = rng(7);
-  for (let i = 0; i < 140; i++) {
-    const x = r() * 1024, y = 60 + r() * 140, rad = 30 + r() * 90, a = 0.05 + r() * 0.09;
-    for (const dx of [-1024, 0, 1024]) {
-      const gr = g.createRadialGradient(x + dx, y, 0, x + dx, y, rad);
-      gr.addColorStop(0, `rgba(200,185,235,${a})`);
-      gr.addColorStop(1, "rgba(200,185,235,0)");
-      g.fillStyle = gr;
-      g.fillRect(x + dx - rad, y - rad, rad * 2, rad * 2);
-    }
-  }
-  return c;
-}
-
-function glow(g, x, y, r, rgb, a) {
-  if (a <= 0.003 || r <= 0) return;
-  const gr = g.createRadialGradient(x, y, 0, x, y, r);
-  gr.addColorStop(0, `rgba(${rgb},${a})`);
-  gr.addColorStop(0.4, `rgba(${rgb},${a * 0.35})`);
-  gr.addColorStop(1, `rgba(${rgb},0)`);
-  g.fillStyle = gr;
-  g.fillRect(x - r, y - r, r * 2, r * 2);
-}
-
-function disc(g, x, y, r, fill) {
-  g.fillStyle = fill;
-  g.beginPath(); g.arc(x, y, r, 0, TAU); g.fill();
-}
 
 function lanternLevel(L, t) {
   let v = 1;

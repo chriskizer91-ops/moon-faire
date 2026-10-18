@@ -1,7 +1,7 @@
 // The page: loading, the play/scrub controls, and hooks for the video render.
 
 let BACKDROP = null;
-const IMGS = [], GLOWS = [];
+const IMGS = [], GLOWS = [], ART = {};   // ART: a scene's own named pictures (paintings, foes)
 
 function loadImage(src) {
   return new Promise(res => {
@@ -13,13 +13,15 @@ function loadImage(src) {
 }
 
 async function loadAll(progress) {
-  const list = [DATA.backdrop, ...DATA.imgs, ...DATA.glows];
+  const names = Object.keys(DATA.art || {});
+  const list = [DATA.backdrop, ...DATA.imgs, ...DATA.glows, ...names.map(n => DATA.art[n])];
   let done = 0;
   const tick = () => progress(++done / list.length);
   const [bd, ...rest] = await Promise.all(list.map(s => loadImage(s).then(im => (tick(), im))));
   BACKDROP = bd;
   rest.slice(0, DATA.imgs.length).forEach((im, i) => (IMGS[i] = im));
-  rest.slice(DATA.imgs.length).forEach((im, i) => (GLOWS[i] = im));
+  rest.slice(DATA.imgs.length, DATA.imgs.length + DATA.glows.length).forEach((im, i) => (GLOWS[i] = im));
+  rest.slice(DATA.imgs.length + DATA.glows.length).forEach((im, i) => (ART[names[i]] = im));
   try { await document.fonts.load('40px "Jacquard 24"'); } catch (e) {}
   return IMGS.every(Boolean);
 }
@@ -43,7 +45,6 @@ function wav(buf) {
   const cv = $("#film"), g = cv.getContext("2d");
   const fmt = s => `${Math.floor(s / 60)}:${String(Math.floor(s % 60)).padStart(2, "0")}`;
   let t = 0, playing = false, pb = null, actx = null, muted = false, last = performance.now(), ready = false, started = false;
-  const POSTER = 13.0;   // her walking in under the moon
 
   function fit() {
     const r = cv.getBoundingClientRect(), dpr = Math.min(window.devicePixelRatio || 1, 2);

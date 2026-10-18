@@ -1,0 +1,10 @@
+{
+  "title": "The Jester's Curtain Call",
+  "intro": "Moon Faire. A two-minute night on the boardwalk, using all ten of her moves. Every light, shade, spell and sound is made in code, timed to her real frames.",
+  "footer": "<p>The stage painting is the boardwalk from the 20-min battle backdrops. The Jester's frames come from the Flip Book Art export, drawn on their anchors and played at the speeds Chris chose. The shades, the airship and all the spell effects are coded; the music and every sound are synthesized in the browser.</p><p>Arrow keys skip 5 seconds. Space plays and pauses.</p>",
+  "out": "dist/jester-night.html",
+  "backdrop": "art/backdrops/boardwalk-night.webp",
+  "art": {},
+  "code": ["lib/util.js", "jester-night/script.js", "lib/fx.js", "lib/jester.js", "lib/stage.js", "jester-night/world.js",
+           "jester-night/actors.js", "jester-night/fx.js", "jester-night/render.js", "lib/audio.js", "jester-night/score.js", "lib/player.js"]
+}
