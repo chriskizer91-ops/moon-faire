@@ -396,7 +396,7 @@ const per = Z.avif / Z.frames * 4 / 3;   // base64 makes every byte 4/3 as big i
 const room = lim => Math.max(0, Math.floor((lim - Z.page) / per));
 $("#room").innerHTML = `${Z.frames} HD frames, ${(Z.avif / Z.frames / 1000).toFixed(1)} KB each on average. This page is <b>${MB(Z.page)}</b>. At this quality there's room for about <b>${room(30e6)} more frames</b> before a 30 MB page, or ${room(16e6)} more before the 16 MB limit of a claude.ai link.`;
 const sup = $("#support");
-const SUP = [["avif444", "Full-colour AVIF (frames)"], ["avif420", "Standard AVIF"], ["webp", "WebP (stages)"]];
+const SUP = [["avif444", "Full-colour AVIF (frames)"], ["avif420", "Standard AVIF (stages)"], ["webp", "WebP (the export)"]];
 const support = {};
 SUP.forEach(([k, label]) => {
   const s = document.createElement("span"); s.textContent = label + ": checking"; sup.appendChild(s);

@@ -20,7 +20,7 @@ meta = json.load(open(os.path.join(ROOT, "frames", "meta.json")))
 CAST = {"A04", "A05", "B01", "B10"} | {f"{t}{i:02d}" for t in "CD" for i in range(13, 19)} \
     | {f"K{i:02d}" for i in range(1, 49)} | {f"O{i:02d}" for i in range(1, 25)} \
     | {f"S{i:02d}" for i in range(1, 17)} | {f"{t}{i:02d}" for t in "GRHF" for i in range(24)} \
-    | {f"{t}{i:02d}" for t in "UVEMNPQ" for i in range(1, 30)}
+    | {f"{t}{i:02d}" for t in "UVEMNPQXYJLT" for i in range(1, 30)}
 
 def grp(n):
     t, i = n[0], int(n[1:])
@@ -36,7 +36,7 @@ REF = {g: G["A"] for g in G}
 REF.update(Aside=G["Aside"], B=G["B"], Cside=G["Aside"], Dside=G["Aside"])
 H = {g: G[g] * G["A"] / REF[g] for g in G}
 H["K"] = 2 * H["Cfront"]
-for t in "MNPQUVERHF": H[t] = H["G"]
+for t in "MNPQUVERHFXYJLT": H[t] = H["G"]
 H["I"] = H["A"]
 H["O"] = 2 * H["A"]; H["S"] = 2 * H["A"]; H["W"] = 2 * H["Cside"]
 

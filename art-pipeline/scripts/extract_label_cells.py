@@ -18,6 +18,10 @@ def label_centres(a, bg, n):
     lab, k = nd.label(txt); objs = nd.find_objects(lab)
     blobs = sorted([((s[1].start + s[1].stop) / 2, (s[1].stop - s[1].start)) for s in objs], key=lambda b: b[0])
     blobs = [b for b in blobs if b[1] > 15]
+    while len(blobs) > n:     # big fonts split '22 key' into two blobs: merge the closest pair
+        i = min(range(len(blobs) - 1), key=lambda i: blobs[i + 1][0] - blobs[i][0])
+        (c1, w1), (c2, w2) = blobs[i], blobs[i + 1]; l, r = c1 - w1 / 2, c2 + w2 / 2
+        blobs[i:i + 2] = [((l + r) / 2, r - l)]
     assert len(blobs) == n, (len(blobs), n, blobs)
     return [b[0] for b in blobs], fr, d
 
@@ -38,6 +42,12 @@ def cut(path, n):
         body = m & sel
         lab, kk = nd.label(body); sz = nd.sum(body, lab, range(1, kk + 1))
         main = lab == (np.argmax(sz) + 1)
+        for _ in range(8):      # dark lace leggings can split a figure at the hip: absorb nearby sizeable pieces (boots, shins)
+            near = nd.binary_dilation(main, iterations=18)
+            ids = [i for i in np.unique(lab[near & body]) if i and sz[i - 1] > 60]
+            grown = np.isin(lab, ids)
+            if grown.sum() == main.sum(): break
+            main = grown
         closed = nd.binary_closing(main, iterations=3); filled = nd.binary_fill_holes(closed)
         hl, hn = nd.label(filled & ~closed)                # holes that are just backdrop (between legs, inside an arc) stay open
         for i, sl in enumerate(nd.find_objects(hl)):

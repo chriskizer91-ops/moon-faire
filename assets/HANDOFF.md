@@ -1,6 +1,6 @@
 # Moon Faire: handoff to the game build
 
-Written October 18, 2026 by the Claude session that built the art pipeline in the claude.ai project **Flip Book Art**. This file is for the Claude Code session building the game in the repo.
+Written October 18, 2026 (updated the same day when the Ranger, Herbal Witch and Fox moves were smoothed) by the Claude session that built the art pipeline in the claude.ai project **Flip Book Art**. This file is for the Claude Code session building the game in the repo.
 
 **The split:**
 - **The claude.ai project:** lore, new ideas, and all new art (ChatGPT image generation plus Claude's cutting pipeline).
@@ -33,7 +33,7 @@ Names for the four, the moon's name and the other planets are still open, and ar
 moonfaire_game_assets/
   HANDOFF.md                     this file
   manifest.json                  every clip, frame, fps, anchor and status (generated, don't hand-edit)
-  hd/<character>/<clip>/NN.webp  HD frames, transparent, WebP 90% (~10 MB total)
+  hd/<character>/<clip>/NN.webp  HD frames, transparent, WebP 90% (~14 MB total)
   pixel/moonfaire_pixel_128.png  every frame as 128 px pixel art on one indexed-PNG sheet
   examples/play_clip.html        tested reference player: loads the manifest, draws on anchors, HD or pixel
   design/                        combat design + balance simulator (section 5)
@@ -53,7 +53,7 @@ moonfaire_game_assets/
 - **anchorX / anchorY:** the torso centre and the boot soles, in that frame's own pixels. Draw every frame so its anchor lands on the character's stage position: `drawImage(img, stageX - anchorX*s, stageY - anchorY*s, w*s, h*s)`. Frame sizes differ wildly, because effects like the Witch's deer guardian or the Jester's flail arc make some frames wide. The anchor is what keeps her standing still. Never centre a frame by its box.
 - **One shared scale for every character.** The Jester is about 370 px from boot to hat in HD. The four women's height differences are real, so keep them.
 - **flipX:** `walk_left` reuses the `walk_right` files mirrored about the anchor. Mirroring is fine for walks. Don't mirror spells, because costumes are asymmetric (the Witch's book is in her left hand).
-- **release_frame:** the 1-based frame where the spell's effect fires: damage, heal, projectile launch. Gameplay events fire on that frame, not on the last frame. The Jester's big spells were timed to their real release frames: the sigil peak, the ring sweep. On the 8-key draft moves it's a best guess, so tune it by eye.
+- **release_frame:** the 1-based frame where the spell's effect fires: damage, heal, projectile launch. Gameplay events fire on that frame, not on the last frame. The Jester's big spells were timed to their real release frames: the sigil peak, the ring sweep. On the other three it's the original key pose where the effect leaves her hand, so tune it by eye if a hit feels early or late.
 - **pixel:** each frame's rectangle in the pixel sheet. Every cell is 278×193 with a shared anchor (139, 185). Draw at whole-number scales with smoothing off.
 - **source:** the internal frame name in the art pipeline (for example K01). Use it to trace a frame back if something looks wrong.
 
@@ -75,14 +75,17 @@ Speeds are Chris's choices, made by watching each clip in the flipbook. Keep the
 | Jester | gilded_rebuke (flail attack) | 8 | 4 | 5 | done |
 | Jester | hush | 29 | 6 | 17 | done |
 | Jester | gravity | 15 | 9 | 11 | done |
-| Ranger | moonsteel_draw, silver_arrow | 8 | 6 | 5 | draft: 2 finishing frames each in progress |
-| Ranger | silverglass_ward | 8 | 4 | 5 | draft: becoming 11 frames |
-| Herbal Witch | harvest_crescent | 8 | 4 | 5 | draft: becoming 12 frames at 6 fps |
-| Herbal Witch | silverleaf_salve, elderwood_guardian | 8 | 2 | 6 / 5 | draft: becoming 22 frames at 6 fps |
-| Fox | hemline_fangs | 8 | 4 | 5 | draft: becoming 12 frames at 6 fps |
-| Fox | blue_mischief, borrowed_face | 8 | 2 | 6 / 4 | draft: becoming 22 frames at 6 fps |
+| Ranger | moonsteel_draw | 10 | 6 | 5 | done (8 keys + 2 finishing frames) |
+| Ranger | silver_arrow | 10 | 6 | 5 | done (8 keys + 2 finishing frames) |
+| Ranger | silverglass_ward | 11 | 4 | 6 | done (shield build-up and dispersal in-betweens; full shield held 2 frames) |
+| Herbal Witch | harvest_crescent | 12 | 6 | 8 | done |
+| Herbal Witch | silverleaf_salve | 22 | 6 | 16 | done |
+| Herbal Witch | elderwood_guardian | 22 | 6 | 13 | done |
+| Fox | hemline_fangs | 12 | 6 | 7 | done |
+| Fox | blue_mischief | 22 | 6 | 16 | done |
+| Fox | borrowed_face | 22 | 6 | 10 | done |
 
-The drafts are complete, playable moves, only choppier. Build with them now, and when the smoothed versions arrive the manifest swaps in with the same clip names.
+All 18 clips are final. The smoothed moves kept their clip names and their cast times, so release times in seconds match the 8-frame drafts: (release_frame − 1) / fps gives the same timing the balance sim uses. The 8-frame drafts are gone from the manifest. If you built against them, nothing changes but frame counts, which you read from the manifest anyway.
 
 **Not drawn yet:**
 - **Ranger, Witch and Fox:** idle, walks, hit, defeat and victory.
@@ -98,8 +101,8 @@ Use placeholders and ask Chris; new art comes from the project, not the repo.
 1. **Data-driven.** Read clips from `manifest.json`. Don't hard-code frame counts, sizes or file names. They will change when new art lands.
 2. **Anchor every frame** (section 2). This is the single most important rule.
 3. **Fire gameplay on `release_frame`.** Cast time = (release_frame − 1) / fps. Recovery is the rest of the clip. One-shot moves return to idle when they end.
-4. **Preload per character.** Load a character's clips when she joins the scene. Decoded HD memory today: Jester ≈ 67 MB, each of the other three ≈ 8–9 MB, ≈ 91 MB total. That fits on a phone, but it grows quickly as moves are smoothed (the Jester alone took 48 frames for one spell). Release clips you're not using, and don't decode everything at boot.
-5. **The pixel sheet is 2780 × 7141.** That's above the 4096 texture limit of some phones and older GPUs. If you draw pixel mode through WebGL, split the sheet per character in a build step. 2D canvas `drawImage` from it is fine.
+4. **Preload per character.** Load a character's clips when she joins the scene. Decoded HD memory today: Jester ≈ 67 MB, Herbal Witch ≈ 23 MB, Fox ≈ 20 MB, Ranger ≈ 11 MB, ≈ 120 MB total. That fits on a phone, but it grows with every move drawn (7 more each are planned). Release clips you're not using, and don't decode everything at boot.
+5. **The pixel sheet is 2780 × 9264.** That's above the 4096 texture limit of some phones and older GPUs. If you draw pixel mode through WebGL, split the sheet per character in a build step. 2D canvas `drawImage` from it is fine.
 6. **Choose HD or pixel per scene, not per frame.** Both share anchors, so the switch is free. HD suits close-ups, the gallery and cutscenes; pixel 128 suits a battle line-up of many sprites.
 7. **Leave the art alone.** No recolouring, cropping or rescaling of individual frames in the repo. If a frame looks wrong, report its `source` name to Chris and it gets fixed in the pipeline.
 
@@ -153,7 +156,7 @@ These come from Chris's own experience across his game projects (Thareia, Envoi,
 3. **Re-export:** Claude regenerates this folder (`manifest.json`, `hd/`, `pixel/`).
 4. **Replace:** Chris drops the new folder into the repo, replacing the old one. Clip names stay stable; frame counts and anchors change.
 
-The pipeline itself (raw cut frames, frame data, scripts, original sheets) ships separately as `moonfaire_art_pipeline_part1-of-N.zip` and the parts after it. Each part is under 20 MB; unzip them all into the same folder. Keep it somewhere safe, for example a `art-pipeline/` folder in the repo, so any future art session can pick up exactly where this one stopped. The scripts carry paths from the art session's workspace, so adjust them before running.
+The pipeline itself (raw cut frames, frame data, scripts, original sheets) ships separately as `moonfaire_art_pipeline_part1-of-N.zip` and the parts after it. Each part is under 20 MB; unzip them all into the same folder. The smoothing round added `moonfaire_art_pipeline_smoothing_update_part1-of-2.zip` and `part2-of-2`: unzip those on top of the six parts, overwriting files. Keep it somewhere safe, for example a `art-pipeline/` folder in the repo, so any future art session can pick up exactly where this one stopped. The scripts carry paths from the art session's workspace, so adjust them before running.
 
 ---
 

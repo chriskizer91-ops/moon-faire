@@ -25,8 +25,8 @@ CAST = [
 ]
 BACKDROPS = [("Boardwalk", "boardwalk-night.webp"), ("Clearing", "clearing-night.webp"),
              ("Cottage", "cottage-night.webp"), ("Fen", "open-fen-night.webp")]
-SAMPLES = [("Jester", "jester", "curtain_call", 31), ("Fox", "fox", "blue_mischief", 6),
-           ("Witch", "herbal_witch", "elderwood_guardian", 4)]
+SAMPLES = [("Jester", "jester", "curtain_call", 31), ("Fox", "fox", "blue_mischief", 15),
+           ("Witch", "herbal_witch", "elderwood_guardian", 12)]   # each one's release frame (0-based)
 
 
 def uri(data, mime):
@@ -104,7 +104,8 @@ def main():
                  avif420=uri(enc(t, "AVIF", quality=70, subsampling="4:2:0"), "image/avif"),
                  webp=uri(enc(t, "WEBP", quality=90), "image/webp"))
 
-    backdrops = [dict(name=n, uri=uri(open(os.path.join(ROOT, "art", "backdrops", p), "rb").read(), "image/webp"))
+    # the paintings go in as standard AVIF too, about half their WebP size
+    backdrops = [dict(name=n, uri=uri(enc(Image.open(os.path.join(ROOT, "art", "backdrops", p)).convert("RGB"), "AVIF", quality=55, speed=6), "image/avif"))
                  for n, p in BACKDROPS]
     cell = man["pixel"]["cell"]
     data = dict(chars=chars, imgs=imgs, backdrops=backdrops, compare=compare, tests=tests, sizes=sizes,

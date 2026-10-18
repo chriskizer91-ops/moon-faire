@@ -1,0 +1,95 @@
+<title>The Jester's Curtain Call</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<style>
+@font-face{font-family:"Jacquard 24";src:url(data:font/woff2;base64,/*FONT*/) format("woff2");font-display:block}
+/* Layout: a cinema screen first, a thin control rail under it, then the chapter list.
+   One dark look on purpose, the same as the Moon Faire flipbook: the film is night-purple. */
+:root{
+  --velvet:#17121e;      /* page ground, black plum */
+  --curtain:#221a2c;     /* raised panels */
+  --gold:#d6a84e;        /* veil trim: progress, current chapter */
+  --veil:#b8407e;        /* magenta chiffon */
+  --pendant:#3fc2b4;     /* turquoise pendant: focus */
+  --ink:#efe6f2;
+  --muted:#a597b3;
+  --line:#3a3049;
+  --f-display:"Jacquard 24", Georgia, serif;
+  --f-body:system-ui, -apple-system, "Segoe UI", sans-serif;
+  --f-mono:ui-monospace, "SFMono-Regular", Menlo, monospace;
+  color-scheme:dark;
+}
+html,body{background:var(--velvet);color:var(--ink)}
+body{font-family:var(--f-body);font-size:15px;line-height:1.5}
+.wrap{max-width:1120px;margin:0 auto;padding-left:max(16px, env(safe-area-inset-left, 0px));padding-right:max(16px, env(safe-area-inset-right, 0px));padding-block:18px 40px;display:grid;gap:16px}
+header{display:flex;flex-wrap:wrap;align-items:baseline;gap:2px 16px}
+h1{font-family:var(--f-display);font-weight:400;font-size:clamp(34px, 7vw, 56px);line-height:.95;margin:0;color:var(--gold);text-wrap:balance}
+header p{margin:0;color:var(--muted);max-width:60ch}
+.mono{font-family:var(--f-mono);font-variant-numeric:tabular-nums}
+
+#screen{position:relative;aspect-ratio:16 / 9;max-width:100%;background:#000;border:1px solid var(--line);border-radius:4px;overflow:hidden}
+#film{display:block;width:100%;height:100%}
+#cover{position:absolute;inset:0;display:grid;place-items:center;background:linear-gradient(0deg, rgba(10,6,16,.65), rgba(10,6,16,.15))}
+#bigplay{display:grid;justify-items:center;gap:6px;background:rgba(23,18,30,.82);border:1px solid var(--gold);border-radius:6px;padding:14px 26px;color:var(--ink);font:inherit;cursor:pointer}
+#bigplay svg{width:42px;height:42px;fill:var(--gold)}
+#bigplay small{color:var(--muted)}
+#loading{display:grid;gap:8px;justify-items:center;color:var(--muted);font-size:14px}
+.bar{width:min(260px, 60vw);height:4px;background:var(--line);border-radius:2px;overflow:hidden}
+#loadbar{height:100%;width:0;background:var(--gold)}
+#loadnote{color:var(--veil)}
+
+.rail{display:flex;align-items:center;gap:12px;flex-wrap:wrap}
+button{font:inherit;color:var(--ink);background:var(--curtain);border:1px solid var(--line);border-radius:4px;padding:6px 10px;cursor:pointer;line-height:1.25}
+button:hover{border-color:var(--muted)}
+button:focus-visible,input:focus-visible{outline:2px solid var(--pendant);outline-offset:2px}
+#play{width:44px;height:36px;display:grid;place-items:center;padding:0}
+#play svg{width:18px;height:18px;fill:currentColor}
+#time{color:var(--muted);font-size:13px;min-width:92px}
+.scrubwrap{position:relative;flex:1 1 220px;min-width:0;display:grid}
+#scrub{width:100%;accent-color:var(--gold);margin:0}
+#ticks{position:relative;height:6px}
+#ticks i{position:absolute;top:0;width:1px;height:6px;background:var(--muted);opacity:.6}
+#mute[aria-pressed="true"]{color:var(--muted)}
+#chapters{display:flex;flex-wrap:wrap;gap:6px}
+#chapters button{font-size:13px;padding:5px 9px}
+#chapters button .mono{color:var(--muted);font-size:12px;margin-right:2px}
+#chapters button[aria-current="true"]{border-color:var(--gold);background:color-mix(in srgb, var(--gold) 14%, var(--curtain))}
+footer{color:var(--muted);font-size:13px;border-top:1px solid var(--line);padding-top:12px}
+footer p{margin:0 0 6px;max-width:80ch}
+</style>
+
+<div class="wrap">
+  <header>
+    <h1>The Jester's Curtain Call</h1>
+    <p>Moon Faire. A two-minute night on the boardwalk, using all ten of her moves. Every light, shade, spell and sound is made in code, timed to her real frames.</p>
+  </header>
+
+  <div id="screen">
+    <canvas id="film" aria-label="The film"></canvas>
+    <div id="cover">
+      <div id="loading"><span>Loading the Jester's frames</span><div class="bar"><div id="loadbar"></div></div></div>
+      <button id="bigplay" hidden><svg viewBox="0 0 20 20"><path d="M5 3v14l12-7z"/></svg><span>Play the film</span><small>2:00 · sound on</small></button>
+    </div>
+  </div>
+  <p id="loadnote" hidden>Some of her frames didn't load in this browser, so she may be missing from parts of the film.</p>
+
+  <div class="rail">
+    <button id="play" aria-label="Play"><svg viewBox="0 0 20 20" id="playicon"><path d="M5 3v14l12-7z"/></svg></button>
+    <span id="time" class="mono">0:00 / 2:00</span>
+    <div class="scrubwrap">
+      <input type="range" id="scrub" min="0" max="120" step="0.01" value="0" aria-label="Position in the film">
+      <div id="ticks"></div>
+    </div>
+    <button id="mute" aria-pressed="false">Sound on</button>
+  </div>
+  <div id="chapters" aria-label="Chapters"></div>
+
+  <footer>
+    <p>The stage painting is the boardwalk from the 20-min battle backdrops. The Jester's frames come from the Flip Book Art export, drawn on their anchors and played at the speeds Chris chose. The shades, the airship and all the spell effects are coded; the music and every sound are synthesized in the browser.</p>
+    <p>Arrow keys skip 5 seconds. Space plays and pauses.</p>
+  </footer>
+</div>
+
+<script>
+const DATA = /*DATA*/null;
+/*CODE*/
+</script>

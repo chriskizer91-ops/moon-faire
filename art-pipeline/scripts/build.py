@@ -2,7 +2,7 @@ from PIL import Image
 import numpy as np, json, os, io, base64
 from scipy import ndimage as nd
 meta=json.load(open("frames/meta.json"))
-CAST={"A04","A05","B01","B10"}|{f"{t}{i:02d}" for t in "CD" for i in range(13,19)}|{f"K{i:02d}" for i in range(1,49)}|{f"O{i:02d}" for i in range(1,25)}|{f"S{i:02d}" for i in range(1,17)}|{f"{t}{i:02d}" for t in "GRHF" for i in range(24)}|{f"{t}{i:02d}" for t in "UVEMNPQ" for i in range(1,30)}
+CAST={"A04","A05","B01","B10"}|{f"{t}{i:02d}" for t in "CD" for i in range(13,19)}|{f"K{i:02d}" for i in range(1,49)}|{f"O{i:02d}" for i in range(1,25)}|{f"S{i:02d}" for i in range(1,17)}|{f"{t}{i:02d}" for t in "GRHF" for i in range(24)}|{f"{t}{i:02d}" for t in "UVEMNPQXYJLT" for i in range(1,30)}
 os.makedirs("hd",exist_ok=True); os.makedirs("px",exist_ok=True)
 frames={}
 # 1) clean strays
@@ -31,12 +31,13 @@ for t,fr in meta.items():
     for m in fr: hts.setdefault(grp(m['name']),[]).append(m['footY']-m['bodyTop'])
 G={g:np.percentile(v,25) for g,v in hts.items()}
 # same character, same scale: match each group to the original sheet's matching view
-REF={"M":G["A"],"N":G["A"],"P":G["A"],"Q":G["A"],"U":G["A"],"V":G["A"],"E":G["A"],"I":G["A"],"G":G["A"],"R":G["A"],"H":G["A"],"F":G["A"],"K":G["A"],"O":G["A"],"S":G["A"],"W":G["A"],"A":G["A"],"Aside":G["Aside"],"B":G["B"],"Cside":G["Aside"],"Cfront":G["A"],"Dside":G["Aside"],"Dfront":G["A"]}
+REF={"X":G["A"],"Y":G["A"],"J":G["A"],"L":G["A"],"T":G["A"],"M":G["A"],"N":G["A"],"P":G["A"],"Q":G["A"],"U":G["A"],"V":G["A"],"E":G["A"],"I":G["A"],"G":G["A"],"R":G["A"],"H":G["A"],"F":G["A"],"K":G["A"],"O":G["A"],"S":G["A"],"W":G["A"],"A":G["A"],"Aside":G["Aside"],"B":G["B"],"Cside":G["Aside"],"Cfront":G["A"],"Dside":G["Aside"],"Dfront":G["A"]}
 H={g:G[g]*G["A"]/REF[g] for g in G}     # effective height after normalising to set A
 H["K"]=2*H["Cfront"]                      # in-between sets are stored at 2x of their key sheet
 H["M"]=H["G"]; H["N"]=H["G"]; H["P"]=H["G"]; H["Q"]=H["G"]
 H["U"]=H["G"]; H["V"]=H["G"]; H["E"]=H["G"]; H["I"]=H["A"]   # cut + scaled onto their own keys
-H["R"]=H["G"]; H["H"]=H["G"]; H["F"]=H["G"]   # all four drawn on one shared scale; keep their true relative heights
+H["R"]=H["G"]; H["H"]=H["G"]; H["F"]=H["G"]
+for t in "XYJLT": H[t]=H["G"]   # smoothed sequences: cut + scaled onto their own keys   # all four drawn on one shared scale; keep their true relative heights
 H["O"]=2*H["A"]; H["S"]=2*H["A"]; H["W"]=2*H["Cside"]
 print("groups",{k:round(v) for k,v in G.items()})
 TARGET_PX=128   # pixel-art body height (hat top to sole)
@@ -95,6 +96,12 @@ for i,nm in enumerate(names):
 Image.fromarray(sheet,"RGBA").save("jester_witch_spritesheet.png")
 Image.fromarray(sheet,"RGBA").resize((sheet.shape[1]*4,sheet.shape[0]*4),Image.NEAREST).save("jester_witch_spritesheet_4x.png")
 out.update(cell=dict(w=CW,h=CH,anchorX=CW//2,anchorY=AY),palette=pal.tolist())
+def ALL(t): return [m["name"] for m in meta[t]]
+def KEYS(t):   # the original 8 key poses inside a smoothed sequence (the 8-frame draft)
+    out_, seen = [], set()
+    for m in meta[t]:
+        if m.get("src", "new") != "new" and m["src"] not in seen: seen.add(m["src"]); out_.append(m["name"])
+    return out_
 out["animations"]={
  "walk_right":dict(frames=[f"C{i:02d}" for i in range(8)],fps=10,loop=True),
  "walk_left":dict(frames=[f"C{i:02d}" for i in range(8)],fps=10,loop=True,flip=True),
@@ -111,10 +118,19 @@ out["animations"]={
  "jester_rebuke":dict(frames=[f"G{i:02d}" for i in range(0,8)],fps=4,loop=True),
  "jester_hush":dict(frames=[f"G{i:02d}" for i in range(8,16)],fps=2,loop=True),
  "jester_gravity":dict(frames=[f"G{i:02d}" for i in range(16,24)],fps=5,loop=True),
- "witch_crescent_v2":dict(frames=[f"M{i:02d}" for i in range(1,9)],fps=6,loop=True),
- "witch_salve_v2":dict(frames=[f"N{i:02d}" for i in range(1,9)],fps=6,loop=True),
- "witch_guardian_v2":dict(frames=[f"P{i:02d}" for i in range(1,9)],fps=6,loop=True),
- "fox_fangs_v2":dict(frames=[f"Q{i:02d}" for i in range(1,9)],fps=6,loop=True),
+ "witch_crescent_v2":dict(frames=KEYS("M"),fps=6,loop=True),
+ "witch_salve_v2":dict(frames=KEYS("N"),fps=6,loop=True),
+ "witch_guardian_v2":dict(frames=KEYS("P"),fps=6,loop=True),
+ "fox_fangs_v2":dict(frames=KEYS("Q"),fps=6,loop=True),
+ "witch_crescent12":dict(frames=ALL("M"),fps=6,loop=True),
+ "witch_salve22":dict(frames=ALL("N"),fps=6,loop=True),
+ "witch_guardian22":dict(frames=ALL("P"),fps=6,loop=True),
+ "fox_fangs12":dict(frames=ALL("Q"),fps=6,loop=True),
+ "fox_mischief22":dict(frames=ALL("X"),fps=6,loop=True),
+ "fox_face22":dict(frames=ALL("Y"),fps=6,loop=True),
+ "ranger_draw10":dict(frames=ALL("J"),fps=6,loop=True),
+ "ranger_arrow10":dict(frames=ALL("L"),fps=6,loop=True),
+ "ranger_ward11":dict(frames=ALL("T"),fps=4,loop=True),
  "jester_hush29":dict(frames=[f"U{i:02d}" for i in range(1,30)],fps=6,loop=True),
  "jester_gravity15":dict(frames=[f"V{i:02d}" for i in range(1,16)],fps=9,loop=True),
  "jester_rebuke_v2":dict(frames=[f"E{i:02d}" for i in range(1,9)],fps=4,loop=True),
