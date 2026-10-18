@@ -1,0 +1,188 @@
+<title>Jester Witch Flipbook</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Jacquard+24&family=Atkinson+Hyperlegible:wght@400;700&family=JetBrains+Mono:wght@400;600&display=swap">
+<style>
+/* Layout: one stage like a puppet theatre, controls underneath, clip list as velvet chips, frame strip as a film reel. Single dark look on purpose: sprites read best on the night-purple they were painted on. */
+:root{
+  --velvet:#17121e;      /* page ground, black plum */
+  --curtain:#221a2c;     /* raised panels */
+  --stage:#383043;       /* the sprites' own backdrop, so sheer veils blend seamlessly */
+  --gold:#d6a84e;        /* veil trim */
+  --veil:#b8407e;        /* magenta chiffon */
+  --pendant:#3fc2b4;     /* turquoise pendant, focus + active */
+  --ink:#efe6f2;
+  --muted:#a597b3;
+  --line:#3a3049;
+  --f-display:"Jacquard 24", "Georgia", serif;
+  --f-body:"Atkinson Hyperlegible", system-ui, -apple-system, "Segoe UI", sans-serif;
+  --f-mono:"JetBrains Mono", ui-monospace, "SFMono-Regular", Menlo, monospace;
+  color-scheme:dark;
+}
+html,body{background:var(--velvet);color:var(--ink)}
+body{font-family:var(--f-body);font-size:15px;line-height:1.5;
+  padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));padding-block:20px 40px}
+.wrap{max-width:860px;margin:0 auto;display:flex;flex-direction:column;gap:18px}
+header{display:flex;flex-wrap:wrap;align-items:baseline;gap:4px 14px}
+h1{font-family:var(--f-display);font-weight:400;font-size:clamp(40px,9vw,64px);line-height:.95;margin:0;color:var(--gold);letter-spacing:.01em;text-wrap:balance}
+.sub{color:var(--muted);font-size:14px;margin:0;max-width:52ch}
+.stagebox{position:relative;background:var(--stage);border:1px solid var(--line);border-radius:6px;overflow:hidden;aspect-ratio:540/470;max-width:100%}
+.stagebox.checker{background:repeating-conic-gradient(#3b3550 0 25%,#302b42 0 50%) 0 0/24px 24px}
+.stagebox.parch{background:#d9c9a8}
+canvas#stage{display:block;width:100%;height:100%}
+.stagebox.px canvas#stage{image-rendering:pixelated}
+.hud{position:absolute;left:10px;top:8px;font-family:var(--f-mono);font-size:12px;color:var(--muted);background:color-mix(in srgb,var(--velvet) 70%,transparent);padding:2px 8px;border-radius:4px;font-variant-numeric:tabular-nums}
+.stagebox.parch .hud{color:#3b2f22;background:#efe3c8cc}
+.label{font-family:var(--f-mono);font-size:11px;letter-spacing:.12em;text-transform:uppercase;color:var(--muted);margin:0 0 6px}
+.clips{display:flex;flex-wrap:wrap;gap:8px}
+.grp{flex-basis:100%;margin:8px 0 0;font:11px var(--f-mono);letter-spacing:.12em;text-transform:uppercase;color:var(--gold)}
+.grp:first-child{margin-top:0}
+.chip{font:600 14px var(--f-body);color:var(--ink);background:var(--curtain);border:1px solid var(--line);padding:7px 13px;border-radius:999px;cursor:pointer}
+.chip:hover{border-color:var(--veil)}
+.chip[aria-pressed="true"]{background:var(--veil);border-color:var(--veil);color:#fff}
+.bar{display:flex;flex-wrap:wrap;gap:10px 16px;align-items:center;background:var(--curtain);border:1px solid var(--line);border-radius:6px;padding:10px 12px}
+.btn{font:600 14px var(--f-body);background:var(--velvet);color:var(--ink);border:1px solid var(--line);border-radius:5px;padding:7px 12px;cursor:pointer;min-width:40px}
+.btn.primary{background:var(--gold);color:#1b1408;border-color:var(--gold);min-width:78px}
+.seg{display:inline-flex;border:1px solid var(--line);border-radius:5px;overflow:hidden}
+.seg button{font:600 13px var(--f-body);background:var(--velvet);color:var(--muted);border:0;padding:7px 11px;cursor:pointer}
+.seg button[aria-pressed="true"]{background:var(--pendant);color:#08201d}
+.fps{display:flex;align-items:center;gap:8px;font-family:var(--f-mono);font-size:13px;color:var(--muted);font-variant-numeric:tabular-nums}
+.fps input{accent-color:var(--gold);width:110px}
+.tog{display:flex;align-items:center;gap:6px;font-size:14px;color:var(--muted);cursor:pointer}
+.tog input{accent-color:var(--pendant)}
+.strip{display:flex;gap:8px;overflow-x:auto;padding-bottom:6px}
+.strip button{flex:0 0 auto;background:var(--stage);border:2px solid transparent;border-radius:5px;padding:2px;cursor:pointer;display:flex;flex-direction:column;align-items:center;gap:2px}
+.strip button[aria-current="true"]{border-color:var(--pendant)}
+.strip img{height:96px;width:auto;image-rendering:pixelated;display:block}
+.strip span{font:11px var(--f-mono);color:var(--muted)}
+section{display:flex;flex-direction:column;gap:8px}
+.sheet{background:var(--stage);border:1px solid var(--line);border-radius:6px;overflow-x:auto}
+.sheet img{display:block;image-rendering:pixelated;width:min(100%,1376px);max-width:none;min-width:640px}
+.notes{color:var(--muted);font-size:14px;max-width:65ch;margin:0}
+.notes b{color:var(--ink)}
+:focus-visible{outline:2px solid var(--pendant);outline-offset:2px}
+@media (prefers-reduced-motion:reduce){.chip,.btn{transition:none}}
+</style>
+
+<div class="wrap">
+  <header>
+    <h1>Moon Faire</h1>
+    <p class="sub">All four performers, cut from their sprite sheets and pinned at the boots so every clip plays without drifting.</p>
+  </header>
+
+  <div>
+    <p class="label">Clip</p>
+    <div class="clips" id="clips"></div>
+  </div>
+
+  <div class="stagebox" id="stagebox">
+    <canvas id="stage" aria-label="Animated sprite"></canvas>
+    <div class="hud" id="hud">A00 · 1/6</div>
+  </div>
+
+  <div class="bar">
+    <button class="btn" id="prev" aria-label="Previous frame">◀</button>
+    <button class="btn primary" id="play">Pause</button>
+    <button class="btn" id="next" aria-label="Next frame">▶</button>
+    <label class="fps" for="fps">FPS <input type="range" id="fps" min="1" max="24" step="1" value="6"><span id="fpsv">5</span></label>
+    <div class="seg" role="group" aria-label="Render style">
+      <button id="mHD" aria-pressed="true">HD</button><button id="mPX" aria-pressed="false">Pixel 128</button>
+    </div>
+    <div class="seg" role="group" aria-label="Backdrop">
+      <button data-bg="" aria-pressed="true">Night</button><button data-bg="checker" aria-pressed="false">Alpha</button><button data-bg="parch" aria-pressed="false">Parchment</button>
+    </div>
+    <label class="tog" for="onion"><input type="checkbox" id="onion"> Onion skin</label>
+  </div>
+
+  <section>
+    <p class="label">Frames in this clip</p>
+    <div class="strip" id="strip"></div>
+  </section>
+
+  <section>
+    <p class="label" id="sheetlabel">Pixel sprite sheet</p>
+    <div class="sheet"><img id="sheetimg" alt="Pixel sprite sheet of all 31 frames"></div>
+    <p class="notes" id="sheetnotes"></p>
+  </section>
+</div>
+
+<script>
+const HD=/*HD*/{};
+const SHEET="/*SHEET*/";
+const META=/*META*/{};
+const CLIPS=[
+ ["#","Jester"],["cast48","Curtain Call"],["cast_orb24","Sealed Fate"],["skyward16","Against All Odds"],["jester_rebuke_v2","Gilded Rebuke"],["jester_hush29","Hush"],["jester_gravity15","Gravity"],
+ ["walk_right16","Walk right"],["walk_left16","Walk left"],["walk_toward","Walk toward"],["idle_breath","Idle"],["walk_away","Walk away"],["turnaround","Turnaround"],
+ ["#","Ranger"],["ranger_draw","Moonsteel Draw"],["ranger_arrow","Silver Arrow"],["ranger_ward","Silverglass Ward"],
+ ["#","Herbal Witch"],["witch_crescent_v2","Harvest Crescent"],["witch_salve_v2","Silverleaf Salve"],["witch_guardian_v2","Elderwood Guardian"],
+ ["#","Fox"],["fox_fangs_v2","Hemline Fangs"],["fox_mischief","Blue Mischief"],["fox_face","Borrowed Face"],
+ ["#","Older drafts"],["witch_crescent","Harvest Crescent · first"],["witch_salve","Silverleaf Salve · first"],["witch_guardian","Elderwood Guardian · first"],["fox_fangs","Hemline Fangs · first"],["jester_rebuke","Gilded Rebuke · 8 old"],["jester_hush","Hush · 8 old"],["jester_gravity","Gravity · 8 old"],["idle_front","Idle · old"],["walk_right_b","Walk right II"],["walk_toward_b","Walk toward II"],["cast_b","Cast II"],["alt_cast","Swirl"],["alt_turn","Turn (alt)"],
+ ["cast","Cast · 12 old"],["cast_orb","Orb · 6 old"],["cast_skyward","Skyward · 4 old"],["walk_right","Walk · 8 old"]];
+const cv=document.getElementById('stage'),ctx=cv.getContext('2d'),box=document.getElementById('stagebox');
+const LW=540,LH=470;   // logical stage units; the backing store follows the screen's real pixels
+function fit(){const r=box.getBoundingClientRect(),dpr=Math.min(window.devicePixelRatio||1,3);
+  cv.width=Math.max(1,Math.round(r.width*dpr));cv.height=Math.max(1,Math.round(r.height*dpr));}
+const CW=META.cell.w,CH=META.cell.h,AX=META.cell.anchorX,AY=META.cell.anchorY;
+const PXS=3, FOOT={x:270,y:448};               // pixel frames drawn at 3x; stage anchor at the soles
+const HDS=(128*PXS)/362;                        // HD frames scaled to match pixel height
+const NF=Object.keys(META.frames).length;
+document.getElementById('sheetlabel').textContent=`Pixel sprite sheet · ${NF} frames · ${CW}×${CH} cells · ${META.palette.length} colours`;
+document.getElementById('sheetnotes').innerHTML=`Every frame shares one <b>${META.palette.length}-colour palette</b> and one anchor point (x ${AX}, y ${AY} in each cell): the torso sits on x, the boot soles on y. In a game, draw the cell at the character's feet and every pose lines up. Walk left is walk right drawn mirrored. Frames C and D are your new walk and cast sheets; A and B are the originals.`;
+const imgs={},sheet=new Image();sheet.src=SHEET;document.getElementById('sheetimg').src=SHEET;
+for(const k in HD){const i=new Image();i.src=HD[k];imgs[k]=i}
+let clip="idle_front",fi=0,playing=true,mode="hd",fps=5,last=0,onion=false;
+function frames(){return META.animations[clip].frames}
+function drawFrame(name,alpha){
+  ctx.save();ctx.globalAlpha=alpha;
+  if(fitK<1){ctx.translate(FOOT.x,FOOT.y);ctx.scale(fitK,fitK);ctx.translate(-FOOT.x,-FOOT.y)}  // zoom out so the whole clip fits
+  if(META.animations[clip].flip){ctx.translate(FOOT.x*2,0);ctx.scale(-1,1)}   // walk left = walk right mirrored
+  if(mode==="px"){const f=META.frames[name];ctx.imageSmoothingEnabled=false;
+    ctx.drawImage(sheet,f.x,f.y,CW,CH,FOOT.x-AX*PXS,FOOT.y-AY*PXS,CW*PXS,CH*PXS);}
+  else{const f=META.frames[name],im=imgs[name];if(!im.complete)return;ctx.imageSmoothingEnabled=true;ctx.imageSmoothingQuality="high";
+    ctx.drawImage(im,FOOT.x-f.hdFootX*HDS,FOOT.y-f.hdFootY*HDS,f.hdW*HDS,f.hdH*HDS);}
+  ctx.restore();
+}
+function render(){
+  ctx.setTransform(cv.width/LW,0,0,cv.height/LH,0,0);ctx.clearRect(0,0,LW,LH);
+  const fr=frames();
+  if(onion&&fr.length>1)drawFrame(fr[(fi-1+fr.length)%fr.length],.28);
+  drawFrame(fr[fi],1);
+  document.getElementById('hud').textContent=`${fr[fi]} · ${fi+1}/${fr.length}`;
+  document.querySelectorAll('#strip button').forEach((b,i)=>b.setAttribute('aria-current',i===fi));
+}
+function buildStrip(){
+  const s=document.getElementById('strip');s.innerHTML="";
+  frames().forEach((n,i)=>{const b=document.createElement('button');b.setAttribute('aria-label',`Frame ${i+1}, ${n}`);
+    const im=new Image();im.src=HD[n];im.alt="";if(META.animations[clip].flip)im.style.transform="scaleX(-1)";const t=document.createElement('span');t.textContent=n;
+    b.append(im,t);b.onclick=()=>{fi=i;setPlaying(false);render()};s.append(b)});
+}
+let fitK=1;
+function fitClip(c){  // largest extent of any frame in this clip, in stage units, around the foot anchor
+  let up=0,side=0;
+  for(const n of META.animations[c].frames){const f=META.frames[n];
+    up=Math.max(up,f.hdFootY*HDS, mode==="px"?AY*PXS:0);
+    side=Math.max(side,f.hdFootX*HDS,(f.hdW-f.hdFootX)*HDS);}
+  fitK=Math.min(1,(FOOT.y-10)/up,(LW/2-8)/side);
+}
+function setClip(c){clip=c;fitClip(c);fi=0;fps=META.animations[c].fps;document.getElementById('fps').value=fps;document.getElementById('fpsv').textContent=fps;
+  document.querySelectorAll('.chip').forEach(b=>b.setAttribute('aria-pressed',b.dataset.c===c));buildStrip();render();
+  try{localStorage.setItem('jw-clip',c)}catch(e){}}
+function setPlaying(p){playing=p;document.getElementById('play').textContent=p?"Pause":"Play"}
+const cl=document.getElementById('clips');
+CLIPS.forEach(([k,l])=>{if(k==='#'){const h=document.createElement('p');h.className='grp';h.textContent=l;cl.append(h);return}const b=document.createElement('button');b.className='chip';b.dataset.c=k;b.textContent=l;b.onclick=()=>setClip(k);cl.append(b)});
+document.getElementById('play').onclick=()=>setPlaying(!playing);
+document.getElementById('prev').onclick=()=>{setPlaying(false);fi=(fi-1+frames().length)%frames().length;render()};
+document.getElementById('next').onclick=()=>{setPlaying(false);fi=(fi+1)%frames().length;render()};
+document.getElementById('fps').oninput=e=>{fps=+e.target.value;document.getElementById('fpsv').textContent=fps};
+document.getElementById('onion').onchange=e=>{onion=e.target.checked;render()};
+function setMode(m){mode=m;fitClip(clip);box.classList.toggle('px',m==="px");document.getElementById('mHD').setAttribute('aria-pressed',m==="hd");document.getElementById('mPX').setAttribute('aria-pressed',m==="px");render()}
+document.getElementById('mHD').onclick=()=>setMode("hd");document.getElementById('mPX').onclick=()=>setMode("px");
+document.querySelectorAll('[data-bg]').forEach(b=>b.onclick=()=>{box.classList.remove('checker','parch');if(b.dataset.bg)box.classList.add(b.dataset.bg);
+  document.querySelectorAll('[data-bg]').forEach(x=>x.setAttribute('aria-pressed',x===b))});
+function loop(t){if(playing&&t-last>1000/fps){last=t;fi=(fi+1)%frames().length;render()}requestAnimationFrame(loop)}
+let saved=null;try{saved=localStorage.getItem('jw-clip')}catch(e){}
+setClip(saved&&META.animations[saved]?saved:"cast48");
+Promise.all([sheet,...Object.values(imgs)].map(i=>i.decode().catch(()=>{}))).then(render);
+fit();try{new ResizeObserver(()=>{fit();render()}).observe(box)}catch(e){addEventListener('resize',()=>{fit();render()})}
+requestAnimationFrame(loop);
+</script>

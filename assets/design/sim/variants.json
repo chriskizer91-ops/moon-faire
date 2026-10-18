@@ -1,0 +1,1668 @@
+{
+ "v02 as written": {
+  "fixtures": [
+   {
+    "fixture": "A one normal",
+    "runs": 150,
+    "win_rate": 1.0,
+    "t_median": 2.65,
+    "per_char": {
+     "Ranger": {
+      "dmg": 460,
+      "heal": 0,
+      "over": 0,
+      "absorbed": 0,
+      "mp": 116,
+      "deaths": 0,
+      "dmg_share": 0.46
+     },
+     "Witch": {
+      "dmg": 0,
+      "heal": 0,
+      "over": 0,
+      "absorbed": 0,
+      "mp": 120,
+      "deaths": 0,
+      "dmg_share": 0.0
+     },
+     "Fox": {
+      "dmg": 540,
+      "heal": 0,
+      "over": 0,
+      "absorbed": 0,
+      "mp": 84,
+      "deaths": 0,
+      "dmg_share": 0.54
+     },
+     "Jester": {
+      "dmg": 0,
+      "heal": 0,
+      "over": 0,
+      "absorbed": 0,
+      "mp": 72,
+      "deaths": 0,
+      "dmg_share": 0.0
+     }
+    },
+    "casts_per_fight": {
+     "Ranger": {
+      "R02": 1.0,
+      "R04": 1.0
+     },
+     "Witch": {
+      "W07": 1.0
+     },
+     "Fox": {
+      "F02": 1.0,
+      "F05": 1.0
+     },
+     "Jester": {
+      "J03": 1.0
+     }
+    }
+   },
+   {
+    "fixture": "B four normals",
+    "runs": 150,
+    "win_rate": 1.0,
+    "t_median": 3.05,
+    "per_char": {
+     "Ranger": {
+      "dmg": 1600,
+      "heal": 0,
+      "over": 0,
+      "absorbed": 0,
+      "mp": 96,
+      "deaths": 0,
+      "dmg_share": 0.4
+     },
+     "Witch": {
+      "dmg": 0,
+      "heal": 0,
+      "over": 0,
+      "absorbed": 0,
+      "mp": 120,
+      "deaths": 0,
+      "dmg_share": 0.0
+     },
+     "Fox": {
+      "dmg": 2400,
+      "heal": 0,
+      "over": 0,
+      "absorbed": 0,
+      "mp": 62,
+      "deaths": 0,
+      "dmg_share": 0.6
+     },
+     "Jester": {
+      "dmg": 0,
+      "heal": 0,
+      "over": 0,
+      "absorbed": 0,
+      "mp": 72,
+      "deaths": 0,
+      "dmg_share": 0.0
+     }
+    },
+    "casts_per_fight": {
+     "Ranger": {
+      "R10": 1.0
+     },
+     "Witch": {
+      "W07": 1.0
+     },
+     "Fox": {
+      "F10": 1.0
+     },
+     "Jester": {
+      "J03": 1.0
+     }
+    }
+   },
+   {
+    "fixture": "C boss 12k",
+    "runs": 150,
+    "win_rate": 1.0,
+    "t_median": 39.65,
+    "per_char": {
+     "Ranger": {
+      "dmg": 2985.1,
+      "heal": 24.5,
+      "over": 0,
+      "absorbed": 667.2,
+      "mp": 5.2,
+      "deaths": 0,
+      "dmg_share": 0.249
+     },
+     "Witch": {
+      "dmg": 1491.2,
+      "heal": 1717.7,
+      "over": 199.1,
+      "absorbed": 1168.3,
+      "mp": 1.3,
+      "deaths": 0,
+      "dmg_share": 0.124
+     },
+     "Fox": {
+      "dmg": 3608.4,
+      "heal": 0,
+      "over": 0,
+      "absorbed": 0,
+      "mp": 6,
+      "deaths": 0.0,
+      "dmg_share": 0.301
+     },
+     "Jester": {
+      "dmg": 3915.3,
+      "heal": 0,
+      "over": 0,
+      "absorbed": 459.5,
+      "mp": 0,
+      "deaths": 0,
+      "dmg_share": 0.326
+     }
+    },
+    "casts_per_fight": {
+     "Ranger": {
+      "R01": 11.74,
+      "R02": 3.29,
+      "R04": 2.0,
+      "R05": 0.79,
+      "R06": 1.91,
+      "R07": 0.01,
+      "R09": 0.15,
+      "R10": 1.0
+     },
+     "Witch": {
+      "W01": 8.98,
+      "W02": 1.41,
+      "W03": 2.84,
+      "W04": 1.91,
+      "W06": 0.86,
+      "W07": 1.07,
+      "W08": 0.93
+     },
+     "Fox": {
+      "F01": 14.95,
+      "F02": 1.0,
+      "F05": 1.0,
+      "F06": 1.0,
+      "F08": 1.0,
+      "F10": 1.0
+     },
+     "Jester": {
+      "J01": 10.99,
+      "J03": 2.0,
+      "J10": 1.0
+     }
+    }
+   },
+   {
+    "fixture": "D boss + 2 adds",
+    "runs": 150,
+    "win_rate": 1.0,
+    "t_median": 39.65,
+    "per_char": {
+     "Ranger": {
+      "dmg": 3748.4,
+      "heal": 41.6,
+      "over": 0,
+      "absorbed": 675.2,
+      "mp": 5.0,
+      "deaths": 0,
+      "dmg_share": 0.268
+     },
+     "Witch": {
+      "dmg": 1470.1,
+      "heal": 1773.6,
+      "over": 159.7,
+      "absorbed": 1267.6,
+      "mp": 1.0,
+      "deaths": 0,
+      "dmg_share": 0.105
+     },
+     "Fox": {
+      "dmg": 4838.0,
+      "heal": 0,
+      "over": 0,
+      "absorbed": 0,
+      "mp": 6,
+      "deaths": 0,
+      "dmg_share": 0.346
+     },
+     "Jester": {
+      "dmg": 3943.6,
+      "heal": 0,
+      "over": 0,
+      "absorbed": 460.3,
+      "mp": 0,
+      "deaths": 0,
+      "dmg_share": 0.282
+     }
+    },
+    "casts_per_fight": {
+     "Ranger": {
+      "R01": 12.11,
+      "R02": 3.02,
+      "R04": 2.0,
+      "R05": 0.84,
+      "R06": 1.88,
+      "R07": 0.03,
+      "R09": 0.26,
+      "R10": 1.0
+     },
+     "Witch": {
+      "W01": 9.32,
+      "W02": 1.41,
+      "W03": 2.85,
+      "W04": 1.75,
+      "W06": 0.94,
+      "W07": 1.07,
+      "W08": 0.93
+     },
+     "Fox": {
+      "F01": 15.26,
+      "F02": 1.0,
+      "F05": 1.0,
+      "F06": 1.0,
+      "F08": 1.0,
+      "F10": 1.0
+     },
+     "Jester": {
+      "J01": 11.26,
+      "J03": 2.0,
+      "J10": 1.0
+     }
+    }
+   },
+   {
+    "fixture": "E attrition 3x4 normals",
+    "runs": 150,
+    "win_rate": 1.0,
+    "t_median": 37.65,
+    "per_char": {
+     "Ranger": {
+      "dmg": 3859.0,
+      "heal": 24.5,
+      "over": 0,
+      "absorbed": 588.1,
+      "mp": 2.8,
+      "deaths": 0,
+      "dmg_share": 0.322
+     },
+     "Witch": {
+      "dmg": 1188.7,
+      "heal": 1728.5,
+      "over": 138.8,
+      "absorbed": 957.9,
+      "mp": 3.7,
+      "deaths": 0,
+      "dmg_share": 0.099
+     },
+     "Fox": {
+      "dmg": 5787.1,
+      "heal": 0,
+      "over": 0,
+      "absorbed": 304.5,
+      "mp": 0.8,
+      "deaths": 0,
+      "dmg_share": 0.482
+     },
+     "Jester": {
+      "dmg": 1165.1,
+      "heal": 0,
+      "over": 0,
+      "absorbed": 0,
+      "mp": 3.2,
+      "deaths": 0.0,
+      "dmg_share": 0.097
+     }
+    },
+    "casts_per_fight": {
+     "Ranger": {
+      "R01": 11.29,
+      "R02": 2.0,
+      "R03": 1.58,
+      "R04": 1.61,
+      "R05": 0.95,
+      "R06": 1.71,
+      "R09": 0.15,
+      "R10": 1.0
+     },
+     "Witch": {
+      "W01": 8.65,
+      "W02": 1.58,
+      "W03": 2.62,
+      "W04": 1.39,
+      "W06": 0.99,
+      "W07": 1.0,
+      "W08": 1.0,
+      "W09": 0.02
+     },
+     "Fox": {
+      "F01": 14.09,
+      "F02": 2.0,
+      "F05": 1.0,
+      "F07": 1.0,
+      "F10": 1.0
+     },
+     "Jester": {
+      "J01": 5.2,
+      "J02": 0.39,
+      "J03": 3.0,
+      "J09": 1.87
+     }
+    }
+   },
+   {
+    "fixture": "F interrupt-heavy 4",
+    "runs": 150,
+    "win_rate": 1.0,
+    "t_median": 3.05,
+    "per_char": {
+     "Ranger": {
+      "dmg": 1600,
+      "heal": 0,
+      "over": 0,
+      "absorbed": 0,
+      "mp": 96,
+      "deaths": 0,
+      "dmg_share": 0.4
+     },
+     "Witch": {
+      "dmg": 0,
+      "heal": 0,
+      "over": 0,
+      "absorbed": 0,
+      "mp": 120,
+      "deaths": 0,
+      "dmg_share": 0.0
+     },
+     "Fox": {
+      "dmg": 2400,
+      "heal": 0,
+      "over": 0,
+      "absorbed": 0,
+      "mp": 62,
+      "deaths": 0,
+      "dmg_share": 0.6
+     },
+     "Jester": {
+      "dmg": 0,
+      "heal": 0,
+      "over": 0,
+      "absorbed": 0,
+      "mp": 78,
+      "deaths": 0,
+      "dmg_share": 0.0
+     }
+    },
+    "casts_per_fight": {
+     "Ranger": {
+      "R10": 1.0
+     },
+     "Witch": {
+      "W07": 1.0
+     },
+     "Fox": {
+      "F10": 1.0
+     },
+     "Jester": {
+      "J04": 1.0
+     }
+    }
+   },
+   {
+    "fixture": "G two-phase boss",
+    "runs": 150,
+    "win_rate": 0.0,
+    "t_median": null,
+    "per_char": {
+     "Ranger": {
+      "dmg": 3875.1,
+      "heal": 24.5,
+      "over": 0,
+      "absorbed": 667.2,
+      "mp": 5.2,
+      "deaths": 1,
+      "dmg_share": 0.261
+     },
+     "Witch": {
+      "dmg": 1987.2,
+      "heal": 2016.7,
+      "over": 202.8,
+      "absorbed": 1185.4,
+      "mp": 0.9,
+      "deaths": 1,
+      "dmg_share": 0.134
+     },
+     "Fox": {
+      "dmg": 4469.9,
+      "heal": 0,
+      "over": 0,
+      "absorbed": 0,
+      "mp": 6,
+      "deaths": 1,
+      "dmg_share": 0.301
+     },
+     "Jester": {
+      "dmg": 4521.7,
+      "heal": 0,
+      "over": 0,
+      "absorbed": 459.5,
+      "mp": 0,
+      "deaths": 1,
+      "dmg_share": 0.304
+     }
+    },
+    "casts_per_fight": {
+     "Ranger": {
+      "R01": 20.19,
+      "R02": 3.29,
+      "R04": 2.0,
+      "R05": 0.79,
+      "R06": 1.91,
+      "R07": 0.01,
+      "R09": 0.15,
+      "R10": 1.0
+     },
+     "Witch": {
+      "W01": 16.71,
+      "W02": 1.42,
+      "W03": 2.87,
+      "W04": 1.91,
+      "W06": 0.86,
+      "W07": 1.07,
+      "W08": 0.93
+     },
+     "Fox": {
+      "F01": 23.31,
+      "F02": 1.0,
+      "F05": 1.0,
+      "F06": 1.0,
+      "F08": 1.0,
+      "F10": 1.0
+     },
+     "Jester": {
+      "J01": 18.59,
+      "J03": 2.0,
+      "J10": 1.0
+     }
+    }
+   },
+   {
+    "fixture": "B2 four tough normals 2500",
+    "runs": 150,
+    "win_rate": 1.0,
+    "t_median": 15.05,
+    "per_char": {
+     "Ranger": {
+      "dmg": 2675.2,
+      "heal": 0,
+      "over": 0,
+      "absorbed": 472.6,
+      "mp": 37.6,
+      "deaths": 0,
+      "dmg_share": 0.268
+     },
+     "Witch": {
+      "dmg": 700.2,
+      "heal": 372.8,
+      "over": 54.8,
+      "absorbed": 300,
+      "mp": 95.7,
+      "deaths": 0,
+      "dmg_share": 0.07
+     },
+     "Fox": {
+      "dmg": 5641.4,
+      "heal": 0,
+      "over": 0,
+      "absorbed": 357.7,
+      "mp": 9.7,
+      "deaths": 0,
+      "dmg_share": 0.564
+     },
+     "Jester": {
+      "dmg": 983.2,
+      "heal": 0,
+      "over": 0,
+      "absorbed": 99.2,
+      "mp": 14,
+      "deaths": 0,
+      "dmg_share": 0.098
+     }
+    },
+    "casts_per_fight": {
+     "Ranger": {
+      "R01": 1.7,
+      "R02": 1.97,
+      "R03": 1.0,
+      "R04": 1.0,
+      "R05": 0.33,
+      "R06": 1.0,
+      "R10": 1.0
+     },
+     "Witch": {
+      "W01": 3.81,
+      "W02": 0.19,
+      "W03": 1.0,
+      "W04": 1.0,
+      "W07": 1.0
+     },
+     "Fox": {
+      "F01": 2.97,
+      "F02": 0.97,
+      "F03": 0.03,
+      "F05": 0.03,
+      "F07": 1.0,
+      "F08": 1.0,
+      "F10": 1.0
+     },
+     "Jester": {
+      "J02": 1.0,
+      "J03": 1.0,
+      "J10": 1.0
+     }
+    }
+   },
+   {
+    "fixture": "G2 two-phase boss, 120 hit / 100 AoE",
+    "runs": 150,
+    "win_rate": 0.0,
+    "t_median": null,
+    "per_char": {
+     "Ranger": {
+      "dmg": 4822.3,
+      "heal": 0,
+      "over": 0,
+      "absorbed": 472.3,
+      "mp": 4.5,
+      "deaths": 1,
+      "dmg_share": 0.273
+     },
+     "Witch": {
+      "dmg": 2754.7,
+      "heal": 1771.3,
+      "over": 268.1,
+      "absorbed": 823.8,
+      "mp": 0.7,
+      "deaths": 1,
+      "dmg_share": 0.156
+     },
+     "Fox": {
+      "dmg": 5207.7,
+      "heal": 0,
+      "over": 0,
+      "absorbed": 0,
+      "mp": 6,
+      "deaths": 1,
+      "dmg_share": 0.295
+     },
+     "Jester": {
+      "dmg": 4853.2,
+      "heal": 0,
+      "over": 0,
+      "absorbed": 351.5,
+      "mp": 0,
+      "deaths": 1,
+      "dmg_share": 0.275
+     }
+    },
+    "casts_per_fight": {
+     "Ranger": {
+      "R01": 26.75,
+      "R02": 4.52,
+      "R04": 2.0,
+      "R05": 0.24,
+      "R06": 2.0,
+      "R10": 1.0
+     },
+     "Witch": {
+      "W01": 24.03,
+      "W02": 1.04,
+      "W03": 2.93,
+      "W04": 2.95,
+      "W06": 0.53,
+      "W07": 1.23,
+      "W08": 0.77
+     },
+     "Fox": {
+      "F01": 30.19,
+      "F02": 1.0,
+      "F05": 1.0,
+      "F06": 1.0,
+      "F08": 1.0,
+      "F10": 1.0
+     },
+     "Jester": {
+      "J01": 25.89,
+      "J03": 2.0,
+      "J10": 1.0
+     }
+    }
+   },
+   {
+    "fixture": "F2 interrupt tough 4x2500",
+    "runs": 150,
+    "win_rate": 1.0,
+    "t_median": 21.9,
+    "per_char": {
+     "Ranger": {
+      "dmg": 2911.9,
+      "heal": 0,
+      "over": 0,
+      "absorbed": 469.3,
+      "mp": 14.3,
+      "deaths": 0,
+      "dmg_share": 0.291
+     },
+     "Witch": {
+      "dmg": 1006.9,
+      "heal": 540.9,
+      "over": 84.1,
+      "absorbed": 300,
+      "mp": 64.5,
+      "deaths": 0,
+      "dmg_share": 0.101
+     },
+     "Fox": {
+      "dmg": 6081.1,
+      "heal": 0,
+      "over": 0,
+      "absorbed": 349.6,
+      "mp": 0.0,
+      "deaths": 0,
+      "dmg_share": 0.608
+     },
+     "Jester": {
+      "dmg": 0,
+      "heal": 0,
+      "over": 0,
+      "absorbed": 0,
+      "mp": 27.1,
+      "deaths": 0,
+      "dmg_share": 0.0
+     }
+    },
+    "casts_per_fight": {
+     "Ranger": {
+      "R01": 2.34,
+      "R02": 2.73,
+      "R03": 1.0,
+      "R04": 2.0,
+      "R05": 0.64,
+      "R06": 1.0,
+      "R10": 1.0
+     },
+     "Witch": {
+      "W01": 4.81,
+      "W02": 0.37,
+      "W03": 1.86,
+      "W04": 1.51,
+      "W06": 0.01,
+      "W07": 1.0,
+      "W08": 0.51
+     },
+     "Fox": {
+      "F01": 5.57,
+      "F02": 1.99,
+      "F03": 0.01,
+      "F05": 1.0,
+      "F07": 1.0,
+      "F10": 1.0
+     },
+     "Jester": {
+      "J03": 2.71,
+      "J04": 2.0,
+      "J09": 0.29
+     }
+    }
+   }
+  ],
+  "solo": {
+   "30": {
+    "Ranger": {
+     "damage": 2860,
+     "dps": 95.3,
+     "mp_left": 4,
+     "mp_dry_at": 28.8
+    },
+    "Witch": {
+     "damage": 1446,
+     "dps": 48.2,
+     "mp_left": 66,
+     "mp_dry_at": null
+    },
+    "Fox": {
+     "damage": 3211,
+     "dps": 107.0,
+     "mp_left": 8,
+     "mp_dry_at": 12.85
+    },
+    "Jester": {
+     "damage": 2306,
+     "dps": 76.9,
+     "mp_left": 0,
+     "mp_dry_at": 14.05
+    }
+   },
+   "60": {
+    "Ranger": {
+     "damage": 4360,
+     "dps": 72.7,
+     "mp_left": 4,
+     "mp_dry_at": 28.8
+    },
+    "Witch": {
+     "damage": 2892,
+     "dps": 48.2,
+     "mp_left": 12,
+     "mp_dry_at": null
+    },
+    "Fox": {
+     "damage": 4801,
+     "dps": 80.0,
+     "mp_left": 8,
+     "mp_dry_at": 12.85
+    },
+    "Jester": {
+     "damage": 4821,
+     "dps": 80.3,
+     "mp_left": 0,
+     "mp_dry_at": 14.05
+    }
+   },
+   "120": {
+    "Ranger": {
+     "damage": 7360,
+     "dps": 61.3,
+     "mp_left": 4,
+     "mp_dry_at": 28.8
+    },
+    "Witch": {
+     "damage": 5346,
+     "dps": 44.5,
+     "mp_left": 0,
+     "mp_dry_at": 60.05
+    },
+    "Fox": {
+     "damage": 7981,
+     "dps": 66.5,
+     "mp_left": 8,
+     "mp_dry_at": 12.85
+    },
+    "Jester": {
+     "damage": 7251,
+     "dps": 60.4,
+     "mp_left": 0,
+     "mp_dry_at": 14.05
+    }
+   }
+  }
+ },
+ "v03 proposal": {
+  "fixtures": [
+   {
+    "fixture": "A one normal",
+    "runs": 150,
+    "win_rate": 1.0,
+    "t_median": 2.65,
+    "per_char": {
+     "Ranger": {
+      "dmg": 460,
+      "heal": 0,
+      "over": 0,
+      "absorbed": 0,
+      "mp": 118.6,
+      "deaths": 0,
+      "dmg_share": 0.46
+     },
+     "Witch": {
+      "dmg": 0,
+      "heal": 0,
+      "over": 0,
+      "absorbed": 0,
+      "mp": 123.1,
+      "deaths": 0,
+      "dmg_share": 0.0
+     },
+     "Fox": {
+      "dmg": 540,
+      "heal": 0,
+      "over": 0,
+      "absorbed": 0,
+      "mp": 86.3,
+      "deaths": 0,
+      "dmg_share": 0.54
+     },
+     "Jester": {
+      "dmg": 0,
+      "heal": 0,
+      "over": 0,
+      "absorbed": 0,
+      "mp": 84.1,
+      "deaths": 0,
+      "dmg_share": 0.0
+     }
+    },
+    "casts_per_fight": {
+     "Ranger": {
+      "R02": 1.0,
+      "R04": 1.0
+     },
+     "Witch": {
+      "W07": 1.0
+     },
+     "Fox": {
+      "F02": 1.0,
+      "F05": 1.0
+     },
+     "Jester": {
+      "J03": 1.0
+     }
+    }
+   },
+   {
+    "fixture": "B four normals",
+    "runs": 150,
+    "win_rate": 1.0,
+    "t_median": 8.45,
+    "per_char": {
+     "Ranger": {
+      "dmg": 809.8,
+      "heal": 1.1,
+      "over": 0,
+      "absorbed": 12.9,
+      "mp": 96.3,
+      "deaths": 0,
+      "dmg_share": 0.202
+     },
+     "Witch": {
+      "dmg": 227.1,
+      "heal": 165.0,
+      "over": 5.2,
+      "absorbed": 240,
+      "mp": 105.3,
+      "deaths": 0,
+      "dmg_share": 0.057
+     },
+     "Fox": {
+      "dmg": 2022.4,
+      "heal": 0,
+      "over": 0,
+      "absorbed": 4.8,
+      "mp": 52.0,
+      "deaths": 0,
+      "dmg_share": 0.506
+     },
+     "Jester": {
+      "dmg": 940.6,
+      "heal": 0,
+      "over": 0,
+      "absorbed": 0,
+      "mp": 59.7,
+      "deaths": 0,
+      "dmg_share": 0.235
+     }
+    },
+    "casts_per_fight": {
+     "Ranger": {
+      "R01": 0.92,
+      "R02": 1.06,
+      "R03": 1.0,
+      "R04": 1.0,
+      "R05": 0.43,
+      "R06": 1.0,
+      "R09": 0.01
+     },
+     "Witch": {
+      "W01": 0.73,
+      "W02": 0.26,
+      "W03": 1.0,
+      "W04": 1.0,
+      "W07": 1.0
+     },
+     "Fox": {
+      "F01": 0.9,
+      "F02": 1.04,
+      "F03": 0.1,
+      "F05": 1.0,
+      "F07": 1.0,
+      "F08": 1.0
+     },
+     "Jester": {
+      "J02": 0.3,
+      "J03": 1.0,
+      "J09": 1.0
+     }
+    }
+   },
+   {
+    "fixture": "C boss 12k",
+    "runs": 150,
+    "win_rate": 1.0,
+    "t_median": 30.65,
+    "per_char": {
+     "Ranger": {
+      "dmg": 2905.4,
+      "heal": 21.3,
+      "over": 0.1,
+      "absorbed": 618.1,
+      "mp": 12.0,
+      "deaths": 0,
+      "dmg_share": 0.242
+     },
+     "Witch": {
+      "dmg": 1246.7,
+      "heal": 1377.4,
+      "over": 85.4,
+      "absorbed": 756.7,
+      "mp": 44.4,
+      "deaths": 0,
+      "dmg_share": 0.104
+     },
+     "Fox": {
+      "dmg": 3585.1,
+      "heal": 0,
+      "over": 0,
+      "absorbed": 427.2,
+      "mp": 7.6,
+      "deaths": 0,
+      "dmg_share": 0.299
+     },
+     "Jester": {
+      "dmg": 4262.8,
+      "heal": 0,
+      "over": 0,
+      "absorbed": 0,
+      "mp": 54.5,
+      "deaths": 0.0,
+      "dmg_share": 0.355
+     }
+    },
+    "casts_per_fight": {
+     "Ranger": {
+      "R01": 5.9,
+      "R02": 4.01,
+      "R04": 3.0,
+      "R05": 0.91,
+      "R06": 2.0,
+      "R09": 0.13,
+      "R10": 1.0
+     },
+     "Witch": {
+      "W01": 5.18,
+      "W02": 1.71,
+      "W03": 2.02,
+      "W04": 1.99,
+      "W06": 0.75,
+      "W07": 1.21,
+      "W08": 0.78,
+      "W09": 0.01
+     },
+     "Fox": {
+      "F01": 9.03,
+      "F02": 2.0,
+      "F05": 2.01,
+      "F06": 1.0,
+      "F08": 1.0,
+      "F10": 1.0
+     },
+     "Jester": {
+      "J01": 9.01,
+      "J02": 0.01,
+      "J03": 1.0,
+      "J06": 1.0,
+      "J09": 1.0
+     }
+    }
+   },
+   {
+    "fixture": "D boss + 2 adds",
+    "runs": 150,
+    "win_rate": 0.9933333333333333,
+    "t_median": 38.1,
+    "per_char": {
+     "Ranger": {
+      "dmg": 3018.2,
+      "heal": 114.1,
+      "over": 0,
+      "absorbed": 677.8,
+      "mp": 4.7,
+      "deaths": 0.0,
+      "dmg_share": 0.216
+     },
+     "Witch": {
+      "dmg": 1416.0,
+      "heal": 2171.9,
+      "over": 202.3,
+      "absorbed": 1284.1,
+      "mp": 9.9,
+      "deaths": 0.0,
+      "dmg_share": 0.101
+     },
+     "Fox": {
+      "dmg": 5130.8,
+      "heal": 0,
+      "over": 0,
+      "absorbed": 412.7,
+      "mp": 8.1,
+      "deaths": 0.0,
+      "dmg_share": 0.367
+     },
+     "Jester": {
+      "dmg": 4423.7,
+      "heal": 0,
+      "over": 0,
+      "absorbed": 25.2,
+      "mp": 54.5,
+      "deaths": 0.0,
+      "dmg_share": 0.316
+     }
+    },
+    "casts_per_fight": {
+     "Ranger": {
+      "R01": 8.31,
+      "R02": 4.34,
+      "R03": 1.0,
+      "R04": 2.17,
+      "R05": 0.58,
+      "R06": 1.97,
+      "R07": 0.57,
+      "R09": 0.73,
+      "R10": 1.0
+     },
+     "Witch": {
+      "W01": 5.28,
+      "W02": 3.06,
+      "W03": 2.97,
+      "W04": 2.58,
+      "W06": 1.14,
+      "W07": 1.41,
+      "W08": 0.58,
+      "W09": 0.01
+     },
+     "Fox": {
+      "F01": 12.48,
+      "F02": 1.0,
+      "F03": 0.06,
+      "F05": 2.01,
+      "F06": 1.95,
+      "F07": 1.0,
+      "F08": 0.01,
+      "F10": 1.0
+     },
+     "Jester": {
+      "J01": 11.45,
+      "J02": 1.09,
+      "J03": 1.04,
+      "J06": 1.0,
+      "J09": 0.96,
+      "J10": 0.04
+     }
+    }
+   },
+   {
+    "fixture": "E attrition 3x4 normals",
+    "runs": 150,
+    "win_rate": 1.0,
+    "t_median": 39.05,
+    "per_char": {
+     "Ranger": {
+      "dmg": 2754.8,
+      "heal": 78.9,
+      "over": 0,
+      "absorbed": 747.1,
+      "mp": 5.2,
+      "deaths": 0,
+      "dmg_share": 0.23
+     },
+     "Witch": {
+      "dmg": 1058.5,
+      "heal": 2286.7,
+      "over": 128.3,
+      "absorbed": 903.9,
+      "mp": 19.9,
+      "deaths": 0,
+      "dmg_share": 0.088
+     },
+     "Fox": {
+      "dmg": 5827.1,
+      "heal": 0,
+      "over": 0,
+      "absorbed": 366.3,
+      "mp": 6.2,
+      "deaths": 0,
+      "dmg_share": 0.486
+     },
+     "Jester": {
+      "dmg": 2359.5,
+      "heal": 0,
+      "over": 0,
+      "absorbed": 0,
+      "mp": 20.4,
+      "deaths": 0,
+      "dmg_share": 0.197
+     }
+    },
+    "casts_per_fight": {
+     "Ranger": {
+      "R01": 7.96,
+      "R02": 4.26,
+      "R03": 1.77,
+      "R04": 1.91,
+      "R05": 1.05,
+      "R06": 2.02,
+      "R07": 0.19,
+      "R09": 0.49,
+      "R10": 1.0
+     },
+     "Witch": {
+      "W01": 5.12,
+      "W02": 2.89,
+      "W03": 2.62,
+      "W04": 2.76,
+      "W06": 1.05,
+      "W07": 1.08,
+      "W08": 0.94
+     },
+     "Fox": {
+      "F01": 12.49,
+      "F02": 1.91,
+      "F03": 0.12,
+      "F05": 2.18,
+      "F07": 1.01,
+      "F08": 1.0,
+      "F10": 0.99
+     },
+     "Jester": {
+      "J01": 6.83,
+      "J02": 1.8,
+      "J03": 2.77,
+      "J09": 2.0
+     }
+    }
+   },
+   {
+    "fixture": "F interrupt-heavy 4",
+    "runs": 150,
+    "win_rate": 1.0,
+    "t_median": 10.05,
+    "per_char": {
+     "Ranger": {
+      "dmg": 762.3,
+      "heal": 0,
+      "over": 0,
+      "absorbed": 11.9,
+      "mp": 101.3,
+      "deaths": 0,
+      "dmg_share": 0.191
+     },
+     "Witch": {
+      "dmg": 359.7,
+      "heal": 169.5,
+      "over": 1.8,
+      "absorbed": 240,
+      "mp": 109.0,
+      "deaths": 0,
+      "dmg_share": 0.09
+     },
+     "Fox": {
+      "dmg": 2078.2,
+      "heal": 0,
+      "over": 0,
+      "absorbed": 0,
+      "mp": 41.2,
+      "deaths": 0,
+      "dmg_share": 0.52
+     },
+     "Jester": {
+      "dmg": 799.9,
+      "heal": 0,
+      "over": 0,
+      "absorbed": 0,
+      "mp": 50.0,
+      "deaths": 0,
+      "dmg_share": 0.2
+     }
+    },
+    "casts_per_fight": {
+     "Ranger": {
+      "R01": 1.67,
+      "R02": 1.08,
+      "R03": 1.0,
+      "R04": 1.0,
+      "R05": 0.17,
+      "R06": 1.0
+     },
+     "Witch": {
+      "W01": 0.91,
+      "W02": 0.08,
+      "W03": 1.0,
+      "W04": 1.01,
+      "W07": 1.0
+     },
+     "Fox": {
+      "F01": 1.0,
+      "F02": 1.92,
+      "F03": 0.08,
+      "F05": 1.0,
+      "F07": 1.0,
+      "F08": 1.0
+     },
+     "Jester": {
+      "J03": 1.0,
+      "J04": 1.0,
+      "J09": 1.0
+     }
+    }
+   },
+   {
+    "fixture": "G two-phase boss",
+    "runs": 150,
+    "win_rate": 0.0,
+    "t_median": null,
+    "per_char": {
+     "Ranger": {
+      "dmg": 5266.7,
+      "heal": 56.5,
+      "over": 0.1,
+      "absorbed": 689.9,
+      "mp": 5.1,
+      "deaths": 1,
+      "dmg_share": 0.267
+     },
+     "Witch": {
+      "dmg": 2294.9,
+      "heal": 3462.0,
+      "over": 125.0,
+      "absorbed": 1615.0,
+      "mp": 5.8,
+      "deaths": 1,
+      "dmg_share": 0.116
+     },
+     "Fox": {
+      "dmg": 5771.4,
+      "heal": 0,
+      "over": 0,
+      "absorbed": 499.2,
+      "mp": 7.5,
+      "deaths": 1,
+      "dmg_share": 0.292
+     },
+     "Jester": {
+      "dmg": 6399.6,
+      "heal": 0,
+      "over": 0,
+      "absorbed": 0,
+      "mp": 61.4,
+      "deaths": 1.0,
+      "dmg_share": 0.324
+     }
+    },
+    "casts_per_fight": {
+     "Ranger": {
+      "R01": 20.33,
+      "R02": 8.15,
+      "R04": 3.05,
+      "R05": 1.21,
+      "R06": 2.29,
+      "R09": 0.35,
+      "R10": 1.0
+     },
+     "Witch": {
+      "W01": 16.76,
+      "W02": 4.63,
+      "W03": 4.21,
+      "W04": 2.75,
+      "W06": 1.22,
+      "W07": 1.41,
+      "W08": 0.79,
+      "W09": 0.01
+     },
+     "Fox": {
+      "F01": 25.51,
+      "F02": 2.0,
+      "F03": 0.42,
+      "F05": 4.41,
+      "F06": 1.0,
+      "F08": 1.0,
+      "F10": 1.0
+     },
+     "Jester": {
+      "J01": 20.87,
+      "J02": 5.38,
+      "J03": 1.0,
+      "J06": 1.0,
+      "J09": 1.0
+     }
+    }
+   },
+   {
+    "fixture": "B2 four tough normals 2500",
+    "runs": 150,
+    "win_rate": 1.0,
+    "t_median": 27.950000000000003,
+    "per_char": {
+     "Ranger": {
+      "dmg": 2600.7,
+      "heal": 75.7,
+      "over": 1.1,
+      "absorbed": 320.7,
+      "mp": 16.6,
+      "deaths": 0,
+      "dmg_share": 0.26
+     },
+     "Witch": {
+      "dmg": 933.1,
+      "heal": 1456.5,
+      "over": 118.1,
+      "absorbed": 877.8,
+      "mp": 31.9,
+      "deaths": 0,
+      "dmg_share": 0.093
+     },
+     "Fox": {
+      "dmg": 4589.9,
+      "heal": 0,
+      "over": 0,
+      "absorbed": 184.3,
+      "mp": 9.4,
+      "deaths": 0,
+      "dmg_share": 0.459
+     },
+     "Jester": {
+      "dmg": 1876.3,
+      "heal": 0,
+      "over": 0,
+      "absorbed": 0,
+      "mp": 27.2,
+      "deaths": 0,
+      "dmg_share": 0.188
+     }
+    },
+    "casts_per_fight": {
+     "Ranger": {
+      "R01": 3.85,
+      "R02": 3.76,
+      "R03": 1.19,
+      "R04": 2.62,
+      "R05": 1.34,
+      "R06": 1.99,
+      "R07": 0.05,
+      "R09": 0.48,
+      "R10": 0.43
+     },
+     "Witch": {
+      "W01": 2.66,
+      "W02": 2.09,
+      "W03": 2.02,
+      "W04": 2.13,
+      "W06": 1.0,
+      "W07": 1.07,
+      "W08": 0.86
+     },
+     "Fox": {
+      "F01": 7.28,
+      "F02": 2.17,
+      "F03": 0.39,
+      "F05": 1.6,
+      "F07": 1.57,
+      "F08": 1.0,
+      "F10": 0.43
+     },
+     "Jester": {
+      "J01": 3.55,
+      "J02": 1.82,
+      "J03": 3.0,
+      "J09": 1.23
+     }
+    }
+   },
+   {
+    "fixture": "G2 two-phase boss, 120 hit / 100 AoE",
+    "runs": 150,
+    "win_rate": 0.9733333333333334,
+    "t_median": 85.05,
+    "per_char": {
+     "Ranger": {
+      "dmg": 6574.9,
+      "heal": 3.2,
+      "over": 0.0,
+      "absorbed": 591.2,
+      "mp": 3.9,
+      "deaths": 0.1,
+      "dmg_share": 0.274
+     },
+     "Witch": {
+      "dmg": 3139.9,
+      "heal": 3503.4,
+      "over": 282.6,
+      "absorbed": 1362.8,
+      "mp": 6.8,
+      "deaths": 0.2,
+      "dmg_share": 0.131
+     },
+     "Fox": {
+      "dmg": 6749.3,
+      "heal": 0,
+      "over": 0,
+      "absorbed": 316,
+      "mp": 8.3,
+      "deaths": 0.1,
+      "dmg_share": 0.281
+     },
+     "Jester": {
+      "dmg": 7529.9,
+      "heal": 0,
+      "over": 0,
+      "absorbed": 0,
+      "mp": 62.8,
+      "deaths": 0.2,
+      "dmg_share": 0.314
+     }
+    },
+    "casts_per_fight": {
+     "Ranger": {
+      "R01": 27.09,
+      "R02": 11.21,
+      "R04": 3.23,
+      "R05": 0.97,
+      "R06": 2.15,
+      "R09": 0.02,
+      "R10": 1.0
+     },
+     "Witch": {
+      "W01": 23.29,
+      "W02": 4.35,
+      "W03": 4.67,
+      "W04": 3.91,
+      "W06": 0.9,
+      "W07": 1.97,
+      "W08": 0.61
+     },
+     "Fox": {
+      "F01": 32.9,
+      "F02": 2.0,
+      "F03": 0.37,
+      "F05": 5.67,
+      "F06": 1.0,
+      "F08": 1.0,
+      "F10": 1.0
+     },
+     "Jester": {
+      "J01": 26.89,
+      "J02": 8.71,
+      "J03": 1.0,
+      "J06": 1.0,
+      "J09": 1.0
+     }
+    }
+   },
+   {
+    "fixture": "F2 interrupt tough 4x2500",
+    "runs": 150,
+    "win_rate": 1.0,
+    "t_median": 34.4,
+    "per_char": {
+     "Ranger": {
+      "dmg": 2631.8,
+      "heal": 99.4,
+      "over": 0.9,
+      "absorbed": 500.8,
+      "mp": 10.5,
+      "deaths": 0,
+      "dmg_share": 0.263
+     },
+     "Witch": {
+      "dmg": 1088.6,
+      "heal": 1914.6,
+      "over": 126.9,
+      "absorbed": 963.3,
+      "mp": 22.6,
+      "deaths": 0,
+      "dmg_share": 0.109
+     },
+     "Fox": {
+      "dmg": 4372.3,
+      "heal": 0,
+      "over": 0,
+      "absorbed": 45.7,
+      "mp": 8.0,
+      "deaths": 0,
+      "dmg_share": 0.437
+     },
+     "Jester": {
+      "dmg": 1907.2,
+      "heal": 0,
+      "over": 0,
+      "absorbed": 0,
+      "mp": 9.9,
+      "deaths": 0,
+      "dmg_share": 0.191
+     }
+    },
+    "casts_per_fight": {
+     "Ranger": {
+      "R01": 5.55,
+      "R02": 3.54,
+      "R03": 1.49,
+      "R04": 2.11,
+      "R05": 1.21,
+      "R06": 1.82,
+      "R07": 0.2,
+      "R09": 0.63,
+      "R10": 1.17
+     },
+     "Witch": {
+      "W01": 4.1,
+      "W02": 2.52,
+      "W03": 2.59,
+      "W04": 2.37,
+      "W06": 1.0,
+      "W07": 1.2,
+      "W08": 0.93
+     },
+     "Fox": {
+      "F01": 8.31,
+      "F02": 2.19,
+      "F03": 0.13,
+      "F05": 1.67,
+      "F07": 2.24,
+      "F08": 1.0,
+      "F10": 0.71
+     },
+     "Jester": {
+      "J01": 4.45,
+      "J02": 1.42,
+      "J03": 2.0,
+      "J04": 2.01,
+      "J09": 1.0,
+      "J10": 1.0
+     }
+    }
+   }
+  ],
+  "solo": {
+   "30": {
+    "Ranger": {
+     "damage": 3100,
+     "dps": 103.3,
+     "mp_left": 17.95,
+     "mp_dry_at": null
+    },
+    "Witch": {
+     "damage": 1446,
+     "dps": 48.2,
+     "mp_left": 101.94,
+     "mp_dry_at": null
+    },
+    "Fox": {
+     "damage": 3530,
+     "dps": 117.7,
+     "mp_left": 8.955,
+     "mp_dry_at": 16.15
+    },
+    "Jester": {
+     "damage": 4028,
+     "dps": 134.3,
+     "mp_left": 53.96,
+     "mp_dry_at": null
+    }
+   },
+   "60": {
+    "Ranger": {
+     "damage": 5200,
+     "dps": 86.7,
+     "mp_left": 7.95,
+     "mp_dry_at": 32.05
+    },
+    "Witch": {
+     "damage": 2892,
+     "dps": 48.2,
+     "mp_left": 83.94,
+     "mp_dry_at": null
+    },
+    "Fox": {
+     "damage": 5374,
+     "dps": 89.6,
+     "mp_left": 11.955,
+     "mp_dry_at": 16.15
+    },
+    "Jester": {
+     "damage": 5751,
+     "dps": 95.8,
+     "mp_left": 61.96,
+     "mp_dry_at": null
+    }
+   },
+   "120": {
+    "Ranger": {
+     "damage": 9200,
+     "dps": 76.7,
+     "mp_left": 3.95,
+     "mp_dry_at": 32.05
+    },
+    "Witch": {
+     "damage": 6134,
+     "dps": 51.1,
+     "mp_left": 35.94,
+     "mp_dry_at": null
+    },
+    "Fox": {
+     "damage": 9030,
+     "dps": 75.2,
+     "mp_left": 5.955,
+     "mp_dry_at": 16.15
+    },
+    "Jester": {
+     "damage": 9451,
+     "dps": 78.8,
+     "mp_left": 69.96,
+     "mp_dry_at": null
+    }
+   }
+  }
+ }
+}

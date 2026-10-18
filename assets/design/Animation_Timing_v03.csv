@@ -1,0 +1,41 @@
+id,name,cast_s,recovery_s,lock_s,playback_frames_at_6fps,release_frame,art_status,in_between_plan
+R01,Moonsteel Draw,0.4,1.6,2.0,12,2,to generate: cells 2-7,8 keys -> 12 frames (1 in-between per gap where needed)
+R02,Silver Arrow,0.6,0.8,1.4,8,4,to generate: cells 2-7,8 keys play as-is
+R03,Lantern Flare,0.8,0.8,1.6,10,5,to generate: cells 2-7,8 keys -> 10 frames (1 in-between per gap where needed)
+R04,Crescent Volley,1.2,0.8,2.0,12,7,to generate: cells 2-7,8 keys -> 12 frames (1 in-between per gap where needed)
+R05,Silverglass Ward,1,1,2,12,6,to generate: cells 2-7,8 keys -> 12 frames (1 in-between per gap where needed)
+R06,Guiding Star,0.6,0.8,1.4,8,4,to generate: cells 2-7,8 keys play as-is
+R07,Moonlit Passage,1.2,0.8,2.0,12,7,to generate: cells 2-7,8 keys -> 12 frames (1 in-between per gap where needed)
+R08,Pin the Shadow,0.8,0.8,1.6,10,5,to generate: cells 2-7,8 keys -> 10 frames (1 in-between per gap where needed)
+R09,Beacon’s Mercy,1,1,2,12,6,to generate: cells 2-7,8 keys -> 12 frames (1 in-between per gap where needed)
+R10,Full Moon Ascendant,3,1,4,24,18,to generate: cells 2-7,"8 keys -> 24 frames (2-3 in-betweens per gap, or holds on the peak pose)"
+W01,Harvest Crescent,0.6,1.4,2.0,12,4,to generate: cells 2-7,8 keys -> 12 frames (1 in-between per gap where needed)
+W02,Silverleaf Salve,1,1,2,12,6,to generate: cells 2-7,8 keys -> 12 frames (1 in-between per gap where needed)
+W03,Moondew,1,1,2,12,6,to generate: cells 2-7,8 keys -> 12 frames (1 in-between per gap where needed)
+W04,Thornwake,1.2,0.8,2.0,12,7,to generate: cells 2-7,8 keys -> 12 frames (1 in-between per gap where needed)
+W05,Bitter Remedy,1,0.8,1.8,11,6,to generate: cells 2-7,8 keys -> 11 frames (1 in-between per gap where needed)
+W06,Bramble Cradle,2,1,3,18,12,to generate: cells 2-7,"8 keys -> 18 frames (2-3 in-betweens per gap, or holds on the peak pose)"
+W07,Elderwood Guardian,3,1,4,24,18,to generate: cells 2-7,"8 keys -> 24 frames (2-3 in-betweens per gap, or holds on the peak pose)"
+W08,Sailwing Moth,3,1,4,24,18,to generate: cells 2-7,"8 keys -> 24 frames (2-3 in-betweens per gap, or holds on the peak pose)"
+W09,Rootbound Return,4,1,5,30,24,to generate: cells 2-7,"8 keys -> 30 frames (2-3 in-betweens per gap, or holds on the peak pose)"
+W10,Garden Beneath the Moon,4,1,5,30,24,to generate: cells 2-7,"8 keys -> 30 frames (2-3 in-betweens per gap, or holds on the peak pose)"
+F01,Hemline Fangs,0.5,1.5,2.0,12,3,to generate: cells 2-7,8 keys -> 12 frames (1 in-between per gap where needed)
+F02,Blue Mischief,0.8,0.8,1.6,10,5,to generate: cells 2-7,8 keys -> 10 frames (1 in-between per gap where needed)
+F03,Borrowed Face,0.8,0.8,1.6,10,5,to generate: cells 2-7,8 keys -> 10 frames (1 in-between per gap where needed)
+F04,Switcheroo,0.6,0.8,1.4,8,4,to generate: cells 2-7,8 keys play as-is
+F05,Finders Keepers,0.8,0.8,1.6,10,5,to generate: cells 2-7,8 keys -> 10 frames (1 in-between per gap where needed)
+F06,Loose Thread,0.8,0.8,1.6,10,5,to generate: cells 2-7,8 keys -> 10 frames (1 in-between per gap where needed)
+F07,Ninefold Lie,1.5,1,2.5,15,9,to generate: cells 2-7,8 keys -> 15 frames (1 in-between per gap where needed)
+F08,Bellbound Bargain,1,1,2,12,6,to generate: cells 2-7,8 keys -> 12 frames (1 in-between per gap where needed)
+F09,When the Bell Falls Silent,2,1,3,18,12,to generate: cells 2-7,"8 keys -> 18 frames (2-3 in-betweens per gap, or holds on the peak pose)"
+F10,The Moon’s Little Lie,3,1,4,24,18,to generate: cells 2-7,"8 keys -> 24 frames (2-3 in-betweens per gap, or holds on the peak pose)"
+J01,Gilded Rebuke,0.6,1.4,2.0,12,4,to generate: cells 2-7,8 keys -> 12 frames (1 in-between per gap where needed)
+J02,Ill Omen,1,1,2,12,6,to generate: cells 2-7,8 keys -> 12 frames (1 in-between per gap where needed)
+J03,Sealed Fate,2.7,1.3,4.0,24,16,"Orb, 24 frames at 6 fps (exists)",none needed
+J04,Hush,1.0,1,2.0,12,6,to generate: cells 2-7,8 keys -> 12 frames (1 in-between per gap where needed)
+J05,Stop,3,1,4,24,18,to generate: cells 2-7,"8 keys -> 24 frames (2-3 in-betweens per gap, or holds on the peak pose)"
+J06,Gravity,4,1,5,30,24,to generate: cells 2-7,"8 keys -> 30 frames (2-3 in-betweens per gap, or holds on the peak pose)"
+J07,Royal Reversal,2,1,3,18,12,to generate: cells 2-7,"8 keys -> 18 frames (2-3 in-betweens per gap, or holds on the peak pose)"
+J08,Against All Odds,2.0,6.0,8.0,16,4,"Skyward, 16 frames at 2 fps (exists)",none needed
+J09,The Last Toll,4,1,5,30,24,to generate: cells 2-7,"8 keys -> 30 frames (2-3 in-betweens per gap, or holds on the peak pose)"
+J10,Curtain Call,5.3,2.7,8.0,48,32,"Cast, 48 frames at 6 fps (exists)",none needed

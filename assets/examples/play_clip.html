@@ -1,0 +1,77 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Moon Faire clip player</title>
+<style>
+  :root{ --bg:#17121e; --stage:#383043; --ink:#efe6f2; --muted:#a597b3; color-scheme:dark }
+  body{margin:0;background:var(--bg);color:var(--ink);font:14px system-ui,sans-serif;padding:16px}
+  canvas{background:var(--stage);display:block;width:100%;max-width:720px;border-radius:6px}
+  select,button{font:inherit;margin:8px 8px 8px 0}
+  .mode{color:var(--muted)}
+</style>
+</head>
+<body>
+<!-- Reference implementation: how to read manifest.json and draw a clip on its anchors.
+     Serve the asset folder over http (fetch does not work from file://), then open examples/play_clip.html. -->
+<div>
+  <select id="clip"></select>
+  <button id="mode">Mode: HD</button>
+  <span class="mode" id="info"></span>
+</div>
+<canvas id="c" width="720" height="560"></canvas>
+<script>
+const BASE = "../";
+const cv = document.getElementById("c"), ctx = cv.getContext("2d");
+const STAGE = { x: 360, y: 520 };          // where the boot soles stand
+let man, clip, frames = [], imgs = [], i = 0, last = 0, mode = "hd", sheet = new Image();
+
+fetch(BASE + "manifest.json").then(r => r.json()).then(m => {
+  man = m; sheet.src = BASE + m.pixel.sheet;
+  const sel = document.getElementById("clip");
+  for (const [ch, c] of Object.entries(m.characters))
+    for (const name of Object.keys(c.clips)) sel.add(new Option(`${ch} · ${name}`, `${ch}/${name}`));
+  sel.onchange = () => load(sel.value); load(sel.value);
+  requestAnimationFrame(tick);
+});
+
+function load(key) {
+  const [ch, name] = key.split("/"); clip = man.characters[ch].clips[name];
+  frames = clip.frames; i = 0;
+  imgs = frames.map(f => { const im = new Image(); im.src = BASE + f.hd; return im; });   // preload the whole clip
+  document.getElementById("info").textContent = `${frames.length} frames · ${clip.fps} fps · ${clip.status}`;
+}
+
+function draw() {
+  ctx.clearRect(0, 0, cv.width, cv.height);
+  const f = frames[i]; if (!f) return;
+  ctx.save();
+  if (clip.flipX) { ctx.translate(STAGE.x * 2, 0); ctx.scale(-1, 1); }   // walk_left = walk_right mirrored about the anchor
+  if (mode === "hd") {
+    const im = imgs[i]; if (!im.complete) { ctx.restore(); return; }
+    const s = 1.2;                                   // one shared scale for every character
+    ctx.imageSmoothingEnabled = true;
+    ctx.drawImage(im, STAGE.x - f.anchorX * s, STAGE.y - f.anchorY * s, f.w * s, f.h * s);
+  } else {
+    const c = man.pixel.cell, s = 3;                 // whole-number scale keeps pixel art crisp
+    ctx.imageSmoothingEnabled = false;
+    ctx.drawImage(sheet, f.pixel.x, f.pixel.y, c.w, c.h, STAGE.x - c.anchorX * s, STAGE.y - c.anchorY * s, c.w * s, c.h * s);
+  }
+  ctx.restore();
+  if (clip.release_frame && i + 1 === clip.release_frame) {          // gameplay events fire on the release frame, not the last frame
+    ctx.fillStyle = "#d6a84e"; ctx.fillText("release", 12, 20);
+  }
+}
+
+function tick(t) {
+  if (clip && t - last >= 1000 / clip.fps) {
+    last = t; draw();
+    i = i + 1 < frames.length ? i + 1 : (clip.loop ? 0 : 0);   // one-shot moves would return to idle here
+  }
+  requestAnimationFrame(tick);
+}
+document.getElementById("mode").onclick = e => { mode = mode === "hd" ? "px" : "hd"; e.target.textContent = "Mode: " + (mode === "hd" ? "HD" : "Pixel 128"); };
+</script>
+</body>
+</html>

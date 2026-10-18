@@ -1,0 +1,1447 @@
+{
+ "version": "0.3-proposed",
+ "status": "Claude review applied; awaiting Chris approval of names, ultimate gate and MP regen",
+ "characters": {
+  "R": {
+   "name": "Ranger",
+   "phase": "Full Moon",
+   "hp": 1000,
+   "mp": 140,
+   "P": 100,
+   "M": 100,
+   "H": 80,
+   "identity": "Adult woman with silver-grey hair in a high bun and loose strands; round wire glasses; royal-blue headband with an oval blue gemstone in gold. Royal-blue brocade corset, black lacing and off-shoulder flared black lace sleeves; blue/silver/turquoise necklaces, right-hip satchel and crystal charms, fitted black trousers/lace leggings, grey socks and grey-black combat boots. Use ranger portrait and sheet for design, Jester sheets for pixel style and body scale.",
+   "palette": "silver-white and pale blue",
+   "weapon": "A moonsteel bow folds flat against the back of her corset; necklace beads supply its spare string."
+  },
+  "W": {
+   "name": "Herbal Witch",
+   "phase": "Waxing Moon",
+   "hp": 900,
+   "mp": 150,
+   "P": 80,
+   "M": 130,
+   "H": 150,
+   "identity": "Adult woman with long very wavy dark-brown hair, round glasses and a kind smile; drooping wine-red pointed hat with two small cream horns and gold crescent trim. Wine-red robe with large layered gold-trimmed sleeves, black corset and slit tiered skirt, black boots, belt pouch/crystal and crescent pendant. An old brown leather spellbook stays visible in her LEFT hand in every frame; she casts and uses the sickle with her right. Use Witch portrait and sheet for design, Jester sheets for pixel style and body scale.",
+   "palette": "sage green, warm gold and pearl",
+   "weapon": "Her crescent pendant unfolds into a golden harvest sickle."
+  },
+  "F": {
+   "name": "Fox",
+   "phase": "Waning Crescent",
+   "hp": 950,
+   "mp": 110,
+   "P": 105,
+   "M": 180,
+   "H": 80,
+   "identity": "Adult woman with curly fluffy shoulder-length light-brown hair, visible pointed fox ears with dark tips, round glasses and a mischievous grin. Pink choker with small gold bell, emerald puffed sleeves/ruffled neckline, red floral brocade corset with black ribbon, wide patchwork TROUSERS gathered at the ankles (skirt-like silhouette), beaded bracelets and brown combat boots. Keep her human face and adult proportions; any extra tails are spectral spell effects. Use Fox portrait and sheet for design, Jester sheets for pixel style and body scale.",
+   "palette": "cold blue foxfire with occasional amber glints",
+   "weapon": "Dressmaker shears separate into twin daggers; sewn-in needles become darts."
+  },
+  "J": {
+   "name": "Jester",
+   "phase": "New Moon",
+   "hp": 850,
+   "mp": 100,
+   "P": 90,
+   "M": 260,
+   "H": 90,
+   "identity": "Adult-proportioned Jester in the two supplied pixel-art style sheets: black curved horns with pom-poms, burgundy veil and layered dress, purple patterned leggings, heavy black boots, turquoise pendant and gold hip bells. Use these sheets directly for pixel density, outlines, shading, scale and casting viewpoint; the group concept is secondary for identity detail.",
+   "palette": "violet, black-violet, restrained silver and turquoise",
+   "weapon": "Gold hip bells unfold into the head of a concealed chain flail."
+  }
+ },
+ "moves": [
+  {
+   "id": "R01",
+   "character": "R",
+   "name": "Moonsteel Draw",
+   "mp": 0,
+   "cast_s": 0.4,
+   "recovery_s": 1.6,
+   "cooldown_s": 0,
+   "target": "One enemy",
+   "effect": "Free weapon attack: 1.0P physical damage.",
+   "terms": [
+    {
+     "kind": "damage",
+     "stat": "P",
+     "coefficient": 1,
+     "max_targets": 1,
+     "ticks": 1
+    }
+   ],
+   "frames": [
+    "Hand reaches behind corset",
+    "Folded bow clears her back",
+    "Bow limbs unfold",
+    "Light string catches between fingers",
+    "Arrow drawn to cheek",
+    "Arrow released",
+    "Bow dips with follow-through",
+    "Return to ready stance"
+   ],
+   "ultimate": false
+  },
+  {
+   "id": "R02",
+   "character": "R",
+   "name": "Silver Arrow",
+   "mp": 8,
+   "cast_s": 0.6,
+   "recovery_s": 0.8,
+   "cooldown_s": 4,
+   "target": "One enemy",
+   "effect": "2.0M light damage.",
+   "terms": [
+    {
+     "kind": "damage",
+     "stat": "M",
+     "coefficient": 2,
+     "max_targets": 1,
+     "ticks": 1
+    }
+   ],
+   "frames": [
+    "Bow held low",
+    "Fingers gather a silver spark",
+    "Spark stretches into an arrow",
+    "Bow raised toward target",
+    "Arrow concentrates to a white point",
+    "Narrow silver arrow released",
+    "Fine light trail fades",
+    "Return to ready stance"
+   ],
+   "ultimate": false
+  },
+  {
+   "id": "R03",
+   "character": "R",
+   "name": "Lantern Flare",
+   "mp": 12,
+   "cast_s": 0.8,
+   "recovery_s": 0.8,
+   "cooldown_s": 12,
+   "target": "Up to four enemies",
+   "effect": "0.6M light damage each; reveal stealth for 12s; Dazzle reduces direct damage dealt by 20% for 6s. Boss damage reduction is 10%.",
+   "terms": [
+    {
+     "kind": "damage",
+     "stat": "M",
+     "coefficient": 0.6,
+     "max_targets": 4,
+     "ticks": 1
+    }
+   ],
+   "frames": [
+    "Fingers touch headband jewel",
+    "Jewel glows pale blue",
+    "Palm turns toward the enemy",
+    "A small lantern-shaped light forms",
+    "Light expands behind her hand",
+    "Flare opens into a broad fan",
+    "Hand shields her own eyes",
+    "Flare contracts and stance resets"
+   ],
+   "ultimate": false,
+   "status": {
+    "reveal_s": 12,
+    "direct_damage_reduction": 0.2,
+    "boss_direct_damage_reduction": 0.1,
+    "duration_s": 6
+   }
+  },
+  {
+   "id": "R04",
+   "character": "R",
+   "name": "Crescent Volley",
+   "mp": 16,
+   "cast_s": 1.2,
+   "recovery_s": 0.8,
+   "cooldown_s": 8,
+   "target": "Three bolts assigned among enemies",
+   "effect": "Three bolts, each 1.0M light damage. Bolts may share a target; total damage is 3.0M, not 3.0M per enemy.",
+   "terms": [
+    {
+     "kind": "damage",
+     "stat": "M",
+     "coefficient": 1,
+     "max_targets": 1,
+     "ticks": 3
+    }
+   ],
+   "frames": [
+    "Bow swings outward",
+    "One arrow forms",
+    "A second arrow fans beside it",
+    "Third arrow completes a crescent",
+    "Three strings of light pull taut",
+    "Three arrows release together",
+    "Bow arm traces their curve",
+    "Return to ready stance"
+   ],
+   "ultimate": false,
+   "name_proposed": "Silver Rain",
+   "change_v03": "Name proposal only: a crescent belongs to the Witch and Fox phases. ID unchanged."
+  },
+  {
+   "id": "R05",
+   "character": "R",
+   "name": "Silverglass Ward",
+   "mp": 14,
+   "cast_s": 1,
+   "recovery_s": 1,
+   "cooldown_s": 14,
+   "target": "One ally",
+   "effect": "Shield of 3.0M for 8s; subject to global shield limits.",
+   "terms": [
+    {
+     "kind": "shield",
+     "stat": "M",
+     "coefficient": 3,
+     "max_targets": 1,
+     "ticks": 1
+    }
+   ],
+   "frames": [
+    "Bow held across body",
+    "Free hand draws a short arc",
+    "Arc becomes a pane of silver glass",
+    "Glass divides into crescent facets",
+    "Facets align toward an ally",
+    "Shield is projected to ally",
+    "Spare facets dissolve",
+    "Return to ready stance"
+   ],
+   "ultimate": false,
+   "status": {
+    "duration_s": 8
+   }
+  },
+  {
+   "id": "R06",
+   "character": "R",
+   "name": "Guiding Star",
+   "mp": 10,
+   "cast_s": 0.6,
+   "recovery_s": 0.8,
+   "cooldown_s": 16,
+   "target": "One enemy",
+   "effect": "For 8s, incoming damage receives +20% additive vulnerability; this mark can add at most 400 total HP damage before ending. No bonus to Doom, Gravity or reflected damage. Does not stack with itself.",
+   "terms": [],
+   "frames": [
+    "Two fingers lift beside eye",
+    "Headband jewel finds the target",
+    "Thin light thread leaves her fingers",
+    "Thread curls into a star",
+    "Star aligns with her gaze",
+    "Star flies onto target",
+    "Connecting thread breaks",
+    "Return to ready stance"
+   ],
+   "ultimate": false,
+   "status": {
+    "vulnerability": 0.2,
+    "bonus_damage_budget": 400,
+    "duration_s": 8
+   }
+  },
+  {
+   "id": "R07",
+   "character": "R",
+   "name": "Moonlit Passage",
+   "mp": 18,
+   "cast_s": 1.2,
+   "recovery_s": 0.8,
+   "cooldown_s": 20,
+   "target": "All four allies",
+   "effect": "Each ally evades their next eligible direct enemy hit within 5s. Does not evade ground hazards, damage-over-time or explicitly unavoidable attacks. Each charge is consumed once; a multi-hit action loses only one hit.",
+   "terms": [],
+   "frames": [
+    "Body turns sideways",
+    "One boot traces a silver line",
+    "Silver line opens into a path",
+    "Cloak and hair lift toward path",
+    "Four dim silhouettes step aside",
+    "Passage grants each ally an evasion charge",
+    "Silhouettes merge back",
+    "Return to ready stance"
+   ],
+   "ultimate": false,
+   "status": {
+    "evasion_charges_per_ally": 1,
+    "duration_s": 5
+   }
+  },
+  {
+   "id": "R08",
+   "character": "R",
+   "name": "Pin the Shadow",
+   "mp": 12,
+   "cast_s": 0.8,
+   "recovery_s": 0.8,
+   "cooldown_s": 12,
+   "target": "One enemy",
+   "effect": "1.2M light damage and 4s Root; anchored bosses receive 1s Root. Root stops movement, not casting or attacks.",
+   "terms": [
+    {
+     "kind": "damage",
+     "stat": "M",
+     "coefficient": 1.2,
+     "max_targets": 1,
+     "ticks": 1
+    }
+   ],
+   "frames": [
+    "Bow tilts toward ground",
+    "Arrow darkens to blue-silver",
+    "Eye follows the target shadow",
+    "String draws close to shoulder",
+    "Arrowhead splits into a crescent",
+    "Arrow pins the target shadow",
+    "Bowstring settles",
+    "Return to ready stance"
+   ],
+   "ultimate": false,
+   "status": {
+    "root_s": 4,
+    "boss_root_s": 1
+   }
+  },
+  {
+   "id": "R09",
+   "character": "R",
+   "name": "Beacon’s Mercy",
+   "mp": 14,
+   "cast_s": 1,
+   "recovery_s": 1,
+   "cooldown_s": 10,
+   "target": "One living ally",
+   "effect": "Heal 2.0H and remove one removable negative status; prioritize Doom, then hard control, then damage-over-time.",
+   "terms": [
+    {
+     "kind": "heal",
+     "stat": "H",
+     "coefficient": 2,
+     "max_targets": 1,
+     "ticks": 1
+    }
+   ],
+   "frames": [
+    "Bow folds against hip",
+    "Both hands cup a little light",
+    "Light warms to pearl",
+    "Hands cradle a crescent",
+    "Crescent turns toward ally",
+    "Gentle beam delivers the remedy",
+    "Empty hands lower",
+    "Return to ready stance"
+   ],
+   "ultimate": false,
+   "cleanse_count": 1
+  },
+  {
+   "id": "R10",
+   "character": "R",
+   "name": "Full Moon Ascendant",
+   "mp": 44,
+   "cast_s": 3,
+   "recovery_s": 1,
+   "cooldown_s": null,
+   "target": "Up to four enemies and all four allies",
+   "effect": "Ultimate, once per encounter. 4.0M light damage per enemy; shield every living ally for 1.5M for 8s.",
+   "terms": [
+    {
+     "kind": "damage",
+     "stat": "M",
+     "coefficient": 4,
+     "max_targets": 4,
+     "ticks": 1
+    },
+    {
+     "kind": "shield",
+     "stat": "M",
+     "coefficient": 1.5,
+     "max_targets": 4,
+     "ticks": 1
+    }
+   ],
+   "frames": [
+    "Feet plant and bow rises",
+    "Silver threads climb from her jewel",
+    "Threads curve into a lunar disc",
+    "Full moon forms above bow",
+    "She draws an enormous light arrow",
+    "Arrow breaks into a moonlit rain",
+    "Lunar facets settle around allies",
+    "Moon fades and she lowers bow"
+   ],
+   "ultimate": true,
+   "status": {
+    "shield_s": 8
+   },
+   "change_v03": "Unlocks after 15 s of combat, once per encounter; 60 s cooldown removed."
+  },
+  {
+   "id": "W01",
+   "character": "W",
+   "name": "Harvest Crescent",
+   "mp": 0,
+   "cast_s": 0.6,
+   "recovery_s": 1.4,
+   "cooldown_s": 0,
+   "target": "One enemy",
+   "effect": "Free weapon attack: 0.8P physical damage.",
+   "terms": [
+    {
+     "kind": "damage",
+     "stat": "P",
+     "coefficient": 0.8,
+     "max_targets": 1,
+     "ticks": 1
+    }
+   ],
+   "frames": [
+    "Fingers close around pendant",
+    "Pendant stretches into a crescent",
+    "Golden sickle unfolds",
+    "Body turns into a low guard",
+    "Sickle draws behind shoulder",
+    "Short controlled slash",
+    "Golden arc fades",
+    "Sickle lowers to ready position"
+   ],
+   "ultimate": false
+  },
+  {
+   "id": "W02",
+   "character": "W",
+   "name": "Silverleaf Salve",
+   "mp": 12,
+   "cast_s": 1,
+   "recovery_s": 1,
+   "cooldown_s": 4,
+   "target": "One living ally",
+   "effect": "Heal 2.4H.",
+   "terms": [
+    {
+     "kind": "heal",
+     "stat": "H",
+     "coefficient": 2.4,
+     "max_targets": 1,
+     "ticks": 1
+    }
+   ],
+   "frames": [
+    "Open book stays in left hand at waist",
+    "Right fingers select a dried leaf",
+    "Leaf becomes silver-green",
+    "Leaf rests above her palm",
+    "Warm light gathers under leaf",
+    "Leaf dissolves into healing motes",
+    "Palm follows motes toward ally",
+    "Book and hand return to ready"
+   ],
+   "ultimate": false
+  },
+  {
+   "id": "W03",
+   "character": "W",
+   "name": "Moondew",
+   "mp": 10,
+   "cast_s": 1,
+   "recovery_s": 1,
+   "cooldown_s": 12,
+   "target": "One living ally",
+   "effect": "Heal 0.5H at 2,4,6,8,10,12s after release: total 3.0H. Same-caster refresh replaces remaining ticks; no immediate tick.",
+   "terms": [
+    {
+     "kind": "heal_over_time",
+     "stat": "H",
+     "coefficient": 0.5,
+     "max_targets": 1,
+     "ticks": 6
+    }
+   ],
+   "frames": [
+    "Book stays in left hand as right hand lifts a small bottle",
+    "Right thumb uncorks the bottle",
+    "A bead of dew floats upward",
+    "Dew divides into six droplets",
+    "Droplets circle her crescent pendant",
+    "Dew ring travels to ally",
+    "Bottle closes as ring fades",
+    "Return to ready stance"
+   ],
+   "ultimate": false,
+   "status": {
+    "duration_s": 12,
+    "tick_interval_s": 2
+   }
+  },
+  {
+   "id": "W04",
+   "character": "W",
+   "name": "Thornwake",
+   "mp": 12,
+   "cast_s": 1.2,
+   "recovery_s": 0.8,
+   "cooldown_s": 10,
+   "target": "One enemy",
+   "effect": "1.6M nature damage and 3s Root; anchored bosses receive 1s Root.",
+   "terms": [
+    {
+     "kind": "damage",
+     "stat": "M",
+     "coefficient": 1.6,
+     "max_targets": 1,
+     "ticks": 1
+    }
+   ],
+   "frames": [
+    "Sickle point touches earth",
+    "Green light follows its curve",
+    "A seed glows beside her boot",
+    "Root curls around her hand",
+    "Thorn tips rise in a narrow line",
+    "Thorn line erupts beneath target",
+    "She lifts the sickle clear",
+    "Roots settle and stance resets"
+   ],
+   "ultimate": false,
+   "status": {
+    "root_s": 3,
+    "boss_root_s": 1
+   }
+  },
+  {
+   "id": "W05",
+   "character": "W",
+   "name": "Bitter Remedy",
+   "mp": 10,
+   "cast_s": 1,
+   "recovery_s": 0.8,
+   "cooldown_s": 8,
+   "target": "One living ally",
+   "effect": "Heal 0.8H and cleanse up to two removable negative statuses using the shared priority order.",
+   "terms": [
+    {
+     "kind": "heal",
+     "stat": "H",
+     "coefficient": 0.8,
+     "max_targets": 1,
+     "ticks": 1
+    }
+   ],
+   "frames": [
+    "Book balances on one forearm",
+    "Dark herb is pinched between fingers",
+    "Herb crumbles over a tiny cup",
+    "Cup steams with green-gold vapour",
+    "She swirls vapour into a spiral",
+    "Spiral carries remedy toward ally",
+    "Dark residue falls harmlessly away",
+    "Return to ready stance"
+   ],
+   "ultimate": false,
+   "cleanse_count": 2
+  },
+  {
+   "id": "W06",
+   "character": "W",
+   "name": "Bramble Cradle",
+   "mp": 26,
+   "cast_s": 2,
+   "recovery_s": 1,
+   "cooldown_s": 22,
+   "target": "All four living allies",
+   "effect": "Shield each ally for 1.5H for 10s.",
+   "terms": [
+    {
+     "kind": "shield",
+     "stat": "H",
+     "coefficient": 1.5,
+     "max_targets": 4,
+     "ticks": 1
+    }
+   ],
+   "frames": [
+    "Left hand holds closed book against chest",
+    "Right palm lowers toward the earth",
+    "Four young roots appear",
+    "Roots braid into open baskets",
+    "Gold leaves cover sharp thorns",
+    "Four bramble shields bloom around allies",
+    "Right hand opens to release the shields",
+    "Return to ready stance"
+   ],
+   "ultimate": false,
+   "status": {
+    "duration_s": 10
+   }
+  },
+  {
+   "id": "W07",
+   "character": "W",
+   "name": "Elderwood Guardian",
+   "mp": 30,
+   "cast_s": 3,
+   "recovery_s": 1,
+   "cooldown_s": 24,
+   "target": "Summoned guardian; enemies and allies",
+   "effect": "Summon for 15s, HP 5.0H. It intercepts at most three single-target direct hits against allies and attacks the selected enemy for 0.6M at 3,6,9,12,15s after summon. Redirect overflow reaches the original ally. One shared Witch summon slot.",
+   "terms": [
+    {
+     "kind": "summon_damage",
+     "stat": "M",
+     "coefficient": 0.6,
+     "max_targets": 1,
+     "ticks": 5
+    },
+    {
+     "kind": "summon_hp",
+     "stat": "H",
+     "coefficient": 5,
+     "max_targets": 1,
+     "ticks": 1
+    }
+   ],
+   "frames": [
+    "A large seed rests on her right palm above the left-held book",
+    "She lays seed on open book",
+    "Roots hang from the pages",
+    "Roots form a great ribcage",
+    "Bark face and branch antlers emerge",
+    "Guardian steps free beside her",
+    "Right hand rests briefly against the guardian arm; left hand retains book",
+    "Return to ready stance"
+   ],
+   "ultimate": false,
+   "summon": {
+    "duration_s": 15,
+    "tick_interval_s": 3,
+    "intercepts": 3,
+    "slot": "witch",
+    "intercept_overflow_to_original": true
+   }
+  },
+  {
+   "id": "W08",
+   "character": "W",
+   "name": "Sailwing Moth",
+   "mp": 28,
+   "cast_s": 3,
+   "recovery_s": 1,
+   "cooldown_s": 24,
+   "target": "Summoned moth; lowest-HP living ally",
+   "effect": "Summon for 15s, HP 3.0H. Heal the living ally with lowest HP percentage for 0.6H at 3,6,9,12,15s. Party takes 10% less area damage while it lives. Does not intercept attacks. Shares Witch summon slot.",
+   "terms": [
+    {
+     "kind": "summon_heal",
+     "stat": "H",
+     "coefficient": 0.6,
+     "max_targets": 1,
+     "ticks": 5
+    },
+    {
+     "kind": "summon_hp",
+     "stat": "H",
+     "coefficient": 3,
+     "max_targets": 1,
+     "ticks": 1
+    }
+   ],
+   "frames": [
+    "Right hand touches crescent pendant while left hand holds book",
+    "A small cocoon appears above book",
+    "Cocoon unfolds like pale paper",
+    "One great moth wing opens",
+    "Second wing reveals moonlike eyespots",
+    "Moth lifts free with a shower of pollen",
+    "Right hand guides the first wingbeat; book stays in left hand",
+    "Return to ready stance"
+   ],
+   "ultimate": false,
+   "summon": {
+    "duration_s": 15,
+    "tick_interval_s": 3,
+    "area_damage_reduction": 0.1,
+    "slot": "witch"
+   }
+  },
+  {
+   "id": "W09",
+   "character": "W",
+   "name": "Rootbound Return",
+   "mp": 32,
+   "cast_s": 4,
+   "recovery_s": 1,
+   "cooldown_s": 45,
+   "target": "One defeated ally",
+   "effect": "Revive at 30% maximum HP. Each ally may receive this revive only once per encounter. Clears removable debuffs; recipient cannot act for 2s and is not invulnerable. No effect on story deaths.",
+   "terms": [],
+   "frames": [
+    "She kneels with the open book still held in her left hand",
+    "A seed glows on her right palm above the pages",
+    "Roots outline a resting figure",
+    "Small white flowers open",
+    "A bright pulse passes through the roots",
+    "Roots lift ally back to life",
+    "Flowers scatter as she rises with book in left hand",
+    "Return to ready stance"
+   ],
+   "ultimate": false,
+   "revive": {
+    "hp_fraction": 0.3,
+    "per_target_encounter_limit": 1,
+    "recipient_action_lock_s": 2
+   }
+  },
+  {
+   "id": "W10",
+   "character": "W",
+   "name": "Garden Beneath the Moon",
+   "mp": 52,
+   "cast_s": 4,
+   "recovery_s": 1,
+   "cooldown_s": null,
+   "target": "All living allies and up to four enemies",
+   "effect": "Ultimate, once per encounter. Heal each living ally for 2.0H immediately, then six ticks of H/3 at 2s intervals: 2.0H more over 12s. Root enemies 3s; anchored bosses 1s. Does not revive.",
+   "terms": [
+    {
+     "kind": "heal",
+     "stat": "H",
+     "coefficient": 2,
+     "max_targets": 4,
+     "ticks": 1
+    },
+    {
+     "kind": "heal_over_time",
+     "stat": "H",
+     "coefficient": 0.3333333333333333,
+     "max_targets": 4,
+     "ticks": 6
+    }
+   ],
+   "frames": [
+    "Left hand opens book wide and pages lift",
+    "Right hand scatters a handful of seeds",
+    "Green lunar arcs join overhead",
+    "Great flowers rise around her",
+    "A pale moon illuminates the garden",
+    "Garden blooms across the party",
+    "Pollen and vines settle into a healing field",
+    "She lowers her right hand beneath petals while left hand retains book"
+   ],
+   "ultimate": true,
+   "status": {
+    "duration_s": 12,
+    "tick_interval_s": 2,
+    "root_s": 3,
+    "boss_root_s": 1
+   },
+   "change_v03": "Unlocks after 15 s of combat, once per encounter; 60 s cooldown removed."
+  },
+  {
+   "id": "F01",
+   "character": "F",
+   "name": "Hemline Fangs",
+   "mp": 0,
+   "cast_s": 0.5,
+   "recovery_s": 1.5,
+   "cooldown_s": 0,
+   "target": "One enemy",
+   "effect": "Free weapon attack: two hits of 0.5P each; 1.0P total.",
+   "terms": [
+    {
+     "kind": "damage",
+     "stat": "P",
+     "coefficient": 0.5,
+     "max_targets": 1,
+     "ticks": 2
+    }
+   ],
+   "frames": [
+    "Fingers find shears at patchwork trouser seam",
+    "Shears lift with a playful flourish",
+    "Blades split into twin daggers",
+    "Weight shifts onto front foot",
+    "Both blades cross behind shoulders",
+    "Two quick crossing cuts",
+    "Daggers spin back into her palms",
+    "Return to ready stance"
+   ],
+   "ultimate": false
+  },
+  {
+   "id": "F02",
+   "character": "F",
+   "name": "Blue Mischief",
+   "mp": 14,
+   "cast_s": 0.8,
+   "recovery_s": 0.8,
+   "cooldown_s": 6,
+   "target": "One enemy",
+   "effect": "2.0M cold foxfire damage. It harms only its designated target.",
+   "terms": [
+    {
+     "kind": "damage",
+     "stat": "M",
+     "coefficient": 2,
+     "max_targets": 1,
+     "ticks": 1
+    }
+   ],
+   "frames": [
+    "One finger hooks under bell",
+    "A blue spark skips onto fingertip",
+    "Spark becomes a small fox-shaped flame",
+    "She balances it above her palm",
+    "Flame crouches as though ready to leap",
+    "Foxfire springs toward target",
+    "She waves after it with a grin",
+    "Return to ready stance"
+   ],
+   "ultimate": false
+  },
+  {
+   "id": "F03",
+   "character": "F",
+   "name": "Borrowed Face",
+   "mp": 12,
+   "cast_s": 0.8,
+   "recovery_s": 0.8,
+   "cooldown_s": 14,
+   "target": "Self",
+   "effect": "Create one decoy for 6s with a total 2.0M HP budget. It redirects at most two eligible single-target hits aimed at Fox. Overflow damages Fox; no copied attacks or extra turns.",
+   "terms": [
+    {
+     "kind": "decoy_hp",
+     "stat": "M",
+     "coefficient": 2,
+     "max_targets": 1,
+     "ticks": 1
+    }
+   ],
+   "frames": [
+    "Head tilts and smile widens",
+    "She covers one eye",
+    "A second smile appears beside her",
+    "Her silhouette peels sideways",
+    "Double takes a mocking bow",
+    "Decoy settles in front of her",
+    "Real Fox slips one step behind",
+    "Return to ready stance"
+   ],
+   "ultimate": false,
+   "status": {
+    "duration_s": 6,
+    "redirect_charges": 2
+   }
+  },
+  {
+   "id": "F04",
+   "character": "F",
+   "name": "Switcheroo",
+   "mp": 14,
+   "cast_s": 0.6,
+   "recovery_s": 0.8,
+   "cooldown_s": 14,
+   "target": "One ally and one enemy",
+   "effect": "Swap an ally and an ordinary enemy between their formation slots and cancel one ordinary enemy windup aimed at that ally. Against anchored bosses, move ally between allied ranks and grant one direct-hit evasion charge for 4s; do not move boss or cancel its windup. No cooldown reset.",
+   "terms": [],
+   "frames": [
+    "She looks from ally to enemy",
+    "A hand points toward each",
+    "Two blue ribbon loops form",
+    "Hands cross at the wrists",
+    "Ribbons tug in opposite directions",
+    "Targets exchange places in foxfire",
+    "She opens hands innocently",
+    "Return to ready stance"
+   ],
+   "ultimate": false,
+   "status": {
+    "boss_evasion_charge": 1,
+    "boss_evasion_s": 4
+   }
+  },
+  {
+   "id": "F05",
+   "character": "F",
+   "name": "Finders Keepers",
+   "mp": 12,
+   "cast_s": 0.8,
+   "recovery_s": 0.8,
+   "cooldown_s": 10,
+   "target": "One enemy; self receives stolen buff",
+   "effect": "Steal the oldest eligible positive buff for its remaining duration, capped at 10s. Excludes phase mechanics, invulnerability, summons, shields and unique boss effects. With no eligible buff, deal 1.0M foxfire damage instead; never both.",
+   "terms": [
+    {
+     "kind": "fallback_damage",
+     "stat": "M",
+     "coefficient": 1,
+     "max_targets": 1,
+     "ticks": 1
+    }
+   ],
+   "frames": [
+    "She rubs thumb against fingertip",
+    "A fine blue thread appears",
+    "Thread hooks an enemy enchantment",
+    "She reels it in with two fingers",
+    "Stolen light hangs above bell",
+    "Enchantment snaps onto her collar",
+    "She pats the bell possessively",
+    "Return to ready stance"
+   ],
+   "ultimate": false,
+   "status": {
+    "stolen_buff_duration_cap_s": 10
+   }
+  },
+  {
+   "id": "F06",
+   "character": "F",
+   "name": "Loose Thread",
+   "mp": 14,
+   "cast_s": 0.8,
+   "recovery_s": 0.8,
+   "cooldown_s": 12,
+   "target": "One enemy",
+   "effect": "Three damage ticks of 0.65M at 3,6,9s: total 1.95M. Target deals 15% less direct damage for the first 6s; anchored bosses receive 7.5% reduction.",
+   "terms": [
+    {
+     "kind": "damage_over_time",
+     "stat": "M",
+     "coefficient": 0.65,
+     "max_targets": 1,
+     "ticks": 3
+    }
+   ],
+   "frames": [
+    "A needle slides from patchwork trouser hem",
+    "She catches an invisible thread",
+    "Thread turns blue between her hands",
+    "Needle loops through a tiny knot",
+    "Knot tightens around a flame",
+    "Needle sends the knot to target",
+    "She snips the loose end",
+    "Return to ready stance"
+   ],
+   "ultimate": false,
+   "status": {
+    "duration_s": 9,
+    "tick_interval_s": 3,
+    "direct_damage_reduction": 0.15,
+    "boss_direct_damage_reduction": 0.075,
+    "reduction_s": 6
+   }
+  },
+  {
+   "id": "F07",
+   "character": "F",
+   "name": "Ninefold Lie",
+   "mp": 22,
+   "cast_s": 1.5,
+   "recovery_s": 1,
+   "cooldown_s": 12,
+   "target": "Up to three enemies",
+   "effect": "Three successive waves each deal 0.8M per enemy; total 2.4M per enemy. Nine visible images are cosmetic and do not add nine extra hits.",
+   "terms": [
+    {
+     "kind": "damage",
+     "stat": "M",
+     "coefficient": 0.8,
+     "max_targets": 3,
+     "ticks": 3
+    }
+   ],
+   "frames": [
+    "She lifts a fold of her wide patchwork trousers",
+    "One blue reflection appears",
+    "Reflections split into three",
+    "Three become nine in a curved fan",
+    "Nine figures mirror one mischievous gesture",
+    "Three waves of foxfire strike",
+    "Reflections collapse into the real Fox",
+    "Return to ready stance"
+   ],
+   "ultimate": false
+  },
+  {
+   "id": "F08",
+   "character": "F",
+   "name": "Bellbound Bargain",
+   "mp": 16,
+   "cast_s": 1,
+   "recovery_s": 1,
+   "cooldown_s": 20,
+   "target": "One other living ally",
+   "effect": "Ally gains +25% M for 10s. Fox pays ceil(15% of her maximum HP) on release, bypassing shields; cannot cast if this would leave her below 1 HP. No MP transfer. Bonus adds to other M buffs, with total M bonus capped at +50%.",
+   "terms": [],
+   "frames": [
+    "She cradles bell in both hands",
+    "Bell lifts clear of her throat",
+    "A gold-blue thread joins an ally",
+    "Her smile briefly tightens",
+    "Thread glows as the bargain seals",
+    "Light travels from bell to ally",
+    "She releases bell and exhales",
+    "Return to ready stance"
+   ],
+   "ultimate": false,
+   "status": {
+    "magic_power_bonus": 0.25,
+    "duration_s": 10,
+    "self_max_hp_cost": 0.15
+   }
+  },
+  {
+   "id": "F09",
+   "character": "F",
+   "name": "When the Bell Falls Silent",
+   "mp": 24,
+   "cast_s": 2,
+   "recovery_s": 1,
+   "cooldown_s": 30,
+   "target": "Self",
+   "effect": "For 12s gain +30% M and +20% physical weapon-attack damage. Bell falls silent and spectral fox tails appear. No instant attack; no time stop. Same buff cannot stack.",
+   "terms": [],
+   "frames": [
+    "She rests two fingers on bell",
+    "Smile settles into a calm expression",
+    "Bell stops moving",
+    "Blue light gathers behind her",
+    "Spectral tails open in a broad fan",
+    "Silent foxfire mantle locks into place",
+    "She lowers hand without a jingle",
+    "Return to a composed ready stance"
+   ],
+   "ultimate": false,
+   "status": {
+    "duration_s": 12,
+    "magic_power_bonus": 0.3,
+    "weapon_damage_bonus": 0.2
+   }
+  },
+  {
+   "id": "F10",
+   "character": "F",
+   "name": "The Moon’s Little Lie",
+   "mp": 48,
+   "cast_s": 3,
+   "recovery_s": 1,
+   "cooldown_s": null,
+   "target": "Up to four enemies and all living allies",
+   "effect": "Ultimate, once per encounter. 5.0M foxfire damage per enemy. Each ally receives one decoy for 6s; each has M HP and redirects only one eligible direct hit, with overflow reaching ally. Replaces weaker decoys on same ally.",
+   "terms": [
+    {
+     "kind": "damage",
+     "stat": "M",
+     "coefficient": 5,
+     "max_targets": 4,
+     "ticks": 1
+    },
+    {
+     "kind": "decoy_hp",
+     "stat": "M",
+     "coefficient": 1,
+     "max_targets": 4,
+     "ticks": 1
+    }
+   ],
+   "frames": [
+    "She points up with an amused glance",
+    "A tiny crescent balances on her finger",
+    "Crescent spins like a tossed coin",
+    "Spectral tails sweep across the sky",
+    "Crescent becomes an impossible blue moon",
+    "Moon splits into foxfire and four doubles",
+    "She catches the returning crescent",
+    "Crescent vanishes into bell as stance resets"
+   ],
+   "ultimate": true,
+   "status": {
+    "duration_s": 6,
+    "redirect_charges_per_ally": 1
+   },
+   "change_v03": "Unlocks after 15 s of combat, once per encounter; 60 s cooldown removed."
+  },
+  {
+   "id": "J01",
+   "character": "J",
+   "name": "Gilded Rebuke",
+   "mp": 0,
+   "cast_s": 0.6,
+   "recovery_s": 1.4,
+   "cooldown_s": 0,
+   "target": "One enemy",
+   "effect": "Free weapon attack: 0.9P physical damage.",
+   "terms": [
+    {
+     "kind": "damage",
+     "stat": "P",
+     "coefficient": 0.9,
+     "max_targets": 1,
+     "ticks": 1
+    }
+   ],
+   "frames": [
+    "Fingers brush gold hip bells",
+    "One bell drops onto a fine chain",
+    "Chain uncoils beneath sleeve",
+    "Wrist turns in a small courtly flourish",
+    "Bell-head circles behind her",
+    "Short flail strike snaps outward",
+    "Chain gathers back toward hip",
+    "Bells settle and stance resets"
+   ],
+   "ultimate": false
+  },
+  {
+   "id": "J02",
+   "character": "J",
+   "name": "Ill Omen",
+   "mp": 4,
+   "cast_s": 1,
+   "recovery_s": 1,
+   "cooldown_s": 4,
+   "target": "One enemy",
+   "effect": "0.8M fate damage. Affordable lesser spell; does not place Doom.",
+   "terms": [
+    {
+     "kind": "damage",
+     "stat": "M",
+     "coefficient": 0.8,
+     "max_targets": 1,
+     "ticks": 1
+    }
+   ],
+   "frames": [
+    "One eyebrow lifts",
+    "Two fingers touch turquoise pendant",
+    "A small black-violet spark forms",
+    "Spark curls into a crooked star",
+    "Star hangs motionless above fingertip",
+    "She flicks omen toward enemy",
+    "Empty hand closes gently",
+    "Return to ready stance"
+   ],
+   "ultimate": false
+  },
+  {
+   "id": "J03",
+   "character": "J",
+   "name": "Sealed Fate",
+   "mp": 18,
+   "cast_s": 2.7,
+   "recovery_s": 1.3,
+   "cooldown_s": 6,
+   "target": "One enemy",
+   "effect": "Apply one Doom mark for 20s, maximum three active marks across enemies; reapplication refreshes rather than stacks. At expiry an ordinary enemy dies. Anchored boss instead loses min(10% phase-maximum HP, 5.0M). Mark remembers phase and M at application. Boss loss bypasses shields and damage modifiers. No impact damage.",
+   "terms": [],
+   "frames": [
+    "Ready stance, hands at her sides",
+    "Right hand rises toward her cheek, head tilting",
+    "Hand at her cheek as if hearing a secret, eyes closing",
+    "Palm opens upward beside her head; a violet spark appears",
+    "The spark blooms into a double rune ring above her palm",
+    "Rings turn and flare at their brightest; the seal flies to the target and Doom begins",
+    "Rings shrink back into a spark and go out; hand returns to her cheek",
+    "Hand lowers; return to ready stance"
+   ],
+   "ultimate": false,
+   "status": {
+    "doom_s": 20,
+    "max_active_marks": 3,
+    "boss_phase_hp_fraction": 0.1,
+    "boss_M_cap": 5,
+    "refresh_not_stack": true
+   },
+   "change_v03": "Pose list now describes the existing Orb animation (24 frames, 6 fps). Release at frame 16."
+  },
+  {
+   "id": "J04",
+   "character": "J",
+   "name": "Hush",
+   "mp": 12,
+   "cast_s": 1.0,
+   "recovery_s": 1,
+   "cooldown_s": 12,
+   "target": "One enemy",
+   "effect": "Silence an ordinary enemy for 6s and cancel one interruptible magic windup. Anchored boss instead has its current interruptible magic cast extended by 1.5s, without silence or cancellation. No damage.",
+   "terms": [],
+   "frames": [
+    "One finger rises toward her lips",
+    "Nearby violet motes stop moving",
+    "A thin dark ring forms",
+    "Ring closes around an imagined mouth",
+    "She fixes target with a steady look",
+    "Gesture seals the target voice",
+    "Ring thins into a dark thread",
+    "Hand lowers and stance resets"
+   ],
+   "ultimate": false,
+   "status": {
+    "silence_s": 6,
+    "boss_cast_extension_s": 1.5
+   },
+   "change_v03": "Cast 2.0 s -> 1.0 s so the Jester can answer an interrupting enemy (simulation fixture F2: 0% -> 19% damage share)."
+  },
+  {
+   "id": "J05",
+   "character": "J",
+   "name": "Stop",
+   "mp": 20,
+   "cast_s": 3,
+   "recovery_s": 1,
+   "cooldown_s": 18,
+   "target": "One enemy",
+   "effect": "Freeze an ordinary enemy for 3s; anchored boss for 1s. Pauses its action/movement progress, not global time, cooldowns, status durations or Doom. Uninterruptible scripted actions are explicitly excluded.",
+   "terms": [],
+   "frames": [
+    "Palm turns upright",
+    "A violet ring rotates over it",
+    "Fine clocklike spokes appear without numerals",
+    "Rotation slows",
+    "Ring and her gaze become completely still",
+    "Ring locks around the target",
+    "Ring breaks into suspended points",
+    "Points fade and stance resets"
+   ],
+   "ultimate": false,
+   "status": {
+    "stop_s": 3,
+    "boss_stop_s": 1
+   }
+  },
+  {
+   "id": "J06",
+   "character": "J",
+   "name": "Gravity",
+   "mp": 24,
+   "cast_s": 4,
+   "recovery_s": 1,
+   "cooldown_s": 16,
+   "target": "One enemy",
+   "effect": "Lose min(25% current HP, 4.0M), leaving at least 1 HP. Bypasses shields and modifiers, cannot crit and does not receive Guiding Star. Bosses use the same capped formula.",
+   "terms": [],
+   "frames": [
+    "Hand opens below waist",
+    "Black-violet bead appears",
+    "Loose fabric lifts toward bead",
+    "Bead grows into a dark sphere",
+    "Silver light bends around its edge",
+    "She lowers palm and target gravity collapses inward",
+    "Sphere contracts to a point",
+    "Point vanishes and stance resets"
+   ],
+   "ultimate": false,
+   "status": {
+    "current_hp_fraction": 0.25,
+    "M_cap": 4,
+    "minimum_remaining_hp": 1
+   }
+  },
+  {
+   "id": "J07",
+   "character": "J",
+   "name": "Royal Reversal",
+   "mp": 16,
+   "cast_s": 2,
+   "recovery_s": 1,
+   "cooldown_s": 18,
+   "target": "One living ally",
+   "effect": "For 8s intercept the next removable negative status application against ally. Block it and attempt to apply that status once to its source under normal boss/control rules. Never reflect damage, Doom, other reflected effects, phase effects or unavoidable mechanics. Consumed even if source is immune.",
+   "terms": [],
+   "frames": [
+    "Two fingers lift an edge of veil",
+    "She offers a shallow courtly bow",
+    "A small silver-violet mirror forms",
+    "Mirror turns its dark face outward",
+    "An inverted crescent lights its frame",
+    "Mirror floats into place beside ally",
+    "She straightens with a slight smile",
+    "Return to ready stance"
+   ],
+   "ultimate": false,
+   "status": {
+    "duration_s": 8,
+    "reflect_charges": 1
+   }
+  },
+  {
+   "id": "J08",
+   "character": "J",
+   "name": "Against All Odds",
+   "mp": 26,
+   "cast_s": 2.0,
+   "recovery_s": 6.0,
+   "cooldown_s": 30,
+   "target": "All living allies",
+   "effect": "Over 12s heal each ally for six ticks of H/6 (total 1.0H), plus 15% Haste. If mean HP fraction of living allies is at or below 40% at release: total heal becomes 2.0H and Haste 25%. Haste affects recovery only, not casting, cooldowns, summons, DoT or Doom.",
+   "terms": [
+    {
+     "kind": "heal_over_time",
+     "stat": "H",
+     "coefficient": 0.16666666666666666,
+     "max_targets": 4,
+     "ticks": 6
+    }
+   ],
+   "frames": [
+    "Ready stance",
+    "Both arms sweep up and out in a wide arc",
+    "Arms high, head tilting back, first stars appear",
+    "Arms fully raised; the heal and haste release onto the party",
+    "Held pose: stars twinkle and drift down",
+    "Held pose: stars keep falling, veils float",
+    "Arms sweep down and out to her sides",
+    "Return to ready stance"
+   ],
+   "ultimate": false,
+   "status": {
+    "duration_s": 12,
+    "tick_interval_s": 2,
+    "haste": 0.15,
+    "desperate_haste": 0.25,
+    "desperate_heal_multiplier": 2,
+    "desperate_hp_threshold": 0.4
+   },
+   "change_v03": "Pose list now describes the existing Skyward animation (16 frames, 2 fps). Release at frame 4; she holds the pose while the heal streams."
+  },
+  {
+   "id": "J09",
+   "character": "J",
+   "name": "The Last Toll",
+   "mp": 28,
+   "cast_s": 4,
+   "recovery_s": 1,
+   "cooldown_s": 20,
+   "target": "One enemy",
+   "effect": "4.0M fate damage. One deep bell note accompanies impact. Does not trigger or consume Doom.",
+   "terms": [
+    {
+     "kind": "damage",
+     "stat": "M",
+     "coefficient": 4,
+     "max_targets": 1,
+     "ticks": 1
+    }
+   ],
+   "frames": [
+    "Hand closes around one hip bell",
+    "Chain lifts bell in front of her",
+    "Violet circles gather around bell",
+    "She draws bell toward shoulder",
+    "Bell hangs still at the centre of a dark halo",
+    "Bell swings once and releases a heavy pulse",
+    "Halo breaks into falling silver dust",
+    "Chain gathers back and stance resets"
+   ],
+   "ultimate": false
+  },
+  {
+   "id": "J10",
+   "character": "J",
+   "name": "Curtain Call",
+   "mp": 54,
+   "cast_s": 5.3,
+   "recovery_s": 2.7,
+   "cooldown_s": null,
+   "target": "Up to four enemies; all living allies",
+   "effect": "Ultimate, once per encounter. First resolve all active Doom marks immediately, consuming each once; then deal 2.0M fate damage to each surviving selected enemy. Shield each living ally for 0.75M for 6s. No damage to corpses; no second Doom trigger.",
+   "terms": [
+    {
+     "kind": "damage",
+     "stat": "M",
+     "coefficient": 2,
+     "max_targets": 4,
+     "ticks": 1
+    },
+    {
+     "kind": "shield",
+     "stat": "M",
+     "coefficient": 0.75,
+     "max_targets": 4,
+     "ticks": 1
+    }
+   ],
+   "frames": [
+    "Ready stance, faint glow at her fingertips",
+    "Hands draw together at her chest; a small orb forms",
+    "Hands part; the orb opens into the rune sigil",
+    "Right hand lifts the sigil to her shoulder",
+    "Sigil bursts skyward; both arms rise, sparkles rain",
+    "Arms sweep down and out; falling sparks become a ring around her waist, every Doom seal resolves",
+    "The ring settles over the party as a ward and fades",
+    "Arms lower; return to ready stance"
+   ],
+   "ultimate": true,
+   "status": {
+    "shield_s": 6,
+    "resolve_all_doom": true
+   },
+   "change_v03": "Pose list now describes the existing Cast animation (48 frames, 6 fps). Release at frame 32."
+  }
+ ],
+ "art_direction": {
+  "source_pack": "base_sheets_pack/",
+  "rendering": "16-bit JRPG HD-2D pixel sprite style matching supplied Jester sheets; adult proportions, not chibi",
+  "style_refs": [
+   "base_sheets_pack/style_reference/jester_sheet_style_and_scale.png",
+   "base_sheets_pack/style_reference/jester_sheet_2.png"
+  ],
+  "base_generation": {
+   "missing_sheets": 3,
+   "sheet_px": [
+    1536,
+    1024
+   ],
+   "rows": [
+    6,
+    8,
+    6
+   ],
+   "requested_figures_per_sheet": 20,
+   "background": "#393144",
+   "shadow": "soft oval ground shadow as in supplied prompts"
+  },
+  "combat_template": {
+   "sheets": 40,
+   "frames_per_sheet": 8,
+   "layout": [
+    4,
+    2
+   ],
+   "proposed_sheet_px": [
+    1536,
+    1024
+   ],
+   "proposed_cell_px": [
+    384,
+    512
+   ],
+   "pose_anchor": "match actual Jester body height and measured foot baseline; do not normalize to hat tips",
+   "background": "#393144 for generation masters; alpha extraction later",
+   "casting_view": "front/near-front as existing Jester",
+   "walk_view": "side, facing right as supplied base prompts"
+  },
+  "notes": [
+   "New pack contains six concept crops and two pixel Jester style sheets, not finished Ranger/Witch/Fox base sprite sheets.",
+   "60 figures on three requested base sheets are production work, not automatically 60 additional unique runtime frames.",
+   "320 combat keyframes remain the gross target; reuse is credited only after inspection."
+  ]
+ },
+ "rules_v03": {
+  "mp_regen_per_s": {
+   "R": 1.0,
+   "W": 1.2,
+   "F": 0.9,
+   "J": 0.8
+  },
+  "ultimate_unlock": "Ultimates unlock after 15 s of combat (stand-in for a charge meter filled by damage dealt and taken). Once per encounter. The separate 60 s ultimate cooldown is removed.",
+  "animation_timing": "Cast time = time to the release frame of the actual animation; recovery = the rest of the animation. Lock time = full animation length."
+ }
+}
