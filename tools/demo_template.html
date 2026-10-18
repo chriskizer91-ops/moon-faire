@@ -1,0 +1,464 @@
+<title>Moon Faire Stage</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Jacquard+24&family=Atkinson+Hyperlegible:wght@400;700&family=JetBrains+Mono:wght@400;600&display=swap">
+<style>
+/* Layout: a puppet-theatre stage first, the cast and their moves beside it (under it on a phone), then the file-size and crispness checks.
+   One dark look on purpose, the same as the Moon Faire flipbook: the sprites were painted on night purple. */
+:root{
+  --velvet:#17121e;      /* page ground, black plum */
+  --curtain:#221a2c;     /* raised panels */
+  --stage:#383043;       /* the sprites' own backdrop */
+  --gold:#d6a84e;        /* veil trim: selection, release */
+  --veil:#b8407e;        /* magenta chiffon: draft tags */
+  --pendant:#3fc2b4;     /* turquoise pendant: focus, "shows" */
+  --ink:#efe6f2;
+  --muted:#a597b3;
+  --line:#3a3049;
+  --warn:#e8806f;
+  --f-display:"Jacquard 24", Georgia, serif;
+  --f-body:"Atkinson Hyperlegible", system-ui, -apple-system, "Segoe UI", sans-serif;
+  --f-mono:"JetBrains Mono", ui-monospace, "SFMono-Regular", Menlo, monospace;
+  color-scheme:dark;
+}
+html,body{background:var(--velvet);color:var(--ink)}
+body{font-family:var(--f-body);font-size:15px;line-height:1.5}
+.wrap{max-width:1180px;margin:0 auto;padding-left:max(16px, env(safe-area-inset-left, 0px));padding-right:max(16px, env(safe-area-inset-right, 0px));padding-block:18px 48px;display:grid;gap:28px}
+header{display:flex;flex-wrap:wrap;align-items:baseline;gap:4px 16px}
+h1{font-family:var(--f-display);font-weight:400;font-size:clamp(40px, 8vw, 64px);line-height:.9;margin:0;color:var(--gold);letter-spacing:.01em}
+header p{margin:0;color:var(--muted);max-width:60ch;text-wrap:pretty}
+h2{font-family:var(--f-display);font-weight:400;font-size:32px;line-height:1;margin:0 0 4px;color:var(--ink);text-wrap:balance}
+.label{font-size:12px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);margin:0 0 6px}
+.mono{font-family:var(--f-mono);font-variant-numeric:tabular-nums}
+
+.theatre{display:grid;gap:18px;grid-template-columns:minmax(0, 1fr)}
+@media (min-width: 900px){ .theatre{grid-template-columns:minmax(0, 1fr) 330px;align-items:start} }
+
+.stage{position:relative;border:1px solid var(--gold);border-radius:4px;background:var(--stage);aspect-ratio:1448 / 1086;max-width:100%;overflow:hidden;touch-action:manipulation}
+.stage canvas{display:block;width:100%;height:100%}
+.stage .msg{position:absolute;inset:auto 12px 12px 12px;background:var(--velvet);border:1px solid var(--warn);color:var(--ink);padding:10px 12px;border-radius:4px;font-size:14px}
+.readout{margin-top:8px;display:flex;flex-wrap:wrap;gap:4px 14px;font-size:13px;color:var(--muted)}
+.readout b{color:var(--ink);font-weight:600}
+.readout .rel{color:var(--gold)}
+
+.panel{display:grid;gap:16px;align-content:start}
+.chips{display:flex;flex-wrap:wrap;gap:6px}
+button{font:inherit;color:var(--ink);background:var(--curtain);border:1px solid var(--line);border-radius:4px;padding:6px 10px;cursor:pointer;line-height:1.25}
+button:hover{border-color:var(--muted)}
+button:focus-visible{outline:2px solid var(--pendant);outline-offset:2px}
+button[aria-pressed="true"]{border-color:var(--gold);background:color-mix(in srgb, var(--gold) 14%, var(--curtain))}
+.cast button{display:grid;text-align:left;padding:7px 10px;min-width:0}
+.cast button small{color:var(--muted);font-size:12px}
+.cast{display:grid;grid-template-columns:repeat(2, minmax(0, 1fr));gap:6px}
+.moves button{display:inline-flex;align-items:baseline;gap:6px}
+.moves small{font-family:var(--f-mono);font-size:11px;color:var(--muted)}
+.tag{font-size:10px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--veil);border:1px solid var(--veil);border-radius:3px;padding:0 4px}
+.row{display:flex;flex-wrap:wrap;gap:6px 14px;align-items:center}
+.seg{display:inline-flex}
+.seg button{border-radius:0;margin-left:-1px}
+.seg button:first-child{border-radius:4px 0 0 4px;margin-left:0}
+.seg button:last-child{border-radius:0 4px 4px 0}
+.seg button[aria-pressed="true"]{position:relative;z-index:1}
+.transport button{min-width:44px;display:inline-grid;place-items:center}
+.transport svg{width:16px;height:16px;fill:currentColor}
+
+.checks{display:grid;gap:28px;grid-template-columns:minmax(0, 1fr)}
+@media (min-width: 900px){ .checks{grid-template-columns:minmax(0, 5fr) minmax(0, 7fr)} }
+.checks section{display:grid;gap:12px;align-content:start;min-width:0}
+.checks p{margin:0;color:var(--muted);max-width:62ch;text-wrap:pretty}
+.checks p b{color:var(--ink)}
+.tablewrap{overflow-x:auto}
+table{border-collapse:collapse;width:100%;font-size:14px}
+th,td{text-align:left;padding:7px 10px 7px 0;border-bottom:1px solid var(--line);vertical-align:baseline}
+th{font-size:12px;letter-spacing:.06em;text-transform:uppercase;color:var(--muted);font-weight:700}
+td.num,th.num{text-align:right;font-family:var(--f-mono);font-variant-numeric:tabular-nums;white-space:nowrap}
+tr.now td{color:var(--gold)}
+.support{display:flex;flex-wrap:wrap;gap:6px}
+.support span{font-size:13px;border:1px solid var(--line);border-radius:4px;padding:3px 8px;color:var(--muted)}
+.support span.yes{border-color:var(--pendant);color:var(--ink)}
+.support span.no{border-color:var(--warn);color:var(--warn)}
+
+.grid4{display:grid;grid-template-columns:repeat(2, minmax(0, 1fr));gap:10px}
+@media (min-width: 640px){ .grid4{grid-template-columns:repeat(4, minmax(0, 1fr))} }
+figure{margin:0;display:grid;gap:6px;min-width:0}
+figure canvas{width:100%;aspect-ratio:1;background:var(--stage);border:1px solid var(--line);border-radius:3px;image-rendering:pixelated;display:block}
+figure.used canvas{border-color:var(--gold)}
+figcaption{font-size:13px;line-height:1.35}
+figcaption small{display:block;color:var(--muted);font-family:var(--f-mono);font-size:11.5px}
+figcaption .fail{color:var(--warn);font-family:var(--f-body)}
+footer{color:var(--muted);font-size:13px;border-top:1px solid var(--line);padding-top:14px}
+footer p{margin:0;max-width:75ch}
+@media (prefers-reduced-motion: reduce){ *{scroll-behavior:auto} }
+</style>
+
+<div class="wrap">
+  <header>
+    <h1>Moon Faire</h1>
+    <p>Stage test. All four witches, every move in the export, packed as AVIF frames. Tap a witch, then a move. The gold ring marks each spell's release frame.</p>
+  </header>
+
+  <div class="theatre">
+    <div>
+      <div class="stage" id="stagebox">
+        <canvas id="stage" aria-label="Stage with the four witches"></canvas>
+        <div class="msg" id="stagemsg" hidden></div>
+      </div>
+      <div class="readout mono" id="readout" aria-live="polite"></div>
+    </div>
+
+    <div class="panel">
+      <div>
+        <p class="label">Cast</p>
+        <div class="cast" id="cast"></div>
+      </div>
+      <div>
+        <p class="label" id="moveslabel">Moves</p>
+        <div class="chips moves" id="moves"></div>
+      </div>
+      <div class="row transport">
+        <div class="seg">
+          <button id="back" aria-label="Previous frame"><svg viewBox="0 0 16 16"><path d="M3 2h2v12H3zM14 2v12L6 8z"/></svg></button>
+          <button id="play" aria-label="Pause"><svg viewBox="0 0 16 16" id="playicon"><path d="M3 2h4v12H3zM9 2h4v12H9z"/></svg></button>
+          <button id="fwd" aria-label="Next frame"><svg viewBox="0 0 16 16"><path d="M11 2h2v12h-2zM2 2v12l8-6z"/></svg></button>
+        </div>
+        <div class="seg" id="speed" role="group" aria-label="Speed">
+          <button data-v="0.25">¼×</button><button data-v="0.5">½×</button><button data-v="1">1×</button>
+        </div>
+        <button id="loop" aria-pressed="false">Loop move</button>
+      </div>
+      <div class="row">
+        <div class="seg" id="view" role="group" aria-label="View">
+          <button data-v="lineup">Line-up</button><button data-v="solo">Solo</button>
+        </div>
+        <div class="seg" id="mode" role="group" aria-label="Frames">
+          <button data-v="hd">HD</button><button data-v="pixel">Pixel 128</button>
+        </div>
+      </div>
+      <div>
+        <p class="label">Stage</p>
+        <div class="chips" id="bg"></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="checks">
+    <section>
+      <h2>How big the frames are</h2>
+      <div class="tablewrap">
+        <table>
+          <thead><tr><th>Format</th><th class="num">All frames</th><th class="num">vs now</th></tr></thead>
+          <tbody id="sizes"></tbody>
+        </table>
+      </div>
+      <p id="room"></p>
+      <div>
+        <p class="label">What this browser shows</p>
+        <div class="support" id="support"></div>
+      </div>
+    </section>
+
+    <section>
+      <h2>Crispness check</h2>
+      <p>The same frame in four encodings, side by side and unsmoothed. The gold box is what this page and <span class="mono">game-assets/</span> use.</p>
+      <div class="row">
+        <div class="chips" id="samples"></div>
+        <div class="seg" id="zoom" role="group" aria-label="Zoom">
+          <button data-v="1">Whole</button><button data-v="2">2×</button><button data-v="4">4×</button>
+        </div>
+      </div>
+      <div class="grid4" id="compare"></div>
+    </section>
+  </div>
+
+  <footer><p id="foot"></p></footer>
+</div>
+
+<script type="application/json" id="mf-data">/*DATA*/</script>
+<script>
+(() => {
+const $ = s => document.querySelector(s);
+const D = JSON.parse($("#mf-data").textContent);
+const W = 1448, H = 1086, PX = 3;   // stage units = HD pixels; pixel frames are 128 px tall, drawn at 3x
+const reduce = matchMedia("(prefers-reduced-motion: reduce)").matches;
+const MB = b => (b / 1e6).toFixed(2) + " MB";
+
+// ---------- images, decoded lazily per clip ----------
+const imgs = [], sheets = {}, bgs = [];
+function img(i) {
+  let im = imgs[i];
+  if (!im) { im = imgs[i] = new Image(); im.decoding = "async"; im.src = D.imgs[i]; }
+  return im;
+}
+const ok = im => im && im.complete && im.naturalWidth > 0;
+const settle = im => im.decode ? im.decode().catch(() => {}) : Promise.resolve();
+function sheet(ch) {
+  if (!sheets[ch.id]) { const im = new Image(); im.src = ch.sheet; sheets[ch.id] = im; }
+  return sheets[ch.id];
+}
+function bgImg(i) {
+  if (!bgs[i]) { const im = new Image(); im.src = D.backdrops[i].uri; bgs[i] = im; }
+  return bgs[i];
+}
+const preload = clip => Promise.all(clip.frames.map(f => settle(img(f[0]))));
+
+// ---------- state ----------
+const S = { sel: D.chars.length - 1, view: "lineup", mode: "hd", speed: 1, playing: true, loop: false, bg: 0 };
+const cast = D.chars.map(c => Object.assign(c, { map: Object.fromEntries(c.clips.map(k => [k.id, k])), cur: null, frame: 0, acc: 0, standing: true, flash: -1e9, last: null, shown: null }));
+const sel = () => cast[S.sel];
+function stand(ch) { ch.cur = ch.map[ch.stand.clip]; ch.frame = ch.stand.frame; ch.acc = 0; ch.standing = true; }
+cast.forEach(stand);
+function play(ch, id) {
+  const clip = ch.map[id];
+  ch.last = id;
+  renderMoves();
+  preload(clip).then(() => { ch.cur = clip; ch.frame = 0; ch.acc = 0; ch.standing = false; ch.flash = -1e9; release(ch); });
+}
+function release(ch) { if (!ch.standing && ch.cur.release && ch.frame + 1 === ch.cur.release) ch.flash = performance.now(); }
+function step(ch, d, manual) {
+  const n = ch.cur.frames.length;
+  let f = ch.frame + d;
+  if (f >= n) {
+    if (ch.cur.loop || ch.standing || manual || (S.loop && ch === sel())) f = 0;
+    else { stand(ch); return; }
+  }
+  if (f < 0) f = n - 1;
+  ch.frame = f;
+  release(ch);
+}
+function tick(ch, dt) {
+  if (ch.standing && !ch.cur.loop) return;
+  ch.acc += dt * S.speed;
+  const fd = 1 / ch.cur.fps;
+  while (ch.acc >= fd) { ch.acc -= fd; step(ch, 1); if (ch.standing && !ch.cur.loop) break; }
+}
+
+// ---------- stage ----------
+const cv = $("#stage"), ctx = cv.getContext("2d");
+function fit() {
+  const r = cv.getBoundingClientRect(), dpr = Math.min(window.devicePixelRatio || 1, 2.5);
+  cv.width = Math.max(1, Math.round(r.width * dpr)); cv.height = Math.max(1, Math.round(r.width * dpr * H / W));
+}
+new ResizeObserver(fit).observe($("#stagebox"));
+function slots() {
+  if (S.view === "solo") return [{ ch: sel(), x: W * 0.46, y: H * 0.93, s: 1.6 }];
+  return cast.map((ch, i) => ({ ch, x: W * (0.155 + 0.23 * i), y: H * 0.875, s: 1 }));
+}
+function drawChar(ch, x, y, s) {
+  const f = ch.cur.frames[ch.frame], flip = ch.cur.flipX;
+  ctx.save();
+  if (flip) { ctx.translate(x, 0); ctx.scale(-1, 1); ctx.translate(-x, 0); }
+  if (S.mode === "pixel") {
+    const sh = sheet(ch), k = PX * s, c = D.cell;
+    if (ok(sh)) { ctx.imageSmoothingEnabled = false; ctx.drawImage(sh, f[5], f[6], c.w, c.h, x - c.ax * k, y - c.ay * k, c.w * k, c.h * k); }
+  } else {
+    let im = img(f[0]), use = f;
+    if (!ok(im) && ch.shown) { use = ch.shown; im = img(use[0]); }   // keep the last frame up while the next one decodes
+    if (ok(im)) {
+      ctx.imageSmoothingEnabled = true; ctx.imageSmoothingQuality = "high";
+      ctx.drawImage(im, x - use[3] * s, y - use[4] * s, use[1] * s, use[2] * s);
+      ch.shown = use;
+    }
+  }
+  ctx.restore();
+}
+function drawRelease(ch, x, y, s, now) {
+  const t = (now - ch.flash) / 520;
+  if (t < 0 || t > 1) return;
+  const cy = y - 215 * s, r = reduce ? 120 * s : (40 + 150 * t) * s;
+  ctx.save();
+  ctx.globalAlpha = reduce ? 0.9 : 1 - t;
+  ctx.strokeStyle = "#d6a84e"; ctx.lineWidth = 5 * s;
+  ctx.beginPath(); ctx.arc(x, cy, r, 0, Math.PI * 2); ctx.stroke();
+  ctx.fillStyle = "#d6a84e"; ctx.font = `600 ${Math.round(26 * s)}px "JetBrains Mono", monospace`; ctx.textAlign = "center";
+  ctx.shadowColor = "#17121e"; ctx.shadowBlur = 8 * s;
+  ctx.fillText("release", x, y - 420 * s);
+  ctx.restore();
+}
+let last = performance.now();
+function frame(now) {
+  const dt = Math.min(0.25, (now - last) / 1000); last = now;
+  if (S.playing) cast.forEach(ch => tick(ch, dt));
+  const k = cv.width / W;
+  ctx.setTransform(k, 0, 0, k, 0, 0);
+  const b = S.bg < D.backdrops.length ? bgImg(S.bg) : null;
+  if (b && ok(b)) ctx.drawImage(b, 0, 0, W, H); else { ctx.fillStyle = "#383043"; ctx.fillRect(0, 0, W, H); }
+  for (const sl of slots()) {
+    if (S.view === "lineup" && sl.ch === sel()) {
+      ctx.save(); ctx.strokeStyle = "rgba(214,168,78,.75)"; ctx.lineWidth = 3;
+      ctx.beginPath(); ctx.ellipse(sl.x, sl.y + 4, 92, 16, 0, 0, Math.PI * 2); ctx.stroke(); ctx.restore();
+    }
+    drawChar(sl.ch, sl.x, sl.y, sl.s);
+    drawRelease(sl.ch, sl.x, sl.y, sl.s, now);
+  }
+  readout();
+  requestAnimationFrame(frame);
+}
+
+// ---------- readout ----------
+let lastText = "";
+function readout() {
+  const ch = sel(), c = ch.cur;
+  let parts;
+  if (ch.standing) parts = [`<b>${ch.name}</b>`, c.loop ? `standing (${c.name} loop, frame ${ch.frame + 1} / ${c.frames.length})` : "standing", "tap a move"];
+  else {
+    parts = [`<b>${ch.name} · ${c.name}</b>`, `frame ${ch.frame + 1} / ${c.frames.length}`, `${c.fps} fps`];
+    if (c.release) parts.push(`<span class="rel">release on ${c.release} (${((c.release - 1) / c.fps).toFixed(2)} s in)</span>`);
+    parts.push(c.draft ? "draft" : "done");
+  }
+  const t = parts.map(p => `<span>${p}</span>`).join("");
+  if (t !== lastText) { $("#readout").innerHTML = t; lastText = t; }
+}
+
+// ---------- controls ----------
+function pressed(group, v) { group.querySelectorAll("button").forEach(b => b.setAttribute("aria-pressed", String(b.dataset.v === String(v)))); }
+function seg(id, key, cast) {
+  const g = $(id);
+  g.addEventListener("click", e => { const b = e.target.closest("button"); if (!b) return; S[key] = cast(b.dataset.v); pressed(g, S[key]); onChange(key); });
+  pressed(g, S[key]);
+}
+function onChange(key) {
+  if (key === "mode" && S.mode === "pixel") cast.forEach(sheet);
+}
+function renderCast() {
+  const box = $("#cast");
+  box.innerHTML = "";
+  cast.forEach((ch, i) => {
+    const b = document.createElement("button");
+    b.innerHTML = `<span>${ch.name}</span><small>${ch.moon}</small>`;
+    b.setAttribute("aria-pressed", String(i === S.sel));
+    b.onclick = () => { S.sel = i; renderCast(); renderMoves(); };
+    box.appendChild(b);
+  });
+}
+function renderMoves() {
+  const ch = sel(), box = $("#moves");
+  $("#moveslabel").textContent = `${ch.name}'s moves`;
+  box.innerHTML = "";
+  ch.clips.forEach(c => {
+    const b = document.createElement("button");
+    b.innerHTML = `<span>${c.name}</span><small>${c.frames.length}f · ${c.fps}fps</small>${c.draft ? '<span class="tag">draft</span>' : ""}`;
+    b.setAttribute("aria-pressed", String(ch.last === c.id));
+    b.onclick = () => play(ch, c.id);
+    box.appendChild(b);
+  });
+}
+function setPlaying(p) {
+  S.playing = p;
+  $("#play").setAttribute("aria-label", p ? "Pause" : "Play");
+  $("#playicon").innerHTML = p ? '<path d="M3 2h4v12H3zM9 2h4v12H9z"/>' : '<path d="M3 2v12l11-6z"/>';
+}
+$("#play").onclick = () => setPlaying(!S.playing);
+function manual(d) {
+  const ch = sel();
+  setPlaying(false);
+  if (ch.standing && !ch.cur.loop) {
+    const id = ch.last || ch.clips[0].id;
+    ch.last = id; renderMoves();
+    preload(ch.map[id]).then(() => { ch.cur = ch.map[id]; ch.standing = false; ch.frame = d > 0 ? 0 : ch.cur.frames.length - 1; release(ch); });
+  } else step(ch, d, true);
+}
+$("#back").onclick = () => manual(-1);
+$("#fwd").onclick = () => manual(1);
+$("#loop").onclick = () => { S.loop = !S.loop; $("#loop").setAttribute("aria-pressed", String(S.loop)); };
+seg("#speed", "speed", Number);
+seg("#view", "view", String);
+seg("#mode", "mode", String);
+const bgBox = $("#bg");
+[...D.backdrops.map(b => b.name), "Flat"].forEach((n, i) => {
+  const b = document.createElement("button"); b.textContent = n; b.dataset.v = i; bgBox.appendChild(b);
+});
+seg("#bg", "bg", Number);
+cv.addEventListener("pointerdown", e => {
+  if (S.view !== "lineup") return;
+  const r = cv.getBoundingClientRect(), x = (e.clientX - r.left) / r.width * W;
+  let best = -1, dist = W * 0.12;
+  slots().forEach((sl, i) => { const d = Math.abs(sl.x - x); if (d < dist) { dist = d; best = i; } });
+  if (best >= 0) { S.sel = best; renderCast(); renderMoves(); }
+});
+document.addEventListener("keydown", e => {
+  if (e.target.closest("input,textarea")) return;
+  if (e.key === " ") { e.preventDefault(); setPlaying(!S.playing); }
+  if (e.key === "ArrowLeft") manual(-1);
+  if (e.key === "ArrowRight") manual(1);
+});
+
+// ---------- sizes + support ----------
+const Z = D.sizes;
+$("#sizes").innerHTML = [
+  [`WebP q90, the export now`, Z.now, null, "now"],
+  [`AVIF q${Z.quality}, full colour <small class="mono">(this page)</small>`, Z.avif, Z.now],
+  [`AVIF q${Z.small_quality}, full colour`, Z.small, Z.now],
+  [`Pixel 128, one sheet now`, Z.pixel_now, null, "now"],
+  [`Pixel 128, one sheet per witch`, Z.pixel, Z.pixel_now],
+].map(([n, b, ref, cls]) => `<tr class="${cls || ""}"><td>${n}</td><td class="num">${MB(b)}</td><td class="num">${ref ? "−" + Math.round(100 - b / ref * 100) + "%" : "—"}</td></tr>`).join("");
+const per = Z.avif / Z.frames * 4 / 3;   // base64 makes every byte 4/3 as big inside a page
+const room = lim => Math.max(0, Math.floor((lim - Z.page) / per));
+$("#room").innerHTML = `${Z.frames} HD frames, ${(Z.avif / Z.frames / 1000).toFixed(1)} KB each on average. This page is <b>${MB(Z.page)}</b>. At this quality there's room for about <b>${room(30e6)} more frames</b> before a 30 MB page, or ${room(16e6)} more before the 16 MB limit of a claude.ai link.`;
+const sup = $("#support");
+const SUP = [["avif444", "Full-colour AVIF (frames)"], ["avif420", "Standard AVIF"], ["webp", "WebP (stages)"]];
+const support = {};
+SUP.forEach(([k, label]) => {
+  const s = document.createElement("span"); s.textContent = label + ": checking"; sup.appendChild(s);
+  const im = new Image();
+  im.onload = () => { support[k] = im.naturalWidth > 0; s.className = support[k] ? "yes" : "no"; s.textContent = `${label}: ${support[k] ? "shows" : "doesn't show"}`; if (k === "avif444") warn(); };
+  im.onerror = () => { support[k] = false; s.className = "no"; s.textContent = `${label}: doesn't show`; if (k === "avif444") warn(); };
+  im.src = D.tests[k];
+});
+function warn() {
+  const m = $("#stagemsg");
+  m.hidden = support.avif444 !== false;
+  m.textContent = "This browser can't show full-colour AVIF, so the HD frames are missing. Switch to Pixel 128 to see the moves, and tell Claude which phone and browser this is.";
+}
+
+// ---------- crispness check ----------
+let sample = 0, zoom = 2;
+const cmpImgs = D.compare.map(s => s.variants.map(v => { const im = new Image(); im.src = v.uri; return im; }));
+function renderSamples() {
+  const box = $("#samples"); box.innerHTML = "";
+  D.compare.forEach((s, i) => {
+    const b = document.createElement("button"); b.textContent = s.label; b.setAttribute("aria-pressed", String(i === sample));
+    b.onclick = () => { sample = i; renderSamples(); renderCompare(); };
+    box.appendChild(b);
+  });
+}
+function renderCompare() {
+  const s = D.compare[sample], box = $("#compare");
+  box.innerHTML = "";
+  s.variants.forEach((v, i) => {
+    const fig = document.createElement("figure");
+    if (v.used) fig.className = "used";
+    const c = document.createElement("canvas");
+    fig.appendChild(c);
+    const cap = document.createElement("figcaption");
+    cap.innerHTML = `${v.name}<small>${(v.bytes / 1000).toFixed(1)} KB · ${v.note}</small>`;
+    fig.appendChild(cap);
+    box.appendChild(fig);
+    const im = cmpImgs[sample][i];
+    const draw = () => {
+      if (!ok(im)) { cap.innerHTML += '<small class="fail">This browser can\'t show this format.</small>'; return; }
+      let [x, y, w, h] = zoom === 1 ? [0, 0, s.w, s.h] : s.crop;
+      if (zoom === 4) { x += w / 4; y += h / 4; w /= 2; h /= 2; }
+      const side = Math.max(w, h);
+      c.width = Math.round(side); c.height = Math.round(side);
+      const g = c.getContext("2d");
+      g.fillStyle = "#383043"; g.fillRect(0, 0, c.width, c.height);
+      g.imageSmoothingEnabled = false;
+      g.drawImage(im, x, y, w, h, (side - w) / 2, (side - h) / 2, w, h);
+    };
+    if (im.complete) draw(); else { im.onload = draw; im.onerror = draw; }
+  });
+}
+const zg = $("#zoom");
+zg.addEventListener("click", e => { const b = e.target.closest("button"); if (!b) return; zoom = Number(b.dataset.v); pressed(zg, zoom); renderCompare(); });
+pressed(zg, zoom);
+renderSamples(); renderCompare();
+
+$("#foot").textContent = D.foot;
+
+// ---------- start ----------
+renderCast(); renderMoves(); setPlaying(true); fit();
+Promise.all(cast.map(ch => preload(ch.map[ch.stand.clip]))).then(() => {});
+requestAnimationFrame(frame);
+})();
+</script>
