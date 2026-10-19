@@ -10,9 +10,10 @@ A 2D game about four witch performers on the Moon Faire, a festival airship tour
 | `scenes/` | Coded films of the Jester: *The Jester's Curtain Call* (`jester-night/`, the boardwalk), *A Fool's Mercy* (`jester-square/`, Envoi's night square and foes) and *A Fool's Mercy in 3D* (`jester-square-3d/`, the square built in code with three.js, to Chris's songs). Shared code is in `scenes/lib/`. Built by `tools/build_scene.py <film>`, rendered to MP4 by `tools/render_video.mjs` (run `npm install` first). |
 | `art/music/` | Chris's songs Moonlit Forest Path and Herbal Decay, from follow-me-down-witch-way. |
 | `docs/sound-requests/` | Prompts for AI-made sound effects: her moves, the foes and the square. |
+| `docs/music-requests/` | Suno prompts for Moon Faire's own music: the Jester's waltz, the lost souls, the fight, the Curtain Call, going home, and the Faire's title theme. |
 | `art/foes/` | Envoi's wisps, Shadow Wraith and great wraith as sprites, cut by `tools/cut_envoi_foes.py`. |
 | `docs/stories/` | The films' stories, in plain words. |
-| `tools/` | `pack_assets.py` builds `game-assets/`. `build_demo.py` builds `dist/moon-faire-demo.html`, a single-file demo with everything embedded. |
+| `tools/` | `pack_assets.py` builds `game-assets/`. `build_demo.py` builds `dist/moon-faire-demo.html`, a single-file demo with everything embedded. `pack_audio.py` brings in songs and sound effects: trimmed, levelled and small, with their key and tempo. |
 | `art-pipeline/` | Everything that makes the art: cut frames and their anchors, scripts, the original sheets, and `smoothing-pack/` (the strips for ChatGPT that smooth the Ranger's, Witch's and Fox's moves). |
 | `docs/` | `START-HERE-sprite-animation-method.md`: how the animations are made, and what didn't work. |
 
