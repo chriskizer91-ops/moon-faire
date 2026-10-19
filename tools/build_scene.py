@@ -9,7 +9,7 @@ the code files in order (shared ones from scenes/lib/). Every scene gets the
 Jester's frames from game-assets/ (AVIF) with a bloom map per frame, made here
 from the lossless frames, and the title font.
 """
-import base64, io, json, os, sys
+import base64, io, json, os, subprocess, sys, tempfile
 import numpy as np
 from PIL import Image, ImageFilter
 
@@ -68,6 +68,29 @@ def picture(spec):
     return uri(b.getvalue(), "image/webp")
 
 
+THREE = "0.186.1"   # three.js from the jsDelivr CDN; the scene tools serve node_modules/three instead
+
+
+def music(spec):
+    """Cut a film's music track from the songs: each segment is a slice of a song placed at a film time, with fades."""
+    dur = spec["duration"]
+    args, parts = ["ffmpeg", "-v", "error", "-y"], []
+    for i, sg in enumerate(spec["segments"]):
+        args += ["-i", os.path.join(ROOT, sg["src"])]
+        length = sg["to"] - sg["from"]
+        f = [f"atrim={sg['from']}:{sg['to']}", "asetpts=PTS-STARTPTS", "aformat=sample_rates=44100:channel_layouts=stereo"]
+        if sg.get("fadeIn"): f.append(f"afade=t=in:st=0:d={sg['fadeIn']}")
+        if sg.get("fadeOut"): f.append(f"afade=t=out:st={length - sg['fadeOut']}:d={sg['fadeOut']}")
+        f += [f"volume={sg.get('gain', 1)}", f"adelay={int(sg['at'] * 1000)}:all=1"]
+        parts.append(f"[{i}:a]{','.join(f)}[s{i}]")
+    n = len(spec["segments"])
+    graph = ";".join(parts) + ";" + "".join(f"[s{i}]" for i in range(n)) + f"amix=inputs={n}:normalize=0,apad,atrim=0:{dur}[out]"
+    with tempfile.TemporaryDirectory() as tmp:
+        out = os.path.join(tmp, "music.mp3")
+        subprocess.run(args + ["-filter_complex", graph, "-map", "[out]", "-c:a", "libmp3lame", "-b:a", spec.get("kbps", "128k"), out], check=True)
+        return uri(open(out, "rb").read(), "audio/mpeg")
+
+
 def main():
     name = sys.argv[1] if len(sys.argv) > 1 else "jester-night"
     scene = json.load(open(os.path.join(SCENES, name, "scene.json")))
@@ -88,12 +111,21 @@ def main():
     art = {k: picture(v) for k, v in scene.get("art", {}).items()}
     data = dict(clips=clips, imgs=imgs, glows=glows, art=art,
                 meta={k: json.load(open(os.path.join(ROOT, v))) for k, v in scene.get("meta", {}).items()},
-                backdrop=uri(open(os.path.join(ROOT, scene["backdrop"]), "rb").read(), "image/webp"))
+                backdrop=uri(open(os.path.join(ROOT, scene["backdrop"]), "rb").read(), "image/webp") if scene.get("backdrop") else "")
+    if scene.get("music"):
+        data["music"] = music(scene["music"])
     code = "\n".join(f"// ---- {n} ----\n" + open(os.path.join(SCENES, n)).read() for n in scene["code"])
     font = base64.b64encode(open(os.path.join(ROOT, "art", "fonts", "jacquard24-latin.woff2"), "rb").read()).decode()
     html = open(os.path.join(SCENES, "lib", "page.html")).read()
     html = html.replace("/*TITLE*/", scene["title"]).replace("/*INTRO*/", scene["intro"]).replace("/*FOOTER*/", scene["footer"])
     html = html.replace("/*FONT*/", font).replace("/*DATA*/null", json.dumps(data, separators=(",", ":")).replace("</", "<\\/"))
+    if scene.get("imports"):
+        imap = {"imports": {"three": f"https://cdn.jsdelivr.net/npm/three@{THREE}/build/three.module.js",
+                            "three/addons/": f"https://cdn.jsdelivr.net/npm/three@{THREE}/examples/jsm/"}}
+        html = html.replace("/*IMPORTMAP*/", f'<script type="importmap">{json.dumps(imap)}</script>\n')
+        html = html.replace("<script/*MODULE*/>", '<script type="module">').replace("/*IMPORTS*/", "\n".join(scene["imports"]))
+    else:
+        html = html.replace("/*IMPORTMAP*/", "").replace("<script/*MODULE*/>", "<script>").replace("/*IMPORTS*/\n", "")
     html = html.replace("/*CODE*/", code.replace("</script", "<\\/script"))
     out = os.path.join(ROOT, scene["out"])
     os.makedirs(os.path.dirname(out), exist_ok=True)

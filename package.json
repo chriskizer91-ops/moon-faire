@@ -1,0 +1,10 @@
+{
+  "name": "moon-faire",
+  "private": true,
+  "description": "Moon Faire: the game, its demos and coded films",
+  "type": "module",
+  "devDependencies": {
+    "playwright": "1.56.1",
+    "three": "0.186.1"
+  }
+}

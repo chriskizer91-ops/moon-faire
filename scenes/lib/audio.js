@@ -24,11 +24,13 @@ function makeBus(ctx, dest) {
   comp.threshold.value = -20; comp.knee.value = 12; comp.ratio.value = 3; comp.attack.value = 0.004; comp.release.value = 0.3;
   const limit = ctx.createDynamicsCompressor();     // keeps the big hits from clipping
   limit.threshold.value = -3; limit.knee.value = 0; limit.ratio.value = 20; limit.attack.value = 0.001; limit.release.value = 0.12;
-  master.connect(comp); comp.connect(limit); limit.connect(dest);
+  const dc = ctx.createBiquadFilter(); dc.type = "highpass"; dc.frequency.value = 18;   // nothing below hearing reaches the compressor
+  master.connect(dc); dc.connect(comp); comp.connect(limit); limit.connect(dest);
   const verb = ctx.createConvolver(); verb.buffer = impulse(ctx, 3.4);
   const send = ctx.createGain(); send.connect(verb);
   const ret = ctx.createGain(); ret.gain.value = 0.55; verb.connect(ret); ret.connect(master);
-  return { ctx, master, send, noise: noiseBuffer(ctx) };
+  const music = ctx.createGain(); music.connect(limit);   // songs skip the compressor: they're mixed already
+  return { ctx, master, send, music, noise: noiseBuffer(ctx), sources: [] };
 }
 
 // Route a node out with pan (number, or [from, to, t0, t1]) and reverb send.
@@ -143,8 +145,9 @@ function rattle(B, t, dur, gain, pan, r) {
 function boom(B, t, gain, f = 70, d = 1.8) {
   const [o, g] = osc(B, "sine", f, t, d);
   o.frequency.exponentialRampToValueAtTime(f * 0.38, t + d * 0.8);
-  const sh = B.ctx.createWaveShaper(), curve = new Float32Array(256);
-  for (let i = 0; i < 256; i++) { const x = i / 128 - 1; curve[i] = Math.tanh(2.5 * x); }
+  // an odd length puts silence exactly on the curve's middle (0 in, 0 out); an even one leaked a constant offset
+  const sh = B.ctx.createWaveShaper(), curve = new Float32Array(257);
+  for (let i = 0; i < 257; i++) { const x = i / 128 - 1; curve[i] = Math.tanh(2.5 * x); }
   sh.curve = curve;
   hit(g.gain, t, 0.005, gain, d); out(B, chain(g, sh), { wet: 0.2 });
   const ng = B.ctx.createGain(); chain(noise(B, t, d + 0.5), filt(B, "lowpass", 160), ng); hit(ng.gain, t, 0.01, gain * 0.8, d + 0.4); out(B, ng, { wet: 0.3 });
@@ -305,6 +308,21 @@ function bedDrone(B, when, cue, skip) {
   out(B, g, { wet: 0.35 });
 }
 
+// A film's songs, cut to its timeline by tools/build_scene.py and decoded by
+// the player into MUSIC. Played from the film time it starts at, loudness
+// following cue.keys so the effects can sit on top.
+let MUSIC = null;
+function bedMusic(B, when, cue, skip) {
+  const dur = cue.end - cue.t - skip;
+  if (!MUSIC || dur <= 0) return;
+  const src = B.ctx.createBufferSource(), g = B.ctx.createGain();
+  src.buffer = MUSIC; src.connect(g); g.connect(B.music);
+  g.gain.setValueAtTime(Math.max(0.0001, env(cue.t + skip, cue.keys)), when);
+  for (let u = 0.05; u <= dur; u += 0.05) g.gain.linearRampToValueAtTime(Math.max(0.0001, env(cue.t + skip + u, cue.keys)), when + u);
+  src.start(when, cue.t + skip, dur);
+  B.sources.push(src);
+}
+
 const NOTE = { D3: 146.83, Fs3: 185, A3: 220, B3: 246.94, Cs4: 277.18, D4: 293.66, E4: 329.63, Fs4: 369.99, G4: 392, A4: 440, B4: 493.88, Cs5: 554.37,
   D5: 587.33, E5: 659.25, Fs5: 739.99, G5: 783.99, A5: 880, B5: 987.77, Cs6: 1108.73, D6: 1174.66, E6: 1318.51 };
 
@@ -358,6 +376,7 @@ class Playback {
   stop() {
     clearInterval(this.timer);
     const g = this.gain, now = this.ctx.currentTime;
+    for (const s of this.B.sources) try { s.stop(now + 0.1); } catch (e) {}
     g.gain.setTargetAtTime(0, now, 0.03);
     setTimeout(() => g.disconnect(), 300);
   }

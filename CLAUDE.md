@@ -25,16 +25,19 @@
   ```
   The demo is published at https://claude.ai/artifact/NvHGfCNmn7Y5eeGBsp94D3. Republish `dist/moon-faire-demo.html` to that link after a rebuild. Keep it under 16 MB so it stays a link; Chris accepts up to 30 MB as a file.
 - `art/backdrops/` holds the stage paintings: four from `20-min/art/battle/`, `night-square.webp` from Envoi's `art/backdrops/`, and `town-moonrise.webp` from `20-min/art/stills/moonrise.webp`. `art/fonts/` holds Jacquard 24 (Google Fonts, open licence), embedded for titles.
-- `scenes/` holds the coded films. `scenes/lib/` is shared: the Jester's drawing, effects, camera, the sound engine and the player page. Each film has its own folder: `script.js` (every time, place and cue, so re-cut a film there), `world.js`, `actors.js`, `fx.js`, `render.js`, `score.js`, and `scene.json` (title, words, pictures, code order). Everything is a pure function of time; the sound is all Web Audio, with no sound files.
+- `scenes/` holds the coded films. `scenes/lib/` is shared: the Jester's drawing, effects, camera, the sound engine and the player page. Each film has its own folder: `script.js` (every time, place and cue, so re-cut a film there), `world.js`, `actors.js`, `fx.js`, `render.js`, `score.js`, and `scene.json` (title, words, pictures, code order). Everything is a pure function of time. The sound effects are all Web Audio; a film can add Chris's songs from `art/music/` through `music` in its `scene.json` (slices of songs placed at film times, cut by `build_scene.py` with ffmpeg), and its `score.js` sets how loud they play.
   - `jester-night/`: *The Jester's Curtain Call*, on the boardwalk. Published at https://claude.ai/artifact/7U5xf4Qm6iPbN6czP7n32K.
   - `jester-square/`: *A Fool's Mercy*, in Envoi's night square against Envoi's foes (story: `docs/stories/a-fools-mercy.md`). Published at https://claude.ai/artifact/BdbuhgY9M4cixyJHbyrTmq.
+  - `jester-square-3d/`: *A Fool's Mercy in 3D*, the same story, with the square built in code with three.js and the camera close on her, to Moonlit Forest Path and Herbal Decay. `world3d.js` builds the square, `actors3d.js` puts her frames and the foes on cards that face the camera, and `fx3d.js` holds the spells. Places are in metres; keep her on the left of the frame and the foes on the right, because her spells cast to screen right. Published at https://claude.ai/artifact/QXjD3N91Kc5BxfmP8zZtsT.
   ```
   python3 tools/build_scene.py jester-square                                  # dist/jester-square.html
   SCENE_HTML=dist/jester-square.html node tools/scene_stills.mjs <dir> 30 80  # stills at chosen seconds
   SCENE_HTML=dist/jester-square.html node tools/scene_audio.mjs <file.wav>    # the soundtrack alone
-  SCENE_HTML=dist/jester-square.html node tools/render_video.mjs dist/jester-square.mp4   # about 4 minutes
+  SCENE_HTML=dist/jester-square.html node tools/render_video.mjs dist/jester-square.mp4   # about 4 minutes; the 3D film about 2 hours
   ```
-  Republish a film's page to its link after a rebuild. The node tools need Playwright (`ln -s /opt/node-tools/node_modules node_modules` in a cloud session).
+  Republish a film's page to its link after a rebuild. The node tools need `npm install` (Playwright and three.js; the 3D pages load three.js from jsDelivr, and the tools serve it from `node_modules` instead). `render_video.mjs` renders in 10-second pieces, so if it stops, run it again and it carries on.
+- `art/music/` holds Chris's songs, made with Suno: `moonlit-forest-path.mp3` (B-flat major) and `herbal-decay.mp3` (E minor), from `follow-me-down-witch-way`. Tune pitched sound effects to the song under them.
+- `docs/sound-requests/` holds prompts for AI-made sound effects (her moves, the foes, the square). Recorded effects Chris sends go in `art/sfx/`.
 - `art/foes/` holds Envoi's foes as sprites, cut by `tools/cut_envoi_foes.py` from the sheets in `art/foes/envoi-sheets/` (copied from Envoi's `reference/art/`). `foes.json` gives each sprite's ground point and pixels per metre.
 - `art-pipeline/` holds the cut frames (`frames/` with `meta.json`), the scripts, the original sheets, the smoothing pack (finished October 18) and `frames_pre_smoothing/`. The scripts still carry paths from the old art workspace (`/home/claude/...`). `tools/hd_lossless.py` repeats `build.py`'s HD step; when a new frame prefix appears in `build.py`, add it there too.
 - Read clips from `manifest.json`. Draw every frame on its anchor, and fire gameplay on `release_frame`. Don't mirror spells, because the costumes are asymmetric.

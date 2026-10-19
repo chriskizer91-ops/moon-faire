@@ -1,0 +1,187 @@
+{
+ "title": "A Fool's Mercy in 3D",
+ "intro": "Moon Faire, in 3D. Two minutes in the night square with the camera close on the Jester: all ten of her moves against Envoi's lost souls, to Chris's songs Moonlit Forest Path and Herbal Decay. The square, its lights and every spell are built in code.",
+ "footer": "<p>The square is built in code with three.js: every house, lamp, cobble and star, and every texture is painted on the fly. The Jester's frames come from the Flip Book Art export, drawn on their anchors on a card that turns to face the camera. The wisps, the Shadow Wraith and the great wraith are cut from Envoi's model and action sheets (envoi-on-the-longest-night). The music is Chris's Moonlit Forest Path and Herbal Decay (made with Suno, from follow-me-down-witch-way); the effects on top are synthesized in the browser, tuned to the songs.</p><p>Arrow keys skip 5 seconds. Space plays and pauses.</p>",
+ "out": "dist/jester-square-3d.html",
+ "art": {
+  "wisp_idle": {
+   "src": "art/foes/wisp_idle.png",
+   "max": 360,
+   "q": 86
+  },
+  "wisp_flicker": {
+   "src": "art/foes/wisp_flicker.png",
+   "max": 360,
+   "q": 86
+  },
+  "wisp_cling": {
+   "src": "art/foes/wisp_cling.png",
+   "max": 360,
+   "q": 86
+  },
+  "wisp_gutter": {
+   "src": "art/foes/wisp_gutter.png",
+   "max": 360,
+   "q": 86
+  },
+  "wisp_wail": {
+   "src": "art/foes/wisp_wail.png",
+   "max": 360,
+   "q": 86
+  },
+  "wisp_hurt": {
+   "src": "art/foes/wisp_hurt.png",
+   "max": 360,
+   "q": 86
+  },
+  "wisp_released": {
+   "src": "art/foes/wisp_released.png",
+   "max": 360,
+   "q": 86
+  },
+  "wisp_moth": {
+   "src": "art/foes/wisp_moth.png",
+   "max": 360,
+   "q": 86
+  },
+  "great_front": {
+   "src": "art/foes/great_front.png",
+   "max": 520,
+   "q": 86
+  },
+  "great_sweep": {
+   "src": "art/foes/great_sweep.png",
+   "max": 520,
+   "q": 86
+  },
+  "great_swallow": {
+   "src": "art/foes/great_swallow.png",
+   "max": 520,
+   "q": 86
+  },
+  "great_breath": {
+   "src": "art/foes/great_breath.png",
+   "max": 520,
+   "q": 86
+  },
+  "great_released": {
+   "src": "art/foes/great_released.png",
+   "max": 520,
+   "q": 86
+  },
+  "wraith_idle": {
+   "src": "art/foes/wraith_idle.png",
+   "max": 520,
+   "q": 86
+  },
+  "wraith_idle_turn": {
+   "src": "art/foes/wraith_idle_turn.png",
+   "max": 520,
+   "q": 86
+  },
+  "wraith_side": {
+   "src": "art/foes/wraith_side.png",
+   "max": 520,
+   "q": 86
+  },
+  "wraith_back": {
+   "src": "art/foes/wraith_back.png",
+   "max": 520,
+   "q": 86
+  },
+  "wraith_raise": {
+   "src": "art/foes/wraith_raise.png",
+   "max": 520,
+   "q": 86
+  },
+  "wraith_sweep": {
+   "src": "art/foes/wraith_sweep.png",
+   "max": 520,
+   "q": 86
+  },
+  "wraith_sweep_low": {
+   "src": "art/foes/wraith_sweep_low.png",
+   "max": 520,
+   "q": 86
+  },
+  "wraith_cast": {
+   "src": "art/foes/wraith_cast.png",
+   "max": 520,
+   "q": 86
+  },
+  "wraith_reach": {
+   "src": "art/foes/wraith_reach.png",
+   "max": 520,
+   "q": 86
+  },
+  "wraith_aura": {
+   "src": "art/foes/wraith_aura.png",
+   "max": 520,
+   "q": 86
+  },
+  "wraith_heart": {
+   "src": "art/foes/wraith_heart.png",
+   "max": 520,
+   "q": 86
+  },
+  "wraith_kneel": {
+   "src": "art/foes/wraith_kneel.png",
+   "max": 520,
+   "q": 86
+  }
+ },
+ "meta": {
+  "foes": "art/foes/foes.json"
+ },
+ "music": {
+  "duration": 120,
+  "segments": [
+   {
+    "src": "art/music/moonlit-forest-path.mp3",
+    "from": 0.0,
+    "to": 23.5,
+    "at": 0.0,
+    "fadeIn": 1.0,
+    "fadeOut": 3.0
+   },
+   {
+    "src": "art/music/herbal-decay.mp3",
+    "from": 0.0,
+    "to": 56.4,
+    "at": 23.6,
+    "fadeIn": 0.5,
+    "fadeOut": 0.4
+   },
+   {
+    "src": "art/music/moonlit-forest-path.mp3",
+    "from": 92.0,
+    "to": 129.0,
+    "at": 83.0,
+    "fadeIn": 2.5,
+    "fadeOut": 1.0
+   }
+  ]
+ },
+ "imports": [
+  "import * as THREE from \"three\";",
+  "import { EffectComposer } from \"three/addons/postprocessing/EffectComposer.js\";",
+  "import { RenderPass } from \"three/addons/postprocessing/RenderPass.js\";",
+  "import { UnrealBloomPass } from \"three/addons/postprocessing/UnrealBloomPass.js\";",
+  "import { OutputPass } from \"three/addons/postprocessing/OutputPass.js\";",
+  "import { SMAAPass } from \"three/addons/postprocessing/SMAAPass.js\";"
+ ],
+ "code": [
+  "lib/util.js",
+  "jester-square-3d/script.js",
+  "lib/fx.js",
+  "lib/jester.js",
+  "lib/stage.js",
+  "jester-square-3d/world3d.js",
+  "jester-square-3d/actors3d.js",
+  "jester-square-3d/fx3d.js",
+  "jester-square-3d/render.js",
+  "lib/audio.js",
+  "jester-square-3d/score.js",
+  "lib/player.js"
+ ]
+}

@@ -23,6 +23,14 @@ async function loadAll(progress) {
   rest.slice(DATA.imgs.length, DATA.imgs.length + DATA.glows.length).forEach((im, i) => (GLOWS[i] = im));
   rest.slice(DATA.imgs.length + DATA.glows.length).forEach((im, i) => (ART[names[i]] = im));
   try { await document.fonts.load('40px "Jacquard 24"'); } catch (e) {}
+  if (DATA.music) {
+    // the film's songs: one track, decoded once, played as a bed under the cues
+    try {
+      const bytes = Uint8Array.from(atob(DATA.music.slice(DATA.music.indexOf(",") + 1)), c => c.charCodeAt(0));
+      const Off = window.OfflineAudioContext || window.webkitOfflineAudioContext;
+      MUSIC = await new Off(2, 48000, 48000).decodeAudioData(bytes.buffer);
+    } catch (e) { MUSIC = null; }
+  }
   return IMGS.every(Boolean);
 }
 
