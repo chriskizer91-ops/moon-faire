@@ -1,0 +1,132 @@
+{
+ "about": "Every song in music-of-the-moon-faire, written by tools/breakdown.py. Play a part from start to end (seconds) in the song's file; each song's breakdown.json has its beats, bar lines and chords.",
+ "songs": [
+  {
+   "slug": "carnival-of-ashes",
+   "title": "Carnival of Ashes",
+   "file": "carnival-of-ashes/carnival-of-ashes.opus",
+   "kb": 1278,
+   "seconds": 147.72,
+   "key": "G minor",
+   "beats_per_bar": 3,
+   "bpm": [
+    109,
+    159
+   ],
+   "parts": [
+    {
+     "slug": "opening-tune",
+     "name": "Opening tune",
+     "start": 0.0,
+     "end": 6.7,
+     "bpm": 159.0,
+     "bars": null
+    },
+    {
+     "slug": "first-swell",
+     "name": "First swell",
+     "start": 6.7,
+     "end": 11.96,
+     "bpm": 159.0,
+     "bars": null
+    },
+    {
+     "slug": "lead-in",
+     "name": "Lead-in",
+     "start": 11.96,
+     "end": 16.8,
+     "bpm": 152.0,
+     "bars": null
+    },
+    {
+     "slug": "waltz-1",
+     "name": "Waltz, first time",
+     "start": 16.8,
+     "end": 38.2,
+     "bpm": 139.7,
+     "bars": 16
+    },
+    {
+     "slug": "stop",
+     "name": "Stop",
+     "start": 38.2,
+     "end": 38.86,
+     "bpm": null,
+     "bars": null
+    },
+    {
+     "slug": "waltz-2",
+     "name": "Waltz, second time",
+     "start": 38.86,
+     "end": 57.42,
+     "bpm": 139.7,
+     "bars": 14
+    },
+    {
+     "slug": "breath",
+     "name": "Breath",
+     "start": 57.42,
+     "end": 59.58,
+     "bpm": 138.7,
+     "bars": null
+    },
+    {
+     "slug": "waltz-3",
+     "name": "Waltz, third time",
+     "start": 59.58,
+     "end": 79.1,
+     "bpm": 141.6,
+     "bars": 15
+    },
+    {
+     "slug": "quiet-break",
+     "name": "Quiet break",
+     "start": 79.1,
+     "end": 88.12,
+     "bpm": 137.8,
+     "bars": 7
+    },
+    {
+     "slug": "waltz-4",
+     "name": "Waltz, fourth time",
+     "start": 88.12,
+     "end": 113.7,
+     "bpm": 130.8,
+     "bars": 18
+    },
+    {
+     "slug": "winding-down",
+     "name": "Winding down",
+     "start": 113.7,
+     "end": 120.9,
+     "bpm": 113.6,
+     "bars": null
+    },
+    {
+     "slug": "rising-swell",
+     "name": "Rising swell",
+     "start": 120.9,
+     "end": 124.6,
+     "bpm": null,
+     "bars": null
+    },
+    {
+     "slug": "last-waltz",
+     "name": "Last waltz",
+     "start": 124.6,
+     "end": 136.75,
+     "bpm": 120.2,
+     "bars": 8
+    },
+    {
+     "slug": "ending",
+     "name": "Ending",
+     "start": 136.75,
+     "end": 147.72,
+     "bpm": 108.8,
+     "bars": null
+    }
+   ]
+  }
+ ]
+}

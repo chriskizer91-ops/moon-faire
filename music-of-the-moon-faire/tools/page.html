@@ -1,0 +1,300 @@
+<title>/*TITLE*/</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<style>
+@font-face{font-family:"Jacquard 24";src:url(data:font/woff2;base64,/*FONT*/) format("woff2");font-display:block}
+/* Layout: the song drawn as one long strip, its speed under it, a play rail, then the parts as a running order.
+   One dark look on purpose, the same night-purple as the Moon Faire film pages. */
+:root{
+  --velvet:#17121e;      /* page ground, black plum */
+  --curtain:#221a2c;     /* raised panels */
+  --gold:#d6a84e;        /* the part playing, the playhead */
+  --veil:#b8407e;        /* magenta: stops and swells */
+  --pendant:#3fc2b4;     /* turquoise: the speed line, focus */
+  --ink:#efe6f2;
+  --muted:#a597b3;
+  --line:#3a3049;
+  --wave:#6d5c80;        /* the song's loudness, at rest */
+  --f-display:"Jacquard 24", Georgia, serif;
+  --f-body:system-ui, -apple-system, "Segoe UI", sans-serif;
+  --f-mono:ui-monospace, "SFMono-Regular", Menlo, monospace;
+  color-scheme:dark;
+}
+html,body{background:var(--velvet);color:var(--ink)}
+body{font-family:var(--f-body);font-size:15px;line-height:1.5}
+.wrap{max-width:980px;margin:0 auto;padding-left:max(16px, env(safe-area-inset-left, 0px));padding-right:max(16px, env(safe-area-inset-right, 0px));padding-block:20px 48px;display:grid;gap:22px}
+h1{font-family:var(--f-display);font-weight:400;font-size:clamp(40px, 9vw, 68px);line-height:.95;margin:0;color:var(--gold);text-wrap:balance}
+h2{font-size:13px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);margin:0}
+.mono{font-family:var(--f-mono);font-variant-numeric:tabular-nums}
+header{display:grid;gap:8px}
+header p{margin:0;color:var(--muted);max-width:66ch}
+
+.facts{display:grid;grid-template-columns:repeat(auto-fit, minmax(150px, 1fr));gap:1px;background:var(--line);border:1px solid var(--line);border-radius:4px;overflow:hidden;margin:0}
+.facts div{background:var(--curtain);padding:10px 12px;display:grid;gap:2px;min-width:0}
+.facts dt{font-size:12px;letter-spacing:.06em;text-transform:uppercase;color:var(--muted)}
+.facts dd{margin:0;font-size:15px}
+
+.map{display:grid;gap:6px}
+.strip{position:relative;cursor:pointer;touch-action:manipulation}
+#wave{display:block;width:100%;height:132px}
+#speed{display:block;width:100%;height:64px}
+.axis{display:flex;justify-content:space-between;color:var(--muted);font-size:12px}
+
+.rail{position:sticky;top:env(safe-area-inset-top, 0px);z-index:5;display:flex;align-items:center;gap:12px;flex-wrap:wrap;background:var(--velvet);padding-block:8px;border-bottom:1px solid var(--line)}
+body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset-top, 0px);z-index:10;background:var(--velvet)}
+button{font:inherit;color:var(--ink);background:var(--curtain);border:1px solid var(--line);border-radius:4px;padding:6px 10px;cursor:pointer;line-height:1.25}
+button:hover{border-color:var(--muted)}
+button:focus-visible,.strip:focus-visible{outline:2px solid var(--pendant);outline-offset:2px}
+#play{width:48px;height:40px;display:grid;place-items:center;padding:0;border-color:var(--gold)}
+#play svg{width:18px;height:18px;fill:var(--gold)}
+#time{color:var(--muted);font-size:13px}
+#now{flex:1 1 160px;min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+#now b{color:var(--gold);font-weight:600}
+#note{color:var(--veil);font-size:13px;margin:0}
+
+.parts{list-style:none;margin:0;padding:0;display:grid;gap:0;border-top:1px solid var(--line)}
+.part{display:grid;grid-template-columns:44px minmax(0, 1fr);gap:4px 12px;padding:14px 0;border-bottom:1px solid var(--line)}
+.part[aria-current="true"] .num{color:var(--velvet);background:var(--gold);border-color:var(--gold)}
+.part[aria-current="true"] h3{color:var(--gold)}
+.num{grid-row:span 2;width:40px;height:40px;display:grid;place-items:center;border:1px solid var(--line);border-radius:50%;font-family:var(--f-mono);font-size:13px;color:var(--muted);background:var(--curtain);padding:0}
+.num:hover{border-color:var(--gold);color:var(--gold)}
+.head{display:flex;flex-wrap:wrap;align-items:baseline;gap:2px 14px;min-width:0}
+.head h3{margin:0;font-size:17px;font-weight:600}
+.head .when{color:var(--muted);font-size:13px}
+.body{display:grid;gap:6px;min-width:0}
+.body p{margin:0;max-width:68ch}
+.body .use{color:var(--muted)}
+.body .use b{color:var(--ink);font-weight:600}
+.chords{display:flex;flex-wrap:wrap;gap:4px}
+.chords span{font-family:var(--f-mono);font-size:12px;padding:1px 6px;border-radius:3px;background:var(--curtain);border:1px solid var(--line);color:var(--ink)}
+.chords span.four{color:var(--pendant)}
+.chords span.five{color:var(--veil)}
+.legend{margin:0;color:var(--muted);font-size:13px}
+.legend b{font-weight:600}
+.legend .home{color:var(--ink)}.legend .four{color:var(--pendant)}.legend .five{color:var(--veil)}
+
+.prose{display:grid;gap:10px}
+.prose ul{margin:0;padding-left:20px;display:grid;gap:8px}
+.prose li{max-width:70ch}
+.prose p{margin:0;max-width:70ch}
+footer{color:var(--muted);font-size:13px;border-top:1px solid var(--line);padding-top:14px;display:grid;gap:6px}
+footer p{margin:0;max-width:80ch}
+@media (prefers-reduced-motion: reduce){*{scroll-behavior:auto}}
+</style>
+
+<div class="wrap">
+  <header>
+    <h1>/*TITLE*/</h1>
+    <p id="source"></p>
+  </header>
+
+  <dl class="facts" id="facts"></dl>
+
+  <section class="map" aria-label="The song drawn out">
+    <div class="strip" id="strip" tabindex="0" role="slider" aria-label="Position in the song" aria-valuemin="0" aria-valuenow="0">
+      <canvas id="wave"></canvas>
+    </div>
+    <canvas id="speed" aria-label="Speed through the song, in beats a minute"></canvas>
+    <div class="axis mono" id="axis"></div>
+  </section>
+
+  <div class="rail">
+    <button id="play" aria-label="Play the song"><svg viewBox="0 0 20 20"><path id="icon" d="M5 3v14l12-7z"/></svg></button>
+    <span id="time" class="mono">0:00</span>
+    <span id="now"></span>
+  </div>
+  <p id="note" hidden>This browser can't play the song's Opus file. Phones from iOS 18.4 and Android, and every current desktop browser, can. The breakdown below still reads the same.</p>
+
+  <section class="prose" aria-labelledby="h-short">
+    <h2 id="h-short">In short</h2>
+    <ul id="summary"></ul>
+  </section>
+
+  <section class="prose" aria-labelledby="h-parts">
+    <h2 id="h-parts">The parts · tap a number to hear just that part</h2>
+    <p class="legend" id="legend"></p>
+    <ol class="parts" id="parts"></ol>
+  </section>
+
+  <section class="prose" aria-labelledby="h-bells">
+    <h2 id="h-bells">Tuning bells and chimes to it</h2>
+    <p id="bells"></p>
+  </section>
+
+  <section class="prose" aria-labelledby="h-fit">
+    <h2 id="h-fit">How it fits Moon Faire</h2>
+    <ul id="fit"></ul>
+  </section>
+
+  <footer>
+    <p>Measured from the song itself: the beat from its drum and pluck hits, the speed from how often their rhythm repeats, the bar lines by counting beats from the start of each part, and the chords from the notes that sound most in each bar. Instrument names are guesses from the shape of the sound.</p>
+    <p>In the repo: <span class="mono">music-of-the-moon-faire/</span>. The song is one Opus file; each part is a start and an end in it, listed in <span class="mono">songs.json</span>, with every beat, bar and chord in the song's <span class="mono">breakdown.json</span>.</p>
+  </footer>
+</div>
+
+<audio id="song" preload="auto"></audio>
+
+<script>
+const DATA = /*DATA*/;
+const $ = id => document.getElementById(id);
+const NAMES = {"C#":"C sharp","Eb":"E flat","F#":"F sharp","Ab":"A flat","Bb":"B flat"};
+const say = n => NAMES[n] || n;
+const clock = (t, d = 0) => { const m = Math.floor(t / 60), s = t - m * 60; return m + ":" + (d ? s.toFixed(d).padStart(3 + d, "0") : String(Math.floor(s)).padStart(2, "0")); };
+const text = (tag, str, cls) => { const e = document.createElement(tag); e.textContent = str; if (cls) e.className = cls; return e; };
+const css = name => getComputedStyle(document.documentElement).getPropertyValue(name).trim();
+
+const parts = DATA.parts;
+const dur = DATA.seconds;
+const speeds = parts.map(p => p.bpm).filter(Boolean);
+const [tonic, mode] = DATA.key.split(" ");
+const KEYS = ["C","C#","D","Eb","E","F","F#","G","Ab","A","Bb","B"], at = s => KEYS[(KEYS.indexOf(tonic) + s) % 12];
+const m = mode === "minor" ? "m" : "";
+const ROLE = {[tonic + m]: "home", [at(5) + m]: "four", [at(7)]: "five"};  // the home chord, the one a fourth up, and the one that pulls home
+const chordName = c => say(c.replace(/m$/, "")) + (c.endsWith("m") ? " minor" : " major");
+
+$("source").textContent = DATA.source;
+for (const [k, v] of [
+  ["Length", clock(dur)],
+  ["Key", say(tonic) + " " + mode],
+  ["Beat", DATA.beats_per_bar + " to the bar, each split in 3"],
+  ["Speed", Math.round(Math.min(...speeds)) + " to " + Math.round(Math.max(...speeds)) + " beats a minute"],
+  ["Parts", parts.length + ", all in one " + (DATA.kb * 1024 / 1e6).toFixed(1) + " MB file"],
+  ["Safe bell notes", ["G", "Bb", "D"].map(say).join(", ")],
+]) { const d = document.createElement("div"); d.append(text("dt", k), text("dd", v)); $("facts").append(d); }
+for (const s of DATA.summary) $("summary").append(text("li", s));
+for (const s of DATA.fit) $("fit").append(text("li", s));
+$("bells").textContent = DATA.bells;
+for (const [c, role, says] of Object.entries(ROLE).map(([c, r]) => [c, r, {home: "home", four: "", five: "pulls home"}[r]])) {
+  $("legend").append(text("b", c, role), " is " + chordName(c) + (says ? ", " + says : ""), "  ·  ");
+}
+$("legend").lastChild.remove();
+$("legend").prepend("One chip per bar. ");
+
+parts.forEach((p, i) => {
+  const li = document.createElement("li"); li.className = "part"; li.id = "part-" + (i + 1);
+  const b = text("button", String(i + 1).padStart(2, "0"), "num");
+  b.setAttribute("aria-label", "Play " + p.name);
+  b.addEventListener("click", () => playPart(i));
+  const head = document.createElement("div"); head.className = "head";
+  const facts = [clock(p.start, 1) + " to " + clock(p.end, 1), p.seconds.toFixed(1) + " s"];
+  if (p.bpm) facts.push(Math.round(p.bpm) + " a minute");
+  if (p.bars) facts.push(p.bars.length + " bars");
+  head.append(text("h3", p.name), text("span", facts.join(" · "), "when mono"));
+  const body = document.createElement("div"); body.className = "body";
+  if (p.sound) body.append(text("p", p.sound));
+  if (p.use) { const u = document.createElement("p"); u.className = "use"; u.append(text("b", "Good for: "), p.use); body.append(u); }
+  if (p.bars) {
+    const c = document.createElement("div"); c.className = "chords"; c.setAttribute("aria-label", "Chords, one per bar");
+    for (const bar of p.bars) c.append(text("span", bar.chord, ROLE[bar.chord] || ""));
+    body.append(c);
+  } else if (p.notes.length) {
+    body.append(text("p", "Strongest notes: " + p.notes.map(say).join(", "), "use"));
+  }
+  li.append(b, head, body);
+  $("parts").append(li);
+});
+
+// the axis under the map: a mark every 30 seconds
+for (let t = 0; t <= dur; t += 30) $("axis").append(text("span", clock(t)));
+
+const audio = $("song");
+if (!audio.canPlayType('audio/ogg; codecs="opus"')) $("note").hidden = false;
+audio.src = DATA.song;
+audio.addEventListener("error", () => { $("note").hidden = false; });
+let stopAt = null, current = -1;
+
+function partAt(t) { let i = 0; while (i + 1 < parts.length && parts[i + 1].start <= t) i++; return i; }
+function playPart(i) { audio.currentTime = parts[i].start; stopAt = parts[i].end; audio.play().catch(() => {}); }
+function seek(t, play) { audio.currentTime = Math.max(0, Math.min(dur - 0.05, t)); stopAt = null; if (play) audio.play().catch(() => {}); draw(); }
+
+$("play").addEventListener("click", () => {
+  if (audio.paused) { if (stopAt !== null && audio.currentTime >= stopAt - 0.05) stopAt = null; audio.play().catch(() => {}); }
+  else audio.pause();
+});
+audio.addEventListener("play", () => { $("icon").setAttribute("d", "M5 3h4v14H5zM11 3h4v14h-4z"); $("play").setAttribute("aria-label", "Pause"); tick(); });
+audio.addEventListener("pause", () => { $("icon").setAttribute("d", "M5 3v14l12-7z"); $("play").setAttribute("aria-label", "Play the song"); draw(); });
+audio.addEventListener("ended", () => { stopAt = null; });
+
+const strip = $("strip");
+strip.addEventListener("click", e => { const r = strip.getBoundingClientRect(); seek((e.clientX - r.left) / r.width * dur, true); });
+strip.addEventListener("keydown", e => {
+  if (e.key === "ArrowRight") { seek(audio.currentTime + 5, !audio.paused); e.preventDefault(); }
+  if (e.key === "ArrowLeft") { seek(audio.currentTime - 5, !audio.paused); e.preventDefault(); }
+  if (e.key === " " || e.key === "Enter") { $("play").click(); e.preventDefault(); }
+});
+
+function fit(canvas) {
+  const r = canvas.getBoundingClientRect(), k = window.devicePixelRatio || 1;
+  canvas.width = Math.round(r.width * k); canvas.height = Math.round(r.height * k);
+  const g = canvas.getContext("2d"); g.setTransform(k, 0, 0, k, 0, 0); return [g, r.width, r.height];
+}
+
+function drawSpeed() {
+  const [g, w, h] = fit($("speed"));
+  const lo = Math.floor((Math.min(...DATA.tempo.map(x => x[1])) - 6) / 10) * 10;
+  const hi = Math.ceil((Math.max(...DATA.tempo.map(x => x[1])) + 6) / 10) * 10;
+  const y = v => h - 4 - (v - lo) / (hi - lo) * (h - 8);
+  g.font = "11px " + css("--f-mono"); g.textBaseline = "middle";
+  const marks = [];
+  for (let v = lo + 10; v < hi; v += 20) {
+    g.strokeStyle = css("--line"); g.lineWidth = 1; g.beginPath(); g.moveTo(0, y(v)); g.lineTo(w, y(v)); g.stroke();
+    marks.push(v);
+  }
+  // the same time scale as the strip above, edge to edge
+  g.strokeStyle = css("--pendant"); g.lineWidth = 2; g.lineJoin = "round"; g.beginPath();
+  DATA.tempo.forEach(([t, v], i) => { const x = t / dur * w; i ? g.lineTo(x, y(v)) : g.moveTo(x, y(v)); });
+  g.stroke();
+  for (const v of marks) {
+    const label = String(v), tw = g.measureText(label).width;
+    g.fillStyle = css("--velvet"); g.fillRect(0, y(v) - 7, tw + 6, 14);
+    g.fillStyle = css("--muted"); g.fillText(label, 2, y(v));
+  }
+}
+
+function draw() {
+  const [g, w, h] = fit($("wave"));
+  const t = audio.currentTime || 0, now = partAt(t), mid = h / 2 - 6;
+  const step = DATA.shape_step, n = DATA.shape.length, bw = w / (dur / step);
+  parts.forEach((p, i) => {
+    const x0 = p.start / dur * w, x1 = p.end / dur * w;
+    if (i % 2) { g.fillStyle = css("--curtain"); g.fillRect(x0, 0, x1 - x0, h - 12); }
+    g.fillStyle = i === now ? css("--gold") : css("--muted");
+    if (x1 - x0 > 16) { g.font = "11px " + css("--f-mono"); g.textBaseline = "top"; g.fillText(String(i + 1), x0 + 3, 3); }
+  });
+  for (let i = 0; i < n; i++) {
+    const v = DATA.shape[i], x = i * bw, a = Math.max(1, v * v * (mid - 14));
+    const ti = i * step;
+    const here = partAt(ti) === now;
+    g.fillStyle = here ? css("--gold") : css("--wave");
+    g.globalAlpha = here && ti > t ? 0.5 : 1;
+    g.fillRect(x, mid + 8 - a, Math.max(1, bw - 0.6), a * 2);
+    g.globalAlpha = 1;
+  }
+  // bar lines along the bottom, for the parts that have them
+  g.fillStyle = css("--muted");
+  for (const p of parts) for (const b of p.bars || []) g.fillRect(b.t / dur * w, h - 9, 1, 6);
+  // part edges
+  g.fillStyle = css("--line");
+  for (const p of parts.slice(1)) g.fillRect(p.start / dur * w, 0, 1, h - 12);
+  // playhead
+  g.fillStyle = css("--ink"); g.fillRect(t / dur * w - 1, 0, 2, h - 12);
+  strip.setAttribute("aria-valuenow", Math.round(t)); strip.setAttribute("aria-valuemax", Math.round(dur));
+  strip.setAttribute("aria-valuetext", clock(t) + ", " + parts[now].name);
+  $("time").textContent = clock(t) + " / " + clock(dur);
+  $("now").innerHTML = ""; $("now").append(text("b", parts[now].name), " · part " + (now + 1) + " of " + parts.length);
+  if (now !== current) {
+    document.querySelectorAll(".part").forEach((li, i) => li.setAttribute("aria-current", i === now ? "true" : "false"));
+    current = now;
+  }
+}
+
+function tick() {
+  if (stopAt !== null && audio.currentTime >= stopAt) { audio.pause(); audio.currentTime = stopAt - 0.01; stopAt = null; }
+  draw();
+  if (!audio.paused) requestAnimationFrame(tick);
+}
+
+function redraw() { drawSpeed(); draw(); }
+window.addEventListener("resize", redraw);
+document.fonts?.ready?.then(redraw);
+redraw();
+</script>

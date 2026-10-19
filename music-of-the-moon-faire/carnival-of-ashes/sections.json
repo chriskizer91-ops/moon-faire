@@ -1,0 +1,129 @@
+{
+ "title": "Carnival of Ashes",
+ "source": "Chris's song, made with Suno and sent on October 19, 2026 as a WAV (48 kHz, 16-bit stereo; Suno id a3aad3c7-c33f-4298-85c9-7af319b9fc2f).",
+ "beats_per_bar": 3,
+ "summary": [
+  "A dark carnival waltz in G minor. I can find no singing in it: the held notes are steady, without the wobble and word breaks a voice leaves.",
+  "Three beats to the bar, and each beat splits into three, so it rolls and sways rather than marching.",
+  "It opens quietly on plucked notes, like a harpsichord or a music box. The band sweeps in for a moment at 0:07, then crashes in for real at 0:17 and plays the waltz four times, with a stop at 0:38, a two-second breath at 0:57 and a quiet break at 1:19.",
+  "After the band winds down at 1:54, a swell rises out of near silence into a last, slower waltz at 2:05, and the plucked tune comes back to fade it out from 2:17.",
+  "The tune turns on three chords: G minor for four bars, C minor for two and D major for two, then round again. D major is the chord that pulls home to G minor, and both the stop and the breath hold on it, so they leave you leaning forward.",
+  "The speed isn't steady. The opening runs at about 160 beats a minute, the waltz at about 140 until 1:19, and from 1:28 it slows, to about 130 by 1:45 and about 120 for the last waltz."
+ ],
+ "bells": "G and D fit over the whole song. B flat fits everywhere except the D major bars, where F sharp takes its place. Keep to B flat and E flat, not B and E. G, B flat and D are all in B-flat major too, so a bell already tuned to Moonlit Forest Path fits here if it rings one of those three.",
+ "fit": [
+  "Key: G minor is B-flat major's dark twin, the family that docs/music-requests/suno-cues.md asks for. It can sit next to Moonlit Forest Path, or any later piece in that family, with no drone between them. Herbal Decay (E minor) is outside the family, so give that change a gap.",
+  "It is close to the fight the music requests ask for (piece 3: G minor, about 132 beats a minute, a sudden stop, a bare moment, a big return). It also has the mood of the Jester's Waltz (piece 1), in the minor: a waltz that opens on a music-box tune. It could be her dark waltz, the fight, or both.",
+  "Cut within one part, or between parts that sit next to each other. The steadiest stretch is 0:17 to 1:19. Because the song slows down later, joining something early to something late will show as a jump in speed.",
+  "The full-band parts are dense and loud, so small sounds get buried under them. The opening, the lead-in, the quiet break and the ending leave room for her bells, her steps and the wisps.",
+  "It fades out on the plucked tune rather than stopping dead. For a hard stop, end at 2:16.75, the last bar of the last waltz, with a short fade."
+ ],
+ "parts": [
+  {
+   "start": 0.0,
+   "name": "Opening tune",
+   "slug": "opening-tune",
+   "sound": "Plucked notes alone, like a harpsichord or a music box, playing the tune in G minor. Quiet, with nothing in the low end, and quicker than the waltz.",
+   "use": "The empty square at the start of A Fool's Mercy, where one tune is still drifting from somewhere. Her close-ups, idle moments and menus."
+  },
+  {
+   "start": 6.7,
+   "name": "First swell",
+   "slug": "first-swell",
+   "sound": "The band sweeps in for a moment with a crash and a held chord, then fades back down.",
+   "use": "A reveal: the chapel bell's first toll, or the town coming into view."
+  },
+  {
+   "start": 11.96,
+   "name": "Lead-in",
+   "slug": "lead-in",
+   "sound": "Quiet again: a plucked line over a soft held chord, leaning on D and A, which pull toward G minor.",
+   "use": "Something is coming: the wisps leaving the graveyard. It hands straight over to the band at 0:17."
+  },
+  {
+   "start": 16.8,
+   "name": "Waltz, first time",
+   "slug": "waltz-1",
+   "bars": true,
+   "sound": "The band crashes in: a low hit on the bar, held chords and a busy tune on top.",
+   "use": "The fight's first blows: the wisp lunging, Gilded Rebuke."
+  },
+  {
+   "start": 38.2,
+   "name": "Stop",
+   "slug": "stop",
+   "beat": false,
+   "sound": "The band drops out, leaving a held D major chord for two thirds of a second.",
+   "use": "One hit in the gap: Hush, or a flail strike."
+  },
+  {
+   "start": 38.86,
+   "name": "Waltz, second time",
+   "slug": "waltz-2",
+   "bars": true,
+   "sound": "The waltz again, brighter, with more high notes. Its chords are the plainest in the song: G minor for four bars, C minor for two, D major for two, twice over.",
+   "use": "The Shadow Wraith climbing out of the graveyard, and Gravity."
+  },
+  {
+   "start": 57.42,
+   "name": "Breath",
+   "slug": "breath",
+   "sound": "The drums and bass drop out on a D major chord, which fades for two seconds. Then a quick swell pulls the band back in.",
+   "use": "The great wraith on the bridge before it moves, or the moment she listens to her pendant."
+  },
+  {
+   "start": 59.58,
+   "name": "Waltz, third time",
+   "slug": "waltz-3",
+   "bars": true,
+   "sound": "The waltz a third time, full, and a little quicker than before.",
+   "use": "The great wraith swallowing the lamps."
+  },
+  {
+   "start": 79.1,
+   "name": "Quiet break",
+   "slug": "quiet-break",
+   "bars": true,
+   "sound": "The band stops. The plucked notes play alone over a low hum, like the opening but at the waltz's speed.",
+   "use": "Sealed Fate: room for the chapel bell to count the Doom down. Also good under the wisps."
+  },
+  {
+   "start": 88.12,
+   "name": "Waltz, fourth time",
+   "slug": "waltz-4",
+   "bars": true,
+   "sound": "The band crashes back in. From here the waltz slowly loses speed.",
+   "use": "Against All Odds: the band's big return as the fire breaks on her light."
+  },
+  {
+   "start": 113.7,
+   "name": "Winding down",
+   "slug": "winding-down",
+   "sound": "The band thins out, and the plucked notes slow and fade almost to silence.",
+   "use": "The square going dark like a theatre, before the Curtain Call."
+  },
+  {
+   "start": 120.9,
+   "name": "Rising swell",
+   "slug": "rising-swell",
+   "beat": false,
+   "sound": "A swell rises out of near silence on an E flat chord, grows for two seconds, then holds until the band comes in.",
+   "use": "The Curtain Call's build. It lands on the last waltz at 2:04.6, the moment for the release."
+  },
+  {
+   "start": 124.6,
+   "name": "Last waltz",
+   "slug": "last-waltz",
+   "bars": true,
+   "sound": "The band's last waltz, slower and heavier than before.",
+   "use": "The release: moths rising past the bell tower, flames flying home to their lamps."
+  },
+  {
+   "start": 136.75,
+   "name": "Ending",
+   "slug": "ending",
+   "sound": "The plucked tune comes back over the low hum, with a few last low accents, and fades out on G minor.",
+   "use": "The walk home and the last shot."
+  }
+ ]
+}
