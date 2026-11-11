@@ -1,0 +1,7 @@
+node_modules/
+work/
+dist/
+viewer/lib/
+viewer/jester.glb
+viewer/jester_glb.js
+__pycache__/

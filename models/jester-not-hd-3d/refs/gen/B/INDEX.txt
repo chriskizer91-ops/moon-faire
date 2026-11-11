@@ -1,0 +1,14 @@
+Jester Witch — Set B: Without Veil
+
+Generated November 11, 2026.
+PNG filenames follow the codes in the supplied prompt file.
+Created using built-in image generation.
+
+B1.png — front and back, no veil — 1536 × 1024 pixels
+B2.png — both sides, no veil — 1536 × 1024 pixels
+B3.png — three-quarter views, no veil — 1536 × 1024 pixels
+B4.png — arms straight out, no veil — 1536 × 1024 pixels
+
+Landscape sheets retain their native 1536 × 1024 resolution.
+Square spell effects retain their native 1254 × 1254 resolution.
+Images are supplied as modeling/art references; cloth cutout outlines are interpreted from the visible costume.

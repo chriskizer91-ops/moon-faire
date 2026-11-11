@@ -1,0 +1,240 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+<title>Jester game model</title>
+<style>
+  :root { --bg:#2b2634; --panel:rgba(24,20,30,.82); --line:#5b4f6b; --ink:#efe6f2; --dim:#a99db5; --gold:#e2b04a; --wine:#8d2f4e; }
+  * { box-sizing:border-box; -webkit-tap-highlight-color:transparent; }
+  html,body { margin:0; height:100%; background:var(--bg); color:var(--ink); font:14px/1.3 system-ui,-apple-system,"Segoe UI",sans-serif; overflow:hidden; }
+  #stage { position:fixed; inset:0; touch-action:none; }
+  canvas { display:block; width:100%; height:100%; }
+  #top { position:fixed; left:0; right:0; top:0; padding:10px 12px; display:flex; gap:8px; align-items:center; pointer-events:none; }
+  #top h1 { font-size:15px; font-weight:600; margin:0; letter-spacing:.02em; white-space:nowrap; }
+  #top .note { color:var(--dim); font-size:12px; margin-left:auto; text-align:right; }
+  #bar { position:fixed; left:0; right:0; bottom:0; padding:8px 8px calc(8px + env(safe-area-inset-bottom)); background:var(--panel); border-top:1px solid var(--line); backdrop-filter:blur(6px); }
+  .row { display:flex; flex-wrap:wrap; gap:6px; padding:3px 2px; }
+  .lab { flex:none; align-self:center; color:var(--dim); font-size:11px; width:44px; text-transform:uppercase; letter-spacing:.06em; }
+  button { flex:none; font:inherit; color:var(--ink); background:#3a3246; border:1px solid var(--line); border-radius:999px; padding:8px 13px; min-height:36px; cursor:pointer; }
+  button.on { background:var(--wine); border-color:var(--gold); color:#fff; }
+  #fade { flex:1; min-width:90px; accent-color:var(--gold); }
+  #load { position:fixed; inset:0; display:grid; place-items:center; color:var(--dim); background:var(--bg); }
+  #err { position:fixed; left:8px; right:8px; top:44px; color:#ffb4a8; font-size:12px; white-space:pre-wrap; pointer-events:none; }
+</style>
+<script type="importmap">
+{ "imports": { "three": "./lib/build/three.module.min.js", "three/addons/": "./lib/examples/jsm/" } }
+</script>
+</head>
+<body>
+<div id="stage"></div>
+<div id="top"><h1>Jester &middot; game model</h1><div class="note" id="note">step 1: body and skeleton</div></div>
+<div id="err"></div>
+<div id="bar">
+  <div class="row" id="moves"><span class="lab">Move</span></div>
+  <div class="row" id="views"><span class="lab">View</span>
+    <button data-view="free" class="on">Free</button><button data-view="front">Front</button><button data-view="side">Side</button><button data-view="back">Back</button>
+    <button id="bTurn">Turntable</button><button id="bRoam">Walk about</button>
+  </div>
+  <div class="row"><span class="lab">Show</span>
+    <button id="bBones">Skeleton</button><button id="bSheet">Your drawing</button>
+    <input id="fade" type="range" min="0" max="100" value="50" aria-label="How strongly the drawing shows">
+  </div>
+</div>
+<div id="load">Loading the Jester&hellip;</div>
+<script>
+setTimeout(function () { var l = document.getElementById('load'); if (l) l.textContent = 'Still loading. If this stays, the 3D library or the model did not arrive: tell Claude.'; }, 20000);
+</script>
+<script src="jester_glb.js"></script>
+<script type="module">
+import * as THREE from 'three';
+import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
+import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
+
+const $ = s => document.querySelector(s);
+const errBox = $('#err');
+window.addEventListener('error', e => { errBox.textContent += (e.message || e) + '\n'; });
+window.addEventListener('unhandledrejection', e => { errBox.textContent += (e.reason && e.reason.message || e.reason) + '\n'; });
+
+const TEST = location.hash === '#test';
+const stage = $('#stage');
+const renderer = new THREE.WebGLRenderer({ antialias: true, preserveDrawingBuffer: TEST });
+renderer.setPixelRatio(Math.min(devicePixelRatio || 1, 2));
+renderer.outputColorSpace = THREE.SRGBColorSpace;
+stage.appendChild(renderer.domElement);
+
+const scene = new THREE.Scene();
+scene.background = new THREE.Color(0x2b2634);
+const persp = new THREE.PerspectiveCamera(32, 1, 0.05, 60);
+const ortho = new THREE.OrthographicCamera(-1, 1, 1, -1, 0.01, 60);
+let camera = persp;
+const controls = new OrbitControls(persp, renderer.domElement);
+controls.enableDamping = true; controls.dampingFactor = 0.08;
+controls.minDistance = 0.6; controls.maxDistance = 14; controls.maxPolarAngle = Math.PI * 0.52;
+controls.target.set(0, 0.88, 0);
+persp.position.set(1.5, 1.25, 4.4);
+
+scene.add(new THREE.HemisphereLight(0xd9d2ff, 0x3a2c3a, 1.25));
+const key = new THREE.DirectionalLight(0xfff1dc, 2.1); key.position.set(1.6, 3.2, 2.6); scene.add(key);
+const rim = new THREE.DirectionalLight(0xb78cff, 1.1); rim.position.set(-2.2, 2.0, -2.6); scene.add(rim);
+
+// floor: a soft disc with rings so movement across it is easy to read
+const floor = new THREE.Group(); scene.add(floor);
+{
+  const c = document.createElement('canvas'); c.width = c.height = 512; const g = c.getContext('2d');
+  g.fillStyle = '#352e40'; g.fillRect(0, 0, 512, 512);
+  g.strokeStyle = 'rgba(226,176,74,.22)'; g.lineWidth = 2;
+  for (let r = 32; r < 256; r += 32) { g.beginPath(); g.arc(256, 256, r, 0, 7); g.stroke(); }
+  for (let a = 0; a < 12; a++) { g.beginPath(); g.moveTo(256, 256); g.lineTo(256 + 256 * Math.cos(a * Math.PI / 6), 256 + 256 * Math.sin(a * Math.PI / 6)); g.stroke(); }
+  const grd = g.createRadialGradient(256, 256, 120, 256, 256, 256); grd.addColorStop(0, 'rgba(43,38,52,0)'); grd.addColorStop(1, 'rgba(43,38,52,1)');
+  g.fillStyle = grd; g.fillRect(0, 0, 512, 512);
+  const t = new THREE.CanvasTexture(c); t.colorSpace = THREE.SRGBColorSpace;
+  const m = new THREE.Mesh(new THREE.CircleGeometry(4, 64), new THREE.MeshBasicMaterial({ map: t }));
+  m.rotation.x = -Math.PI / 2; floor.add(m);
+}
+const blob = new THREE.Mesh(new THREE.CircleGeometry(0.34, 32), new THREE.MeshBasicMaterial({ color: 0x120e16, transparent: true, opacity: 0.45, depthWrite: false }));
+blob.rotation.x = -Math.PI / 2; blob.position.y = 0.003; scene.add(blob);
+
+// Chris's drawing as a flat card, for checking proportions in the straight-on views
+const SHEET = { ppm: 930 / 1.66, ground: 980, front: { file: 'ref/A1_front.png', x0: 150, w: 600, cx: 447.5 }, back: { file: 'ref/A1_back.png', x0: 800, w: 600, cx: 1088.5 } };
+const cards = {};
+function makeCard(which) {
+  const s = SHEET[which];
+  const tex = new THREE.TextureLoader().load(s.file); tex.colorSpace = THREE.SRGBColorSpace; tex.magFilter = THREE.NearestFilter;
+  const W = s.w / SHEET.ppm, H = 1024 / SHEET.ppm;
+  const mat = new THREE.MeshBasicMaterial({ map: tex, transparent: true, opacity: 0.5, depthTest: false, depthWrite: false });
+  const m = new THREE.Mesh(new THREE.PlaneGeometry(W, H), mat);
+  const left = (s.x0 - s.cx) / SHEET.ppm;
+  m.position.set((left + W / 2) * (which === 'front' ? 1 : -1), SHEET.ground / SHEET.ppm - H / 2, which === 'front' ? 1.2 : -1.2);
+  if (which === 'back') m.rotation.y = Math.PI;
+  m.renderOrder = 10; m.visible = false; scene.add(m); cards[which] = m;
+}
+makeCard('front'); makeCard('back');
+
+let root, mixer, clips = {}, action, skel, current = 'Stand', info = {};
+const state = { view: 'free', bones: false, sheet: false, turn: false, roam: false, fade: 0.5, paused: false };
+let roamT = 0;
+
+function modelBytes() {            // the model travels inside jester_glb.js as text
+  const s = atob(window.JESTER_GLB), n = s.length, u = new Uint8Array(n);
+  for (let i = 0; i < n; i++) u[i] = s.charCodeAt(i);
+  window.JESTER_GLB = null;
+  return u.buffer;
+}
+const onModel = gltf => {
+  root = gltf.scene; scene.add(root);
+  root.traverse(o => {
+    if (o.isSkinnedMesh) o.frustumCulled = false;
+  });
+  const j = root.getObjectByName('Jester') || root;
+  info = (j.userData && j.userData.clips) || {};
+  mixer = new THREE.AnimationMixer(root);
+  for (const c of gltf.animations) clips[c.name] = c;
+  skel = new THREE.SkeletonHelper(root); skel.visible = false; skel.material.depthTest = false; skel.renderOrder = 20; scene.add(skel);
+  const row = $('#moves');
+  for (const name of ['Stand', ...Object.keys(clips)]) {
+    const b = document.createElement('button'); b.textContent = (info[name] && info[name].label) || name; b.dataset.move = name;
+    b.onclick = () => play(name); row.appendChild(b);
+  }
+  play(clips.Idle ? 'Idle' : 'Stand');
+  $('#load').remove();
+  let tris = 0; root.traverse(o => { if (o.isMesh) tris += o.geometry.index.count / 3; });
+  $('#note').textContent = `step 1: body and skeleton · ${Math.round(tris / 1000)}k triangles`;
+  api.ready = true;
+};
+const onFail = e => { errBox.textContent += 'Could not load the model: ' + (e.message || e) + '\n'; };
+if (window.JESTER_GLB) new GLTFLoader().parse(modelBytes(), '', onModel, onFail);
+else new GLTFLoader().load('jester.glb', onModel, undefined, onFail);
+
+function play(name, opts = {}) {
+  current = name;
+  document.querySelectorAll('#moves button').forEach(b => b.classList.toggle('on', b.dataset.move === name));
+  if (action) { action.fadeOut(opts.instant ? 0 : 0.25); }
+  if (name === 'Stand' || !clips[name]) { action = null; if (opts.instant) mixer.stopAllAction(); return; }
+  const a = mixer.clipAction(clips[name]);
+  const loop = !(info[name] && info[name].loop === false);
+  a.reset(); a.setLoop(loop ? THREE.LoopRepeat : THREE.LoopPingPong, Infinity); a.clampWhenFinished = true;
+  if (opts.instant) { mixer.stopAllAction(); a.reset(); a.setEffectiveWeight(1); a.play(); } else a.fadeIn(0.25).play();
+  action = a;
+}
+
+function setView(v) {
+  state.view = v;
+  document.querySelectorAll('#views button[data-view]').forEach(b => b.classList.toggle('on', b.dataset.view === v));
+  camera = v === 'free' ? persp : ortho;
+  controls.enabled = v === 'free';
+  const d = 6;
+  if (v === 'front') ortho.position.set(0, 0.86, d);
+  if (v === 'back') ortho.position.set(0, 0.86, -d);
+  if (v === 'side') ortho.position.set(d, 0.86, 0);
+  if (v !== 'free') { ortho.lookAt(v === 'side' ? 0 : ortho.position.x, 0.86, 0); if (state.roam) toggle('roam', false); }
+  syncCards(); resize();
+}
+function syncCards() {
+  cards.front.visible = state.sheet && state.view === 'front';
+  cards.back.visible = state.sheet && state.view === 'back';
+  cards.front.material.opacity = cards.back.material.opacity = state.fade;
+}
+function toggle(k, v) {
+  state[k] = v === undefined ? !state[k] : v;
+  $('#bBones').classList.toggle('on', state.bones); $('#bSheet').classList.toggle('on', state.sheet);
+  $('#bTurn').classList.toggle('on', state.turn); $('#bRoam').classList.toggle('on', state.roam);
+  if (skel) skel.visible = state.bones;
+  if (k === 'sheet' && state.sheet && state.view !== 'front' && state.view !== 'back') setView('front');
+  if (k === 'roam') {
+    if (state.roam) { if (state.view !== 'free') setView('free'); if (!(info[current] && info[current].speed)) play('Walk'); roamT = 0; }
+    else if (root) { root.position.set(0, 0, 0); root.rotation.y = 0; }
+  }
+  syncCards();
+}
+document.querySelectorAll('#views button[data-view]').forEach(b => b.onclick = () => setView(b.dataset.view));
+$('#bBones').onclick = () => toggle('bones'); $('#bSheet').onclick = () => toggle('sheet');
+$('#bTurn').onclick = () => toggle('turn'); $('#bRoam').onclick = () => toggle('roam');
+$('#fade').oninput = e => { state.fade = e.target.value / 100; syncCards(); };
+
+function resize() {
+  const w = stage.clientWidth, h = stage.clientHeight;
+  renderer.setSize(w, h, false);
+  const bar = $('#bar').offsetHeight || 0;
+  persp.aspect = w / h; persp.fov = w < h ? 40 : 32;
+  persp.setViewOffset(w, h, 0, Math.round(bar * 0.45), w, h);      // lift the picture clear of the button bar
+  persp.updateProjectionMatrix();
+  const span = 2.02, usable = Math.max(120, h - bar - 40);
+  const mpp = Math.max(span / usable, 1.25 / w);          // metres per screen pixel
+  const cy = 0.86 - (bar - 40) / 2 * mpp;                  // keep her clear of the button bar
+  ortho.left = -w / 2 * mpp; ortho.right = w / 2 * mpp; ortho.top = h / 2 * mpp + (cy - 0.86); ortho.bottom = -h / 2 * mpp + (cy - 0.86);
+  ortho.updateProjectionMatrix();
+}
+addEventListener('resize', resize); resize();
+new ResizeObserver(resize).observe($('#bar'));
+
+const clock = new THREE.Clock();
+function frame(dtOverride) {
+  const dt = dtOverride !== undefined ? dtOverride : Math.min(clock.getDelta(), 0.05);
+  if (mixer && !state.paused) mixer.update(dt);
+  if (root) {
+    if (state.roam) {
+      const sp = (info[current] && info[current].speed) || 0;
+      roamT += dt * sp;
+      // a long oval so she walks toward the camera, turns, and walks away
+      const a = 0.9, b = 2.2, th = roamT / ((a + b) / 2);
+      root.position.set(a * Math.sin(th), 0, b * Math.cos(th));
+      root.rotation.y = Math.atan2(a * Math.cos(th), -b * Math.sin(th));
+    } else if (state.turn) root.rotation.y += dt * 0.7;
+    blob.position.x = root.position.x; blob.position.z = root.position.z;
+  }
+  if (state.view === 'free') controls.update();
+  renderer.render(scene, camera);
+}
+renderer.setAnimationLoop(() => { if (!TEST) frame(); });
+
+// hooks for automated checks
+const api = window.J = {
+  ready: false, state, play, setView, toggle, frame,
+  pose(name, t) { play(name, { instant: true }); if (action) { action.time = t; action.paused = true; } mixer.update(0); state.paused = true; frame(0); },
+  cam(px, py, pz, tx, ty, tz) { setView('free'); persp.position.set(px, py, pz); controls.target.set(tx, ty, tz); controls.update(); frame(0); },
+  clipNames: () => Object.keys(clips), dur: n => clips[n].duration, errors: () => errBox.textContent,
+};
+</script>
+</body>
+</html>

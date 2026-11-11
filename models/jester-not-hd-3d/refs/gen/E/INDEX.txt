@@ -1,0 +1,15 @@
+Jester Witch — Set E: Movement Poses
+
+Generated November 11, 2026.
+PNG filenames follow the codes in the supplied prompt file.
+Created using built-in image generation.
+
+E1.png — running, side view — 1536 × 1024 pixels
+E2.png — running toward and away — 1536 × 1024 pixels
+E3.png — squatting — 1536 × 1024 pixels
+E4.png — kneeling on one knee — 1536 × 1024 pixels
+E5.png — kneeling on both knees — 1536 × 1024 pixels
+
+Landscape sheets retain their native 1536 × 1024 resolution.
+Square spell effects retain their native 1254 × 1254 resolution.
+Images are supplied as modeling/art references; cloth cutout outlines are interpreted from the visible costume.
