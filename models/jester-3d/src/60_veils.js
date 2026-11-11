@@ -31,7 +31,7 @@
   function sheerMat(tex, o) {
     const m = new THREE.MeshStandardMaterial({ map: tex.map, alphaMap: tex.alpha, transparent: true, depthWrite: false, roughness: o.rough == null ? 0.6 : o.rough, metalness: 0.05,
       emissive: lin(o.glow || '#ffffff'), emissiveMap: tex.map, emissiveIntensity: o.emi == null ? 0.2 : o.emi, opacity: o.opacity == null ? 1 : o.opacity });
-    return sheen(m, o.sheen || '#ffb0d0', 2.2, o.sheenK == null ? 0.3 : o.sheenK);
+    return sheen(m, o.sheen || '#ffb0d0', 2.2, o.sheenK == null ? 0.3 : o.sheenK, o.shot);
   }
   function addSheer(cloth, tex, o, order) {            // back faces first, then front faces, so a sheet sorts against itself
     for (const side of [THREE.BackSide, THREE.FrontSide]) {
@@ -113,7 +113,9 @@
 
   // the great veil and the shorter tier beneath it: pinned over the back of the cap, falling past her shoulders, caught at each wrist
   (function buildMantles() {
-    const SHEER = { glow: '#d040a0', emi: 0.22, sheen: '#f070b0', sheenK: 0.3, rough: 0.5 }, WINE = { glow: '#c83080', emi: 0.14, sheen: '#e0508c', sheenK: 0.16 }, OLIVE = { glow: '#8a7038', emi: 0.12, sheen: '#c8a050', sheenK: 0.2 };
+    // the sheer veil is red shot with gold: one cloth that shows two colours as the light and the folds turn
+    const SHEER = { glow: '#d8486e', emi: 0.22, sheen: '#f0b464', sheenK: 0.20, rough: 0.5, shot: { c: '#f0b450', k: 0.72, p: 1.25 } }, WINE = { glow: '#c83080', emi: 0.14, sheen: '#e0508c', sheenK: 0.16 }, OLIVE = { glow: '#8a7038', emi: 0.12, sheen: '#c8a050', sheenK: 0.2 };
+    let mainTex = null;
     const TIERS = [
       // the innermost tier: wine in shadow, the face of the fan seen from the front
       { pleat: { n: 18, amp: 0.012, hem: 0.006 }, A: 114, inset: 0.020, ph: 9, up: 0, cap: 80, flat: 0.76, amp: 0.34, per: 38, shawl: true, order: 6, margin: 0.012, cols: Q(49, 27), rows: Q(40, 22), mat: WINE,
@@ -142,52 +144,36 @@
         rest: (c, r) => cols[c][r],
         pin: (c, r, p) => { const u = r / (NR - 1); return Math.max(r === 0 ? 1 : u < 0.1 ? lerp(0.9, 0.12, u / 0.1) : lerp(0.06, 0.022, u), wristPin(p)); },
         weights: (c, r, p) => (wristPin(p) > 0.02 ? [BI['farm' + (p[0] < 0 ? 'R' : 'L')], 1] : T.shawl && p[1] > 1.25 ? [BI.spine3, 1] : wHang(p)) });
-      (T.sheer ? addSheer : addSolid)(cloth, veilTex(1024, T.rows > 24 ? 1024 : 512, T.tex), T.mat, T.order);
+      const vt = veilTex(1024, T.rows > 24 ? 1024 : 512, T.tex); if (T.main) mainTex = vt;
+      (T.sheer ? addSheer : addSolid)(cloth, vt, T.mat, T.order);
       cloth.outer = true;                           // the veils and the shawl: the layers worn over the base outfit
       if (T.main) mantleCloth = cloth;
     }
+    // The veil's two front falls. It is one cloth: gathered at the knot on her crown, it comes forward in front of each horn, down past
+    // her cheek, over the front of the shoulder and round to meet the great veil at her side. (These were fourteen separate ribbons;
+    // Chris asked for one cloth and no strips, November 11.) Each fall wears the edge of the great veil's own painting, gold trim to the face.
+    const HEMF = [0.80, 0.71, 0.63, 0.68, 0.60, 0.65, 0.57];
+    for (const [S, s] of SIDES) {
+      const NC = Q(15, 9), NR = Q(36, 20), cols = [];
+      for (let c = 0; c < NC; c++) {
+        const k = 6 * c / (NC - 1), P1 = headPoint(s * (38 + k * 10) * DEG, 0.72, 0.011), P2 = headPoint(s * (64 + k * 8) * DEG, 1.40, 0.015);
+        const ctrl = [V3(s * 0.004 * (k + 1), 1.657, 0.010), V3(P1[0], P1[1], P1[2]), V3(P2[0], P2[1], P2[2]), V3(s * (0.088 + 0.008 * k), 1.435, 0.060 - 0.012 * k),
+          V3(s * (0.094 + 0.019 * k), 1.30, 0.108 - 0.012 * k), V3(s * (0.092 + 0.024 * k), 1.12, 0.138 - 0.013 * k), V3(s * (0.112 + 0.024 * k), 0.90, 0.150 - 0.013 * k),
+          V3(s * (0.115 + 0.025 * k), 0.70, 0.150 - 0.013 * k), V3(s * (0.118 + 0.025 * k), 0.50, 0.148 - 0.013 * k)];
+        cols.push(dropRows(ctrl, crom(HEMF, k), NR, 1));
+      }
+      const cloth = makeCloth({ pleat: { n: 5, amp: 0.007, hem: 0.008, ph: s }, cols: NC, rows: NR, mask: 1 | 2 | 16, margin: 0.024, bend: 0.22, grav: 0.7, drag: 0.018, flutter: 0.8,
+        rest: (c, r) => cols[c][r], pin: (c, r, p) => (r === 0 ? 1 : p[1] > 1.46 ? lerp(1, 0.5, sm(1.70, 1.46, p[1])) : 0.03), weights: (c, r, p) => wHang(p),
+        uv: (c, r) => [s > 0 ? 0.27 * c / (NC - 1) : 1 - 0.27 * c / (NC - 1), 1 - r / (NR - 1)] });
+      addSheer(cloth, mainTex, SHEER, 10 + (s > 0 ? 0.2 : 0)); cloth.outer = true;
+    }
   })();
 
-  // ribbon veils from the knot on her crown, framing her face and falling over the bodice
-  function ribbonTex() {
-    const W = Math.round(512 * TEXS), H = Math.round(1024 * TEXS), c = cvs(W, H), g = c.getContext('2d'), ca = cvs(W, H), ga = ca.getContext('2d');
-    const styles = [['#8a2050', '#5e1236'], ['#5a1230', '#3c0a20'], ['#b84482', '#84285a'], ['#40091c', '#2a0612'], ['#70183e', '#4c0e28']], sw = W / styles.length;
-    styles.forEach(([a, b], i) => {
-      const gr = g.createLinearGradient(0, 0, 0, H); gr.addColorStop(0, a); gr.addColorStop(1, b); g.fillStyle = gr; g.fillRect(i * sw, 0, sw, H);
-      ga.fillStyle = '#a8a8a8'; ga.fillRect(i * sw, 0, sw, H);
-      for (let y = 0; y < H; y += sw * 0.2) for (const x of [i * sw + sw * 0.1, i * sw + sw * 0.9]) { dot(g, x, y, sw * 0.075, rnd() < 0.3 ? PAL.goldHi : PAL.gold); dot(ga, x, y, sw * 0.08, '#fff'); }
-      for (let k = 0; k < 26; k++) { const x = i * sw + rr(0.25, 0.75) * sw, y = rnd() * H; dot(g, x, y, sw * 0.028, PAL.gold); dot(ga, x, y, sw * 0.028, '#fff'); }
-      g.fillStyle = rgba('#000000', 0.22); g.fillRect(i * sw + sw * 0.44, 0, sw * 0.12, H);
-      g.fillStyle = PAL.gold; g.fillRect(i * sw, H - sw * 0.12, sw, sw * 0.12); ga.fillStyle = '#fff'; ga.fillRect(i * sw, H - sw * 0.12, sw, sw * 0.12);
-    });
-    const map = ctex(c), alpha = ctex(ca, 0, 0, false);
-    onBaked('veil', (im) => onBaked('veilA', (ia) => {         // each ribbon is a strip of the painted veil
-      [0.10, 0.28, 0.455, 0.64, 0.82].forEach((u, i) => { const w = im.width * 0.09; g.drawImage(im, u * im.width, 0, w, im.height * 0.66, i * sw, 0, sw, H); ga.drawImage(ia, u * ia.width, 0, ia.width * 0.09, ia.height * 0.66, i * sw, 0, sw, H); });
-      g.fillStyle = PAL.gold; g.fillRect(0, H - sw * 0.035, W, sw * 0.035); ga.fillStyle = '#fff'; ga.fillRect(0, H - sw * 0.035, W, sw * 0.035);
-      map.needsUpdate = alpha.needsUpdate = true;
-    }));
-    return { map, alpha };
-  }
-  (function buildRibbons() {
-    const tex = ribbonTex(), NR = Q(30, 18), NK = 7, ENDS = [0.99, 0.84, 1.06, 0.78, 0.93, 0.88, 1.02], WID = [0.040, 0.030, 0.044, 0.032, 0.040, 0.036, 0.030];
-    for (const [S, s] of SIDES) for (let k = 0; k < NK; k++) {
-      const P1 = headPoint(s * (38 + k * 10) * DEG, 0.72, 0.016), P2 = headPoint(s * (64 + k * 8) * DEG, 1.40, 0.022);
-      const ctrl = [V3(s * 0.005 * (k + 1), 1.664, 0.010), V3(P1[0], P1[1], P1[2]), V3(P2[0], P2[1], P2[2]), V3(s * (0.088 + 0.008 * k), 1.435, 0.060 - 0.012 * k),
-        V3(s * (0.094 + 0.019 * k), 1.30, 0.108 - 0.012 * k), V3(s * (0.092 + 0.024 * k), 1.12, 0.138 - 0.013 * k), V3(s * (0.112 + 0.024 * k), 0.90, 0.150 - 0.013 * k), V3(s * (0.115 + 0.025 * k), 0.70, 0.150 - 0.013 * k)];
-      const mid = dropRows(ctrl, ENDS[(k + (s > 0 ? 2 : 0)) % NK], NR, 1), w = WID[k], st = (k + (s > 0 ? 1 : 0)) % 5;
-      const rows = mid.map((p, r) => {
-        const a = V3(...mid[Math.max(0, r - 1)]), b = V3(...mid[Math.min(NR - 1, r + 1)]), T = b.sub(a).normalize(), out = V3(p[0], 0, p[2] + 0.02).normalize();
-        const side = V3().crossVectors(T, out).normalize();
-        return [-1, 0, 1].map((q) => [p[0] + side.x * q * w * 0.5, p[1] + side.y * q * w * 0.5, p[2] + side.z * q * w * 0.5 + (q === 0 ? 0.002 : 0)]);
-      });
-      const cloth = makeCloth({ cols: 3, rows: NR, mask: 1 | 2 | 16, margin: 0.030 + 0.002 * k, bend: 0.3, grav: 0.75, drag: 0.02, flutter: 0.7,
-        rest: (c, r) => rows[r][c], pin: (c, r, p) => (r === 0 ? 1 : p[1] > 1.46 ? lerp(1, 0.5, sm(1.70, 1.46, p[1])) : 0.02), weights: (c, r, p) => wHang(p),
-        uv: (c, r) => [(st + 0.04 + 0.92 * c / 2) / 5, 1 - r / (NR - 1)] });
-      addSheer(cloth, tex, { glow: '#d04890', emi: 0.22, sheen: '#f070b0', sheenK: 0.26 }, 10 + k * 0.1);
-      ribbonCloths.push(cloth);
-    }
-    // the knot that gathers them, between the horns
-    const kc = V3(0, 1.660, 0.004), wf = wOne('head');
+  // The veil is one sheet of sheer cloth. There were also fourteen ribbon strands from the knot on her crown, framing her face
+  // and falling over the bodice; Chris had them taken away (November 11): they read as strips of cloth hanging down her front.
+  (function buildKnot() {
+    // the knot between the horns
+    const kc = V3(0, 1.657, 0.004), wf = wOne('head');
     addPart('wine', spherePart(kc, 0.030, 0.017, 0.026, 14, 8), wf, { out: kc });
     for (const sx of [-1, 1]) { const c2 = V3(sx * 0.03, 1.664, 0.0); addPart('wine', spherePart(c2, 0.022, 0.013, 0.018, 12, 8), wf, { out: c2 }); }
   })();

@@ -32,7 +32,9 @@
     addBone('toe' + S, 'foot' + S, s * 0.081, 0.035, 0.088);
   }
   // a point of the canonical right hand (fingers along -Y, palm toward +X, thumb toward +Z), placed on either wrist
+  const HAND_S = opts.handScale || 0.93;         // Chris: the hands a little smaller (November 11); everything of the hand is placed through handPt, so it all shrinks about the wrist
   function handPt(s, x, y, z, out) {
+    x *= HAND_S; y *= HAND_S; z *= HAND_S;
     const c = Math.cos(s * A_POSE), sn = Math.sin(s * A_POSE), mx = -s * x;   // mirror for the left hand
     const w = restPts['wr' + (s < 0 ? 'R' : 'L')];
     return (out || V3()).set(w.x + mx * c - y * sn, w.y + mx * sn + y * c, w.z + z);

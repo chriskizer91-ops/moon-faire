@@ -20,7 +20,7 @@
   function headPoint(a, ph, grow) {                 // a: angle from the front toward her left; ph: 0 at the crown, PI at the chin
     const yn = Math.cos(ph), s = Math.sin(a), c = Math.cos(a), g = grow || 0, t = Math.max(0, -yn), sn = yn < 0 ? snLow(Math.sin(ph), t) : Math.sin(ph);
     let y = (yn >= 0 ? HR.yT : HR.yB) * yn + g * yn; const Y = HC.y + (yn >= 0 ? HR.yT : HR.yB) * yn;
-    const x = ((HR.x * sn) * (1 - 0.16 * sm(0.5, 1.0, t)) + g * Math.min(1, sn * 3)) * s;      // the outline from the front, narrowing to the jaw
+    const x = ((HR.x * sn) * (1 - 0.22 * sm(0.42, 1.0, t)) + g * Math.min(1, sn * 3)) * s;      // the outline from the front, narrowing to the jaw (a little slimmer than painting 08, after the newer face paintings)
     const zc = 0.050 * t * t * t;                   // the lower head sits forward, so the chin hangs under the mouth; the corners of the jaw stay back near the ears
     let z;
     if (c < 0) z = zc * (1 - 0.95 * sm(0, -0.9, c)) + (HR.zB + g) * sn * c;      // only the face comes forward: the back of the head runs straight down into the nape
@@ -44,7 +44,7 @@
         z += d * f;
       }
     }
-    if (t > 0.86) y += 0.30 * Math.max(0, 0.083 - z) * sm(0.86, 0.985, t);        // under the jaw the skin rises toward the throat
+    if (yn < 0) y += 0.50 * Math.max(0, 0.083 - Math.max(z, 0)) * cl((1.475 - Y) / 0.060, 0, 1);     // the line of the jaw climbs from the chin toward the ear, and the skin under it climbs toward the throat
     return [HC.x + x, HC.y + y, HC.z + z];
   }
   const wHead = wOne('head'), faceMix = [], faceUvS = [];
@@ -65,8 +65,8 @@
     const FB = buckets.face, MIXED = !!(BAKED && BAKED.faceSide), Wn = (BAKED && BAKED.faceSideWin) || [-0.01, 0.13, 1.40, 1.58];
     for (let i = info.start; i < info.start + info.count; i++) {
       const nx = FB.nor[i * 3], ny = FB.nor[i * 3 + 1], px = FB.pos[i * 3], py = FB.pos[i * 3 + 1], pz = FB.pos[i * 3 + 2];
-      const under = sm(-0.22, -0.66, ny) * sm(1.444, 1.428, py), plain = Math.max(under, sm(0.010, -0.006, pz - HC.z));      // only under the jaw: the nose and lips have undersides too, and keep their paint
-      const side = sm(0.70, 0.93, Math.abs(nx)) * sm(0.034, 0.050, Math.abs(px)) * sm(Wn[0] + 0.004, Wn[0] + 0.022, pz) * sm(Wn[2] + 0.002, Wn[2] + 0.014, py) * sm(Wn[3] - 0.002, Wn[3] - 0.014, py) * (1 - plain);
+      const under = sm(-0.22, -0.66, ny) * sm(0.094, 0.084, pz - HC.z) * sm(1.480, 1.465, py), plain = Math.max(under, sm(0.010, -0.006, pz - HC.z));      // only under the jaw: the nose and lips have undersides too, and keep their paint
+      const side = sm(0.78, 0.96, Math.abs(nx)) * sm(0.034, 0.050, Math.abs(px)) * sm(Wn[0] + 0.004, Wn[0] + 0.022, pz) * sm(Wn[2] + 0.002, Wn[2] + 0.014, py) * sm(Wn[3] - 0.002, Wn[3] - 0.014, py) * (1 - plain);
       faceMix.push(side, plain, 1 - 0.40 * under); faceUvS.push((pz - Wn[0]) / (Wn[1] - Wn[0]), (py - Wn[2]) / (Wn[3] - Wn[2]));
     }
     // neck
@@ -218,15 +218,16 @@
     return ctex(c);
   }
   // horns: [x, y, z] control points for her left; the right is mirrored. Each has a chain of bones so it can sway.
-  const HORN_CTRL = [[0.030, 1.615, -0.004], [0.085, 1.680, -0.012], [0.150, 1.715, -0.018], [0.215, 1.705, -0.020], [0.262, 1.665, -0.014], [0.278, 1.610, -0.008], [0.274, 1.560, -0.002], [0.264, 1.522, 0.0]];
-  const HORN_R = [0.072, 0.068, 0.063, 0.058, 0.052, 0.045, 0.039, 0.033];
+  // They leave the head thick, arc over low and flop down, thinning to a point where the pompom hangs (Chris, November 11, after the flipbook).
+  const HORN_CTRL = [[0.030, 1.610, -0.004], [0.078, 1.652, -0.012], [0.140, 1.672, -0.018], [0.206, 1.664, -0.020], [0.258, 1.630, -0.014], [0.288, 1.578, -0.008], [0.297, 1.528, -0.002], [0.295, 1.492, 0.0]];
+  const HORN_R = [0.070, 0.066, 0.057, 0.045, 0.034, 0.024, 0.016, 0.011];
   const HORN_N = 6, hornChains = {};
   for (const [S, s] of SIDES) {
     const ctrl = HORN_CTRL.map((p) => V3(s * p[0], p[1], p[2])), N = Q(64, 32), pts = curvePts(ctrl, N);
     // bones along the curve; the last carries the pompom
     const chain = []; let par = 'head';
     for (let k = 0; k < HORN_N; k++) { const p = pts[Math.round((0.06 + 0.94 * k / HORN_N) * (N - 1))]; addBone('horn' + k + S, par, p.x, p.y, p.z); par = 'horn' + k + S; chain.push(par); }
-    const tip = pts[N - 1], pc = V3(tip.x, tip.y - 0.050, tip.z + 0.002);
+    const tip = pts[N - 1], pc = V3(tip.x, tip.y - 0.058, tip.z + 0.002);        // the pompom hangs from the very tip
     addBone('pom' + S, par, tip.x, tip.y, tip.z); chain.push('pom' + S);
     hornChains[S] = { names: chain, pom: pc };
     const rad = pts.map((p, i) => { const u = i / (N - 1); return crom(HORN_R, u * (HORN_R.length - 1)) * (1 + 0.045 * Math.pow(Math.abs(Math.sin(u * PI * 11)), 1.5) - 0.02); });
@@ -259,7 +260,7 @@
     tufts('fur', Q(2600, 1000), () => { const d = V3(rnd() - 0.5, rnd() - 0.5, rnd() - 0.5).normalize(); return { p: c.clone().addScaledVector(d, R * 0.86), n: d }; }, wf, 0.013, 0.0058);
     // the short cord that ties the pompom to the horn tip
     const tipB = SK['pom' + S].userData.rest;
-    addPart('velvet', loft(tubeRings([tipB.clone(), c.clone().lerp(tipB, 0.5), c.clone()], [0.012, 0.010, 0.012], 8)), wf, { out: c.clone().lerp(tipB, 0.5).add(V3(0.05, 0, 0)) , weld: true });
+    addPart('velvet', loft(tubeRings([tipB.clone(), c.clone().lerp(tipB, 0.5), c.clone()], [0.010, 0.008, 0.010], 8)), wf, { out: c.clone().lerp(tipB, 0.5).add(V3(0.05, 0, 0)) , weld: true });
   }
   (function buildCollar() {                           // the ruff at her throat: three stacked frills of pleated black organza
     const C = V3(0, 1.362, -0.006), wf = (x, y) => { const u = sm(1.33, 1.40, y); return [BI.neck, 0.6 + 0.4 * u, BI.spine3, 0.4 * (1 - u)]; };

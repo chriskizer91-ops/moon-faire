@@ -72,7 +72,7 @@
   for (const [S, s] of SIDES) {
     const d = armDir[S], sh = restPts['sh' + S], side = V3(-d.y, d.x, 0).normalize(), fw = V3(0, 0, 1);
     { const pc = sh.clone().addScaledVector(d, 0.050); addPart('wine', spherePart(pc, 0.060, 0.074, 0.062, 22, 16), () => [BI['uarm' + S], 0.7, BI['clav' + S], 0.3], { out: pc }); }      // the puff at the top of the sleeve
-    for (const [ax0, Rm, r0, phs, NP] of [[0.318, 0.046, 0.026, 0.0, 9], [0.350, 0.058, 0.032, 1.7, 11], [0.386, 0.066, 0.035, 3.1, 12], [0.420, 0.062, 0.031, 4.4, 11], [0.446, 0.050, 0.022, 5.6, 10]]) {
+    for (const [ax0, Rm, r0, phs, NP] of [[0.327, 0.0423, 0.0239, 0.0, 9], [0.357, 0.0534, 0.0294, 1.7, 11], [0.391, 0.0607, 0.0322, 3.1, 12], [0.423, 0.0570, 0.0285, 4.4, 11], [0.4474, 0.0460, 0.0202, 5.6, 10]]) {
       const NA = NP * Q(8, 4), NS = Q(12, 8), rings = [];
       for (let i = 0; i < NS; i++) {
         const f = (i / NS) * TAU, cf = Math.cos(f), sf = Math.sin(f), ring = [];
@@ -87,7 +87,7 @@
       rings.push(rings[0]);
       addPart('ruffle', loft(rings, { uS: 6, v0: 0.15, vS: 0.7 }), () => [BI['farm' + S], 1], { out: sh.clone().addScaledVector(d, ax0) });
     }
-    for (const [ax, nb, rr0] of [[0.452, 15, 0.0320], [0.464, 14, 0.0305]]) for (let j = 0; j < nb; j++) {      // two strands of beads at the wrist
+    for (const [ax, nb, rr0] of [[0.452, 15, 0.0300], [0.464, 14, 0.0286]]) for (let j = 0; j < nb; j++) {      // two strands of beads at the wrist
       const a = (j / nb) * TAU + ax * 40, c = sh.clone().addScaledVector(d, ax).addScaledVector(side, rr0 * Math.cos(a)).addScaledVector(fw, rr0 * 0.86 * Math.sin(a));
       addPart(j % 5 === 2 ? 'gold' : 'pearl', spherePart(c, 0.0060, 0.0060, 0.0060, 8, 6), () => [BI['farm' + S], 1], { out: c });
     }

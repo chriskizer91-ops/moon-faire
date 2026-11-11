@@ -13,12 +13,16 @@ claude.ai Project "Flip Book Art", doc `claude/jester-3d-model.md`. Read that fi
 - `out/jester_tex.js`: the current baked textures. `out/palette.js`, `out/fb.json`, `out/fb/`: palette and flipbook frames for the viewer.
 - `references/chatgpt/`: the 23 paintings Chris had ChatGPT make from the model's layout renders (WebP, quality 95).
 - `references/hands/`: the younger hand paintings (November 11, 2026); the left-hand picture is the one baked.
+- `references/faces/`: five newer paintings of her face (November 11, 2026): front, two three-quarter views, from above and from
+  below. They are used to check the head's shape from those angles (`fref.sh` renders the model beside them); the face
+  painted on the model is still painting 08.
 - `references/Jester_Witch_HD_Flipbook.html`: Chris's HD flipbook, 58 painted frames stored as base64 AVIF in `const FR={...}`.
   This is the look to match. `lib/unavif.py` lists and extracts the frames.
 - `bake_hands.py`: makes the hands picture inside `jester_tex.js` (called by `bake.py`; can be run alone).
 - `shoot.py`, `shoot_site.py`, `fit.py`, `lib/`: headless render and comparison tools (Playwright with Chrome and SwiftShader).
 - `shoot2.py`: like `shoot.py`, but each view is a line of script, so the camera can be aimed anywhere. `hshots.sh` renders a hand
-  square-on from five sides, `fshots.sh` and `fclose.sh` render the head from eight and six angles, and `prof_cmp.py` prints her
+  square-on from five sides, `fshots.sh` and `fclose.sh` render the head from eight and six angles, `fref.sh` renders it beside
+  the paintings in `references/faces/`, and `prof_cmp.py` prints her
   painted profile beside the model's, millimetre by millimetre.
 
 ## How the hands and the head are made (pass 13, November 11, 2026)
@@ -38,6 +42,11 @@ claude.ai Project "Flip Book Art", doc `claude/jester-3d-model.md`. Read that fi
 - **Face paint.** One material mixes three pictures by which way the skin faces (`faceMix` in `buildHead`, the shader patch on
   `MATS.face`): the front painting, the profile painting at the far edge of the cheek, and plain skin under the jaw and on the neck,
   dimmed where the jaw shades it. The front painting is far sharper than the profile one, so it is used as far round as it will go.
+- **Pass 14.** Horns leave the head thick, arc over low and thin to a point; the pompom hangs from the very tip (`HORN_CTRL`,
+  `HORN_R`). Hands are 7% smaller (`HAND_S` in `handPt`), cuffs about 8% smaller. The fourteen ribbon strands are gone: the veil
+  now has one wide front fall on each side, built from the same paths and wearing the edge of the great veil's own painting. The
+  sheer veil is "shot": `sheen(..., shot)` keeps its red where you look straight at it and turns it gold where it turns away. The
+  jaw is a little slimmer and its line climbs from the chin toward the ear, after `references/faces/`.
 - The ruff sits about 2 cm lower than before so the neck shows, as in the paintings. The hair is a bob that comes out from under the
   cap, lies against the neck and ends at the ruff.
 
