@@ -18,7 +18,7 @@ def px(x, y):
 
 
 # ----------------------------------------------------------------- skeleton
-ARM_ANGLE = np.radians(31.0)                      # arms away from vertical in the bind pose
+ARM_ANGLE = np.radians(43.0)                      # arms away from vertical in the bind pose (as in A1, B1)
 ARM_DIR = np.array([np.sin(ARM_ANGLE), -np.cos(ARM_ANGLE), 0.0])
 UPPER_ARM, FOREARM = 0.255, 0.233
 
@@ -42,18 +42,18 @@ FINGERS = {   # name: (offset along z at knuckle, knuckle distance along hand, l
 PHAL = (0.45, 0.30, 0.25)
 CURL = np.radians(7.0)        # relaxed curl per joint in the bind pose
 
-HORN = np.array([   # x, y, z, radius  (left horn; mirrored for the right)
+HORN = np.array([   # x, y, z, radius  (left horn; mirrored for the right). Out to the side, and swept back as in B2 and C3.
     (0.030, 1.598, -0.020, 0.048),
-    (0.075, 1.650, -0.026, 0.057),
-    (0.120, 1.672, -0.031, 0.060),
-    (0.165, 1.664, -0.036, 0.060),
-    (0.205, 1.640, -0.039, 0.054),
-    (0.235, 1.605, -0.041, 0.044),
-    (0.249, 1.570, -0.041, 0.033),
-    (0.256, 1.537, -0.041, 0.020),
-    (0.258, 1.510, -0.041, 0.012),
+    (0.075, 1.650, -0.030, 0.057),
+    (0.120, 1.672, -0.042, 0.060),
+    (0.165, 1.664, -0.056, 0.060),
+    (0.205, 1.640, -0.070, 0.054),
+    (0.235, 1.605, -0.084, 0.044),
+    (0.250, 1.568, -0.097, 0.032),
+    (0.255, 1.530, -0.108, 0.021),
+    (0.256, 1.486, -0.118, 0.012),
 ])
-POMPOM_C = np.array([0.266, 1.458, -0.041]); POMPOM_R = 0.058
+POMPOM_C = np.array([0.255, 1.424, -0.126]); POMPOM_R = 0.062
 
 
 def rot_axis(axis, ang):
@@ -121,6 +121,7 @@ def skeleton():
         add(side + 'Horn2', side + 'Horn1', HORN[3, :3] * m)
         add(side + 'Horn3', side + 'Horn2', HORN[6, :3] * m)
         add(side + 'Pompom', side + 'Horn3', HORN[8, :3] * m)
+    add('Bells', 'Hips', (0.060, 1.066, 0.070))
     names = [j[0] for j in J]
     parents = [None if j[1] is None else names.index(j[1]) for j in J]
     pos = np.array([j[2] for j in J])
@@ -212,54 +213,11 @@ def body_part(step=0.004):
         if s_.tag in ('torso', 'bust'):
             tb.add(s_, k_)
 
-    def neckline(P):
-        x, z = np.abs(P[:, 0]), P[:, 2]
-        front = 1.268 + 0.85 * np.maximum(x - 0.026, 0)
-        return np.where(z > -0.012, front, 1.312)
-
-    def bodice(P):
-        d = tb.dist(P) - 0.005
-        return smax(smax(d, P[:, 1] - neckline(P), 0.002), 1.100 - P[:, 1], 0.002)
-
     def belt(P):
         return smax(tb.dist(P) - 0.0075, np.abs(P[:, 1] - 1.089) - 0.027, 0.003)
 
-    tb2 = Part('tb2', step)
-    for s_, k_, _ in p.items:
-        if s_.tag in ('torso', 'bust', 'trap'):
-            tb2.add(s_, k_)
-
-    def shrug(P):     # the wine velvet over her shoulders and upper back, open over the chest
-        x, y, z = np.abs(P[:, 0]), P[:, 1], P[:, 2]
-        d = tb2.dist(P) - 0.0055
-        chest = np.maximum(x - 0.058, -(z + 0.012))                 # negative inside the open chest window
-        d = smax(d, -chest, 0.003)
-        d = smax(d, 1.262 - y, 0.003)
-        return smax(d, 0.047 - np.sqrt(P[:, 0] ** 2 + (z + 0.012) ** 2), 0.004)   # hole for the neck
-
-    def wshrug(P):
-        W, _, _ = tb2.weights(P, BONES)
-        return {b: W[:, i] for i, b in enumerate(BONES) if W[:, i].max() > 1e-4}
-
-    p.add(Func(shrug, (-0.14, 1.25, -0.11), (0.14, 1.40, 0.11), wfn=wshrug, tag='shrug'))
-    p.add(Func(bodice, (-0.13, 1.09, -0.11), (0.13, 1.36, 0.11), wfn=torso.weights, tag='bodice'))
     p.add(Func(belt, (-0.13, 1.05, -0.11), (0.13, 1.13, 0.11), wfn=torso.weights, tag='belt'))
     p.post = lambda P, d: np.maximum(d, 0.262 - P[:, 1])        # the boots take over below here
-
-    def colour(V, owner_tags):
-        C = np.empty((len(V), 3))
-        x, y, z = V[:, 0], V[:, 1], V[:, 2]
-        tag = np.array(owner_tags)
-        C[:] = LEGGING
-        up = np.isin(tag, ['torso', 'bust'])
-        C[up & (y > 1.10)] = SKIN
-        C[tag == 'bodice'] = BODICE
-        C[tag == 'belt'] = BELT
-        C[np.isin(tag, ['trap', 'arm', 'forearm', 'shrug'])] = SLEEVE
-        C[tag == 'neck'] = SKIN
-        return C
-
-    p.colour = colour
     return p
 
 
@@ -273,8 +231,8 @@ def head_core():
 
 def window(P):
     """Negative inside the opening of the cap that shows her face."""
-    q = np.abs(np.stack([P[:, 0], P[:, 1] - 1.462], 1)) - np.array([0.057 - 0.028, 0.095 - 0.028])
-    d2 = np.linalg.norm(np.maximum(q, 0), axis=1) + np.minimum(q.max(axis=1), 0) - 0.028
+    q = np.abs(np.stack([P[:, 0], P[:, 1] - 1.462], 1)) - np.array([0.057 - 0.040, 0.095 - 0.040])
+    d2 = np.linalg.norm(np.maximum(q, 0), axis=1) + np.minimum(q.max(axis=1), 0) - 0.040
     return np.maximum(d2, 0.010 - P[:, 2])
 
 
@@ -292,7 +250,6 @@ def head_part(step=0.003):
         return smax(d, box, 0.004)
 
     p.post = clip
-    p.colour = lambda V, tags: np.tile(np.array(SKIN, float), (len(V), 1))
     return p
 
 
@@ -301,15 +258,13 @@ def cap_part(step=0.003):
 
     def fn(P):
         y = P[:, 1]
-        band = sstep(1.550, 1.558, y) * (1 - sstep(1.598, 1.606, y)) * sstep(-0.02, 0.02, P[:, 2])
-        d = core.dist(P) - (0.007 + 0.004 * band)
+        d = core.dist(P) - 0.007
         d = smax(d, -window(P), 0.006)
         d = smax(d, 1.385 - y, 0.01)          # ends at the nape
         return d
 
     p = Part('cap', step)
-    p.add(Func(fn, (-0.095, 1.37, -0.115), (0.095, 1.675, 0.105), bone='Head'))
-    p.colour = lambda V, tags: np.tile(np.array(CAP, float), (len(V), 1))
+    p.add(Func(fn, (-0.095, 1.37, -0.115), (0.095, 1.675, 0.105), bone='Head', tag='cap'))
     return p
 
 
@@ -337,6 +292,7 @@ def horns_part(step=0.0045):
         rib = (0.5 + 0.5 * np.cos(2 * np.pi * s / 0.034)) ** 6          # stitched ribs along the padded horn
         rad *= 1 - 0.07 * rib * sstep(0.02, 0.06, s)
         sw = Sweep(pts, rad, tag='horn')
+        sw.length = float(s[-1])
         sN = sw.s
 
         def at(i):
@@ -356,12 +312,6 @@ def horns_part(step=0.0045):
 
         p.add(Func(pom, c - POMPOM_R - 0.006, c + POMPOM_R + 0.006, bone=side + 'Pompom', tag='pompom'), 0.004)
 
-    def colour(V, tags):
-        C = np.tile(np.array(HORNC, float), (len(V), 1))
-        C[np.array(tags) == 'pompom'] = POMC
-        return C
-
-    p.colour = colour
     return p
 
 
@@ -380,7 +330,6 @@ def hands_part(step=0.0016):
             for i in range(3):
                 p.add(RoundCone(pts[i], pts[i + 1], rr[i], rr[i + 1], bone=f'{side}Hand{f}{i + 1}', tag='finger'),
                       0.004 if i == 0 else 0.0015)
-    p.colour = lambda V, tags: np.tile(np.array(SKIN, float), (len(V), 1))
     return p
 
 
@@ -421,58 +370,125 @@ def boots_part(step=0.0045):
                         wkeys=[(0, {side + 'Foot': 0.7, side + 'Leg': 0.3}), (0.4, {side + 'Leg': 1}), (1, {side + 'Leg': 1})],
                         tag='tongue'), 0.012)
 
-        kn, an = KNEE * np.array([sx, 1, 1.0]), ANKLE * np.array([sx, 1, 1.0])
-
-        def on_leg(y):
-            return kn + (an - kn) * ((kn[1] - y) / (kn[1] - an[1]))
-
-        for y0, y1, r, tg in ((0.288, 0.3150, 0.0410, 'sock'), (0.3270, 0.350, 0.0410, 'sock')):
-            p.add(Column(on_leg(y0), on_leg(y1), [(0, r, r + 0.001), (1, r, r + 0.001)], side=(sx, 0, 0), bone=side + 'Leg', tag=tg))
-
-    def colour(V, tags):
-        C = np.tile(np.array(BOOT, float), (len(V), 1))
-        tags = np.array(tags)
-        C[tags == 'sole'] = SOLE
-        C[tags == 'sock'] = SOCK
-        C[tags == 'sockline'] = SOCK_DK
-        return C
-
-    p.colour = colour
     return p
 
 
-PARTS = [  # (builder, roughness, metallic, keep ratio when thinning the mesh, weight-smoothing passes)
-    (body_part, 0.85, 0.0, 0.30, 14),
-    (head_part, 0.80, 0.0, 0.60, 2),
-    (cap_part, 0.70, 0.0, 0.40, 2),
-    (horns_part, 0.80, 0.0, 0.50, 8),
-    (hands_part, 0.80, 0.0, 0.55, 4),
-    (boots_part, 0.28, 0.0, 0.50, 6),
+def outfit_part(step=0.005):
+    """What she wears under the veil, apart from the skirt: ruff, puffed sleeves, ruffled cuffs,
+    belt buckle, pouch, bells and pendant. Sizes read off B1, B4 and C3."""
+    p = Part('outfit', step, soft=0.004)
+
+    # ruff: two rows of frills round the neck
+    def ruff(P):
+        x, y, z = P[:, 0], P[:, 1], P[:, 2] + 0.010
+        rho = np.hypot(x, z); phi = np.arctan2(x, z)
+        d = np.full(len(P), BIG)
+        for j, (yc, R, a, b) in enumerate(((1.371, 0.060, 0.034, 0.019), (1.399, 0.050, 0.029, 0.017))):
+            wave = 0.008 * np.sin(13 * phi + j * np.pi)
+            q0 = (rho - R - 0.004 * np.cos(26 * phi)) / a; q1 = (y - yc - wave) / b
+            d = smin(d, (np.hypot(q0, q1) - 1) * min(a, b), 0.004)
+        return d
+
+    p.add(Func(ruff, (-0.11, 1.33, -0.12), (0.11, 1.44, 0.10), tag='ruff',
+               wfn=lambda P: {'Neck': np.full(len(P), 0.5), 'Spine2': np.full(len(P), 0.5)}))
+
+    for sx, side in ((1, 'Left'), (-1, 'Right')):
+        m = np.array([sx, 1, 1.0])
+        sh, el, wr = SH * m, EL * m, WR * m
+        ax = norm(el - sh); fax = norm(wr - el)
+        Lf = np.linalg.norm(wr - el)
+
+        def around(P, o, axis):
+            v = P - o
+            t = v @ axis
+            r = v - np.outer(t, axis)
+            e1 = norm(np.cross(axis, (0, 0, 1.0))); e2 = np.cross(axis, e1)
+            return t, np.linalg.norm(r, axis=1), np.arctan2(r @ e1, r @ e2)
+
+        # puffed upper sleeve, ribbed along the arm
+        pc = sh + ax * (UPPER_ARM * 0.46)
+
+        def puff(P, pc=pc, ax=ax):
+            t, rho, phi = around(P, pc, ax)
+            k0 = np.hypot(t / 0.122, rho / 0.068)
+            d = (k0 - 1) * 0.068
+            return d + 0.0035 * (0.5 + 0.5 * np.cos(14 * phi)) ** 2 * np.clip(1 - np.abs(t) / 0.12, 0, 1)
+
+        p.add(Func(puff, pc - 0.14, pc + 0.14, tag='puff',
+                   wfn=lambda P, side=side, pc=pc, ax=ax: (lambda t: {side + 'Shoulder': 0.45 * (1 - t), side + 'Arm': 1 - 0.45 * (1 - t)})(
+                       sstep(-0.10, -0.02, (P - pc) @ ax))))
+
+        # three tiers of ruffles from the elbow to the wrist
+        TIERS = ((-0.12, 0.40, 0.038, 0.082, 0.0), (0.20, 0.72, 0.046, 0.100, 1.9), (0.50, 1.00, 0.052, 0.114, 3.7))
+
+        def cuff(P, el=el, fax=fax, Lf=Lf):
+            t, rho, phi = around(P, el, fax)
+            t = t / Lf
+            d = np.full(len(P), BIG)
+            for t0, t1, r0, r1, ph in TIERS:
+                w = np.clip((t - t0) / (t1 - t0), 0, 1)
+                R = (r0 + (r1 - r0) * w ** 1.25) * (1 + 0.11 * w * w * np.sin(11 * phi + ph)) + 0.004 * w * np.cos(22 * phi + ph)
+                di = np.maximum((rho - R) * 0.85, np.maximum((t0 - t) * Lf, (t - t1) * Lf))
+                d = smin(d, di, 0.003)
+            return d
+
+        lo = np.minimum(el, wr) - 0.14; hi = np.maximum(el, wr) + 0.14
+        p.add(Func(cuff, lo, hi, tag='cuff',
+                   wfn=lambda P, side=side, el=el, fax=fax, Lf=Lf: (lambda t: {side + 'Arm': 0.5 * (1 - t), side + 'ForeArm': 1 - 0.5 * (1 - t)})(
+                       sstep(-0.12, 0.10, ((P - el) @ fax) / Lf))))
+
+    # belt buckle: a gold frame on the front of the belt
+    def buckle(P):
+        q = np.abs(P - np.array([0, 1.089, 0.066])) - np.array([0.024, 0.019, 0.006])
+        outer = np.linalg.norm(np.maximum(q, 0), axis=1) + np.minimum(q.max(axis=1), 0) - 0.004
+        qi = np.abs(P[:, :2] - np.array([0, 1.089])) - np.array([0.013, 0.008])
+        hole = np.linalg.norm(np.maximum(qi, 0), axis=1) + np.minimum(qi.max(axis=1), 0)
+        bar = np.abs(P - np.array([0.004, 1.089, 0.071])) - np.array([0.016, 0.0028, 0.003])
+        bar = np.linalg.norm(np.maximum(bar, 0), axis=1) + np.minimum(bar.max(axis=1), 0)
+        return np.minimum(np.maximum(outer, -hole), bar)
+
+    hs = lambda P: {'Hips': np.full(len(P), 0.5), 'Spine': np.full(len(P), 0.5)}
+    p.add(Func(buckle, (-0.04, 1.06, 0.05), (0.04, 1.12, 0.085), tag='buckle', wfn=hs))
+
+    # pouch on her right hip, hanging from the belt
+    yaw = np.radians(-38)
+    Rp = np.array([[np.cos(yaw), 0, np.sin(yaw)], [0, 1, 0], [-np.sin(yaw), 0, np.cos(yaw)]])
+    pc_ = np.array([-0.108, 1.004, 0.062])
+
+    def pouch(P):
+        q = (P - pc_) @ Rp
+        b = np.abs(q) - np.array([0.024, 0.026, 0.008])
+        body = np.linalg.norm(np.maximum(b, 0), axis=1) + np.minimum(b.max(axis=1), 0) - 0.018
+        f = np.abs(q - np.array([0, 0.022, 0.006])) - np.array([0.033, 0.016, 0.014])
+        flap = np.linalg.norm(np.maximum(f, 0), axis=1) + np.minimum(f.max(axis=1), 0) - 0.010
+        s_ = np.abs(q - np.array([0, 0.050, -0.008])) - np.array([0.010, 0.012, 0.003])
+        strap = np.linalg.norm(np.maximum(s_, 0), axis=1) + np.minimum(s_.max(axis=1), 0) - 0.003
+        stud = np.linalg.norm(q - np.array([0, 0.012, 0.031]), axis=1) - 0.006
+        return np.minimum(np.minimum(smin(body, flap, 0.004), strap), stud)
+
+    p.add(Func(pouch, pc_ - 0.075, pc_ + np.array([0.075, 0.10, 0.075]), tag='pouch', bone='Hips'))
+
+    # three bells on bead strings, on her left
+    BELLS = (np.array([0.052, 0.972, 0.128]), np.array([0.082, 0.950, 0.120]), np.array([0.060, 0.920, 0.134]))
+    top = np.array([0.060, 1.066, 0.074])
+    for bc in BELLS:
+        p.add(RoundCone(top, bc + np.array([0, 0.016, 0]), 0.0032, 0.0032, bone='Bells', tag='string'))
+        p.add(Ellipsoid(bc, (0.0185, 0.0185, 0.0185), bone='Bells', tag='bell'))
+        p.add(Ellipsoid(bc + np.array([0, 0.019, 0]), (0.006, 0.006, 0.006), bone='Bells', tag='bell'))
+
+    # pendant
+    gc = np.array([0.0, 1.298, 0.0655])
+    p.add(Ellipsoid(gc, (0.0125, 0.0165, 0.006), bone='Spine2', tag='gold'))
+    p.add(Ellipsoid(gc + np.array([0, 0, 0.003]), (0.0090, 0.0130, 0.0065), bone='Spine2', tag='gem'))
+    return p
+
+
+PARTS = [  # (builder, roughness, keep ratio when thinning the mesh, weight-smoothing passes, texture size)
+    (body_part, 0.85, 0.24, 14, 1024),
+    (head_part, 0.80, 0.50, 2, 512),
+    (cap_part, 0.75, 0.30, 2, 256),
+    (horns_part, 0.80, 0.35, 8, 512),
+    (hands_part, 0.80, 0.45, 4, 128),
+    (boots_part, 0.30, 0.40, 6, 512),
+    (outfit_part, 0.80, 0.40, 6, 1024),
 ]
-
-
-def head_face(V):
-    """Her face from the A1 front view, laid flat onto the front of the head.
-    Returns per-vertex UVs and the small picture they point into."""
-    import os
-    from PIL import Image
-    X0, Y0, N = 400, 100, 96
-    im = np.asarray(Image.open(os.path.join(os.path.dirname(__file__), '..', 'refs', 'sheets', 'A1_first_version.png')).convert('RGB')).astype(int)
-    crop = im[Y0:Y0 + N, X0:X0 + N].copy()
-    from scipy import ndimage
-    r, g, b = crop[..., 0], crop[..., 1], crop[..., 2]
-    lum = 0.3 * r + 0.59 * g + 0.11 * b
-    notface = (lum < 112) | ((r > g + 40) & (b > g + 10) & (lum < 175))     # cap, ruff, outline, ribbon strands
-    lab, _ = ndimage.label(notface)
-    edge = np.unique(np.concatenate([lab[0], lab[-1], lab[:, 0], lab[:, -1]]))
-    outside = np.isin(lab, edge[edge > 0])
-    yy, xx = np.mgrid[0:N, 0:N]
-    eyeband = (yy >= 10) & (yy < 52) & (xx >= 14) & (xx <= 82)             # brows and lashes are dark but belong to the face
-    outside &= ~eyeband
-    outside |= yy < 9
-    outside = ndimage.binary_dilation(outside, iterations=1) & ~eyeband | outside
-    out = crop.copy()
-    out[outside] = SKIN
-    u = (CX + V[:, 0] / S - X0) / N
-    v = (GROUND - V[:, 1] / S - Y0) / N
-    return np.stack([u, v], 1).astype(np.float32), Image.fromarray(out.astype(np.uint8))

@@ -278,6 +278,16 @@ class Part:
         return W, owner, shapes
 
 
+def part_owner(part, P, chunk=200000):
+    """Which of the part's shapes each point belongs to (index into the returned list)."""
+    shapes = [s for s, k, op in part.items if op == 'add']
+    out = np.empty(len(P), np.int64)
+    for i in range(0, len(P), chunk):
+        D = np.stack([part._eval_one(s, P[i:i + chunk], 0.05) for s in shapes], axis=1)
+        out[i:i + chunk] = D.argmin(axis=1)
+    return out, shapes
+
+
 def smooth_weights(V, F, W, iters=8, lam=0.5):
     """Blur weights along the surface so joints bend softly."""
     import scipy.sparse as sp

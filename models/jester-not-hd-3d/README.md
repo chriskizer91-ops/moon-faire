@@ -4,7 +4,7 @@ A game character version of the Jester: one skinned model with a standard skelet
 
 The look to match is Chris's detailed pixel sheets (`refs/sheets/`), not the 128-pixel sprites and not the HD paintings. `refs/gen/A` to `F` are the 30 reference drawings made from the prompt list in the claude.ai Project "Flip Book Art", doc `claude/jester-game-model-reference-prompts.md` (each set also carries the prompts it was made from). The full notes are in that Project, doc `claude/jester-game-model.md`.
 
-Published page: https://claude.ai/artifact/SzipoQiHHriE2AQncBaR4R
+Published page ("Jester Witch: not-HD 3D model"): https://claude.ai/artifact/SzipoQiHHriE2AQncBaR4R
 
 ## Conventions
 
@@ -20,7 +20,9 @@ python3 src/build.py all        # every part, then out/jester.glb (python3 src/b
 - `src/sdf.py`: shapes as distance functions, smooth blends, meshing, thinning, skin weights.
 - `src/jester.py`: her measurements, skeleton and parts.
 - `src/anim.py`: the pose solver and the movement clips.
-- `build/glb.py`, `src/build.py`: the glTF writer and the build itself.
+- `src/bake.py`, `src/paint.py`: unwrap each part and colour every point of her surface from its position (fabrics, stars, laces, her face from drawing C3).
+- `src/cloth.py`: the skirt as thin layered sheets with ragged hems cut by transparency.
+- `src/glb.py`, `src/build.py`: the glTF writer and the build itself (`paint` repaints without re-meshing, `none` only rewrites clips).
 
 ## Look at it
 

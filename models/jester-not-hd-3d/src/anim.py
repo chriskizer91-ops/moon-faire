@@ -208,7 +208,7 @@ class Rig:
 # ------------------------------------------------------------------ the clips
 def relaxed(P, amount=1.0, bend=0.20):
     """Arms hanging closer to the body than the bind pose."""
-    ang = JS.ARM_ANGLE - np.radians(19) * amount
+    ang = JS.ARM_ANGLE + (np.radians(26) - JS.ARM_ANGLE) * amount      # wide enough for the big cuffs to clear her hips
     for side, sx in (('Left', 1), ('Right', -1)):
         P.arms[side] = Arm(upper=(sx * np.sin(ang), -np.cos(ang), 0.02), bend=bend * amount, curl=0.32)
     return P
@@ -255,7 +255,7 @@ def gait(t, T, stride, stance, drop, bob, lift, lean, arm_swing, arm_bend, kick=
     P.hips_rot = Ry(yw) @ Rx(lean * 0.4) @ Rz(-0.035 * np.sin(w + np.pi * stance))
     P.spine = [(lean * 0.3, -yw * 0.5, 0.012 * np.sin(w + np.pi * stance)), (lean * 0.3, -yw * 0.7, 0.01 * np.sin(w + np.pi * stance)), (0, -yw * 0.8, 0)]
     P.neck = (-lean * 0.3, yw * 0.5, 0); P.head = (-lean * 0.3, yw * 0.4, 0)
-    ang = JS.ARM_ANGLE - np.radians(20)
+    ang = np.radians(25)
     for side, sx, off in (('Left', 1, 0.5), ('Right', -1, 0.0)):
         sw = arm_swing * np.cos(2 * np.pi * (ph + off))          # forward when the opposite leg is forward
         d = Rx(-sw) @ np.array([sx * np.sin(ang), -np.cos(ang), 0])
@@ -322,7 +322,7 @@ def arms_up(t, T):
     P.hips = P.hips + np.array([0, 0.004 * u, 0])
     P.spine = [(-0.03 * u, 0, 0), (-0.05 * u, 0, 0), (-0.07 * u, 0, 0)]
     P.neck = (-0.10 * u, 0, 0); P.head = (-0.16 * u, 0, 0)
-    a0 = JS.ARM_ANGLE - np.radians(19)
+    a0 = np.radians(26)
     for side, sx in (('Left', 1), ('Right', -1)):
         ang = lerp(a0, np.radians(158), u)                 # from hanging to raised in a wide V
         d = np.array([sx * np.sin(ang), -np.cos(ang), 0.10 * np.sin(np.pi * u) + 0.05 * u])
@@ -372,6 +372,7 @@ def horn_sway(rig, frames_L, head_pos, head_R, T, loops):
             frames_L[k][rig.i[side + 'Horn2']] = Rx(px_ * 0.35) @ Rz(rz_ * 0.25)
             frames_L[k][rig.i[side + 'Horn3']] = Rx(px_ * 0.7) @ Rz(rz_ * 0.6)
             frames_L[k][rig.i[side + 'Pompom']] = Rx(px_ * 1.4) @ Rz(rz_ * 1.2)
+        frames_L[k][rig.i['Bells']] = Rx(px_ * 2.2) @ Rz(rz_ * 2.2)
 
 
 def all_clips(names, parents, rest):

@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
-<title>Jester game model</title>
+<title>Jester Witch: not-HD 3D model</title>
 <style>
   :root { --bg:#2b2634; --panel:rgba(24,20,30,.82); --line:#5b4f6b; --ink:#efe6f2; --dim:#a99db5; --gold:#e2b04a; --wine:#8d2f4e; }
   * { box-sizing:border-box; -webkit-tap-highlight-color:transparent; }
@@ -28,7 +28,7 @@
 </head>
 <body>
 <div id="stage"></div>
-<div id="top"><h1>Jester &middot; game model</h1><div class="note" id="note">step 1: body and skeleton</div></div>
+<div id="top"><h1>Jester Witch &middot; not-HD 3D</h1><div class="note" id="note">step 2: the outfit under the veil</div></div>
 <div id="err"></div>
 <div id="bar">
   <div class="row" id="moves"><span class="lab">Move</span></div>
@@ -96,7 +96,7 @@ const blob = new THREE.Mesh(new THREE.CircleGeometry(0.34, 32), new THREE.MeshBa
 blob.rotation.x = -Math.PI / 2; blob.position.y = 0.003; scene.add(blob);
 
 // Chris's drawing as a flat card, for checking proportions in the straight-on views
-const SHEET = { ppm: 930 / 1.66, ground: 980, front: { file: 'ref/A1_front.png', x0: 150, w: 600, cx: 447.5 }, back: { file: 'ref/A1_back.png', x0: 800, w: 600, cx: 1088.5 } };
+const SHEET = { ppm: 961 / 1.722, ground: 983.5, front: { file: 'ref/A1_front.png', x0: 100, w: 670, cx: 447.5 }, back: { file: 'ref/A1_back.png', x0: 770, w: 670, cx: 1088 } };
 const cards = {};
 function makeCard(which) {
   const s = SHEET[which];
@@ -139,7 +139,7 @@ const onModel = gltf => {
   play(clips.Idle ? 'Idle' : 'Stand');
   $('#load').remove();
   let tris = 0; root.traverse(o => { if (o.isMesh) tris += o.geometry.index.count / 3; });
-  $('#note').textContent = `step 1: body and skeleton · ${Math.round(tris / 1000)}k triangles`;
+  $('#note').textContent = `step 2: the outfit under the veil · ${Math.round(tris / 1000)}k triangles`;
   api.ready = true;
 };
 const onFail = e => { errBox.textContent += 'Could not load the model: ' + (e.message || e) + '\n'; };
