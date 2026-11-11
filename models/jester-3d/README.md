@@ -46,7 +46,8 @@ claude.ai Project "Flip Book Art", doc `claude/jester-3d-model.md`. Read that fi
   `HORN_R`). Hands are 7% smaller (`HAND_S` in `handPt`), cuffs about 8% smaller. The fourteen ribbon strands are gone: the veil
   now has one wide front fall on each side, built from the same paths and wearing the edge of the great veil's own painting. The
   sheer veil is "shot": `sheen(..., shot)` keeps its red where you look straight at it and turns it gold where it turns away. The
-  jaw is a little slimmer and its line climbs from the chin toward the ear, after `references/faces/`.
+  The face was also slimmed at the jaw after `references/faces/`, and Chris had that undone the same day: the face shape of
+  pass 13 is the one he wants. Do not slim the jaw or tilt the jawline again without asking him.
 - The ruff sits about 2 cm lower than before so the neck shows, as in the paintings. The hair is a bob that comes out from under the
   cap, lies against the neck and ends at the ruff.
 
