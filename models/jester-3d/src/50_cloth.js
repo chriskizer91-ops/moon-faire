@@ -6,7 +6,7 @@
     const A = SK[bA].userData.rest, B = SK[bB].userData.rest;
     COLL.push({ ia: BI[bA], la: V3(a[0] - A.x, a[1] - A.y, a[2] - A.z), ib: BI[bB], lb: V3(b[0] - B.x, b[1] - B.y, b[2] - B.z), r0, r1: r1 == null ? r0 : r1, mask });
   }
-  collider('head', [0, 1.505, 0.010], 'head', [0, 1.585, 0.004], 0.088, 0.088, 16);
+  collider('head', [0, 1.500, 0.012], 'head', [0, 1.590, 0.000], 0.071, 0.071, 16);
   collider('neck', [0, 1.35, -0.008], 'neck', [0, 1.42, -0.004], 0.088, 0.086, 1);
   collider('spine3', [-0.075, 1.25, -0.004], 'spine3', [0.075, 1.25, -0.004], 0.112, 0.112, 1);
   collider('spine2', [-0.045, 1.15, 0.012], 'spine2', [0.045, 1.15, 0.012], 0.120, 0.120, 1);

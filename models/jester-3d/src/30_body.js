@@ -223,12 +223,12 @@
   };
   for (const [S, s] of SIDES) {
     const HP = (x, y, z) => { const p = handPt(s, x, y, z); return [p.x, p.y, p.z]; };
-    const wH = wOne('hand' + S), NU = Q(44, 16), HANDP = !!(BAKED && BAKED.hands), HKEY = HANDP ? 'hand' : 'skin';
+    const wH = wOne('hand' + S), NU = Q(72, 16), HANDP = !!(BAKED && BAKED.hands), HKEY = HANDP ? 'hand' : 'skin';
     const HCELL = { idx: [0, 64], mid: [64, 64], rng: [128, 64], pnk: [192, 64], thb: [256, 64], palm: [320, 192] };   // columns of the hands atlas (512 wide): each cell wraps once round its finger
     const cellUV = (part, key) => { if (HANDP) { const c = HCELL[key]; for (let k = 0; k < part.uv.length; k += 2) part.uv[k] = (c[0] + 0.5 + (c[1] - 1) * cl(part.uv[k], 0, 1)) / 512; } return part; };
     // palm
     const PM = [[0.03, [0.0235, 0.0245, 0]], [0.012, [0.0200, 0.0250, 0]], [-0.012, [0.0135, 0.031, 0.001]], [-0.04, [0.0128, 0.038, 0.002]], [-0.07, [0.0118, 0.0405, 0.002]], [-0.088, [0.0100, 0.039, 0.002]], [-0.096, [0.0060, 0.034, 0.002]]];
-    const pr = [], NP = Q(40, 12), G2 = (dy, dz, wy, wz) => Math.exp(-dy * dy / (wy * wy) - dz * dz / (wz * wz));
+    const pr = [], NP = Q(64, 12), G2 = (dy, dz, wy, wz) => Math.exp(-dy * dy / (wy * wy) - dz * dz / (wz * wz));
     for (let i = 0; i <= NP; i++) {
       const y = lerp(0.03, -0.096, i / NP), [tx, tz, cz] = prof(PM, y, true), ring = [];
       for (let j = 0; j < NU; j++) {
@@ -248,8 +248,8 @@
     }
     addPart(HKEY, cellUV(loft(pr, { capB: true }), 'palm'), (x, y, z, i) => { const row = Math.min(NP, Math.floor(i / (NU + 1))), yy = lerp(0.03, -0.096, row / NP), u = sm(-0.006, 0.02, yy); return [BI['hand' + S], 1 - u, BI['farm' + S], u]; }, { out: handPt(s, 0, -0.04, 0) });
     // fingers
-    const NFU = Q(20, 10), finger = (name, base, dir, fl, r0, wfn) => {
-      const n = Q(44, 14), pts = [], rad = [], tts = [];
+    const NFU = Q(32, 10), finger = (name, base, dir, fl, r0, wfn) => {
+      const n = Q(72, 14), pts = [], rad = [], tts = [];
       for (let i = 0; i <= n; i++) {
         const u = i / n, tt = lerp(-0.008, fl, u); pts.push(base.clone().addScaledVector(dir, tt)); tts.push(tt);
         const tip = Math.sqrt(Math.max(0, 1 - Math.pow(sm(fl - r0 * 1.25, fl, tt), 2)));

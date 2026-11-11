@@ -40,6 +40,9 @@
   const spinChip = chip(toggleRow, 'Turntable', (b) => { spin = !spin; viewAz = null; b.setAttribute('aria-pressed', spin); }, false);
   chip(toggleRow, 'Flipbook', (b) => { showBook = !showBook; b.setAttribute('aria-pressed', showBook); $('book').hidden = !showBook; }, true);
   chip(toggleRow, 'Flipbook look', (b) => { stage.look = stage.look === 'flipbook' ? 'smooth' : 'flipbook'; b.setAttribute('aria-pressed', stage.look === 'flipbook'); }, false);
+  // the layers worn over the base outfit (veils, ribbon strands, shawl, shoulder kerchiefs) can be taken off, to work on the outfit beneath
+  let outerOn = true;
+  chip(toggleRow, 'Veil and shawl', (b) => { outerOn = !outerOn; J.debug.cloths.forEach((c) => { if (c.outer || (c.meshes[0] && c.meshes[0].material.transparent)) c.meshes.forEach((m) => { m.visible = outerOn; }); }); b.setAttribute('aria-pressed', outerOn); }, true);
   chip(toggleRow, 'Half speed', (b) => { slow = !slow; b.setAttribute('aria-pressed', slow); }, false);
 
   // ---- orbit: drag to turn, pinch or wheel to zoom ----
