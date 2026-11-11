@@ -8,7 +8,7 @@ with sync_playwright() as p:
     logs = []
     pg.on('console', lambda m: logs.append(m.type + ': ' + m.text[:300]) if m.type in ('error','warning') and 'GPU stall' not in m.text else None)
     pg.on('pageerror', lambda e: logs.append('PAGEERR: ' + str(e)[:600]))
-    pg.goto('file:///home/claude/work/out/site/test_local.html?shot=1')
+    pg.goto('file:///home/claude/work/out/site/test_local.html?shot=1#lite')
     pg.wait_for_function('window.JESTER', timeout=120000)
     pg.wait_for_timeout(2500)
     k = 0

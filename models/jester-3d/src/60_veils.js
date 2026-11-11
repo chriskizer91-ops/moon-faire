@@ -56,9 +56,9 @@
   let skirtCloth, overCloth, mantleCloth; const ribbonCloths = [];
   (function buildSkirt() {
     const NC = Q(84, 44), NR = Q(18, 10), cols = [];
-    const hem = (a) => { const f = Math.abs(a) / PI; return lerp(0.15, 0.82, Math.pow(sm(0.70, 0.90, f), 1.1)) + 0.07 * tri(a / (TAU / 11)) - 0.02 + 0.03 * (h1(Math.round(a * 20)) - 0.5); };
+    const hem = (a) => { const f = Math.abs(a) / PI; return lerp(0.24, 0.84, Math.pow(sm(0.62, 0.84, f), 1.1)) + 0.05 * tri(a / (TAU / 11)) - 0.02 + 0.03 * (h1(Math.round(a * 20)) - 0.5); };
     for (let c = 0; c < NC; c++) { const a = -PI + (c / NC) * TAU; cols.push(dropRows(skirtPath(a, 0.075, 19, 0.6), hem(a), NR, 1.06)); }
-    skirtCloth = makeCloth({ pleat: { n: 34, amp: 0.010, hem: 0.014 }, cols: NC, rows: NR, wrap: true, mask: 1 | 4, margin: 0.007, bend: 0.25, grav: 0.8, drag: 0.02, flutter: 0.5,
+    skirtCloth = makeCloth({ pleat: { n: 30, amp: 0.010, hem: 0.022 }, cols: NC, rows: NR, wrap: true, mask: 1 | 4, margin: 0.007, bend: 0.25, grav: 0.8, drag: 0.02, flutter: 0.5,
       rest: (c, r) => cols[c][r], pin: (c, r) => (r === 0 ? 1 : r === 1 ? 0.5 : 0.05), weights: (c, r, p) => (r < 2 ? [BI.hips, 0.5, BI.spine1, 0.5] : [BI.hips, 1]),
       uv: (c, r) => [c / NC * 3, 1 - r / (NR - 1)] });
     const tex = raggedTex(1024, 512, '#2b2229', '#4a3d48', '#120d12', 'gauze'); tex.map.wrapS = tex.alpha.wrapS = THREE.RepeatWrapping;
@@ -79,14 +79,14 @@
   // two shorter tiers of ragged black gauze above them, as painted: each a little wider than the one beneath, open at the front
   (function buildTiers() {
     const tex = raggedTex(1024, 512, '#2e242b', '#52434e', '#140e13', 'gauze'); tex.map.wrapS = tex.alpha.wrapS = THREE.RepeatWrapping;
-    for (const [k, A, hem0, amp, np, ph, NR, order] of [[1.03, 140, 0.30, 0.08, 9, 0.9, Q(18, 10), 4.2], [1.055, 144, 0.44, 0.08, 8, 2.9, Q(15, 9), 4.35], [1.085, 150, 0.58, 0.07, 9, 2.3, Q(12, 7), 4.6], [1.11, 156, 0.73, 0.06, 7, 4.1, Q(9, 6), 4.75]]) {
+    for (const [k, A, hem0, amp, np, ph, NR, order] of [[1.03, 126, 0.36, 0.05, 9, 0.9, Q(18, 10), 4.2], [1.055, 130, 0.48, 0.05, 8, 2.9, Q(15, 9), 4.35], [1.085, 134, 0.60, 0.045, 9, 2.3, Q(12, 7), 4.6], [1.11, 138, 0.74, 0.04, 7, 4.1, Q(9, 6), 4.75]]) {
       const NC = Q(61, 33), cols = [], Ar = A * DEG;
       const hem = (a) => hem0 + amp * (tri(a / (TAU / np) + ph) - 0.4) + 0.035 * (h1(Math.round(a * 23 + ph * 7)) - 0.5) + 0.10 * sm(A - 22, A, Math.abs(a) / DEG);
       for (let c = 0; c < NC; c++) {
         const a = lerp(-Ar, Ar, c / (NC - 1));
         cols.push(dropRows(skirtPath(a, 0.10, 23, ph * 3).map((p) => { const f = 1 + (k - 1) * sm(1.04, 0.8, p.y) + 0.015 * sm(0.9, 0.5, p.y); p.x *= f; p.z *= f; return p; }), hem(a), NR, 1.05));
       }
-      const cloth = makeCloth({ pleat: { n: np > 10 ? 25 : 22, amp: 0.010, hem: 0.016, ph: ph }, cols: NC, rows: NR, mask: 1 | 4, margin: 0.012 + (k - 1) * 0.04, bend: 0.3, grav: 0.7, drag: 0.02, flutter: 0.7,
+      const cloth = makeCloth({ pleat: { n: 20, amp: 0.010, hem: 0.026, ph: ph }, cols: NC, rows: NR, mask: 1 | 4, margin: 0.012 + (k - 1) * 0.04, bend: 0.3, grav: 0.7, drag: 0.02, flutter: 0.7,
         rest: (c, r) => cols[c][r], pin: (c, r) => (r === 0 ? 1 : r === 1 ? 0.5 : 0.07), weights: (c, r) => (r < 2 ? [BI.hips, 0.5, BI.spine1, 0.5] : [BI.hips, 1]),
         uv: (c, r) => [c / (NC - 1) * 3, 1 - r / (NR - 1)] });
       addCut(cloth, sheen(new THREE.MeshStandardMaterial({ map: tex.map, alphaMap: tex.alpha, alphaTest: 0.5, side: THREE.DoubleSide, roughness: 0.92 }), '#94848e', 2.2, 0.5), order);

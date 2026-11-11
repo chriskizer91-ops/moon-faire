@@ -93,17 +93,16 @@
   // ---------- the front drape: a short black swag from the belt across her hips (a small sheet of its own) ----------
   let apronCloth;
   (function buildApron() {
-    const NC = Q(27, 15), NR = Q(12, 8), cols = [];
+    const NC = Q(33, 17), NR = Q(20, 10), cols = [];
     for (let c = 0; c < NC; c++) {
-      const u = lerp(-1, 1, c / (NC - 1)), a = PI + u * 70 * DEG, col = [], drop = 0.085 + 0.235 * Math.pow(1 - u * u, 0.8) + 0.02 * Math.sin(u * 9);
+      const u = lerp(-1, 1, c / (NC - 1)), a = PI + u * 64 * DEG, col = [], drop = 0.075 + 0.27 * Math.pow(1 - u * u, 0.9);
       for (let r = 0; r < NR; r++) {
-        const v = r / (NR - 1), y = WAIST - 0.007 - v * drop, [rx, rz] = prof(SKIRT_R, y, true), g = 0.034 + 0.012 * Math.sin(v * PI * 3.2) * (1 - u * u) + 0.006 * Math.sin(u * 14 + v * 3);
+        const v = r / (NR - 1), y = WAIST - 0.007 - v * drop, [rx, rz] = prof(SKIRT_R, y, true), g = 0.030 + 0.016 * Math.sin(v * PI * 4.2 - 1.2 * u * u) * (1 - u * u) * (0.4 + 0.6 * v);
         const p = ell(rx + g, rz + g, a, y, skirtZc(y)); col.push([p.x, p.y, p.z]);
       }
       cols.push(col);
     }
     apronCloth = makeCloth({ cols: NC, rows: NR, mask: 1 | 4, margin: 0.033, bend: 0.25, grav: 0.8, drag: 0.03, flutter: 0.35,
       rest: (c, r) => cols[c][r], pin: (c, r) => (r === 0 ? 1 : r === 1 ? 0.4 : 0), weights: () => [BI.hips, 0.6, BI.spine1, 0.4] });
-    const tex = raggedTex(512, 512, '#30262d', '#4e404a', '#161015');
-    addCut(apronCloth, sheen(new THREE.MeshStandardMaterial({ map: tex.map, alphaMap: tex.alpha, alphaTest: 0.5, side: THREE.DoubleSide, roughness: 0.95 }), '#94848e', 2.2, 0.55), 2);
+    addCut(apronCloth, sheen(new THREE.MeshStandardMaterial({ map: fabricTex(256, '#2a2228', '#41343e', '#141014', 2), side: THREE.DoubleSide, roughness: 0.95 }), '#94848e', 2.2, 0.4), 2);
   })();

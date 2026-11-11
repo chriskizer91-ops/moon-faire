@@ -8,7 +8,8 @@
     ['gilded_rebuke', 'Gilded Rebuke', 1.28], ['hush', 'Hush', 1.05], ['gravity', 'Gravity', 1.1]
   ];
   const VIEWS = [['Front', 0, 0.10, 1], ['Three-quarter', -0.62, 0.14, 1], ['Side', -1.5708, 0.08, 1], ['Back', 3.1416, 0.12, 1], ['Face', 0.22, 0.02, 0.27]];
-  const small = Math.min(window.innerWidth, window.innerHeight) < 700;
+  const touchPhone = (navigator.maxTouchPoints > 0 || /Mobi|Android|iPhone/i.test(navigator.userAgent)) && Math.min(screen.width, screen.height) < 820;
+  const small = location.hash === '#lite' ? true : location.hash === '#full' ? false : touchPhone;      // phones get the lighter model; the Full detail switch overrides
   let stage, J;
   try {
     if (!window.THREE) throw new Error('three.js did not load');
@@ -43,6 +44,7 @@
   // the layers worn over the base outfit (veils, ribbon strands, shawl, shoulder kerchiefs) can be taken off, to work on the outfit beneath
   let outerOn = true;
   chip(toggleRow, 'Veil and shawl', (b) => { outerOn = !outerOn; J.debug.cloths.forEach((c) => { if (c.outer || (c.meshes[0] && c.meshes[0].material.transparent)) c.meshes.forEach((m) => { m.visible = outerOn; }); }); b.setAttribute('aria-pressed', outerOn); }, true);
+  chip(toggleRow, 'Full detail', () => { location.hash = small ? '#full' : '#lite'; location.reload(); }, !small);
   chip(toggleRow, 'Half speed', (b) => { slow = !slow; b.setAttribute('aria-pressed', slow); }, false);
 
   // ---- orbit: drag to turn, pinch or wheel to zoom ----
