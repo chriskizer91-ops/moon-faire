@@ -7,7 +7,7 @@ claude.ai Project "Flip Book Art", doc `claude/jester-3d-model.md`. Read that fi
 ## What is here
 
 - `src/`: the model, in numbered parts that `build.sh` joins into `out/jester.js` (`makeJester(opts)`).
-- `viewer/`: the viewer page (stage, move buttons, Flipbook look).
+- `viewer/`: the viewer page (stage, body, move and spell buttons, Flipbook look).
 - `bake.py`: turns the reference paintings into `out/jester_tex.js` (`window.JESTER_TEX`): face, expressions, profile layer,
   hands, bodice, veil and fabric swatches.
 - `out/jester_tex.js`: the current baked textures. `out/palette.js`, `out/fb.json`, `out/fb/`: palette and flipbook frames for the viewer.
@@ -50,6 +50,44 @@ claude.ai Project "Flip Book Art", doc `claude/jester-3d-model.md`. Read that fi
   pass 13 is the one he wants. Do not slim the jaw or tilt the jawline again without asking him.
 - The ruff sits about 2 cm lower than before so the neck shows, as in the paintings. The hair is a bob that comes out from under the
   cap, lies against the neck and ends at the ruff.
+
+## How she moves (pass 15, November 11, 2026)
+
+Chris asked for running, kneeling, squatting, sitting on a chair, sitting on the ground, jumping, talking with her hands, and more
+spells. Motion now has three layers, added one on top of the other each frame in `animate` (`src/90_api.js`):
+
+1. **The base** (`fillBase` in `src/75_pose.js`): breathing, the walk, and the run. `animate(phase, walk, t, dt, run)`: `walk` and
+   `run` are blends from 0 to 1 (set both to 1 to run), and the host advances `phase` (about 4.9 a second walking, 9 running).
+2. **A stance** (`defStance` in `src/70_anim.js`; the stances are in `src/86_moves.js`): a way she holds her body until told
+   otherwise. `setStance('kneel' | 'squat' | 'sit_chair' | 'sit_ground' | 'hover' | '')`. Its keys run from standing to the held
+   pose and play backwards to stand up. Going from one stance to another passes through standing. `sit_chair` conjures a stool
+   (`stool`, built in `86_moves.js`) and switches on a round seat the cloth rests on (`SEAT` in `src/50_cloth.js`). `hover` is the
+   cross-legged pose floating, with a slow bob (`live`) and a wheel of light on the floor (`fx`).
+3. **A move** (`defAction`; `play(name, true)`): plays once. Over a stance, a move keeps the stance's legs, its hand targets are
+   carried by the chest (`torsoM` works out where the chest is for the stance), and its lean and gaze are added to the
+   stance's. So every spell and `talk` work standing, kneeling, sitting or hovering. A move marked `stand: true` (`jump`) stands
+   her up first and then plays.
+
+New moves: `jump` (the flight is a true arc, 0.46 m high) and `talk` (11.4 s: nine gestures, with her mouth worked in bursts of
+syllables from the three painted mouths). New spells, from `assets/design/moves_v03.json`, in `src/87_spells.js`:
+`ill_omen` (2 s), `stop` (4 s), `royal_reversal` (3 s) and `last_toll` (5 s), each timed to its cast and recovery on the sheet.
+They have no flipbook frames, so they are built from the eight-step descriptions and are open to Chris's notes.
+
+Things that were added to make them possible:
+
+- Feet have a sixth number, a roll, for lying on their sides when her legs are crossed. Shorter lists are filled from rest.
+- `grabCloth(point, reach, spread, n)` and `releaseGrab()` in `src/50_cloth.js`: the loose particles of a veil nearest a point are
+  carried by it. Royal Reversal uses it for "two fingers lift an edge of veil". A move that holds cloth is marked `grabs: true`.
+- `fxAuto` in `src/80_fx.js`: effect objects made in later files are pushed here and hidden at the start of each frame.
+  `oneBell: true` on a move shows the flail as a single bell (The Last Toll).
+- Anchors `pendant`, `chest` and `hips`. `debug.applyPose` and `debug.clonePose` pose her directly, which is how the hand for
+  touching the pendant was found (a small search that puts her fingertip on it).
+- The viewer has three rows: Body (states), Moves and Spells, and on a phone the rows slide sideways. The camera widens and
+  shifts toward the target for the spells that travel (`cam` in the `SPELLS` list of `viewer/app.js`).
+
+Checked: every move over every stance (72 pairs) runs with no errors and no broken numbers; each was looked at in stills.
+Not yet done: no eyebrow motion (Ill Omen's "eyebrow lifts" is a head tilt and narrowed eyes); getting from one stance to
+another always stands up first; the run was tuned from stills, not from video; the hip bells do not rest on her lap when seated.
 
 ## Building
 

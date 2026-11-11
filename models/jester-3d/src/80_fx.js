@@ -125,12 +125,19 @@
   const cue = (a, name, at) => { if (a.t >= at && !a.fired[name]) { a.fired[name] = true; return true; } return false; };
   const win = (t, a, b, fade) => sm(a, a + (fade || 0.15), t) * (1 - sm(b - (fade || 0.15), b, t));
   let aura = 0;
+  const fxAuto = [];                                  // extra effect objects (later files add theirs): hidden at the start of every frame
+  function flailSingle(on) { flHead.children.forEach((b, i) => { if (!b.userData.p0) b.userData.p0 = b.position.clone(); b.visible = !on || i === 0; if (on && i === 0) { b.position.set(0, 0.03, 0); b.scale.setScalar(1.35); } else { b.position.copy(b.userData.p0); b.scale.setScalar(1); } }); }
+  let flailOne = false;
   function updateFx(t, dt, P) {
     _tgt.set(1, 0, 0).applyQuaternion(_rq);
     for (const s of [gHandR, gHandL, gMain, gCore, gAux, sigil, sigil2, gGold, ringGold]) s.visible = false;
     sweep.visible = sweep2.visible = hushRing.visible = well.visible = shaft.visible = false; floorSig[0].visible = floorSig[1].visible = false; lightK = 0; trailOn = 0; dimK = 0;
+    for (const o of fxAuto) o.visible = false;
     let flailOn = false;
     if (act && act.def.fx) flailOn = act.def.fx(act, t, dt) === 'flail';
+    if (stance && stance.def.fx) stance.def.fx(stance, t, dt);
+    if (grabbed && !(act && act.def.grabs)) releaseGrab();
+    const one = flailOn && !!act.def.oneBell; if (one !== flailOne) { flailOne = one; flailSingle(one); }
     if (!flailOn && flail.visible) { flail.visible = false; flInit = false; trail.visible = false; }
     if (meshes.bells) meshes.bells.visible = meshes.bellslit.visible = !flailOn;
     spellLight.position.copy(lightP); spellLight.intensity += (lightK * 2.4 - spellLight.intensity) * Math.min(1, dt * 14 + (dt === 0 ? 1 : 0));

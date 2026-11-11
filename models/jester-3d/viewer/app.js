@@ -3,10 +3,14 @@
   'use strict';
   const $ = (id) => document.getElementById(id);
   const canvas = $('stage'), box = $('stagebox'), hud = $('hud'), err = $('err');
-  const MOVES = [
-    ['idle', 'Idle', 0.7], ['walk', 'Walk', 0.7], ['curtain_call', 'Curtain Call', 1.0], ['sealed_fate', 'Sealed Fate', 0.8], ['against_all_odds', 'Against All Odds', 0.82],
-    ['gilded_rebuke', 'Gilded Rebuke', 1.28], ['hush', 'Hush', 1.05], ['gravity', 'Gravity', 1.1]
-  ];
+  // What she can do. States are how she holds herself and stay until changed; moves and spells play once over whatever state she is in.
+  // Each: [id, label, half-width in meters the camera must show, half-height (optional), camera by time (optional): t -> [half-width, shift toward the target]]
+  const STATES = [['idle', 'Stand', 0.7], ['walk', 'Walk', 0.7], ['run', 'Run', 0.8], ['kneel', 'Kneel', 0.7], ['squat', 'Squat', 0.7], ['sit_chair', 'Sit on a stool', 0.7], ['sit_ground', 'Sit on the ground', 0.7], ['hover', 'Hover', 0.75]];
+  const ACTS = [['jump', 'Jump', 0.9, 1.42], ['talk', 'Talk', 0.8]];
+  const SPELLS = [['curtain_call', 'Curtain Call', 1.0], ['sealed_fate', 'Sealed Fate', 0.8], ['against_all_odds', 'Against All Odds', 0.82], ['gilded_rebuke', 'Gilded Rebuke', 1.28], ['hush', 'Hush', 1.05], ['gravity', 'Gravity', 1.1],
+    ['ill_omen', 'Ill Omen', 0.8, 0, (t) => t > 0.95 ? [1.75, 1.0] : [0.8, 0]], ['stop', 'Stop', 1.0, 0, (t) => t > 2.35 ? [1.8, 1.05] : [1.0, 0.25]],
+    ['royal_reversal', 'Royal Reversal', 0.85, 0, (t) => t > 1.8 ? [1.45, -0.55] : [0.85, -0.1]], ['last_toll', 'The Last Toll', 0.9, 0, (t) => t > 3.85 ? [2.0, 0] : [0.9, 0]]];
+  const ALL = STATES.concat(ACTS, SPELLS), find = (id) => ALL.find((x) => x[0] === id);
   const VIEWS = [['Front', 0, 0.10, 1], ['Three-quarter', -0.62, 0.14, 1], ['Side', -1.5708, 0.08, 1], ['Back', 3.1416, 0.12, 1], ['Face', 0.22, 0.02, 0.27]];
   const touchPhone = (navigator.maxTouchPoints > 0 || /Mobi|Android|iPhone/i.test(navigator.userAgent)) && Math.min(screen.width, screen.height) < 820;
   const small = location.hash === '#lite' ? true : location.hash === '#full' ? false : touchPhone;      // phones get the lighter model; the Full detail switch overrides
@@ -18,28 +22,36 @@
     stage.scene.add(J.root, J.fx);
   } catch (e) { err.hidden = false; err.textContent = 'This page needs WebGL to draw her. ' + (e && e.message ? e.message : ''); return; }
   const orbit = stage.orbit; orbit.az = 0; orbit.el = 0.10; orbit.target.y = 0.95;
-  let move = 'idle', wb = 0, wbTo = 0, phase = 0, time = 0, spin = false, slow = false, showBook = true;
+  let state = 'idle', move = '', wb = 0, wbTo = 0, rb = 0, rbTo = 0, phase = 0, time = 0, spin = false, slow = false, showBook = true;
   stage.look = 'smooth';      // the painted face and fabrics show in the smooth look; the flipbook look is a switch
-  let needHalf = 0.86, zoomUser = 1, faceMode = 0, faceTo = 0, viewAz = null, viewEl = null, last = performance.now();
+  let needHalf = 0.86, needV = 1.12, camX = 0, zoomUser = 1, faceMode = 0, faceTo = 0, viewAz = null, viewEl = null, last = performance.now();
 
   // ---- chips ----
-  const chipRow = $('moves'), viewRow = $('views'), toggleRow = $('toggles');
+  const viewRow = $('views'), toggleRow = $('toggles');
   function chip(parent, label, on, pressed) {
     const b = document.createElement('button'); b.type = 'button'; b.className = 'chip'; b.textContent = label; if (pressed != null) b.setAttribute('aria-pressed', pressed ? 'true' : 'false');
     b.addEventListener('click', () => on(b)); parent.appendChild(b); return b;
   }
   const moveChips = {};
-  for (const [id, label, half] of MOVES) moveChips[id] = chip(chipRow, label, () => setMove(id), id === 'idle');
+  for (const [id, label] of STATES) moveChips[id] = chip($('states'), label, () => setState(id), id === 'idle');
+  for (const [id, label] of ACTS) moveChips[id] = chip($('acts'), label, () => setMove(id), false);
+  for (const [id, label] of SPELLS) moveChips[id] = chip($('spells'), label, () => setMove(id), false);
+  const press = () => { for (const k in moveChips) moveChips[k].setAttribute('aria-pressed', k === state || k === move ? 'true' : 'false'); };
+  function setState(id) {
+    state = id; faceTo = 0; wbTo = id === 'walk' || id === 'run' ? 1 : 0; rbTo = id === 'run' ? 1 : 0;
+    J.setStance(J.STANCES.indexOf(id) >= 0 ? id : '');
+    if (move === 'jump') { J.stop(); move = ''; }
+    press(); bookT0 = time;
+  }
   function setMove(id) {
-    move = id; const m = MOVES.find((x) => x[0] === id); needHalf = m[2]; faceTo = 0;
-    for (const k in moveChips) moveChips[k].setAttribute('aria-pressed', k === id ? 'true' : 'false');
-    wbTo = id === 'walk' ? 1 : 0;
-    if (id !== 'idle' && id !== 'walk') J.play(id, true); else J.stop();
-    bookT0 = time;
+    if (id === 'idle' || id === 'walk') { J.stop(); move = ''; return setState(id); }      // kept for older callers
+    move = id; faceTo = 0; J.play(id, true);
+    if (J.stance === '' && J.STANCES.indexOf(state) >= 0) state = 'idle';             // a jump stands her up first
+    press(); bookT0 = time;
   }
   for (const [label, az, el, face] of VIEWS) chip(viewRow, label, () => { viewAz = az; viewEl = el; faceTo = face < 1 ? 1 : 0; spin = false; spinChip.setAttribute('aria-pressed', 'false'); });
   const spinChip = chip(toggleRow, 'Turntable', (b) => { spin = !spin; viewAz = null; b.setAttribute('aria-pressed', spin); }, false);
-  chip(toggleRow, 'Flipbook', (b) => { showBook = !showBook; b.setAttribute('aria-pressed', showBook); $('book').hidden = !showBook; }, true);
+  chip(toggleRow, 'Flipbook', (b) => { showBook = !showBook; b.setAttribute('aria-pressed', showBook); if (!showBook) $('book').hidden = true; }, true);
   chip(toggleRow, 'Flipbook look', (b) => { stage.look = stage.look === 'flipbook' ? 'smooth' : 'flipbook'; b.setAttribute('aria-pressed', stage.look === 'flipbook'); }, false);
   // the layers worn over the base outfit (veils, ribbon strands, shawl, shoulder kerchiefs) can be taken off, to work on the outfit beneath
   let outerOn = true;
@@ -72,13 +84,14 @@
   const book = $('book'), bctx = book.getContext('2d'), imgs = {}; let bookT0 = 0, bookClip = '';
   function loadClip(id) { const c = FB.clips[id]; if (!c) return; for (const n of c.frames) if (!imgs[n]) { const im = new Image(); im.src = (window.FBDATA && window.FBDATA[n]) || ('fb/' + n + '.webp'); imgs[n] = im; } }
   function drawBook() {
-    const c = FB.clips[move]; if (!c) return;
-    if (bookClip !== move) { bookClip = move; loadClip(move); }
-    const t = (move === 'idle' || move === 'walk') ? time : (J.action === move ? J.time : -1);
-    let i = t < 0 ? 0 : Math.floor(t * c.fps); i = (move === 'idle' || move === 'walk') ? i % c.frames.length : Math.min(c.frames.length - 1, i);
+    const id = move || state, c = FB.clips[id], want = !c; if (book.hidden !== want) book.hidden = want;       // only her drawn moves have a flipbook frame to show
+    if (!c) return;
+    if (bookClip !== id) { bookClip = id; loadClip(id); }
+    const t = !move ? time : (J.action === id ? J.time : -1);
+    let i = t < 0 ? 0 : Math.floor(t * c.fps); i = !move ? i % c.frames.length : Math.min(c.frames.length - 1, i);
     const n = c.frames[i], im = imgs[n], f = FB.frames[n], W = book.width, H = book.height;
     bctx.clearRect(0, 0, W, H); if (!im || !im.complete || !im.naturalWidth) return;
-    const k = (H * 0.92) / 215, wide = move === 'gilded_rebuke' || move === 'hush' || move === 'gravity' ? 0.36 : 0.5;
+    const k = (H * 0.92) / 215, wide = id === 'gilded_rebuke' || id === 'hush' || id === 'gravity' ? 0.36 : 0.5;
     bctx.imageSmoothingEnabled = true; bctx.drawImage(im, W * wide - f[2] * k, H * 0.97 - f[3] * k, f[0] * k, f[1] * k);
   }
 
@@ -86,24 +99,25 @@
   function frame(now) {
     requestAnimationFrame(frame);
     let dt = Math.min(0.05, (now - last) / 1000); last = now; if (slow) dt *= 0.5;
-    time += dt; wb += (wbTo - wb) * Math.min(1, dt * 5); if (wb > 0.001) phase += dt * 4.9;
-    if (move !== 'idle' && move !== 'walk' && !J.action) setMove('idle');
-    J.animate(phase, wb, time, dt);
+    time += dt; wb += (wbTo - wb) * Math.min(1, dt * 5); rb += (rbTo - rb) * Math.min(1, dt * 3.5); if (wb > 0.001) phase += dt * (4.9 + 4.1 * rb);
+    if (move && !J.action && !J.pending) { move = ''; press(); bookT0 = time; }
+    J.animate(phase, wb, time, dt, rb);
+    { const m = find(move || state), cam = m[4] && J.action === m[0] ? m[4](J.time) : null; needHalf = cam ? cam[0] : m[2]; needV = m[3] || 1.12; camX += ((cam ? cam[1] : 0) - camX) * Math.min(1, dt * 3); orbit.target.x = camX; }
     // camera: fit the move, ease to a chosen view, or turn slowly
     if (spin) orbit.az += dt * 0.5;
     if (viewAz != null) { let d = viewAz - orbit.az; d = Math.atan2(Math.sin(d), Math.cos(d)); orbit.az += d * Math.min(1, dt * 5); orbit.el += (viewEl - orbit.el) * Math.min(1, dt * 5); if (Math.abs(d) < 0.003) viewAz = null; }
     faceMode += (faceTo - faceMode) * Math.min(1, dt * 4);
-    const asp = stage.camera.aspect, th = Math.tan(orbit.fov * Math.PI / 360), fitDist = Math.max(needHalf / (th * asp), 1.12 / th);
+    const asp = stage.camera.aspect, th = Math.tan(orbit.fov * Math.PI / 360), fitDist = Math.max(needHalf / (th * asp), needV / th);
     const want = (fitDist * (1 - faceMode) + 1.75 * faceMode) * zoomUser;
     orbit.dist += (want - orbit.dist) * Math.min(1, dt * 3.5);
     orbit.target.y += ((0.95 * (1 - faceMode) + 1.5 * faceMode) - orbit.target.y) * Math.min(1, dt * 4);
     stage.dim = J.dim;
     stage.render();
     if (showBook) drawBook();
-    const a = J.action, m = MOVES.find((x) => x[0] === move);
+    const a = J.action, m = find(move || state);
     hud.textContent = m[1] + (a ? '  ' + J.time.toFixed(1) + ' / ' + J.ACTIONS[a].dur.toFixed(1) + ' s' : '') + '  ·  ' + Math.round(J.triangles / 1000) + 'k triangles';
   }
   loadClip('idle');
   requestAnimationFrame((t) => { last = t; frame(t); });
-  window.JESTER = { J, stage, setMove };
+  window.JESTER = { J, stage, setMove, setState, STATES, ACTS, SPELLS };
 })();

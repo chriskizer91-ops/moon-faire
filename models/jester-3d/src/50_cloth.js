@@ -45,6 +45,21 @@
     }
   }
   const cloths = [], clothGroup = new THREE.Group(); clothGroup.name = 'jester-cloth';
+  // taking hold of a veil: the loose particles of the outer sheets nearest a point are carried by it until let go
+  let grabbed = null;
+  function grabCloth(p, reach, spread, n) {
+    let best = null, bd = reach * reach;
+    for (const c of cloths) { if (!c.outer) continue; for (let i = 0; i < c.n; i++) { if (c.pin[i] > 0.2) continue; const dx = c.pos[i * 3] - p.x, dy = c.pos[i * 3 + 1] - p.y, dz = c.pos[i * 3 + 2] - p.z, d = dx * dx + dy * dy + dz * dz; if (d < bd) { bd = d; best = c; best._gi = i; } } }
+    if (!best) return false;
+    const c = best, i0 = c._gi, cx = c.pos[i0 * 3], cy = c.pos[i0 * 3 + 1], cz = c.pos[i0 * 3 + 2], list = [];
+    for (let i = 0; i < c.n; i++) { if (c.pin[i] > 0.2) continue; const d = Math.hypot(c.pos[i * 3] - cx, c.pos[i * 3 + 1] - cy, c.pos[i * 3 + 2] - cz); if (d < spread) list.push([d, i]); }
+    list.sort((a, b) => a[0] - b[0]); list.length = Math.min(list.length, n || 8);
+    c.grabI = new Int32Array(list.map((e) => e[1])); c.grabO = new Float32Array(list.length * 3); c.grabP = p.clone(); c.grabK = 0.5;
+    list.forEach((e, m) => { c.grabO[m * 3] = (c.pos[e[1] * 3] - cx) * 0.45; c.grabO[m * 3 + 1] = (c.pos[e[1] * 3 + 1] - cy) * 0.45; c.grabO[m * 3 + 2] = (c.pos[e[1] * 3 + 2] - cz) * 0.45; });
+    grabbed = c; return true;
+  }
+  function releaseGrab() { if (grabbed) { grabbed.grabI = null; grabbed = null; } }
+  const SEAT = { on: false, x: 0, z: 0, r: 0.2, top: 0.45 };       // a round seat the cloth rests on while she sits (world space)
   const WIND = V3(0, 0, 0);                           // apparent wind in world space (the host or the walk sets it)
   // o: cols, rows, wrap, rest(c, r) -> [x,y,z], pin(c, r, p) -> 0..1, weights(c, r, p) -> [bone, w, ...], mask, margin,
   //    mat (material), uv(c, r) -> [u, v], grav, drag, bend, flutter
@@ -156,7 +171,12 @@
           if (d2 < rr2 * rr2 && d2 > 1e-12) { const d = Math.sqrt(d2), s = rr2 / d; x = cS[q] + cS[q + 3] * t + dx * s; y = cS[q + 1] + cS[q + 4] * t + dy * s; z = cS[q + 2] + cS[q + 5] * t + dz * s; hit = true; }
         }
         if (y < 0.012) { y = 0.012; hit = true; }
+        if (SEAT.on && y < SEAT.top) { const sx = x - SEAT.x, sz = z - SEAT.z, d2 = sx * sx + sz * sz; if (d2 < SEAT.r * SEAT.r) { if (y > SEAT.top - 0.07) y = SEAT.top; else { const d = Math.sqrt(d2) || 1e-6, q = SEAT.r / d; x = SEAT.x + sx * q; z = SEAT.z + sz * q; } hit = true; } }
         if (hit) { pos[a] = x; pos[a + 1] = y; pos[a + 2] = z; prev[a] += (x - prev[a]) * 0.35; prev[a + 1] += (y - prev[a + 1]) * 0.35; prev[a + 2] += (z - prev[a + 2]) * 0.35; }
+      }
+      if (out.grabI) {                                 // particles held in her fingers go where the fingers go
+        const gi = out.grabI, go = out.grabO, gp = out.grabP, gk = out.grabK;
+        for (let m = 0; m < gi.length; m++) { const a = gi[m] * 3; for (let q = 0; q < 3; q++) { const tv = (q === 0 ? gp.x : q === 1 ? gp.y : gp.z) + go[m * 3 + q]; pos[a + q] += (tv - pos[a + q]) * gk; prev[a + q] += (pos[a + q] - prev[a + q]) * 0.6; } }
       }
     };
     out.finish = () => {

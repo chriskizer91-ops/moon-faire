@@ -26,7 +26,7 @@ canvas#stage{display:block;width:100%;height:100%;touch-action:none;cursor:grab}
 .hud{position:absolute;left:10px;top:8px;font-family:var(--f-mono);font-size:12px;color:var(--muted);background:rgba(23,18,30,.7);padding:2px 8px;border-radius:4px;font-variant-numeric:tabular-nums;pointer-events:none;max-width:calc(100% - 20px)}
 #book{position:absolute;right:8px;bottom:8px;width:min(30%,180px);aspect-ratio:13/11;background:var(--stage);border:1px solid var(--gold);border-radius:4px;pointer-events:none;box-shadow:0 4px 18px rgba(0,0,0,.45)}
 .booktag{position:absolute;right:14px;bottom:12px;font-family:var(--f-mono);font-size:10px;letter-spacing:.1em;text-transform:uppercase;color:var(--gold);pointer-events:none;text-shadow:0 1px 2px #000}
-#book[hidden]+.booktag{display:none}
+#book[hidden],#book[hidden]+.booktag{display:none}
 .err[hidden]{display:none}
 .err{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;padding:24px;text-align:center;color:var(--ink);background:var(--stage)}
 .label{font-family:var(--f-mono);font-size:11px;letter-spacing:.12em;text-transform:uppercase;color:var(--muted);margin:0 0 6px}
@@ -35,10 +35,12 @@ canvas#stage{display:block;width:100%;height:100%;touch-action:none;cursor:grab}
 .chip:hover{border-color:var(--muted)}
 .chip:focus-visible{outline:2px solid var(--pendant);outline-offset:2px}
 .chip[aria-pressed="true"]{background:var(--veil);border-color:var(--gold);color:#fff}
-#moves .chip{font-weight:700}
+#states .chip,#acts .chip,#spells .chip{font-weight:700}
 .notes{color:var(--muted);font-size:14px;max-width:68ch;margin:0}
 .notes b{color:var(--ink);font-weight:700}
 @media (prefers-reduced-motion:reduce){.chip{transition:none}}
+/* on a phone the three rows of moves slide sideways, so the stage stays in view while you pick */
+@media (max-width:700px){.stagebox{height:min(60vh,120vw)}.slide{flex-wrap:nowrap;overflow-x:auto;scrollbar-width:none;margin-right:-12px;padding-right:12px}.slide::-webkit-scrollbar{display:none}.slide .chip{flex:0 0 auto;white-space:nowrap}}
 </style>
 </head>
 <body>
@@ -53,10 +55,12 @@ canvas#stage{display:block;width:100%;height:100%;touch-action:none;cursor:grab}
     <canvas id="book" width="390" height="330" aria-label="The flipbook frame for the same moment"></canvas><span class="booktag">Flipbook</span>
     <div class="err" id="err" hidden></div>
   </div>
-  <section aria-label="Moves"><p class="label">Moves</p><div class="chips" id="moves"></div></section>
+  <section aria-label="How she holds herself"><p class="label">Body</p><div class="chips slide" id="states"></div></section>
+  <section aria-label="Moves"><p class="label">Moves</p><div class="chips slide" id="acts"></div></section>
+  <section aria-label="Spells"><p class="label">Spells</p><div class="chips slide" id="spells"></div></section>
   <section aria-label="Views"><p class="label">Views</p><div class="chips" id="views"></div></section>
   <section aria-label="Switches"><p class="label">Switches</p><div class="chips" id="toggles"></div></section>
-  <p class="notes">Drag to turn her; pinch or scroll to zoom. Her face, expressions, great veil and cloth are taken from the paintings. <b>Flipbook look</b> redraws the model at the sprites' pixel size in her own 56 colours. The small picture is her <b>flipbook frame for the same moment</b>, so each move can be checked against the drawing. As in the sprites she plays to the audience and casts toward her left, where the target stands at screen right. Timings are the flipbook's own: Curtain Call 8.0 s with the ring on frame 32, Sealed Fate 4.8 s, Against All Odds 8.0 s, Gilded Rebuke 2.0 s, Hush 4.8 s, Gravity 1.7 s.</p>
+  <p class="notes">Drag to turn her; pinch or scroll to zoom. <b>Body</b> is how she holds herself: it stays until you pick another. <b>Moves</b> and <b>Spells</b> play once over whatever she is doing, so she can talk while she sits, or cast from her knees. The stool is conjured when she sits and goes when she stands. The first six spells follow her flipbook, and the small picture shows her <b>flipbook frame for the same moment</b>; Ill Omen, Stop, Royal Reversal and The Last Toll are built from the move sheet and have no drawn frames yet. As in the sprites she casts toward her left, where the target stands at screen right. <b>Flipbook look</b> redraws the model at the sprites' pixel size in her own 56 colours.</p>
 </div>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
 <script>/*PAL*/</script>

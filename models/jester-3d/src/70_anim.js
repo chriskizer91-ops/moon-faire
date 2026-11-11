@@ -120,7 +120,7 @@
     hip: [0, 0, 0], hipR: [0, 0, 0], sp: [0, 0, 0], hd: [0, 0, 0], sh: [0, 0],
     hR: [-0.300, 0.868, 0.055], hL: [0.300, 0.868, 0.055], eR: [-0.55, -0.1, -1], eL: [0.55, -0.1, -1], twR: 0, twL: 0, wrR: [0.1, 0], wrL: [0.1, 0],
     fR: FP.relax.slice(), fL: FP.relax.slice(),
-    ftR: [0, 0, 0, -0.10, 0], ftL: [0, 0, 0, 0.10, 0], knR: [-0.12, 0, 1], knL: [0.12, 0, 1],
+    ftR: [0, 0, 0, -0.10, 0, 0], ftL: [0, 0, 0, 0.10, 0, 0], knR: [-0.12, 0, 1], knL: [0.12, 0, 1],
     eyes: 0, mouth: 0, glow: 0
   };
   const CHANS = Object.keys(REST);
@@ -128,20 +128,26 @@
   const cur = clonePose(REST), base = clonePose(REST);
   function blendPose(out, a, b, w) { for (const k of CHANS) { const x = a[k], y = b[k]; if (typeof x === 'number') out[k] = x + (y - x) * w; else { const o = out[k]; for (let i = 0; i < x.length; i++) o[i] = x[i] + (y[i] - x[i]) * w; } } }
   // actions: keys inherit the last value of every channel they leave out; values glide through keys on smooth curves
-  const ACTS = {};
-  function defAction(name, dur, keys, o) {
-    const tracks = {}, outro = (o && o.outro) || 0.5;
+  const ACTS = {}, STANCES = {};
+  function buildTracks(keys, dur, outro, hold) {
+    const tracks = {};
     for (const k of CHANS) {
-      const ts = [0], vs = [REST[k]];
-      for (const key of keys) if (key[k] !== undefined) { const v = key[k] === 'rest' ? REST[k] : key[k]; if (key.t <= 0) vs[0] = v; else { ts.push(key.t); vs.push(v); } }
+      const ts = [0], vs = [REST[k]], n = typeof REST[k] === 'number' ? 0 : REST[k].length;
+      for (const key of keys) if (key[k] !== undefined) {
+        let v = key[k] === 'rest' ? REST[k] : key[k]; if (n && v.length < n) v = v.concat(REST[k].slice(v.length));      // short lists (feet without a roll) are filled from rest
+        if (key.t <= 0) vs[0] = v; else { ts.push(key.t); vs.push(v); }
+      }
       if (ts.length === 1 && vs[0] === REST[k]) continue;
-      const tl = ts[ts.length - 1], vl = vs[vs.length - 1];        // hold the last value, then settle back to rest at the end
-      if (tl < dur - outro - 1e-3) { ts.push(dur - outro); vs.push(vl); }
-      if (ts[ts.length - 1] < dur) { ts.push(dur); vs.push(REST[k]); }
+      const tl = ts[ts.length - 1], vl = vs[vs.length - 1];        // hold the last value, then settle back to rest at the end (a stance stays)
+      if (hold) { if (tl < dur) { ts.push(dur); vs.push(vl); } }
+      else { if (tl < dur - outro - 1e-3) { ts.push(dur - outro); vs.push(vl); } if (ts[ts.length - 1] < dur) { ts.push(dur); vs.push(REST[k]); } }
       tracks[k] = { ts, vs };
     }
-    ACTS[name] = Object.assign({ dur, tracks, hits: [], cues: [] }, o || {});
+    return tracks;
   }
+  function defAction(name, dur, keys, o) { ACTS[name] = Object.assign({ dur, tracks: buildTracks(keys, dur, (o && o.outro) || 0.5, false), hits: [], cues: [] }, o || {}); }
+  // a stance is a way of holding the body (kneeling, sitting): its keys run from standing to the held pose, and play backwards to stand up again
+  function defStance(name, dur, keys, o) { STANCES[name] = Object.assign({ dur, tracks: buildTracks(keys, dur, 0, true) }, o || {}); }
   function evalTrack(tr, t, out) {
     const ts = tr.ts, vs = tr.vs, n = ts.length; let i = 1; while (i < n - 1 && ts[i] < t) i++;
     const t0 = ts[i - 1], t1 = ts[i], u = cl((t - t0) / (t1 - t0), 0, 1), u2 = u * u, u3 = u2 * u, dtt = t1 - t0;
@@ -156,11 +162,15 @@
     for (let k = 0; k < a.length; k++) out[k] = comp(a[k], b[k], pa[k], nb[k], ta, tb);
     return out;
   }
-  let act = null, guardOn = false;
-  const actPose = clonePose(REST);
+  let act = null, guardOn = false, stance = null, stanceTo = '', pending = '';
+  const actPose = clonePose(REST), stPose = clonePose(REST);
+  function evalPose(tracks, t, out) { for (const k of CHANS) { const tr = tracks[k]; if (tr) { const v = evalTrack(tr, t, out[k]); if (typeof v === 'number') out[k] = v; } else if (typeof REST[k] === 'number') out[k] = REST[k]; else for (let i = 0; i < REST[k].length; i++) out[k][i] = REST[k][i]; } return out; }
+  function setStance(name) { if (name && !STANCES[name]) return false; stanceTo = name || ''; return true; }
   function play(name, force) {
     const def = ACTS[name]; if (!def) return false;
     if (act && !force) return false;
+    if (def.stand && (stance || stanceTo)) { stanceTo = ''; pending = name; act = null; return true; }      // moves that need her feet (a jump) wait until she is standing
+    pending = '';
     act = { type: name, t: 0, dur: def.dur, def, fired: {} };
     if (def.start) def.start(act);
     return true;
