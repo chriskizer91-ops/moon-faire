@@ -50,13 +50,13 @@
     const mesh = new THREE.Mesh(cloth.geo, mat); mesh.frustumCulled = false; mesh.castShadow = true; mesh.receiveShadow = true; mesh.renderOrder = order; clothGroup.add(mesh); cloth.meshes.push(mesh);
   }
   // the black skirt is slim; the wide silhouette is the veils fanned out behind her
-  const SKIRT_R = [[1.04, [0.112, 0.088]], [0.975, [0.160, 0.134]], [0.87, [0.200, 0.180]], [0.70, [0.228, 0.222]], [0.50, [0.246, 0.252]], [0.30, [0.262, 0.270]], [0, [0.272, 0.282]]];
+  const SKIRT_R = [[1.04, [0.108, 0.086]], [0.975, [0.132, 0.108]], [0.87, [0.158, 0.138]], [0.70, [0.198, 0.180]], [0.50, [0.250, 0.212]], [0.30, [0.262, 0.224]], [0, [0.266, 0.228]]];
   const skirtZc = (y) => 0;
   const skirtPath = (a, fold, nf, ph) => SKIRT_R.map(([y, [rx, rz]]) => { const k = 1 + fold * sm(0.98, 0.5, y) * Math.sin(a * nf + ph); return ell(rx * k, rz * k, a, y, 0); });
   let skirtCloth, overCloth, mantleCloth; const ribbonCloths = [];
   (function buildSkirt() {
     const NC = Q(84, 44), NR = Q(18, 10), cols = [];
-    const hem = (a) => { const f = Math.abs(a) / PI; return lerp(0.13, 0.82, Math.pow(sm(0.70, 0.90, f), 1.1)) + 0.11 * tri(a / (TAU / 13)) - 0.03 + 0.03 * (h1(Math.round(a * 20)) - 0.5); };
+    const hem = (a) => { const f = Math.abs(a) / PI; return lerp(0.15, 0.82, Math.pow(sm(0.70, 0.90, f), 1.1)) + 0.07 * tri(a / (TAU / 11)) - 0.02 + 0.03 * (h1(Math.round(a * 20)) - 0.5); };
     for (let c = 0; c < NC; c++) { const a = -PI + (c / NC) * TAU; cols.push(dropRows(skirtPath(a, 0.075, 19, 0.6), hem(a), NR, 1.06)); }
     skirtCloth = makeCloth({ pleat: { n: 34, amp: 0.010, hem: 0.014 }, cols: NC, rows: NR, wrap: true, mask: 1 | 4, margin: 0.007, bend: 0.25, grav: 0.8, drag: 0.02, flutter: 0.5,
       rest: (c, r) => cols[c][r], pin: (c, r) => (r === 0 ? 1 : r === 1 ? 0.5 : 0.05), weights: (c, r, p) => (r < 2 ? [BI.hips, 0.5, BI.spine1, 0.5] : [BI.hips, 1]),
@@ -68,23 +68,23 @@
   // the olive overskirt: hung from the belt over the black, open in front, falling in gold-trimmed points
   (function buildOverskirt() {
     const A = 140 * DEG, NC = Q(53, 29), NR = Q(16, 10), cols = [];
-    const hem = (a) => { const d = Math.abs(a) / DEG; return 0.20 + 0.24 * Math.pow(tri((d - 20) / 40), 0.9) + 0.12 * sm(125, 140, d); };
-    for (let c = 0; c < NC; c++) { const a = lerp(-A, A, c / (NC - 1)); cols.push(dropRows(skirtPath(a, 0.07, 21, 2.1).map((p) => { p.x *= 1.09; p.z *= 1.09; return p; }), hem(a), NR, 1.05)); }
+    const hem = (a) => { const d = Math.abs(a) / DEG; return 0.40 + 0.10 * Math.pow(tri((d - 20) / 40), 0.9) + 0.14 * sm(120, 140, d); };
+    for (let c = 0; c < NC; c++) { const a = lerp(-A, A, c / (NC - 1)); cols.push(dropRows(skirtPath(a, 0.07, 21, 2.1).map((p) => { p.x *= 1.07; p.z *= 1.07; return p; }), hem(a), NR, 1.05)); }
     overCloth = makeCloth({ pleat: { n: 20, amp: 0.009, hem: 0.008, ph: 1.1 }, cols: NC, rows: NR, mask: 1 | 4, margin: 0.02, bend: 0.2, grav: 0.7, flutter: 0.8,
       rest: (c, r) => cols[c][r], pin: (c, r) => (r === 0 ? 1 : r === 1 ? 0.5 : 0.045), weights: (c, r) => (r < 2 ? [BI.hips, 0.5, BI.spine1, 0.5] : [BI.hips, 1]) });
-    addSolid(overCloth, veilTex(1024, 512, { top: '#33260f', mid: '#44341a', bottom: '#503e1c', glow: '#6e5826', dark: '#140e05', mottle: ['#5a461e', '#1e1508'], motif: PAL.goldDk, a0: 1, folds: 0.8, stripes: 18, sequins: 300, trim: 0.035, sideTrim: 0.008, dotScale: 1.2, bake: 'olive', bakeTiles: [8, 2] }),
-      { glow: '#8a7038', emi: 0.08, sheen: '#b89048', sheenK: 0.16 }, 4);
+    const otex = raggedTex(1024, 512, '#4a3c1c', '#6e5a2a', '#241c0c', 'olive');
+    addCut(overCloth, sheen(new THREE.MeshStandardMaterial({ map: otex.map, alphaMap: otex.alpha, alphaTest: 0.5, side: THREE.DoubleSide, roughness: 0.9 }), '#b89048', 2.2, 0.3), 4);
   })();
 
   // two shorter tiers of ragged black gauze above them, as painted: each a little wider than the one beneath, open at the front
   (function buildTiers() {
     const tex = raggedTex(1024, 512, '#2e242b', '#52434e', '#140e13', 'gauze'); tex.map.wrapS = tex.alpha.wrapS = THREE.RepeatWrapping;
-    for (const [k, A, hem0, amp, np, ph, NR, order] of [[1.07, 146, 0.36, 0.16, 11, 0.9, Q(16, 9), 4.4], [1.11, 152, 0.60, 0.14, 9, 2.3, Q(11, 7), 4.7]]) {
+    for (const [k, A, hem0, amp, np, ph, NR, order] of [[1.03, 140, 0.30, 0.08, 9, 0.9, Q(18, 10), 4.2], [1.055, 144, 0.44, 0.08, 8, 2.9, Q(15, 9), 4.35], [1.085, 150, 0.58, 0.07, 9, 2.3, Q(12, 7), 4.6], [1.11, 156, 0.73, 0.06, 7, 4.1, Q(9, 6), 4.75]]) {
       const NC = Q(61, 33), cols = [], Ar = A * DEG;
       const hem = (a) => hem0 + amp * (tri(a / (TAU / np) + ph) - 0.4) + 0.035 * (h1(Math.round(a * 23 + ph * 7)) - 0.5) + 0.10 * sm(A - 22, A, Math.abs(a) / DEG);
       for (let c = 0; c < NC; c++) {
         const a = lerp(-Ar, Ar, c / (NC - 1));
-        cols.push(dropRows(skirtPath(a, 0.10, 23, ph * 3).map((p) => { const f = 1 + (k - 1) * sm(1.04, 0.8, p.y) + 0.04 * sm(0.9, 0.5, p.y); p.x *= f; p.z *= f; return p; }), hem(a), NR, 1.05));
+        cols.push(dropRows(skirtPath(a, 0.10, 23, ph * 3).map((p) => { const f = 1 + (k - 1) * sm(1.04, 0.8, p.y) + 0.015 * sm(0.9, 0.5, p.y); p.x *= f; p.z *= f; return p; }), hem(a), NR, 1.05));
       }
       const cloth = makeCloth({ pleat: { n: np > 10 ? 25 : 22, amp: 0.010, hem: 0.016, ph: ph }, cols: NC, rows: NR, mask: 1 | 4, margin: 0.012 + (k - 1) * 0.04, bend: 0.3, grav: 0.7, drag: 0.02, flutter: 0.7,
         rest: (c, r) => cols[c][r], pin: (c, r) => (r === 0 ? 1 : r === 1 ? 0.5 : 0.07), weights: (c, r) => (r < 2 ? [BI.hips, 0.5, BI.spine1, 0.5] : [BI.hips, 1]),

@@ -168,7 +168,12 @@
     }
     for (let i = 0; i < 90; i++) { const x = rnd() * W, y = H * rr(0.72, 0.98); ga.beginPath(); ga.ellipse(x, y, rr(1, W * 0.006), rr(2, H * 0.02), rr(-0.3, 0.3), 0, TAU); ga.fill(); }
     const map = ctex(c);
-    onBaked(bake, (im) => { tileBaked(g, im, W, H, 6, 2); g.fillStyle = eg; g.fillRect(0, H * 0.8, W, H * 0.2); map.needsUpdate = true; });
+    onBaked(bake, (im) => {                          // the painted cloth, in shadow under the tier above and catching light along its own hem, so each tier reads
+      tileBaked(g, im, W, H, 6, 2);
+      const sh = g.createLinearGradient(0, 0, 0, H * 0.45); sh.addColorStop(0, 'rgba(8,5,8,0.62)'); sh.addColorStop(1, 'rgba(8,5,8,0)'); g.fillStyle = sh; g.fillRect(0, 0, W, H * 0.45);
+      const e2 = g.createLinearGradient(0, H * 0.84, 0, H); e2.addColorStop(0, rgba(hi, 0)); e2.addColorStop(0.75, rgba(hi, 0.5)); e2.addColorStop(1, rgba(hi, 0.75)); g.fillStyle = e2; g.fillRect(0, H * 0.84, W, H * 0.16);
+      map.needsUpdate = true;
+    });
     return { map, alpha: ctex(ca, 0, 0, false) };
   }
   // purple leggings with a black flocked floral pattern; the white striped sock band sits at the boot top
