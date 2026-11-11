@@ -16,6 +16,8 @@ claude.ai Project "Flip Book Art", doc `claude/jester-3d-model.md`. Read that fi
 - `references/faces/`: five newer paintings of her face (November 11, 2026): front, two three-quarter views, from above and from
   below. They are used to check the head's shape from those angles (`fref.sh` renders the model beside them); the face
   painted on the model is still painting 08.
+- `references/boots/`: eight paintings of her boots (November 11, 2026): both sides, front pair, back, three-quarter, from above,
+  the sole, and a close view of the laces and sock. The boots in `src/31_boots.js` are built to them.
 - `references/Jester_Witch_HD_Flipbook.html`: Chris's HD flipbook, 58 painted frames stored as base64 AVIF in `const FR={...}`.
   This is the look to match. `lib/unavif.py` lists and extracts the frames.
 - `bake_hands.py`: makes the hands picture inside `jester_tex.js` (called by `bake.py`; can be run alone).
@@ -88,6 +90,33 @@ Things that were added to make them possible:
 Checked: every move over every stance (72 pairs) runs with no errors and no broken numbers; each was looked at in stills.
 Not yet done: no eyebrow motion (Ill Omen's "eyebrow lifts" is a head tilt and narrowed eyes); getting from one stance to
 another always stands up first; the run was tuned from stills, not from video; the hip bells do not rest on her lap when seated.
+
+## Her boots, and crossed legs (pass 16, November 11, 2026)
+
+Chris sent eight boot paintings and said that, sitting cross-legged or hovering, "her feet look like they break".
+
+**Boots** (`src/31_boots.js`, replacing the old block at the end of `30_body.js`). Built in code to the paintings; nothing is
+projected. Measured from the side painting at 0.28 mm a pixel: the sole is 26 cm long, 4.5 cm deep at the toe and 6.6 cm at the
+heel, and the collar is 26 cm up. Parts:
+
+- the upper: a shaft whose lower rings run out along the instep, and the foot from heel to round toe (`B_SH`, `B_FT`); the
+  tongue stands above the collar. Material `boot` is patent leather with a crease normal map made in code (`crinkleTex`).
+- the sole: one ridged wall from the lugs up to the welt, cut up at the arch between the block heel and the forefoot
+  (`B_YT` top edge, `B_HW` plan, `bBot`), with lugs round the edge and bars under the middle. `soleTex` draws the ridges, and
+  `v` is height so they stay level.
+- stitching: small yellow dashes laid on the surface in double rows (eyelet stays, back strap, heel counter, collar, toe cap)
+  and a bold row round the welt (`stitch`, `dash`). Thin raised tubes mark the panel edges (`seam`).
+- ten pairs of silver eyelets, crossed laces, a bow with two loops and two tails with metal tips.
+- the sock is its own part now (cream ribs, two grey stripes; `sockTex`), so the stripe band was taken off the leggings.
+
+The new textures use their own random seed, so no other pattern on her changed. Full detail is about 584k triangles.
+
+**Crossed legs.** A foot was always turned to face the ground, whatever its shin was doing, so with her legs folded the ankle
+bent the wrong way. Feet now have a seventh number: how far the foot follows its own shin instead of the ground
+(`applyPose` in `src/75_pose.js`). `sit_ground` and `hover` set it to 1, with the right shin resting across the left.
+
+Not yet done: the bow is stiff (it does not swing); the boot's leather is one piece of colour, with no painted wear; the thick
+sole still bends at the ball when she rises on her toes.
 
 ## Building
 

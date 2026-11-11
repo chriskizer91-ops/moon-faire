@@ -8,7 +8,9 @@
     wine: sheen(std({ map: fabricTex(256, '#6e1a3a', '#8e2a50', '#3c0c20', 3, false, 'wine'), roughness: 0.92 }), '#e0608c', 2.6, 0.45),
     cloth: sheen(std({ map: fabricTex(256, BLK, BLK_HI, BLK_LO, 3), roughness: 0.94 }), WARM, 3, 0.3),
     leggings: sheen(std({ map: tLeg, roughness: 0.7 }), '#b890d8', 3, 0.2),
-    boot: phys({ color: lin(0x17131a), roughness: 0.24, clearcoat: 1, clearcoatRoughness: 0.12, envMapIntensity: 1.0 }),
+    boot: (() => { const n = crinkleTex(), k = new THREE.Vector2(0.6, 0.6); return phys({ color: lin(0x120e0e), roughness: 0.34, clearcoat: 1, clearcoatRoughness: 0.13, envMapIntensity: 1.0, normalMap: n, normalScale: k, clearcoatNormalMap: n, clearcoatNormalScale: k }); })(),
+    stitch: std({ color: lin(0xd9983a), roughness: 0.7 }), eyelet: std({ color: lin(0xc0bab4), roughness: 0.30, metalness: 1, envMapIntensity: 1.5 }), aglet: std({ color: lin(0x242024), roughness: 0.35, metalness: 0.9 }),
+    sock: std({ map: sockTex(), roughness: 0.95 }), lace: std({ color: lin(0x37333a), roughness: 0.82 }),
     sole: std({ map: soleTex(), roughness: 0.78 }),
     leather: std({ color: lin(0x1a1418), roughness: 0.42, envMapIntensity: 0.8 }),
     gold: std({ color: lin(0xd8a546), roughness: 0.3, metalness: 1, envMapIntensity: 1.6 }),
@@ -120,7 +122,7 @@
     hip: [0, 0, 0], hipR: [0, 0, 0], sp: [0, 0, 0], hd: [0, 0, 0], sh: [0, 0],
     hR: [-0.300, 0.868, 0.055], hL: [0.300, 0.868, 0.055], eR: [-0.55, -0.1, -1], eL: [0.55, -0.1, -1], twR: 0, twL: 0, wrR: [0.1, 0], wrL: [0.1, 0],
     fR: FP.relax.slice(), fL: FP.relax.slice(),
-    ftR: [0, 0, 0, -0.10, 0, 0], ftL: [0, 0, 0, 0.10, 0, 0], knR: [-0.12, 0, 1], knL: [0.12, 0, 1],
+    ftR: [0, 0, 0, -0.10, 0, 0, 0], ftL: [0, 0, 0, 0.10, 0, 0, 0], knR: [-0.12, 0, 1], knL: [0.12, 0, 1],
     eyes: 0, mouth: 0, glow: 0
   };
   const CHANS = Object.keys(REST);

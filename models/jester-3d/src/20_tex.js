@@ -15,13 +15,36 @@
     if (e.ok) cb(e.img); else e.cbs.push(cb);
     return true;
   }
-  function soleTex() {                               // a lugged rubber sole: welt stitching along the top, deep treads below
-    const W = Math.round(512 * TEXS), H = Math.round(64 * TEXS), c = cvs(W, H), g = c.getContext('2d');
-    g.fillStyle = '#1c161a'; g.fillRect(0, 0, W, H);
-    for (let i = 0; i < 28; i++) { const x = (i + 0.5) / 28 * W; g.fillStyle = '#060406'; g.fillRect(x - W / 28 * 0.17, H * 0.42, W / 28 * 0.34, H * 0.58); g.fillStyle = 'rgba(90,76,84,0.5)'; g.fillRect(x + W / 28 * 0.17, H * 0.44, W / 28 * 0.08, H * 0.56); }
-    g.fillStyle = '#3a2c2c'; g.fillRect(0, H * 0.16, W, H * 0.16); g.fillStyle = '#b8a890';
-    for (let i = 0; i < 90; i++) g.fillRect((i + 0.2) / 90 * W, H * 0.215, W / 90 * 0.55, Math.max(1, H * 0.05));
-    return ctex(c);
+  function soleTex() {                               // ridged rubber: fine level grooves all the way up the wall of the sole (v is height, 0 to 7 cm)
+    const W = Math.round(256 * TEXS), H = Math.round(256 * TEXS), c = cvs(W, H), g = c.getContext('2d'), N = 30, seed0 = seed; seed = 4711;      // its own dice, so nothing else's pattern shifts
+    g.fillStyle = '#1d1a1c'; g.fillRect(0, 0, W, H);
+    for (let i = 0; i < N; i++) { const y = (i + 0.5) / N * H, h = H / N; g.fillStyle = '#070607'; g.fillRect(0, y - h * 0.5, W, h * 0.34); g.fillStyle = 'rgba(92,86,90,0.55)'; g.fillRect(0, y - h * 0.10, W, h * 0.22); }
+    for (let i = 0; i < 260; i++) { g.fillStyle = 'rgba(' + (rnd() < 0.5 ? '120,112,116' : '0,0,0') + ',' + rr(0.03, 0.10) + ')'; g.fillRect(rnd() * W, rnd() * H, rr(8, 60) * TEXS, rr(1, 2.2) * TEXS); }
+    seed = seed0; return ctex(c, 1, 1);
+  }
+  function sockTex() {                               // a ribbed cream sock with two grey stripes near its top
+    const W = Math.round(512 * TEXS), H = Math.round(128 * TEXS), c = cvs(W, H), g = c.getContext('2d'), N = 46, seed0 = seed; seed = 9001;
+    g.fillStyle = '#d6cfc2'; g.fillRect(0, 0, W, H);
+    for (const [v0, v1] of [[0.685, 0.735], [0.785, 0.835]]) { g.fillStyle = '#4b484d'; g.fillRect(0, (1 - v1) * H, W, (v1 - v0) * H); }
+    for (let i = 0; i < N; i++) { const x = (i + 0.5) / N * W, w = W / N; g.fillStyle = 'rgba(40,34,30,0.42)'; g.fillRect(x - w * 0.5, 0, w * 0.22, H); g.fillStyle = 'rgba(255,250,240,0.20)'; g.fillRect(x - w * 0.08, 0, w * 0.30, H); }
+    for (let i = 0; i < 900; i++) { g.fillStyle = 'rgba(' + (rnd() < 0.5 ? '255,255,250' : '60,52,46') + ',' + rr(0.03, 0.09) + ')'; g.fillRect(rnd() * W, rnd() * H, rr(1, 3) * TEXS, rr(1, 4) * TEXS); }
+    seed = seed0; return ctex(c, 1, 1);
+  }
+  function crinkleTex() {                            // the creases of patent leather, as a normal map that tiles
+    const S = Math.round(256 * TEXS), h = new Float32Array(S * S), c = cvs(S, S), g = c.getContext('2d'), im = g.createImageData(S, S), d = im.data, seed0 = seed; seed = 2026;
+    for (let k = 0; k < 44; k++) {
+      const cx = rnd() * S, cy = rnd() * S, th = rr(-0.55, 0.55) + (rnd() < 0.12 ? PI / 2 : 0), L = rr(22, 70) * TEXS, w = rr(5, 11) * TEXS, amp = rr(0.5, 1.3) * (rnd() < 0.6 ? 1 : -1), ct = Math.cos(th), st = Math.sin(th), R = Math.ceil(L * 2.2);
+      for (let dy = -R; dy <= R; dy++) for (let dx = -R; dx <= R; dx++) {
+        const al = dx * ct + dy * st, ac = -dx * st + dy * ct + 0.6 * w * Math.sin(al / L * 2.2); if (Math.abs(ac) > w * 3 || Math.abs(al) > L * 2.2) continue;
+        const x = ((Math.round(cx) + dx) % S + S) % S, y = ((Math.round(cy) + dy) % S + S) % S; h[y * S + x] += amp * Math.exp(-ac * ac / (w * w)) * Math.exp(-al * al / (L * L));
+      }
+    }
+    for (let k = 0; k < 30; k++) { const cx = rnd() * S, cy = rnd() * S, r = rr(14, 40) * TEXS, amp = rr(-1.2, 1.2), R = Math.ceil(r * 2.2); for (let dy = -R; dy <= R; dy++) for (let dx = -R; dx <= R; dx++) { const x = ((Math.round(cx) + dx) % S + S) % S, y = ((Math.round(cy) + dy) % S + S) % S; h[y * S + x] += amp * Math.exp(-(dx * dx + dy * dy) / (r * r)); } }
+    for (let y = 0; y < S; y++) for (let x = 0; x < S; x++) {
+      const gx = h[y * S + (x + 1) % S] - h[y * S + (x + S - 1) % S], gy = h[((y + 1) % S) * S + x] - h[((y + S - 1) % S) * S + x], k = 0.62 / TEXS, nx = -gx * k, ny = gy * k, l = Math.hypot(nx, ny, 1), o = (y * S + x) * 4;
+      d[o] = 127.5 + 127.5 * nx / l; d[o + 1] = 127.5 + 127.5 * ny / l; d[o + 2] = 127.5 + 127.5 / l; d[o + 3] = 255;
+    }
+    g.putImageData(im, 0, 0); seed = seed0; return ctex(c, 1, 1, false);
   }
   function bakedTex(key, W, H, fill) {             // a canvas that becomes the baked image once it has decoded
     W = Math.round(W * TEXS); H = Math.round(H * TEXS);
@@ -184,7 +207,7 @@
     blobs(g, W, H, 100, [PAL.purpleDk], W * 0.04, W * 0.14, 0.08, 0.22);
     const ink = '#150c1c';
     for (let i = 0; i < 230; i++) {
-      const x = rnd() * W, y = rnd() * H * 0.80, s = rr(W * 0.024, W * 0.056), rot = rnd() * TAU, k = rnd();
+      const x = rnd() * W, y = rnd() * H * 0.93, s = rr(W * 0.024, W * 0.056), rot = rnd() * TAU, k = rnd();
       for (const dx of [0, -W, W]) {
         g.save(); g.translate(x + dx, y); g.rotate(rot); g.fillStyle = ink;
         if (k < 0.55) { for (let p = 0; p < 4; p++) { g.rotate(TAU / 4); g.beginPath(); g.ellipse(0, s * 0.62, s * 0.3, s * 0.52, 0, 0, TAU); g.fill(); } dot(g, 0, 0, s * 0.22, ink); }
@@ -193,13 +216,11 @@
         g.restore();
       }
     }
-    for (let i = 0; i < 500; i++) dot(g, rnd() * W, rnd() * H * 0.80, rr(0.8, 2.4) * TEXS, ink);
-    const y0 = H * 0.800, y1 = H * 0.885;             // sock band
-    g.fillStyle = '#ded9e6'; g.fillRect(0, y0, W, y1 - y0);
-    g.fillStyle = '#6d6580'; g.fillRect(0, y0 + (y1 - y0) * 0.28, W, (y1 - y0) * 0.14); g.fillRect(0, y0 + (y1 - y0) * 0.6, W, (y1 - y0) * 0.14);
-    g.fillStyle = '#0d0a10'; g.fillRect(0, y1, W, H - y1);
+    for (let i = 0; i < 500; i++) dot(g, rnd() * W, rnd() * H * 0.93, rr(0.8, 2.4) * TEXS, ink);
+    const y0 = H * 0.930;                             // the leggings run down into the sock, which is its own part now (31_boots.js)
+    g.fillStyle = '#0d0a10'; g.fillRect(0, y0, W, H - y0);
     const t = ctex(c);
-    onBaked('leggings', (im) => { g.save(); g.beginPath(); g.rect(0, 0, W, y0); g.clip(); tileBaked(g, im, W, y0, 2, 4); g.restore(); t.needsUpdate = true; });
+    onBaked('leggings', (im) => { g.save(); g.beginPath(); g.rect(0, 0, W, y0); g.clip(); tileBaked(g, im, W, y0, 2, 5); g.restore(); t.needsUpdate = true; });
     return t;
   }
   // black ruffle lace: opaque cloth that breaks into a scalloped lace edge (v = 1 is the edge)

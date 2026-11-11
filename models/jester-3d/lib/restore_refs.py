@@ -3,6 +3,6 @@
 import glob, os
 from PIL import Image
 W = '/home/claude/work/'
-for sub, out in (('chatgpt', 'in'), ('hands', 'in3'), ('faces', 'in4')):
+for sub, out in (('chatgpt', 'in'), ('hands', 'in3'), ('faces', 'in4'), ('boots', 'in5')):
     os.makedirs(W + out, exist_ok=True)
     for f in sorted(glob.glob(W + 'references/' + sub + '/*.webp')): Image.open(f).save(W + out + '/' + os.path.basename(f)[:-5] + '.png')
