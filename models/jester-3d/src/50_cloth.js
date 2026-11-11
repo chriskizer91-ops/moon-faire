@@ -86,6 +86,23 @@
     geo.setAttribute('position', new THREE.BufferAttribute(gpos, 3)); geo.setAttribute('normal', new THREE.BufferAttribute(gnor, 3)); geo.setAttribute('uv', new THREE.BufferAttribute(guv, 2));
     geo.setIndex(nv > 65535 ? new THREE.Uint32BufferAttribute(gi, 1) : new THREE.Uint16BufferAttribute(gi, 1));
     const out = { o, n, pos, prev, pin, geo, tris: gi.length / 3, meshes: [], NC, NR, id };
+    // Pleats. The simulated sheet stays coarse; what is drawn is K times finer, each fine point pushed along the sheet's normal by a fixed pattern of
+    // folds: gathers that deepen down the cloth, and a ripple along the hem. The pattern is worked out once; each frame only interpolates and adds.
+    const PL = o.pleat, K = PL ? (PL.k || Q(3, 2)) : 1; let fine = null;
+    if (K > 1) {
+      const FC = (VC - 1) * K + 1, FR = (NR - 1) * K + 1, fn = FC * FR, fpos = new Float32Array(fn * 3), fnor = new Float32Array(fn * 3), fuv = new Float32Array(fn * 2), fi = [];
+      const p0 = new Float32Array(fn * 3), tp = new Float32Array(NR * FC * 3), tn = new Float32Array(NR * FC * 3), dd = new Float32Array(fn), nP = PL.n || 40, amp = PL.amp || 0.007, hemA = PL.hem || 0;
+      for (let fr = 0; fr < FR; fr++) for (let fc = 0; fc < FC; fc++) {
+        const su = fc / (FC - 1), sv = fr / (FR - 1), k = fr * FC + fc, r0 = Math.min(NR - 2, Math.floor(fr / K)), c0 = Math.min(VC - 2, Math.floor(fc / K)), tr = fr / K - r0, tc = fc / K - c0;
+        for (let q = 0; q < 2; q++) { const A = guv[(r0 * VC + c0) * 2 + q], B = guv[(r0 * VC + c0 + 1) * 2 + q], Cc = guv[((r0 + 1) * VC + c0) * 2 + q], D = guv[((r0 + 1) * VC + c0 + 1) * 2 + q]; fuv[k * 2 + q] = (A + (B - A) * tc) * (1 - tr) + (Cc + (D - Cc) * tc) * tr; }
+        const env = sm(0.03, 0.30, sv) * (0.7 + 0.3 * sv);
+        dd[k] = amp * env * (Math.sin(TAU * nP * su + 1.3 * Math.sin(TAU * 2 * sv) + (PL.ph || 0)) + 0.18 * Math.sin(TAU * 2 * nP * su + 2.1 + 3 * sv)) + hemA * Math.pow(sv, 5) * Math.sin(TAU * (nP + 7) * su + 0.6);
+      }
+      for (let fr = 0; fr < FR - 1; fr++) for (let fc = 0; fc < FC - 1; fc++) { const A = fr * FC + fc, B = A + 1, D = A + FC, E = D + 1; fi.push(A, D, B, B, D, E); }
+      geo.setAttribute('position', new THREE.BufferAttribute(fpos, 3)); geo.setAttribute('normal', new THREE.BufferAttribute(fnor, 3)); geo.setAttribute('uv', new THREE.BufferAttribute(fuv, 2));
+      geo.setIndex(fn > 65535 ? new THREE.Uint32BufferAttribute(fi, 1) : new THREE.Uint16BufferAttribute(fi, 1));
+      out.tris = fi.length / 3; fine = { FC, FR, fpos, fnor, p0, tp, tn, dd };
+    }
     const margin = o.margin || 0.01, grav = (o.grav == null ? 0.62 : o.grav) * 9.81, keep = 1 - (o.drag == null ? 0.014 : o.drag), flut = o.flutter == null ? 1 : o.flutter;
     // skinned targets: where each particle would sit if it were simply skinned to its bones
     function targets() {
@@ -151,6 +168,25 @@
         const bx = pos[idn * 3] - pos[iu * 3], by = pos[idn * 3 + 1] - pos[iu * 3 + 1], bz = pos[idn * 3 + 2] - pos[iu * 3 + 2];
         let nx = by * az - bz * ay, ny = bz * ax - bx * az, nz = bx * ay - by * ax; const l = Math.sqrt(nx * nx + ny * ny + nz * nz) || 1;
         gpos[v] = pos[i * 3]; gpos[v + 1] = pos[i * 3 + 1]; gpos[v + 2] = pos[i * 3 + 2]; gnor[v] = nx / l; gnor[v + 1] = ny / l; gnor[v + 2] = nz / l;
+      }
+      if (fine) {
+        const FC = fine.FC, FR = fine.FR, fpos = fine.fpos, fnor = fine.fnor, p0 = fine.p0, tp = fine.tp, tn = fine.tn, dd = fine.dd, W3 = FC * 3;
+        for (let r = 0; r < NR; r++) for (let fc = 0; fc < FC; fc++) {              // along each simulated row
+          const c0 = Math.min(VC - 2, (fc / K) | 0), t = fc / K - c0, a = (r * VC + c0) * 3, k = (r * FC + fc) * 3;
+          tp[k] = gpos[a] + (gpos[a + 3] - gpos[a]) * t; tp[k + 1] = gpos[a + 1] + (gpos[a + 4] - gpos[a + 1]) * t; tp[k + 2] = gpos[a + 2] + (gpos[a + 5] - gpos[a + 2]) * t;
+          tn[k] = gnor[a] + (gnor[a + 3] - gnor[a]) * t; tn[k + 1] = gnor[a + 1] + (gnor[a + 4] - gnor[a + 1]) * t; tn[k + 2] = gnor[a + 2] + (gnor[a + 5] - gnor[a + 2]) * t;
+        }
+        for (let fr = 0; fr < FR; fr++) {                                         // then down between the rows
+          const r0 = Math.min(NR - 2, (fr / K) | 0), t = fr / K - r0, ra = r0 * W3, ko = fr * W3;
+          for (let j = 0; j < W3; j++) { p0[ko + j] = tp[ra + j] + (tp[ra + W3 + j] - tp[ra + j]) * t; fnor[ko + j] = tn[ra + j] + (tn[ra + W3 + j] - tn[ra + j]) * t; }
+        }
+        for (let fr = 0; fr < FR; fr++) for (let fc = 0; fc < FC; fc++) {          // push each point out along the fold pattern and lean its normal with the fold
+          const k = fr * FC + fc, k3 = k * 3, kl = fc > 0 ? k - 1 : k, kr = fc < FC - 1 ? k + 1 : k, d = dd[k];
+          const ex = p0[kr * 3] - p0[kl * 3], ey = p0[kr * 3 + 1] - p0[kl * 3 + 1], ez = p0[kr * 3 + 2] - p0[kl * 3 + 2], sl = (dd[kr] - dd[kl]) / (ex * ex + ey * ey + ez * ez + 1e-9);
+          const nx = fnor[k3], ny = fnor[k3 + 1], nz = fnor[k3 + 2];
+          fpos[k3] = p0[k3] + nx * d; fpos[k3 + 1] = p0[k3 + 1] + ny * d; fpos[k3 + 2] = p0[k3 + 2] + nz * d;
+          fnor[k3] = nx - sl * ex; fnor[k3 + 1] = ny - sl * ey; fnor[k3 + 2] = nz - sl * ez;
+        }
       }
       geo.attributes.position.needsUpdate = true; geo.attributes.normal.needsUpdate = true;
     };

@@ -58,7 +58,7 @@
     const NC = Q(84, 44), NR = Q(18, 10), cols = [];
     const hem = (a) => { const f = Math.abs(a) / PI; return lerp(0.13, 0.82, Math.pow(sm(0.70, 0.90, f), 1.1)) + 0.11 * tri(a / (TAU / 13)) - 0.03 + 0.03 * (h1(Math.round(a * 20)) - 0.5); };
     for (let c = 0; c < NC; c++) { const a = -PI + (c / NC) * TAU; cols.push(dropRows(skirtPath(a, 0.075, 19, 0.6), hem(a), NR, 1.06)); }
-    skirtCloth = makeCloth({ cols: NC, rows: NR, wrap: true, mask: 1 | 4, margin: 0.007, bend: 0.25, grav: 0.8, drag: 0.02, flutter: 0.5,
+    skirtCloth = makeCloth({ pleat: { n: 34, amp: 0.010, hem: 0.014 }, cols: NC, rows: NR, wrap: true, mask: 1 | 4, margin: 0.007, bend: 0.25, grav: 0.8, drag: 0.02, flutter: 0.5,
       rest: (c, r) => cols[c][r], pin: (c, r) => (r === 0 ? 1 : r === 1 ? 0.5 : 0.05), weights: (c, r, p) => (r < 2 ? [BI.hips, 0.5, BI.spine1, 0.5] : [BI.hips, 1]),
       uv: (c, r) => [c / NC * 3, 1 - r / (NR - 1)] });
     const tex = raggedTex(1024, 512, '#2b2229', '#4a3d48', '#120d12', 'gauze'); tex.map.wrapS = tex.alpha.wrapS = THREE.RepeatWrapping;
@@ -70,7 +70,7 @@
     const A = 140 * DEG, NC = Q(53, 29), NR = Q(16, 10), cols = [];
     const hem = (a) => { const d = Math.abs(a) / DEG; return 0.20 + 0.24 * Math.pow(tri((d - 20) / 40), 0.9) + 0.12 * sm(125, 140, d); };
     for (let c = 0; c < NC; c++) { const a = lerp(-A, A, c / (NC - 1)); cols.push(dropRows(skirtPath(a, 0.07, 21, 2.1).map((p) => { p.x *= 1.09; p.z *= 1.09; return p; }), hem(a), NR, 1.05)); }
-    overCloth = makeCloth({ cols: NC, rows: NR, mask: 1 | 4, margin: 0.02, bend: 0.2, grav: 0.7, flutter: 0.8,
+    overCloth = makeCloth({ pleat: { n: 20, amp: 0.009, hem: 0.008, ph: 1.1 }, cols: NC, rows: NR, mask: 1 | 4, margin: 0.02, bend: 0.2, grav: 0.7, flutter: 0.8,
       rest: (c, r) => cols[c][r], pin: (c, r) => (r === 0 ? 1 : r === 1 ? 0.5 : 0.045), weights: (c, r) => (r < 2 ? [BI.hips, 0.5, BI.spine1, 0.5] : [BI.hips, 1]) });
     addSolid(overCloth, veilTex(1024, 512, { top: '#33260f', mid: '#44341a', bottom: '#503e1c', glow: '#6e5826', dark: '#140e05', mottle: ['#5a461e', '#1e1508'], motif: PAL.goldDk, a0: 1, folds: 0.8, stripes: 18, sequins: 300, trim: 0.035, sideTrim: 0.008, dotScale: 1.2, bake: 'olive', bakeTiles: [8, 2] }),
       { glow: '#8a7038', emi: 0.08, sheen: '#b89048', sheenK: 0.16 }, 4);
@@ -86,7 +86,7 @@
         const a = lerp(-Ar, Ar, c / (NC - 1));
         cols.push(dropRows(skirtPath(a, 0.10, 23, ph * 3).map((p) => { const f = 1 + (k - 1) * sm(1.04, 0.8, p.y) + 0.04 * sm(0.9, 0.5, p.y); p.x *= f; p.z *= f; return p; }), hem(a), NR, 1.05));
       }
-      const cloth = makeCloth({ cols: NC, rows: NR, mask: 1 | 4, margin: 0.024 + (k - 1) * 0.06, bend: 0.3, grav: 0.7, drag: 0.02, flutter: 0.7,
+      const cloth = makeCloth({ pleat: { n: np > 10 ? 25 : 22, amp: 0.010, hem: 0.016, ph: ph }, cols: NC, rows: NR, mask: 1 | 4, margin: 0.024 + (k - 1) * 0.06, bend: 0.3, grav: 0.7, drag: 0.02, flutter: 0.7,
         rest: (c, r) => cols[c][r], pin: (c, r) => (r === 0 ? 1 : r === 1 ? 0.5 : 0.07), weights: (c, r) => (r < 2 ? [BI.hips, 0.5, BI.spine1, 0.5] : [BI.hips, 1]),
         uv: (c, r) => [c / (NC - 1) * 3, 1 - r / (NR - 1)] });
       addCut(cloth, sheen(new THREE.MeshStandardMaterial({ map: tex.map, alphaMap: tex.alpha, alphaTest: 0.5, side: THREE.DoubleSide, roughness: 0.92 }), '#94848e', 2.2, 0.5), order);
@@ -104,7 +104,7 @@
         const ctrl = [ell(0.086, 0.080, sa, 1.374, -0.010), ell(0.132, 0.110, sa, 1.344, -0.010), envPt(sa, 1.28, -0.012), envPt(sa, 1.16, -0.014), envPt(sa, 1.02, -0.014), envPt(sa, 0.90, -0.014)];
         cols.push(dropRows(ctrl, hem(a), NR, 1));
       }
-      const cloth = makeCloth({ cols: NC, rows: NR, mask: 1 | 2, margin: 0.040, bend: 0.25, grav: 0.7, flutter: 0.5,
+      const cloth = makeCloth({ pleat: { n: 5, amp: 0.004, hem: 0.004 }, cols: NC, rows: NR, mask: 1 | 2, margin: 0.040, bend: 0.25, grav: 0.7, flutter: 0.5,
         rest: (c, r) => cols[c][r], pin: (c, r) => (r === 0 ? 1 : r === 1 ? 0.5 : 0.03),
         weights: (c, r, p) => (p[1] > 1.33 ? [BI.spine3, 0.6, BI.neck, 0.4] : p[1] > 1.2 ? [BI['uarm' + S], 0.35, BI.spine3, 0.65] : [BI['uarm' + S], 0.75, BI.spine3, 0.25]) });
       addSolid(cloth, tex, { glow: '#8a7038', emi: 0.06, sheen: '#a88440', sheenK: 0.12 }, 9);
@@ -116,13 +116,13 @@
     const SHEER = { glow: '#d040a0', emi: 0.22, sheen: '#f070b0', sheenK: 0.3, rough: 0.5 }, WINE = { glow: '#c83080', emi: 0.14, sheen: '#e0508c', sheenK: 0.16 }, OLIVE = { glow: '#8a7038', emi: 0.12, sheen: '#c8a050', sheenK: 0.2 };
     const TIERS = [
       // the innermost tier: wine in shadow, the face of the fan seen from the front
-      { A: 114, inset: 0.030, ph: 9, up: 0, cap: 80, flat: 0.76, amp: 0.34, per: 38, shawl: true, order: 6, margin: 0.012, cols: Q(49, 27), rows: Q(40, 22), mat: WINE,
+      { pleat: { n: 18, amp: 0.012, hem: 0.006 }, A: 114, inset: 0.030, ph: 9, up: 0, cap: 80, flat: 0.76, amp: 0.34, per: 38, shawl: true, order: 6, margin: 0.012, cols: Q(49, 27), rows: Q(40, 22), mat: WINE,
         tex: { top: '#3a061c', mid: '#500a2c', bottom: '#66103a', glow: '#941e58', dark: '#14020a', mottle: ['#7a143c', '#20040c', '#4a0e42'], a0: 1, folds: 0.9, stripes: 15, sequins: 400, trim: 0.03, sideTrim: 0.012, dotScale: 1.4, bake: 'wine', bakeTiles: [8, 4] } },
       // the great veil: deep wine, gold-dotted lines, a band of gold down the middle
-      { A: 108, hk: 0.48, rise: 0.0010, inset: 0.012, ph: 0, up: 0, cap: 80, amp: 0.20, order: 8, margin: 0.024, cols: Q(73, 37), rows: Q(52, 28), main: true, sheer: true, mat: SHEER,
+      { pleat: { n: 30, amp: 0.010, hem: 0.012, ph: 0.7 }, A: 108, hk: 0.48, rise: 0.0010, inset: 0.012, ph: 0, up: 0, cap: 80, amp: 0.20, order: 8, margin: 0.024, cols: Q(73, 37), rows: Q(52, 28), main: true, sheer: true, mat: SHEER,
         tex: { top: '#5a0c3a', mid: '#78144e', bottom: '#8e2064', glow: '#c040a0', dark: '#2a0620', mottle: ['#a02468', '#3a0a2a', '#6a2090'], a0: 0.58, folds: 0.5, stripes: 17, center: true, sequins: 700, trim: 0.02, sideTrim: 0.008, dotScale: 1.6, whole: 'veil', wash: '#d2b4c8' } },
       // a short top tier over her shoulders and back, brighter
-      { A: 108, hk: 0.48, inset: 0, ph: 9, up: 0.30, cap: 40, amp: 0.18, order: 9, margin: 0.034, cols: Q(57, 31), rows: Q(30, 18), sheer: true, mat: SHEER,
+      { pleat: { n: 23, amp: 0.008, hem: 0.010, ph: 2.2 }, A: 108, hk: 0.48, inset: 0, ph: 9, up: 0.30, cap: 40, amp: 0.18, order: 9, margin: 0.034, cols: Q(57, 31), rows: Q(30, 18), sheer: true, mat: SHEER,
         tex: { top: '#64103e', mid: '#841a56', bottom: '#9c2870', glow: '#d050a8', dark: '#2e0822', mottle: ['#b02c74', '#40102e', '#7428a0'], a0: 0.55, folds: 0.5, stripes: 13, sequins: 420, trim: 0.03, sideTrim: 0.009, dotScale: 1.6, whole: 'veilTop', wash: '#d2b4c8' } }
     ];
     for (const T of TIERS) {
@@ -138,7 +138,7 @@
         cols.push(dropRows(ctrl, hem(a), NR, 1));
       }
       const wristPin = (p) => { const S = p[0] < 0 ? 'R' : 'L', w = restPts['wr' + S]; return 1 - sm(0.05, 0.11, Math.hypot(p[0] - w.x * 1.33, p[1] - (w.y + 0.04), p[2] - w.z)); };
-      const cloth = makeCloth({ cols: NC, rows: NR, mask: 1 | 2 | 8 | 16, margin: T.margin, bend: 0.14, grav: 0.6, drag: 0.016, flutter: 1,
+      const cloth = makeCloth({ pleat: T.pleat, cols: NC, rows: NR, mask: 1 | 2 | 8 | 16, margin: T.margin, bend: 0.14, grav: 0.6, drag: 0.016, flutter: 1,
         rest: (c, r) => cols[c][r],
         pin: (c, r, p) => { const u = r / (NR - 1); return Math.max(r === 0 ? 1 : u < 0.1 ? lerp(0.9, 0.12, u / 0.1) : lerp(0.06, 0.022, u), wristPin(p)); },
         weights: (c, r, p) => (wristPin(p) > 0.02 ? [BI['farm' + (p[0] < 0 ? 'R' : 'L')], 1] : T.shawl && p[1] > 1.25 ? [BI.spine3, 1] : wHang(p)) });

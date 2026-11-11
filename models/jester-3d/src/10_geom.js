@@ -40,7 +40,7 @@
   // fingers: [name, knuckle z, knuckle y, length, radius]
   const FINGERS = [['idx', 0.0275, -0.088, 0.070, 0.0086], ['mid', 0.0085, -0.091, 0.078, 0.0088], ['rng', -0.0105, -0.088, 0.072, 0.0083], ['pnk', -0.028, -0.080, 0.056, 0.0074]];
   const PHAL = [0.45, 0.30, 0.25];
-  const THUMB = { base: [0.006, -0.028, 0.030], dir: [0.22, -0.62, 0.75], len: [0.036, 0.030, 0.024], r: 0.0105 };
+  const THUMB = { base: [0.012, -0.036, 0.026], dir: [0.40, -0.84, 0.36], len: [0.036, 0.030, 0.024], r: 0.0105 };
   for (const [S, s] of SIDES) {
     for (const [fn, fz, fy, fl] of FINGERS) {
       let par = 'hand' + S, y = fy;

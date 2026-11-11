@@ -69,7 +69,7 @@
         const h = W['h' + S]; h[0] = s * (0.225 - 0.02 * swing); h[1] = 0.985 + 0.045 * Math.max(0, swing) + 0.01 * Math.cos(2 * ph); h[2] = 0.075 + 0.165 * swing;
         const e = W['e' + S]; e[0] = s * 0.5; e[1] = -0.3; e[2] = -1;
         W['tw' + S] = 0.25; W['wr' + S][0] = 0.12; W['wr' + S][1] = 0;
-        for (let i = 0; i < 6; i++) W['f' + S][i] = lerp(FP.relax[i], FP.fist[i], 0.72);
+        for (let i = 0; i < 6; i++) W['f' + S][i] = lerp(FP.relax[i], FP.fist[i], 0.16);      // loose hands as she walks (they were nearly fists, thumb out)
       }
       W.eyes = B.eyes; W.mouth = 0; W.glow = 0;
       blendPose(B, B, W, sm(0, 1, wb));
