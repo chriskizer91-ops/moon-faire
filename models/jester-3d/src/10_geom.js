@@ -37,14 +37,23 @@
     const w = restPts['wr' + (s < 0 ? 'R' : 'L')];
     return (out || V3()).set(w.x + mx * c - y * sn, w.y + mx * sn + y * c, w.z + z);
   }
-  // fingers: [name, knuckle z, knuckle y, length, radius]
-  const FINGERS = [['idx', 0.0275, -0.088, 0.070, 0.0086], ['mid', 0.0085, -0.091, 0.078, 0.0088], ['rng', -0.0105, -0.088, 0.072, 0.0083], ['pnk', -0.028, -0.080, 0.056, 0.0074]];
-  const PHAL = [0.45, 0.30, 0.25];
-  const THUMB = { base: [0.012, -0.036, 0.026], dir: [0.40, -0.84, 0.36], len: [0.036, 0.030, 0.024], r: 0.0105 };
+  // a direction of the canonical hand, turned onto either wrist
+  function handDir(s, x, y, z, out) {
+    const c = Math.cos(s * A_POSE), sn = Math.sin(s * A_POSE), mx = -s * x;
+    return (out || V3()).set(mx * c - y * sn, mx * sn + y * c, z);
+  }
+  // fingers: [name, knuckle z, knuckle y, length from the knuckle, radius, splay (radians toward the thumb), knuckle-to-web distance]
+  // read off the young-hand painting: 1 pixel = 0.2366 mm, the middle finger's axis at z 0.0085, its web at y -0.089.
+  // The knuckle joints sit inside the back of the hand, a little above the webs, as on a real hand.
+  const FINGERS = [['idx', 0.0291, -0.0725, 0.0916, 0.0073, 1.5 * DEG, 0.013], ['mid', 0.0085, -0.0760, 0.0970, 0.0071, 0, 0.013], ['rng', -0.0100, -0.0725, 0.0897, 0.0067, -1.6 * DEG, 0.013], ['pnk', -0.0282, -0.0709, 0.0633, 0.0058, -5.0 * DEG, 0.011]];
+  const PHAL = [0.50, 0.255, 0.245];
+  const fingerDir = (a) => [0, -Math.cos(a), Math.sin(a)];
+  // the thumb's first bone lies inside the heel of the hand, from the wrist to where the thumb comes free
+  const THUMB = { base: [0.008, -0.0062, 0.0286], dir: [0.12, -0.92, 0.37], len: [0.0432, 0.0310, 0.0256], r: 0.0077, roll: 60 * DEG };
   for (const [S, s] of SIDES) {
-    for (const [fn, fz, fy, fl] of FINGERS) {
-      let par = 'hand' + S, y = fy;
-      for (let k = 0; k < 3; k++) { const p = handPt(s, 0, y, fz); addBone(fn + k + S, par, p.x, p.y, p.z); par = fn + k + S; y -= fl * PHAL[k]; }
+    for (const [fn, fz, fy, fl, fr, fa] of FINGERS) {
+      let par = 'hand' + S, t = 0; const fd = fingerDir(fa);
+      for (let k = 0; k < 3; k++) { const p = handPt(s, 0, fy + fd[1] * t, fz + fd[2] * t); addBone(fn + k + S, par, p.x, p.y, p.z); par = fn + k + S; t += fl * PHAL[k]; }
     }
     const td = V3(...THUMB.dir).normalize(); let tp = V3(...THUMB.base), par = 'hand' + S;
     for (let k = 0; k < 3; k++) { const p = handPt(s, tp.x, tp.y, tp.z); addBone('thb' + k + S, par, p.x, p.y, p.z); par = 'thb' + k + S; tp = tp.clone().addScaledVector(td, THUMB.len[k]); }
@@ -85,7 +94,7 @@
   function addPart(key, part, wf, o) {
     o = o || {};
     const B = bucket(key), pos = part.pos, n = pos.length / 3; let idx = part.idx;
-    let nor = computeNormals(pos, idx, o.weld);
+    let nor = o.nor || computeNormals(pos, idx, o.weld);            // o.nor: normals worked out by the caller
     let flip = !!o.flip;
     if (o.out) {
       let s = 0; const c = o.out;

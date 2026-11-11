@@ -15,7 +15,31 @@ claude.ai Project "Flip Book Art", doc `claude/jester-3d-model.md`. Read that fi
 - `references/hands/`: the younger hand paintings (November 11, 2026); the left-hand picture is the one baked.
 - `references/Jester_Witch_HD_Flipbook.html`: Chris's HD flipbook, 58 painted frames stored as base64 AVIF in `const FR={...}`.
   This is the look to match. `lib/unavif.py` lists and extracts the frames.
+- `bake_hands.py`: makes the hands picture inside `jester_tex.js` (called by `bake.py`; can be run alone).
 - `shoot.py`, `shoot_site.py`, `fit.py`, `lib/`: headless render and comparison tools (Playwright with Chrome and SwiftShader).
+- `shoot2.py`: like `shoot.py`, but each view is a line of script, so the camera can be aimed anywhere. `hshots.sh` renders a hand
+  square-on from five sides, `fshots.sh` and `fclose.sh` render the head from eight and six angles, and `prof_cmp.py` prints her
+  painted profile beside the model's, millimetre by millimetre.
+
+## How the hands and the head are made (pass 13, November 11, 2026)
+
+- **Hands** (`src/32_hands.js`). Each hand is one continuous skin. The hand is described as a soft solid: a palm slab whose outline is
+  read off the hand painting, the two mounds at its heel, and four fingers and a thumb as tubes with their own width, pad and crease
+  tables, blended where they meet. Its surface is found on a 1.25 mm grid (2.2 mm at phone detail) with surface nets, each point is
+  then settled onto the solid, and the normals come from the solid, so creases and knuckles shade. The knuckle joints sit inside the
+  back of the hand, a little above the webs; the thumb's first bone runs from the wrist inside the heel of the hand and the thumb is
+  rolled 60 degrees so its pad faces the fingers. Sizes are in `FINGERS` and `THUMB` in `src/10_geom.js` (1 painting pixel = 0.2366 mm).
+  Nails are separate thin plates. The hands picture is 1024 x 1024: five finger strips on top, each wrapping once round its finger,
+  and the back and the palm laid flat below. Painted nails are removed from it, because the model has real ones.
+- **Head** (`src/40_head.js`). The head is a stack of rings, one per height. `FACE_MID` is her profile read off painting 07 with the
+  nose and lips taken away, `NOSE` is the nose that stands on it, and `FACE_V` says how the face turns back toward the ears at each
+  height. The outline seen from the front still comes from painting 08. Run `prof_cmp.py` after any change: the model's profile
+  should stay within about a millimetre of the painted one.
+- **Face paint.** One material mixes three pictures by which way the skin faces (`faceMix` in `buildHead`, the shader patch on
+  `MATS.face`): the front painting, the profile painting at the far edge of the cheek, and plain skin under the jaw and on the neck,
+  dimmed where the jaw shades it. The front painting is far sharper than the profile one, so it is used as far round as it will go.
+- The ruff sits about 2 cm lower than before so the neck shows, as in the paintings. The hair is a bob that comes out from under the
+  cap, lies against the neck and ends at the ruff.
 
 ## Building
 

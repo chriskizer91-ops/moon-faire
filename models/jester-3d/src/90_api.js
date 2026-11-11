@@ -41,7 +41,7 @@
       case 'crown': return at('head', 0, 1.70, 0);
       case 'handR': { const p = handPt(-1, 0.018, -0.06, 0.004); return at('handR', p.x, p.y, p.z); }
       case 'handL': { const p = handPt(1, 0.018, -0.06, 0.004); return at('handL', p.x, p.y, p.z); }
-      case 'tipR': { const p = handPt(-1, 0, -0.165, 0.027); return at('idx2R', p.x, p.y, p.z); }
+      case 'tipR': { const p = handPt(-1, 0, -0.164, 0.0315); return at('idx2R', p.x, p.y, p.z); }
       case 'tipL': { const p = handPt(1, 0, -0.165, 0.027); return at('idx2L', p.x, p.y, p.z); }
       case 'bells': return at('bell3', bellRest[3].x, bellRest[3].y - 0.035, bellRest[3].z);
       case 'feet': return out.set(0, 0, 0).applyMatrix4(root.matrixWorld);

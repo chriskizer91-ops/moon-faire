@@ -8,7 +8,7 @@ with sync_playwright() as p:
     logs = []
     pg.on('console', lambda m: logs.append(m.type + ': ' + m.text[:400]) if m.type in ('error',) or 'JLOG' in m.text else None)
     pg.on('pageerror', lambda e: logs.append('PAGEERR: ' + str(e)[:600]))
-    pg.goto('file:///home/claude/work/test.html')
+    import os; pg.goto('file:///home/claude/work/test.html' + os.environ.get('Q',''))
     pg.wait_for_function('window.T && (T.ok || T.err)', timeout=120000)
     err = pg.evaluate('T.err || ""')
     if err: print('BUILD ERROR', err); sys.exit(1)

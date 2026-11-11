@@ -48,6 +48,15 @@ function makeJester(opts) {
     return 0.5 * ((2 * p1) + (-p0 + p2) * u + (2 * p0 - 5 * p1 + 4 * p2 - p3) * u * u + (-p0 + 3 * p1 - 3 * p2 + p3) * u * u * u);
   }
   const cvs = (w, h) => { const c = document.createElement('canvas'); c.width = w; c.height = h; return c; };
+  // a smooth curve through [[x, v], ...] (x rising; v a number or a list), with no flat spots at the keys
+  const spline = (K, x) => {
+    const n = K.length; let i = 0; while (i < n - 2 && K[i + 1][0] < x) i++;
+    const x0 = K[i][0], x1 = K[i + 1][0], dx = x1 - x0, t = cl((x - x0) / dx, 0, 1), t2 = t * t, t3 = t2 * t;
+    const one = (c) => { const g = (j) => (c == null ? K[j][1] : K[j][1][c]), v0 = g(i), v1 = g(i + 1);
+      const m0 = i > 0 ? (v1 - g(i - 1)) / (x1 - K[i - 1][0]) : (v1 - v0) / dx, m1 = i < n - 2 ? (g(i + 2) - v0) / (K[i + 2][0] - x0) : (v1 - v0) / dx;
+      return (2 * t3 - 3 * t2 + 1) * v0 + (t3 - 2 * t2 + t) * dx * m0 + (-2 * t3 + 3 * t2) * v1 + (t3 - t2) * dx * m1; };
+    return typeof K[0][1] === 'number' ? one(null) : K[0][1].map((v, c) => one(c));
+  };
   const ctex = (c, rx, ry, srgb) => {
     const t = new THREE.CanvasTexture(c);
     if (rx) { t.wrapS = t.wrapT = THREE.RepeatWrapping; t.repeat.set(rx, ry || rx); }

@@ -31,6 +31,7 @@ f1,w1=fill(base,valid,18); f2,w2=fill(base,valid,60); t1=np.clip(w1*3,0,1)[...,N
 ext=f1*t1+(f2*t2+skin*(1-t2))*(1-t1)                       # skin carried outward from the face, fading to her plain skin tone
 keep=ndi.gaussian_filter(ndi.binary_erosion(valid>0.5,iterations=9).astype(np.float32),7)[...,None]; base=base*keep+ext*(1-keep)
 T['face']=uri(img(base),90); T['skin']='#%02x%02x%02x'%tuple(int(v) for v in skin)
+T['skinJaw']='#%02x%02x%02x'%tuple(int(v) for v in np.median(base[742:819,358:666].reshape(-1,3),0))      # the tone along her jaw, for the plain skin under it and on the neck
 ex=(N_EYE[1][0]-N_EYE[0][0])/2/PPM
 T['layout']={'eyeY':EYE_Y,'eyeX':round(ex,4),'mouthY':round(EYE_Y-D_EM,4),'noseY':round(EYE_Y-(690-408)/PPM,4),'browY':round(EYE_Y+(408-315)/PPM,4),'chinY':round(EYE_Y-(1215-408)/PPM,4),'bandY':round(EYE_Y+(408-130)/PPM,4)}
 T['faceEyes']=[[round(n2c(*N_EYE[i])[0]/S,4),round(n2c(*N_EYE[i])[1]/S,4)] for i in (0,1)]
@@ -144,29 +145,11 @@ def flood_backdrop(a, tol=(14,12,14)):
     bgc=np.median(a[:12,:12].reshape(-1,3),0); l=a.mean(-1); fl=np.sqrt(np.maximum(ndi.uniform_filter(l**2,5)-ndi.uniform_filter(l,5)**2,0))<4.5
     cand=(np.abs(a[...,0]-bgc[0])<tol[0])&(np.abs(a[...,1]-bgc[1])<tol[1])&(np.abs(a[...,2]-bgc[2])<tol[2])&fl
     lab,_=ndi.label(cand); e=np.unique(np.concatenate([lab[0],lab[-1],lab[:,0],lab[:,-1]])); return ndi.binary_dilation(np.isin(lab,e[e>0]),iterations=2)
-SK=np.array([int(T['skin'][i:i+2],16) for i in (1,3,5)],float)
-h16=arr(Image.open('/home/claude/work/in3/hands_young_left.png')); bd16=flood_backdrop(h16); ok16=(~bd16).astype(np.float32)
-gain=np.clip(SK/np.median(h16[600:750,200:300].reshape(-1,3),0),0.8,1.15); print('hand tone gain',np.round(gain,3))
-f16,_=fill(h16,ok16,6); h16=(h16*ok16[...,None]+f16*(1-ok16[...,None]))*gain
-sk16=((h16[...,0]>h16[...,1])&(h16[...,1]>h16[...,2]*0.9)&(h16[...,0]-h16[...,2]>28)&(h16.mean(-1)>105)); sk16=ndi.gaussian_filter(ndi.binary_erosion(sk16,iterations=2).astype(np.float32),2)[...,None]
-lo=np.stack([ndi.gaussian_filter(h16[...,c],9) for c in range(3)],-1); mid=np.stack([ndi.gaussian_filter(h16[...,c],2.5) for c in range(3)],-1)
-young=(lo+0.30*(mid-lo)+0.22*(h16-mid))*np.array([1.03,1.0,0.985])+np.array([6,3,2])     # younger skin: veins, tendons and fine wrinkles eased back, a little warmer; rings and nails untouched
-h16=h16*(1-0.0*sk16)+0.0*young*sk16     # no smoothing needed on the new painting
+# the hands picture is made by bake_hands.py (one continuous hand skin: five finger strips and two flat panels)
+import importlib.util as _ilu; _sp=_ilu.spec_from_file_location('bake_hands','/home/claude/work/bake_hands.py'); bake_hands=_ilu.module_from_spec(_sp); _sp.loader.exec_module(bake_hands)
+T['hands']=bake_hands.make('/home/claude/work/in3/hands_young_left.png', T.get('skin'), '/home/claude/work/shots/bake_hands.png')
+hands=arr(Image.open('/home/claude/work/shots/bake_hands.png').resize((512,512)))
 def samp(a,x,y): return np.stack([ndi.map_coordinates(a[...,c],[y,x],order=1,mode='nearest') for c in range(3)],-1)
-D={'idx':(417,440,425,108,30),'mid':(330,425,327,70,31),'rng':(252,440,243,116,30),'pnk':(175,455,148,236,24),'thb':(490,600,566,382,34)}      # base x,y, tip x,y, half-width: read off the gridded picture (true pixels)
-P={'idx':(836,430,822,106,30),'mid':(920,415,920,64,31),'rng':(998,430,1014,108,30),'pnk':(1068,460,1104,232,24),'thb':(760,590,680,382,34)}
-def strip(lm, s, t):                       # s: -1..1 across the finger (picture left to right), t: 0 at the base, 1 at the tip
-    bx,by,tx,ty,hw=lm; ax,ay=tx-bx,ty-by; L=np.hypot(ax,ay); ux,uy=ax/L,ay/L; nx,ny=-uy,ux
-    tt=-0.10+1.10*t; w=hw*(1-0.14*np.clip(tt,0,1)); return bx+ax*tt+nx*s*w, by+ay*tt+ny*s*w
-def quad(c0,c1,s,t):                       # trapezoid from wrist (t=0) to the knuckle line (t=1)
-    (x0,y0,w0),(x1,y1,w1)=c0,c1; return x0+(x1-x0)*t+s*(w0+(w1-w0)*t), y0+(y1-y0)*t
-def cell(Wc, dors, palm):
-    Hc=256; jj,ii=np.mgrid[0:Hc,0:Wc]; q=(ii+0.5)/Wc; t=1-jj/(Hc-1.0)
-    sp=np.where(q<0.25,-q/0.25,1-(q-0.75)/0.25); sd=1-(q-0.25)/0.5*2; isd=(q>=0.25)&(q<0.75)
-    xd,yd=dors(sd,t); xp,yp=palm(sp,t); return np.where(isd[...,None],samp(h16,xd,yd),samp(h16,xp,yp))
-cells=[cell(64,lambda s,t,k=k:strip(D[k],s,t),lambda s,t,k=k:strip(P[k],s,t)) for k in ('idx','mid','rng','pnk','thb')]
-cells.append(cell(192,lambda s,t:quad((330,880,100),(305,450,160),s,t),lambda s,t:quad((920,860,105),(935,445,160),s,t)))
-hands=np.concatenate(cells,1); T['hands']=uri(img(hands),90)
 # ---- profile ----
 h7=arr(Image.open(IN+'07_head_views.png')); X0,X1,Y0p,Y1p=1130,1400,262,560; c7=h7[Y0p:Y1p,X0:X1]
 skinm=(c7[...,0]>118)&(c7[...,0]-c7[...,2]>22)&(c7[...,0]>c7[...,1]); skinm=ndi.binary_fill_holes(ndi.binary_closing(skinm,np.ones((9,9),bool)))
@@ -181,11 +164,11 @@ col=samp(c7,px,py); m=ndi.map_coordinates(ndi.binary_erosion(skinm,iterations=9)
 ed=np.interp(py[:,0],np.arange(len(edge)),np.where(edge<9000,edge,edge[tip]+200))[:,None]; behind=px-ed
 def sms(a,b,x): t=np.clip((x-a)/(b-a),0,1); return t*t*(3-2*t)
 ex,ey=edge[nas]+34,nas+5; eye=sms(0.75,1.15,np.sqrt(((px-ex)/52)**2+((py-ey)/28)**2))
-alpha=ndi.gaussian_filter(m,2.0)*sms(20,55,behind)*eye
+alpha=ndi.gaussian_filter(m,2.0)*sms(6,22,behind)*eye      # where the profile painting may be used at all; how much of it is used is set on the model, by which way the skin faces
 okm=(m>0.9).astype(np.float32); fcol,_=fill(col,okm,8); col=col*okm[...,None]+fcol*(1-okm[...,None])
 # tone: match the cheek of the front painting
 cx0,cy0=n2c(CX+0.048*PPM,N_EYE[0][1]+(EYE_Y-1.485)*PPM); front_cheek=base[int(cy0)-25:int(cy0)+25,int(cx0)-20:int(cx0)+20].reshape(-1,3).mean(0)
-sel=(alpha>0.9)&(np.abs(yy-1.485)<0.012); side_cheek=col[sel].mean(0) if sel.sum()>50 else front_cheek; g2=np.clip(front_cheek/side_cheek,0.85,1.18); print('side tone gain',np.round(g2,3),'opaque share',round(float((alpha>0.9).mean()),3))
+sel=(alpha>0.9)&(np.abs(yy-1.485)<0.012); side_cheek=col[sel].mean(0) if sel.sum()>50 else front_cheek; g2=np.clip(front_cheek/side_cheek,0.70,1.20); print('side tone gain',np.round(g2,3),'opaque share',round(float((alpha>0.9).mean()),3))
 T['faceSide']=uri(img(col*g2),90); T['faceSideA']=uri(img(np.repeat((alpha*255)[...,None],3,-1)),88); T['faceSideWin']=list(WINS)
 js='window.JESTER_TEX='+json.dumps(T,separators=(',',':'))+';'; open(OUT+'jester_tex.js','w').write(js); print('jester_tex.js',len(js)//1024,'KB')
 chk=Image.new('RGB',(512+420+420,540),(40,40,40)); chk.paste(img(hands),(0,0)); chk.paste(img(col*g2),(512,0)); chk.paste(img(col*g2*alpha[...,None]+np.array([0,255,0])*(1-alpha[...,None])),(932,0)); chk.save('/home/claude/work/shots/bake3.png')

@@ -1,50 +1,79 @@
 
   // ---------- head: a sculpted oval with soft features; the face itself is painted (and repainted to blink) ----------
-  const HC = V3(0, 1.555, 0.002), HR = { x: 0.070, yT: 0.092, yB: 0.140, zF: 0.095, zB: 0.083 };     // skull: lower crown and shallower back, as in her profile
+  const HC = V3(0, 1.555, 0.002), HR = { x: 0.070, yT: 0.092, yB: 0.140, zF: 0.0985, zB: 0.083 };     // skull: lower crown and shallower back, as in her profile
   const LAY = (BAKED && BAKED.layout) || {};          // where the features sit in the painted face
   const FC = { eyeY: LAY.eyeY || 1.5246, eyeX: LAY.eyeX || 0.0304, ew: 0.0135, eh: 0.0056, browY: LAY.browY || 1.5368, noseY: LAY.noseY || 1.4877, mouthY: LAY.mouthY || 1.4586 };
   const FACE = { x0: -0.1, x1: 0.1, y0: 1.385, y1: 1.585 };          // the face canvas covers this window, seen from the front
+  // The face is set out from her paintings. Its outline comes from the front view (08): the half width at each height.
+  // Its profile comes from the side view (07), read off at 1500 pixels a metre with the tip of the nose as the fixed point:
+  // FACE_MID is the middle line with the nose and lips taken away [height, metres forward of the ear line], NOSE is how far the
+  // nose stands out from it, and FACE_V says how the face turns back toward the ears at each height (0: round like an egg;
+  // more: straighter from chin to jaw, the way a jaw is; less than 0: flat across, the way a brow is).
+  const FACE_MID = [[1.4174, 0.0825], [1.4200, 0.0861], [1.4240, 0.0887], [1.4300, 0.0884], [1.4380, 0.0891], [1.4454, 0.0908], [1.4520, 0.0921], [1.4586, 0.0941], [1.4630, 0.0952], [1.4680, 0.0954],
+    [1.4747, 0.0956], [1.4800, 0.0956], [1.4900, 0.0947], [1.5000, 0.0943], [1.5100, 0.0948], [1.5220, 0.0946], [1.5300, 0.0964], [1.5387, 0.1000], [1.5500, 0.0989], [1.5550, 0.0985]];
+  const NOSE = [[1.4680, 0], [1.4700, 0.0019], [1.4720, 0.0031], [1.4747, 0.0035], [1.4760, 0.0040], [1.4774, 0.0052], [1.4787, 0.0104], [1.4800, 0.0135], [1.4840, 0.0172], [1.4880, 0.0189], [1.4920, 0.0171], [1.4980, 0.0125], [1.5040, 0.0092], [1.5100, 0.0059], [1.5160, 0.0023], [1.5220, 0.0004], [1.5260, 0]];
+  const NOSE_W = [[1.4680, 0.0050], [1.4760, 0.0050], [1.4800, 0.0064], [1.4880, 0.0094], [1.4960, 0.0078], [1.5080, 0.0060], [1.5260, 0.0056]];
+  const FACE_V = [[1.4150, 0.30], [1.4300, 0.40], [1.4450, 0.44], [1.4586, 0.40], [1.4760, 0.22], [1.4975, 0.02], [1.5246, -0.12], [1.5400, -0.10], [1.5550, 0]];
+  // how wide a ring of the lower head is, from 1 at the cheeks to 0 under the chin: the last tenth closes quickly, so the jaw has an edge and a flat underside
+  const SIN9 = Math.sqrt(1 - 0.81), SN9 = Math.pow(SIN9, 0.60), snLow = (sp, t) => (t > 0.9 ? SN9 * Math.pow(sp / SIN9, 0.40) : Math.pow(sp, 0.60));
+  const T_CHIN = (HC.y - FACE_MID[0][0]) / HR.yB, SN_CHIN = snLow(Math.sqrt(1 - T_CHIN * T_CHIN), T_CHIN), RZ_CHIN = FACE_MID[0][1] - 0.050 * T_CHIN * T_CHIN * T_CHIN;
   function headPoint(a, ph, grow) {                 // a: angle from the front toward her left; ph: 0 at the crown, PI at the chin
-    const yn = Math.cos(ph), s = Math.sin(a), c = Math.cos(a), g = grow || 0, t = Math.max(0, -yn), sn = yn < 0 ? Math.pow(Math.sin(ph), 0.60) : Math.sin(ph);
-    let x = (HR.x + g) * sn * s, y = (yn >= 0 ? HR.yT : HR.yB) * yn + (yn >= 0 ? g * yn : g * yn), z = ((c >= 0 ? HR.zF : HR.zB) + g) * sn * c;
-    x *= 1 - 0.16 * sm(0.5, 1.0, t);              // a narrower jaw
-    if (c > 0) z *= 1 - 0.11 * sm(0.3, 1.0, t) * c;  // the lower face sits back a little
-    if (c > 0 && !g) {
-      const f = c * c, ax = Math.abs(x), G = (dx, dy, wx, wy) => Math.exp(-Math.pow(dx / wx, 2) - Math.pow(dy / wy, 2));
-      let d = 0; const Y = HC.y + y, NT = FC.noseY, up = (FC.eyeY + 0.004 - Y) / (FC.eyeY + 0.004 - NT);
-      // nose: a straight bridge rising from between the eyes to the tip, cut back under it; narrow at the bridge, wider at the tip
-      const ridge = Y >= NT ? 0.0165 * Math.pow(cl(up, 0, 1), 1.25) : 0.0165 * Math.exp(-Math.pow((NT - Y) / 0.0066, 2)), nw = lerp(0.0062, 0.0105, cl(up, 0, 1));
-      d += ridge * Math.exp(-Math.pow(x / nw, 2)) + 0.0050 * G(ax - 0.0115, Y - (NT - 0.0055), 0.0062, 0.0062);
-      d -= 0.0050 * G(ax - FC.eyeX, Y - FC.eyeY, 0.017, 0.0105) + 0.0022 * G(ax - 0.014, Y - (FC.eyeY - 0.002), 0.007, 0.010);   // eye sockets, deepest beside the bridge
-      d += 0.0034 * G(ax - 0.027, Y - (FC.browY + 0.002), 0.026, 0.008);                        // brow
-      d += 0.0028 * G(ax - FC.eyeX, Y - FC.eyeY, 0.0105, 0.0066) - 0.0010 * G(ax - FC.eyeX, Y - (FC.eyeY + 0.0088), 0.014, 0.0024);   // the eyeball rounding out of its socket, and the crease of the lid above it
-      d -= 0.0011 * G(x, Y - (FC.mouthY + 0.0135), 0.0034, 0.0055);                             // the groove under the nose
-      d += 0.0072 * G(x, Y - (FC.mouthY + 0.0062), 0.020, 0.0058) + 0.0062 * G(x, Y - (FC.mouthY - 0.0078), 0.016, 0.0058);  // lips
-      d -= 0.0016 * G(ax - 0.024, Y - FC.mouthY, 0.006, 0.008);                                 // corners of the mouth
-      d += 0.0036 * G(x, Y - 1.4325, 0.019, 0.011);                                             // chin
-      d += 0.0042 * G(ax - 0.041, Y - (NT + 0.008), 0.024, 0.026);                              // cheekbones
-      z += d * f;
+    const yn = Math.cos(ph), s = Math.sin(a), c = Math.cos(a), g = grow || 0, t = Math.max(0, -yn), sn = yn < 0 ? snLow(Math.sin(ph), t) : Math.sin(ph);
+    let y = (yn >= 0 ? HR.yT : HR.yB) * yn + g * yn; const Y = HC.y + (yn >= 0 ? HR.yT : HR.yB) * yn;
+    const x = ((HR.x * sn) * (1 - 0.16 * sm(0.5, 1.0, t)) + g * Math.min(1, sn * 3)) * s;      // the outline from the front, narrowing to the jaw
+    const zc = 0.050 * t * t * t;                   // the lower head sits forward, so the chin hangs under the mouth; the corners of the jaw stay back near the ears
+    let z;
+    if (c < 0) z = zc * (1 - 0.95 * sm(0, -0.9, c)) + (HR.zB + g) * sn * c;      // only the face comes forward: the back of the head runs straight down into the nape
+    else {
+      const rz = (yn >= 0 ? HR.zF * sn : t > T_CHIN ? RZ_CHIN * sn / SN_CHIN : spline(FACE_MID, Y) - zc) + g * Math.min(1, sn * 3), v = yn >= 0 ? 0 : spline(FACE_V, Y), s2 = s * s;
+      z = zc + rz * (c - v * s2 * Math.pow(c, 1.5));
+      if (!g && yn < 0.35) {
+        const f = c, ax = Math.abs(x), G = (dx, dy, wx, wy) => Math.exp(-Math.pow(dx / wx, 2) - Math.pow(dy / wy, 2));
+        let d = 0; const NT = FC.noseY;
+        // nose: the bridge and the ball of the tip, the wings of the nostrils, the folds where they meet the cheek, the hollows under it
+        if (Y > 1.468 && Y < 1.526) d += spline(NOSE, Y) * Math.exp(-Math.pow(x / spline(NOSE_W, Y), 2));
+        d += 0.0062 * G(ax - 0.0116, Y - (NT - 0.0054), 0.0052, 0.0052) - 0.0014 * G(ax - 0.0186, Y - (NT - 0.0040), 0.0030, 0.0066) - 0.0030 * G(ax - 0.0062, Y - (NT - 0.0096), 0.0030, 0.0021);
+        d -= 0.0064 * G(ax - FC.eyeX, Y - FC.eyeY, 0.017, 0.0105) + 0.0026 * G(ax - 0.014, Y - (FC.eyeY - 0.002), 0.007, 0.010);   // eye sockets, deepest beside the bridge
+        d += 0.0030 * G(ax - 0.027, Y - (FC.browY + 0.002), 0.026, 0.008);                        // brow
+        d += 0.0030 * G(ax - FC.eyeX, Y - FC.eyeY, 0.0105, 0.0066) - 0.0010 * G(ax - FC.eyeX, Y - (FC.eyeY + 0.0088), 0.014, 0.0024);   // the eyeball rounding out of its socket, and the crease of the lid above it
+        d += 0.0040 * G(ax - 0.043, Y - 1.4975, 0.020, 0.016) - 0.0022 * G(ax - 0.047, Y - 1.4670, 0.016, 0.014);   // cheekbones, and the hollow under them
+        d -= 0.0010 * G(x, Y - (FC.mouthY + 0.0135), 0.0034, 0.0055);                             // the groove under the nose
+        d += 0.0056 * G(x, Y - (FC.mouthY + 0.0058), 0.020, 0.0054) + 0.0044 * G(x, Y - (FC.mouthY - 0.0074), 0.016, 0.0054);  // lips
+        d -= 0.0016 * G(ax - 0.024, Y - FC.mouthY, 0.006, 0.008);                                 // corners of the mouth
+        d += 0.0026 * G(x, Y - 1.4300, 0.017, 0.0095);                                            // the ball of the chin
+        z += d * f;
+      }
     }
-    z += 0.050 * t * t;                           // the jaw: the lower head leans forward, so mouth and chin sit under the brow and not under the ear
+    if (t > 0.86) y += 0.30 * Math.max(0, 0.083 - z) * sm(0.86, 0.985, t);        // under the jaw the skin rises toward the throat
     return [HC.x + x, HC.y + y, HC.z + z];
   }
-  const wHead = wOne('head');
+  const wHead = wOne('head'), faceMix = [], faceUvS = [];
   (function buildHead() {
-    const NU = Q(176, 60), NV = Q(156, 56), rings = [];        // most of the rings are spent on the face
+    const NU = Q(256, 84), NV = Q(168, 60), rings = [];        // most of the rings, and most of the columns, are spent on the face
     for (let i = 0; i <= NV; i++) {
       const u = i / NV, ph = u < 0.28 ? lerp(0.02, 1.45, u / 0.28) : lerp(1.45, PI - 0.02, (u - 0.28) / 0.72), ring = [];
-      for (let j = 0; j < NU; j++) ring.push(headPoint(PI + (j / NU) * TAU, ph));
+      for (let j = 0; j < NU; j++) { const v = 2 * (j / NU) - 1; ring.push(headPoint(PI * (0.35 * v + 0.65 * v * v * v), ph)); }     // v = 0 is the middle of the face
       rings.push(ring);
     }
     const part = loft(rings, { capA: true, capB: true });
     for (let i = 0; i < part.pos.length / 3; i++) {   // planar projection from the front
       part.uv[i * 2] = (part.pos[i * 3] - FACE.x0) / (FACE.x1 - FACE.x0); part.uv[i * 2 + 1] = (part.pos[i * 3 + 1] - FACE.y0) / (FACE.y1 - FACE.y0);
     }
-    addPart('face', part, wHead, { out: HC });
+    const info = addPart('face', part, wHead, { out: HC });
+    // which painting each point of the head wears: the front view where the skin faces forward, the profile view where it faces
+    // sideways, and plain skin under the jaw and behind the ears, where neither painting can see
+    const FB = buckets.face, MIXED = !!(BAKED && BAKED.faceSide), Wn = (BAKED && BAKED.faceSideWin) || [-0.01, 0.13, 1.40, 1.58];
+    for (let i = info.start; i < info.start + info.count; i++) {
+      const nx = FB.nor[i * 3], ny = FB.nor[i * 3 + 1], px = FB.pos[i * 3], py = FB.pos[i * 3 + 1], pz = FB.pos[i * 3 + 2];
+      const under = sm(-0.22, -0.66, ny) * sm(1.444, 1.428, py), plain = Math.max(under, sm(0.010, -0.006, pz - HC.z));      // only under the jaw: the nose and lips have undersides too, and keep their paint
+      const side = sm(0.70, 0.93, Math.abs(nx)) * sm(0.034, 0.050, Math.abs(px)) * sm(Wn[0] + 0.004, Wn[0] + 0.022, pz) * sm(Wn[2] + 0.002, Wn[2] + 0.014, py) * sm(Wn[3] - 0.002, Wn[3] - 0.014, py) * (1 - plain);
+      faceMix.push(side, plain, 1 - 0.40 * under); faceUvS.push((pz - Wn[0]) / (Wn[1] - Wn[0]), (py - Wn[2]) / (Wn[3] - Wn[2]));
+    }
     // neck
     const np = [V3(0, 1.30, -0.014), V3(0, 1.345, -0.012), V3(0, 1.40, -0.006), V3(0, 1.45, 0)], nr = [0.050, 0.046, 0.043, 0.046];
     const nrings = tubeRings(curvePts(np, 8), [0.048, 0.046, 0.044, 0.042, 0.041, 0.041, 0.043, 0.046], Q(24, 12), V3(0, 0, 1));
-    addPart('skin', loft(nrings), (x, y) => { const u = sm(1.33, 1.37, y), v = sm(1.385, 1.43, y); return [BI.spine3, 1 - u, BI.neck, u * (1 - v), BI.head, u * v]; }, { out: V3(0, 1.38, -0.01) });
+    const nk = addPart(MIXED ? 'face' : 'skin', loft(nrings), (x, y) => { const u = sm(1.33, 1.37, y), v = sm(1.385, 1.43, y); return [BI.spine3, 1 - u, BI.neck, u * (1 - v), BI.head, u * v]; }, { out: V3(0, 1.38, -0.01) });
+    if (MIXED) for (let i = nk.start; i < nk.start + nk.count; i++) { faceMix.push(0, 1, 1 - 0.38 * sm(1.330, 1.428, FB.pos[i * 3 + 1])); faceUvS.push(0, 0); }     // the neck is plain skin, dim where the jaw shades it
   })();
 
   // the face canvas: eyes (0 open .. 1 closed), mouth ('rest', 'open', 'smile'), glow (spell light in her eyes)
@@ -142,33 +171,20 @@
 
   // ---------- hair: black, framing the face beneath the cap and falling down the back under the veils ----------
   (function buildHair() {
-    const NU = Q(56, 28), NR = 16, rings = [];
-    for (let i = 0; i <= NR; i++) {                 // a curtain round the sides and back of the head, longest behind
+    const NU = Q(84, 36), NR = Q(18, 10), rings = [];
+    for (let i = 0; i <= NR; i++) {                 // a curtain round the sides and back of the head: out from under the cap, in against the neck, down to the ruff
       const u = i / NR, ring = [];
       for (let j = 0; j <= NU; j++) {
-        const f = j / NU, a = lerp(0.72 * PI, 1.28 * PI, f), back = Math.pow(Math.sin(f * PI), 0.6), y = lerp(1.50, lerp(1.432, 1.424, back), u);     // a short bob that tucks into the ruff, as in the back view
-        const flare = sm(1.50, 1.30, y), rx = HR.x + 0.012 + 0.024 * flare + 0.004 * Math.sin(j * 2.1 + i * 0.7), rz = HR.zB + 0.008 + 0.012 * flare;
-        ring.push([rx * Math.sin(a), y, 0.004 + rz * Math.cos(a) - 0.012 * flare * back]);
+        const f = j / NU, a = lerp(0.50 * PI, 1.50 * PI, f), back = Math.pow(Math.sin(f * PI), 0.5), y = lerp(1.50, lerp(1.404, 1.390, back) + 0.004 * Math.sin(j * 1.7), u);
+        const k = sm(1.398, 1.455, y), up = cl((y - 1.455) / 0.045, 0, 1), lock = (0.0014 * Math.sin(j * 2.1 + i * 0.35) + 0.0008 * Math.sin(j * 0.7)) * (1 - up);
+        const rx = (y > 1.455 ? lerp(0.0570, 0.0695, up) : lerp(0.0490, 0.0570, k)) + lock, rz = (y > 1.455 ? lerp(0.0710, 0.0840, up) : lerp(0.0600, 0.0710, k)) + lock;
+        ring.push([rx * Math.sin(a), y, 0.004 + rz * Math.cos(a)]);
       }
       rings.push(ring);
     }
-    addPart('hair', loft(rings, { open: true, vS: 2, uS: 6 }), (x, y) => { const v = sm(1.40, 1.47, y); return [BI.head, v, BI.neck, (1 - v) * 0.5, BI.spine3, (1 - v) * 0.5]; }, { out: V3(0, 1.5, 0) });
+    addPart('hair', loft(rings, { open: true, vS: 2, uS: 9 }), (x, y) => { const v = sm(1.40, 1.47, y); return [BI.head, v, BI.neck, (1 - v) * 0.5, BI.spine3, (1 - v) * 0.5]; }, { out: V3(0, 1.5, 0) });
   })();
 
-  if (BAKED && BAKED.faceSide) (function buildFaceSides() {
-    const Wn = BAKED.faceSideWin, NA = Q(24, 12), NV = Q(32, 16);
-    for (const sx of [-1, 1]) {
-      const rings = [];
-      for (let i = 0; i <= NV; i++) {
-        const ph = lerp(1.36, PI - 0.09, i / NV), ring = [];
-        for (let j = 0; j <= NA; j++) { const a = sx * lerp(20, 110, j / NA) * DEG, p = headPoint(a, ph), k = 0.0008; ring.push([p[0] + k * Math.sin(a), p[1], p[2] + k * Math.cos(a)]); }
-        rings.push(ring);
-      }
-      const part = loft(rings, { open: true });
-      for (let k = 0; k < part.pos.length / 3; k++) { part.uv[k * 2] = (part.pos[k * 3 + 2] - Wn[0]) / (Wn[1] - Wn[0]); part.uv[k * 2 + 1] = (part.pos[k * 3 + 1] - Wn[2]) / (Wn[3] - Wn[2]); }
-      addPart('faceSide', part, () => [BI.head, 1], { out: V3(0, 1.5, 0) });
-    }
-  })();
 
   // ---------- the jester cap: quilted black velvet, two great stuffed horns ----------
   const CAP_EDGE = [[-1, 1.432], [-0.3, 1.440], [0, 1.452], [0.276, 1.482], [0.446, 1.5246], [0.62, 1.553], [0.78, 1.5615], [1, 1.5625]];   // [cos of the angle from the front, height]: level across the brow, down in front of the ears, low round the back
@@ -249,7 +265,7 @@
     const C = V3(0, 1.362, -0.006), wf = (x, y) => { const u = sm(1.33, 1.40, y); return [BI.neck, 0.6 + 0.4 * u, BI.spine3, 0.4 * (1 - u)]; };
     // each frill is a soft roll of gathered organza: a ring whose outer face is pleated into rounded folds
     const NP = 25, NA = NP * Q(8, 4), NS = Q(12, 8);
-    for (const [yc, Rm, r0, phs] of [[1.3560, 0.0640, 0.0155, 0.0], [1.3810, 0.0625, 0.0150, 1.9], [1.4050, 0.0585, 0.0138, 3.7]]) {
+    for (const [yc, Rm, r0, phs] of [[1.3440, 0.0655, 0.0150, 0.0], [1.3670, 0.0630, 0.0143, 1.9], [1.3880, 0.0585, 0.0128, 3.7]]) {
       const rings = [];
       for (let i = 0; i < NS; i++) {
         const f = (i / NS) * TAU, cf = Math.cos(f), sf = Math.sin(f), ring = [];
@@ -263,7 +279,7 @@
       rings.push(rings[0]);
       addPart('ruffle', loft(rings, { uS: 8, v0: 0.15, vS: 0.7 }), wf, { out: V3(0, yc, 0) });
     }
-    addPart('cloth', loft(tubeRings([V3(0, 1.338, -0.008), V3(0, 1.380, -0.006), V3(0, 1.420, -0.004)], [0.049, 0.047, 0.046], Q(24, 12), V3(0, 0, 1))), wf, { out: C });   // the band the frills are sewn to
+    addPart('cloth', loft(tubeRings([V3(0, 1.326, -0.008), V3(0, 1.362, -0.006), V3(0, 1.393, -0.005)], [0.050, 0.048, 0.0465], Q(24, 12), V3(0, 0, 1))), wf, { out: C });   // the band the frills are sewn to
     // a turquoise pendant on a fine gold chain
     const wc = () => [BI.spine3, 1], tp = prof(TORSO, 1.306, true), pc = V3(0, PROJ ? 1.306 : 1.268, PROJ ? tp[3] + tp[1] + 0.003 : 0.094);
     if (!PROJ) { const chain = curvePts([V3(-0.052, 1.332, 0.030), V3(-0.030, 1.296, 0.078), pc.clone().add(V3(0, 0.014, 0.002)), V3(0.030, 1.296, 0.078), V3(0.052, 1.332, 0.030)], 28);
