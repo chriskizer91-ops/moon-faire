@@ -1,0 +1,350 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+<title>Jester Witch: the night square</title>
+<style>
+  :root { --panel:rgba(22,17,30,.72); --line:#6a5a7c; --ink:#f1e8f4; --dim:#b3a6c0; --gold:#e2b04a; --wine:#8d2f4e; }
+  * { box-sizing:border-box; -webkit-tap-highlight-color:transparent; user-select:none; -webkit-user-select:none; }
+  html,body { margin:0; height:100%; background:#120e1a; color:var(--ink); font:14px/1.3 system-ui,-apple-system,"Segoe UI",sans-serif; overflow:hidden; }
+  #stage { position:fixed; inset:0; touch-action:none; }
+  canvas { display:block; width:100%; height:100%; }
+  #top { position:fixed; left:0; right:0; top:0; padding:10px 12px; display:flex; gap:8px; align-items:flex-start; pointer-events:none; }
+  #top h1 { font-size:15px; font-weight:600; margin:0; letter-spacing:.02em; text-shadow:0 1px 6px #000; }
+  #hint { color:var(--dim); font-size:12px; margin-top:3px; text-shadow:0 1px 6px #000; transition:opacity 1.2s; max-width:230px; }
+  #opts { margin-left:auto; display:flex; gap:6px; pointer-events:auto; }
+  button { font:inherit; color:var(--ink); background:var(--panel); border:1px solid var(--line); border-radius:999px; padding:7px 12px; min-height:34px; cursor:pointer; white-space:nowrap; backdrop-filter:blur(5px); }
+  button.on { background:var(--wine); border-color:var(--gold); color:#fff; }
+  #pad { position:fixed; left:18px; bottom:calc(22px + env(safe-area-inset-bottom)); width:124px; height:124px; border-radius:50%; background:var(--panel); border:1px solid var(--line); touch-action:none; backdrop-filter:blur(5px); }
+  #knob { position:absolute; left:50%; top:50%; width:52px; height:52px; margin:-26px 0 0 -26px; border-radius:50%; background:#5b4a6e; border:1px solid var(--gold); pointer-events:none; }
+  #spells { position:fixed; right:12px; bottom:calc(18px + env(safe-area-inset-bottom)); display:grid; grid-template-columns:1fr 1fr; gap:7px; width:min(250px, calc(100vw - 172px)); }
+  #spells button { border-radius:14px; padding:9px 6px; min-height:42px; white-space:normal; line-height:1.15; font-size:13px; }
+  #spells.busy button { opacity:.45; }
+  #spells.busy button.on { opacity:1; }
+  #load { position:fixed; inset:0; display:grid; place-items:center; color:var(--dim); background:#120e1a; }
+  #err { position:fixed; left:8px; right:8px; top:70px; color:#ffb4a8; font-size:12px; white-space:pre-wrap; pointer-events:none; }
+</style>
+<script type="importmap">
+{ "imports": { "three": "./lib/build/three.module.min.js", "three/addons/": "./lib/examples/jsm/" } }
+</script>
+</head>
+<body>
+<div id="stage"></div>
+<div id="top">
+  <div><h1>The night square</h1><div id="hint">Drag the pad to walk and run. Drag the picture to look around. Tap a spell.</div></div>
+  <div id="opts"><button id="bPixel">Pixel finish</button><button id="bVeil" class="on">Veil</button></div>
+</div>
+<div id="err"></div>
+<div id="pad"><div id="knob"></div></div>
+<div id="spells"></div>
+<div id="load">Setting the stage&hellip;</div>
+<script>
+setTimeout(function () { var l = document.getElementById('load'); if (l) l.textContent = 'Still loading. If this stays, the 3D library or the model did not arrive: tell Claude.'; }, 25000);
+</script>
+<script src="jester_glb_a.js"></script>
+<script src="jester_glb_b.js"></script>
+<script src="jester_glb_c.js"></script>
+<script type="module">
+import * as THREE from 'three';
+import { makePipeline, DECOR } from './pipeline.js';
+import { loadJester, makeContext, makeBlink } from './core.js';
+import { makeFx } from './fx.js';
+
+const $ = s => document.querySelector(s);
+const errBox = $('#err');
+window.addEventListener('error', e => { errBox.textContent += (e.message || e) + '\n'; });
+window.addEventListener('unhandledrejection', e => { errBox.textContent += (e.reason && e.reason.message || e.reason) + '\n'; });
+
+const TEST = location.hash === '#test';
+const stage = $('#stage');
+const renderer = new THREE.WebGLRenderer({ antialias: false, preserveDrawingBuffer: TEST });
+renderer.outputColorSpace = THREE.SRGBColorSpace; renderer.autoClear = false;
+stage.appendChild(renderer.domElement);
+const pixelRatio = Math.min(devicePixelRatio || 1, 2);
+const scene = new THREE.Scene();
+const NIGHT = new THREE.Color(0x171122);
+scene.background = NIGHT; scene.fog = new THREE.FogExp2(0x171122, 0.026);
+const camera = new THREE.PerspectiveCamera(46, 1, 0.1, 140);
+const rnd = (() => { let s = 7; return () => { s = (s * 16807) % 2147483647; return s / 2147483647; }; })();
+const decor = o => { o.traverse(x => x.layers.set(DECOR)); return o; };
+const hdr = (r, g, b) => new THREE.Color().setRGB(r, g, b);
+
+// ------------------------------------------------------------------ the square
+const R = 9;                                  // the paved circle, in metres
+const lights = [];
+{
+  // paving: rings of flagstones round a new-moon medallion
+  const S = 2048, ppm = S / 32, c = document.createElement('canvas'); c.width = c.height = S; const g = c.getContext('2d');
+  g.fillStyle = '#17131c'; g.fillRect(0, 0, S, S);
+  for (let i = 0; i < 2600; i++) { g.fillStyle = `rgba(${30 + rnd() * 26},${34 + rnd() * 26},${30 + rnd() * 20},.5)`; const a = rnd() * 7, r = (R + 0.3 + rnd() * 7) * ppm; g.beginPath(); g.ellipse(S / 2 + r * Math.cos(a), S / 2 + r * Math.sin(a), 6 + rnd() * 16, 3 + rnd() * 6, rnd() * 3, 0, 7); g.fill(); }
+  let r0 = 1.25;
+  for (let ring = 0; r0 < R; ring++) {
+    const w = 0.5 + 0.22 * ((ring * 7) % 3), r1 = Math.min(R, r0 + w), n = Math.max(8, Math.round(2 * Math.PI * (r0 + r1) / 2 / (0.75 + 0.2 * (ring % 2)))), off = rnd() * 6;
+    for (let k = 0; k < n; k++) {
+      const a0 = off + k / n * 2 * Math.PI, a1 = off + (k + 1) / n * 2 * Math.PI, v = 44 + rnd() * 26, band = ring % 4 === 3;
+      g.fillStyle = band ? `rgb(${v + 30},${v + 4},${v + 22})` : `rgb(${v},${v - 4},${v + 12})`;
+      g.beginPath(); g.arc(S / 2, S / 2, r1 * ppm - 1.5, a0 + 0.012, a1 - 0.012); g.arc(S / 2, S / 2, r0 * ppm + 1.5, a1 - 0.012, a0 + 0.012, true); g.closePath(); g.fill();
+      for (let s = 0; s < 3; s++) { g.fillStyle = `rgba(0,0,0,${0.05 + rnd() * 0.08})`; const a = a0 + rnd() * (a1 - a0), rr = (r0 + rnd() * (r1 - r0)) * ppm; g.beginPath(); g.arc(S / 2 + rr * Math.cos(a), S / 2 + rr * Math.sin(a), 3 + rnd() * 9, 0, 7); g.fill(); }
+    }
+    r0 = r1 + 0.03;
+  }
+  g.fillStyle = '#2a2233'; g.beginPath(); g.arc(S / 2, S / 2, 1.22 * ppm, 0, 7); g.fill();
+  g.strokeStyle = '#b98b3c'; g.lineWidth = 5; g.beginPath(); g.arc(S / 2, S / 2, 1.16 * ppm, 0, 7); g.stroke();
+  g.lineWidth = 3; for (let k = 0; k < 8; k++) { const a = k * Math.PI / 4; g.beginPath(); g.moveTo(S / 2 + 0.55 * ppm * Math.cos(a), S / 2 + 0.55 * ppm * Math.sin(a)); g.lineTo(S / 2 + (k % 2 ? 0.85 : 1.1) * ppm * Math.cos(a), S / 2 + (k % 2 ? 0.85 : 1.1) * ppm * Math.sin(a)); g.stroke(); }
+  g.fillStyle = '#0d0a12'; g.beginPath(); g.arc(S / 2, S / 2, 0.5 * ppm, 0, 7); g.fill(); g.lineWidth = 4; g.stroke();   // the new moon
+  const t = new THREE.CanvasTexture(c); t.colorSpace = THREE.SRGBColorSpace; t.anisotropy = 8;
+  const ground = new THREE.Mesh(new THREE.CircleGeometry(16, 96), new THREE.MeshStandardMaterial({ map: t, roughness: 0.93, metalness: 0 }));
+  ground.rotation.x = -Math.PI / 2; scene.add(ground);
+  const kerb = new THREE.Mesh(new THREE.TorusGeometry(R + 0.05, 0.11, 8, 96), new THREE.MeshStandardMaterial({ color: 0x4a4052, roughness: 0.9 }));
+  kerb.rotation.x = -Math.PI / 2; kerb.position.y = 0.03; scene.add(kerb);
+
+  // lantern posts with bunting strung between them
+  const wood = new THREE.MeshStandardMaterial({ color: 0x3a2c2a, roughness: 0.85 }), iron = new THREE.MeshStandardMaterial({ color: 0x1c181e, roughness: 0.6 });
+  const lamp = new THREE.MeshBasicMaterial({ color: hdr(2.3, 1.4, 0.55) });
+  const haloTex = (() => { const c = document.createElement('canvas'); c.width = c.height = 128; const g = c.getContext('2d'); const gr = g.createRadialGradient(64, 64, 2, 64, 64, 64); gr.addColorStop(0, 'rgba(255,255,255,1)'); gr.addColorStop(0.25, 'rgba(255,255,255,.35)'); gr.addColorStop(1, 'rgba(255,255,255,0)'); g.fillStyle = gr; g.fillRect(0, 0, 128, 128); return new THREE.CanvasTexture(c); })();
+  const tops = [];
+  for (let k = 0; k < 8; k++) {
+    const a = (k + 0.5) / 8 * 2 * Math.PI, x = (R - 0.55) * Math.sin(a), z = (R - 0.55) * Math.cos(a), p = new THREE.Group();
+    const post = new THREE.Mesh(new THREE.CylinderGeometry(0.05, 0.075, 3.3, 10), wood); post.position.y = 1.65; p.add(post);
+    const foot = new THREE.Mesh(new THREE.CylinderGeometry(0.16, 0.2, 0.22, 10), wood); foot.position.y = 0.11; p.add(foot);
+    const arm = new THREE.Mesh(new THREE.CylinderGeometry(0.022, 0.022, 0.55, 6), iron); arm.rotation.x = Math.PI / 2; arm.position.set(0, 3.05, -0.27); p.add(arm);
+    const lan = new THREE.Mesh(new THREE.CylinderGeometry(0.1, 0.075, 0.27, 6), lamp); lan.position.set(0, 2.78, -0.5); p.add(lan);
+    const cap = new THREE.Mesh(new THREE.ConeGeometry(0.15, 0.14, 6), iron); cap.position.set(0, 2.98, -0.5); p.add(cap);
+    const halo = new THREE.Sprite(new THREE.SpriteMaterial({ map: haloTex, color: hdr(0.9, 0.5, 0.2), blending: THREE.AdditiveBlending, depthWrite: false, transparent: true })); halo.scale.setScalar(1.6); halo.position.set(0, 2.78, -0.5); p.add(decor(halo));
+    p.position.set(x, 0, z); p.rotation.y = a; scene.add(p);
+    tops.push(new THREE.Vector3(x, 3.25, z));
+    if (k % 3 === 0) { const l = new THREE.PointLight(0xffa850, 26, 15, 1.7); l.position.set(x * 0.93, 2.7, z * 0.93); l.layers.enableAll(); scene.add(l); lights.push({ l, base: 26, warm: true }); }
+  }
+  const pos = [], col = [], FLAG = [[0.52, 0.11, 0.24], [0.80, 0.56, 0.16], [0.36, 0.30, 0.18], [0.42, 0.22, 0.56], [0.16, 0.12, 0.16]];
+  for (let k = 0; k < 8; k++) {
+    const A = tops[k], B = tops[(k + 1) % 8], n = 15, d = B.clone().sub(A);
+    for (let i = 0; i < n; i++) {
+      const u0 = (i + 0.12) / n, u1 = (i + 0.88) / n, sag = u => 0.55 * Math.sin(Math.PI * u);
+      const p0 = A.clone().addScaledVector(d, u0), p1 = A.clone().addScaledVector(d, u1); p0.y -= sag(u0); p1.y -= sag(u1);
+      const tip = p0.clone().add(p1).multiplyScalar(0.5); tip.y -= 0.34;
+      pos.push(p0.x, p0.y, p0.z, p1.x, p1.y, p1.z, tip.x, tip.y, tip.z);
+      const c = FLAG[(i + k * 2) % 5]; for (let v = 0; v < 3; v++) col.push(...c);
+    }
+  }
+  const bg = new THREE.BufferGeometry(); bg.setAttribute('position', new THREE.Float32BufferAttribute(pos, 3)); bg.setAttribute('color', new THREE.Float32BufferAttribute(col, 3)); bg.computeVertexNormals();
+  scene.add(new THREE.Mesh(bg, new THREE.MeshLambertMaterial({ vertexColors: true, side: THREE.DoubleSide })));
+
+  // striped tents beyond the square
+  const stripe = (a, b) => { const c = document.createElement('canvas'); c.width = 256; c.height = 8; const g = c.getContext('2d'); for (let i = 0; i < 16; i++) { g.fillStyle = i % 2 ? a : b; g.fillRect(i * 16, 0, 16, 8); } const t = new THREE.CanvasTexture(c); t.colorSpace = THREE.SRGBColorSpace; return t; };
+  const TENT = [stripe('#5a1730', '#b7a58c'), stripe('#3b2a5c', '#b7a58c'), stripe('#4c4424', '#b7a58c')];
+  [[-0.9, 13.2, 2.6], [-0.3, 14.6, 3.3], [0.35, 13.6, 2.4], [0.95, 14.4, 2.9], [1.75, 13.4, 2.3], [-1.7, 13.8, 2.5], [2.6, 14.2, 2.7], [-2.6, 14.0, 2.2]].forEach(([a, r, s], k) => {
+    const m = new THREE.MeshLambertMaterial({ map: TENT[k % 3] }), t = new THREE.Group();
+    const wall = new THREE.Mesh(new THREE.CylinderGeometry(s, s, s * 0.7, 14, 1, true), m); wall.position.y = s * 0.35; t.add(wall);
+    const roof = new THREE.Mesh(new THREE.ConeGeometry(s * 1.12, s * 0.95, 14), m); roof.position.y = s * 0.7 + s * 0.475; t.add(roof);
+    const pole = new THREE.Mesh(new THREE.CylinderGeometry(0.03, 0.03, 0.9, 5), iron); pole.position.y = s * 1.65 + 0.4; t.add(pole);
+    const fl = new THREE.Mesh(new THREE.PlaneGeometry(0.5, 0.26), new THREE.MeshBasicMaterial({ color: k % 2 ? 0x9a2a4c : 0xc89430, side: THREE.DoubleSide })); fl.position.set(0.27, s * 1.65 + 0.7, 0); t.add(fl);
+    t.position.set(r * Math.sin(a), 0, r * Math.cos(a)); scene.add(t);
+  });
+
+  // sky: a deep dusk, stars, and the new moon as a dark disc with a burning rim
+  const sky = new THREE.Mesh(new THREE.SphereGeometry(90, 32, 16), new THREE.ShaderMaterial({ side: THREE.BackSide, depthWrite: false, fog: false,
+    vertexShader: 'varying vec3 vP; void main(){ vP = position; gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0); }',
+    fragmentShader: 'varying vec3 vP; void main(){ float h = normalize(vP).y; vec3 c = mix(vec3(0.060, 0.030, 0.085), vec3(0.008, 0.008, 0.028), smoothstep(-0.05, 0.6, h)); c += vec3(0.05, 0.015, 0.05) * exp(-abs(h) * 9.0); gl_FragColor = vec4(c, 1.0); }' }));
+  scene.add(decor(sky));
+  const sp = [], N = 900; for (let i = 0; i < N; i++) { const a = rnd() * 6.283, y = 0.06 + rnd() * 0.94, r = Math.sqrt(1 - y * y); sp.push(80 * r * Math.cos(a), 80 * y, 80 * r * Math.sin(a)); }
+  const sg = new THREE.BufferGeometry(); sg.setAttribute('position', new THREE.Float32BufferAttribute(sp, 3));
+  scene.add(decor(new THREE.Points(sg, new THREE.PointsMaterial({ color: hdr(1.5, 1.5, 2.0), size: 1.7, sizeAttenuation: false, fog: false, depthWrite: false }))));
+  const md = new THREE.Vector3(-0.42, 0.40, 0.82).normalize(), moon = new THREE.Group();
+  moon.add(new THREE.Mesh(new THREE.CircleGeometry(4.0, 48), new THREE.MeshBasicMaterial({ color: 0x05040a, fog: false })));
+  moon.add(new THREE.Mesh(new THREE.RingGeometry(4.0, 4.16, 64), new THREE.MeshBasicMaterial({ color: hdr(2.6, 2.3, 3.4), fog: false })));
+  const corona = new THREE.Sprite(new THREE.SpriteMaterial({ map: haloTex, color: hdr(0.55, 0.4, 0.9), blending: THREE.AdditiveBlending, depthWrite: false, transparent: true, fog: false })); corona.scale.setScalar(26); corona.position.z = -0.5; moon.add(corona);
+  moon.position.copy(md).multiplyScalar(70); moon.lookAt(0, 0, 0); scene.add(decor(moon));
+  const hemi = new THREE.HemisphereLight(0x8a84d0, 0x3a2c40, 1.5), moonL = new THREE.DirectionalLight(0xa9b0ff, 1.7), fill = new THREE.DirectionalLight(0xffc890, 0.9);
+  moonL.position.copy(md).multiplyScalar(10); fill.position.set(0.5, 1.2, -1);
+  for (const l of [hemi, moonL, fill]) { l.layers.enableAll(); scene.add(l); }
+  lights.push({ l: hemi, base: 1.5, flat: 2.3 }, { l: moonL, base: 1.7, flat: 1.15 }, { l: fill, base: 0.9, flat: 0 });
+  lights.hemi = hemi; lights.moonL = moonL;
+}
+// fireflies drifting over the square
+const flies = (() => {
+  const dot = (() => { const c = document.createElement('canvas'); c.width = c.height = 32; const g = c.getContext('2d'), gr = g.createRadialGradient(16, 16, 0, 16, 16, 16); gr.addColorStop(0, 'rgba(255,255,255,1)'); gr.addColorStop(0.3, 'rgba(255,255,255,.5)'); gr.addColorStop(1, 'rgba(255,255,255,0)'); g.fillStyle = gr; g.fillRect(0, 0, 32, 32); return new THREE.CanvasTexture(c); })();
+  const n = 140, p = new Float32Array(n * 3), seed = [];
+  for (let i = 0; i < n; i++) seed.push([rnd() * 6.28, 1 + rnd() * 9, 0.4 + rnd() * 3.2, rnd() * 6.28, 0.2 + rnd() * 0.5]);
+  const g = new THREE.BufferGeometry(); g.setAttribute('position', new THREE.BufferAttribute(p, 3));
+  const m = decor(new THREE.Points(g, new THREE.PointsMaterial({ map: dot, color: hdr(2.4, 1.9, 0.7), size: 0.11, transparent: true, depthWrite: false, blending: THREE.AdditiveBlending }))); m.frustumCulled = false; scene.add(m);
+  return t => { for (let i = 0; i < n; i++) { const [a, r, y, ph, sp] = seed[i], aa = a + t * sp * 0.12; p[i * 3] = r * Math.cos(aa) + 0.3 * Math.sin(t * sp + ph); p[i * 3 + 1] = y + 0.35 * Math.sin(t * sp * 1.7 + ph); p[i * 3 + 2] = r * Math.sin(aa) + 0.3 * Math.cos(t * sp * 1.3 + ph); } g.attributes.position.needsUpdate = true; };
+})();
+
+// ------------------------------------------------------------------ something to cast at: a practice dummy
+const dummy = new THREE.Group(), DUMMY = new THREE.Vector3(0, 0, 5.4);
+{
+  const weave = (() => { const c = document.createElement('canvas'); c.width = c.height = 128; const g = c.getContext('2d'); g.fillStyle = '#8a7350'; g.fillRect(0, 0, 128, 128); for (let y = 0; y < 128; y += 4) for (let x = 0; x < 128; x += 4) { g.fillStyle = `rgba(${40 + rnd() * 50},${30 + rnd() * 40},${10 + rnd() * 20},.35)`; g.fillRect(x + ((y / 4) % 2) * 2, y, 3, 3); } const t = new THREE.CanvasTexture(c); t.colorSpace = THREE.SRGBColorSpace; t.wrapS = t.wrapT = THREE.RepeatWrapping; t.repeat.set(3, 3); return t; })();
+  const burlap = new THREE.MeshStandardMaterial({ map: weave, roughness: 0.95 }), wood = new THREE.MeshStandardMaterial({ color: 0x4a3526, roughness: 0.85 }), straw = new THREE.MeshStandardMaterial({ color: 0xb89a4a, roughness: 0.9 });
+  const add = (geo, mat, x, y, z) => { const m = new THREE.Mesh(geo, mat); m.position.set(x, y, z); dummy.add(m); return m; };
+  add(new THREE.CylinderGeometry(0.34, 0.4, 0.1, 12), wood, 0, 0.05, 0);
+  add(new THREE.CylinderGeometry(0.055, 0.065, 1.0, 8), wood, 0, 0.55, 0);
+  add(new THREE.CapsuleGeometry(0.25, 0.5, 6, 14), burlap, 0, 1.2, 0);
+  add(new THREE.CylinderGeometry(0.035, 0.035, 1.25, 6), wood, 0, 1.45, 0).rotation.z = Math.PI / 2;
+  for (const s of [1, -1]) { const c = add(new THREE.ConeGeometry(0.11, 0.3, 9), straw, s * 0.72, 1.45, 0); c.rotation.z = s * Math.PI / 2; }
+  add(new THREE.ConeGeometry(0.3, 0.16, 12), straw, 0, 0.9, 0).rotation.x = Math.PI;
+  const face = (() => { const c = document.createElement('canvas'); c.width = 256; c.height = 128; const g = c.getContext('2d'); g.fillStyle = '#93794f'; g.fillRect(0, 0, 256, 128); g.strokeStyle = '#2a1c14'; g.lineWidth = 5; g.lineCap = 'round';
+    for (const x of [104, 152]) { g.beginPath(); g.moveTo(x - 9, 46); g.lineTo(x + 9, 64); g.moveTo(x + 9, 46); g.lineTo(x - 9, 64); g.stroke(); }
+    g.beginPath(); g.moveTo(98, 88); g.quadraticCurveTo(128, 104, 158, 88); g.stroke(); g.lineWidth = 3; for (let x = 104; x <= 152; x += 12) { g.beginPath(); g.moveTo(x, 84); g.lineTo(x, 100); g.stroke(); }
+    const t = new THREE.CanvasTexture(c); t.colorSpace = THREE.SRGBColorSpace; return t; })();
+  const head = add(new THREE.SphereGeometry(0.2, 20, 14), new THREE.MeshStandardMaterial({ map: face, roughness: 0.95 }), 0, 1.84, 0); head.rotation.y = -Math.PI / 2;
+  add(new THREE.ConeGeometry(0.15, 0.34, 10), new THREE.MeshStandardMaterial({ color: 0x5a4c24, roughness: 0.8 }), 0.03, 2.13, 0).rotation.z = -0.25;
+  const board = (() => { const c = document.createElement('canvas'); c.width = c.height = 128; const g = c.getContext('2d'); ['#3a2a1e', '#d8c9a8', '#7a2140', '#d8c9a8', '#c8922e'].forEach((col, i) => { g.fillStyle = col; g.beginPath(); g.arc(64, 64, 62 - i * 13, 0, 7); g.fill(); }); const t = new THREE.CanvasTexture(c); t.colorSpace = THREE.SRGBColorSpace; return t; })();
+  const tb = add(new THREE.CylinderGeometry(0.2, 0.2, 0.03, 20), [wood, new THREE.MeshStandardMaterial({ map: board, roughness: 0.8 }), wood], 0, 1.25, 0.26); tb.rotation.x = Math.PI / 2;
+  dummy.position.copy(DUMMY); dummy.rotation.y = Math.PI; scene.add(dummy);
+}
+const wob = { x: 0, z: 0, vx: 0, vz: 0, squash: 0 };
+function kick(dx, dz, strength, squash = 0) { wob.vx += dz * strength; wob.vz -= dx * strength; wob.squash = Math.max(wob.squash, squash); }
+const HIT = { CurtainCall: [[0.25, 5]], SealedFate: [[0.34, 1.5], [1.0, 5]], GildedRebuke: [[0.12, 8]], Hush: [[0.4, 1.2]], Gravity: [[0.13, 0, 0.5], [0.4, 6]] };
+
+// ------------------------------------------------------------------ her
+const fx = makeFx(scene);
+let dim = 0;
+function light(flat) {
+  const k = flat ? 1 - 0.3 * dim : 1 - 0.78 * dim;
+  for (const o of lights) o.l.intensity = (flat ? (o.warm ? o.base * 0.25 : o.flat) : o.base) * k;
+  lights.hemi.color.set(flat ? 0xffffff : 0x8a84d0); lights.hemi.groundColor.set(flat ? 0xb8b0b8 : 0x3a2c40); lights.moonL.color.set(flat ? 0xffffff : 0xa9b0ff);
+}
+const pipe = makePipeline(renderer, scene, { flatLight: light, onViewport: h => { fx.uH.value = h; } });
+const blob = decor(new THREE.Mesh(new THREE.CircleGeometry(0.36, 32), new THREE.MeshBasicMaterial({ color: 0x06040a, transparent: true, opacity: 0.5, depthWrite: false })));
+blob.rotation.x = -Math.PI / 2; blob.position.y = 0.012; scene.add(blob);
+
+let J = null, ctx = null, blink = null, loco = null, casting = null;
+const state = { pixel: false, veil: true };
+const me = { x: 0, z: -0.6, yaw: 0, v: 0 };
+const cam = { yaw: Math.PI, pitch: 0.2, dist: 5.6, focus: new THREE.Vector3(0, 1.2, 0), d: 5.6, shake: 0 };
+const stick = { x: 0, y: 0 }, keys = {};
+const WIDE = { CurtainCall: 4.2, AgainstAllOdds: 3.0, SealedFate: 1.6, GildedRebuke: 1.4, Hush: 1.4, Gravity: 1.8 };
+
+loadJester(scene).then(j => {
+  J = j; ctx = makeContext(J); ctx.prime(); blink = makeBlink(J.lids);
+  pipe.setPalette(J.palette);
+  const act = n => { const a = J.mixer.clipAction(J.clips[n]); a.setLoop(THREE.LoopRepeat, Infinity); a.setEffectiveWeight(0); a.play(); return a; };
+  loco = { idle: act('Idle'), walk: act('Walk'), run: act('Run') };
+  for (const name of Object.keys(J.clips)) {
+    if (!(J.info[name] && J.info[name].spell)) continue;
+    const b = document.createElement('button'); b.textContent = J.info[name].label; b.dataset.spell = name; b.onclick = () => cast(name); $('#spells').appendChild(b);
+  }
+  $('#load').remove(); resize(); api.ready = true;
+}).catch(e => { errBox.textContent += 'Could not load the model: ' + (e.message || e) + '\n'; });
+
+function cast(name) {
+  if (casting || !J) return;
+  const a = J.mixer.clipAction(J.clips[name]);
+  a.reset(); a.setLoop(THREE.LoopOnce, 1); a.clampWhenFinished = true; a.setEffectiveWeight(0); a.play();
+  casting = { name, a, w: 0, dur: J.clips[name].duration, hits: (HIT[name] || []).map(h => ({ at: J.info[name].release + h[0], s: h[1], q: h[2] || 0, done: false })) };
+  $('#spells').classList.add('busy'); document.querySelectorAll('#spells button').forEach(b => b.classList.toggle('on', b.dataset.spell === name));
+  hintOff();
+}
+function toggle(k) {
+  state[k] = !state[k]; $('#bPixel').classList.toggle('on', state.pixel); $('#bVeil').classList.toggle('on', state.veil);
+  if (J && J.veil) J.veil.visible = state.veil;
+}
+$('#bPixel').onclick = () => toggle('pixel'); $('#bVeil').onclick = () => toggle('veil');
+let hinted = false; function hintOff() { if (!hinted) { hinted = true; $('#hint').style.opacity = 0; } }
+
+// ---- controls: the pad walks her, dragging the picture turns the camera, the wheel or a pinch moves it in and out
+{
+  const pad = $('#pad'), knob = $('#knob'); let id = null;
+  const set = e => { const r = pad.getBoundingClientRect(), R2 = r.width / 2; let x = (e.clientX - r.left - R2) / (R2 - 14), y = -(e.clientY - r.top - R2) / (R2 - 14); const m = Math.hypot(x, y); if (m > 1) { x /= m; y /= m; } stick.x = x; stick.y = y; knob.style.transform = `translate(${x * (R2 - 26)}px,${-y * (R2 - 26)}px)`; };
+  pad.addEventListener('pointerdown', e => { id = e.pointerId; pad.setPointerCapture(id); set(e); hintOff(); });
+  pad.addEventListener('pointermove', e => { if (e.pointerId === id) set(e); });
+  const up = e => { if (e.pointerId === id) { id = null; stick.x = stick.y = 0; knob.style.transform = ''; } };
+  pad.addEventListener('pointerup', up); pad.addEventListener('pointercancel', up);
+  const el = renderer.domElement, pts = new Map(); let pinch = 0;
+  el.addEventListener('pointerdown', e => { pts.set(e.pointerId, [e.clientX, e.clientY]); el.setPointerCapture(e.pointerId); });
+  el.addEventListener('pointermove', e => {
+    const p = pts.get(e.pointerId); if (!p) return;
+    if (pts.size === 1) { cam.yaw -= (e.clientX - p[0]) * 0.006; cam.pitch = Math.min(1.2, Math.max(-0.05, cam.pitch + (e.clientY - p[1]) * 0.005)); }
+    p[0] = e.clientX; p[1] = e.clientY;
+    if (pts.size === 2) { const [a, b] = [...pts.values()], d = Math.hypot(a[0] - b[0], a[1] - b[1]); if (pinch) cam.dist = Math.min(14, Math.max(2.2, cam.dist * pinch / d)); pinch = d; }
+  });
+  const end = e => { pts.delete(e.pointerId); pinch = 0; };
+  el.addEventListener('pointerup', end); el.addEventListener('pointercancel', end);
+  el.addEventListener('wheel', e => { cam.dist = Math.min(14, Math.max(2.2, cam.dist * (1 + Math.sign(e.deltaY) * 0.1))); e.preventDefault(); }, { passive: false });
+  addEventListener('keydown', e => { keys[e.code] = true; const n = '123456'.indexOf(e.key); if (n >= 0) { const b = document.querySelectorAll('#spells button')[n]; if (b) b.click(); } });
+  addEventListener('keyup', e => { keys[e.code] = false; });
+}
+
+function resize() {
+  const w = stage.clientWidth, h = stage.clientHeight;
+  renderer.setPixelRatio(pixelRatio); renderer.setSize(w, h, false); pipe.setSize(w, h, pixelRatio);
+  camera.aspect = w / h; camera.fov = w < h ? 58 : 44;
+  camera.setViewOffset(w, h, 0, Math.round(h * (w < h ? 0.10 : 0.04)), w, h);        // lift the picture clear of the controls
+  camera.updateProjectionMatrix();
+}
+addEventListener('resize', resize); resize();
+
+const cl = (x, a = 0, b = 1) => Math.min(b, Math.max(a, x));
+const turn = (from, to, k) => from + Math.atan2(Math.sin(to - from), Math.cos(to - from)) * k;
+const clock = new THREE.Clock(); let T = 0;
+function frame(dtOverride, skipDraw) {
+  const dt = dtOverride !== undefined ? dtOverride : Math.min(clock.getDelta(), 0.05);
+  T += dt; dim = 0; let shake = 0;
+  flies(T);
+  if (J) {
+    // where she wants to go
+    let sx = stick.x, sy = stick.y;
+    const kx = (keys.KeyD || keys.ArrowRight ? 1 : 0) - (keys.KeyA || keys.ArrowLeft ? 1 : 0), ky = (keys.KeyW || keys.ArrowUp ? 1 : 0) - (keys.KeyS || keys.ArrowDown ? 1 : 0);
+    if (kx || ky) { const m = Math.hypot(kx, ky), s = keys.ShiftLeft || keys.ShiftRight ? 0.5 : 1; sx = kx / m * s; sy = ky / m * s; hintOff(); }
+    const mag = Math.min(1, Math.hypot(sx, sy));
+    let want = casting ? 0 : (mag < 0.55 ? mag / 0.55 * 1.05 : 1.05 + (mag - 0.55) / 0.45 * 1.55);
+    if (mag < 0.08) want = 0;
+    me.v += (want - me.v) * Math.min(1, dt * 7);
+    if (want > 0) {
+      const fxv = -Math.sin(cam.yaw), fzv = -Math.cos(cam.yaw), dx = (sx * -fzv + sy * fxv) / mag, dz = (sx * fxv + sy * fzv) / mag;
+      me.yaw = turn(me.yaw, Math.atan2(dx, dz), Math.min(1, dt * 9));
+    }
+    me.x += Math.sin(me.yaw) * me.v * dt; me.z += Math.cos(me.yaw) * me.v * dt;
+    const r = Math.hypot(me.x, me.z); if (r > R - 0.9) { me.x *= (R - 0.9) / r; me.z *= (R - 0.9) / r; }
+    const ddx = me.x - DUMMY.x, ddz = me.z - DUMMY.z, dd = Math.hypot(ddx, ddz); if (dd < 0.95) { me.x = DUMMY.x + ddx / dd * 0.95; me.z = DUMMY.z + ddz / dd * 0.95; }
+    // which movement she plays
+    let cw = 0;
+    if (casting) {
+      const c = casting, left = c.dur - c.a.time;
+      c.w += ((left < 0.28 ? 0 : 1) - c.w) * Math.min(1, dt * 9); cw = c.w;
+      me.yaw = turn(me.yaw, Math.atan2(DUMMY.x - me.x, DUMMY.z - me.z), Math.min(1, dt * 6));
+      c.a.setEffectiveWeight(cw);
+    }
+    const wRun = cl((me.v - 1.3) / 0.9), wMove = cl(me.v / 0.35);
+    loco.idle.setEffectiveWeight((1 - wMove) * (1 - cw)); loco.walk.setEffectiveWeight(wMove * (1 - wRun) * (1 - cw)); loco.run.setEffectiveWeight(wMove * wRun * (1 - cw));
+    loco.walk.timeScale = cl(me.v / 0.93, 0.7, 1.7); loco.run.timeScale = cl(me.v / 2.58, 0.75, 1.15);
+    J.mixer.update(dt); if (!TEST) blink(dt);
+    J.root.position.set(me.x, 0, me.z); J.root.rotation.y = me.yaw; J.root.updateMatrixWorld(true);
+    blob.position.x = me.x; blob.position.z = me.z;
+    // her spell
+    fx.F.begin(camera);
+    const tgt = new THREE.Vector3(DUMMY.x, 1.2, DUMMY.z);
+    if (casting) {
+      const c = casting, t = c.a.time, x = ctx(c.name, c.a, tgt);
+      fx.SPELLS[c.name](t, x); dim = x.out.dim; shake = x.out.shake;
+      for (const h of c.hits) if (!h.done && t >= h.at) { h.done = true; const dx = DUMMY.x - me.x, dz = DUMMY.z - me.z, d = Math.hypot(dx, dz) || 1; kick(dx / d, dz / d, h.s, h.q); }
+      if (c.dur - t < 0.02 || !c.a.isRunning()) { c.a.stop(); casting = null; $('#spells').classList.remove('busy'); document.querySelectorAll('#spells button').forEach(b => b.classList.remove('on')); }
+    }
+    // the dummy rocks on its post when it is hit
+    wob.vx += (-wob.x * 60 - wob.vx * 5) * dt; wob.vz += (-wob.z * 60 - wob.vz * 5) * dt; wob.x += wob.vx * dt; wob.z += wob.vz * dt; wob.squash *= Math.exp(-dt * 6);
+    dummy.rotation.set(cl(wob.x, -0.7, 0.7), Math.PI, cl(wob.z, -0.7, 0.7)); dummy.scale.set(1 + 0.25 * wob.squash, 1 - 0.45 * wob.squash, 1 + 0.25 * wob.squash);
+    // the camera follows her, and steps back to take in a big spell
+    const wide = casting ? WIDE[casting.name] || 1.5 : 0, aim = new THREE.Vector3(me.x, 1.2, me.z);
+    if (casting && !['CurtainCall', 'AgainstAllOdds'].includes(casting.name)) aim.lerp(tgt, 0.42);
+    if (casting && wide > 2.5) aim.y += 0.5;
+    cam.focus.lerp(aim, Math.min(1, dt * 4)); cam.d += (cam.dist + wide - cam.d) * Math.min(1, dt * 2.5);
+  }
+  light(false);
+  const cp = Math.cos(cam.pitch);
+  camera.position.set(cam.focus.x + cam.d * Math.sin(cam.yaw) * cp, Math.max(0.25, cam.focus.y + cam.d * Math.sin(cam.pitch)), cam.focus.z + cam.d * Math.cos(cam.yaw) * cp);
+  if (shake > 0 && !TEST) camera.position.add(new THREE.Vector3((Math.random() - 0.5), (Math.random() - 0.5), (Math.random() - 0.5)).multiplyScalar(0.14 * shake));
+  camera.lookAt(cam.focus);
+  if (!skipDraw) pipe.render(camera, state.pixel);
+}
+renderer.setAnimationLoop(() => { if (!TEST) frame(); });
+
+// hooks for automated checks
+const api = window.J = {
+  ready: false, state, cast, toggle, frame, cam, me, stick,
+  run(seconds, dt = 1 / 30) { for (let t = 0; t < seconds - 1e-6; t += dt) frame(dt, true); frame(0); },
+  busy: () => !!casting, spellNames: () => [...document.querySelectorAll('#spells button')].map(b => b.dataset.spell), errors: () => errBox.textContent,
+};
+</script>
+</body>
+</html>

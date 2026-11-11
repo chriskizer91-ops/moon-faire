@@ -4,7 +4,7 @@ A game character version of the Jester: one skinned model with a standard skelet
 
 The look to match is Chris's detailed pixel sheets (`refs/sheets/`), not the 128-pixel sprites and not the HD paintings. `refs/gen/A` to `F` are the 30 reference drawings made from the prompt list in the claude.ai Project "Flip Book Art", doc `claude/jester-game-model-reference-prompts.md` (each set also carries the prompts it was made from). The full notes are in that Project, doc `claude/jester-game-model.md`.
 
-Published page ("Jester Witch: not-HD 3D model"): https://claude.ai/artifact/SzipoQiHHriE2AQncBaR4R
+Published pages: the viewer, "Jester Witch: not-HD 3D model", https://claude.ai/artifact/SzipoQiHHriE2AQncBaR4R, and "Jester Witch: the night square", https://claude.ai/artifact/SNNTwQDhYR6WHfKxPxPmjT
 
 ## Conventions
 
@@ -32,10 +32,18 @@ python3 src/build.py all        # every part, then out/jester.glb (python3 src/b
 
 ```
 npm install                       # three.js 0.160, playwright-core, gltf-validator
-bash tools/setup_viewer.sh        # copies three.js into viewer/lib and the model into viewer/
-node tools/smoke.mjs 390x800      # opens the page, presses every button, reports errors
-python3 tools/sheet.py work/x.png 500x760 4 0.6 '[{"name":"a","clip":"Walk","t":0.3,"view":"side"}]'   # stills
-bash tools/make_dist.sh           # dist/ is what gets published (three.js from jsDelivr, model inside jester_glb_a.js and jester_glb_b.js)
+bash tools/setup_viewer.sh        # copies three.js into viewer/lib and the model (as text, in three pieces) into viewer/
+node tools/smoke.mjs 390x800      # the viewer: presses every button, plays every clip, reports errors
+node tools/smoke_stage.mjs 390x800   # the night square: walks her, casts every spell, flips the switches
+python3 tools/sheet.py work/x.png 500x760 4 0.6 '[{"name":"a","clip":"Walk","t":0.3,"view":"side"}]'   # stills of the viewer
+node tools/page_shot.mjs stage.html work/s 900x600 '[{"name":"a","js":"J.cast(\"Gravity\");J.run(1.2)"}]'   # stills of any page
+bash tools/make_dist.sh           # dist/ (viewer) and dist-stage/ (night square) are what gets published
 ```
 
-The tools use Google Chrome at `/usr/bin/google-chrome`. The artifact host does not serve `.glb` files, so the published page carries the model as text in `jester_glb_a.js` and `jester_glb_b.js` (the host also limits a script file to 16 MB).
+The pages in `viewer/`:
+
+- `index.html`: the viewer. Every move and spell, straight-on views, your drawing as an overlay, veil and pixel-finish switches.
+- `stage.html`: the night square. She walks and runs with a touch pad or the keyboard, the camera follows her, and she casts at a practice dummy.
+- `core.js` loads her and tells spell effects where her hands and her target are. `pipeline.js` draws a frame: bloom on anything brighter than white, and the pixel finish. `fx.js` holds the spell effects.
+
+The tools use Google Chrome at `/usr/bin/google-chrome` and step frames by hand, because software rendering there is far slower than a real screen. The artifact host does not serve `.glb` files and limits a script file to 16 MB, so the published pages carry the model as text in `jester_glb_a.js`, `_b.js` and `_c.js`.

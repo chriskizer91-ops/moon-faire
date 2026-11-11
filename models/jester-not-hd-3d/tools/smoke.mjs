@@ -1,4 +1,5 @@
-// Open the viewer the way a person does (no test mode), press every button, and report any errors.
+// Open the viewer, press every button, play every clip right through, and report any errors.
+// Frames are stepped by hand (#test), because software rendering here is far slower than a real screen.
 import http from 'node:http'; import fs from 'node:fs'; import path from 'node:path';
 import { chromium } from 'playwright-core';
 const ROOT = path.resolve(path.dirname(new URL(import.meta.url).pathname), '..', process.argv[4] || 'viewer');
@@ -15,18 +16,18 @@ const page = await browser.newPage({ viewport: { width: W, height: H }, deviceSc
 const logs = [];
 page.on('console', m => { if (m.type() === 'error' && !/favicon|404/.test(m.text())) logs.push('console: ' + m.text()); });
 page.on('pageerror', e => logs.push('pageerror: ' + e.message));
-await page.goto(`http://localhost:${server.address().port}/index.html`);
+await page.goto(`http://localhost:${server.address().port}/index.html#test`);
+const step = (n, dt = 1 / 30) => page.evaluate(([n, dt]) => { window.J.state.paused = false; for (let i = 0; i < n; i++) window.J.frame(dt); }, [n, dt]);
 await page.waitForFunction(() => window.J && window.J.ready, null, { timeout: 60000 });
 const buttons = await page.$$eval('#bar button', bs => bs.map(b => b.textContent));
 let pressed = 0;
-for (const b of await page.$$('#bar button')) { await b.click(); await page.waitForTimeout(450); pressed++; }
+for (const b of await page.$$('#bar button')) { await b.click(); await step(3); pressed++; }
 for (const name of await page.evaluate(() => window.J.clipNames())) {       // let every clip run right through once
   await page.evaluate(n => window.J.play(n), name);
-  await page.waitForTimeout(Math.min(1500, 1000 * await page.evaluate(n => window.J.dur(n), name)));
+  await step(12, (await page.evaluate(n => window.J.dur(n), name)) / 11);
 }
 await page.evaluate(() => { window.J.toggle('sheet', false); window.J.toggle('bones', false); window.J.toggle('turn', false); window.J.toggle('roam', false); window.J.toggle('veil', true); window.J.toggle('pixel', false); window.J.setView('free'); window.J.play('Walk'); });
-const t0 = Date.now(); const f0 = await page.evaluate(() => window.__frames = 0);
-await page.waitForTimeout(600);
+await step(4);
 if (process.argv[3]) await page.screenshot({ path: process.argv[3] });
 const errs = await page.evaluate(() => window.J.errors());
 console.log(`${W}x${H}: pressed ${pressed} buttons [${buttons.join(', ')}]`);

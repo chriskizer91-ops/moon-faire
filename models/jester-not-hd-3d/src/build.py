@@ -61,6 +61,36 @@ def texture(part, nm, g):
     return buf.getvalue()
 
 
+def lids(head):
+    """Closed eyelids: two small patches lying just over her eyes, hidden except while she blinks."""
+    c3 = paint.C3
+    V, N, F = head['V'], head['N'], head['F']
+    px = V[:, 0] / c3['k']                                   # pixels from the centre line of drawing C3
+    py = c3['chin'] - (V[:, 1] - c3['chin_y']) / c3['k']
+    ex, ey, rx, ry = 49.0, 446.0, 37.0, 22.0                 # each eye's centre and the patch's half-size, in C3 pixels
+    sel = (N[:, 2] > 0.25) & (np.abs(np.abs(px) - ex) < rx + 6) & (np.abs(py - ey) < ry + 6)
+    f = F[sel[F].all(axis=1)]
+    used = np.unique(f)
+    remap = -np.ones(len(V), np.int64); remap[used] = np.arange(len(used))
+    u = (np.abs(px[used]) - ex) / rx * 0.5 + 0.5             # 0 at the nose side, 1 at the temple side
+    v = (py[used] - ey) / ry * 0.5 + 0.5
+    W_, H_ = 64, 32
+    yy, xx = np.mgrid[0:H_, 0:W_]
+    nx = (xx + 0.5) / W_ * 2 - 1; ny = (yy + 0.5) / H_ * 2 - 1
+    r = np.hypot(nx / 0.86, ny / 0.72)
+    img = np.zeros((H_, W_, 4), np.uint8)
+    img[..., :3] = (248, 192, 170)                           # the lid, a little rosier than her skin
+    img[(ny < -0.15) & (r < 1)] = (252, 200, 176, 0)
+    img[..., 3] = (r < 1.0) * 255
+    lash = (r > 0.80) & (r < 1.0) & (ny > 0.25)              # the lash line along the lower edge
+    img[lash, :3] = (40, 22, 30)
+    wing = (nx > 0.72) & (ny > -0.1) & (ny < 0.35) & (r < 1.12)   # a flick at the outer corner
+    img[wing, :3] = (40, 22, 30); img[wing, 3] = 255
+    buf = io.BytesIO(); Image.fromarray(img, 'RGBA').save(buf, 'PNG')
+    return dict(V=V[used] + N[used] * 0.0009, N=N[used], F=remap[f], J=head['J'][used], W=head['W'][used],
+                uv=np.stack([u, v], 1).astype(np.float32), png=buf.getvalue(), rough=0.8, cloth=True, n0=len(f))
+
+
 def build_parts(only):
     names, parents, rest = jester.skeleton()
     os.makedirs(WORK, exist_ok=True)
@@ -79,6 +109,7 @@ def build_parts(only):
         if redo_geo or only == 'paint':
             print(f'{nm:6s} {g["n0"]:7d} -> {len(g["F"]):6d} triangles, {len(g["V"]):6d} points, texture {tres}, {time.time() - t0:.1f}s', flush=True)
     pickle.dump(built, open(CACHE, 'wb'))
+    built['lids'] = lids(built['head'])
     for nm, fn in (('skirt', cloth.skirt), ('veil', cloth.veil)):
         t0 = time.time()
         built[nm] = fn(names)

@@ -28,6 +28,21 @@ SOCK_L = (176, 150, 206)
 INK = (22, 16, 18)
 
 
+LIGHT = np.array([-0.35, 0.55, 0.75]) / np.linalg.norm([-0.35, 0.55, 0.75])
+
+
+def shade(C, P, N, dark=0.74, lo=-0.12, hi=0.95, lift=1.13, seed=5):
+    """Painted light and shadow, the way the drawings are shaded: a darker tone where the surface
+    turns away from a light high in front of her, a lighter one where it faces it. Edges are dithered."""
+    l = N @ LIGHT
+    h = rnd(*cell(P).T, seed=seed) - 0.5
+    d = l + 0.22 * h < lo
+    C[d] = C[d] * dark
+    b = l + 0.16 * h > hi
+    C[b] = np.minimum(C[b] * lift + 5, 255)
+    return C
+
+
 def fill(n, c):
     return np.tile(np.array(c, float), (n, 1))
 
@@ -41,6 +56,10 @@ def leg_coords(P):
     cz = np.interp(y, ys, [JS.ANKLE[2], JS.KNEE[2], JS.HIP[2]])
     th = np.arctan2(z - cz, (np.abs(x) - cx))
     return th * 0.05 / AP + sx * 400, y / AP          # the two legs get different phases
+
+
+def front_(z):
+    return z > -0.012
 
 
 def body(P, N, tag):
@@ -65,7 +84,11 @@ def body(P, N, tag):
     C[up] = tones(P[up], *BODICE, pd=0.2, pl=0.14)
     lat = up & (((np.floor(np.arctan2(x, z) * 0.08 / AP) + np.floor(y / AP)) % 5) == 0)
     C[lat] = BODICE[2]
-    C[up & (y < 1.152)] = tones(P[up & (y < 1.152)], *CORSET)          # the dark waist under the bust
+    co = up & (y < 1.152)
+    C[co] = tones(P[co], *CORSET)                                      # the dark waist under the bust
+    ang_ = np.arctan2(x, z)
+    C[co & (np.abs(np.mod(ang_ * 0.09, 0.017) - 0.0085) < 0.0011)] = CORSET[2]       # boning
+    C[co & (np.abs(x) < 0.0032) & front_(z) & (np.mod(y, 0.012) < 0.005)] = GOLD[1]  # studs down the front
     front = z > -0.012
     vneck = 1.262 + 1.64 * np.abs(x)
     skin = up & front & (y > vneck) & (np.abs(x) < 0.05) | (tag == 'neck')
@@ -90,38 +113,45 @@ def body(P, N, tag):
     C[a] = tones(P[a], *PLUM)
     f = tag == 'forearm'
     C[f] = tones(P[f], *RUFFLE)
+    keep = C.copy()
+    C = shade(C, P, N)
+    flat = sock | legs & st | trim | stud                              # patterns and metal keep their own colour
+    C[flat] = keep[flat]
     return C
 
 
 def boots(P, N, tag):
-    C = tones(P, *LEATHER, pd=0.18, pl=0.10)
+    C = tones(P, *LEATHER, pd=0.18, pl=0.08)
+    l = N @ LIGHT
+    h = rnd(*cell(P).T, seed=9) - 0.5
+    up = np.isin(tag, ['shaft', 'vamp', 'toecap', 'heel', 'tongue'])
+    C[up & (l + 0.1 * h < -0.05)] = (20, 16, 19)                       # polished leather: deep shadow,
+    C[up & (l + 0.12 * h > 0.90)] = (84, 72, 78)                       # a narrow sheen,
+    C[up & (l + 0.03 * h > 0.988)] = (214, 204, 212)                   # and a small hard highlight
+    sole = tag == 'sole'
+    C[sole] = tones(P[sole], (18, 15, 17), (27, 23, 25), (42, 36, 37))
+    C[sole & (N[:, 1] < -0.7)] = (14, 12, 13)
+    w = tag == 'welt'
+    C[w] = tones(P[w], (52, 44, 46), (72, 60, 62), (98, 84, 86), pd=0.25, pl=0.2)
     for sx in (1, -1):
-        o = np.array([JS.ANKLE[0] * sx, 0.0, JS.ANKLE[2]])
-        q = P - o
+        q = P - np.array([JS.ANKLE[0] * sx, 0.0, JS.ANKLE[2]])
         mine = np.sign(P[:, 0]) == sx
-        sole = mine & (tag == 'sole')
-        C[sole] = tones(P[sole], (18, 15, 17), (26, 22, 24), (40, 34, 35))
-        C[sole & (q[:, 1] > 0.043) & (N[:, 1] < 0.6)] = (74, 62, 64)            # the welt line round the top of the sole
-        ang = np.arctan2(q[:, 0], q[:, 2])
-        notch = sole & (q[:, 1] < 0.020) & (np.mod(ang * 0.06, 0.020) < 0.007) & (N[:, 1] < 0.5)
-        C[notch] = INK                                                            # tread cut into the edge
-        # laces up the front of the shaft
-        fr = mine & (q[:, 2] > 0.03) & (np.abs(q[:, 0]) < 0.024) & (q[:, 1] > 0.135) & (q[:, 1] < 0.295) & (N[:, 2] > 0.35)
-        row = np.mod(q[:, 1] - 0.135, 0.021)
-        C[fr & (np.abs(q[:, 0]) < 0.014)] = INK
-        C[fr & (row < 0.007) & (np.abs(q[:, 0]) < 0.019)] = (86, 72, 74)          # a lace crossing
-        C[fr & (row < 0.008) & (np.abs(np.abs(q[:, 0]) - 0.019) < 0.004)] = GOLD[1]   # eyelets
-        cap = mine & np.isin(tag, ['toecap', 'vamp']) & (np.abs(q[:, 2] - 0.062) < 0.0025) & (q[:, 1] > 0.055)
-        C[cap] = (70, 58, 60)                                                     # toe-cap seam
+        C[mine & np.isin(tag, ['toecap', 'vamp']) & (np.abs(q[:, 2] - 0.060) < 0.0022) & (q[:, 1] > 0.062)] = (74, 62, 66)      # toe-cap seam
+        C[mine & (tag == 'shaft') & (np.abs(q[:, 0]) < 0.0018) & (q[:, 2] < -0.02)] = (70, 58, 62)                              # back seam
+        C[mine & (tag == 'shaft') & (np.abs(np.abs(q[:, 0]) - 0.030) < 0.0014) & (q[:, 2] > 0.02) & (q[:, 1] > 0.12)] = (66, 54, 58)   # facing stitch
+    la = tag == 'lace'
+    C[la] = tones(P[la], (40, 33, 36), (62, 52, 56), (104, 90, 94), pd=0.3, pl=0.22)
+    e = tag == 'eyelet'
+    C[e] = tones(P[e], *GOLD, pd=0.2, pl=0.3)
     return C
 
 
 def cap(P, N, tag):
-    return tones(P, *CAPC, pd=0.2, pl=0.12)
+    return shade(tones(P, *CAPC, pd=0.2, pl=0.12), P, N, lo=-0.05, hi=0.9, lift=1.25)
 
 
 def horns(P, N, tag, owner=None, shapes=None):
-    C = tones(P, *HORN, pd=0.10, pl=0.0)
+    C = shade(tones(P, *HORN, pd=0.10, pl=0.0), P, N, dark=0.7, lo=-0.1, hi=2.0)
     top = (N[:, 1] > 0.45) & (rnd(*cell(P).T, seed=11) > 0.45)
     C[top] = (86, 66, 65)                                  # the padded cloth catches light along the top
     for i, sh in enumerate(shapes):
@@ -143,8 +173,35 @@ def horns(P, N, tag, owner=None, shapes=None):
     return C
 
 
-def hands(P, N, tag):
-    return fill(len(P), SKIN)
+NAIL = ((226, 150, 158), (246, 186, 188), (255, 232, 228))
+
+
+def hands(P, N, tag, owner=None, shapes=None):
+    C = fill(len(P), SKIN)
+    for i, sh in enumerate(shapes):
+        m = owner == i
+        if not m.any():
+            continue
+        name = sh.bone or ''
+        sx = -1.0 if name.startswith('Right') else 1.0
+        back = -JS.PALM_N * [sx, 1, 1]                               # which way the back of this hand faces
+        nb = N[m] @ back
+        c = C[m]
+        h = rnd(*cell(P[m] * 2).T, seed=17) - 0.5
+        c[nb + 0.2 * h < -0.25] = SKIN_SH                             # the palm side sits in shadow
+        if sh.tag == 'finger':
+            t = sh.param(P[m])
+            seg = name[-1]
+            if seg in '23':
+                c[(t < 0.10) & (nb > 0.3)] = SKIN_SH                  # knuckle creases
+            if seg == '3':
+                nail = (t > 0.34) & (nb > 0.52)
+                c[nail] = NAIL[1]
+                c[nail & (t > 0.86)] = NAIL[2]
+                c[nail & (t < 0.42)] = NAIL[0]
+                c[(t > 0.30) & (t <= 0.34) & (nb > 0.52)] = SKIN_SH
+        C[m] = c
+    return C
 
 
 # C3 front view: face centre column, chin row, and metres per pixel (chin to cap edge is 207 px = 13.2 cm)
@@ -183,6 +240,8 @@ def head(P, N, tag):
     xi = np.clip(np.round(px_).astype(int), 0, img.shape[1] - 1); yi = np.clip(np.round(py_).astype(int), 0, img.shape[0] - 1)
     C[ok] = img[yi[ok], xi[ok]]
     C[(P[:, 1] < 1.415) & (P[:, 2] < 0.05)] = SKIN_SH          # under the chin
+    side = ~ok
+    C[side] = shade(C[side], P[side], N[side], dark=0.92, lo=0.0, hi=2.0)
     return C
 
 
@@ -205,7 +264,8 @@ def outfit(P, N, tag):
     # frill edges catch the light: lighter where a cuff or ruff surface faces up or outward at its rim
     cf = tag == 'cuff'
     C[cf & (rnd(*cell(P).T, seed=3) > 0.80)] = RUFFLE[2]
-    g = np.isin(tag, ['buckle', 'bell', 'gold', 'string'])
+    C = shade(C, P, N, lo=-0.05, hi=0.9, lift=1.22)
+    g = np.isin(tag, ['buckle', 'bell', 'gold', 'string', 'bead'])
     C[g] = tones(P[g], *GOLD, pd=0.12, pl=0.16)
     bell = tag == 'bell'
     C[bell & (N[:, 1] < -0.55)] = INK                           # the slot under each bell

@@ -245,6 +245,11 @@ def head_part(step=0.003):
     for s, k, op in core.items:
         p.add(s, k)
     p.add(Ellipsoid((0, 1.479, 0.0835), (0.0055, 0.012, 0.0095), bone='Head'), 0.007)      # nose
+    p.add(RoundCone((0, 1.512, 0.0760), (0, 1.484, 0.0850), 0.0045, 0.0050, bone='Head'), 0.008)   # bridge
+    p.add(Ellipsoid((0, 1.4595, 0.0745), (0.0125, 0.0050, 0.0060), bone='Head'), 0.006)    # upper lip
+    p.add(Ellipsoid((0, 1.4535, 0.0730), (0.0105, 0.0048, 0.0058), bone='Head'), 0.005)    # lower lip
+    for sx in (1, -1):
+        p.sub(Ellipsoid((sx * 0.031, 1.5075, 0.0880), (0.0150, 0.0080, 0.0085), bone='Head'), 0.010)   # eye sockets
     p.add(Column((0, 1.36, -0.010), (0, 1.47, -0.004), [(0, 0.031, 0.031), (1, 0.030, 0.031)], bone='Head'), 0.02)
 
     def clip(P, d):   # only the face and the front of the neck are skin; the cap covers the rest
@@ -264,7 +269,8 @@ def cap_part(step=0.003):
         d = core.dist(P) - 0.007
         d = smax(d, -window(P), 0.006)
         d = smax(d, 1.385 - y, 0.01)          # ends at the nape
-        return d
+        roll = np.maximum(np.abs(core.dist(P) - 0.0075) - 0.0048, np.abs(window(P)) - 0.0058) - 0.0012
+        return smin(d, roll, 0.003)
 
     p = Part('cap', step)
     p.add(Func(fn, (-0.095, 1.37, -0.115), (0.095, 1.675, 0.105), bone='Head', tag='cap'))
@@ -326,6 +332,7 @@ def hands_part(step=0.0016):
         p.add(Column(wr - 0.012 * d, wr + PALM_LEN * d,
                      [(0, 0.0135, 0.0185), (0.22, 0.0120, 0.0190), (0.55, 0.0105, 0.0235), (0.9, 0.0092, 0.0245), (1, 0.0085, 0.0235)],
                      front=(0, 0, 1), side=(sx, 0, 0), n=2.6, bone=side + 'Hand', tag='palm'))
+        p.add(Ellipsoid(wr + 0.022 * d + 0.012 * ZF + 0.006 * PALM_N * m, (0.012, 0.017, 0.011), bone=side + 'Hand', tag='palm'), 0.006)   # thumb mound
         for f in ('Thumb', 'Index', 'Middle', 'Ring', 'Pinky'):
             pts, (r0, r1) = finger_chain(f)
             pts = pts * m
@@ -336,29 +343,52 @@ def hands_part(step=0.0016):
     return p
 
 
-def boots_part(step=0.0045):
-    p = Part('boots', step, soft=0.006)
+def boots_part(step=0.0026):
+    """Chunky lace-up platform boots, after C2: lugged sole with a taller heel block and an arch,
+    a welt, rounded toe cap, eight rows of eyelets, crossed laces over the tongue and a bow."""
+    p = Part('boots', step, soft=0.004)
     for sx, side in ((1, 'Left'), (-1, 'Right')):
         o = np.array([ANKLE[0] * sx, 0.0, ANKLE[2]])        # on the ground under the ankle
 
+        def outline(q):                                      # seen from above: a round cone from heel to ball
+            a = np.array([0.0, -0.036]); b = np.array([0.0, 0.066]); ra, rb = 0.050, 0.068
+            xz = q[:, [0, 2]]; ba = b - a
+            h = np.clip(((xz - a) @ ba) / (ba @ ba), 0, 1)
+            return np.linalg.norm(xz - a - np.outer(h, ba), axis=1) - (ra * (1 - h) + rb * h)
+
+        def top_of(q):
+            return 0.046 + 0.018 * (1 - sstep(-0.030, 0.010, q[:, 2]))        # taller under the heel
+
         def sole(P, o=o):
             q = P - o
-            # outline seen from above: a round cone from heel to ball
-            a = np.array([0.0, -0.036]); b = np.array([0.0, 0.066]); ra, rb = 0.050, 0.068
-            xz = q[:, [0, 2]]
-            ba = b - a
-            h = np.clip(((xz - a) @ ba) / (ba @ ba), 0, 1)
-            d2 = np.linalg.norm(xz - a - np.outer(h, ba), axis=1) - (ra * (1 - h) + rb * h)
-            top = 0.050 + 0.014 * (1 - sstep(-0.035, 0.03, q[:, 2]))        # taller under the heel
-            dy = np.abs(q[:, 1] - top / 2) - top / 2
-            w = np.stack([d2 + 0.006, dy + 0.006], 1)
-            return np.linalg.norm(np.maximum(w, 0), axis=1) + np.minimum(w.max(axis=1), 0) - 0.006
+            d2 = outline(q)
+            lo = 0.020 * np.exp(-((q[:, 2] - 0.002) / 0.015) ** 2)             # the arch between heel and forefoot
+            dy = np.maximum(lo - q[:, 1], q[:, 1] - top_of(q))
+            w = np.stack([d2 + 0.004, dy + 0.004], 1)
+            d = np.linalg.norm(np.maximum(w, 0), axis=1) + np.minimum(w.max(axis=1), 0) - 0.004
+            ang = np.arctan2(q[:, 0], q[:, 2] - 0.015)
+            notch = np.maximum(np.maximum(q[:, 1] - 0.017, -(d2 + 0.013)), (0.55 - np.cos(ang * 12)) * 0.012)   # tread lugs round the edge
+            return np.maximum(d, -notch)
+
+        def welt(P, o=o):
+            q = P - o
+            return np.maximum(outline(q) - 0.0045, np.abs(q[:, 1] - (top_of(q) - 0.001)) - 0.0035)
 
         def wsole(P, o=o, side=side):
             t = sstep(0.045, 0.085, (P - o)[:, 2])
             return {side + 'Foot': 1 - t, side + 'ToeBase': t}
 
-        p.add(Func(sole, o + np.array([-0.075, -0.004, -0.092]), o + np.array([0.075, 0.07, 0.14]), wfn=wsole, tag='sole'))
+        def wshaft(P, o=o, side=side):
+            t = np.clip(((P - o)[:, 1] - 0.105) / 0.197, 0, 1)
+            wf = np.interp(t, [0, 0.12, 0.45, 1], [1, 0.75, 0, 0])
+            return {side + 'Foot': wf, side + 'Leg': 1 - wf}
+
+        def on_shaft(shape, tag, k=0.0):
+            lo, hi = shape.bbox()
+            p.add(Func(shape.dist, lo, hi, wfn=wshaft, tag=tag), k)
+
+        p.add(Func(sole, o + np.array([-0.075, -0.004, -0.092]), o + np.array([0.075, 0.075, 0.14]), wfn=wsole, tag='sole'))
+        p.add(Func(welt, o + np.array([-0.08, 0.03, -0.097]), o + np.array([0.08, 0.075, 0.145]), wfn=wsole, tag='welt'))
         p.add(Func(lambda P, o=o: Ellipsoid(o + np.array([0, 0.084, 0.040]), (0.055, 0.044, 0.086)).dist(P),
                    o + np.array([-0.06, 0.03, -0.05]), o + np.array([0.06, 0.135, 0.13]), wfn=wsole, tag='vamp'), 0.012)
         p.add(Func(lambda P, o=o: Ellipsoid(o + np.array([0, 0.080, 0.080]), (0.056, 0.037, 0.050)).dist(P),
@@ -369,14 +399,31 @@ def boots_part(step=0.0045):
                      side=(sx, 0, 0), tag='shaft',
                      wkeys=[(0, {side + 'Foot': 1}), (0.12, {side + 'Foot': 0.75, side + 'Leg': 0.25}),
                             (0.45, {side + 'Leg': 1}), (1, {side + 'Leg': 1})]), 0.012)
-        p.add(RoundCone(o + np.array([0, 0.125, 0.046]), o + np.array([-0.003 * sx, 0.295, 0.047]), 0.016, 0.014,
+        p.add(RoundCone(o + np.array([0, 0.125, 0.046]), o + np.array([-0.003 * sx, 0.298, 0.047]), 0.016, 0.014,
                         wkeys=[(0, {side + 'Foot': 0.7, side + 'Leg': 0.3}), (0.4, {side + 'Leg': 1}), (1, {side + 'Leg': 1})],
                         tag='tongue'), 0.012)
-
+        # a collar round the top of the shaft
+        on_shaft(Column(o + np.array([-0.003 * sx, 0.292, 0.012]), o + np.array([-0.003 * sx, 0.304, 0.012]),
+                        [(0, 0.0445, 0.048), (1, 0.0445, 0.048)], side=(sx, 0, 0)), 'welt', 0.002)
+        rows = np.linspace(0.128, 0.284, 8)
+        zc = 0.0655                                           # where the laces cross, on top of the tongue
+        for i, y in enumerate(rows):
+            for s2 in (1, -1):
+                on_shaft(Ellipsoid(o + np.array([s2 * 0.0215, y, 0.0515]), (0.0064, 0.0064, 0.0046)), 'eyelet')
+                if i < len(rows) - 1:
+                    mid = o + np.array([0, (y + rows[i + 1]) / 2, zc])
+                    on_shaft(RoundCone(o + np.array([s2 * 0.020, y, 0.054]), mid, 0.0042, 0.0042), 'lace', 0.001)
+                    on_shaft(RoundCone(mid, o + np.array([-s2 * 0.020, rows[i + 1], 0.054]), 0.0042, 0.0042), 'lace', 0.001)
+        knot = o + np.array([0, 0.290, zc + 0.002])
+        on_shaft(Ellipsoid(knot, (0.008, 0.008, 0.007)), 'lace', 0.002)
+        for s2 in (1, -1):
+            on_shaft(Ellipsoid(knot + np.array([s2 * 0.021, 0.006, 0.0]), (0.017, 0.0085, 0.0055)), 'lace', 0.003)        # bow loops
+            on_shaft(RoundCone(knot, knot + np.array([s2 * 0.013, -0.034, 0.003]), 0.0040, 0.0036), 'lace', 0.002)       # bow tails
+        on_shaft(Ellipsoid(o + np.array([0, 0.305, -0.036]), (0.0055, 0.014, 0.0045)), 'lace', 0.003)                    # pull loop at the back
     return p
 
 
-def outfit_part(step=0.004):
+def outfit_part(step=0.0035):
     """What she wears under the veil, apart from the skirt: ruff, puffed sleeves, ruffled cuffs,
     belt buckle, pouch, bells and pendant. Sizes read off B1, B4 and C3."""
     p = Part('outfit', step, soft=0.004)
@@ -478,7 +525,9 @@ def outfit_part(step=0.004):
     BELLS = (np.array([0.052, 0.972, 0.128]), np.array([0.082, 0.950, 0.120]), np.array([0.060, 0.920, 0.134]))
     top = np.array([0.060, 1.066, 0.074])
     for bc in BELLS:
-        p.add(RoundCone(top, bc + np.array([0, 0.016, 0]), 0.0032, 0.0032, bone='Bells', tag='string'))
+        end = bc + np.array([0, 0.020, 0]); nb = int(np.linalg.norm(end - top) / 0.0105)
+        for b_ in range(nb + 1):
+            p.add(Ellipsoid(top + (end - top) * b_ / nb, (0.0050, 0.0050, 0.0050), bone='Bells', tag='bead'), 0.0012)
         p.add(Ellipsoid(bc, (0.0185, 0.0185, 0.0185), bone='Bells', tag='bell'))
         p.add(Ellipsoid(bc + np.array([0, 0.019, 0]), (0.006, 0.006, 0.006), bone='Bells', tag='bell'))
 
@@ -486,6 +535,27 @@ def outfit_part(step=0.004):
     for sx in (1, -1):
         p.add(Ellipsoid((sx * 0.024, 1.672, -0.004), (0.023, 0.012, 0.011), bone='Head', tag='bow'), 0.003)
     p.add(Ellipsoid((0, 1.670, -0.002), (0.0095, 0.0105, 0.0105), bone='Head', tag='bow'), 0.003)
+
+    # the bead chain her pendant hangs on, lying on her chest
+    tb = Part('tb', 0.004)
+    for s_, k_, op_ in body_part().items:
+        if op_ == 'add' and s_.tag in ('torso', 'bust', 'trap', 'neck'):
+            tb.add(s_, k_)
+
+    def on_chest(x, y):
+        lo, hi = 0.0, 0.16
+        for _ in range(22):
+            mid = (lo + hi) / 2
+            if tb.dist(np.array([[x, y, mid]]))[0] < 0:
+                lo = mid
+            else:
+                hi = mid
+        return np.array([x, y, hi + 0.0025])
+
+    for sx in (1, -1):
+        for b_ in range(8):
+            f = b_ / 7
+            p.add(Ellipsoid(on_chest(sx * (0.010 + 0.046 * f), 1.313 + 0.040 * f ** 0.8), (0.0050, 0.0050, 0.0050), bone='Spine2', tag='bead'), 0.0012)
 
     # pendant
     gc = np.array([0.0, 1.298, 0.0655])
@@ -496,11 +566,11 @@ def outfit_part(step=0.004):
 
 PARTS = [  # (builder, roughness, keep ratio when thinning the mesh, weight-smoothing passes, texture size)
     (body_part, 0.85, 0.24, 14, 1024),
-    (head_part, 0.80, 0.50, 2, 512),
+    (head_part, 0.80, 0.60, 2, 512),
     (cap_part, 0.75, 0.30, 2, 256),
     (horns_part, 0.80, 0.35, 8, 512),
-    (hands_part, 0.80, 0.45, 4, 128),
-    (boots_part, 0.30, 0.40, 6, 512),
+    (hands_part, 0.80, 0.50, 4, 512),
+    (boots_part, 0.30, 0.45, 5, 1024),
     (outfit_part, 0.80, 0.42, 6, 1024),
 ]
 
