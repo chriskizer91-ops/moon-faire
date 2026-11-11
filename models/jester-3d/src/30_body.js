@@ -189,7 +189,7 @@
     // toe-cap seam and laces
     const seam = []; for (let j = 0; j <= 12; j++) { const a = lerp(-0.1, PI + 0.1, j / 12); seam.push(V3(cx + 0.052 * BW * Math.cos(a), base + 0.054 * Math.pow(Math.max(0, Math.sin(a)), 0.85) + 0.001, (0.112 - 0.012 * Math.sin(a)) * BZ)); }
     addPart('boot', loft(tubeRings(seam, seam.map(() => 0.0032), 6)), wf, { out: V3(cx, 0.05, 0.11) });
-    const front = (k) => { const u = k / 8; return V3(cx, lerp(0.112, 0.325, Math.pow(u, 0.85)), (lerp(0.078, 0.052, Math.pow(u, 0.6)) + 0.012 * Math.sin(u * PI)) * BZ); };
+    const front = (k) => { const u = k / 8, y = lerp(0.112, 0.325, Math.pow(u, 0.85)), sp = prof(SH, Math.max(0.06, y), true), zs = (sp[3] + sp[1]) * BZ + 0.0035; return V3(cx, y, lerp(0.078 * BZ, zs, sm(0.02, 0.30, u))); };
     for (let k = 0; k <= 8; k++) {
       const p = front(k), ex = 0.0165 * BW;
       for (const sx of [-1, 1]) {

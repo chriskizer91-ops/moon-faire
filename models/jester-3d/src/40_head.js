@@ -203,7 +203,7 @@
   }
   // horns: [x, y, z] control points for her left; the right is mirrored. Each has a chain of bones so it can sway.
   const HORN_CTRL = [[0.030, 1.615, -0.004], [0.085, 1.680, -0.012], [0.150, 1.715, -0.018], [0.215, 1.705, -0.020], [0.262, 1.665, -0.014], [0.278, 1.610, -0.008], [0.274, 1.560, -0.002], [0.264, 1.522, 0.0]];
-  const HORN_R = [0.064, 0.060, 0.056, 0.052, 0.047, 0.041, 0.035, 0.030];
+  const HORN_R = [0.072, 0.068, 0.063, 0.058, 0.052, 0.045, 0.039, 0.033];
   const HORN_N = 6, hornChains = {};
   for (const [S, s] of SIDES) {
     const ctrl = HORN_CTRL.map((p) => V3(s * p[0], p[1], p[2])), N = Q(64, 32), pts = curvePts(ctrl, N);
@@ -238,7 +238,7 @@
     addPart(key, { pos, uv, idx }, wf, { weld: false });
   }
   for (const [S, s] of SIDES) {
-    const c = hornChains[S].pom, R = 0.062, wf = wOne('pom' + S);
+    const c = hornChains[S].pom, R = 0.066, wf = wOne('pom' + S);
     addPart('fur', spherePart(c, R * 0.86, R * 0.86, R * 0.86, 20, 14), wf, { out: c });
     tufts('fur', Q(2600, 1000), () => { const d = V3(rnd() - 0.5, rnd() - 0.5, rnd() - 0.5).normalize(); return { p: c.clone().addScaledVector(d, R * 0.86), n: d }; }, wf, 0.013, 0.0058);
     // the short cord that ties the pompom to the horn tip

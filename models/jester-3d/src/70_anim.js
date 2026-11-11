@@ -35,7 +35,7 @@
   const root = new THREE.Group(); root.name = 'jester';
   root.add(SK.hips); root.updateMatrixWorld(true);
   const skeleton = new THREE.Skeleton(bones), meshes = {};
-  SK.spine1.scale.setScalar(UPK); SK.head.scale.setScalar(opts.headScale || 0.94); root.updateMatrixWorld(true);   // horns keep their size as the head shrinks       // after the bind, so head, cap, horns and their veils all shrink about the neck
+  SK.spine1.scale.setScalar(UPK); SK.head.scale.setScalar(opts.headScale || 0.98); root.updateMatrixWorld(true);   // horns keep their size as the head shrinks       // after the bind, so head, cap, horns and their veils all shrink about the neck
   let triCount = 0;
   for (const key in buckets) {
     const B = buckets[key], g = new THREE.BufferGeometry();

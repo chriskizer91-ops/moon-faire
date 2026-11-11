@@ -18,14 +18,16 @@
   })();
 
   (function buildPouch() {
-    const a = -146 * DEG, y = WAIST - 0.060, [rx, rz] = prof(SKIRT_R, y, true), c = ell(rx + 0.020, rz + 0.020, a, y, 0), wf = () => [BI.hips, 0.6, BI.spine1, 0.4];
+    const a = -150 * DEG, y = WAIST - 0.072, [rx, rz] = prof(SKIRT_R, y, true), c = ell(rx + 0.020, rz + 0.020, a, y, 0), wf = () => [BI.hips, 0.6, BI.spine1, 0.4];
     const yaw = Math.atan2(c.x, c.z), R = (p) => { const x = p[0], z = p[2]; return [c.x + x * Math.cos(yaw) + z * Math.sin(yaw), c.y + p[1], c.z - x * Math.sin(yaw) + z * Math.cos(yaw)]; };
     const turn = (part) => { for (let i = 0; i < part.pos.length; i += 3) { const q = R([part.pos[i], part.pos[i + 1], part.pos[i + 2]]); part.pos[i] = q[0]; part.pos[i + 1] = q[1]; part.pos[i + 2] = q[2]; } return part; };
-    addPart('leather', turn(spherePart(V3(0, -0.004, 0), 0.036, 0.040, 0.015, 18, 12)), wf, { out: c });                 // the bag
-    addPart('leather', turn(spherePart(V3(0, 0.022, 0.004), 0.038, 0.020, 0.0155, 18, 10)), wf, { out: c });            // its flap
-    addPart('gold', turn(spherePart(V3(0, 0.006, 0.0185), 0.0048, 0.0048, 0.0030, 10, 6)), wf, { out: c });            // the stud
-    addPart('leather', turn(loft(tubeRings([V3(-0.016, 0.036, 0.004), V3(-0.016, 0.066, -0.006)], [0.006, 0.006], 6))), wf, { out: c });   // two loops to the belt
-    addPart('leather', turn(loft(tubeRings([V3(0.016, 0.036, 0.004), V3(0.016, 0.066, -0.006)], [0.006, 0.006], 6))), wf, { out: c });
+    addPart('leather', turn(spherePart(V3(0, -0.006, 0), 0.046, 0.054, 0.021, 22, 14)), wf, { out: c });                 // the bag
+    addPart('leather', turn(spherePart(V3(0, 0.028, 0.005), 0.048, 0.026, 0.021, 22, 12)), wf, { out: c });            // its flap
+    addPart('gold', turn(spherePart(V3(0, 0.008, 0.0255), 0.0090, 0.0070, 0.0034, 12, 8)), wf, { out: c });            // the buckle
+    addPart('leather', turn(spherePart(V3(-0.075, 0.004, -0.030), 0.030, 0.036, 0.016, 16, 10)), wf, { out: c });    // a smaller pouch behind it
+    addPart('gold', turn(spherePart(V3(-0.075, 0.010, -0.013), 0.0050, 0.0050, 0.0028, 10, 6)), wf, { out: c });
+    addPart('leather', turn(loft(tubeRings([V3(-0.020, 0.044, 0.004), V3(-0.020, 0.078, -0.006)], [0.006, 0.006], 6))), wf, { out: c });   // two loops to the belt
+    addPart('leather', turn(loft(tubeRings([V3(0.020, 0.044, 0.004), V3(0.020, 0.078, -0.006)], [0.006, 0.006], 6))), wf, { out: c });
   })();
 
   // ---------- the hip bells: a beaded gold chain from the belt at her left hip, ending in a cluster of bells ----------
@@ -69,13 +71,14 @@
   // ---------- ruffled black cuffs: four flared tiers of lace round each forearm ----------
   for (const [S, s] of SIDES) {
     const d = armDir[S], sh = restPts['sh' + S], side = V3(-d.y, d.x, 0).normalize(), fw = V3(0, 0, 1);
-    for (const [ax0, Rm, r0, phs, NP] of [[0.300, 0.047, 0.0175, 0.0, 15], [0.336, 0.055, 0.0205, 1.7, 17], [0.374, 0.062, 0.0230, 3.1, 18], [0.412, 0.063, 0.0225, 4.4, 18], [0.444, 0.055, 0.0185, 5.6, 16]]) {
+    { const pc = sh.clone().addScaledVector(d, 0.050); addPart('wine', spherePart(pc, 0.060, 0.074, 0.062, 22, 16), () => [BI['uarm' + S], 0.7, BI['clav' + S], 0.3], { out: pc }); }      // the puff at the top of the sleeve
+    for (const [ax0, Rm, r0, phs, NP] of [[0.318, 0.046, 0.026, 0.0, 9], [0.350, 0.058, 0.032, 1.7, 11], [0.386, 0.066, 0.035, 3.1, 12], [0.420, 0.062, 0.031, 4.4, 11], [0.446, 0.050, 0.022, 5.6, 10]]) {
       const NA = NP * Q(8, 4), NS = Q(12, 8), rings = [];
       for (let i = 0; i < NS; i++) {
         const f = (i / NS) * TAU, cf = Math.cos(f), sf = Math.sin(f), ring = [];
         for (let j = 0; j < NA; j++) {
           const a = (j / NA) * TAU, th = a * NP + phs + 0.5 * Math.sin(a * 3 + phs), out = Math.max(0, cf);
-          const rr = r0 * (1 + out * (0.36 * Math.sin(th) + 0.12 * Math.sin(2.3 * th + 1)) + 0.06 * Math.sin(a * 4 + phs)), R = Rm + rr * cf * 1.2, ax = ax0 + rr * sf * (1 + 0.25 * out * Math.cos(th));
+          const rr = r0 * (1 + out * (0.46 * Math.sin(th) + 0.20 * Math.sin(2.3 * th + 1 + phs)) + 0.12 * Math.sin(a * 3 + phs * 2) + 0.07 * Math.sin(a * 7 + f * 2)), R = Rm + rr * cf * 1.2, ax = ax0 + rr * sf * (1 + 0.25 * out * Math.cos(th));
           const c = sh.clone().addScaledVector(d, ax).addScaledVector(side, R * Math.cos(a)).addScaledVector(fw, R * Math.sin(a));
           ring.push([c.x, c.y, c.z]);
         }
@@ -105,4 +108,5 @@
     apronCloth = makeCloth({ cols: NC, rows: NR, mask: 1 | 4, margin: 0.033, bend: 0.25, grav: 0.8, drag: 0.03, flutter: 0.35,
       rest: (c, r) => cols[c][r], pin: (c, r) => (r === 0 ? 1 : r === 1 ? 0.4 : 0), weights: () => [BI.hips, 0.6, BI.spine1, 0.4] });
     addCut(apronCloth, sheen(new THREE.MeshStandardMaterial({ map: fabricTex(256, '#2a2228', '#41343e', '#141014', 2), side: THREE.DoubleSide, roughness: 0.95 }), '#94848e', 2.2, 0.4), 2);
+    apronCloth.meshes.forEach((m) => { m.visible = false; });      // Chris: take the swag away (November 11)
   })();
