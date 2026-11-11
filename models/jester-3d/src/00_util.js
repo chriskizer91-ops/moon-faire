@@ -1,0 +1,67 @@
+// jester.js: the Jester of the Moon Faire (New Moon; Fate magic; gold hip bells that become a chain flail).
+// Code-built three.js r128 model (global THREE). Defines makeJester(opts) only.
+// Units are meters, Y up, feet on y = 0. She faces +Z (the audience); her left is +X, which is also the side her
+// spells fly to, as in her sprite sheets (the target stands at screen right).
+// Interface (the same Model Build Spec as Io and Sol): root, fx, skeleton, bones, animate(phase, wb, t, dt),
+// play(name, force), ACTIONS (dur, hits, cues), anchor(name, out), state, setFade(f), reset(), busy, action, progress.
+function makeJester(opts) {
+  'use strict';
+  opts = opts || {};
+  // detail 0.5 to 1 scales segment counts and cloth resolution for slower phones
+  const DET = Math.max(0.5, Math.min(1, opts.detail == null || !Number.isFinite(+opts.detail) ? 1 : +opts.detail));
+  const Q = (n, min) => (DET >= 1 ? n : Math.max(min || 3, Math.round(n * DET)));
+  const TAU = Math.PI * 2, PI = Math.PI, DEG = Math.PI / 180;
+  let seed = 4242;
+  const rnd = () => (seed = (seed * 16807) % 2147483647) / 2147483647;
+  const rr = (a, b) => a + (b - a) * rnd();
+  const cl = (v, a, b) => (v < a ? a : v > b ? b : v);
+  const lerp = (a, b, t) => a + (b - a) * t;
+  const sm = (e0, e1, x) => { const u = cl((x - e0) / (e1 - e0), 0, 1); return u * u * (3 - 2 * u); };
+  const V3 = (x, y, z) => new THREE.Vector3(x, y, z);
+  // value noise (deterministic)
+  const h1 = (n) => { const s = Math.sin(n * 127.1 + 311.7) * 43758.5453; return s - Math.floor(s); };
+  const h2 = (x, y) => { const s = Math.sin(x * 127.1 + y * 311.7) * 43758.5453; return s - Math.floor(s); };
+  function vnoise(x, y) {
+    const xi = Math.floor(x), yi = Math.floor(y), xf = x - xi, yf = y - yi;
+    const u = xf * xf * (3 - 2 * xf), v = yf * yf * (3 - 2 * yf);
+    return lerp(lerp(h2(xi, yi), h2(xi + 1, yi), u), lerp(h2(xi, yi + 1), h2(xi + 1, yi + 1), u), v);
+  }
+  const fbm = (x, y) => vnoise(x, y) * 0.5 + vnoise(x * 2.03, y * 2.03) * 0.25 + vnoise(x * 4.01, y * 4.01) * 0.125 + vnoise(x * 8.1, y * 8.1) * 0.0625;
+  // piecewise-linear lookup through [[x, v], ...] (v a number or an array), smooth between keys
+  function prof(keys, x, smooth) {
+    if (keys[0][0] > keys[keys.length - 1][0]) keys = keys._rev || (keys._rev = keys.slice().reverse());
+    if (x <= keys[0][0]) return keys[0][1];
+    const n = keys.length;
+    if (x >= keys[n - 1][0]) return keys[n - 1][1];
+    let i = 1; while (keys[i][0] < x) i++;
+    let u = (x - keys[i - 1][0]) / (keys[i][0] - keys[i - 1][0]);
+    if (smooth) u = u * u * (3 - 2 * u);
+    const a = keys[i - 1][1], b = keys[i][1];
+    if (typeof a === 'number') return a + (b - a) * u;
+    return a.map((v, k) => v + (b[k] - v) * u);
+  }
+  // Catmull-Rom through numbers at uniform spacing; ps = [p0, p1, ...], x in 0..n-1
+  function crom(ps, x) {
+    const n = ps.length; x = cl(x, 0, n - 1);
+    const i = Math.min(n - 2, Math.floor(x)), u = x - i;
+    const p0 = ps[Math.max(0, i - 1)], p1 = ps[i], p2 = ps[i + 1], p3 = ps[Math.min(n - 1, i + 2)];
+    return 0.5 * ((2 * p1) + (-p0 + p2) * u + (2 * p0 - 5 * p1 + 4 * p2 - p3) * u * u + (-p0 + 3 * p1 - 3 * p2 + p3) * u * u * u);
+  }
+  const cvs = (w, h) => { const c = document.createElement('canvas'); c.width = w; c.height = h; return c; };
+  const ctex = (c, rx, ry, srgb) => {
+    const t = new THREE.CanvasTexture(c);
+    if (rx) { t.wrapS = t.wrapT = THREE.RepeatWrapping; t.repeat.set(rx, ry || rx); }
+    t.anisotropy = 4; if (srgb !== false) t.encoding = THREE.sRGBEncoding; return t;
+  };
+  const TEXS = Math.max(0.5, Math.min(1, opts.textureScale == null ? 1 : +opts.textureScale)); // canvas size scale
+
+  // ---------- palette, sampled from her sprite sheets ----------
+  const PAL = {
+    skin: '#fccfb0', skinSh: '#d39a84', blush: '#e88f88', lip: '#b02c46',
+    black: '#141016', soft: '#231c26', char: '#2e2630',
+    wine: '#7a1f43', wineDk: '#4c1029', magenta: '#b8407e', rose: '#d2617f',
+    gold: '#d6a84e', goldHi: '#f5d98a', goldDk: '#8f6a25', orange: '#d98a3a',
+    olive: '#6f5a2a', oliveHi: '#9a8040', oliveDk: '#3c3018',
+    purple: '#7a4298', purpleHi: '#9c66ba', purpleDk: '#3c1e54', lace: '#63305e', laceHi: '#864a80',
+    teal: '#3fc2b4', tealDk: '#1d7f86', white: '#e9e4ee', violet: '#b35cff', spell: '#d58bff'
+  };

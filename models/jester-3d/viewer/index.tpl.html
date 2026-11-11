@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Jester Witch 3D</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Jacquard+24&family=Atkinson+Hyperlegible:wght@400;700&family=JetBrains+Mono:wght@400;600&display=swap">
+<style>
+/* One stage like a puppet theatre, the move chips under it, then views and switches. Dark on purpose: she was painted on night-purple. */
+:root{
+  --velvet:#17121e; --curtain:#221a2c; --stage:#383043; --gold:#d6a84e; --veil:#b8407e; --pendant:#3fc2b4; --ink:#efe6f2; --muted:#a597b3; --line:#3a3049;
+  --f-display:"Jacquard 24","Georgia",serif; --f-body:"Atkinson Hyperlegible",system-ui,-apple-system,"Segoe UI",sans-serif; --f-mono:"JetBrains Mono",ui-monospace,Menlo,monospace;
+  color-scheme:dark;
+}
+*,*::before,*::after{box-sizing:border-box}
+html,body{margin:0;background:var(--velvet);color:var(--ink)}
+body{font-family:var(--f-body);font-size:15px;line-height:1.5;padding:16px 14px 40px}
+.wrap{max-width:900px;margin:0 auto;display:flex;flex-direction:column;gap:14px}
+header{display:flex;flex-wrap:wrap;align-items:baseline;gap:2px 14px}
+h1{font-family:var(--f-display);font-weight:400;font-size:clamp(38px,9vw,60px);line-height:.95;margin:0;color:var(--gold);letter-spacing:.01em}
+.sub{color:var(--muted);font-size:14px;margin:0;max-width:60ch}
+.stagebox{position:relative;background:var(--stage);border:1px solid var(--line);border-radius:6px;overflow:hidden;width:100%;height:min(74vh,125vw);min-height:340px;touch-action:none}
+canvas#stage{display:block;width:100%;height:100%;touch-action:none;cursor:grab}
+.stagebox.px canvas#stage{image-rendering:pixelated}
+.hud{position:absolute;left:10px;top:8px;font-family:var(--f-mono);font-size:12px;color:var(--muted);background:rgba(23,18,30,.7);padding:2px 8px;border-radius:4px;font-variant-numeric:tabular-nums;pointer-events:none;max-width:calc(100% - 20px)}
+#book{position:absolute;right:8px;bottom:8px;width:min(30%,180px);aspect-ratio:13/11;background:var(--stage);border:1px solid var(--gold);border-radius:4px;pointer-events:none;box-shadow:0 4px 18px rgba(0,0,0,.45)}
+.booktag{position:absolute;right:14px;bottom:12px;font-family:var(--f-mono);font-size:10px;letter-spacing:.1em;text-transform:uppercase;color:var(--gold);pointer-events:none;text-shadow:0 1px 2px #000}
+#book[hidden]+.booktag{display:none}
+.err[hidden]{display:none}
+.err{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;padding:24px;text-align:center;color:var(--ink);background:var(--stage)}
+.label{font-family:var(--f-mono);font-size:11px;letter-spacing:.12em;text-transform:uppercase;color:var(--muted);margin:0 0 6px}
+.chips{display:flex;flex-wrap:wrap;gap:8px}
+.chip{font:inherit;font-size:14px;color:var(--ink);background:var(--curtain);border:1px solid var(--line);border-radius:999px;padding:9px 14px;min-height:40px;cursor:pointer;transition:background .15s,border-color .15s}
+.chip:hover{border-color:var(--muted)}
+.chip:focus-visible{outline:2px solid var(--pendant);outline-offset:2px}
+.chip[aria-pressed="true"]{background:var(--veil);border-color:var(--gold);color:#fff}
+#moves .chip{font-weight:700}
+.notes{color:var(--muted);font-size:14px;max-width:68ch;margin:0}
+.notes b{color:var(--ink);font-weight:700}
+@media (prefers-reduced-motion:reduce){.chip{transition:none}}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <h1>Jester Witch 3D</h1>
+    <p class="sub">The New Moon performer of the Moon Faire in 3D, with her painted face, veil and fabrics baked onto the model.</p>
+  </header>
+  <div class="stagebox" id="stagebox">
+    <canvas id="stage" aria-label="3D model of the Jester Witch. Drag to turn her, pinch or scroll to zoom."></canvas>
+    <div class="hud" id="hud">Loading</div>
+    <canvas id="book" width="390" height="330" aria-label="The flipbook frame for the same moment"></canvas><span class="booktag">Flipbook</span>
+    <div class="err" id="err" hidden></div>
+  </div>
+  <section aria-label="Moves"><p class="label">Moves</p><div class="chips" id="moves"></div></section>
+  <section aria-label="Views"><p class="label">Views</p><div class="chips" id="views"></div></section>
+  <section aria-label="Switches"><p class="label">Switches</p><div class="chips" id="toggles"></div></section>
+  <p class="notes">Drag to turn her; pinch or scroll to zoom. Her face, expressions, great veil and cloth are taken from the paintings. <b>Flipbook look</b> redraws the model at the sprites' pixel size in her own 56 colours. The small picture is her <b>flipbook frame for the same moment</b>, so each move can be checked against the drawing. As in the sprites she plays to the audience and casts toward her left, where the target stands at screen right. Timings are the flipbook's own: Curtain Call 8.0 s with the ring on frame 32, Sealed Fate 4.8 s, Against All Odds 8.0 s, Gilded Rebuke 2.0 s, Hush 4.8 s, Gravity 1.7 s.</p>
+</div>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+<script>/*PAL*/</script>
+<script>/*FB*/</script>
+<script>/*STAGE*/</script>
+<script src="jester_tex.js"></script>
+<script src="jester.js"></script>
+<script>/*APP*/</script>
+</body>
+</html>

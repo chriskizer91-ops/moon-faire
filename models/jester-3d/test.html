@@ -1,0 +1,23 @@
+<!doctype html><html><head><meta charset="utf-8"><style>html,body{margin:0;background:#383043}canvas{display:block}</style></head><body>
+<canvas id="c" width="700" height="900"></canvas>
+<script src="node_modules/three/build/three.min.js"></script>
+<script src="out/palette.js"></script>
+<script src="viewer/stage.js"></script>
+<script src="out/jester_tex.js"></script>
+<script src="out/jester.js"></script>
+<script>
+window.T = {}; var T = window.T;
+try {
+  T.stage = makeStage(document.getElementById('c'), { preserve: true, shadow: 2048 });
+  const t0 = performance.now();
+  T.j = makeJester({});
+  T.buildMs = performance.now() - t0;
+  T.stage.scene.add(T.j.root); if (T.j.fx) T.stage.scene.add(T.j.fx);
+  T.time = 0; T.phase = 0; T.wb = 0;
+  T.step = (n, dt) => { for (let i = 0; i < n; i++) { T.time += dt; if (T.wb > 0) T.phase += dt * 7.2; T.j.animate(T.phase, T.wb, T.time, dt); } };
+  T.view = (az, el, dist, ty, fov, w, h) => { const o = T.stage.orbit; o.az = az; o.el = el; o.dist = dist; o.target.y = ty; if (fov) o.fov = fov; T.stage.resize(w || 700, h || 900, 1); T.stage.render(); return T.stage.renderer.info.render.triangles; };
+  T.at = (name, time) => { T.j.play(name, true); const n = Math.round(time * 60); for (let i = 0; i < n; i++) { T.time += 1/60; T.j.animate(T.phase, T.wb, T.time, 1/60); } return T.j.time; };
+  T.clean = (mode) => { const s = T.stage; s.noFloor = true; s.floor.visible = false; s.shadowCatcher.visible = false; s.bg = new THREE.Color(mode === 'mask' ? 0x00ff00 : 0x383043); };
+  T.ok = true;
+} catch (e) { T.err = String(e.stack || e); console.error(T.err); }
+</script></body></html>
