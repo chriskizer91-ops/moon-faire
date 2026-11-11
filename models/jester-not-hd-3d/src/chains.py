@@ -29,9 +29,9 @@ for k, (deg, follow) in enumerate(((30, 0.85), (75, 0.60), (120, 0.35), (165, 0.
                        thigh='LeftUpLeg' if deg < 180 else 'RightUpLeg', follow=follow))
 # veil: five chains (left side, back-left, back, back-right, right side), three bones each
 VEIL_Y = (1.10, 0.84, 0.56, 0.28)
-for name, deg, parent, rho in (('VeilL', 95, 'LeftArm', (0.31, 0.37, 0.43, 0.47)), ('VeilBL', 140, 'Spine2', (0.25, 0.30, 0.35, 0.39)),
-                               ('VeilB', 180, 'Spine2', (0.17, 0.22, 0.27, 0.31)), ('VeilBR', 220, 'Spine2', (0.25, 0.30, 0.35, 0.39)),
-                               ('VeilR', 265, 'RightArm', (0.31, 0.37, 0.43, 0.47))):
+for name, deg, parent, rho in (('VeilL', 108, 'LeftArm', (0.31, 0.37, 0.43, 0.47)), ('VeilBL', 144, 'Spine2', (0.25, 0.30, 0.35, 0.39)),
+                               ('VeilB', 180, 'Spine2', (0.17, 0.22, 0.27, 0.31)), ('VeilBR', 216, 'Spine2', (0.25, 0.30, 0.35, 0.39)),
+                               ('VeilR', 252, 'RightArm', (0.31, 0.37, 0.43, 0.47))):
     phi = np.radians(deg)
     pts = [np.array([r * np.sin(phi), y, r * np.cos(phi) - 0.01]) for r, y in zip(rho, VEIL_Y)]
     CHAINS.append(dict(name=name, kind='veil', phi=phi, parent=parent, joints=pts[:3], tip=pts[3], thigh=None, follow=0.0))
@@ -80,6 +80,52 @@ def _springs(acc, dt, loops, w=7.0, z=0.4, gain=0.010):
     return out
 
 
+def _from_to(u, v):
+    """The smallest rotation that turns direction u onto direction v."""
+    u = u / np.linalg.norm(u); v = v / np.linalg.norm(v)
+    ax = np.cross(u, v); s = np.linalg.norm(ax)
+    if s < 1e-9:
+        return np.eye(3)
+    return _axis_rot(ax / s, np.arctan2(s, u @ v))
+
+
+def _colliders(kind, name, P):
+    """Capsules (end, end, radius) the cloth must stay outside of, for this frame's joint positions P."""
+    out = []
+    if kind == 'veil':
+        out.append((P['Hips'] + np.array([0, 0.02, 0]), P['Spine2'] + np.array([0, 0.06, -0.01]), 0.125))          # trunk
+        out.append((P['Hips'] + np.array([0, -0.10, -0.03]), P['Hips'] + np.array([0, -0.60, -0.03]), 0.215))      # the skirt's bulk
+        for side in ('Left', 'Right'):
+            out.append((P[side + 'ForeArm'], P[side + 'Hand'], 0.105))                                            # forearm in its cuff
+            if not name.endswith(side[0]):
+                out.append((P[side + 'Arm'], P[side + 'ForeArm'], 0.075))
+    else:
+        for side in ('Left', 'Right'):
+            out.append((P[side + 'UpLeg'], P[side + 'Leg'], 0.082))
+            out.append((P[side + 'Leg'], P[side + 'Foot'], 0.062))
+    return out
+
+
+def _push_out(p, end, caps):
+    """Move a segment's far end out of every capsule, keeping the segment's length."""
+    L = np.linalg.norm(end - p)
+    for _ in range(3):
+        moved = False
+        for a, b, r in caps:
+            ab = b - a
+            h = np.clip(((end - a) @ ab) / (ab @ ab), 0, 1)
+            c = a + h * ab
+            v = end - c; d = np.linalg.norm(v)
+            if d < r:
+                v = v / d if d > 1e-6 else np.array([0, 0, -1.0])
+                end = c + v * r
+                end = p + (end - p) * (L / np.linalg.norm(end - p))
+                moved = True
+        if not moved:
+            break
+    return end
+
+
 def bake(rig, frames_L, pos, Wd, T, loops, speed):
     """Fill in every chain bone's rotation for every frame of a clip."""
     n = len(frames_L)
@@ -100,6 +146,7 @@ def bake(rig, frames_L, pos, Wd, T, loops, speed):
         for k in range(n):
             p = roots[k].copy()
             Rprev = Wd[k][par]
+            caps = _colliders(c['kind'], c['name'], pos[k])
             for i, seg in enumerate(segs):
                 depth = (i + 1) / nj
                 R = _axis_rot((1, 0, 0), drag * depth * (0.6 if c['kind'] == 'skirt' else 1.0) + sway[k, 0] * depth) @ _axis_rot((0, 0, 1), sway[k, 1] * depth)
@@ -108,6 +155,10 @@ def bake(rig, frames_L, pos, Wd, T, loops, speed):
                 elif c['thigh']:
                     R = _toward(Wd[k][c['thigh']], c['follow'] * 0.35) @ R
                 end = p + R @ seg
+                free = _push_out(p, end, caps)                               # keep clear of her body
+                if np.linalg.norm(free - end) > 1e-6:
+                    R = _from_to(end - p, free - p) @ R
+                    end = p + R @ seg
                 if end[1] < GROUND:                                          # fan outward until the end clears the ground
                     lo, hi = 0.0, np.pi * 0.55
                     for _ in range(14):

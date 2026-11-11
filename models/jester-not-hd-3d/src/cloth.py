@@ -197,7 +197,8 @@ VNU, VNV = 150, 34
 
 def edge_angle(y):
     """How far round from straight ahead the veil's front edge sits, at each height."""
-    return np.interp(y, [0.2, 1.00, 1.12, 1.22, 1.33, 1.50, YTOP], [1.25, 1.25, 1.15, 0.95, 0.80, 1.25, 1.30])
+    # it comes forward over her shoulders and upper arms, then hangs behind her forearms and cuffs
+    return np.interp(y, [0.2, 1.02, 1.10, 1.20, 1.33, 1.50, YTOP], [1.80, 1.80, 1.50, 1.00, 0.80, 1.25, 1.30])
 
 
 def drape_table():
@@ -306,9 +307,9 @@ def veil(names):
         N = grid_normals(P, np.stack([x, np.full_like(x, 0.02), z - AXIS_Z], -1))
         uv = np.stack([(S * (TW - 2) + 1) / TW, (row0 + 1 + T * (rows - 2)) / TW], -1)
         # resting on her: head, then chest and arms. Hanging free below about elbow height: the veil chains.
-        free = sstep(1.20, 1.02, y)
+        free = sstep(1.22, 0.98, y)
         w_head = sstep(1.41, 1.48, y)
-        w_arm = sstep(0.12, 0.20, np.abs(x)) * (1 - w_head) * sstep(1.38, 1.30, y)
+        w_arm = sstep(0.09, 0.24, np.abs(x)) * (1 - w_head) * sstep(1.40, 1.28, y)
         wd = {idx['Head']: w_head * (1 - free), idx['Spine2']: (1 - w_head - w_arm) * (1 - free),
               idx['LeftArm']: w_arm * (x > 0) * (1 - free), idx['RightArm']: w_arm * (x <= 0) * (1 - free)}
         for b, w in chain_weights(idx, 'veil', phi, y, CH.VEIL_Y[:3]).items():

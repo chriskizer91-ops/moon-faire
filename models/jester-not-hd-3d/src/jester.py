@@ -514,6 +514,10 @@ def support_part():
     for s_, k_, op in outfit_part().items:
         if op == 'add' and s_.tag in ('puff', 'ruff'):
             p.add(s_, k_)
+    for sx in (1, -1):                       # the elbow and the top of the cuff: the veil reaches out this far
+        m = np.array([sx, 1, 1.0])
+        el = EL * m
+        p.add(RoundCone(el, el + norm(WR * m - el) * 0.09, 0.066, 0.078, tag='elbow'), 0.02)
     core = head_core()
     p.add(Func(lambda P: core.dist(P) - 0.008, (-0.1, 1.37, -0.12), (0.1, 1.68, 0.11), tag='head'))
     return p

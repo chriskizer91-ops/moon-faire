@@ -28,7 +28,7 @@
 </head>
 <body>
 <div id="stage"></div>
-<div id="top"><h1>Jester Witch &middot; not-HD 3D</h1><div class="note" id="note">step 3: veil, frills and cloth</div></div>
+<div id="top"><h1>Jester Witch &middot; not-HD 3D</h1><div class="note" id="note">step 4: cloth that knows her body</div></div>
 <div id="err"></div>
 <div id="bar">
   <div class="row" id="moves"><span class="lab">Move</span></div>
@@ -139,7 +139,7 @@ const onModel = gltf => {
   play(clips.Idle ? 'Idle' : 'Stand');
   $('#load').remove();
   let tris = 0; root.traverse(o => { if (o.isMesh) tris += o.geometry.index.count / 3; });
-  $('#note').textContent = `step 3: veil, frills and cloth · ${Math.round(tris / 1000)}k triangles`;
+  $('#note').textContent = `step 4: cloth that knows her body · ${Math.round(tris / 1000)}k triangles`;
   api.ready = true;
 };
 const onFail = e => { errBox.textContent += 'Could not load the model: ' + (e.message || e) + '\n'; };
