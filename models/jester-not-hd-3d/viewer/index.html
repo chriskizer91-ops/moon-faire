@@ -28,7 +28,7 @@
 </head>
 <body>
 <div id="stage"></div>
-<div id="top"><h1>Jester Witch &middot; not-HD 3D</h1><div class="note" id="note">step 2: the outfit under the veil</div></div>
+<div id="top"><h1>Jester Witch &middot; not-HD 3D</h1><div class="note" id="note">step 3: veil, frills and cloth</div></div>
 <div id="err"></div>
 <div id="bar">
   <div class="row" id="moves"><span class="lab">Move</span></div>
@@ -37,7 +37,7 @@
     <button id="bTurn">Turntable</button><button id="bRoam">Walk about</button>
   </div>
   <div class="row"><span class="lab">Show</span>
-    <button id="bBones">Skeleton</button><button id="bSheet">Your drawing</button>
+    <button id="bVeil" class="on">Veil</button><button id="bBones">Skeleton</button><button id="bSheet">Your drawing</button>
     <input id="fade" type="range" min="0" max="100" value="50" aria-label="How strongly the drawing shows">
   </div>
 </div>
@@ -112,7 +112,7 @@ function makeCard(which) {
 makeCard('front'); makeCard('back');
 
 let root, mixer, clips = {}, action, skel, current = 'Stand', info = {};
-const state = { view: 'free', bones: false, sheet: false, turn: false, roam: false, fade: 0.5, paused: false };
+const state = { view: 'free', bones: false, sheet: false, turn: false, roam: false, veil: true, fade: 0.5, paused: false };
 let roamT = 0;
 
 function modelBytes() {            // the model travels inside jester_glb.js as text
@@ -139,7 +139,7 @@ const onModel = gltf => {
   play(clips.Idle ? 'Idle' : 'Stand');
   $('#load').remove();
   let tris = 0; root.traverse(o => { if (o.isMesh) tris += o.geometry.index.count / 3; });
-  $('#note').textContent = `step 2: the outfit under the veil · ${Math.round(tris / 1000)}k triangles`;
+  $('#note').textContent = `step 3: veil, frills and cloth · ${Math.round(tris / 1000)}k triangles`;
   api.ready = true;
 };
 const onFail = e => { errBox.textContent += 'Could not load the model: ' + (e.message || e) + '\n'; };
@@ -178,7 +178,8 @@ function syncCards() {
 function toggle(k, v) {
   state[k] = v === undefined ? !state[k] : v;
   $('#bBones').classList.toggle('on', state.bones); $('#bSheet').classList.toggle('on', state.sheet);
-  $('#bTurn').classList.toggle('on', state.turn); $('#bRoam').classList.toggle('on', state.roam);
+  $('#bTurn').classList.toggle('on', state.turn); $('#bRoam').classList.toggle('on', state.roam); $('#bVeil').classList.toggle('on', state.veil);
+  if (root) { const vm = root.getObjectByName('mesh_veil'); if (vm) vm.visible = state.veil; }
   if (skel) skel.visible = state.bones;
   if (k === 'sheet' && state.sheet && state.view !== 'front' && state.view !== 'back') setView('front');
   if (k === 'roam') {
@@ -188,7 +189,7 @@ function toggle(k, v) {
   syncCards();
 }
 document.querySelectorAll('#views button[data-view]').forEach(b => b.onclick = () => setView(b.dataset.view));
-$('#bBones').onclick = () => toggle('bones'); $('#bSheet').onclick = () => toggle('sheet');
+$('#bVeil').onclick = () => toggle('veil'); $('#bBones').onclick = () => toggle('bones'); $('#bSheet').onclick = () => toggle('sheet');
 $('#bTurn').onclick = () => toggle('turn'); $('#bRoam').onclick = () => toggle('roam');
 $('#fade').oninput = e => { state.fade = e.target.value / 100; syncCards(); };
 

@@ -21,7 +21,8 @@ python3 src/build.py all        # every part, then out/jester.glb (python3 src/b
 - `src/jester.py`: her measurements, skeleton and parts.
 - `src/anim.py`: the pose solver and the movement clips.
 - `src/bake.py`, `src/paint.py`: unwrap each part and colour every point of her surface from its position (fabrics, stars, laces, her face from drawing C3).
-- `src/cloth.py`: the skirt as thin layered sheets with ragged hems cut by transparency.
+- `src/cloth.py`: the skirt, veil and ribbon strands as thin layered sheets, with ragged hems and the veil's see-through weave cut by transparency. The veil's shape is worked out by draping a taut cloth over her head, shoulders, arms and skirt.
+- `src/chains.py`: the bone chains the cloth hangs on (8 for the skirt, 5 for the veil). Each clip sets them to hang straight down, follow the thighs, trail when she moves and fan out instead of going through the ground. A game engine should drive these bones with its own spring or cloth bones.
 - `src/glb.py`, `src/build.py`: the glTF writer and the build itself (`paint` repaints without re-meshing, `none` only rewrites clips).
 
 ## Look at it

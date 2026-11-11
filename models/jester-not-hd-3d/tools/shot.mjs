@@ -32,7 +32,7 @@ fs.mkdirSync(outdir, { recursive: true });
 for (const s of shots) {
   await page.evaluate(s => {
     const J = window.J;
-    J.toggle('bones', !!s.bones); J.toggle('sheet', !!s.sheet);
+    J.toggle('bones', !!s.bones); J.toggle('sheet', !!s.sheet); J.toggle('veil', s.veil !== false);
     if (s.fade !== undefined) { J.state.fade = s.fade; }
     J.setView(s.view || 'free');
     if (s.cam) J.cam(...s.cam);

@@ -11,6 +11,13 @@ def srgb_to_linear(c):
     return np.where(c <= 0.04045, c / 12.92, ((c + 0.055) / 1.055) ** 2.4)
 
 
+def weights8(W):
+    """Skin weights as bytes that still add up to exactly one."""
+    w = np.floor(np.asarray(W, np.float64) * 255 + 0.5).astype(np.int64)
+    w[np.arange(len(w)), np.argmax(w, axis=1)] += 255 - w.sum(axis=1)
+    return w.astype(np.uint8)
+
+
 class Glb:
     def __init__(self):
         self.bin = bytearray()
@@ -56,7 +63,7 @@ class Glb:
     def texture(self, png_bytes, nearest=True):
         view = self._view(png_bytes)
         self.j.setdefault("images", []).append({"bufferView": view, "mimeType": "image/png"})
-        self.j.setdefault("samplers", []).append({"magFilter": 9728 if nearest else 9729, "minFilter": 9729, "wrapS": 33071, "wrapT": 33071})
+        self.j.setdefault("samplers", []).append({"magFilter": 9728 if nearest else 9729, "minFilter": 9987, "wrapS": 33071, "wrapT": 33071})
         self.j.setdefault("textures", []).append({"source": len(self.j["images"]) - 1, "sampler": len(self.j["samplers"]) - 1})
         return len(self.j["textures"]) - 1
 
@@ -65,7 +72,7 @@ class Glb:
             "POSITION": self.acc(V, F32, "VEC3", 34962, minmax=True),
             "NORMAL": self.acc(N, F32, "VEC3", 34962),
             "JOINTS_0": self.acc(J, U8, "VEC4", 34962),
-            "WEIGHTS_0": self.acc(W, F32, "VEC4", 34962),
+            "WEIGHTS_0": self.acc(weights8(W), U8, "VEC4", 34962, normalized=True),
         }
         if C is not None:
             c8 = np.clip(np.round(srgb_to_linear(C) * 255), 0, 255).astype(np.uint8)

@@ -78,8 +78,11 @@ def build_parts(only):
         if redo_geo or only == 'paint':
             print(f'{nm:6s} {g["n0"]:7d} -> {len(g["F"]):6d} triangles, {len(g["V"]):6d} points, texture {tres}, {time.time() - t0:.1f}s', flush=True)
     pickle.dump(built, open(CACHE, 'wb'))
-    built['skirt'] = cloth.skirt(names)
-    Image.open(io.BytesIO(built['skirt']['png'])).save(os.path.join(WORK, 'tex_skirt.png'))
+    for nm, fn in (('skirt', cloth.skirt), ('veil', cloth.veil)):
+        t0 = time.time()
+        built[nm] = fn(names)
+        Image.open(io.BytesIO(built[nm]['png'])).save(os.path.join(WORK, f'tex_{nm}.png'))
+        print(f'{nm:6s} {len(built[nm]["F"]):6d} triangles (sheets), {time.time() - t0:.1f}s', flush=True)
     return names, parents, rest, built
 
 

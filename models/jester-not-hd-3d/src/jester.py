@@ -122,6 +122,9 @@ def skeleton():
         add(side + 'Horn3', side + 'Horn2', HORN[6, :3] * m)
         add(side + 'Pompom', side + 'Horn3', HORN[8, :3] * m)
     add('Bells', 'Hips', (0.060, 1.066, 0.070))
+    import chains
+    for n, p, pos in chains.bones():
+        add(n, p, pos)
     names = [j[0] for j in J]
     parents = [None if j[1] is None else names.index(j[1]) for j in J]
     pos = np.array([j[2] for j in J])
@@ -224,7 +227,7 @@ def body_part(step=0.004):
 def head_core():
     c = Part('headcore', 0.003)
     c.add(Ellipsoid((0, 1.555, -0.012), (0.0715, 0.095, 0.088), bone='Head'))
-    c.add(Ellipsoid((0, 1.492, 0.020), (0.058, 0.070, 0.066), bone='Head'), 0.02)
+    c.add(Ellipsoid((0, 1.492, 0.011), (0.068, 0.070, 0.075), bone='Head'), 0.02)
     c.add(Ellipsoid((0, 1.440, 0.055), (0.022, 0.018, 0.022), bone='Head'), 0.015)
     return c
 
@@ -373,7 +376,7 @@ def boots_part(step=0.0045):
     return p
 
 
-def outfit_part(step=0.005):
+def outfit_part(step=0.004):
     """What she wears under the veil, apart from the skirt: ruff, puffed sleeves, ruffled cuffs,
     belt buckle, pouch, bells and pendant. Sizes read off B1, B4 and C3."""
     p = Part('outfit', step, soft=0.004)
@@ -383,10 +386,10 @@ def outfit_part(step=0.005):
         x, y, z = P[:, 0], P[:, 1], P[:, 2] + 0.010
         rho = np.hypot(x, z); phi = np.arctan2(x, z)
         d = np.full(len(P), BIG)
-        for j, (yc, R, a, b) in enumerate(((1.371, 0.060, 0.034, 0.019), (1.399, 0.050, 0.029, 0.017))):
-            wave = 0.008 * np.sin(13 * phi + j * np.pi)
-            q0 = (rho - R - 0.004 * np.cos(26 * phi)) / a; q1 = (y - yc - wave) / b
-            d = smin(d, (np.hypot(q0, q1) - 1) * min(a, b), 0.004)
+        for j, (yc, R, a, b, nw) in enumerate(((1.362, 0.064, 0.036, 0.020, 15), (1.386, 0.057, 0.032, 0.019, 14), (1.406, 0.047, 0.026, 0.016, 13))):
+            wave = 0.007 * np.sin(nw * phi + j * 2.1)
+            q0 = (rho - R - 0.007 * np.cos(nw * phi + j * 2.1)) / a; q1 = (y - yc - wave) / b
+            d = smin(d, (np.hypot(q0, q1) - 1) * min(a, b), 0.003)
         return d
 
     p.add(Func(ruff, (-0.11, 1.33, -0.12), (0.11, 1.44, 0.10), tag='ruff',
@@ -419,7 +422,7 @@ def outfit_part(step=0.005):
                        sstep(-0.10, -0.02, (P - pc) @ ax))))
 
         # three tiers of ruffles from the elbow to the wrist
-        TIERS = ((-0.12, 0.40, 0.038, 0.082, 0.0), (0.20, 0.72, 0.046, 0.100, 1.9), (0.50, 1.00, 0.052, 0.114, 3.7))
+        TIERS = ((-0.14, 0.40, 0.036, 0.090, 0.0), (0.16, 0.72, 0.044, 0.108, 1.9), (0.46, 1.02, 0.050, 0.122, 3.7))
 
         def cuff(P, el=el, fax=fax, Lf=Lf):
             t, rho, phi = around(P, el, fax)
@@ -427,9 +430,12 @@ def outfit_part(step=0.005):
             d = np.full(len(P), BIG)
             for t0, t1, r0, r1, ph in TIERS:
                 w = np.clip((t - t0) / (t1 - t0), 0, 1)
-                R = (r0 + (r1 - r0) * w ** 1.25) * (1 + 0.11 * w * w * np.sin(11 * phi + ph)) + 0.004 * w * np.cos(22 * phi + ph)
-                di = np.maximum((rho - R) * 0.85, np.maximum((t0 - t) * Lf, (t - t1) * Lf))
-                d = smin(d, di, 0.003)
+                frill = np.sin(12 * phi + ph)
+                R = (r0 + (r1 - r0) * w ** 1.3) * (1 + 0.17 * w * w * frill) + 0.006 * w * np.cos(24 * phi + 2 * ph)
+                rim = t1 - 0.05 * (0.5 - 0.5 * frill)                       # the hem dips between the frills
+                outer = np.maximum((rho - R) * 0.82, np.maximum((t0 - t) * Lf, (t - rim) * Lf))
+                hollow = np.maximum((rho - (R - 0.011)) * 0.82, (t0 + 0.55 * (t1 - t0) - t) * Lf)   # scooped out under the rim
+                d = smin(d, np.maximum(outer, -hollow), 0.002)
             return d
 
         lo = np.minimum(el, wr) - 0.14; hi = np.maximum(el, wr) + 0.14
@@ -476,6 +482,11 @@ def outfit_part(step=0.005):
         p.add(Ellipsoid(bc, (0.0185, 0.0185, 0.0185), bone='Bells', tag='bell'))
         p.add(Ellipsoid(bc + np.array([0, 0.019, 0]), (0.006, 0.006, 0.006), bone='Bells', tag='bell'))
 
+    # the wine bow on top of the cap, where the ribbons and veil are tied
+    for sx in (1, -1):
+        p.add(Ellipsoid((sx * 0.024, 1.672, -0.004), (0.023, 0.012, 0.011), bone='Head', tag='bow'), 0.003)
+    p.add(Ellipsoid((0, 1.670, -0.002), (0.0095, 0.0105, 0.0105), bone='Head', tag='bow'), 0.003)
+
     # pendant
     gc = np.array([0.0, 1.298, 0.0655])
     p.add(Ellipsoid(gc, (0.0125, 0.0165, 0.006), bone='Spine2', tag='gold'))
@@ -490,5 +501,19 @@ PARTS = [  # (builder, roughness, keep ratio when thinning the mesh, weight-smoo
     (horns_part, 0.80, 0.35, 8, 512),
     (hands_part, 0.80, 0.45, 4, 128),
     (boots_part, 0.30, 0.40, 6, 512),
-    (outfit_part, 0.80, 0.40, 6, 1024),
+    (outfit_part, 0.80, 0.42, 6, 1024),
 ]
+
+
+def support_part():
+    """What the veil rests on: head and cap, trunk, upper arms and puffed sleeves, ruff. Not the forearms or cuffs."""
+    p = Part('support', 0.006)
+    for s_, k_, op in body_part().items:
+        if op == 'add' and s_.tag in ('torso', 'bust', 'glute', 'trap', 'arm', 'neck'):
+            p.add(s_, k_)
+    for s_, k_, op in outfit_part().items:
+        if op == 'add' and s_.tag in ('puff', 'ruff'):
+            p.add(s_, k_)
+    core = head_core()
+    p.add(Func(lambda P: core.dist(P) - 0.008, (-0.1, 1.37, -0.12), (0.1, 1.68, 0.11), tag='head'))
+    return p

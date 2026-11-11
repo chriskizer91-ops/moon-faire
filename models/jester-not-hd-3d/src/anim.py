@@ -5,6 +5,7 @@ each foot stands, which way each arm points). The solver turns that into bone
 rotations, so feet stay planted and limbs keep their lengths."""
 import numpy as np
 import jester as JS
+import chains
 
 FPS = 30
 
@@ -382,12 +383,13 @@ def all_clips(names, parents, rest):
     for name, fn, T, loops, speed, label in CLIPS:
         n = int(round(T * FPS)) + 1
         times = np.linspace(0, T, n)
-        frames = []; hips = []; hpos = []; hR = []
+        frames = []; hips = []; hpos = []; hR = []; allpos = []; allW = []
         for t in times:
             tt = 0.0 if (loops and t == times[-1]) else t
             L, hp, pos, Wd = RIG.solve(fn(tt, T))
-            frames.append(L); hips.append(hp); hpos.append(pos['Head']); hR.append(Wd['Head'])
+            frames.append(L); hips.append(hp); hpos.append(pos['Head']); hR.append(Wd['Head']); allpos.append(pos); allW.append(Wd)
         horn_sway(RIG, frames, hpos, hR, T, loops)
+        chains.bake(RIG, frames, allpos, allW, T, loops, speed)
         rot = {}
         for k, nm in enumerate(names):
             Q = np.array([quat(f[k]) for f in frames])

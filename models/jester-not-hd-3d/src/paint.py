@@ -121,16 +121,17 @@ def cap(P, N, tag):
 
 
 def horns(P, N, tag, owner=None, shapes=None):
-    C = tones(P, *HORN, pd=0.22, pl=0.05)
+    C = tones(P, *HORN, pd=0.10, pl=0.0)
+    top = (N[:, 1] > 0.45) & (rnd(*cell(P).T, seed=11) > 0.45)
+    C[top] = (86, 66, 65)                                  # the padded cloth catches light along the top
     for i, sh in enumerate(shapes):
         m = owner == i
         if sh.tag == 'horn' and m.any():
             s = sh.param(P[m]) * sh.length
             ph = np.mod(s / 0.034, 1.0)                   # 0 in a stitched groove, 0.5 on the crown of a rib
             c = C[m]
-            c[(ph < 0.07) | (ph > 0.93)] = INK
-            lit = (np.abs(ph - 0.5) < 0.13) & (N[m][:, 1] > 0.2)
-            c[lit] = HORN[2]
+            c[(ph < 0.09) | (ph > 0.91)] = INK
+
             C[m] = c
         if sh.tag == 'pompom' and m.any():
             c = P[m] - (JS.POMPOM_C * [np.sign(P[m][:, 0].mean()), 1, 1])
@@ -213,6 +214,8 @@ def outfit(P, N, tag):
     C[gem] = GEM[1]
     C[gem & (N[:, 1] > 0.25)] = GEM[2]
     C[gem & (N[:, 1] < -0.3)] = GEM[0]
+    bw = tag == 'bow'
+    C[bw] = tones(P[bw], (128, 34, 52), (176, 52, 70), (214, 92, 98), pd=0.2, pl=0.2)
     po = tag == 'pouch'
     C[po] = tones(P[po], *LEATHER, pd=0.2, pl=0.14)
     return C
