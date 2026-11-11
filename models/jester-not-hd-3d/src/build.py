@@ -103,7 +103,9 @@ def write(names, parents, rest, built, clips, path):
     tris = 0
     for nm, b in built.items():
         extra = {'pbrMetallicRoughness': {'baseColorTexture': {'index': g.texture(b['png'])}, 'roughnessFactor': b['rough'], 'metallicFactor': 0.0}}
-        if b.get('cloth'):
+        if b.get('blend'):
+            extra.update(alphaMode='BLEND', doubleSided=True)
+        elif b.get('cloth'):
             extra.update(alphaMode='MASK', alphaCutoff=0.5, doubleSided=True)
         mat = g.material(nm, b['rough'], 0.0, extra)
         m = g.mesh(nm, b['V'], b['N'], None, b['J'], b['W'], b['F'], mat, uv=b['uv'])

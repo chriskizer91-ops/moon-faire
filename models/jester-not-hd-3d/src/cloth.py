@@ -16,6 +16,7 @@ WINE = ((92, 32, 60), (124, 44, 74), (166, 68, 84))
 GOLDV = ((196, 124, 52), (238, 178, 82))
 INK = (20, 15, 18)
 TW = 1024
+SHEER = 150                 # how solid the veil's cloth is, out of 255
 
 
 def hem_profile(seed, length, depth, wmin, wmax, w=TW):
@@ -274,9 +275,9 @@ def paint_veil(j, length, depth, folds, phase, rows):
     rgb[gold] = GOLDV[0]
     rgb[inner & dots] = GOLDV[0]
     rgb[edge] = np.where(dots[edge, None], np.array(GOLDV[1]), np.array(WINE[0]))
-    sheer = (np.mod(ix, 2) == 0) & (np.mod(iy, 2) == 0) & ~gold & ~edge & ~inner       # one texel in four left open: you can see through it
-    alpha = inside & ~sheer
-    return rgb, (alpha * 255).astype(np.uint8)
+    solid = gold | edge | (inner & dots)                                      # the gold stays solid; the cloth itself is sheer
+    alpha = np.where(solid, 255, SHEER) * inside
+    return rgb, alpha.astype(np.uint8)
 
 
 def veil(names):
@@ -320,34 +321,6 @@ def veil(names):
         tex[row0:row0 + rows, :, :3] = rgb; tex[row0:row0 + rows, :, 3] = alpha
         row0 += rows
 
-    # ribbon strands tied at the bow, falling beside her face and over her chest
-    RW, RROWS, RLEN = 0.014, 16, 420
-    ry, rx = np.mgrid[0:RROWS, 0:RLEN]
-    rib = np.empty((RROWS, RLEN, 3), np.uint8); rib[:] = WINE[1]
-    rib[rnd(rx, ry, 5) < 0.3] = WINE[2]
-    edge = (ry < 2) | (ry >= RROWS - 2)
-    rib[edge & (np.mod(rx, 4) < 2)] = GOLDV[1]
-    rib[edge & (np.mod(rx, 4) >= 2)] = WINE[0]
-    tex[row0 + 4:row0 + 4 + RROWS, :RLEN, :3] = rib; tex[row0 + 4:row0 + 4 + RROWS, :RLEN, 3] = 255
-    zfront = lambda yy: np.interp(yy, [1.00, 1.02, 1.12, 1.21, 1.30, 1.38, 1.50, 1.63], [0.118, 0.112, 0.094, 0.106, 0.090, 0.078, 0.048, 0.034])
-    for sx in (1, -1):
-        for k, (xh, zoff, yend) in enumerate(((0.064, 0.000, 1.11), (0.076, -0.010, 1.02), (0.088, -0.022, 1.17), (0.099, -0.036, 1.07))):
-            n = 26
-            t = np.linspace(0, 1, n + 1)                                      # from the bow, out over the cap, then straight down
-            yy = np.where(t < 0.12, 1.672 - (t / 0.12) * 0.045, 1.627 - (t - 0.12) / 0.88 * (1.627 - yend))
-            xx = sx * np.where(t < 0.12, 0.010 + (t / 0.12) * (xh - 0.010), xh + 0.004 * np.sin(k + 9 * t))
-            zz = np.where(t < 0.12, (t / 0.12) * (zfront(1.627) + zoff), zfront(yy) + zoff * np.clip((yy - 1.30) / 0.2, 0, 1))
-            C = np.stack([xx, yy, zz], -1)
-            side = np.array([sx * 1.0, 0, -0.35]); side /= np.linalg.norm(side)
-            P = np.stack([C - side * RW / 2, C + side * RW / 2], axis=1)          # (n+1, 2, 3)
-            N = grid_normals(P, np.tile(np.array([0, 0, 1.0]), P.shape[:2] + (1,)))
-            L = np.concatenate([[0], np.cumsum(np.linalg.norm(np.diff(C, axis=0), axis=1))])
-            uu = (1 + np.minimum(L / 0.002, RLEN - 2)) / TW
-            uv = np.stack([np.stack([uu, uu], 1), np.tile(np.array([(row0 + 5) / TW, (row0 + 3 + RROWS) / TW]), (n + 1, 1))], -1)
-            yv = P[..., 1]
-            w_head = sstep(1.40, 1.47, yv)
-            w_low = sstep(1.16, 1.06, yv)
-            wd = {idx['Head']: w_head, idx['Spine2']: (1 - w_head) * (1 - w_low), idx['Spine']: (1 - w_head) * w_low}
-            J, W = pack(wd, P.shape[:2])
-            sh.add(P, N, uv, J, W, 1, n)
-    return sh.done(tex, rough=0.85)
+    out = sh.done(tex, rough=0.85)
+    out['blend'] = True                 # truly see-through: drawn after everything solid, blended over it
+    return out
