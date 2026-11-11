@@ -7,6 +7,7 @@
 """
 import sys
 import io
+import json
 import time
 import pickle
 import os
@@ -118,7 +119,8 @@ def write(names, parents, rest, built, clips, path):
         if clip.get('hips') is not None:
             tracks.append((joint_nodes[0], 'translation', clip['hips']))
         g.animation(clip['name'], clip['times'], tracks)
-    g.j['nodes'][root]['extras'] = {'clips': {c['name']: {'speed': float(c['speed']), 'loop': bool(c['loop']), 'label': c['label']} for c in clips or []},
+    g.j['nodes'][root]['extras'] = {'clips': {c['name']: {'speed': float(c['speed']), 'loop': bool(c['loop']), 'label': c['label'], 'spell': c['release'] is not None, 'release': c['release']} for c in clips or []},
+                                    'palette': json.load(open(os.path.join(HERE, 'palette.json'))),
                                     'heightMetres': 1.66, 'faces': '+Z', 'bindPose': 'standing pose of drawings A1 and B1'}
     size = g.save(path)
     print(f'wrote {os.path.relpath(path)}: {size / 1e6:.2f} MB, {tris} triangles, {len(names)} bones, {len(clips or [])} clips')

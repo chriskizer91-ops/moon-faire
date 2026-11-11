@@ -23,6 +23,9 @@ python3 src/build.py all        # every part, then out/jester.glb (python3 src/b
 - `src/bake.py`, `src/paint.py`: unwrap each part and colour every point of her surface from its position (fabrics, stars, laces, her face from drawing C3).
 - `src/cloth.py`: the skirt, veil and ribbon strands as thin layered sheets, with ragged hems and the veil's see-through weave cut by transparency. The veil's shape is worked out by draping a taut cloth over her head, shoulders, arms and skirt.
 - `src/chains.py`: the bone chains the cloth hangs on (8 for the skirt, 5 for the veil). Each clip sets them to hang straight down, follow the thighs, trail when she moves and fan out instead of going through the ground. A game engine should drive these bones with its own spring or cloth bones.
+- `src/anim.py` also holds her six spells as clips, with the sprite clips' own lengths and release moments (from `assets/manifest.json`). She casts straight ahead (+Z).
+- `viewer/fx.js` and `viewer/fx/`: the spell effects (circle, ring, glows, sparkles, bell chain, cut from reference set F), each a pure function of the clip's time. They are part of the page, not of the `.glb`.
+- `src/palette.json`: her 56 colours, stored in the `.glb` for the viewer's pixel finish.
 - `src/glb.py`, `src/build.py`: the glTF writer and the build itself (`paint` repaints without re-meshing, `none` only rewrites clips).
 
 ## Look at it
@@ -32,7 +35,7 @@ npm install                       # three.js 0.160, playwright-core, gltf-valida
 bash tools/setup_viewer.sh        # copies three.js into viewer/lib and the model into viewer/
 node tools/smoke.mjs 390x800      # opens the page, presses every button, reports errors
 python3 tools/sheet.py work/x.png 500x760 4 0.6 '[{"name":"a","clip":"Walk","t":0.3,"view":"side"}]'   # stills
-bash tools/make_dist.sh           # dist/ is what gets published (three.js from jsDelivr, model inside jester_glb.js)
+bash tools/make_dist.sh           # dist/ is what gets published (three.js from jsDelivr, model inside jester_glb_a.js and jester_glb_b.js)
 ```
 
-The tools use Google Chrome at `/usr/bin/google-chrome`. The artifact host does not serve `.glb` files, so the published page carries the model as text in `jester_glb.js`.
+The tools use Google Chrome at `/usr/bin/google-chrome`. The artifact host does not serve `.glb` files, so the published page carries the model as text in `jester_glb_a.js` and `jester_glb_b.js` (the host also limits a script file to 16 MB).

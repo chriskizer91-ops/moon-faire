@@ -77,9 +77,9 @@ class Foot:
 class Arm:
     """An arm by direction (in the chest's own axes): upper-arm direction, elbow bend, and which way the arm's front faces.
     Or by target: a world position for the wrist."""
-    def __init__(self, upper=None, bend=0.0, front=(0, 0, 1), target=None, world=False, twist=0.0, hand=None, curl=0.25, spread=0.0):
+    def __init__(self, upper=None, bend=0.0, front=(0, 0, 1), target=None, world=False, twist=0.0, hand=None, curl=0.25, spread=0.0, point=0.0):
         self.upper, self.bend, self.front, self.target, self.world = upper, bend, front, target, world
-        self.twist, self.hand, self.curl, self.spread = twist, hand, curl, spread
+        self.twist, self.hand, self.curl, self.spread, self.point = twist, hand, curl, spread, point
 
 
 class Pose:
@@ -165,7 +165,8 @@ class Rig:
             for fi, fn in enumerate(('Index', 'Middle', 'Ring', 'Pinky')):
                 sp = JS.rot_axis(pn, sx * A.spread * (fi - 1.5) * 0.35)
                 for j in range(3):
-                    c = A.curl * (1.0, 1.1, 0.8)[j] * 1.5
+                    cf = A.curl + A.point * ((0.04 - A.curl) if fn == 'Index' else (0.95 - A.curl))    # pointing: first finger straight, the rest closed
+                    c = cf * (1.0, 1.1, 0.8)[j] * 1.5
                     set_local(f'{side}Hand{fn}{j + 1}', (sp if j == 0 else np.eye(3)) @ JS.rot_axis(hinge, c))
             th = unit(np.cross(unit(0.6 * dirm + 0.74 * ZREF), pn))
             for j in range(3):
@@ -333,13 +334,118 @@ def arms_up(t, T):
     return P
 
 
-CLIPS = [  # name, function, length in seconds, loops, ground speed (m/s), button label
-    ('Idle', idle, 4.0, True, 0.0, 'Idle'),
-    ('Walk', walk, 1.10, True, 1.02 / 1.10, 'Walk'),
-    ('Run', run, 0.66, True, 1.70 / 0.66, 'Run'),
-    ('Squat', squat, 3.2, True, 0.0, 'Squat'),
-    ('Kneel', kneel, 4.4, True, 0.0, 'Kneel'),
-    ('ArmsUp', arms_up, 3.4, True, 0.0, 'Arms up'),
+# ---------------------------------------------------------------------- her six spells
+# Lengths and release moments are the sprite clips' own (assets/manifest.json). She casts straight ahead (+Z).
+def track(t, keys):
+    """Value at time t from [(time, value), ...], easing between neighbours."""
+    if t <= keys[0][0]:
+        return np.asarray(keys[0][1], float)
+    for (t0, v0), (t1, v1) in zip(keys, keys[1:]):
+        if t <= t1:
+            return lerp(v0, v1, ease((t - t0) / (t1 - t0)))
+    return np.asarray(keys[-1][1], float)
+
+
+_REST = {}
+
+
+def rest_wrist(side):
+    if not _REST:
+        L, _, pos, _ = RIG.solve(relaxed(Pose()))
+        _REST['Left'] = pos['LeftHand'].copy(); _REST['Right'] = pos['RightHand'].copy()
+    return _REST[side]
+
+
+def cast_pose(t, left, right, lean=((0, 0),), turn=((0, 0),), head=((0, 0),), curlL=((0, 0.3),), curlR=((0, 0.3),),
+              spreadL=((0, 0),), spreadR=((0, 0),), pointR=((0, 0),), frontL=(-0.5, 0.2, 1.0), frontR=(0.5, 0.2, 1.0), sink=((0, 0),)):
+    """A casting pose from wrist paths and a few body tracks. Feet stay planted."""
+    P = Pose()
+    ln = float(track(t, lean)); tw = float(track(t, turn)); hd = float(track(t, head))
+    P.hips = HIPS0 + np.array([0, -float(track(t, sink)), 0.02 * ln])
+    P.hips_rot = Ry(tw * 0.25) @ Rx(ln * 0.3)
+    P.spine = [(ln * 0.3, tw * 0.25, 0), (ln * 0.25, tw * 0.25, 0), (ln * 0.15, tw * 0.25, 0)]
+    P.neck = (hd * 0.4, -tw * 0.2, 0); P.head = (hd * 0.6, -tw * 0.2, 0)
+    P.arms['Left'] = Arm(target=track(t, left), front=frontL, curl=float(track(t, curlL)), spread=float(track(t, spreadL)))
+    P.arms['Right'] = Arm(target=track(t, right), front=frontR, curl=float(track(t, curlR)), spread=float(track(t, spreadR)), point=float(track(t, pointR)))
+    return P
+
+
+def curtain_call(t, T):
+    rl, rr = rest_wrist('Left'), rest_wrist('Right')
+    left = [(0, rl), (0.9, (0.30, 0.98, 0.10)), (1.9, (0.08, 1.20, 0.27)), (3.3, (0.40, 1.12, 0.14)), (4.6, (0.34, 1.70, 0.05)),
+            (5.05, (0.34, 1.72, 0.03)), (5.45, (0.50, 1.20, 0.18)), (6.6, (0.48, 1.12, 0.20)), (8.0, rl)]
+    right = [(0, rr), (0.9, (-0.30, 0.98, 0.10)), (1.9, (-0.08, 1.20, 0.27)), (3.3, (-0.15, 1.76, 0.10)), (4.6, (-0.34, 1.70, 0.05)),
+             (5.05, (-0.34, 1.72, 0.03)), (5.45, (-0.50, 1.20, 0.18)), (6.6, (-0.48, 1.12, 0.20)), (8.0, rr)]
+    return cast_pose(t, left, right, lean=[(0, 0), (3.3, -0.10), (5.0, -0.22), (5.5, 0.10), (6.3, 0.55), (7.1, 0.10), (8.0, 0)],
+                     head=[(0, 0), (3.3, -0.25), (5.0, -0.35), (5.6, 0.0), (6.3, 0.30), (8.0, 0)],
+                     curlL=[(0, 0.3), (1.9, 0.12), (8.0, 0.3)], curlR=[(0, 0.3), (1.9, 0.12), (8.0, 0.3)],
+                     spreadL=[(0, 0), (1.9, 0.6), (5.0, 1.0), (7.0, 0.3), (8.0, 0)], spreadR=[(0, 0), (1.9, 0.6), (5.0, 1.0), (7.0, 0.3), (8.0, 0)])
+
+
+def sealed_fate(t, T):
+    rl, rr = rest_wrist('Left'), rest_wrist('Right')
+    left = [(0, rl), (0.7, (0.03, 1.02, 0.19)), (1.5, (0.10, 1.00, 0.16)), (2.8, rl + [0.02, 0.02, 0.0]), (4.8, rl)]
+    right = [(0, rr), (0.7, (-0.03, 1.02, 0.19)), (1.7, (-0.24, 1.52, 0.26)), (2.75, (-0.27, 1.55, 0.16)), (3.0, (-0.10, 1.36, 0.46)),
+             (3.7, (-0.10, 1.34, 0.45)), (4.8, rr)]
+    return cast_pose(t, left, right, lean=[(0, 0), (2.75, -0.08), (3.0, 0.22), (3.7, 0.16), (4.8, 0)],
+                     turn=[(0, 0), (2.75, -0.30), (3.0, 0.35), (3.8, 0.25), (4.8, 0)], head=[(0, 0), (1.7, -0.08), (3.0, 0.06), (4.8, 0)],
+                     curlR=[(0, 0.3), (1.7, 0.06), (3.9, 0.06), (4.8, 0.3)], spreadR=[(0, 0), (1.7, 0.9), (3.9, 0.9), (4.8, 0)])
+
+
+def against_all_odds(t, T):
+    rl, rr = rest_wrist('Left'), rest_wrist('Right')
+    sway = 0.012 * np.sin(2 * np.pi * t / 2.6)
+    up_l, up_r = np.array([0.34 + sway, 1.70, 0.05]), np.array([-0.34 + sway, 1.70, 0.05])
+    left = [(0, rl), (0.5, (0.42, 1.10, 0.14)), (1.4, up_l), (6.7, up_l), (7.4, (0.44, 1.14, 0.14)), (8.0, rl)]
+    right = [(0, rr), (0.5, (-0.42, 1.10, 0.14)), (1.4, up_r), (6.7, up_r), (7.4, (-0.44, 1.14, 0.14)), (8.0, rr)]
+    return cast_pose(t, left, right, lean=[(0, 0), (1.4, -0.20), (6.7, -0.20), (8.0, 0)], head=[(0, 0), (1.4, -0.40), (6.7, -0.40), (8.0, 0)],
+                     curlL=[(0, 0.3), (1.4, 0.08), (6.7, 0.08), (8.0, 0.3)], curlR=[(0, 0.3), (1.4, 0.08), (6.7, 0.08), (8.0, 0.3)],
+                     spreadL=[(0, 0), (1.4, 1.0), (6.7, 1.0), (8.0, 0)], spreadR=[(0, 0), (1.4, 1.0), (6.7, 1.0), (8.0, 0)])
+
+
+def gilded_rebuke(t, T):
+    rl, rr = rest_wrist('Left'), rest_wrist('Right')
+    left = [(0, rl), (0.30, (0.08, 1.04, 0.16)), (0.55, (0.44, 0.98, 0.02)), (0.85, (0.22, 1.74, -0.06)), (1.0, (0.10, 1.36, 0.47)),
+            (1.3, (0.12, 1.33, 0.46)), (1.65, (0.30, 1.00, 0.12)), (2.0, rl)]
+    right = [(0, rr), (0.55, rr + [-0.04, 0.03, 0.04]), (1.0, rr + [-0.08, 0.06, -0.10]), (2.0, rr)]
+    return cast_pose(t, left, right, lean=[(0, 0), (0.85, -0.12), (1.0, 0.28), (1.3, 0.22), (2.0, 0)],
+                     turn=[(0, 0), (0.85, 0.40), (1.0, -0.40), (1.35, -0.30), (2.0, 0)], head=[(0, 0), (0.85, -0.1), (1.0, 0.05), (2.0, 0)],
+                     curlL=[(0, 0.3), (0.3, 0.8), (1.65, 0.8), (2.0, 0.3)])
+
+
+def hush(t, T):
+    rl, rr = rest_wrist('Left'), rest_wrist('Right')
+    lips = (-0.035, 1.385, 0.135)
+    right = [(0, rr), (0.9, lips), (1.9, lips), (2.67, (-0.12, 1.40, 0.46)), (3.6, (-0.12, 1.40, 0.46)), (4.83, rr)]
+    left = [(0, rl), (2.67, rl + [0.02, 0.02, -0.03]), (4.83, rl)]
+    return cast_pose(t, left, right, lean=[(0, 0), (0.9, -0.03), (2.67, 0.12), (3.6, 0.12), (4.83, 0)],
+                     turn=[(0, 0), (2.67, 0.22), (3.6, 0.22), (4.83, 0)], head=[(0, 0), (0.9, 0.10), (1.9, 0.10), (2.67, 0.0), (4.83, 0)],
+                     pointR=[(0, 0), (0.7, 1), (3.7, 1), (4.5, 0)], frontR=(0.25, 1.0, 0.3))
+
+
+def gravity(t, T):
+    rl, rr = rest_wrist('Left'), rest_wrist('Right')
+    left = [(0, rl), (0.42, (0.26, 1.42, 0.22)), (0.90, (0.24, 1.56, 0.14)), (1.11, (0.16, 1.02, 0.40)), (1.30, (0.16, 1.00, 0.40)), (1.67, rl)]
+    right = [(0, rr), (0.9, rr + [-0.05, 0.05, -0.04]), (1.11, rr + [-0.08, 0.02, 0.04]), (1.67, rr)]
+    return cast_pose(t, left, right, lean=[(0, 0), (0.9, -0.10), (1.11, 0.34), (1.3, 0.30), (1.67, 0)],
+                     turn=[(0, 0), (0.9, 0.18), (1.11, -0.20), (1.67, 0)], head=[(0, 0), (0.9, -0.12), (1.11, 0.16), (1.67, 0)],
+                     curlL=[(0, 0.3), (0.42, 0.10), (0.9, 0.10), (1.11, 0.02), (1.67, 0.3)], spreadL=[(0, 0), (0.42, 0.7), (1.11, 1.0), (1.67, 0)],
+                     sink=[(0, 0), (0.9, 0.0), (1.11, 0.06), (1.3, 0.05), (1.67, 0)])
+
+
+CLIPS = [  # name, function, length in seconds, loops, ground speed (m/s), button label, release moment (spells)
+    ('Idle', idle, 4.0, True, 0.0, 'Idle', None),
+    ('Walk', walk, 1.10, True, 1.02 / 1.10, 'Walk', None),
+    ('Run', run, 0.66, True, 1.70 / 0.66, 'Run', None),
+    ('Squat', squat, 3.2, True, 0.0, 'Squat', None),
+    ('Kneel', kneel, 4.4, True, 0.0, 'Kneel', None),
+    ('ArmsUp', arms_up, 3.4, True, 0.0, 'Arms up', None),
+    ('CurtainCall', curtain_call, 8.0, True, 0.0, 'Curtain Call', 5.17),
+    ('SealedFate', sealed_fate, 4.8, True, 0.0, 'Sealed Fate', 3.0),
+    ('AgainstAllOdds', against_all_odds, 8.0, True, 0.0, 'Against All Odds', 1.5),
+    ('GildedRebuke', gilded_rebuke, 2.0, True, 0.0, 'Gilded Rebuke', 1.0),
+    ('Hush', hush, 4.83, True, 0.0, 'Hush', 2.67),
+    ('Gravity', gravity, 1.67, True, 0.0, 'Gravity', 1.11),
 ]
 RIG = None
 
@@ -380,7 +486,7 @@ def all_clips(names, parents, rest):
     global RIG
     RIG = Rig(names, parents, rest)
     out = []
-    for name, fn, T, loops, speed, label in CLIPS:
+    for name, fn, T, loops, speed, label, release in CLIPS:
         n = int(round(T * FPS)) + 1
         times = np.linspace(0, T, n)
         frames = []; hips = []; hpos = []; hR = []; allpos = []; allW = []
@@ -398,5 +504,5 @@ def all_clips(names, parents, rest):
                     Q[j] = -Q[j]
             if np.abs(Q - np.array([0, 0, 0, 1.0])).max() > 1e-5 or nm == 'Hips':
                 rot[nm] = Q.astype(np.float32)
-        out.append(dict(name=name, times=times, rot=rot, hips=np.array(hips, np.float32), loop=loops, speed=speed, label=label))
+        out.append(dict(name=name, times=times, rot=rot, hips=np.array(hips, np.float32), loop=loops, speed=speed, label=label, release=release))
     return out

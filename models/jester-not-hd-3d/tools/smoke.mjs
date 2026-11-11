@@ -24,7 +24,7 @@ for (const name of await page.evaluate(() => window.J.clipNames())) {       // l
   await page.evaluate(n => window.J.play(n), name);
   await page.waitForTimeout(Math.min(1500, 1000 * await page.evaluate(n => window.J.dur(n), name)));
 }
-await page.evaluate(() => { window.J.toggle('sheet', false); window.J.toggle('bones', false); window.J.toggle('turn', false); window.J.toggle('roam', false); window.J.toggle('veil', true); window.J.setView('free'); window.J.play('Walk'); });
+await page.evaluate(() => { window.J.toggle('sheet', false); window.J.toggle('bones', false); window.J.toggle('turn', false); window.J.toggle('roam', false); window.J.toggle('veil', true); window.J.toggle('pixel', false); window.J.setView('free'); window.J.play('Walk'); });
 const t0 = Date.now(); const f0 = await page.evaluate(() => window.__frames = 0);
 await page.waitForTimeout(600);
 if (process.argv[3]) await page.screenshot({ path: process.argv[3] });
