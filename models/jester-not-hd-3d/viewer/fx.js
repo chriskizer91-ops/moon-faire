@@ -1,6 +1,11 @@
 // Spell effects for the Jester. Everything is a pure function of the clip's time, so a spell
 // can be paused or scrubbed and always looks the same at the same moment.
 // Colours here go brighter than white on purpose: the bloom pass makes that glow.
+//
+// The look (Chris, November 12): her power is drawn from the idea of interstellar space, the infinity of the universe.
+// Of the four witches the themes are the moment, then nature, then chaos, then infinity, and she is infinity.
+// So her big spells are dark and cold: holes in the world with the night sky inside them, light being swallowed,
+// thin white rims, slow dust. Gold is kept for her bells, as a thread on the black.
 // The drawn pictures (circle, ring, glows, bell chain) come from reference set F.
 import * as THREE from 'three';
 import { FXL } from './pipeline.js';
@@ -70,12 +75,55 @@ const MOTE_V = `attribute vec4 aSeed; uniform vec3 uOrigin; uniform float uAge, 
     gl_PointSize = uSize * (0.5 + fract(aSeed.x * 13.7)) * sin(u * 3.14159) * uH * 0.5 * projectionMatrix[1][1] * persp;
     vA = sin(u * 3.14159) * (0.55 + 0.45 * sin(la * 23.0 + aSeed.y * 40.0));
   }`;
-const MOTE_F = `varying float vA; uniform vec3 uColor;
+const MOTE_F = `varying float vA; uniform vec3 uColor; uniform float uSpark;
   void main(){
     vec2 p = gl_PointCoord * 2.0 - 1.0; float r = length(p);
-    float s = (0.012 / (abs(p.x) * abs(p.y) + 0.012)) * max(0.0, 1.0 - r) + exp(-r * r * 7.0) * 0.8;
+    float s = mix(exp(-r * r * 9.0) * 1.5, (0.012 / (abs(p.x) * abs(p.y) + 0.012)) * max(0.0, 1.0 - r) + exp(-r * r * 7.0) * 0.8, uSpark);     // round dust, or a four-pointed sparkle
     gl_FragColor = vec4(uColor * s, vA);
   }`;
+
+// the night sky seen in a direction: three depths of stars and a faint river of dust
+const SKY = `
+  float h31(vec3 p){ p = fract(p * vec3(0.1031, 0.1030, 0.0973)); p += dot(p, p.yxz + 33.33); return fract((p.x + p.y) * p.z); }
+  vec3 sky(vec3 d, float t){
+    vec3 col = vec3(0.0);
+    for (int i = 0; i < 3; i++) {
+      float fi = float(i), s = 16.0 + fi * 19.0;
+      vec3 g = d * s + fi * 7.7, id = floor(g), f = fract(g) - 0.5;
+      float h = h31(id);
+      vec3 o = (vec3(h31(id + 1.3), h31(id + 2.7), h31(id + 4.1)) - 0.5) * 0.7;
+      float r = length(f - o), tw = 0.65 + 0.35 * sin(t * (1.0 + 5.0 * h) + h * 40.0);
+      float b = step(0.58, h) * tw * smoothstep(0.11, 0.0, r) * (0.7 + 3.4 * h * h);
+      col += b * mix(vec3(0.72, 0.80, 1.0), vec3(1.0, 0.92, 0.80), h31(id + 9.1)) * (1.0 - 0.22 * fi);
+    }
+    float n = sin(d.x * 3.1 + sin(d.y * 2.3 + t * 0.05) * 1.7) * sin(d.y * 4.3 + d.z * 2.9), m = sin(d.z * 5.3 + d.x * 2.1 + 1.0) * sin(d.y * 3.7 - d.x * 1.9);
+    return col + vec3(0.0015, 0.0012, 0.006) + vec3(0.012, 0.005, 0.034) * smoothstep(0.1, 1.0, n) + vec3(0.003, 0.010, 0.022) * smoothstep(0.3, 1.0, m);     // linear light: small numbers already show
+  }`;
+const VOID_V = 'varying vec2 vUv; varying vec3 vN; varying vec3 vV; varying vec3 vW; void main(){ vUv = uv; vec4 w = modelMatrix * vec4(position, 1.0); vW = w.xyz; vec4 mv = viewMatrix * w; vN = normalize(normalMatrix * normal); vV = normalize(-mv.xyz); gl_Position = projectionMatrix * mv; }';
+// a ball of nothing with the sky inside it and a thin rim of light
+const VOID_BALL = SKY + `varying vec3 vN; varying vec3 vV; varying vec3 vW; uniform float uT, uAlpha, uPow, uStars; uniform vec3 uRim;
+  void main(){ float f = pow(1.0 - abs(dot(normalize(vN), normalize(vV))), uPow);
+    gl_FragColor = vec4(sky(normalize(vW - cameraPosition), uT) * uStars * (1.0 - f) + uRim * f, uAlpha); }`;
+// a flat hole in the world: a disc (shape 0), or a drape with a bright hem on its right (1) or left (2) edge
+const VOID_FLAT = SKY + `varying vec2 vUv; varying vec3 vW; uniform float uT, uAlpha, uShape, uStars; uniform vec3 uRim;
+  void main(){ vec2 p = vUv * 2.0 - 1.0; float e, k = 1.0;
+    if (uShape < 0.5) { float r = length(p); if (r > 1.0) discard; e = smoothstep(0.016, 0.0, abs(r - 0.978)) + 0.16 * exp(-(1.0 - r) * 22.0); }
+    else { float x = uShape < 1.5 ? p.x : -p.x; e = exp(-(1.0 - x) * 90.0) + exp(-(1.0 - x) * 12.0) * 0.025; k = 0.7 + 0.3 * sin(p.x * 16.0 + sin(p.y * 3.0 + uT) * 1.3); }
+    gl_FragColor = vec4(sky(normalize(vW - cameraPosition), uT) * uStars * k + uRim * e, uAlpha); }`;
+// a thin hoop with graduations, like a ring of an armillary sphere
+const HOOP = `varying vec2 vUv; uniform float uAlpha; uniform vec3 uColor;
+  void main(){ float r = length(vUv * 2.0 - 1.0), a = atan(vUv.y - 0.5, vUv.x - 0.5);
+    float v = smoothstep(0.009, 0.0, abs(r - 0.965)) + step(0.5, fract(a * 36.0 / 6.28318)) * smoothstep(0.012, 0.0, abs(r - 0.925)) * 0.35 + exp(-abs(r - 0.965) * 30.0) * 0.05;
+    gl_FragColor = vec4(uColor * v, uAlpha * step(r, 1.0)); }`;
+// the disc of light falling into a black hole: streaks that wind faster the nearer they are
+const ACCRETE = `varying vec2 vUv; uniform float uT, uAlpha; uniform vec3 uColor;
+  void main(){ vec2 p = vUv * 2.0 - 1.0; float r = length(p), a = atan(p.y, p.x);
+    float band = smoothstep(0.40, 0.50, r) * smoothstep(1.0, 0.70, r), w = a + uT * (1.3 / (r + 0.15));
+    float st = (0.55 + 0.45 * sin(w * 7.0 + r * 31.0)) * (0.6 + 0.4 * sin(w * 3.0 - r * 13.0));
+    vec3 col = mix(uColor, vec3(1.0), smoothstep(0.80, 0.44, r));
+    gl_FragColor = vec4(col * band * (0.25 + 0.75 * st) * (1.15 - 0.55 * r), uAlpha * step(r, 1.0)); }`;
+// darkness around a point: it takes light away from whatever is behind it
+const SHADE = 'varying vec2 vUv; uniform float uAlpha; void main(){ float r = length(vUv * 2.0 - 1.0); gl_FragColor = vec4(vec3(1.0 - uAlpha * smoothstep(1.0, 0.12, r)), 1.0); }';
 
 export function makeFx(scene, base = 'fx/') {
   const L = new THREE.TextureLoader();
@@ -83,6 +131,9 @@ export function makeFx(scene, base = 'fx/') {
   const T = { sigil: load('sigil'), ring: load('ring'), glows: load('glows'), chain: load('chain') };
   const cell = (tex, cols, rows, i) => { const t = tex.clone(); t.needsUpdate = true; t.repeat.set(1 / cols, 1 / rows); t.offset.set((i % cols) / cols, 1 - (Math.floor(i / cols) + 1) / rows); return t; };
   const glowTex = [0, 1, 2, 3].map(i => cell(T.glows, 2, 2, i));
+  const soft = (() => { const cv = document.createElement('canvas'); cv.width = cv.height = 64; const g = cv.getContext('2d'), gr = g.createRadialGradient(32, 32, 0, 32, 32, 32);
+    gr.addColorStop(0, 'rgba(255,255,255,1)'); gr.addColorStop(0.25, 'rgba(255,255,255,0.55)'); gr.addColorStop(0.6, 'rgba(255,255,255,0.12)'); gr.addColorStop(1, 'rgba(255,255,255,0)');
+    g.fillStyle = gr; g.fillRect(0, 0, 64, 64); const t = new THREE.CanvasTexture(cv); t.colorSpace = THREE.SRGBColorSpace; return t; })();
   const group = new THREE.Group(); scene.add(group);
   const light = new THREE.PointLight(0xc070ff, 0, 11, 1.4); light.layers.enableAll(); scene.add(light);
   const uH = { value: 800 };                 // height in pixels of whatever is being drawn into, for sparkle sizes
@@ -110,7 +161,10 @@ export function makeFx(scene, base = 'fx/') {
     m.position.copy(pos); m.scale.set(size, size, 1);
   }
   const VIOLET = 0xd070ff, GOLD = 0xffb040, DUSK = 0x8f6cff, ROSE = 0xff5fa8, WINE = 0xc02868;
+  const STAR = 0xdfe6ff, ICE = 0x9fb4ff, EMBER = 0xffdcae;          // starlight, the cold light it casts, and the warm light round a black hole
+  const ID = new THREE.Quaternion();
 
+  let edge = 0;                                                   // how far the open ground runs from the middle, when the page says (fx.arena)
   const F = {
     begin(camera) { cam = camera; for (const o of pool.values()) o.visible = false; light.intensity = 0; },
     light(pos, color, intensity) { if (intensity > light.intensity) { light.position.copy(pos); light.color.set(color); light.intensity = intensity; } },   // the strongest wins
@@ -153,6 +207,57 @@ export function makeFx(scene, base = 'fx/') {
       const m = get(id, () => new THREE.Mesh(ball, new THREE.MeshBasicMaterial({ color: 0x000000 })));
       m.renderOrder = 29; m.position.copy(pos); m.scale.setScalar(radius);
     },
+    orb(id, pos, size, alpha, color = STAR, gain = 2.6) {                // a plain soft light, facing the camera
+      if (alpha <= 0.003 || size <= 0) return;
+      const m = get(id, () => new THREE.Mesh(plane, basic(soft, color, gain)));
+      m.quaternion.copy(cam.quaternion); m.position.copy(pos); m.scale.set(size, size, 1); m.material.opacity = Math.min(1, alpha);
+    },
+    hoop(id, pos, rootQ, size, spin, alpha, tilt = 1, color = STAR, gain = 2.0) {
+      if (alpha <= 0.003 || size <= 0) return;
+      const m = get(id, () => new THREE.Mesh(plane, shader(HOOP, { uAlpha: { value: 1 }, uColor: { value: C(color, gain * 0.75) } })));
+      place(m, pos, rootQ, size, spin, tilt); m.material.uniforms.uAlpha.value = Math.min(1, alpha);
+    },
+    accrete(id, pos, size, t, alpha, tilt = 0.84, color = EMBER, gain = 1.15) {
+      if (alpha <= 0.003 || size <= 0) return;
+      const m = get(id, () => new THREE.Mesh(plane, shader(ACCRETE, { uT: { value: 0 }, uAlpha: { value: 1 }, uColor: { value: C(color, gain) } })));
+      place(m, pos, ID, size, 0, tilt); m.material.uniforms.uT.value = t; m.material.uniforms.uAlpha.value = Math.min(1, alpha);
+    },
+    // ---- the void: these hide and darken, where everything else here adds light
+    voidBall(id, pos, radius, alpha = 1, rim = STAR, gain = 3.0, pow = 4.0, stars = 1, t = 0) {
+      if (alpha <= 0.01 || radius <= 0.002) return;
+      const m = get(id, () => new THREE.Mesh(ball, new THREE.ShaderMaterial({ vertexShader: VOID_V, fragmentShader: VOID_BALL, transparent: true, depthWrite: true,
+        uniforms: { uT: { value: 0 }, uAlpha: { value: 1 }, uPow: { value: pow }, uStars: { value: stars }, uRim: { value: C(rim, gain * 0.7) } } })));     // rims are kept low: the bloom spreads anything bright across the black
+      m.renderOrder = 29; m.position.copy(pos); m.scale.setScalar(radius); m.quaternion.identity();
+      const u = m.material.uniforms; u.uT.value = t; u.uAlpha.value = Math.min(1, alpha);
+    },
+    // size is the width across, or [width, height] for a drape. shape: 0 disc, 1 drape with its hem on the right, 2 on the left.
+    voidFlat(id, pos, quat, size, t, alpha = 1, shape = 0, rim = STAR, gain = 2.6, stars = 1) {
+      const w = Array.isArray(size) ? size[0] : size, h = Array.isArray(size) ? size[1] : size;
+      if (alpha <= 0.01 || w <= 0.01) return;
+      const m = get(id, () => new THREE.Mesh(plane, new THREE.ShaderMaterial({ vertexShader: VOID_V, fragmentShader: VOID_FLAT, transparent: true, depthWrite: true, side: THREE.DoubleSide,
+        uniforms: { uT: { value: 0 }, uAlpha: { value: 1 }, uShape: { value: shape }, uStars: { value: stars }, uRim: { value: C(rim, gain * 0.6) } } })));
+      m.renderOrder = 29; m.position.copy(pos); m.quaternion.copy(quat); m.scale.set(w, h, 1);
+      const u = m.material.uniforms; u.uT.value = t; u.uAlpha.value = Math.min(1, alpha); u.uShape.value = shape;
+    },
+    shade(id, pos, size, alpha) {              // always faces the camera
+      if (alpha <= 0.01 || size <= 0) return;
+      const m = get(id, () => new THREE.Mesh(plane, new THREE.ShaderMaterial({ vertexShader: VERT, fragmentShader: SHADE, transparent: true, depthWrite: false, uniforms: { uAlpha: { value: 0 } },
+        blending: THREE.CustomBlending, blendSrc: THREE.ZeroFactor, blendDst: THREE.SrcColorFactor, blendSrcAlpha: THREE.ZeroFactor, blendDstAlpha: THREE.OneFactor })));
+      m.renderOrder = 28; m.quaternion.copy(cam.quaternion); m.position.copy(pos); m.scale.set(size, size, 1); m.material.uniforms.uAlpha.value = Math.min(1, alpha);
+    },
+    // a black hole as films draw it: a ball of nothing, a thin ring of light bent round it, a disc of light spinning into it, and the dark it casts
+    hole(id, pos, radius, t, alpha = 1, stars = 0.6) {
+      if (alpha <= 0.01 || radius <= 0.002) return;
+      F.shade(id + 's', pos, radius * 8, 0.8 * alpha);
+      F.voidBall(id + 'b', pos, radius, alpha, STAR, 3.2, 5.0, stars, t);
+      F.wave(id + 'h', pos, ID, radius * 2.42, 0.85 * alpha, cam.quaternion, EMBER, 1.1);
+      F.accrete(id + 'd', pos, radius * 4.4, t * 4, alpha);
+    },
+    flare(id, pos, len, width, alpha, color = STAR, gain = 3.0, upright = false) {      // a thin line of light across the picture
+      if (alpha <= 0.003 || len <= 0.02) return;
+      const r = new THREE.Vector3(upright ? 0 : 1, upright ? 1 : 0, 0).applyQuaternion(cam.quaternion).multiplyScalar(len / 2);
+      F.strip(id, soft, pos.clone().sub(r), pos.clone().add(r), width, alpha, color, gain);
+    },
     glow(id, kind, pos, size, alpha, color = 0xffffff, gain = 1.8) {       // kind: 0 orb, 1 flame, 2 curl, 3 burst. Always faces the camera.
       if (alpha <= 0.003 || size <= 0) return;
       const m = get(id, () => new THREE.Mesh(plane, basic(glowTex[kind], color, gain)));
@@ -161,9 +266,9 @@ export function makeFx(scene, base = 'fx/') {
     // n sparkles born over 'emit' seconds from origin, each living about 'life' seconds. age is seconds since the first was born.
     motes(id, origin, n, age, o = {}) {
       if (age <= 0 || age > (o.emit ?? 0.3) + (o.life ?? 0.9)) return;
-      const { emit = 0.3, life = 0.9, spread = 0.6, rise = 0.2, size = 0.07, color = VIOLET, gain = 2.6, inward = false, flatten = 1, swirl = 0 } = o;
+      const { emit = 0.3, life = 0.9, spread = 0.6, rise = 0.2, size = 0.07, color = VIOLET, gain = 2.6, inward = false, flatten = 1, swirl = 0, spark = color === STAR ? 0 : 1 } = o;
       const m = get(id, () => new THREE.Points(moteGeo[n] || (moteGeo[n] = seeds(n)), new THREE.ShaderMaterial({ vertexShader: MOTE_V, fragmentShader: MOTE_F, ...BLEND,
-        uniforms: { uOrigin: { value: new THREE.Vector3() }, uAge: { value: 0 }, uLife: { value: 1 }, uEmit: { value: 0 }, uSpread: { value: 1 }, uRise: { value: 0 }, uSize: { value: 0.07 }, uInward: { value: 0 }, uSwirl: { value: 0 }, uFlat: { value: 1 }, uH, uColor: { value: C(color, gain) } } })));
+        uniforms: { uOrigin: { value: new THREE.Vector3() }, uAge: { value: 0 }, uLife: { value: 1 }, uEmit: { value: 0 }, uSpread: { value: 1 }, uRise: { value: 0 }, uSize: { value: 0.07 }, uInward: { value: 0 }, uSwirl: { value: 0 }, uFlat: { value: 1 }, uSpark: { value: spark }, uH, uColor: { value: C(color, gain) } } })));
       const u = m.material.uniforms; u.uOrigin.value.copy(origin); u.uAge.value = age; u.uLife.value = life; u.uEmit.value = emit; u.uSpread.value = spread; u.uRise.value = rise; u.uSize.value = size; u.uInward.value = inward ? 1 : 0; u.uSwirl.value = swirl; u.uFlat.value = flatten;
     },
     // a picture stretched from one point to another and turned to face the camera (the bell chain, or a streak of light)
@@ -185,93 +290,116 @@ export function makeFx(scene, base = 'fx/') {
   const up = new THREE.Vector3(0, 1, 0);
   const gyro = (q, ax, ang) => q.clone().multiply(new THREE.Quaternion().setFromAxisAngle(ax, ang));
 
+  const X = new THREE.Vector3(1, 0, 0), SKEW = new THREE.Vector3(0.6, 0.8, 0).normalize();
+  const camRight = () => new THREE.Vector3(1, 0, 0).applyQuaternion(cam.quaternion), camFwd = () => new THREE.Vector3(0, 0, -1).applyQuaternion(cam.quaternion);
+
   const SPELLS = {
-    // Her show-stopper. A circle is raised into a chandelier of three, the stage dims, a curtain of light closes behind her, and the house comes down.
+    // Her show-stopper, and the darkest thing she does. Every lamp gutters. A new moon no bigger than a coin is lit between
+    // her hands and lifted in an armillary of thin rings; the ground under her becomes the night sky; behind the square the
+    // new moon itself rises and swells until it fills the sky. On the release two curtains of night sweep shut across
+    // everything, a line of light runs through the dark, and when they part the cold rings are already going out.
     CurtainCall(t, c) {
       const Lh = c.hand('Left'), Rh = c.hand('Right'), q = c.q, mid = Lh.clone().add(Rh).multiplyScalar(0.5), r = t - c.release;
-      c.out.dim = 0.8 * win(t, 1.0, 4.4, c.release + 0.1, 6.6);
-      const g = win(t, 0, 0.8, 4.6, 5.2) + win(t, 6.4, 6.9, 7.5, 8.0);
-      F.glow('gl', 0, Lh, 0.26, g, VIOLET); F.glow('gr', 0, Rh, 0.26, g, VIOLET);
-      F.motes('gather', mid, 260, t - 0.3, { emit: 1.5, life: 0.8, spread: 1.4, size: 0.05, inward: true, rise: 0 });
-      const rise = ease(ramp(t, 1.9, 3.3)), open = ease(ramp(t, 3.3, 4.7)), a = win(t, 1.1, 1.7, c.release + 0.5, c.release + 1.6);
-      const p = mid.clone().add(c.dir(0, 0, 0.06)).lerp(Rh.clone().add(c.dir(0, 0.12, 0)), rise).lerp(c.at(0, 2.25, 0), open);
-      const tilt = Math.max(rise * 0.6, open);
-      F.sigil('s', p, q, 0.30 * ease(ramp(t, 1.1, 1.9)) + 0.2 * rise + 0.7 * open, t * 0.9, a, tilt);
-      F.rune('c1', p, q, 0.5 * ease(ramp(t, 1.3, 2.0)) + 0.3 * rise + 2.3 * open, t, ramp(t, 1.3, 2.4), a, tilt);
-      F.rune('c2', p.clone().add(c.dir(0, 0.32 * open, 0)), q, 2.0 * open, -t * 1.3, open, a * open, 1, ROSE, 2.0, 5);
-      F.rune('c3', p.clone().add(c.dir(0, 0.60 * open, 0)), q, 1.1 * open, t * 1.9, open, a * open, 1, GOLD, 2.0, 9);
-      F.rune('floor', c.at(0, 0.03, 0), q, 5.2, t * 0.6, ramp(t, 3.2, 4.6), 0.85 * win(t, 3.2, 3.6, 7.0, 7.8), 1, VIOLET, 1.8, 3);
-      F.pillar('col', c.at(0, 0, 0), 1.15, 2.3, t, 0.55 * win(t, 3.4, 4.4, c.release, c.release + 0.5));
-      F.motes('lift', c.at(0, 0.1, 0), 420, t - 3.3, { emit: 1.9, life: 1.5, spread: 1.2, rise: 1.3, size: 0.06, flatten: 0.15, swirl: 1.6 });
-      // the curtains of light: they hang open at the wings, sweep shut behind her on the release, then part and fade
-      const shut = ease(ramp(r, -0.05, 0.38)), part = ease(ramp(r, 1.1, 2.3)), ca = win(t, 4.1, 4.9, c.release + 1.3, c.release + 2.4), x = 4.2 - 2.7 * shut + 3.0 * part;
-      F.curtain('cL', c.at(x, 0, -1.1), q, 3.4, 4.6, t, ca); F.curtain('cR', c.at(-x, 0, -1.1), q, 3.4, 4.6, t + 2.0, ca);
+      c.out.dim = 0.95 * win(t, 0.6, 3.6, c.release + 1.7, 7.5);
+      F.motes('gather', mid, 260, t - 0.3, { emit: 2.2, life: 1.3, spread: 2.2, size: 0.04, inward: true, rise: 0, swirl: 1.2, color: STAR });
+      const rise = ease(ramp(t, 1.9, 3.3)), open = ease(ramp(t, 3.3, 4.7)), a = win(t, 1.0, 1.6, c.release + 0.15, c.release + 0.5);
+      const p = mid.clone().add(c.dir(0, 0.02, 0.06)).lerp(c.at(0, 2.55, 0), rise), rad = 0.07 * ease(ramp(t, 1.0, 1.9)) + 0.15 * rise + 0.2 * open;
+      F.shade('sh', p, 1.2 + 4.5 * open, 0.8 * a);
+      F.voidBall('moon', p, rad, a, STAR, 2.2, 5.0, 1, t);
+      F.wave('halo', p, ID, rad * 2.5, 0.7 * a, cam.quaternion, STAR, 1.4);
+      const ar = a * ramp(t, 1.3, 2.0);
+      F.hoop('a0', p, q, rad * 4.4, t * 0.9, ar, gyro(q, up, t * 0.7), STAR, 2.0);
+      F.hoop('a1', p, q, rad * 3.8, -t * 0.7, ar, gyro(q, X, 1.1 + t * 0.5), VIOLET, 2.0);
+      F.hoop('a2', p, q, rad * 3.2, t * 0.5, ar, gyro(q, SKEW, 2.2 - t * 0.6), GOLD, 1.8);
+      // she stands on the night sky
+      F.voidFlat('floor', c.at(0, 0.02, 0), flat, 5.4 * ease(ramp(t, 2.6, 4.4)) * (1 - ease(ramp(t, 6.6, 7.6))), t, 1, 0, STAR, 1.3);
+      F.rune('circle', c.at(0, 0.035, 0), q, 6.2, t * 0.3, ramp(t, 3.0, 4.6), 0.13 * win(t, 3.0, 3.6, 7.0, 7.8), 1, STAR, 0.8, 3);
+      F.motes('lift', c.at(0, 0.1, 0), 420, t - 3.0, { emit: 2.2, life: 2.0, spread: 1.7, rise: 0.7, size: 0.035, flatten: 0.15, swirl: 0.8, color: STAR });
+      // the new moon rises beyond the square
+      const away = c.at(0, 0, 0).sub(cam.position).setY(0).normalize(), sw = ease(ramp(t, 3.4, c.release + 0.3));
+      const o = c.at(0, 0, 0), b = o.dot(away), far = edge ? Math.min(16, -b + Math.sqrt(Math.max(0, b * b - o.dot(o) + (edge - 0.5) * (edge - 0.5)))) : 16;   // at the far edge of the open ground, in front of whatever stands round it
+      const moon = o.addScaledVector(away, far); moon.y = 3.0 + 5.0 * sw;
+      F.voidFlat('sky', moon, cam.quaternion, (5 + 19 * sw) * (0.5 + far / 32), t, win(t, 3.4, 4.1, c.release + 1.9, 7.6), 0, STAR, 1.4);
+      // the curtains of night, close to the eye
+      const shut = ease(ramp(r, -0.14, 0.2)), part = ease(ramp(r, 0.48, 0.95));
+      if (r > -0.16 && r < 0.98) {
+        const base = cam.position.clone().addScaledVector(camFwd(), 1.2), x = 1.25 + 1.3 * (1 - shut) + 1.6 * part, rt = camRight();
+        F.voidFlat('cL', base.clone().addScaledVector(rt, -x), cam.quaternion, [2.5, 3.2], t, 1, 1, STAR, 3.0);
+        F.voidFlat('cR', base.clone().addScaledVector(rt, x), cam.quaternion, [2.5, 3.2], t + 9, 1, 2, STAR, 3.0);
+      }
       // the release
-      for (let k = 0; k < 3; k++) F.wave('w' + k, c.at(0, 0.04 + 0.5 * k, 0), q, 1 + 13 * ease((r - 0.12 * k) / 1.3), win(r - 0.12 * k, 0, 0.06, 0.5, 1.3), 1, [VIOLET, ROSE, GOLD][k]);
-      F.glow('fl', 3, c.at(0, 1.5, 0.15), 1.2 + 3.6 * ramp(r, 0, 0.2), win(r, 0, 0.04, 0.15, 0.55), VIOLET, 2.2);
-      F.motes('burst', c.at(0, 1.3, 0), 1200, r, { emit: 0.12, life: 1.6, spread: 5.0, rise: 0.25, size: 0.09, flatten: 0.55 });
-      F.motes('gold', c.at(0, 3.6, 0), 600, r - 0.25, { emit: 1.6, life: 2.4, spread: 3.2, rise: -1.25, size: 0.07, flatten: 0.2, color: GOLD, swirl: 0.5 });
-      F.motes('rose', c.at(0, 3.4, 0), 400, r - 0.5, { emit: 1.6, life: 2.4, spread: 3.0, rise: -1.1, size: 0.08, flatten: 0.2, color: ROSE, swirl: -0.4 });
-      F.light(c.at(0, 1.6, 0.6), VIOLET, 3.0 * win(t, 1.2, 4.6, 6.6, 7.6) + 14 * win(r, 0, 0.05, 0.2, 0.9));
-      c.out.shake = win(r, 0, 0.05, 0.1, 0.8);
+      F.flare('line', c.at(0, 1.2, 0), 30 * ease(ramp(r, 0.2, 0.6)), 0.05 + 0.2 * (1 - ramp(r, 0.25, 0.9)), win(r, 0.2, 0.25, 0.6, 1.2), STAR, 2.4);
+      for (let k = 0; k < 3; k++) { const u = r - 0.25 - 0.3 * k; F.wave('w' + k, c.at(0, 0.04 + 0.4 * k, 0), q, 1 + 15 * ease(u / 1.1), win(u, 0, 0.06, 0.45, 1.1), 1, k === 1 ? VIOLET : STAR, 1.3); }
+      F.motes('fall', c.at(0, 4.2, 0), 700, r - 0.6, { emit: 1.8, life: 2.6, spread: 4.5, rise: -1.0, size: 0.04, flatten: 0.2, color: STAR, swirl: 0.3 });
+      F.motes('gold', c.at(0, 3.8, 0), 160, r - 0.8, { emit: 1.6, life: 2.4, spread: 3.0, rise: -1.1, size: 0.05, flatten: 0.2, color: GOLD });
+      F.light(c.at(0, 2.6, -0.9), ICE, 9.0 * win(t, 1.2, 3.0, 6.6, 7.6) + 8 * win(r, 0.2, 0.26, 0.5, 1.1));
+      c.out.shake = 0.3 * win(t, 3.6, 5.0, c.release, c.release + 0.1) + win(r, 0.2, 0.25, 0.35, 1.0);
     },
-    // A seal is drawn in her hand, thrown, and locks round her target in three turning rings that clamp shut.
+    // Doom. A hole is opened in her hand, ringed with a tally, and thrown. It lands as an eclipse over her target's heart;
+    // three thin rings clamp shut on it, and for a moment the ground beneath shows what is waiting.
     SealedFate(t, c) {
-      const Rh = c.hand('Right'), Lh = c.hand('Left'), q = c.q, r = t - c.release, tg = c.target;
-      F.glow('g', 0, Lh.clone().add(Rh).multiplyScalar(0.5), 0.3, win(t, 0.3, 0.7, 1.0, 1.4), VIOLET);
+      const Rh = c.hand('Right'), q = c.q, r = t - c.release, tg = c.target;
       const held = Rh.clone().add(c.dir(0, 0.02, 0.08)), grow = ease(ramp(t, 1.0, 1.9));
-      c.out.dim = 0.35 * win(t, 1.0, 2.6, c.release + 1.0, c.release + 1.7);
+      c.out.dim = 0.4 * win(t, 0.8, 2.4, c.release + 1.2, c.release + 1.8);
       if (r < 0) {
-        F.rune('seal', held, q, 0.62 * grow, t * 1.4, ramp(t, 1.0, 2.2), 1, 0);
-        F.sigil('s', held, q, 0.30 * grow, -t * 1.4, grow, 0);
-        for (let k = 0; k < 3; k++) { const a = t * 5 + k * 2.094; F.glow('o' + k, 0, held.clone().add(c.dir(0.36 * Math.cos(a) * grow, 0.36 * Math.sin(a) * grow, 0)), 0.11, grow, ROSE); }
-        F.motes('draw', held, 220, t - 1.0, { emit: 1.9, life: 0.6, spread: 0.9, size: 0.045, inward: true, rise: 0 });
-        F.light(held, VIOLET, 3.0 * grow);
+        F.shade('sh', held, 0.6 + 1.8 * grow, 0.85 * grow);
+        F.voidFlat('seal', held, q, 0.46 * grow, t, 1, 0, STAR, 2.8);
+        F.rune('tally', held, q, 0.68 * grow, t * 0.8, ramp(t, 1.0, 2.2), 0.9, 0, STAR, 1.0, 7);
+        for (let k = 0; k < 3; k++) { const a = t * 1.6 + k * 2.094; F.orb('o' + k, held.clone().add(c.dir(0.38 * Math.cos(a) * grow, 0.38 * Math.sin(a) * grow, 0)), 0.09, grow, STAR, 2.4); }
+        F.motes('draw', held, 220, t - 1.0, { emit: 1.9, life: 0.9, spread: 1.7, size: 0.035, inward: true, rise: 0, swirl: 3, color: STAR });
+        F.light(held, ICE, 2.5 * grow);
       } else {
         const fly = ease(r / 0.32), from = c.releaseR.clone().add(c.dir(0, 0.02, 0.08)), at = from.clone().lerp(tg, fly);
-        if (r < 0.34) { F.rune('seal', at, q, 0.62, t * 1.4, 1, 1, 0); F.strip('trail', glowTex[0], from.clone().lerp(tg, Math.max(0, fly - 0.35)), at, 0.5, 0.9, VIOLET, 2.4); }
+        if (r < 0.34) {
+          F.shade('sh', at, 2.4, 0.8); F.voidFlat('seal', at, q, 0.46 + 0.5 * fly, t, 1, 0, STAR, 2.8);
+          F.strip('trail', soft, from.clone().lerp(tg, Math.max(0, fly - 0.35)), at, 0.16, 0.9, STAR, 2.4);
+        }
         const lock = ease(ramp(r, 0.34, 0.60)), clamp = ease(ramp(r, 0.95, 1.12)), fade = 1 - ramp(r, 1.35, 1.75);
-        F.rune('stamp', tg, q, 2.4 * lock - 0.9 * clamp, t * 0.8, ramp(r, 0.32, 0.6), fade * lock, 0, VIOLET, 2.4, 7);
-        F.sigil('s', tg, q, 1.0 * lock - 0.3 * clamp, r * 3, fade * lock, 0);
-        const spin = r * (7 - 6.5 * clamp), size = 2.0 - 1.05 * clamp;
-        F.ring('gy0', tg, q, size * lock, spin, fade * lock, gyro(q, up, spin * 0.9), ROSE, 2.2);
-        F.ring('gy1', tg, q, size * 0.9 * lock, -spin, fade * lock, gyro(q, new THREE.Vector3(1, 0, 0), 1.2 + spin * 0.7), VIOLET, 2.2);
-        F.ring('gy2', tg, q, size * 0.8 * lock, spin, fade * lock, gyro(q, new THREE.Vector3(0.6, 0.8, 0).normalize(), 2.2 - spin * 0.8), GOLD, 2.2);
-        F.motes('pull', tg, 420, r - 0.34, { emit: 0.55, life: 0.5, spread: 2.2, size: 0.06, inward: true, rise: 0 });
-        F.glow('hit', 3, tg, 0.8 + 2.6 * ramp(r, 0.95, 1.1), win(r, 0.95, 1.0, 1.1, 1.5), VIOLET, 2.6);
-        F.wave('w', c.ground, q, 0.6 + 5 * ease((r - 1.0) / 0.7), win(r, 1.0, 1.05, 1.3, 1.7));
-        F.motes('snap', tg, 500, r - 1.0, { emit: 0.06, life: 0.8, spread: 2.4, size: 0.07, rise: 0.1 });
-        F.light(tg, VIOLET, 4 * lock * fade + 12 * win(r, 0.95, 1.0, 1.1, 1.5));
-        c.out.shake = 0.6 * win(r, 0.98, 1.02, 1.08, 1.5);
+        F.shade('sh2', tg, 5.5 * lock, 0.9 * lock * fade);
+        F.voidFlat('stamp', tg, cam.quaternion, 2.3 * lock - 1.55 * clamp, t, fade * lock, 0, STAR, 2.0);
+        const spin = r * (5 - 4.6 * clamp), size = 2.9 - 1.9 * clamp;
+        F.hoop('gy0', tg, q, size * lock, spin, fade * lock, gyro(q, up, spin * 0.9), STAR, 2.0);
+        F.hoop('gy1', tg, q, size * 0.9 * lock, -spin, fade * lock, gyro(q, X, 1.2 + spin * 0.7), VIOLET, 2.0);
+        F.hoop('gy2', tg, q, size * 0.8 * lock, spin, fade * lock, gyro(q, SKEW, 2.2 - spin * 0.8), STAR, 1.8);
+        F.voidFlat('pit', c.ground, flat, 3.6 * win(r, 0.5, 0.95, 1.05, 1.5), t, 1, 0, VIOLET, 2.0);
+        F.motes('pull', tg, 420, r - 0.34, { emit: 0.55, life: 0.6, spread: 2.6, size: 0.045, inward: true, rise: 0, swirl: 5, color: STAR });
+        F.flare('fl', tg, 8 * win(r, 0.95, 1.0, 1.05, 1.4), 0.2, win(r, 0.95, 1.0, 1.1, 1.4));
+        F.wave('w', c.ground, q, 0.6 + 6 * ease((r - 1.0) / 0.7), 0.7 * win(r, 1.0, 1.05, 1.3, 1.7), 1, VIOLET, 1.6);
+        F.light(tg, ICE, 3 * lock * fade + 12 * win(r, 0.95, 1.0, 1.1, 1.5));
+        c.out.shake = 0.7 * win(r, 0.98, 1.02, 1.08, 1.5);
       }
     },
-    // A long blessing: a great circle under her, a column of light, rings climbing her and embers spiralling up.
+    // The odds turn. She stands on the night sky; seven stars come out round her one by one and lines join them into a
+    // figure that turns slowly overhead, and their light runs down into her.
     AgainstAllOdds(t, c) {
-      const Lh = c.hand('Left'), Rh = c.hand('Right'), q = c.q, r = t - c.release, a = win(t, 1.0, 1.6, 6.8, 7.7), end = t - 6.8;
-      c.out.dim = 0.55 * a;
-      F.rune('floor', c.at(0, 0.03, 0), q, 4.4, t * 0.5, ramp(t, 0.5, 1.5), 0.95 * win(t, 0.5, 0.8, 6.9, 7.8), 1);
-      F.rune('floor2', c.at(0, 0.04, 0), q, 2.7, -t * 0.9, ramp(t, 0.9, 1.5), 0.9 * a, 1, GOLD, 1.8, 4);
-      F.sigil('fs', c.at(0, 0.05, 0), q, 1.5 * ease(ramp(t, 1.0, 1.7)), t * 0.35, 0.9 * a, 1);
-      F.pillar('col', c.at(0, 0, 0), 1.3 + 0.05 * Math.sin(t * 3), 5.5, t, (0.5 * win(r, 0, 0.15, 0.5, 1.2) + 0.3) * a);
-      F.pillar('core', c.at(0, 0, -0.5), 0.5, 9.0, t * 1.7, 0.4 * a, 1, GOLD, 1.5);
-      F.glow('gl', 1, Lh.clone().add(c.dir(0, 0.12, 0)), 0.42, a, VIOLET, 2.2); F.glow('gr', 1, Rh.clone().add(c.dir(0, 0.12, 0)), 0.42, a, VIOLET, 2.2);
+      const q = c.q, r = t - c.release, a = win(t, 1.0, 1.6, 6.8, 7.7), end = t - 6.8;
+      c.out.dim = 0.5 * a;
+      F.voidFlat('floor', c.at(0, 0.02, 0), flat, 4.6 * ease(ramp(t, 0.5, 1.5)) * (1 - ease(ramp(t, 6.9, 7.8))), t, 1, 0, STAR, 2.2);
+      F.rune('floor2', c.at(0, 0.035, 0), q, 2.9, -t * 0.5, ramp(t, 0.9, 1.5), 0.7 * a, 1, GOLD, 1.5, 4);
+      let last = null;
+      for (let k = 0; k < 7; k++) {
+        const ang = k * 2.399 + 0.6 + 0.22 * t, rad = 1.5 + 0.5 * ((k * 37) % 5) / 5, h = 0.8 + 2.3 * ((k * 53) % 7) / 7, t0 = 1.2 + 0.28 * k;
+        const P = c.at(rad * Math.cos(ang), h, rad * Math.sin(ang));
+        F.orb('st' + k, P, 0.2 * (1 + 0.25 * Math.sin(t * 5 + k)), a * ramp(t, t0, t0 + 0.2), STAR, 2.4);
+        if (last) F.strip('ln' + k, soft, last, last.clone().lerp(P, ramp(t, t0, t0 + 0.28)), 0.03, 0.8 * a, STAR, 1.6);
+        F.strip('dn' + k, soft, P, P.clone().lerp(c.at(0, 1.3, 0), ramp(r, 0.1 + 0.05 * k, 0.5 + 0.05 * k)), 0.022, 0.5 * a * win(r, 0.1, 0.3, 1.2, 2.0), EMBER, 1.6);
+        last = P;
+      }
+      F.pillar('col', c.at(0, 0, 0), 0.9, 6.0, t * 0.6, (0.2 * win(r, 0, 0.15, 0.5, 1.2) + 0.07) * a, 1, ICE, 1.3);
       for (let k = 0; k < 5; k++) {                           // rings of light climb her, one after another
         const u = (r / 1.6 - k * 0.2) % 1;
-        if (r > k * 0.32 && t < 6.9 && u >= 0) F.ring('up' + k, c.at(0, 0.1 + 2.2 * u, 0), q, 1.5 - 0.6 * u, t * 1.5 + k, 0.9 * Math.sin(u * Math.PI), 1, k % 2 ? GOLD : VIOLET, 2.0);
+        if (r > k * 0.32 && t < 6.9 && u >= 0) F.hoop('up' + k, c.at(0, 0.1 + 2.2 * u, 0), q, 1.5 - 0.6 * u, t * 1.5 + k, 0.8 * Math.sin(u * Math.PI), 1, k % 2 ? GOLD : STAR, 1.7);
       }
-      for (let k = 0; k < 4; k++) {                           // four lights circle her
-        const ang = t * 2.2 + k * 1.5708, h = 0.6 + 0.5 * k + 0.2 * Math.sin(t * 2 + k);
-        F.glow('orb' + k, 0, c.at(1.05 * Math.cos(ang), h, 1.05 * Math.sin(ang)), 0.2, a, GOLD, 2.2);
-      }
-      F.motes('embers', c.at(0, 0.1, 0), 900, r, { emit: 5.2, life: 1.6, spread: 1.3, rise: 1.9, size: 0.06, flatten: 0.1, swirl: 2.6 });
-      F.motes('glints', c.at(0, 0.1, 0), 300, r, { emit: 5.2, life: 1.4, spread: 1.0, rise: 2.3, size: 0.05, flatten: 0.1, swirl: -3.0, color: GOLD });
-      F.glow('start', 3, c.at(0, 1.2, 0.1), 1 + 2.2 * ramp(r, 0, 0.25), 0.8 * win(r, 0, 0.05, 0.15, 0.5), VIOLET, 2.0);
-      F.wave('w0', c.at(0, 0.05, 0), q, 1 + 9 * ease(r / 1.0), win(r, 0, 0.05, 0.4, 1.0));
+      F.motes('embers', c.at(0, 0.1, 0), 700, r, { emit: 5.2, life: 2.2, spread: 1.5, rise: 1.0, size: 0.035, flatten: 0.1, swirl: 1.2, color: STAR });
+      F.motes('glints', c.at(0, 0.1, 0), 200, r, { emit: 5.2, life: 1.8, spread: 1.0, rise: 1.4, size: 0.04, flatten: 0.1, swirl: -2.0, color: GOLD });
+      F.flare('hz', c.at(0, 1.2, 0), 10 * win(r, 0, 0.08, 0.1, 0.5), 0.2, win(r, 0, 0.04, 0.15, 0.5));
+      F.wave('w0', c.at(0, 0.05, 0), q, 1 + 9 * ease(r / 1.0), 0.6 * win(r, 0, 0.05, 0.4, 1.0), 1, VIOLET, 1.5);
       F.wave('w1', c.at(0, 0.05, 0), q, 1 + 8 * ease(end / 0.9), win(end, 0, 0.05, 0.4, 0.9), 1, GOLD);
-      F.light(c.at(0, 1.4, 0.9), 0xd9a0ff, 2.6 * a + 6 * win(r, 0, 0.05, 0.2, 0.7));
+      F.light(c.at(0, 2.2, 0.6), ICE, 2.4 * a + 6 * win(r, 0, 0.05, 0.2, 0.7));
       c.out.shake = 0.4 * win(r, 0, 0.05, 0.1, 0.6);
     },
-    // Her hip bells unfold into a gold chain: drawn, whirled overhead in a ring of gold, and lashed out.
+    // Her hip bells unfold into a gold chain: drawn, whirled overhead in a ring of gold, and lashed out. The lash cuts the air,
+    // and the cut hangs there a moment.
     GildedRebuke(t, c) {
       const Lh = c.hand('Left'), q = c.q, r = t - c.release, tg = c.target;
       let to;
@@ -280,71 +408,104 @@ export function makeFx(scene, base = 'fx/') {
       else to = Lh.clone().lerp(tg, ease(r / 0.12) - ease((r - 0.32) / 0.4));
       F.chain('ch', Lh, to, win(t, 0.3, 0.4, 1.75, 1.97));
       const whirl = win(t, 0.5, 0.7, c.release, c.release + 0.12), wp = Lh.clone().add(c.dir(0, 0.22, 0));
-      F.ring('halo', wp, q, 1.45, -t * 20, whirl, 1, GOLD, 2.4); F.ring('halo2', wp, q, 1.0, t * 26, whirl * 0.7, 1, GOLD, 2.0);
+      F.shade('sh', wp, 3.2, 0.6 * whirl);
+      F.ring('halo', wp, q, 1.45, -t * 20, whirl, 1, GOLD, 2.4); F.ring('halo2', wp, q, 1.0, t * 26, whirl * 0.7, 1, STAR, 2.0);
       F.motes('spin', wp, 240, t - 0.5, { emit: 0.5, life: 0.4, spread: 0.8, size: 0.05, flatten: 0.1, swirl: 14, color: GOLD, rise: 0 });
       const h = r - 0.12;
+      F.strip('cut', soft, c.releaseL, tg, 0.09, win(r, 0.06, 0.12, 0.3, 0.7), STAR, 2.6);
+      F.shade('sh2', tg, 3.4, 0.75 * win(h, 0, 0.03, 0.15, 0.5));
       F.glow('hit', 3, tg, 1 + 2.4 * ramp(h, 0, 0.12), win(h, 0, 0.03, 0.1, 0.45), GOLD, 2.8);
+      F.flare('hz', tg, 7 * win(h, 0, 0.04, 0.06, 0.4), 0.2, win(h, 0, 0.03, 0.1, 0.4), GOLD);
       F.wave('w', tg, q, 0.4 + 3.2 * ease(h / 0.45), win(h, 0, 0.03, 0.2, 0.45), 0, GOLD);
       F.wave('wg', c.ground, q, 0.4 + 4.5 * ease(h / 0.6), win(h, 0, 0.03, 0.3, 0.6), 1, GOLD);
-      F.motes('sp', tg, 700, h, { emit: 0.05, life: 0.8, spread: 2.6, rise: -0.6, size: 0.08, color: GOLD });
+      F.motes('sp', tg, 700, h, { emit: 0.05, life: 0.8, spread: 2.6, rise: -0.6, size: 0.07, color: GOLD });
       F.light(r < 0 ? wp : tg, GOLD, 4 * whirl + 14 * win(h, 0, 0.03, 0.1, 0.5));
-      c.out.shake = 0.7 * win(h, 0, 0.02, 0.06, 0.4);
+      c.out.shake = 0.9 * win(h, 0, 0.02, 0.06, 0.4);
     },
-    // Silence. The air stills, a thin ring leaves her fingertip, and the sound around her target is drawn in and shut inside a shell.
+    // Silence, as it is between the stars. The air stills, a thin ring leaves her fingertip, and the space round her target
+    // goes dark and dead: its sound is drawn in and shut inside a shell.
     Hush(t, c) {
       const tip = c.bone('RightHandIndex3'), q = c.q, r = t - c.release, tg = c.target, face = c.at(0, 1.5, 0.15);
-      c.out.dim = 0.5 * win(t, 0.4, 1.6, c.release + 1.4, c.release + 2.0);
-      F.motes('motes', face, 160, Math.min(t - 0.2, 0.8), { emit: 0.5, life: 1.6, spread: 1.0, rise: 0.04, size: 0.035, color: DUSK });      // they drift, then hang still
+      c.out.dim = 0.4 * win(t, 0.4, 1.6, c.release + 1.4, c.release + 2.0);
+      F.motes('motes', face, 160, Math.min(t - 0.2, 0.8), { emit: 0.5, life: 1.6, spread: 1.0, rise: 0.04, size: 0.03, color: STAR });      // they drift, then hang still
       if (r < 0) {
         const p = tip.clone().add(c.dir(0, 0, 0.05)), g = ease(ramp(t, 1.5, 2.6));
-        F.ring('r', p, q, 0.12 + 0.14 * g, t * 3, ramp(t, 1.5, 1.9), 0, DUSK, 2.2);
-        F.rune('rr', p, q, 0.34 * g, -t * 2, g, g, 0, DUSK, 1.8, 6);
-        F.light(p, DUSK, 1.5 * g);
+        F.shade('sh', p, 1.6 * g, 0.7 * g);
+        F.hoop('r', p, q, 0.12 + 0.14 * g, t * 3, ramp(t, 1.5, 1.9), 0, STAR, 2.0);
+        F.rune('rr', p, q, 0.34 * g, -t * 2, g, g, 0, STAR, 1.5, 6);
+        F.light(p, ICE, 1.2 * g);
       } else {
         const fly = ease(r / 0.3), at = c.releaseTip.clone().lerp(tg, fly);
-        if (r < 0.32) F.ring('r', at, q, 0.26 + 0.5 * fly, t * 3 + r * 5, 1, 0, DUSK, 2.4);
+        if (r < 0.32) F.hoop('r', at, q, 0.26 + 0.5 * fly, t * 3 + r * 5, 1, 0, STAR, 2.2);
         const on = ramp(r, 0.28, 0.4), off = 1 - ramp(r, 1.6, 2.1), shut = ease(ramp(r, 0.3, 0.95));
-        F.shell('bub', tg, 1.5 - 0.75 * shut, on * off, DUSK, 2.0); F.shell('bub2', tg, 1.35 - 0.7 * shut, 0.6 * on * off, 0x5040c0, 2.0, 1.5);
-        for (let k = 0; k < 4; k++) { const u = (r - 0.3 - k * 0.17) / 0.7; if (u > 0 && u < 1) F.wave('in' + k, tg, q, 3.4 * (1 - ease(u)) + 0.3, 0.8 * Math.sin(u * Math.PI), 0, DUSK, 1.8); }   // sound being drawn in
-        for (let k = 0; k < 3; k++) { const u = (r - 0.35 - k * 0.2) / 0.7; if (u > 0 && u < 1) F.wave('ing' + k, c.ground, q, 4.2 * (1 - ease(u)) + 0.3, 0.6 * Math.sin(u * Math.PI), 1, DUSK, 1.8); }
-        F.motes('pull', tg, 380, r - 0.3, { emit: 0.7, life: 0.6, spread: 2.4, size: 0.05, inward: true, rise: 0, color: DUSK });
-        F.rune('lock', tg, q, 1.0 * shut, r, ramp(r, 0.9, 1.1), off * ramp(r, 0.9, 1.0), 0, DUSK, 2.0, 8);
-        F.glow('th', 2, tg, 0.7, win(r, 1.5, 1.7, 1.9, 2.15), DUSK);
-        F.light(tg, DUSK, 3.5 * on * off);
+        F.shade('veil', tg, 6.5 - 2.6 * shut, 0.96 * on * off);
+        F.shell('bub', tg, 1.5 - 0.75 * shut, on * off, STAR, 1.3, 6.0);
+        for (let k = 0; k < 4; k++) { const u = (r - 0.3 - k * 0.17) / 0.7; if (u > 0 && u < 1) F.wave('in' + k, tg, q, 3.4 * (1 - ease(u)) + 0.3, 0.45 * Math.sin(u * Math.PI), cam.quaternion, DUSK, 1.2); }   // sound being drawn in
+        for (let k = 0; k < 3; k++) { const u = (r - 0.35 - k * 0.2) / 0.7; if (u > 0 && u < 1) F.wave('ing' + k, c.ground, q, 4.2 * (1 - ease(u)) + 0.3, 0.4 * Math.sin(u * Math.PI), 1, DUSK, 1.2); }
+        F.motes('pull', tg, 380, r - 0.3, { emit: 0.7, life: 0.6, spread: 2.4, size: 0.04, inward: true, rise: 0, color: STAR });
+        F.rune('lock', tg, q, 1.0 * shut, r, ramp(r, 0.9, 1.1), off * ramp(r, 0.9, 1.0), cam.quaternion, STAR, 1.8, 8);
+        F.flare('fl', tg, 3.5 * win(r, 0.9, 0.95, 1.0, 1.3), 0.1, win(r, 0.9, 0.95, 1.05, 1.3));
+        F.light(tg, ICE, 2.5 * on * off);
       }
     },
-    // A ball of nothing gathers over her hand, drinking the light, and is dropped on her target with the weight of the sky.
+    // A black hole gathers over her hand, drinking the light, and is dropped on her target with the weight of the sky.
     Gravity(t, c) {
       const Lh = c.hand('Left'), q = c.q, r = t - c.release, tg = c.target, gr = c.ground;
       if (r < 0) {
-        const p = Lh.clone().add(c.dir(0, 0.15, 0)), s = ease(ramp(t, 0.15, 0.95));
-        F.dark('hole', p, 0.05 + 0.07 * s); F.shell('rim', p, 0.075 + 0.10 * s, ramp(t, 0.15, 0.4), VIOLET, 3.0, 2.0);
-        F.ring('disk', p, q, 0.36 + 0.42 * s, t * 11, 0.95 * ramp(t, 0.25, 0.5), 0.78, VIOLET, 2.6);
-        F.ring('disk2', p, q, 0.26 + 0.3 * s, -t * 15, 0.7 * ramp(t, 0.25, 0.5), 0.78, ROSE, 2.2);
-        F.motes('pull', p, 420, t - 0.2, { emit: 0.75, life: 0.42, spread: 1.3, size: 0.05, inward: true, rise: 0, swirl: 9 });
-        F.light(p, VIOLET, 4 * s);
-        c.out.dim = 0.4 * s;
+        const p = Lh.clone().add(c.dir(0, 0.17, 0)), s = ease(ramp(t, 0.15, 0.95));
+        F.hole('g', p, 0.05 + 0.09 * s, t, ramp(t, 0.15, 0.4));
+        F.motes('pull', p, 420, t - 0.2, { emit: 0.75, life: 0.42, spread: 1.5, size: 0.04, inward: true, rise: 0, swirl: 9, color: STAR });
+        F.light(p, EMBER, 3 * s);
+        c.out.dim = 0.5 * s;
       } else {
-        const drop = ease(r / 0.13), mid = tg.clone().lerp(gr, 0.35), p = c.releaseL.clone().add(c.dir(0, 0.15, 0)).lerp(mid, drop), grow = ease(ramp(r, 0.1, 0.28)), gone = ease(ramp(r, 0.34, 0.44));
-        F.dark('hole', p, (0.12 + 0.5 * grow) * (1 - gone)); F.shell('rim', p, (0.19 + 0.62 * grow) * (1 - gone), 1 - gone, VIOLET, 3.2, 2.0);
-        F.ring('disk', p, q, (0.8 + 2.0 * grow) * (1 - gone), t * 13, 1 - gone, 0.9, VIOLET, 2.6);
-        F.pillar('press', gr, 1.3 - 0.5 * grow, 6.5, t * 2.2, 0.9 * win(r, 0.02, 0.1, 0.32, 0.5), -1);
-        F.wave('imp', gr, q, 5.0 - 4.6 * ease(r / 0.36), win(r, 0.02, 0.08, 0.3, 0.4));
-        F.rune('crush', gr, q, 3.2, t * 3, 1, win(r, 0.05, 0.12, 0.36, 0.55), 1, VIOLET, 2.0, 2);
-        F.motes('in', mid, 800, r, { emit: 0.12, life: 0.34, spread: 3.2, size: 0.07, inward: true, flatten: 0.5, rise: 0, swirl: 7 });
+        const drop = ease(r / 0.13), mid = tg.clone().lerp(gr, 0.35), p = c.releaseL.clone().add(c.dir(0, 0.17, 0)).lerp(mid, drop), grow = ease(ramp(r, 0.1, 0.28)), gone = ease(ramp(r, 0.34, 0.44));
+        F.hole('g', p, (0.14 + 0.72 * grow) * (1 - gone), t, 1 - gone);
+        F.voidFlat('pit', gr, flat, 4.6 * win(r, 0.02, 0.2, 0.4, 0.7), t, 1, 0, STAR, 2.2);
+        F.wave('imp', gr, q, 5.0 - 4.6 * ease(r / 0.36), 0.7 * win(r, 0.02, 0.08, 0.3, 0.4), 1, VIOLET, 1.5);
+        F.motes('in', mid, 800, r, { emit: 0.12, life: 0.34, spread: 3.4, size: 0.05, inward: true, flatten: 0.5, rise: 0, swirl: 7, color: STAR });
         const b = r - 0.4;
-        F.glow('hit', 3, mid, 1 + 3.2 * ramp(b, 0, 0.12), win(b, 0, 0.02, 0.08, 0.4), VIOLET, 2.8);
-        F.wave('out', gr, q, 0.5 + 7 * ease(b / 0.5), win(b, 0, 0.02, 0.2, 0.5));
-        F.motes('pop', mid, 600, b, { emit: 0.04, life: 0.6, spread: 2.6, size: 0.07, rise: 0.4 });
-        F.light(mid, VIOLET, 6 * (1 - gone) + 14 * win(b, 0, 0.02, 0.1, 0.4));
-        c.out.dim = 0.4 * (1 - ramp(r, 0.3, 0.5)); c.out.shake = 0.5 * win(r, 0.02, 0.1, 0.3, 0.4) + 0.9 * win(b, 0, 0.02, 0.06, 0.35);
+        F.flare('hz', mid, 13 * win(b, 0, 0.05, 0.08, 0.4), 0.25, win(b, 0, 0.03, 0.1, 0.4));
+        F.flare('vt', mid, 5 * win(b, 0, 0.05, 0.08, 0.3), 0.12, win(b, 0, 0.03, 0.1, 0.3), STAR, 3.0, true);
+        F.orb('hit', mid, 0.5 + 1.5 * ramp(b, 0, 0.12), win(b, 0, 0.02, 0.06, 0.3), STAR, 1.8);
+        F.wave('out', gr, q, 0.5 + 8 * ease(b / 0.5), 0.8 * win(b, 0, 0.02, 0.2, 0.5), 1, VIOLET, 1.6);
+        F.motes('pop', mid, 500, b, { emit: 0.04, life: 0.9, spread: 2.6, size: 0.045, rise: 0.2, color: STAR });
+        F.light(mid, ICE, 6 * (1 - gone) + 14 * win(b, 0, 0.02, 0.1, 0.4));
+        c.out.dim = 0.5 * (1 - ramp(r, 0.4, 0.7)); c.out.shake = 0.5 * win(r, 0.02, 0.1, 0.3, 0.4) + 0.9 * win(b, 0, 0.02, 0.06, 0.35);
       }
+    },
+  };
+
+  // Things that are hers but are not one of her clips.
+  const EXTRA = {
+    // The mark Doom leaves over a foe's head while the bell counts: a small black sun with one star left for each turn. c: { pos, count }
+    DoomMark(t, c) {
+      F.hole('m', c.pos, 0.17 + 0.012 * Math.sin(t * 3), t, 1, 0);
+      for (let k = 0; k < (c.count || 0); k++) { const a = t * 1.3 + k * 2.094; F.orb('p' + k, c.pos.clone().addScaledVector(camRight(), 0.52 * Math.cos(a)).add(new THREE.Vector3(0, 0.52 * Math.sin(a), 0)), 0.11, 1, STAR, 2.6); }
+    },
+    // Doom landing, about 2.3 seconds; the foe is gone at 1.0. The ground opens on the night sky, the mark falls into the foe
+    // and grows into a black hole that swallows it, everything near is pulled in, and it collapses to a line of light.
+    // c: { top (where the mark was), target (its heart), ground }
+    DoomLands(t, c) {
+      const fall = ease(ramp(t, 0, 0.35)), grow = ease(ramp(t, 0.08, 0.85)), gone = ease(ramp(t, 0.9, 1.02)), p = c.top.clone().lerp(c.target, fall);
+      c.out.dim = 0.92 * win(t, 0, 0.3, 1.3, 2.2);
+      F.voidFlat('pit', c.ground, flat, 4.6 * ease(ramp(t, 0, 0.5)) * (1 - ease(ramp(t, 1.15, 1.7))), t, 1, 0, STAR, 2.0);
+      F.hole('h', p, (0.16 + 0.95 * grow) * (1 - gone), t, 1, 0.8);
+      F.motes('in', p, 900, t - 0.05, { emit: 0.8, life: 0.5, spread: 4.8, size: 0.05, inward: true, rise: 0, swirl: 8, color: STAR });
+      F.flare('hz', p, 12 * win(t, 0.9, 1.0, 1.02, 1.5), 0.14, win(t, 0.9, 0.98, 1.1, 1.5), STAR, 2.4);
+      F.flare('vt', p, 4.5 * win(t, 0.92, 1.0, 1.02, 1.3), 0.09, win(t, 0.92, 0.98, 1.05, 1.3), STAR, 2.2, true);
+      F.orb('pt', p, 0.5 + 1.8 * ramp(t, 1.0, 1.15), win(t, 1.0, 1.03, 1.1, 1.5), STAR, 2.2);
+      for (let k = 0; k < 3; k++) { const u = t - 1.05 - 0.14 * k; F.wave('w' + k, c.ground.clone().add(new THREE.Vector3(0, 0.3 * k, 0)), ID, 0.8 + 10 * ease(u / 1.1), 0.8 * win(u, 0, 0.05, 0.4, 1.1), 1, k === 1 ? VIOLET : STAR, 1.3); }
+      F.motes('dust', p, 500, t - 1.05, { emit: 0.1, life: 1.8, spread: 4.0, size: 0.04, rise: 0.15, color: STAR });
+      F.light(p, ICE, 5 * grow * (1 - gone) + 10 * win(t, 1.0, 1.03, 1.15, 1.6));
+      c.out.shake = 0.5 * win(t, 0.1, 0.8, 0.9, 1.0) + win(t, 1.0, 1.03, 1.1, 1.6);
     },
   };
 
   // Draw one spell at clip time t. 'slot' tells two casts of the same spell apart.
   function cast(name, t, c, slot = '') { ns = name + slot + ':'; SPELLS[name](t, c); ns = ''; }
   // Draw anything else with the same building blocks, under a name of its own.
-  function draw(name, fn) { ns = name + ':'; fn(F, { cl, ramp, ease, win, glowTex, VIOLET, GOLD, DUSK, ROSE }); ns = ''; }
-  return { F, SPELLS, cast, draw, group, light, uH };
+  function draw(name, fn) { ns = name + ':'; fn(F, { cl, ramp, ease, win, glowTex, VIOLET, GOLD, DUSK, ROSE, STAR, ICE, EMBER }); ns = ''; }
+  // Draw one of the EXTRA effects (the Doom mark, Doom landing). c: { pos or target, ground, count, out }.
+  function extra(name, key, t, c) { ns = name + key + ':'; if (!c.out) c.out = { dim: 0, shake: 0 }; EXTRA[name](t, c); ns = ''; return c.out; }
+  return { F, SPELLS, EXTRA, cast, draw, extra, group, light, uH, pool, arena(r) { edge = r; } };
 }

@@ -1,51 +1,49 @@
-// Plays the turn-based fight thousands of times with a few kinds of player, to check that choices matter.
-// It uses the page's own rules (viewer/rules.js), so what it measures is what Chris plays.
+// Plays the turn-based fight thousands of times with a few kinds of player. It uses the page's own rules
+// (viewer/rules.js). Balance is not the point yet (Chris, November 12): this only checks the fight can be played and lost.
 // usage: node tools/sim_battle.mjs [fights] [level]
 import * as R from '../viewer/rules.js';
 
 function rng(seed) { let s = seed >>> 0 || 1; return () => { s ^= s << 13; s >>>= 0; s ^= s >>> 17; s ^= s << 5; s >>>= 0; return s / 4294967296; }; }
+const ok = (S, id, f) => !R.why(S, id, f);
+const first = (S, id) => R.living(S).find(f => ok(S, id, f));
 
-const ok = (S, id) => !R.why(S, id);
+// each player answers with [command, target]
 export const PLAYERS = {
-  // plans: marks it with Doom at once, then stays alive while the bell counts: Hush so it can only swing its scythe,
-  // Defend, a heal if she is low; and Curtain Call the moment it is ready, because that lands the Doom at once
+  // marks each wraith with Doom, then stays alive while the bell counts; takes Curtain Call the moment it is ready
   'plays well': S => {
-    const h = S.hero, f = S.foe;
-    if (ok(S, 'curtain')) return 'curtain';
-    if (ok(S, 'fate')) return 'fate';
-    if (h.hp <= 0.4 * h.maxHp && ok(S, 'odds')) return 'odds';
-    if (f.doom > 0) return ok(S, 'hush') ? 'hush' : 'defend';
-    return 'attack';
+    const h = S.hero, next = [...R.living(S)].sort((a, b) => b.atb - a.atb)[0];
+    if (ok(S, 'curtain')) return ['curtain'];
+    if (h.hp <= 0.4 * h.maxHp && ok(S, 'odds')) return ['odds'];
+    if (first(S, 'fate')) return ['fate', first(S, 'fate')];
+    if (ok(S, 'hush', next) && h.mp - R.CMD.hush.mp >= R.CMD.odds.mp) return ['hush', next];
+    return ['defend'];
   },
-  // knows Doom ends it, but does nothing to stay alive while it counts
-  'dooms, then attacks': S => (ok(S, 'curtain') ? 'curtain' : ok(S, 'fate') ? 'fate' : 'attack'),
-  // heals and attacks, never plans
-  'heals and hits': S => (S.hero.hp <= 0.4 * S.hero.maxHp && ok(S, 'odds') ? 'odds' : ok(S, 'curtain') ? 'curtain' : 'attack'),
-  'only attacks': () => 'attack',
-  'picks at random': S => { const all = Object.keys(R.CMD).filter(id => ok(S, id)); return all[Math.floor(S.rng() * all.length)]; },
-  'spends MP badly': S => (ok(S, 'hush') ? 'hush' : ok(S, 'gravity') && S.foe.hp < 0.5 * S.foe.maxHp ? 'gravity' : ok(S, 'odds') && S.hero.hp > 0.8 * S.hero.maxHp ? 'odds' : 'attack'),
+  'dooms, then attacks': S => (ok(S, 'curtain') ? ['curtain'] : first(S, 'fate') ? ['fate', first(S, 'fate')] : ['attack', R.living(S)[0]]),
+  'only attacks': S => ['attack', R.living(S)[0]],
+  'picks at random': S => { const all = Object.keys(R.CMD).filter(id => ok(S, id)), id = all[Math.floor(S.rng() * all.length)], ts = R.living(S).filter(f => ok(S, id, f)); return [id, ts[Math.floor(S.rng() * ts.length)]]; },
 };
 
 export function fight(player, seed, level = 1) {
   const S = R.newBattle(level, rng(seed)); let guard = 0;
-  while (!S.over && guard++ < 400) {
+  const run = ev => { for (const e of ev) if (e.k === 'due') R.landDoom(S, S.foes[e.i]); };
+  while (!S.over && guard++ < 600) {
     let who = R.tick(S, 0); if (!who) who = R.tick(S, R.timeToNext(S) + 1e-9);
-    if (who === 'hero') { R.beginHeroTurn(S); const id = player(S); for (const step of R.heroSteps(S, id)) { step(); if (S.over) break; } R.endHeroTurn(S); }
-    else if (who === 'foe') { const id = R.pickFoeMove(S); for (const step of R.foeSteps(S, id)) { step(); if (S.over) break; } R.endFoeTurn(S); }
+    if (who === 'hero') { R.beginHeroTurn(S); const [id, f] = player(S); for (const step of R.heroSteps(S, id, f)) { run(step()); if (S.over) break; } R.endHeroTurn(S); }
+    else if (who) { const id = R.pickFoeMove(S, who); for (const step of R.foeSteps(S, who, id)) { step(); if (S.over) break; } if (!S.over) run(R.endFoeTurn(S, who)); }
   }
   return S;
 }
 export function rate(player, n, level = 1) {
-  let won = 0, turns = 0, hpLeft = 0, foeLeft = 0;
-  for (let i = 0; i < n; i++) { const S = fight(player, 1000 + i * 7919, level); if (S.over === 'won') { won++; hpLeft += S.hero.hp / S.hero.maxHp; } else foeLeft += S.foe.hp / S.foe.maxHp; turns += S.turns; }
-  return { win: won / n, turns: turns / n, hpLeft: won ? hpLeft / won : 0, foeLeft: won < n ? foeLeft / (n - won) : 0 };
+  let won = 0, turns = 0, hpLeft = 0;
+  for (let i = 0; i < n; i++) { const S = fight(player, 1000 + i * 7919, level); if (S.over === 'won') { won++; hpLeft += S.hero.hp / S.hero.maxHp; } turns += S.turns; }
+  return { win: won / n, turns: turns / n, hpLeft: won ? hpLeft / won : 0 };
 }
 
 if (process.argv[1] && process.argv[1].endsWith('sim_battle.mjs')) {
-  const N = +(process.argv[2] || 4000), LEVEL = +(process.argv[3] || 1);
-  { const S = R.newBattle(LEVEL); console.log(`${N} fights each: Jester level ${S.level}, ${S.hero.maxHp} HP; ${R.FOE.name} level ${S.foeLevel}, ${S.foe.maxHp} HP`); }
+  const N = +(process.argv[2] || 4000), LEVEL = +(process.argv[3] || 1), S = R.newBattle(LEVEL);
+  console.log(`${N} fights each: Jester level ${S.level}, ${S.hero.maxHp} HP; ${S.foes.length} x ${R.FOE.name} level ${S.foeLevel}, ${S.foes[0].maxHp} HP`);
   for (const [name, player] of Object.entries(PLAYERS)) {
     const r = rate(player, N, LEVEL);
-    console.log(`  ${name.padEnd(20)} wins ${(100 * r.win).toFixed(0).padStart(3)}%   ${r.turns.toFixed(1)} of her turns   ${r.win ? 'HP left when she wins ' + (100 * r.hpLeft).toFixed(0) + '%' : ''}${r.win < 1 ? '   wraith HP left when she loses ' + (100 * r.foeLeft).toFixed(0) + '%' : ''}`);
+    console.log(`  ${name.padEnd(20)} wins ${(100 * r.win).toFixed(0).padStart(3)}%   ${r.turns.toFixed(1)} of her turns${r.win ? '   HP left when she wins ' + (100 * r.hpLeft).toFixed(0) + '%' : ''}`);
   }
 }

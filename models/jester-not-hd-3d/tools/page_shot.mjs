@@ -22,7 +22,7 @@ await page.waitForFunction(() => window.J && window.J.ready, null, { timeout: 90
 fs.mkdirSync(outdir, { recursive: true });
 for (const s of shots) {
   await page.evaluate(js => { (0, eval)(js); }, s.js || 'J.frame(0)');
-  await page.screenshot({ path: path.join(outdir, s.name + '.png') });
+  for (let k = 0; k < 3; k++) { try { await page.screenshot({ path: path.join(outdir, s.name + '.png'), timeout: 90000 }); break; } catch (e) { if (k === 2) throw e; } }
 }
 const errs = await page.evaluate(() => window.J.errors());
 console.log(logs.length || errs ? ['ERRORS', ...logs, errs].join('\n') : 'no errors');

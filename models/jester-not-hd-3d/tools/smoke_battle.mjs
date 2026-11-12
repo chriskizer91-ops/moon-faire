@@ -1,7 +1,7 @@
 // Play the turn-based fight through in headless Chrome and report how it went and any errors.
 // Frames are stepped by hand (#test), because software rendering here is far slower than a real screen.
 // usage: node tools/smoke_battle.mjs [WxH] [stills dir] [well|attack|slow] [pixel] [levels]
-//   well: Doom at once, then stay alive. attack: only attacks. slow: no Doom or Curtain Call, to see the long fight
+//   well: Doom on each wraith, then stay alive. attack: only attacks. slow: no Doom or Curtain Call, so the other moves get seen
 //   stills dir: saves a picture the first time each command and each wraith move plays, and at the end
 import http from 'node:http'; import fs from 'node:fs'; import path from 'node:path';
 import { chromium } from 'playwright-core';
@@ -29,36 +29,46 @@ await snap('title');
 if (pixel) await page.click('#bPixel');
 await page.click('#go');
 
-// the same careful player as tools/sim_battle.mjs, reading the page's own state
+// the same players as tools/sim_battle.mjs, reading the page's own state. Each answers with [command, wraith number].
 const choose = (s, how) => {
-  const h = s.hero, f = s.foe, can = id => s.menuAll.includes(id);
-  if (how === 'attack') return 'attack';
-  if (how === 'slow') return h.hp <= 0.4 * h.maxHp && can('odds') ? 'odds' : s.turn === 1 && can('gravity') ? 'gravity' : can('hush') && s.turn % 3 === 2 ? 'hush' : s.turn % 2 ? 'attack' : 'defend';
-  if (can('curtain')) return 'curtain';
-  if (can('fate')) return 'fate';
-  if (h.hp <= 0.4 * h.maxHp && can('odds')) return 'odds';
-  if (f.doom > 0) return can('hush') ? 'hush' : 'defend';
-  return 'attack';
+  const h = s.hero, alive = s.foes.filter(f => f.hp > 0), can = (id, f) => s.can[id] && (f === undefined || s.can[id].includes(f.i));
+  const firstFor = id => alive.find(f => can(id, f));
+  if (how === 'attack') return ['attack', alive[0].i];
+  if (how === 'slow') {             // no Doom and no Curtain Call, so every other move gets seen
+    if (h.hp <= 0.4 * h.maxHp && can('odds')) return ['odds'];
+    if (s.turn === 1 && firstFor('gravity')) return ['gravity', firstFor('gravity').i];
+    if (s.turn % 3 === 2 && firstFor('hush')) return ['hush', firstFor('hush').i];
+    return s.turn % 2 ? ['attack', alive[alive.length - 1].i] : ['defend'];
+  }
+  const next = [...alive].sort((a, b) => b.atb - a.atb)[0];
+  if (can('curtain')) return ['curtain'];
+  if (h.hp <= 0.4 * h.maxHp && can('odds')) return ['odds'];
+  if (firstFor('fate')) return ['fate', firstFor('fate').i];
+  if (can('hush', next) && h.mp - 12 >= 26) return ['hush', next.i];
+  return ['defend'];
 };
 const seen = new Set(), used = {}, foeUsed = {}, results = [], trace = [];
-let pending = null, lastAct = '', turn = 0;
+let pending = null, lastAct = [], turn = 0;
 for (let level = 1; level <= levels; level++) {
   turn = 0;
   for (let step = 0; step < 3000; step++) {
-    const s = await page.evaluate(() => { const J = window.J, l = J.look(), R = J.RULES, S = J.B.S; return { ...l, k: S ? S.k : 1, menuAll: S && l.choosing ? Object.keys(R.CMD).filter(id => !R.why(S, id)) : [] }; });
+    const s = await page.evaluate(() => { const J = window.J, l = J.look(), R = J.RULES, S = J.B.S, can = {};
+      if (S && l.choosing) for (const id of Object.keys(R.CMD)) if (!R.why(S, id)) can[id] = R.CMD[id].aim ? S.foes.filter(f => !R.why(S, id, f)).map(f => f.i) : [];
+      return { ...l, can }; });
     if (s.state === 'over' && s.tasks === 0) { results.push(s); break; }
     if (s.choosing) {
       if (pending && pending.t > 0) pending = null;
-      turn++; const id = choose({ ...s, turn }, how);
-      used[id] = (used[id] || 0) + 1; trace.push(`${id}(she ${s.hero.hp}hp ${s.hero.mp}mp, it ${s.foe.hp}${s.foe.doom ? ' doom' + s.foe.doom : ''}${s.foe.silence ? ' sil' + s.foe.silence : ''})`);
+      turn++; const [id, ti] = choose({ ...s, turn }, how);
+      used[id] = (used[id] || 0) + 1; trace.push(`${id}${ti !== undefined ? ' on ' + ['I', 'II', 'III'][ti] : ''} (she ${s.hero.hp}hp ${s.hero.mp}mp; ${s.foes.map(f => f.hp + (f.doom ? ' doom' + f.doom : '') + (f.silence ? ' hush' + f.silence : '')).join(', ')})`);
       if (!seen.has('menu')) { seen.add('menu'); await snap('menu'); }
-      if (id !== 'attack' && id !== 'defend' && !seen.has('magic')) { seen.add('magic'); await page.evaluate(() => window.J.choose('magic')); await snap('magic'); await page.evaluate(() => window.J.choose('back')); }
-      if (id === 'attack' && !seen.has('tap')) { seen.add('tap'); await page.click('#cmd button:first-of-type'); }     // once, by a real tap on the menu
-      else await page.evaluate(id => window.J.choose(id), id);
-      if (!seen.has(id)) { seen.add(id); pending = { name: id, at: [0.9, 2.2, 3.4, 4.6, 5.8], t: 0 }; }
+      if (!seen.has('tap') && id === 'attack') {             // once, by real taps: Attack, then the wraith
+        seen.add('tap'); await page.locator('#cmd button', { hasText: 'Attack' }).first().click(); await snap('target');
+        const hasTargets = await page.evaluate(() => window.J.look().menu.some(m => /^t\d/.test(m)));
+        if (hasTargets) await page.click(`#cmd button[data-i="${s.foes.filter(f => f.hp > 0).findIndex(f => f.i === ti)}"]`);
+      } else await page.evaluate(([id, ti]) => window.J.choose(id, ti), [id, ti]);
+      if (!seen.has(id)) { seen.add(id); pending = { name: id, at: id === 'curtain' ? [1.0, 2.6, 3.8, 4.5, 4.75, 5.0, 5.4, 6.0, 7.0] : id === 'fate' ? [1.0, 1.9, 2.3, 2.9, 3.4] : [0.9, 1.5, 2.2, 3.4], t: 0 }; }
     }
-    const act = s.wraith ? s.wraith.action : '';
-    if (act !== lastAct) { lastAct = act; if (['sweep', 'cast', 'grasp', 'eclipse', 'die'].includes(act)) { foeUsed[act] = (foeUsed[act] || 0) + 1; if (!seen.has(act)) { seen.add(act); pending = { name: act, at: act === 'die' ? [1.0, 2.4, 3.6] : [0.7, 1.2, 1.8, 2.4], t: 0 }; } } }
+    s.foes.forEach((f, i) => { const act = f.action || ''; if (act !== lastAct[i]) { lastAct[i] = act; if (['sweep', 'cast', 'grasp', 'eclipse', 'die'].includes(act)) { foeUsed[act] = (foeUsed[act] || 0) + 1; if (!seen.has(act) && !pending) { seen.add(act); pending = { name: act, at: act === 'die' ? [0.3, 1.2, 2.4] : [0.7, 1.4, 2.2], t: 0 }; } } } });
     const dt = 0.1;
     await page.evaluate(dt => window.J.run(dt, 1 / 30, false), dt);
     if (pending) { pending.t += dt; if (pending.t >= pending.at[0] - 1e-6) { await snap(pending.name + '-' + pending.at.shift().toFixed(1)); if (!pending.at.length) pending = null; } }
@@ -66,7 +76,7 @@ for (let level = 1; level <= levels; level++) {
   const r = results[results.length - 1];
   if (!r) { console.log('did not finish'); break; }
   await snap('end-level' + level);
-  console.log(`${W}x${H}${pixel ? ' pixel finish' : ''}, level ${level}, ${how}: ${r.over} after ${r.time.toFixed(0)} s of game time, ${turn} of her turns, HP ${r.hero.hp}/${r.hero.maxHp}, MP ${r.hero.mp}, wraith ${r.foe.hp}/${r.foe.maxHp}`);
+  console.log(`${W}x${H}${pixel ? ' pixel finish' : ''}, level ${level}, ${how}: ${r.over} after ${r.time.toFixed(0)} s of game time, ${turn} of her turns, HP ${r.hero.hp}/${r.hero.maxHp}, MP ${r.hero.mp}, wraiths ${r.foes.map(f => f.hp + '/' + f.maxHp).join(' and ')}`);
   if (level < levels && r.over === 'won') await page.click('#endCard .go'); else break;
 }
 console.log('  turn by turn: ' + trace.join(' > '));

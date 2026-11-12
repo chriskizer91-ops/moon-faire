@@ -12,7 +12,7 @@ export const STAGE = 0, HER = 1, DECOR = 2, FXL = 3;
 
 export function makePipeline(renderer, scene, opts = {}) {
   const rows = opts.rows || 520;
-  let lowA = null, lowB = null, cur = { camera: null, pixel: false };
+  let lowA = null, lowB = null, cur = { camera: null, pixel: false, dark: 0 };
   const depthOnly = new THREE.MeshBasicMaterial({ colorWrite: false });
   const pixMat = new THREE.ShaderMaterial({
     uniforms: { a: { value: null }, b: { value: null }, texel: { value: new THREE.Vector2() }, pal: { value: Array.from({ length: 64 }, () => new THREE.Vector3()) }, npal: { value: 0 } },
@@ -36,6 +36,12 @@ export function makePipeline(renderer, scene, opts = {}) {
     blending: THREE.CustomBlending, blendSrc: THREE.OneFactor, blendDst: THREE.OneMinusSrcAlphaFactor, depthTest: false, depthWrite: false, transparent: true,
   });
   const quad = new FullScreenQuad(pixMat);
+  // Darkness: the stage (layers 0 and 2) is drawn first and can be turned down toward black before she and her
+  // spells are drawn over it, so a spell can put the whole square out and still leave her and its own light showing.
+  const darkMat = new THREE.MeshBasicMaterial({ transparent: true, depthTest: false, depthWrite: false, blending: THREE.CustomBlending,
+    blendSrc: THREE.ZeroFactor, blendDst: THREE.SrcColorFactor, blendSrcAlpha: THREE.ZeroFactor, blendDstAlpha: THREE.OneFactor });
+  const darkQuad = new FullScreenQuad(darkMat);
+  const darken = r => { if (cur.dark > 0.003) { darkMat.color.setScalar(1 - Math.min(1, cur.dark)); darkQuad.render(r); } };
   const black = new THREE.Color(0x000000);
 
   class StagePass extends Pass {
@@ -45,11 +51,16 @@ export function makePipeline(renderer, scene, opts = {}) {
       const view = h => { if (opts.onViewport) opts.onViewport(h); };
       r.setRenderTarget(readBuffer); r.setClearColor(black, 1); r.clear();
       if (!cur.pixel || !lowA) {
-        cam.layers.enableAll(); view(readBuffer.height);
-        r.render(scene, cam);
+        view(readBuffer.height);
+        cam.layers.disableAll(); cam.layers.enable(STAGE); cam.layers.enable(DECOR);
+        r.render(scene, cam); darken(r);                         // the stage, then however dark it should be
+        scene.background = null;
+        cam.layers.disableAll(); cam.layers.enable(HER); cam.layers.enable(FXL);
+        r.render(scene, cam);                                    // her and her spells, over that
+        scene.background = bg; cam.layers.enableAll();
       } else {
         cam.layers.disableAll(); cam.layers.enable(STAGE); cam.layers.enable(DECOR);
-        r.render(scene, cam);                                    // the stage, as usual
+        r.render(scene, cam); darken(r);                         // the stage, as usual
         scene.background = null;
         // her, small, under flat white light, hidden where the stage is in front of her
         r.setRenderTarget(lowA); r.setClearColor(black, 0); r.clear();
@@ -90,6 +101,7 @@ export function makePipeline(renderer, scene, opts = {}) {
         pixMat.uniforms.a.value = lowA.texture; pixMat.uniforms.b.value = lowB.texture; pixMat.uniforms.texel.value.set(1 / lw, 1 / lh);
       }
     },
-    render(camera, pixel) { cur.camera = camera; cur.pixel = pixel; composer.render(); },
+    // dark: 0 leaves the stage as it is, 1 puts it out altogether
+    render(camera, pixel, dark = 0) { cur.camera = camera; cur.pixel = pixel; cur.dark = dark; composer.render(); },
   };
 }

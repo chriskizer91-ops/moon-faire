@@ -1,5 +1,5 @@
 // Frames are stepped by hand (#test), because software rendering here is far slower than a real screen.
-// Open the night square the way a person does: drag the pad, look around, cast every spell, flip the switches. Report any errors.
+// Open the training square the way a person does: drag the pad, look around, cast every spell, flip the switches. Report any errors.
 import http from 'node:http'; import fs from 'node:fs'; import path from 'node:path';
 import { chromium } from 'playwright-core';
 const ROOT = path.resolve(path.dirname(new URL(import.meta.url).pathname), '..', 'viewer');
@@ -32,8 +32,15 @@ for (const name of await page.evaluate(() => window.J.spellNames())) {
   if (await page.evaluate(() => window.J.busy())) throw new Error(name + ' never finished');
   cast.push(name);
 }
+// the whole of Doom on the dummy: Sealed Fate marks it, the mark counts down, Doom takes it, a new dummy is stood up
+await page.evaluate(() => window.J.run(12));
+const doom = [];
+await page.click('#spells button[data-spell="SealedFate"]');
+for (let k = 0; k < 80; k++) { await page.evaluate(() => window.J.run(0.25)); const f = await page.evaluate(() => { const f = window.J.fate; return (f.away ? 'gone' : f.doom ? 'falling' : f.count ? 'marked ' + f.count : 'clear'); }); if (doom[doom.length - 1] !== f) doom.push(f); if (doom.length > 3 && f === 'clear') break; }
+await page.click('#bSlow'); await page.evaluate(() => window.J.run(0.5)); await page.click('#bSlow');
 if (process.argv[3]) await page.screenshot({ path: process.argv[3] });
 const errs = await page.evaluate(() => window.J.errors());
+console.log('  Doom on the dummy: ' + doom.join(' > '));
 console.log(`${W}x${H}: walked ${Math.hypot(moved[0] - start[0], moved[1] - start[1]).toFixed(2)} m, cast ${cast.join(', ')}`);
 console.log(logs.length || errs ? ['ERRORS', ...logs, errs].join('\n') : 'no errors');
 await browser.close(); server.close();

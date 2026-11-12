@@ -238,7 +238,7 @@ function frame(dtOverride) {
   }
   light(false);
   if (state.view === 'free') controls.update();
-  pipe.render(camera, state.pixel);
+  pipe.render(camera, state.pixel, 1 - (1 - 0.97 * dim) ** 2);   // squared, because the eye reads a tenth of the light as a third
 }
 renderer.setAnimationLoop(() => { if (!TEST) frame(); });
 

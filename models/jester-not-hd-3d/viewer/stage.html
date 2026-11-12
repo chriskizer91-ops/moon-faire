@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
-<title>Jester Witch: the night square</title>
+<title>Jester Witch: the training square</title>
 <style>
   :root { --panel:rgba(22,17,30,.72); --line:#6a5a7c; --ink:#f1e8f4; --dim:#b3a6c0; --gold:#e2b04a; --wine:#8d2f4e; }
   * { box-sizing:border-box; -webkit-tap-highlight-color:transparent; user-select:none; -webkit-user-select:none; }
@@ -13,7 +13,7 @@
   #top { position:fixed; left:0; right:0; top:0; padding:10px 12px; display:flex; gap:8px; align-items:flex-start; pointer-events:none; }
   #top h1 { font-size:15px; font-weight:600; margin:0; letter-spacing:.02em; text-shadow:0 1px 6px #000; }
   #hint { color:var(--dim); font-size:12px; margin-top:3px; text-shadow:0 1px 6px #000; transition:opacity 1.2s; max-width:230px; }
-  #opts { margin-left:auto; display:flex; gap:6px; pointer-events:auto; }
+  #opts { margin-left:auto; display:flex; gap:6px; pointer-events:auto; flex-wrap:wrap; justify-content:flex-end; }
   button { font:inherit; color:var(--ink); background:var(--panel); border:1px solid var(--line); border-radius:999px; padding:7px 12px; min-height:34px; cursor:pointer; white-space:nowrap; backdrop-filter:blur(5px); }
   button.on { background:var(--wine); border-color:var(--gold); color:#fff; }
   #pad { position:fixed; left:18px; bottom:calc(22px + env(safe-area-inset-bottom)); width:124px; height:124px; border-radius:50%; background:var(--panel); border:1px solid var(--line); touch-action:none; backdrop-filter:blur(5px); }
@@ -32,8 +32,8 @@
 <body>
 <div id="stage"></div>
 <div id="top">
-  <div><h1>The night square</h1><div id="hint">Drag the pad to walk and run. Drag the picture to look around. Tap a spell.</div></div>
-  <div id="opts"><button id="bPixel">Pixel finish</button><button id="bVeil" class="on">Veil</button></div>
+  <div><h1>The training square</h1><div id="hint">Drag the pad to walk and run. Drag the picture to turn the camera, pinch to move it in and out. Tap a spell: the dummy in the corner takes it.</div></div>
+  <div id="opts"><button id="bSlow">Slow</button><button id="bPixel">Pixel finish</button><button id="bVeil" class="on">Veil</button></div>
 </div>
 <div id="err"></div>
 <div id="pad"><div id="knob"></div></div>
@@ -51,6 +51,7 @@ import { makePipeline, DECOR } from './pipeline.js';
 import { buildSquare } from './world.js';
 import { loadJester, makeContext, makeBlink } from './core.js';
 import { makeFx } from './fx.js';
+import { MOVES, DOOM, HUSH } from './moves.js';
 
 const $ = s => document.querySelector(s);
 const errBox = $('#err');
@@ -72,7 +73,7 @@ const hdr = (r, g, b) => new THREE.Color().setRGB(r, g, b);
 const { R, flies, setLight } = buildSquare(scene);
 
 // ------------------------------------------------------------------ something to cast at: a practice dummy
-const dummy = new THREE.Group(), DUMMY = new THREE.Vector3(0, 0, 5.4);
+const dummy = new THREE.Group(), rig = new THREE.Group(), DUMMY = new THREE.Vector3(4.4, 0, 4.4);     // in the corner, out of the way of the camera
 {
   const weave = (() => { const c = document.createElement('canvas'); c.width = c.height = 128; const g = c.getContext('2d'); g.fillStyle = '#8a7350'; g.fillRect(0, 0, 128, 128); for (let y = 0; y < 128; y += 4) for (let x = 0; x < 128; x += 4) { g.fillStyle = `rgba(${40 + rnd() * 50},${30 + rnd() * 40},${10 + rnd() * 20},.35)`; g.fillRect(x + ((y / 4) % 2) * 2, y, 3, 3); } const t = new THREE.CanvasTexture(c); t.colorSpace = THREE.SRGBColorSpace; t.wrapS = t.wrapT = THREE.RepeatWrapping; t.repeat.set(3, 3); return t; })();
   const burlap = new THREE.MeshStandardMaterial({ map: weave, roughness: 0.95 }), wood = new THREE.MeshStandardMaterial({ color: 0x4a3526, roughness: 0.85 }), straw = new THREE.MeshStandardMaterial({ color: 0xb89a4a, roughness: 0.9 });
@@ -91,14 +92,26 @@ const dummy = new THREE.Group(), DUMMY = new THREE.Vector3(0, 0, 5.4);
   add(new THREE.ConeGeometry(0.15, 0.34, 10), new THREE.MeshStandardMaterial({ color: 0x5a4c24, roughness: 0.8 }), 0.03, 2.13, 0).rotation.z = -0.25;
   const board = (() => { const c = document.createElement('canvas'); c.width = c.height = 128; const g = c.getContext('2d'); ['#3a2a1e', '#d8c9a8', '#7a2140', '#d8c9a8', '#c8922e'].forEach((col, i) => { g.fillStyle = col; g.beginPath(); g.arc(64, 64, 62 - i * 13, 0, 7); g.fill(); }); const t = new THREE.CanvasTexture(c); t.colorSpace = THREE.SRGBColorSpace; return t; })();
   const tb = add(new THREE.CylinderGeometry(0.2, 0.2, 0.03, 20), [wood, new THREE.MeshStandardMaterial({ map: board, roughness: 0.8 }), wood], 0, 1.25, 0.26); tb.rotation.x = Math.PI / 2;
-  dummy.position.copy(DUMMY); dummy.rotation.y = Math.PI; scene.add(dummy);
+  dummy.rotation.y = Math.atan2(-DUMMY.x, -DUMMY.z); rig.add(dummy); rig.position.copy(DUMMY); scene.add(rig);          // it faces the middle of the square
 }
 const wob = { x: 0, z: 0, vx: 0, vz: 0, squash: 0 };
 function kick(dx, dz, strength, squash = 0) { wob.vx += dz * strength; wob.vz -= dx * strength; wob.squash = Math.max(wob.squash, squash); }
-const HIT = { CurtainCall: [[0.25, 5]], SealedFate: [[0.34, 1.5], [1.0, 5]], GildedRebuke: [[0.12, 8]], Hush: [[0.4, 1.2]], Gravity: [[0.13, 0, 0.5], [0.4, 6]] };
+// What her spells leave on the dummy (moves.js says which), so the whole of each can be seen here:
+// Sealed Fate marks it with Doom, the mark counts down by itself, and when it runs out (or Curtain Call falls first) Doom takes it.
+// A new dummy is stood up a moment later. Hush leaves it wrapped in quiet for a few seconds.
+const DOOM_BACK = 3.8;
+const fate = { count: 0, next: 0, doom: null, away: false, back: 0, hush: 0 };
+const markPos = () => new THREE.Vector3(DUMMY.x, 2.75, DUMMY.z);
+function landed(leaves) {
+  if (fate.away || fate.doom) return;
+  if (leaves === 'doom') { fate.count = DOOM.count; fate.next = T + DOOM.tick; }
+  if (leaves === 'hush') fate.hush = HUSH.lasts;
+  if (leaves === 'doom now' && fate.count > 0) doomFalls();
+}
+function doomFalls() { fate.count = 0; fate.doom = { t0: T, top: markPos(), target: new THREE.Vector3(DUMMY.x, 1.25, DUMMY.z), ground: new THREE.Vector3(DUMMY.x, 0.03, DUMMY.z) }; }
 
 // ------------------------------------------------------------------ her
-const fx = makeFx(scene);
+const fx = makeFx(scene); fx.arena(R);
 let dim = 0;
 const light = flat => setLight(flat, dim);
 const pipe = makePipeline(renderer, scene, { flatLight: light, onViewport: h => { fx.uH.value = h; } });
@@ -106,9 +119,9 @@ const blob = decor(new THREE.Mesh(new THREE.CircleGeometry(0.36, 32), new THREE.
 blob.rotation.x = -Math.PI / 2; blob.position.y = 0.012; scene.add(blob);
 
 let J = null, ctx = null, blink = null, loco = null, casting = null;
-const state = { pixel: false, veil: true };
-const me = { x: 0, z: -0.6, yaw: 0, v: 0 };
-const cam = { yaw: Math.PI, pitch: 0.2, dist: 5.6, focus: new THREE.Vector3(0, 1.2, 0), d: 5.6, shake: 0 };
+const state = { pixel: false, veil: true, slow: false };
+const me = { x: 0.4, z: -0.2, yaw: Math.PI / 4, v: 0 };
+const cam = { yaw: Math.PI * 1.25 + 0.27, pitch: 0.24, dist: 6.4, focus: new THREE.Vector3(0.4, 1.2, -0.2), d: 6.4, shake: 0 };   // behind her, with the dummy in the far corner of the picture
 const stick = { x: 0, y: 0 }, keys = {};
 const WIDE = { CurtainCall: 4.2, AgainstAllOdds: 3.0, SealedFate: 1.6, GildedRebuke: 1.4, Hush: 1.4, Gravity: 1.8 };
 
@@ -128,15 +141,15 @@ function cast(name) {
   if (casting || !J) return;
   const a = J.mixer.clipAction(J.clips[name]);
   a.reset(); a.setLoop(THREE.LoopOnce, 1); a.clampWhenFinished = true; a.setEffectiveWeight(0); a.play();
-  casting = { name, a, w: 0, dur: J.clips[name].duration, hits: (HIT[name] || []).map(h => ({ at: J.info[name].release + h[0], s: h[1], q: h[2] || 0, done: false })) };
+  casting = { name, a, w: 0, dur: J.clips[name].duration, hits: MOVES[name].hits.map(h => ({ at: J.info[name].release + h.at, s: h.push, q: h.squash || 0, leaves: h.leaves, done: false })) };
   $('#spells').classList.add('busy'); document.querySelectorAll('#spells button').forEach(b => b.classList.toggle('on', b.dataset.spell === name));
   hintOff();
 }
 function toggle(k) {
-  state[k] = !state[k]; $('#bPixel').classList.toggle('on', state.pixel); $('#bVeil').classList.toggle('on', state.veil);
+  state[k] = !state[k]; $('#bPixel').classList.toggle('on', state.pixel); $('#bVeil').classList.toggle('on', state.veil); $('#bSlow').classList.toggle('on', state.slow);
   if (J && J.veil) J.veil.visible = state.veil;
 }
-$('#bPixel').onclick = () => toggle('pixel'); $('#bVeil').onclick = () => toggle('veil');
+$('#bPixel').onclick = () => toggle('pixel'); $('#bVeil').onclick = () => toggle('veil'); $('#bSlow').onclick = () => toggle('slow');
 let hinted = false; function hintOff() { if (!hinted) { hinted = true; $('#hint').style.opacity = 0; } }
 
 // ---- controls: the pad walks her, dragging the picture turns the camera, the wheel or a pinch moves it in and out
@@ -151,13 +164,13 @@ let hinted = false; function hintOff() { if (!hinted) { hinted = true; $('#hint'
   el.addEventListener('pointerdown', e => { pts.set(e.pointerId, [e.clientX, e.clientY]); el.setPointerCapture(e.pointerId); });
   el.addEventListener('pointermove', e => {
     const p = pts.get(e.pointerId); if (!p) return;
-    if (pts.size === 1) { cam.yaw -= (e.clientX - p[0]) * 0.006; cam.pitch = Math.min(1.2, Math.max(-0.05, cam.pitch + (e.clientY - p[1]) * 0.005)); }
+    if (pts.size === 1) { cam.yaw -= (e.clientX - p[0]) * 0.006; cam.pitch = Math.min(1.45, Math.max(-0.12, cam.pitch + (e.clientY - p[1]) * 0.005)); }
     p[0] = e.clientX; p[1] = e.clientY;
-    if (pts.size === 2) { const [a, b] = [...pts.values()], d = Math.hypot(a[0] - b[0], a[1] - b[1]); if (pinch) cam.dist = Math.min(14, Math.max(2.2, cam.dist * pinch / d)); pinch = d; }
+    if (pts.size === 2) { const [a, b] = [...pts.values()], d = Math.hypot(a[0] - b[0], a[1] - b[1]); if (pinch) cam.dist = Math.min(15, Math.max(1.6, cam.dist * pinch / d)); pinch = d; }
   });
   const end = e => { pts.delete(e.pointerId); pinch = 0; };
   el.addEventListener('pointerup', end); el.addEventListener('pointercancel', end);
-  el.addEventListener('wheel', e => { cam.dist = Math.min(14, Math.max(2.2, cam.dist * (1 + Math.sign(e.deltaY) * 0.1))); e.preventDefault(); }, { passive: false });
+  el.addEventListener('wheel', e => { cam.dist = Math.min(15, Math.max(1.6, cam.dist * (1 + Math.sign(e.deltaY) * 0.1))); e.preventDefault(); }, { passive: false });
   addEventListener('keydown', e => { keys[e.code] = true; const n = '123456'.indexOf(e.key); if (n >= 0) { const b = document.querySelectorAll('#spells button')[n]; if (b) b.click(); } });
   addEventListener('keyup', e => { keys[e.code] = false; });
 }
@@ -175,7 +188,7 @@ const cl = (x, a = 0, b = 1) => Math.min(b, Math.max(a, x));
 const turn = (from, to, k) => from + Math.atan2(Math.sin(to - from), Math.cos(to - from)) * k;
 const clock = new THREE.Clock(); let T = 0;
 function frame(dtOverride, skipDraw) {
-  const dt = dtOverride !== undefined ? dtOverride : Math.min(clock.getDelta(), 0.05);
+  const dt = (dtOverride !== undefined ? dtOverride : Math.min(clock.getDelta(), 0.05)) * (state.slow ? 0.3 : 1);    // Slow: a third of the speed, to study a move
   T += dt; dim = 0; let shake = 0;
   flies(T);
   if (J) {
@@ -214,15 +227,27 @@ function frame(dtOverride, skipDraw) {
     if (casting) {
       const c = casting, t = c.a.time, x = ctx(c.name, c.a, tgt);
       fx.cast(c.name, t, x); dim = x.out.dim; shake = x.out.shake;
-      for (const h of c.hits) if (!h.done && t >= h.at) { h.done = true; const dx = DUMMY.x - me.x, dz = DUMMY.z - me.z, d = Math.hypot(dx, dz) || 1; kick(dx / d, dz / d, h.s, h.q); }
+      for (const h of c.hits) if (!h.done && t >= h.at) { h.done = true; const dx = DUMMY.x - me.x, dz = DUMMY.z - me.z, d = Math.hypot(dx, dz) || 1; kick(dx / d, dz / d, h.s, h.q); if (h.leaves) landed(h.leaves); }
       if (c.dur - t < 0.02 || !c.a.isRunning()) { c.a.stop(); casting = null; $('#spells').classList.remove('busy'); document.querySelectorAll('#spells button').forEach(b => b.classList.remove('on')); }
     }
     // the dummy rocks on its post when it is hit
     wob.vx += (-wob.x * 60 - wob.vx * 5) * dt; wob.vz += (-wob.z * 60 - wob.vz * 5) * dt; wob.x += wob.vx * dt; wob.z += wob.vz * dt; wob.squash *= Math.exp(-dt * 6);
-    dummy.rotation.set(cl(wob.x, -0.7, 0.7), Math.PI, cl(wob.z, -0.7, 0.7)); dummy.scale.set(1 + 0.25 * wob.squash, 1 - 0.45 * wob.squash, 1 + 0.25 * wob.squash);
+    rig.rotation.set(cl(wob.x, -0.7, 0.7), 0, -cl(wob.z, -0.7, 0.7)); rig.scale.set(1 + 0.25 * wob.squash, 1 - 0.45 * wob.squash, 1 + 0.25 * wob.squash); rig.position.y = 0;
+    // what is on the dummy: the Doom mark counting down, Doom itself, the quiet of Hush
+    fate.hush = Math.max(0, fate.hush - dt);
+    if (fate.count > 0 && !fate.doom && T >= fate.next) { fate.count--; fate.next = T + DOOM.tick; if (fate.count === 0) doomFalls(); }
+    if (fate.doom) {
+      const d = fate.doom, t = T - d.t0, o = fx.extra('DoomLands', 'd', t, d), pull = cl((t - 0.3) / 0.7);
+      dim = Math.max(dim, o.dim); shake = Math.max(shake, o.shake);
+      rig.position.y = 0.5 * pull * pull; rig.scale.multiplyScalar(1 - 0.5 * pull * pull);          // the hole draws it up and in
+      if (t >= DOOM.lands && !fate.away) { fate.away = true; fate.back = T + DOOM_BACK; fate.hush = 0; rig.visible = false; }
+      if (t > DOOM.over) fate.doom = null;
+    } else if (fate.away && T >= fate.back) { fate.away = false; rig.visible = true; wob.squash = 0.9; }   // a new one is stood up
+    if (fate.count > 0 && !fate.away) fx.extra('DoomMark', 'd', T, { pos: markPos(), count: fate.count });
+    if (fate.hush > 0 && !fate.away) fx.draw('quiet', (F, u) => { const p = new THREE.Vector3(DUMMY.x, 1.84, DUMMY.z), a = cl(fate.hush / 0.6); F.shade('s', p, 2.2, 0.8 * a); F.shell('b', p, 0.42, 0.6 * a, u.STAR, 1.2, 5.0); });
     // the camera follows her, and steps back to take in a big spell
     const wide = casting ? WIDE[casting.name] || 1.5 : 0, aim = new THREE.Vector3(me.x, 1.2, me.z);
-    if (casting && !['CurtainCall', 'AgainstAllOdds'].includes(casting.name)) aim.lerp(tgt, 0.42);
+    if (casting && !['CurtainCall', 'AgainstAllOdds'].includes(casting.name)) aim.lerp(tgt, 0.42); else if (fate.doom) aim.lerp(tgt, 0.5);
     if (casting && wide > 2.5) aim.y += 0.5;
     cam.focus.lerp(aim, Math.min(1, dt * 4)); cam.d += (cam.dist + wide - cam.d) * Math.min(1, dt * 2.5);
   }
@@ -235,13 +260,13 @@ function frame(dtOverride, skipDraw) {
     if (Math.hypot(p.x, p.z) > lim) { let lo = 0, hi = 1; for (let i = 0; i < 12; i++) { const m = (lo + hi) / 2; if (Math.hypot(f.x + (p.x - f.x) * m, f.z + (p.z - f.z) * m) > lim) hi = m; else lo = m; } p.set(f.x + (p.x - f.x) * lo, f.y + (p.y - f.y) * Math.max(lo, 0.35), f.z + (p.z - f.z) * lo); }
   }
   camera.lookAt(cam.focus);
-  if (!skipDraw) pipe.render(camera, state.pixel);
+  if (!skipDraw) pipe.render(camera, state.pixel, 1 - (1 - 0.97 * dim) ** 2);   // squared, because the eye reads a tenth of the light as a third
 }
 renderer.setAnimationLoop(() => { if (!TEST) frame(); });
 
 // hooks for automated checks
 const api = window.J = {
-  ready: false, state, cast, toggle, frame, cam, me, stick,
+  ready: false, state, cast, toggle, frame, cam, me, stick, fate, fx,
   run(seconds, dt = 1 / 30) { for (let t = 0; t < seconds - 1e-6; t += dt) frame(dt, true); frame(0); },
   busy: () => !!casting, spellNames: () => [...document.querySelectorAll('#spells button')].map(b => b.dataset.spell), errors: () => errBox.textContent,
 };

@@ -245,7 +245,7 @@ function spawn(kind) {
 }
 
 // ------------------------------------------------------------------ her
-const fx = makeFx(scene);
+const fx = makeFx(scene); fx.arena(R);
 let dim = 0;
 const pipe = makePipeline(renderer, scene, { flatLight: flat => setLight(flat, dim), onViewport: h => { fx.uH.value = h; } });
 const blob = decor(new THREE.Mesh(new THREE.CircleGeometry(0.36, 32), new THREE.MeshBasicMaterial({ color: 0x06040a, transparent: true, opacity: 0.5, depthWrite: false })));
@@ -485,7 +485,7 @@ function frame(dtOverride, skipDraw) {
     if (Math.hypot(p.x, p.z) > lim) { let lo = 0, hi = 1; for (let i = 0; i < 12; i++) { const m = (lo + hi) / 2; if (Math.hypot(f.x + (p.x - f.x) * m, f.z + (p.z - f.z) * m) > lim) hi = m; else lo = m; } p.set(f.x + (p.x - f.x) * lo, f.y + (p.y - f.y) * Math.max(lo, 0.35), f.z + (p.z - f.z) * lo); }
   }
   camera.lookAt(cam.focus);
-  if (!skipDraw) pipe.render(camera, state.pixel);
+  if (!skipDraw) pipe.render(camera, state.pixel, 1 - (1 - 0.97 * dim) ** 2);   // squared, because the eye reads a tenth of the light as a third
 }
 renderer.setAnimationLoop(() => { if (!TEST) frame(); });
 

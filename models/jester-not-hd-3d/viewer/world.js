@@ -108,7 +108,7 @@ export function buildSquare(scene) {
   })();
   // dim: 0 to 1, how far a spell has darkened the square. flat: the white light the pixel finish needs.
   function setLight(flat, dim) {
-    const k = flat ? 1 - 0.3 * dim : 1 - 0.78 * dim;
+    const k = flat ? 1 - 0.3 * dim : 1 - 0.6 * dim;      // the lamps only go part of the way down, so she can still be seen; the pipeline's 'dark' does the rest
     for (const o of lights) o.l.intensity = (flat ? (o.warm ? o.base * 0.25 : o.flat) : o.base) * k;
     lights.hemi.color.set(flat ? 0xffffff : 0x8a84d0); lights.hemi.groundColor.set(flat ? 0xb8b0b8 : 0x3a2c40); lights.moonL.color.set(flat ? 0xffffff : 0xa9b0ff);
   }

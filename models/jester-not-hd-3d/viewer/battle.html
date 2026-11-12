@@ -22,13 +22,17 @@
   .win { background:linear-gradient(180deg,var(--w1),var(--w2)); border:2px solid var(--wb); border-radius:7px; box-shadow:inset 0 0 0 1px rgba(0,0,0,.55),0 4px 16px rgba(0,0,0,.5); color:var(--wt); text-shadow:0 1px 0 rgba(0,0,0,.7); }
   .serif { font-family:Georgia,"Times New Roman",serif; }
   #enemy { position:fixed; left:calc(10px + env(safe-area-inset-left)); top:calc(10px + env(safe-area-inset-top)); padding:6px 10px 8px; min-width:172px; z-index:4; }
-  .ename { font-size:16px; margin-bottom:5px; display:flex; justify-content:space-between; gap:10px; align-items:baseline; }
+  .ename { font-size:15px; margin-bottom:4px; display:flex; justify-content:space-between; gap:10px; align-items:baseline; }
   .ename small { font:12px system-ui,sans-serif; color:var(--dim); }
   .gauge { position:relative; height:8px; border-radius:4px; background:rgba(0,0,0,.55); box-shadow:inset 0 0 0 1px rgba(255,255,255,.18); overflow:hidden; }
   .gauge i { position:absolute; left:0; top:0; bottom:0; width:0; border-radius:4px; }
   .gauge.thin { height:5px; margin-top:4px; }
-  #ehp { background:linear-gradient(90deg,#46e38c,#b7ffcf); } #eatb { background:linear-gradient(90deg,#8a93b8,#c9d0ee); }
-  #etags { font-size:12px; color:#e6d4ff; min-height:16px; margin-top:4px; }
+  .ehp { background:linear-gradient(90deg,#46e38c,#b7ffcf); } .eatb { background:linear-gradient(90deg,#8a93b8,#c9d0ee); }
+  .erow + .erow { margin-top:7px; } .erow.out { opacity:.45; }
+  .ename small.etags { color:#e6d4ff; white-space:nowrap; }
+  .elv { font-size:11px; color:var(--dim); margin-top:5px; text-align:right; }
+  .flabel { position:absolute; left:0; top:0; font:italic 15px Georgia,serif; color:#fff; background:rgba(20,14,36,.72); border:1px solid rgba(226,214,255,.7); border-radius:10px; padding:0 7px 1px; text-shadow:0 1px 0 #000; will-change:transform; }
+  .flabel.aim { background:#ffd66e; color:#2a1d05; border-color:#fff; text-shadow:none; font-weight:700; }
   #top { position:fixed; right:calc(10px + env(safe-area-inset-right)); top:calc(10px + env(safe-area-inset-top)); display:flex; gap:6px; z-index:10; }
   .hbtn { appearance:none; border:1px solid rgba(255,255,255,.35); background:rgba(14,10,24,.62); color:#fff; border-radius:18px; padding:7px 12px; font-size:13px; min-height:32px; }
   .hbtn.on { border-color:var(--gold); color:var(--gold); }
@@ -96,12 +100,7 @@
 <div id="vignette" class="fill"></div>
 <div id="flash" class="fill"></div>
 <div id="barT" class="barx"></div><div id="barB" class="barx"></div>
-<div id="enemy" class="win" hidden>
-  <div class="ename serif"><span id="ename">Shadow Wraith</span><small id="elv"></small></div>
-  <div class="gauge"><i id="ehp"></i></div>
-  <div class="gauge thin" title="Its turn"><i id="eatb"></i></div>
-  <div id="etags"></div>
-</div>
+<div id="enemy" class="win" hidden></div>
 <div id="top"><button class="hbtn on" id="bSound">Sound on</button><button class="hbtn" id="bPixel">Pixel finish</button></div>
 <div id="banner" class="win serif"></div>
 <div id="msg" class="win"></div>
@@ -129,8 +128,9 @@ setTimeout(function () { var l = document.getElementById('load'); if (l) l.textC
 <script src="envoi/wraith.js"></script>
 <script type="module">
 // Night of No Moon: the square, as a turn-based fight.
-// The fight is Envoi's first one (the Shadow Wraith in the night square) with the 3D Jester in the witch's place.
-// rules.js holds every number; this file is the staging: who moves when, the camera, the effects and the windows.
+// The fight is Envoi's first one (Shadow Wraiths in the night square) with the 3D Jester in the witch's place.
+// It is here to show her: her moves, their effects (fx.js) and how they meet a foe. rules.js holds every number;
+// this file is the staging: who moves when, the camera, and the windows. Balance comes later.
 import * as THREE from 'three';
 import { makePipeline, DECOR } from './pipeline.js';
 import { buildSquare } from './world.js';
@@ -153,7 +153,7 @@ const rnd = (a, b) => a + Math.random() * (b - a);
 const wrap = a => Math.atan2(Math.sin(a), Math.cos(a));
 const faceYaw = (from, to) => Math.atan2(to.x - from.x, to.z - from.z);
 const toward = (from, to, dist) => { const dx = to.x - from.x, dz = to.z - from.z, d = Math.hypot(dx, dz) || 1; return { x: to.x - dx / d * dist, z: to.z - dz / d * dist }; };
-const SOUL = 0x56ff9c;
+const SOUL = 0x56ff9c, STAR = 0xdfe6ff;
 
 // ------------------------------------------------------------------ the picture
 const stage = $('stage');
@@ -165,12 +165,13 @@ const scene = new THREE.Scene();
 const camera = new THREE.PerspectiveCamera(46, 1, 0.1, 140);
 const { R, flies, setLight } = buildSquare(scene);
 const decor = o => { o.traverse(x => x.layers.set(DECOR)); return o; };
-const fx = makeFx(scene);
+const fx = makeFx(scene); fx.arena(R);
 let dim = 0;
 const pipe = makePipeline(renderer, scene, { flatLight: flat => setLight(flat, dim), onViewport: h => { fx.uH.value = h; } });
 const blobOf = r => { const b = decor(new THREE.Mesh(new THREE.CircleGeometry(r, 32), new THREE.MeshBasicMaterial({ color: 0x06040a, transparent: true, opacity: 0.5, depthWrite: false }))); b.rotation.x = -Math.PI / 2; b.position.y = 0.012; scene.add(b); return b; };
-const blobW = blobOf(0.36), blobE = blobOf(0.62);
-const view = { w: 1, h: 1, ui: 0, usable: 1 };
+const blobW = blobOf(0.36);
+const view = { w: 1, h: 1, ui: 0, usable: 1, fov: 44 };
+const Q0 = new THREE.Quaternion();
 
 // ------------------------------------------------------------------ the game clock, and scripts that wait on it
 // Everything that takes time is a script (a generator) that yields what it is waiting for. Scripts run on game time,
@@ -191,11 +192,11 @@ function advance(t) {
 function runTasks() { for (const t of tasks.slice()) if (!t.done) advance(t); for (let i = tasks.length - 1; i >= 0; i--) if (tasks[i].done) tasks.splice(i, 1); }
 const hitStop = sec => { clock.stop = Math.max(clock.stop, sec); };
 
-// ------------------------------------------------------------------ the two fighters
-const HOME = { hero: { x: -2.0, z: 0.25 }, foe: { x: 2.0, z: -0.25 } };
-const W = { x: -4.4, z: 0.25, yaw: Math.PI / 2, tyaw: Math.PI / 2, target: null, speed: 1, v: 0, flinch: 0, guardW: 0, downT: -1, winT: -1 };
-const E = { x: 6.2, z: -2.4, yaw: -Math.PI / 2, tyaw: -Math.PI / 2, target: null, speed: 1, phase: 0, moving: 0 };
-let J = null, ctx = null, blink = null, acts = {}, poses = {}, wraith = null;
+// ------------------------------------------------------------------ the fighters
+const HOME = { hero: { x: -2.3, z: 0 }, foes: [{ x: 2.0, z: -1.45 }, { x: 2.5, z: 1.45 }, { x: 3.6, z: 0 }] };
+const W = { x: -4.6, z: 0, yaw: Math.PI / 2, tyaw: Math.PI / 2, target: null, speed: 1, v: 0, flinch: 0, guardW: 0, downT: -1, winT: -1 };
+let J = null, ctx = null, blink = null, acts = {}, poses = {};
+let foes = [];                 // one per wraith: { i, f (its numbers in the rules), m (its model), x, z, yaw, ... }
 const casts = []; let lock = null, slot = 0;
 // How each of her moves is paced here: how fast the wind-up plays, when its steps land after the release, and when she is free again.
 const PACE = {
@@ -207,49 +208,67 @@ const PACE = {
   CurtainCall:    { rate: 1.15, hits: [0.1, 0.25, 0.55, 0.85, 1.25], free: 1.7 },
 };
 const heroChest = () => v3(W.x, 1.12, W.z), heroHead = () => v3(W.x, 1.5, W.z);
-const foeChest = () => (wraith ? wraith.anchor('chest', v3()) : v3(E.x, 1.3, E.z));
-const foeTop = () => (wraith ? wraith.height : 2.1);
-function startCast(name, tpos) {
-  const P = PACE[name], c = { name, P, t: 0, slot: slot++ % 4, tpos, live: !!tpos, release: J.info[name].release, dur: J.clips[name].duration, w: 0 };
+const chest = A => A.m.anchor('chest', v3()), topOf = A => A.m.height, markPos = A => v3(A.x, topOf(A) + 0.6, A.z);
+const present = () => foes.filter(A => !A.gone);
+const centre = () => { const l = present(); return l.length ? { x: l.reduce((s, A) => s + A.x, 0) / l.length, z: l.reduce((s, A) => s + A.z, 0) / l.length } : { x: 2.2, z: 0 }; };
+function startCast(name, tposFn) {
+  const P = PACE[name], c = { name, P, t: 0, slot: slot++ % 4, tposFn, tpos: tposFn ? tposFn() : null, release: J.info[name].release, dur: J.clips[name].duration, w: 0 };
   const a = poses[name]; a.reset(); a.setEffectiveWeight(0); a.play(); a.paused = true;
   casts.push(c); lock = c; return c;
 }
 function* moveTo(who, x, z, speed) { who.target = { x, z }; who.speed = speed; yield until(() => !who.target); }
+function makeFoes(level) {
+  for (const A of foes) { A.m.dispose(); scene.remove(A.blob); A.label.remove(); }
+  foes = S.foes.map((f, i) => {
+    const m = makeWraith(scene, { level }), label = document.createElement('div'); label.className = 'flabel'; label.textContent = ['I', 'II', 'III'][i]; label.hidden = true; $('nums').appendChild(label);
+    return { i, f, m, x: 6, z: 0, yaw: -Math.PI / 2, tyaw: -Math.PI / 2, target: null, speed: 1, phase: i * 2.1, moving: 0, home: HOME.foes[i], blob: blobOf(0.62), label, gone: false, dying: false, suck: 0 };
+  });
+}
 
-// ------------------------------------------------------------------ the camera director
-// A shot is a function that says where the camera should be right now; the camera eases toward it.
-const cam = { pos: v3(0, 3, 9), look: v3(0, 1.2, 0), shot: null, rate: 3, shake: 0, orbit: 0, tilt: 0 };
+// ------------------------------------------------------------------ the camera
+// One pulled-back view that holds the whole field the whole time. It leans a little toward whoever is acting,
+// and dragging the picture turns it.
+const cam = { pos: v3(0, 3, 9), look: v3(0, 1.2, 0), shot: null, rate: 3, shake: 0, orbit: 0, tilt: 0, lean: null, leanP: v3(0, 1, 0), push: 0, pushT: 0 };
 const dirOf = (yaw, pitch) => v3(Math.sin(yaw) * Math.cos(pitch), Math.sin(pitch), Math.cos(yaw) * Math.cos(pitch));
 function inside(pos, look) {                      // keep the camera in front of the lantern posts and bunting
-  const lim = R - 1.45;
+  const lim = R - 1.3;
   if (Math.hypot(pos.x, pos.z) > lim) { let lo = 0, hi = 1; for (let i = 0; i < 12; i++) { const m = (lo + hi) / 2; if (Math.hypot(look.x + (pos.x - look.x) * m, look.z + (pos.z - look.z) * m) > lim) hi = m; else lo = m; } pos.set(look.x + (pos.x - look.x) * lo, look.y + (pos.y - look.y) * Math.max(lo, 0.5), look.z + (pos.z - look.z) * lo); }
   pos.y = Math.max(0.35, pos.y); return pos;
 }
 function fit(points, yaw, pitch, margin = 0.8, min = 2.5) {       // stand back far enough, in that direction, to hold all the points
   const d = dirOf(yaw, pitch), focus = new THREE.Box3().setFromPoints(points).getCenter(v3());
-  const right = v3(0, 1, 0).cross(d).normalize(), up = d.clone().cross(right);
-  const tv = Math.tan(camera.fov * Math.PI / 360), tanV = tv * view.usable * margin, tanH = tv * camera.aspect * margin;
-  let D = min;
-  for (const p of points) { const r = p.clone().sub(focus), z = r.dot(d); D = Math.max(D, z + Math.abs(r.dot(right)) / tanH, z + Math.abs(r.dot(up)) / tanV); }
-  return { pos: inside(focus.clone().addScaledVector(d, D), focus), look: focus };
+  const right = v3(0, 1, 0).cross(d).normalize(), up = d.clone().cross(right), r = v3();
+  const tv = Math.tan(view.fov * Math.PI / 360), tanV = tv * view.usable * margin, tanH = tv * camera.aspect * margin;
+  const back = () => { let D = min; for (const p of points) { r.copy(p).sub(focus); const z = r.dot(d); D = Math.max(D, z + Math.abs(r.dot(right)) / tanH, z + Math.abs(r.dot(up)) / tanV); } return D; };
+  for (let pass = 0; pass < 4; pass++) {                           // near things look bigger, so slide the aim until both sides are as full
+    const D = back(); let x0 = 1e9, x1 = -1e9, y0 = 1e9, y1 = -1e9;
+    for (const p of points) { r.copy(p).sub(focus); const w = Math.max(0.5, D - r.dot(d)), x = r.dot(right) / w, y = r.dot(up) / w; x0 = Math.min(x0, x); x1 = Math.max(x1, x); y0 = Math.min(y0, y); y1 = Math.max(y1, y); }
+    focus.addScaledVector(right, (x0 + x1) * 0.45 * D).addScaledVector(up, (y0 + y1) * 0.45 * D);
+  }
+  const pos = inside(focus.clone().addScaledVector(d, back()), focus);
+  // if the edge of the square stopped the camera short, widen the lens to make up the difference
+  const f = focus.clone().sub(pos).normalize(), fr = f.clone().cross(v3(0, 1, 0)).normalize(), fu = fr.clone().cross(f); let need = 0;
+  for (const p of points) { r.copy(p).sub(pos); const w = Math.max(0.5, r.dot(f)); need = Math.max(need, Math.abs(r.dot(fr)) / w / (camera.aspect * margin), Math.abs(r.dot(fu)) / w / (view.usable * margin)); }
+  return { pos, look: focus, fov: cl(Math.atan(need) * 360 / Math.PI, view.fov, view.fov + 24) };
 }
-const bothYaw = () => lerp(-1.2, -0.3, cl((camera.aspect - 0.7) / 0.7));   // tall screens look over her shoulder, wide ones from the side
-const sBoth = (tight = 1) => () => fit([v3(W.x, 0, W.z), v3(W.x, 1.85, W.z), v3(E.x, 0, E.z), v3(E.x, foeTop() + 0.25, E.z)], bothYaw() + cam.orbit, cl(0.2 + cam.tilt, 0.03, 1.1), 0.76 * tight);
-// side: how far round from straight in front, toward the side the wide shot is on (so cuts never cross the line between them)
-const sHero = (dist = 3.4, side = 0.55, h = 1.15, pitch = 0.08) => () => { const look = v3(W.x, h, W.z); return { pos: inside(look.clone().addScaledVector(dirOf(W.yaw - side, pitch), dist), look), look }; };
-const sFoe = (dist = 4.6, side = 0.8, h = 1.3, pitch = 0.1) => () => { const look = v3(E.x, h, E.z); return { pos: inside(look.clone().addScaledVector(dirOf(E.yaw + side, pitch), dist), look), look }; };
-const sMid = (tight = 1) => () => fit([v3(W.x, 0, W.z), v3(W.x, 1.85, W.z), v3(E.x, 0, E.z), v3(E.x, foeTop() + 0.2, E.z)], bothYaw() + 0.12, 0.12, 0.8 * tight);
-// from the wraith's side, looking back at her: what she sets behind herself becomes the backdrop
-const sFront = (tight = 1) => () => fit([v3(W.x, 0, W.z), v3(W.x, 2.4, W.z), v3(E.x, 0, E.z), v3(E.x, foeTop(), E.z)], lerp(1.2, 0.6, cl((camera.aspect - 0.7) / 0.7)), 0.2, 0.8 * tight);
-function shot(fn, o = {}) { cam.shot = fn; cam.rate = o.rate || 3; if (o.cut) { const s = fn(); cam.pos.copy(s.pos); cam.look.copy(s.look); } }
+const tall = () => 1 - cl((camera.aspect - 0.7) / 0.7);            // 1 on a phone held upright, 0 on a wide screen
+const around = (p, x, z, h, w) => p.push(v3(x, 0, z), v3(x, h, z), v3(x - w, h * 0.5, z), v3(x + w, h * 0.5, z), v3(x, h * 0.5, z - w), v3(x, h * 0.5, z + w));
+const fieldPoints = () => { const p = []; around(p, W.x, W.z, 1.9 + 1.5 * cam.push, 0.5 + 0.8 * cam.push); for (const A of present()) around(p, A.x, A.z, topOf(A) + 0.3, 0.8); if (p.length < 12) around(p, 2.2, 0, 2, 0.8); return p; };
+function sField() {                                                 // tall screens look over her shoulder and from higher up, wide ones from the side
+  const s = fit(fieldPoints(), lerp(-0.3, -1.15, tall()) + cam.orbit, cl(lerp(0.26, 0.42, tall()) + cam.tilt, 0.05, 1.2), lerp(0.64, 0.8, tall()) + 0.12 * cam.push);
+  const lean = cam.leanP.clone().sub(s.look).multiplyScalar(0.14); lean.y *= 0.3;
+  s.look.add(lean); s.pos.add(lean); return s;
+}
+function shot(fn, o = {}) { cam.shot = fn; cam.rate = o.rate || 3; if (o.cut) { const s = fn(); cam.pos.copy(s.pos); cam.look.copy(s.look); if (s.fov) { camera.fov = s.fov; camera.updateProjectionMatrix(); } } }
+const leanTo = fn => { cam.lean = fn; };                           // fn gives a place to lean toward, or null for the middle
 const addShake = k => { cam.shake = Math.min(1.2, cam.shake + k); };
 
 // ------------------------------------------------------------------ the windows
 const UI = (() => {
-  const el = { hp: $('hp'), hpm: $('hpm'), mp: $('mp'), mpm: $('mpm'), atb: $('atb'), tr: $('tr'), ehp: $('ehp'), eatb: $('eatb'), etags: $('etags'), tags: $('tags'), cmd: $('cmd'), banner: $('banner'), msg: $('msg'), nums: $('nums'), flash: $('flash') };
+  const el = { hp: $('hp'), hpm: $('hpm'), mp: $('mp'), mpm: $('mpm'), atb: $('atb'), tr: $('tr'), tags: $('tags'), cmd: $('cmd'), banner: $('banner'), msg: $('msg'), nums: $('nums'), flash: $('flash'), enemy: $('enemy') };
   const last = {}, set = (k, v, fn) => { if (last[k] !== v) { last[k] = v; fn(); } };
   const HAND = '<svg class="hand" viewBox="0 0 26 16" aria-hidden="true"><path fill="#fff" stroke="#000" stroke-width="1" d="M1 6h13V3l11 5-11 5v-3H1z"/></svg>';
-  let items = [], sel = 0, cb = null, bannerT = 0, flashT = 0, flashD = 1, flashA = 0;
+  let items = [], sel = 0, cb = null, bannerT = 0, flashT = 0, flashD = 1, flashA = 0, rows = [];
   const nums = [];
   function draw(title) {
     el.cmd.innerHTML = (title ? `<div class="title">${title}</div>` : '') + items.map((it, i) => `<button type="button" role="menuitem" data-i="${i}" class="${it.hot ? 'hot ' : ''}${i === sel ? 'sel' : ''}" ${it.disabled ? 'disabled' : ''}>${HAND}<span>${it.label}</span><span class="mp">${it.mp ? it.mp + ' MP' : it.tag || ''}</span>${it.help ? `<small>${it.disabled && it.why ? it.why : it.help}</small>` : ''}</button>`).join('');
@@ -266,7 +285,7 @@ const UI = (() => {
   return {
     open(list, title, onPick) { items = list; cb = onPick; sel = Math.max(0, items.findIndex(it => !it.disabled)); draw(title); },
     waitMenu() { cb = null; items = []; el.cmd.innerHTML = '<div class="wait">&hellip;</div>'; },
-    get choosing() { return !!cb; }, get items() { return items; }, pick,
+    get choosing() { return !!cb; }, get items() { return items; }, get sel() { return items[sel]; }, pick,
     banner(text, sec = 1.6) { el.banner.textContent = text; el.banner.classList.add('on'); bannerT = sec; },
     msg(text) { el.msg.textContent = text; el.msg.classList.add('on'); },
     hideMsg() { el.msg.classList.remove('on'); },
@@ -274,16 +293,24 @@ const UI = (() => {
     vignette(k) { $('vignette').style.opacity = k; },
     cinematic(on) { document.body.classList.toggle('cine', !!on); },
     number(pos, text, cls = '') { const d = document.createElement('div'); d.className = 'num ' + cls; d.textContent = text; el.nums.appendChild(d); nums.push({ d, p: pos.clone(), t: 0, dx: rnd(-14, 14), life: /count|word/.test(cls) ? 1.3 : 1.0 }); },
+    enemies(S) {                                   // one row for each wraith
+      el.enemy.innerHTML = S.foes.map(f => `<div class="erow"><div class="ename serif"><span>${f.name}</span><small class="etags"></small></div><div class="gauge"><i class="ehp"></i></div><div class="gauge thin"><i class="eatb"></i></div></div>`).join('') + `<div class="elv">Level ${S.foeLevel}</div>`;
+      rows = [...el.enemy.querySelectorAll('.erow')].map(r => ({ row: r, hp: r.querySelector('.ehp'), atb: r.querySelector('.eatb'), tags: r.querySelector('.etags') }));
+      for (const k of Object.keys(last)) if (k[0] === 'e') delete last[k];
+    },
     status(S) {
-      const h = S.hero, f = S.foe;
+      const h = S.hero;
       set('hp', h.hp, () => { el.hp.textContent = h.hp; el.hp.className = 'v' + (h.hp <= h.maxHp * 0.2 ? ' crit' : h.hp <= h.maxHp * 0.4 ? ' low' : ''); });
       set('hpm', h.maxHp, () => { el.hpm.textContent = '/' + h.maxHp; }); set('mp', h.mp, () => { el.mp.textContent = h.mp; }); set('mpm', h.maxMp, () => { el.mpm.textContent = '/' + h.maxMp; });
       set('atb', Math.round(h.atb * 200), () => { el.atb.firstElementChild.style.width = (h.atb * 100).toFixed(1) + '%'; el.atb.classList.toggle('full', h.atb >= 1); });
       set('tr', Math.round(h.trance * 200), () => { el.tr.firstElementChild.style.width = (h.trance * 100).toFixed(1) + '%'; el.tr.classList.toggle('full', h.trance >= 1); });
-      set('ehp', Math.round(f.hp / f.maxHp * 400), () => { el.ehp.style.width = (f.hp / f.maxHp * 100).toFixed(1) + '%'; });
-      set('eatb', Math.round(f.atb * 200), () => { el.eatb.style.width = (f.atb * 100).toFixed(1) + '%'; });
-      const et = (f.doom > 0 ? `Doom ${f.doom}  ` : '') + (f.silence > 0 ? `Silenced ${f.silence}` : '');
-      set('etags', et, () => { el.etags.textContent = et; });
+      S.foes.forEach((f, i) => {
+        const r = rows[i]; if (!r) return;
+        set('ehp' + i, Math.round(f.hp / f.maxHp * 400), () => { r.hp.style.width = (f.hp / f.maxHp * 100).toFixed(1) + '%'; r.row.classList.toggle('out', f.hp <= 0); });
+        set('eatb' + i, Math.round(f.atb * 200), () => { r.atb.style.width = (f.hp > 0 ? f.atb * 100 : 0).toFixed(1) + '%'; });
+        const et = f.hp <= 0 ? 'released' : (f.doom > 0 ? `Doom ${f.doom} ` : '') + (f.silence > 0 ? `Hush ${f.silence}` : '');
+        set('etags' + i, et, () => { r.tags.textContent = et; });
+      });
       const tg = (h.defending ? '<span>Defend</span>' : '') + (h.haste > 0 ? '<span>Haste</span>' : '') + (h.ward > 0 ? '<span>Ward</span>' : '');
       set('tags', tg, () => { el.tags.innerHTML = tg; });
     },
@@ -294,10 +321,16 @@ const UI = (() => {
       for (let i = nums.length - 1; i >= 0; i--) {
         const n = nums[i]; n.t += dt;
         p.copy(n.p).project(camera);
-        const x = cl((p.x + 1) / 2 * view.w + n.dx, 34, view.w - 34), y = (1 - p.y) / 2 * view.h - 46 * Math.min(1, n.t / 0.5) - 8 * n.t, pop = 1 + 0.5 * Math.max(0, 1 - n.t / 0.14);
+        const x = cl((p.x + 1) / 2 * view.w + n.dx, 34, view.w - 34), y = Math.max(74, (1 - p.y) / 2 * view.h - 46 * Math.min(1, n.t / 0.5) - 8 * n.t), pop = 1 + 0.5 * Math.max(0, 1 - n.t / 0.14);
         n.d.style.transform = `translate(${x.toFixed(1)}px,${y.toFixed(1)}px) translate(-50%,-50%) scale(${pop.toFixed(2)})`;
         n.d.style.opacity = p.z > 1 ? 0 : cl((n.life - n.t) / 0.3);
         if (n.t >= n.life) { n.d.remove(); nums.splice(i, 1); }
+      }
+      for (const A of foes) {                      // the little I and II over the wraiths' heads
+        const on = B.state === 'battle' && !A.dying && !A.gone && foes.length > 1; A.label.hidden = !on; if (!on) continue;
+        p.set(A.x, topOf(A) + 0.28, A.z).project(camera);
+        A.label.style.transform = `translate(${((p.x + 1) / 2 * view.w).toFixed(1)}px,${((1 - p.y) / 2 * view.h).toFixed(1)}px) translate(-50%,-100%)`;
+        A.label.classList.toggle('aim', B.aim === A);
       }
     },
     clear() { for (const n of nums) n.d.remove(); nums.length = 0; el.banner.classList.remove('on'); el.msg.classList.remove('on'); },
@@ -307,24 +340,25 @@ const UI = (() => {
 // ------------------------------------------------------------------ passing effects, drawn with her spell building blocks
 const sparks = [];           // { t, dur, fn(F, u, t, id), slot }
 let sparkN = 0;
-function spark(dur, fn, done) { const s = { t: 0, dur, fn, done, slot: sparkN++ % 8, over: false }; sparks.push(s); return s; }
+function spark(dur, fn, done) { const s = { t: 0, dur, fn, done, slot: sparkN++ % 8 }; sparks.push(s); return s; }
 const burst = (pos, color, size = 1) => spark(0.7, (F, u, t, id) => {
   F.glow('b' + color + id, 3, pos, size * (0.9 + 2.2 * u.ramp(t, 0, 0.12)), u.win(t, 0, 0.03, 0.1, 0.45), color, 2.6);
   F.motes('m' + color + id, pos, 220, t, { emit: 0.05, life: 0.6, spread: 2.2 * size, rise: 0.2, size: 0.07, color });
   F.light(pos, color, 10 * size * u.win(t, 0, 0.03, 0.1, 0.4));
 });
 const ringOut = (pos, color, r1, dur = 0.7) => spark(dur, (F, u, t, id) => F.wave('w' + color + id, pos, Q0, 0.3 + r1 * u.ease(t / dur), u.win(t, 0, 0.05, dur * 0.5, dur), 1, color));
-const Q0 = new THREE.Quaternion();
+const dooms = [];            // Doom landing on a wraith: { A, t0, top, target, ground }
 
 // ------------------------------------------------------------------ the fight
-const B = { state: 'boot', level: 1, S: null, acting: false, t0: 0, dimTo: 0, dim: 0, best: 1 };
+const B = { state: 'boot', level: 1, S: null, acting: false, t0: 0, dimTo: 0, dim: 0, aim: null };
 let S = null;
-function show(events, at) {                         // put what just happened on the screen
+function show(events) {                             // put what just happened on the screen
   for (const ev of events) {
+    const A = ev.i !== undefined ? foes[ev.i] : null;
     if (ev.k === 'dmg' && ev.to === 'foe') {
-      const p = foeChest(); p.x += rnd(-0.25, 0.25); p.y += rnd(0.1, 0.5);
+      const p = chest(A); p.x += rnd(-0.25, 0.25); p.y += rnd(0.1, 0.5);
       UI.number(p, ev.n.toLocaleString('en-US'), ev.tag === 'doom' ? 'count' : ev.big ? 'big' : '');
-      if (S.foe.hp > 0) wraith.play('hurt');
+      if (A.f.hp > 0) A.m.play('hurt');
       SND.sfx.hit(ev.big ? 1.2 : 0.9); addShake(ev.big ? 0.6 : 0.35); hitStop(ev.big ? 0.1 : 0.06);
     } else if (ev.k === 'dmg' && ev.to === 'hero') {
       UI.number(heroHead(), ev.n, ev.blocked ? 'small hurt' : 'hurt'); W.flinch = ev.blocked ? 0.45 : 1;
@@ -332,49 +366,67 @@ function show(events, at) {                         // put what just happened on
     } else if (ev.k === 'ward') { UI.number(heroHead().add(v3(0, 0.35, 0)), 'Ward ' + ev.n, 'gold'); SND.sfx.guard(); }
     else if (ev.k === 'heal') { UI.number(heroHead(), '+' + ev.n, 'heal'); SND.sfx.heal(); if (ev.low) UI.number(heroHead().add(v3(0, 0.7, 0)), 'Against all odds!', 'word'); }
     else if (ev.k === 'mark') {
-      if (ev.what === 'doom') { UI.number(foeChest().add(v3(0, 1.0, 0)), 'Doom', 'word'); SND.sfx.seal(); }
-      else if (ev.what === 'silence') { UI.number(foeChest().add(v3(0, 1.0, 0)), 'Silenced', 'word'); }
+      if (ev.what === 'doom') { UI.number(chest(A).add(v3(0, 1.0, 0)), 'Doom', 'word'); SND.sfx.seal(); }
+      else if (ev.what === 'silence') UI.number(chest(A).add(v3(0, 1.0, 0)), 'Silenced', 'word');
       else if (ev.what === 'haste') UI.number(heroHead().add(v3(0, 0.38, 0)), 'Haste', 'word');
       else if (ev.what === 'ward') { UI.number(heroHead().add(v3(0, 0.3, 0)), 'Ward', 'word'); SND.sfx.guard(); }
-    } else if (ev.k === 'count') { UI.number(v3(E.x, foeTop() + 0.55, E.z), ev.n, 'count'); SND.sfx.bell(); }     // the chapel bell counts Doom down
-    else if (ev.k === 'doom') { const p = foeChest(); UI.number(p.clone().add(v3(0, 1.0, 0)), 'Doom', 'count'); burst(p, 0xd070ff, 1.5); ringOut(v3(E.x, 0.05, E.z), 0xd070ff, 6); SND.sfx.bell(); SND.sfx.boom(1.2); SND.sfx.blade(); UI.flash('#c9a0ff', 0.3, 0.4); addShake(0.8); }
-    else if (ev.k === 'unmark') UI.number(foeChest().add(v3(0, 1.0, 0)), 'Its voice returns', 'word');
-    else if (ev.k === 'down' && ev.who === 'foe') { clock.scale = 0.25; clock.slowT = 1.2; UI.cinematic(true); }
+    } else if (ev.k === 'count') { UI.number(markPos(A).add(v3(0, 0.45, 0)), ev.n, 'count'); SND.sfx.bell(); }     // the chapel bell counts Doom down
+    else if (ev.k === 'unmark') UI.number(chest(A).add(v3(0, 1.0, 0)), 'Its voice returns', 'word');
+    else if (ev.k === 'down' && ev.who === 'foe') {
+      A.dying = true; A.m.play('die', true); SND.sfx.shriek(1.6);
+      if (ev.last) { clock.scale = 0.3; clock.slowT = 1.0; UI.cinematic(true); }
+    }
   }
+}
+// Doom falls on one or more wraiths at once. The effect is hers (fx.js); the wraith is gone a second in.
+function* doomSeq(list) {
+  list = list.filter(A => A.f.hp > 0); if (!list.length) return;
+  for (const A of list) { dooms.push({ A, t0: clock.t, top: markPos(A), target: chest(A), ground: v3(A.x, 0.03, A.z) }); UI.number(markPos(A).add(v3(0, 0.5, 0)), 'Doom', 'count'); }
+  SND.sfx.bell(); SND.sfx.eclipse(); UI.cinematic(true);
+  yield wait(1.0);
+  for (const A of list) {
+    show(RULES.landDoom(S, A.f));
+    if (A.f.hp <= 0) for (let k = 0; k < 36; k++) A.m.animate(A.phase, 0, clock.t, 0.05);     // the hole has it: skip to where the robe is already burning away
+  }
+  SND.sfx.boom(1.3); SND.sfx.blade(); UI.flash('#dfe6ff', 0.3, 0.35);
+  yield wait(1.2);
+  if (!S.over) UI.cinematic(false);
 }
 
 // ---- her commands
-function* heroCommand(id) {
-  const c = RULES.CMD[id], steps = RULES.heroSteps(S, id);
+function* heroCommand(id, A) {
+  const c = RULES.CMD[id], steps = RULES.heroSteps(S, id, A && A.f);
   UI.banner(c.name || c.label, c.trance ? 2.6 : 1.6);
-  W.tyaw = faceYaw(W, E);
-  if (id === 'defend') { show(steps[0]()); SND.sfx.guard(); shot(sHero(3.6, 0.5, 1.0), { rate: 4 }); yield wait(0.7); return; }
-  const self = id === 'odds' || id === 'curtain', P = PACE[c.clip];
-  const k = startCast(c.clip, self ? null : foeChest()), after = n => until(() => k.t >= k.release + n);
-  if (id === 'attack') { shot(sBoth(1.08), { rate: 4 }); SND.sfx.bells(); yield until(() => k.t >= 0.5); SND.sfx.swish(); }
-  else if (id === 'fate') { shot(sHero(3.0, 0.6, 1.25), { rate: 4 }); SND.sfx.chime(); yield after(0); SND.sfx.blade(); shot(sFoe(4.8, 0.75), { rate: 6 }); }
-  else if (id === 'hush') { shot(sHero(2.0, 0.35, 1.45, 0.02), { rate: 4 }); SND.sfx.hush(); yield after(0); shot(sFoe(4.4, 0.8), { rate: 6 }); }
-  else if (id === 'gravity') { shot(sHero(3.2, 0.75, 1.3, 0.05), { rate: 4 }); SND.sfx.gravity(); yield after(0); shot(sFoe(5.4, 0.65, 1.2, 0.42), { rate: 7 }); SND.sfx.eclipse(); }
-  else if (id === 'odds') { shot(sHero(5.2, 0.4, 1.5, -0.02), { rate: 2.5 }); SND.sfx.moon(); }
+  W.tyaw = faceYaw(W, A || centre()); leanTo(null);
+  if (id === 'defend') { show(steps[0]()); SND.sfx.guard(); yield wait(0.7); return; }
+  const P = PACE[c.clip], k = startCast(c.clip, A ? () => chest(A) : null), after = n => until(() => k.t >= k.release + n), side = [];
+  if (id === 'attack') { SND.sfx.bells(); yield until(() => k.t >= 0.5); SND.sfx.swish(); leanTo(() => chest(A)); }
+  else if (id === 'fate') { SND.sfx.chime(); yield after(0); SND.sfx.blade(); leanTo(() => chest(A)); }
+  else if (id === 'hush') { SND.sfx.hush(); yield after(0); leanTo(() => chest(A)); }
+  else if (id === 'gravity') { SND.sfx.gravity(); yield after(0); SND.sfx.eclipse(); leanTo(() => chest(A)); }
+  else if (id === 'odds') SND.sfx.moon();
   else if (id === 'curtain') {
-    UI.cinematic(true); UI.vignette(0.5); shot(sHero(4.2, 0.3, 1.3, 0.0), { rate: 2 }); SND.sfx.trance(); SND.sfx.moon();
-    yield until(() => k.t >= 3.3); shot(sHero(6.4, 0.15, 1.7, 0.1), { rate: 1.6 }); SND.sfx.chime();
-    yield after(-0.05); shot(sFront(), { rate: 6 }); UI.flash('#ffffff', 0.35, 0.4); SND.sfx.boom(1.3); SND.sfx.bells();
+    UI.cinematic(true); UI.vignette(0.35); cam.pushT = 1; SND.sfx.trance(); SND.sfx.moon();
+    yield until(() => k.t >= 3.3); SND.sfx.eclipse();
+    yield after(0.2); SND.sfx.boom(1.3); SND.sfx.bell(); cam.pushT = 0;
   }
   for (let i = 0; i < steps.length; i++) {
     yield after(P.hits[i]);
-    const ev = steps[i](); show(ev);
+    const ev = steps[i](), due = ev.filter(e => e.k === 'due').map(e => foes[e.i]);
+    if (due.length) side.push(spawn(doomSeq(due)));
+    show(ev.filter(e => e.k !== 'due'));
     if (id === 'attack') SND.sfx.bells();
     if (id === 'gravity') SND.sfx.boom(1.2);
     if (id === 'fate') SND.sfx.boom(0.7);
-    if (id === 'curtain' && i >= 1 && i <= 3) { SND.sfx.boom(1.1); UI.flash('#ffe9ff', 0.22, 0.25); burst(foeChest(), [0xd070ff, 0xff5fa8, 0xffb040][i - 1], 1.3); }
-    if (S.foe.hp <= 0 && id !== 'curtain') break;
+    if (id === 'curtain' && i >= 1 && i <= 3 && ev.length) { SND.sfx.boom(1.1); for (const e of ev) if (e.k === 'dmg') burst(chest(foes[e.i]), STAR, 1.2); }
   }
   yield until(() => lock !== k);
-  if (id === 'curtain') { UI.vignette(0); if (S.foe.hp > 0) UI.cinematic(false); }
+  yield all(side);
+  if (id === 'curtain') { UI.vignette(0); if (!S.over) UI.cinematic(false); }
+  leanTo(null);
 }
 
-// ---- the wraith's moves, staged as in Envoi
+// ---- the wraiths' moves, staged as in Envoi
 function* projectile(from, toFn, dur, arc, side, onHit) {
   const s = { done: false };
   spark(dur, (F, u, t, id) => {
@@ -385,33 +437,32 @@ function* projectile(from, toFn, dur, arc, side, onHit) {
   }, () => { s.done = true; onHit(); });
   yield until(() => s.done);
 }
+const prog = (A, p) => until(() => A.m.progress < 0 || A.m.progress >= p);
 const FOE_ACT = {
-  *sweep(steps) {
-    const spot = toward(E, W, 1.55);
-    shot(sBoth(1.05), { rate: 3 });
-    yield* moveTo(E, spot.x, spot.z, 3.4);
-    E.tyaw = faceYaw(E, W); yield wait(0.15);
-    shot(sMid(1.0), { rate: 5 });
-    wraith.play('sweep', true); SND.sfx.shriek(0.6);
-    yield until(() => wraith.progress < 0 || wraith.progress >= 0.42); SND.sfx.swish();
-    yield until(() => wraith.progress < 0 || wraith.progress >= wraith.ACTIONS.sweep.hits[0]);
-    const p = heroChest(); burst(p, SOUL, 1.1); UI.flash('#0b2a16', 0.25, 0.25);
+  *sweep(A, steps) {
+    const spot = toward(A, W, 1.55);
+    yield* moveTo(A, spot.x, spot.z, 3.4);
+    A.tyaw = faceYaw(A, W); yield wait(0.15);
+    A.m.play('sweep', true); SND.sfx.shriek(0.6);
+    yield prog(A, 0.42); SND.sfx.swish();
+    yield prog(A, A.m.ACTIONS.sweep.hits[0]);
+    burst(heroChest(), SOUL, 1.1); UI.flash('#0b2a16', 0.25, 0.25);
     SND.sfx.hit(1.1); addShake(0.7); hitStop(0.09); show(steps[0]());
-    yield until(() => !wraith.busy);
-    yield* moveTo(E, HOME.foe.x, HOME.foe.z, 3.2); E.tyaw = faceYaw(HOME.foe, W);
+    yield until(() => !A.m.busy);
+    yield* moveTo(A, A.home.x, A.home.z, 3.2); A.tyaw = faceYaw(A.home, W);
   },
-  *bolts(steps) {
-    E.tyaw = faceYaw(E, W); shot(sBoth(1), { rate: 3 });
-    wraith.play('cast', true); SND.sfx.shriek(0.5);
+  *bolts(A, steps) {
+    A.tyaw = faceYaw(A, W);
+    A.m.play('cast', true); SND.sfx.shriek(0.5);
     const flying = [];
     for (let i = 0; i < steps.length; i++) {
-      yield until(() => wraith.progress < 0 || wraith.progress >= wraith.ACTIONS.cast.hits[i]); SND.sfx.fire();
-      flying.push(spawn(projectile(wraith.anchor('bolt', v3()), heroChest, 0.55, rnd(0.3, 0.9), rnd(-0.3, 0.3), () => { burst(heroChest(), SOUL, 0.7); SND.sfx.hit(0.7); addShake(0.3); hitStop(0.04); show(steps[i]()); })));
+      yield prog(A, A.m.ACTIONS.cast.hits[i]); SND.sfx.fire();
+      flying.push(spawn(projectile(A.m.anchor('bolt', v3()), heroChest, 0.6, rnd(0.3, 0.9), rnd(-0.3, 0.3), () => { burst(heroChest(), SOUL, 0.7); SND.sfx.hit(0.7); addShake(0.3); hitStop(0.04); show(steps[i]()); })));
     }
-    yield all(flying); yield until(() => !wraith.busy);
+    yield all(flying); yield until(() => !A.m.busy);
   },
-  *grasp(steps) {
-    E.tyaw = faceYaw(E, W); shot(sBoth(1), { rate: 3 });
+  *grasp(A, steps) {
+    A.tyaw = faceYaw(A, W);
     const at = v3(W.x, 0.04, W.z);
     spark(2.3, (F, u, t) => {                        // a green circle opens under her, and the dark comes up through it
       F.rune('gr', at, Q0, 2.6, -t * 2, u.ramp(t, 0, 0.8), u.win(t, 0, 0.3, 1.8, 2.3), 1, SOUL, 2.0, 11);
@@ -419,29 +470,27 @@ const FOE_ACT = {
       F.motes('gm', v3(W.x, 0.2, W.z), 300, t - 0.9, { emit: 0.4, life: 0.7, spread: 1.0, rise: 1.6, size: 0.06, flatten: 0.2, swirl: 5, color: SOUL });
       F.light(v3(W.x, 0.8, W.z), SOUL, 5 * u.win(t, 0.2, 1.0, 1.5, 2.2));
     });
-    wraith.play('grasp', true); SND.sfx.grasp(); B.dimTo = 0.35;
-    yield until(() => wraith.progress < 0 || wraith.progress >= wraith.ACTIONS.grasp.hits[0] - 0.06); shot(sHero(4.0, 0.9, 1.0, 0.25), { rate: 6 });
-    yield until(() => wraith.progress < 0 || wraith.progress >= wraith.ACTIONS.grasp.hits[0]);
+    A.m.play('grasp', true); SND.sfx.grasp(); B.dimTo = 0.3;
+    yield prog(A, A.m.ACTIONS.grasp.hits[0]);
     burst(heroChest(), SOUL, 1.2); SND.sfx.hit(1.2); addShake(0.8); hitStop(0.1); show(steps[0]());
-    B.dimTo = 0; yield until(() => !wraith.busy);
+    B.dimTo = 0; yield until(() => !A.m.busy);
   },
-  *eclipse(steps) {
-    UI.cinematic(true); UI.vignette(0.85); B.dimTo = 0.85;
-    E.tyaw = faceYaw(E, W); shot(sFoe(5.2, 0.6, 1.9, -0.12), { rate: 3 });
-    wraith.play('eclipse', true); SND.sfx.eclipse(); SND.sfx.shriek(1.4);
-    const dur = wraith.ACTIONS.eclipse.dur, sun = () => wraith.anchor('sun', v3());
+  *eclipse(A, steps) {
+    UI.cinematic(true); UI.vignette(0.6); B.dimTo = 0.7;
+    A.tyaw = faceYaw(A, W);
+    A.m.play('eclipse', true); SND.sfx.eclipse(); SND.sfx.shriek(1.4);
+    const dur = A.m.ACTIONS.eclipse.dur, sun = () => A.m.anchor('sun', v3());
     spark(dur, (F, u, t) => {                        // a black sun over the wraith
       const p = sun(), k = u.ease(u.ramp(t, 0.1, dur * 0.45)) * (1 - u.ramp(t, dur * 0.8, dur * 0.95)), back = p.clone().sub(camera.position).normalize();
       F.dark('sun', p, 0.8 * k); F.shell('rim', p, 0.88 * k, k, SOUL, 2.2, 4.0); F.glow('halo', 0, p.clone().addScaledVector(back, 0.95), 4.4 * k, 0.75 * k, SOUL, 1.5);
-      F.rune('cor', p.clone().addScaledVector(back, 1.0), camera.quaternion, 3.6 * k, t * 1.5, 1, 0.9 * k, camera.quaternion, SOUL, 2.0, 13);     // the corona sits behind the black disc
+      F.rune('cor', p.clone().addScaledVector(back, 1.0), camera.quaternion, 3.6 * k, t * 1.5, 1, 0.9 * k, camera.quaternion, SOUL, 2.0, 13);
       F.light(p, SOUL, 7 * k);
     });
-    yield until(() => wraith.progress < 0 || wraith.progress >= 0.62); shot(sBoth(0.95), { rate: 5 });
-    ringOut(v3(E.x, 0.05, E.z), SOUL, 13, 0.9);
-    yield until(() => wraith.progress < 0 || wraith.progress >= wraith.ACTIONS.eclipse.hits[0]);
+    yield prog(A, 0.62); ringOut(v3(A.x, 0.05, A.z), SOUL, 13, 0.9);
+    yield prog(A, A.m.ACTIONS.eclipse.hits[0]);
     burst(heroChest(), SOUL, 1.8); UI.flash('#0b2a16', 0.7, 0.4);
     SND.sfx.boom(1.3); addShake(1.0); hitStop(0.14); show(steps[0]());
-    yield until(() => !wraith.busy);
+    yield until(() => !A.m.busy);
     UI.vignette(0); UI.cinematic(false); B.dimTo = 0;
   },
 };
@@ -450,99 +499,105 @@ const FOE_ACT = {
 const item = id => { const c = RULES.CMD[id], no = RULES.why(S, id); return { id, label: c.label, mp: c.mp, help: c.help, disabled: !!no, why: no, hot: !!c.trance }; };
 const mainList = () => [S.hero.trance >= 1 ? item('curtain') : null, { id: 'attack', label: 'Attack', tag: 'free' }, { id: 'magic', label: 'Magic' }, { id: 'defend', label: 'Defend' }].filter(Boolean);
 const magicList = () => [...RULES.MAGIC.map(item), { id: 'back', label: 'Back' }];
+const hpOf = f => Math.max(1, Math.round(100 * f.hp / f.maxHp)) + '%';
 function onCmd(id) {
+  B.aim = null;
   if (id === 'magic') return UI.open(magicList(), 'Magic', onCmd);
   if (id === 'back') return UI.open(mainList(), null, onCmd);
-  if (RULES.CMD[id] && !RULES.why(S, id)) spawn(runHero(id));
+  const c = RULES.CMD[id]; if (!c || RULES.why(S, id)) return;
+  if (!c.aim) return void spawn(runHero(id, null));
+  const can = foes.filter(A => A.f.hp > 0 && !RULES.why(S, id, A.f));
+  if (can.length === 1 && RULES.living(S).length === 1) return void spawn(runHero(id, can[0]));
+  UI.open([...foes.filter(A => A.f.hp > 0).map(A => { const no = RULES.why(S, id, A.f); return { id: 't' + A.i, label: A.f.name, tag: hpOf(A.f), help: no || ((A.f.doom > 0 ? 'Doom ' + A.f.doom + '. ' : '') + (A.f.silence > 0 ? 'Silenced. ' : '') || 'Shadow Wraith'), disabled: !!no }; }), { id: 'back', label: 'Back' }],
+    c.label + ': on which?', t => { if (t === 'back') return onCmd(c.clip && RULES.MAGIC.includes(id) ? 'magic' : 'back'); B.aim = null; spawn(runHero(id, foes[+t.slice(1)])); });
 }
 function heroTurn() {
   B.acting = true; RULES.beginHeroTurn(S);
-  shot(sBoth(), { rate: 3 }); UI.open(mainList(), null, onCmd);
+  UI.open(mainList(), null, onCmd);
 }
-function* runHero(id) {
-  UI.waitMenu(); UI.hideMsg();
-  yield* heroCommand(id);
+function* runHero(id, A) {
+  UI.waitMenu(); UI.hideMsg(); B.aim = null;
+  yield* heroCommand(id, A);
   RULES.endHeroTurn(S);
   if (S.over === 'won') return yield* victory();
-  if (S.foe.hp < S.foe.maxHp * RULES.FOE.eclipseAt && !S.foe.usedEclipse && !B.warned) { B.warned = true; UI.msg('The wraith gathers the dark. Brace, or hush it.'); spawn((function* () { yield wait(2.6); UI.hideMsg(); })()); }
-  shot(sBoth(), { rate: 3 }); B.acting = false;
+  B.acting = false;
 }
-function* foeTurn() {
-  B.acting = true;
-  const id = RULES.pickFoeMove(S), steps = RULES.foeSteps(S, id);
-  UI.banner(RULES.FOE_MOVES[id].label, id === 'eclipse' ? 2.4 : 1.6);
-  yield* FOE_ACT[id](steps);
+function* foeTurn(A) {
+  B.acting = true; leanTo(() => v3(A.x, 1.2, A.z));
+  const id = RULES.pickFoeMove(S, A.f), steps = RULES.foeSteps(S, A.f, id);
+  UI.banner(A.f.name + ': ' + RULES.FOE_MOVES[id].label, id === 'eclipse' ? 2.4 : 1.6);
+  yield* FOE_ACT[id](A, steps);
   if (S.over === 'lost') return yield* defeat();
-  const ev = RULES.endFoeTurn(S);
-  if (ev.length) { shot(sFoe(5.0, 0.8), { rate: 5 }); yield wait(0.25); show(ev); yield wait(ev.some(e => e.k === 'doom') ? 0.9 : 0.6); }
+  const ev = RULES.endFoeTurn(S, A.f), due = ev.filter(e => e.k === 'due');
+  if (ev.length) { yield wait(0.25); show(ev.filter(e => e.k !== 'due')); if (due.length) yield* doomSeq(due.map(e => foes[e.i])); else yield wait(0.6); }
   if (S.over === 'won') return yield* victory();
-  shot(sBoth(), { rate: 3 }); B.acting = false;
+  leanTo(null); B.acting = false;
 }
 
 // ---- story beats
 function* intro(quick) {
   B.state = 'intro'; UI.clear();
-  W.x = quick ? HOME.hero.x : -4.6; W.z = HOME.hero.z; W.yaw = W.tyaw = Math.PI / 2; W.target = null; W.flinch = 0; W.downT = -1; W.winT = -1;
-  const from = quick ? HOME.foe : { x: 5.6, z: -2.6 };
-  E.x = from.x; E.z = from.z; E.yaw = E.tyaw = faceYaw(from, HOME.hero); E.target = null;
-  wraith.reset(); wraith.setFade(1); wraith.play('appear', true); SND.sfx.shriek(1.1);
-  burst(v3(E.x, 1.3, E.z), SOUL, 1.2); ringOut(v3(E.x, 0.05, E.z), SOUL, 3.5);
+  W.x = quick ? HOME.hero.x : -4.8; W.z = HOME.hero.z; W.yaw = W.tyaw = Math.PI / 2; W.target = null; W.flinch = 0; W.downT = -1; W.winT = -1;
+  for (const A of foes) {
+    const from = quick ? A.home : { x: A.home.x + 3.4, z: A.home.z * 1.6 };
+    A.x = from.x; A.z = from.z; A.yaw = A.tyaw = faceYaw(from, HOME.hero); A.target = null; A.gone = false; A.dying = false;
+    A.m.reset(); A.m.setFade(1); A.m.play('appear', true);
+    burst(v3(A.x, 1.3, A.z), SOUL, 1.2); ringOut(v3(A.x, 0.05, A.z), SOUL, 3.5);
+  }
+  SND.sfx.shriek(1.1); SND.sfx.bell();
+  shot(sField, { cut: true });
   if (!quick) {
-    shot(sFoe(5.6, 0.7, 1.4, 0.12), { cut: true }); UI.msg('The chapel bell tolls once. Something climbs out of the graveyard…'); SND.sfx.bell();
+    UI.msg(foes.length > 1 ? 'The chapel bell tolls once. Two shapes climb out of the graveyard…' : 'The chapel bell tolls once. Something climbs out of the graveyard…');
     spawn(moveTo(W, HOME.hero.x, HOME.hero.z, 0.95));
-    yield wait(1.9);
-    yield* moveTo(E, HOME.foe.x, HOME.foe.z, 2.4); E.tyaw = faceYaw(HOME.foe, HOME.hero);
+    yield wait(1.6);
+    const gl = foes.map(A => spawn(moveTo(A, A.home.x, A.home.z, 2.2))); yield all(gl);
+    for (const A of foes) A.tyaw = faceYaw(A.home, HOME.hero);
     yield until(() => !W.target);
-  } else { shot(sBoth(), { cut: true }); yield wait(1.2); }
+  } else yield wait(1.2);
   $('enemy').hidden = false; $('ui').hidden = false; UI.waitMenu(); UI.status(S); measure();
-  shot(sBoth(), { rate: 2.5 });
-  UI.msg('The Shadow Wraith attacks!'); SND.startMusic();
+  UI.msg(foes.length > 1 ? 'The Shadow Wraiths attack!' : 'The Shadow Wraith attacks!'); SND.startMusic();
   yield wait(1.4); UI.hideMsg();
   B.state = 'battle'; B.t0 = clock.t;
 }
 function* victory() {
-  B.state = 'over'; UI.waitMenu(); UI.cinematic(true); SND.stopMusic(1.2);
+  B.state = 'over'; UI.waitMenu(); UI.cinematic(true); SND.stopMusic(1.2); leanTo(null);
   yield wait(0.08); clock.scale = 1; clock.slowT = 0;
-  shot(sFoe(5.0, 0.75, 1.3, 0.14), { rate: 3 }); wraith.play('die', true); SND.sfx.shriek(1.8);
-  for (let i = 0; i < 4; i++) { yield wait(0.3); burst(foeChest().add(v3(rnd(-0.3, 0.3), rnd(-0.5, 0.4), 0)), SOUL, 0.8); }
-  ringOut(v3(E.x, 0.05, E.z), SOUL, 5); SND.sfx.boom(0.9);
-  yield wait(0.9); UI.msg('The robe falls empty, and a pale moth rises out of it.');
-  yield until(() => wraith.progress >= 0.99 || wraith.progress < 0);
+  yield wait(0.9); UI.msg(foes.length > 1 ? 'The robes fall empty, and pale moths rise out of them.' : 'The robe falls empty, and a pale moth rises out of it.');
+  yield until(() => foes.every(A => A.gone));
   UI.hideMsg(); UI.cinematic(false); $('enemy').hidden = true; $('ui').hidden = true; measure(); SND.sfx.victory();
-  shot(sHero(3.8, 0.35, 1.25, 0.04), { rate: 2.5 }); W.tyaw = W.yaw + 0.5; W.winT = 0;
+  W.tyaw = W.yaw - 0.9; W.winT = 0; cam.pushT = 1;
   yield wait(2.4);
   const next = Math.min(RULES.TOP_LEVEL, B.level + 1), sec = clock.t - B.t0;
-  B.best = Math.max(B.best, next);
-  endCard(`<h2>Released</h2><h3>Level ${B.level} cleared</h3><p>Defeat is release, not death. The moth rises past the bell tower toward the dark moon.</p>
+  endCard(`<h2>Released</h2><h3>Level ${B.level} cleared</h3><p>Defeat is release, not death. The moths rise past the bell tower toward the dark moon.</p>
     <div class="stats"><div><b>${Math.floor(sec / 60)}:${String(Math.floor(sec % 60)).padStart(2, '0')}</b><span>Battle time</span></div><div><b>${S.dealt.toLocaleString('en-US')}</b><span>Damage dealt</span></div><div><b>${S.hero.hp}</b><span>HP left</span></div></div>
-    ${next > B.level ? `<p><b>Level up: she is level ${next}.</b> The next wraith is level ${Math.min(RULES.TOP_LEVEL, next + RULES.FOE.ahead)}, and every number is a fifth bigger.</p><button type="button" class="go" data-level="${next}">Fight at level ${next}</button>` : ''}<button type="button" class="go alt" data-level="${B.level}">Level ${B.level} again</button>`);
+    ${next > B.level ? `<button type="button" class="go" data-level="${next}">Fight at level ${next}</button>` : ''}<button type="button" class="go alt" data-level="${B.level}">Level ${B.level} again</button>`);
 }
 function* defeat() {
-  B.state = 'over'; UI.waitMenu(); SND.stopMusic(1.0); SND.sfx.defeat();
-  W.downT = 0; shot(sHero(3.6, 0.6, 0.9, 0.2), { rate: 2 }); UI.vignette(0.6); B.dimTo = 0.4;
+  B.state = 'over'; UI.waitMenu(); SND.stopMusic(1.0); SND.sfx.defeat(); leanTo(null);
+  W.downT = 0; UI.vignette(0.6); B.dimTo = 0.4; cam.pushT = 1;
   yield wait(2.2);
-  endCard(`<h2>The curtain falls</h2><h3>The wraith had ${Math.round(100 * S.foe.hp / S.foe.maxHp)}% of its HP left</h3><p>The lamps gutter and the square goes dark. She will have to take that bow again.</p><button type="button" class="go" data-level="${B.level}">Try again</button>`);
+  endCard(`<h2>The curtain falls</h2><h3>${RULES.living(S).length} of ${S.foes.length} still standing</h3><p>The lamps gutter and the square goes dark. She will have to take that bow again.</p><button type="button" class="go" data-level="${B.level}">Try again</button>`);
 }
 function endCard(html) { $('endCard').innerHTML = html; $('end').hidden = false; }
 $('endCard').addEventListener('click', e => { const b = e.target.closest('.go'); if (b) begin(+b.dataset.level, true); });
 function titleCard() {
-  $('startCard').innerHTML = `<h2>The Shadow Wraith</h2><h3>Night of No Moon &middot; the square</h3>
-    <p>The chapel bell tolls once, and a Shadow Wraith climbs out of the graveyard, ${RULES.FOE.ahead} levels above her. Any of the other three would run. The Jester ends fights.</p>
+  $('startCard').innerHTML = `<h2>The Shadow Wraiths</h2><h3>Night of No Moon &middot; the square</h3>
+    <p>The chapel bell tolls once, and two Shadow Wraiths climb out of the graveyard. Any of the other three would run. The Jester ends fights.</p>
     <ul><li>When her <b>Turn</b> bar fills, choose a command. Time waits while you choose.</li>
-    <li><b>Sealed Fate</b> (in Magic) marks it with Doom. When the bell has counted three of its turns, it is released, however much HP it has.</li>
+    <li><b>Sealed Fate</b> (in Magic) marks a wraith with Doom. When the bell has counted three of its turns, it is released.</li>
     <li>She is frail. Stay alive while the bell counts: <b>Hush</b>, <b>Defend</b>, heal.</li>
-    <li>Taking hits fills <b>Curtain</b>. <b>Curtain Call</b> lands Doom at once.</li>
-    <li>The thin bar under the wraith's HP is <b>its</b> turn. Drag the picture to look around.</li></ul>
+    <li>Taking hits fills <b>Curtain</b>. <b>Curtain Call</b> lands every Doom at once.</li>
+    <li>The thin bar under each wraith's HP is <b>its</b> turn. Drag the picture to turn the view.</li></ul>
     <button type="button" class="go" id="go">Begin</button>`;
   $('start').hidden = false; $('go').onclick = () => { SND.init(); begin(1, false); };
 }
 function begin(level, quick) {
   $('start').hidden = true; $('end').hidden = true; UI.vignette(0); UI.cinematic(false); UI.clear();
-  tasks.length = 0; sparks.length = 0; casts.length = 0; lock = null; for (const n of Object.keys(poses)) poses[n].stop();
-  clock.scale = 1; clock.stop = 0; clock.slowT = 0; B.acting = false; B.dimTo = 0; B.warned = false;
+  tasks.length = 0; sparks.length = 0; casts.length = 0; dooms.length = 0; lock = null; for (const n of Object.keys(poses)) poses[n].stop();
+  clock.scale = 1; clock.stop = 0; clock.slowT = 0; B.acting = false; B.dimTo = 0; B.aim = null; cam.pushT = 0; leanTo(null);
   B.level = level; S = B.S = RULES.newBattle(level);
-  if (!wraith || wraith.level !== S.foeLevel) { if (wraith) wraith.dispose(); wraith = makeWraith(scene, { level: S.foeLevel }); }
-  $('elv').textContent = 'Level ' + S.foeLevel; $('enemy').hidden = true; $('ui').hidden = true;
+  if (foes.length !== S.foes.length || foes[0].m.level !== S.foeLevel) makeFoes(S.foeLevel); else foes.forEach((A, i) => { A.f = S.foes[i]; });
+  UI.enemies(S); $('enemy').hidden = true; $('ui').hidden = true;
   spawn(intro(quick));
 }
 
@@ -554,14 +609,14 @@ loadJester(scene).then(j => {
   const held = n => { const a = J.mixer.clipAction(J.clips[n]); a.setLoop(THREE.LoopOnce, 1); a.clampWhenFinished = true; a.setEffectiveWeight(0); a.play(); a.paused = true; return a; };
   acts = { idle: loop('Idle'), walk: loop('Walk'), guard: held('Squat'), down: held('Kneel'), win: held('ArmsUp') };
   for (const name of Object.keys(PACE)) { const a = J.mixer.clipAction(J.clips[name]); a.setLoop(THREE.LoopOnce, 1); a.clampWhenFinished = true; a.setEffectiveWeight(0); poses[name] = a; }
-  wraith = makeWraith(scene, { level: RULES.newBattle(1).foeLevel }); wraith.setFade(0);
-  $('load').remove(); resize(); shot(() => ({ pos: v3(-5.6, 1.9, 4.6), look: v3(-0.6, 1.25, 0) }), { cut: true }); W.x = HOME.hero.x; titleCard(); api.ready = true;
+  S = B.S = RULES.newBattle(1); makeFoes(S.foeLevel); for (const A of foes) { A.m.setFade(0); A.gone = true; }
+  $('load').remove(); resize(); W.x = HOME.hero.x; shot(sField, { cut: true }); titleCard(); api.ready = true;
 }).catch(e => { errBox.textContent += 'Could not load: ' + (e.message || e) + '\n'; });
 
 function measure() { const u = $('ui'); view.ui = u.hidden ? 0 : Math.min(view.h * 0.42, u.getBoundingClientRect().height + 8); applyView(); }
 function applyView() {
   view.usable = 1 - view.ui / view.h;
-  camera.aspect = view.w / view.h; camera.fov = view.w < view.h ? 58 : 44;
+  camera.aspect = view.w / view.h; view.fov = view.w < view.h ? 58 : 44; camera.fov = Math.max(camera.fov, view.fov);
   camera.setViewOffset(view.w, view.h, 0, Math.round(view.ui / 2), view.w, view.h); camera.updateProjectionMatrix();
 }
 function resize() {
@@ -570,16 +625,15 @@ function resize() {
   measure();
 }
 addEventListener('resize', resize);
+const state = { pixel: false };
 {
   const el = renderer.domElement; let id = null, px = 0, py = 0;
   el.addEventListener('pointerdown', e => { id = e.pointerId; px = e.clientX; py = e.clientY; el.setPointerCapture(id); });
-  el.addEventListener('pointermove', e => { if (e.pointerId !== id) return; cam.orbit = cl(cam.orbit - (e.clientX - px) * 0.006, -0.9, 1.3); cam.tilt = cl(cam.tilt + (e.clientY - py) * 0.004, -0.15, 0.7); px = e.clientX; py = e.clientY; });
+  el.addEventListener('pointermove', e => { if (e.pointerId !== id) return; cam.orbit = cl(cam.orbit - (e.clientX - px) * 0.006, -1.2, 1.5); cam.tilt = cl(cam.tilt + (e.clientY - py) * 0.004, -0.2, 0.6); px = e.clientX; py = e.clientY; });
   const up = e => { if (e.pointerId === id) id = null; }; el.addEventListener('pointerup', up); el.addEventListener('pointercancel', up);
-  let pixel = false;
-  $('bPixel').onclick = () => { pixel = !pixel; state.pixel = pixel; $('bPixel').classList.toggle('on', pixel); };
+  $('bPixel').onclick = () => { state.pixel = !state.pixel; $('bPixel').classList.toggle('on', state.pixel); };
   $('bSound').onclick = () => { const m = !SND.muted; SND.setMuted(m); $('bSound').classList.toggle('on', !m); $('bSound').textContent = m ? 'Sound off' : 'Sound on'; };
 }
-const state = { pixel: false };
 
 // ------------------------------------------------------------------ one frame
 const real = new THREE.Clock(); let T = 0;
@@ -590,21 +644,24 @@ function frame(dtOverride, skipDraw) {
   if (clock.stop > 0) { clock.stop -= rdt; dt = 0; }
   if (clock.slowT > 0) { clock.slowT -= rdt; if (clock.slowT <= 0) clock.scale = 1; }
   let spellDim = 0, shake = 0;
-  if (J && wraith) {
+  if (J && foes.length) {
     clock.t += dt;
     runTasks();
-    if (B.state === 'battle' && !B.acting && dt > 0) { const who = RULES.tick(S, dt); if (who === 'hero') heroTurn(); else if (who === 'foe') spawn(foeTurn()); }
+    if (B.state === 'battle' && !B.acting && dt > 0) { const who = RULES.tick(S, dt); if (who === 'hero') heroTurn(); else if (who) spawn(foeTurn(foes[who.i])); }
+    // which wraith the open menu is pointing at
+    if (UI.choosing && UI.sel && /^t\d$/.test(UI.sel.id)) B.aim = foes[+UI.sel.id.slice(1)];
 
     // her: where she stands, which way she faces, and how her poses mix
-    if (W.target) { const dx = W.target.x - W.x, dz = W.target.z - W.z, d = Math.hypot(dx, dz), stepD = W.speed * dt; W.tyaw = d > 0.05 ? Math.atan2(dx, dz) : W.tyaw; if (d <= stepD + 1e-4) { W.x = W.target.x; W.z = W.target.z; W.target = null; W.tyaw = faceYaw(W, E.target || E); } else { W.x += dx / d * stepD; W.z += dz / d * stepD; } }
+    if (W.target) { const dx = W.target.x - W.x, dz = W.target.z - W.z, d = Math.hypot(dx, dz), stepD = W.speed * dt; W.tyaw = d > 0.05 ? Math.atan2(dx, dz) : W.tyaw; if (d <= stepD + 1e-4) { W.x = W.target.x; W.z = W.target.z; W.target = null; W.tyaw = faceYaw(W, centre()); } else { W.x += dx / d * stepD; W.z += dz / d * stepD; } }
     W.v += ((W.target ? W.speed : 0) - W.v) * Math.min(1, dt * 8);
+    if (B.aim && UI.choosing) W.tyaw = faceYaw(W, B.aim);
     W.yaw += wrap(W.tyaw - W.yaw) * Math.min(1, dt * 7);
     W.flinch = Math.max(0, W.flinch - dt * 2.6);
     let cw = 0;
     for (let i = casts.length - 1; i >= 0; i--) {
       const c = casts[i];
       c.t += dt * (c.t < c.release ? c.P.rate : c.t > c.release + c.P.free ? c.P.tail || 1 : 1);
-      if (c.live) c.tpos = foeChest();
+      if (c.tposFn && c.t < c.release + 0.5) c.tpos = c.tposFn();
       if (lock === c) {
         c.w += ((c.t < c.release + c.P.free ? 1 : 0) - c.w) * Math.min(1, dt * 10); cw = c.w;
         poses[c.name].time = Math.min(c.t, c.dur - 0.01); poses[c.name].setEffectiveWeight(cw);
@@ -626,27 +683,37 @@ function frame(dtOverride, skipDraw) {
     J.root.position.set(W.x - Math.sin(W.yaw) * 0.14 * f, 0, W.z - Math.cos(W.yaw) * 0.14 * f); J.root.rotation.set(-0.2 * f, W.yaw, 0, 'YXZ'); J.root.updateMatrixWorld(true);
     blobW.position.x = W.x; blobW.position.z = W.z;
 
-    // the wraith
-    E.moving += ((E.target ? 1 : 0) - E.moving) * Math.min(1, dt * 6);
-    if (E.target) { const dx = E.target.x - E.x, dz = E.target.z - E.z, d = Math.hypot(dx, dz), stepD = E.speed * dt; E.tyaw = d > 0.05 ? Math.atan2(dx, dz) : E.tyaw; E.phase += Math.min(d, stepD) * 4.4; if (d <= stepD + 1e-4) { E.x = E.target.x; E.z = E.target.z; E.target = null; } else { E.x += dx / d * stepD; E.z += dz / d * stepD; } }
-    else if (wraith.busy && wraith.dash) { E.x += Math.sin(E.yaw) * wraith.dash * dt; E.z += Math.cos(E.yaw) * wraith.dash * dt; }
-    else if (!wraith.busy && B.state === 'battle') { const k = Math.min(1, dt * 1.5); E.x += (HOME.foe.x - E.x) * k; E.z += (HOME.foe.z - E.z) * k; }     // each blow knocks it back a little; it drifts back to its mark
-    E.yaw += wrap(E.tyaw - E.yaw) * Math.min(1, dt * (E.target ? 5 : 3.5));
-    wraith.root.position.set(E.x, 0, E.z); wraith.root.rotation.y = E.yaw;
-    wraith.animate(E.phase, E.moving, clock.t, dt);
-    blobE.position.x = E.x; blobE.position.z = E.z; blobE.material.opacity = 0.5 * (wraith.gone ? 0 : 1) * (wraith.action === 'die' ? 1 - cl(wraith.progress * 1.5) : 1); blobE.scale.setScalar(1 - 0.3 * cl(wraith.lift || 0));
+    // the wraiths
+    for (const A of foes) {
+      const m = A.m;
+      A.moving += ((A.target ? 1 : 0) - A.moving) * Math.min(1, dt * 6);
+      if (A.target) { const dx = A.target.x - A.x, dz = A.target.z - A.z, d = Math.hypot(dx, dz), stepD = A.speed * dt; A.tyaw = d > 0.05 ? Math.atan2(dx, dz) : A.tyaw; A.phase += Math.min(d, stepD) * 4.4; if (d <= stepD + 1e-4) { A.x = A.target.x; A.z = A.target.z; A.target = null; } else { A.x += dx / d * stepD; A.z += dz / d * stepD; } }
+      else if (m.busy && m.dash && !A.dying) { A.x += Math.sin(A.yaw) * m.dash * dt; A.z += Math.cos(A.yaw) * m.dash * dt; }
+      else if (!m.busy && B.state === 'battle') { const k = Math.min(1, dt * 1.5); A.x += (A.home.x - A.x) * k; A.z += (A.home.z - A.z) * k; }     // each blow knocks it back a little; it drifts back to its mark
+      A.yaw += wrap(A.tyaw - A.yaw) * Math.min(1, dt * (A.target ? 5 : 3.5));
+      const d = dooms.find(o => o.A === A), pull = d ? cl((clock.t - d.t0 - 0.3) / 0.7) : 0;     // Doom's black hole draws it up and in
+      m.root.position.set(A.x, 0.5 * pull * pull, A.z); m.root.rotation.y = A.yaw; m.root.scale.setScalar(1 - 0.3 * pull * pull);
+      m.animate(A.phase, A.moving, clock.t, dt);
+      if (A.dying && !A.gone && (m.gone || m.progress < 0 || m.progress >= 0.995)) A.gone = true;
+      A.blob.visible = !A.gone; A.blob.position.x = A.x; A.blob.position.z = A.z; A.blob.material.opacity = 0.5 * (A.dying ? 1 - cl(m.progress * 1.5) : m.fade === undefined ? 1 : 1); A.blob.scale.setScalar(1 - 0.3 * cl(m.lift || 0));
+    }
 
-    // light: her spells, the marks on the wraith, and whatever else is passing
+    // light: her spells, the marks on the wraiths, and whatever else is passing
     fx.F.begin(camera);
     for (const c of casts) { const x = ctx(c.name, null, c.tpos); fx.cast(c.name, c.t, x, c.slot); spellDim = Math.max(spellDim, x.out.dim); shake = Math.max(shake, x.out.shake); }
+    for (let i = dooms.length - 1; i >= 0; i--) { const d = dooms[i], o = fx.extra('DoomLands', d.A.i, clock.t - d.t0, { top: d.top, target: d.target, ground: d.ground }); spellDim = Math.max(spellDim, o.dim); shake = Math.max(shake, o.shake); if (clock.t - d.t0 > 2.4) dooms.splice(i, 1); }
+    if (S && B.state !== 'boot') for (const A of foes) if (A.f.doom > 0 && A.f.hp > 0 && !dooms.some(o => o.A === A)) fx.extra('DoomMark', A.i, T, { pos: markPos(A), count: A.f.doom });
     fx.draw('marks', (F, u) => {
       if (!S || B.state === 'boot') return;
-      if (S.foe.doom > 0 && S.foe.hp > 0) F.rune('doom', v3(E.x, foeTop() + 0.55, E.z), camera.quaternion, 1.15, T * 2, 1, 0.9, camera.quaternion, u.VIOLET, 2.0, 7);
-      if (S.foe.silence > 0 && S.foe.hp > 0) { const p = wraith.anchor('head', v3()); F.ring('sil', p, camera.quaternion, 1.1, T * 2, 0.8, camera.quaternion, u.DUSK, 1.8); F.shell('silb', p, 0.42, 0.5, u.DUSK, 1.6); }
+      for (const A of foes) {
+        if (A.f.silence > 0 && A.f.hp > 0) { const p = A.m.anchor('head', v3()); F.shade('sil' + A.i, p, 2.2, 0.8); F.shell('silb' + A.i, p, 0.42, 0.6, u.STAR, 1.2, 5.0); }
+        if (B.aim === A && UI.choosing) F.hoop('aim' + A.i, v3(A.x, 0.05, A.z), Q0, 2.3 + 0.1 * Math.sin(T * 5), T * 0.8, 1, 1, u.GOLD, 2.2);
+      }
+      if (B.state !== 'battle') return;
       if (W.guardW > 0.02) F.shell('guard', v3(W.x, 0.95, W.z), 1.15, 0.42 * W.guardW, u.GOLD, 1.6, 4.5);
-      if (S.hero.ward > 0) F.shell('ward', v3(W.x, 1.0, W.z), 1.3, 0.3, u.ROSE, 1.5, 5.0);
-      if (S.hero.haste > 0 && B.state === 'battle') F.ring('haste', v3(W.x, 0.06, W.z), Q0, 1.5, T * 5, 0.8, 1, u.GOLD, 1.8);
-      if (S.hero.trance >= 1 && B.state === 'battle') F.rune('tr', v3(W.x, 0.05, W.z), Q0, 2.1, T, 1, 0.55 + 0.2 * Math.sin(T * 4), 1, u.ROSE, 1.7, 5);
+      if (S.hero.ward > 0) F.shell('ward', v3(W.x, 1.0, W.z), 1.25, 0.14, u.STAR, 1.2, 6.0);
+      if (S.hero.haste > 0 && B.state === 'battle') F.hoop('haste', v3(W.x, 0.06, W.z), Q0, 1.5, T * 3, 0.8, 1, u.GOLD, 1.8);
+      if (S.hero.trance >= 1 && B.state === 'battle') F.rune('tr', v3(W.x, 0.05, W.z), Q0, 2.1, T, 1, 0.5 + 0.2 * Math.sin(T * 4), 1, u.STAR, 1.2, 5);
     });
     fx.draw('pass', (F, u) => {
       for (let i = sparks.length - 1; i >= 0; i--) { const s = sparks[i]; s.t += dt; if (s.t < s.dur) s.fn(F, u, s.t, 'k' + s.slot); else { sparks.splice(i, 1); if (s.done) s.done(); } }
@@ -656,22 +723,30 @@ function frame(dtOverride, skipDraw) {
   // the stage lights, and the camera
   B.dim += (B.dimTo - B.dim) * Math.min(1, rdt * 3); dim = Math.max(spellDim, B.dim);
   setLight(false, dim);
-  if (cam.shot) { const s = cam.shot(), k = Math.min(1, rdt * cam.rate); cam.pos.lerp(s.pos, k); cam.look.lerp(s.look, k); }
+  cam.push += (cam.pushT - cam.push) * Math.min(1, rdt * 0.8);
+  const lp = cam.lean ? cam.lean() : null; cam.leanP.lerp(lp || cam.look, Math.min(1, rdt * 2.5));
+  if (cam.shot) { const s = cam.shot(), k = Math.min(1, rdt * cam.rate); cam.pos.lerp(s.pos, k); cam.look.lerp(s.look, k); if (s.fov && Math.abs(s.fov - camera.fov) > 0.02) { camera.fov += (s.fov - camera.fov) * k; camera.updateProjectionMatrix(); } }
   cam.shake = Math.max(0, cam.shake - rdt * 2.6); shake = Math.max(shake, cam.shake);
   camera.position.copy(cam.pos);
-  if (shake > 0 && !TEST) camera.position.add(v3(Math.random() - 0.5, Math.random() - 0.5, Math.random() - 0.5).multiplyScalar(0.14 * shake));
+  if (shake > 0 && !TEST) camera.position.add(v3(Math.random() - 0.5, Math.random() - 0.5, Math.random() - 0.5).multiplyScalar(0.12 * shake));
   camera.lookAt(cam.look); camera.updateMatrixWorld();
   UI.tick(rdt);
-  if (!skipDraw) pipe.render(camera, state.pixel);
+  if (!skipDraw) pipe.render(camera, state.pixel, 1 - (1 - 0.97 * dim) ** 2);   // squared, because the eye reads a tenth of the light as a third
 }
 renderer.setAnimationLoop(() => { if (!TEST) frame(); });
 
 // hooks for automated checks
 const api = window.J = {
-  ready: false, frame, begin, cam, W, E, B, RULES,
+  ready: false, frame, begin, cam, W, B, RULES, fx, get foes() { return foes; },
   run(seconds, dt = 1 / 30, draw = true) { for (let t = 0; t < seconds - 1e-6; t += dt) frame(dt, true); if (draw) frame(0); },
-  choose(id) { if (!UI.choosing || B.state !== 'battle') return false; onCmd(id); return !UI.choosing; },
-  look() { return { state: B.state, level: B.level, choosing: UI.choosing, menu: UI.items.map(i => i.id + (i.disabled ? '!' : '')), over: S && S.over, hero: S && { ...S.hero }, foe: S && { ...S.foe, last: undefined }, time: clock.t - B.t0, wraith: wraith && { action: wraith.action, progress: wraith.progress, x: E.x, z: E.z }, casts: casts.length, tasks: tasks.length, sparks: sparks.length }; },
+  // choose a command, and a wraith by number if it needs one
+  choose(id, target) {
+    if (!UI.choosing || B.state !== 'battle') return false;
+    if (id === 'magic' || id === 'back') { onCmd(id); return true; }
+    const c = RULES.CMD[id]; if (!c || RULES.why(S, id, c.aim && target !== undefined ? S.foes[target] : undefined)) return false;
+    spawn(runHero(id, c.aim ? foes[target !== undefined ? target : RULES.living(S).find(f => !RULES.why(S, id, f)).i] : null)); return true;
+  },
+  look() { return { state: B.state, level: B.level, choosing: UI.choosing, menu: UI.items.map(i => i.id + (i.disabled ? '!' : '')), over: S && S.over, hero: S && { ...S.hero }, foes: S ? S.foes.map((f, i) => ({ ...f, last: undefined, action: foes[i] && foes[i].m.action, gone: foes[i] && foes[i].gone })) : [], time: clock.t - B.t0, casts: casts.length, tasks: tasks.length, sparks: sparks.length }; },
   errors: () => errBox.textContent,
 };
 </script>

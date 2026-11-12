@@ -11,6 +11,6 @@ for d in dist dist-stage dist-game; do
   cp viewer/jester_glb_?.js viewer/core.js viewer/pipeline.js viewer/fx.js $d/ && cp viewer/fx/*.png $d/fx/
 done
 cdn viewer/index.html dist/index.html && mkdir -p dist/ref && cp viewer/ref/*.png dist/ref/
-cdn viewer/stage.html dist-stage/index.html && cp viewer/world.js dist-stage/
+cdn viewer/stage.html dist-stage/index.html && cp viewer/world.js viewer/moves.js dist-stage/
 cdn viewer/battle.html dist-game/index.html && cp viewer/world.js viewer/rules.js dist-game/ && mkdir -p dist-game/envoi && cp viewer/envoi/*.js dist-game/envoi/
 du -sh dist dist-stage dist-game
