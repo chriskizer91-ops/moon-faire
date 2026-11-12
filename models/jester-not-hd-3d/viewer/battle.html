@@ -1,0 +1,679 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
+<title>Night of No Moon: the square</title>
+<style>
+  /* The windows, gauges and cards follow Envoi's battle screen (envoi-on-the-longest-night, reference/demos/night-square-shadow-wraith.html). */
+  :root { --w1:rgba(70,58,112,.94); --w2:rgba(26,20,48,.95); --wb:rgba(226,214,255,.9); --wt:#f6f2ff; --gold:#ffd66e; --dim:#a79fce; --uih:186px; }
+  * { box-sizing:border-box; -webkit-tap-highlight-color:transparent; user-select:none; -webkit-user-select:none; }
+  [hidden] { display:none !important; }
+  html,body { margin:0; height:100%; background:#120d18; color:var(--wt); font:15px/1.3 system-ui,-apple-system,"Segoe UI",Roboto,sans-serif; overflow:hidden; }
+  #stage { position:fixed; inset:0; touch-action:none; }
+  canvas { display:block; width:100%; height:100%; }
+  button { font:inherit; cursor:pointer; }
+  .fill { position:fixed; inset:0; pointer-events:none; }
+  #vignette { background:radial-gradient(ellipse at 50% 42%,rgba(0,0,0,0) 30%,rgba(6,3,12,.94) 100%); opacity:0; transition:opacity .6s; }
+  #flash { background:#fff; opacity:0; }
+  .barx { position:fixed; left:0; right:0; height:0; background:#000; transition:height .5s ease; pointer-events:none; z-index:3; }
+  #barT { top:0; } #barB { bottom:0; }
+  .cine #barT { height:7%; } .cine #barB { height:7%; }
+  .win { background:linear-gradient(180deg,var(--w1),var(--w2)); border:2px solid var(--wb); border-radius:7px; box-shadow:inset 0 0 0 1px rgba(0,0,0,.55),0 4px 16px rgba(0,0,0,.5); color:var(--wt); text-shadow:0 1px 0 rgba(0,0,0,.7); }
+  .serif { font-family:Georgia,"Times New Roman",serif; }
+  #enemy { position:fixed; left:calc(10px + env(safe-area-inset-left)); top:calc(10px + env(safe-area-inset-top)); padding:6px 10px 8px; min-width:172px; z-index:4; }
+  .ename { font-size:16px; margin-bottom:5px; display:flex; justify-content:space-between; gap:10px; align-items:baseline; }
+  .ename small { font:12px system-ui,sans-serif; color:var(--dim); }
+  .gauge { position:relative; height:8px; border-radius:4px; background:rgba(0,0,0,.55); box-shadow:inset 0 0 0 1px rgba(255,255,255,.18); overflow:hidden; }
+  .gauge i { position:absolute; left:0; top:0; bottom:0; width:0; border-radius:4px; }
+  .gauge.thin { height:5px; margin-top:4px; }
+  #ehp { background:linear-gradient(90deg,#46e38c,#b7ffcf); } #eatb { background:linear-gradient(90deg,#8a93b8,#c9d0ee); }
+  #etags { font-size:12px; color:#e6d4ff; min-height:16px; margin-top:4px; }
+  #top { position:fixed; right:calc(10px + env(safe-area-inset-right)); top:calc(10px + env(safe-area-inset-top)); display:flex; gap:6px; z-index:10; }
+  .hbtn { appearance:none; border:1px solid rgba(255,255,255,.35); background:rgba(14,10,24,.62); color:#fff; border-radius:18px; padding:7px 12px; font-size:13px; min-height:32px; }
+  .hbtn.on { border-color:var(--gold); color:var(--gold); }
+  #banner { position:fixed; left:50%; top:calc(14px + env(safe-area-inset-top)); transform:translate(-50%,-8px); padding:7px 18px; font-size:19px; white-space:nowrap; opacity:0; transition:opacity .2s,transform .2s; z-index:5; pointer-events:none; }
+  #banner.on { opacity:1; transform:translate(-50%,0); }
+  #msg { position:fixed; left:50%; top:calc(62px + env(safe-area-inset-top)); transform:translateX(-50%); width:max-content; max-width:calc(100% - 24px); padding:9px 15px; font-size:15px; line-height:1.35; text-align:center; opacity:0; transition:opacity .35s; z-index:5; pointer-events:none; }
+  #msg.on { opacity:1; }
+  #nums { position:fixed; inset:0; pointer-events:none; z-index:6; overflow:hidden; }
+  .num { position:absolute; left:0; top:0; font-weight:700; font-size:26px; color:#fff; text-shadow:-2px 0 #000,2px 0 #000,0 -2px #000,0 2px #000,0 3px 6px rgba(0,0,0,.6); white-space:nowrap; will-change:transform,opacity; }
+  .num.heal { color:#8dffb0; } .num.big { font-size:34px; color:#fff6c8; } .num.small { font-size:18px; } .num.hurt { color:#ff9db0; } .num.word { font-size:20px; color:#e2ccff; font-family:Georgia,serif; font-style:italic; } .num.count { font-size:46px; color:#e9c8ff; } .num.gold { color:#ffe08a; font-size:19px; }
+  #ui { position:fixed; left:calc(8px + env(safe-area-inset-left)); right:calc(8px + env(safe-area-inset-right)); bottom:calc(8px + env(safe-area-inset-bottom)); display:grid; grid-template-columns:minmax(0,1.3fr) minmax(0,1fr); gap:6px; max-width:760px; margin:0 auto; z-index:7; align-items:end; }
+  #cmd { padding:6px 4px; min-height:170px; display:flex; flex-direction:column; }
+  #cmd .title { font-size:12px; color:var(--dim); padding:2px 10px 4px; letter-spacing:.02em; }
+  #cmd button { appearance:none; border:0; background:none; color:var(--wt); text-shadow:inherit; text-align:left; display:grid; grid-template-columns:20px 1fr auto; align-items:center; column-gap:4px; min-height:38px; padding:3px 6px 3px 4px; font-size:17px; border-radius:5px; width:100%; }
+  #cmd button .hand { width:18px; height:13px; opacity:0; }
+  #cmd button.sel .hand { opacity:1; animation:bob .7s ease-in-out infinite; }
+  #cmd button.sel { background:rgba(255,255,255,.09); }
+  #cmd button.hot { color:var(--gold); }
+  #cmd button:disabled { color:rgba(244,246,255,.38); }
+  #cmd button .mp { font-size:13px; color:var(--dim); padding-right:4px; }
+  #cmd button small { grid-column:2 / 4; font-size:11.5px; line-height:1.2; color:var(--dim); padding-bottom:2px; }
+  #cmd button:disabled small { color:rgba(190,182,220,.4); }
+  #cmd .wait { margin:auto; color:var(--dim); font-size:14px; }
+  @keyframes bob { 0%,100% { transform:translateX(0); } 50% { transform:translateX(3px); } }
+  #status { padding:8px 12px 10px; display:flex; flex-direction:column; gap:5px; min-height:170px; }
+  #status .name { font-size:19px; display:flex; align-items:center; justify-content:space-between; gap:6px; }
+  #tags { font:700 10.5px system-ui,sans-serif; color:#1a1530; display:flex; gap:3px; white-space:nowrap; }
+  #tags span { background:linear-gradient(90deg,#ffe3f4,#e2ecff); border-radius:4px; padding:2px 5px; }
+  .stat { display:flex; align-items:baseline; gap:8px; }
+  .stat .lbl { font-size:13px; color:var(--dim); width:22px; }
+  .stat .v { font-size:22px; font-weight:700; font-variant-numeric:tabular-nums; }
+  .stat .m { font-size:14px; color:var(--dim); font-variant-numeric:tabular-nums; }
+  .stat .v.low { color:#ffd66e; } .stat .v.crit { color:#ff8a8a; }
+  .glbl { font-size:11px; color:var(--dim); margin-bottom:2px; }
+  #atb i { background:linear-gradient(90deg,#4f7bff,#a8c4ff); }
+  #atb.full i { background:linear-gradient(90deg,#ffd66e,#fff3c4); animation:pulse .6s ease-in-out infinite; }
+  #tr i { background:linear-gradient(90deg,#ff9fd4,#f4f2ff); }
+  #tr.full i { animation:pulse .5s ease-in-out infinite; }
+  @keyframes pulse { 50% { filter:brightness(1.35); } }
+  .overlay { position:fixed; inset:0; display:flex; align-items:center; justify-content:center; padding:18px; z-index:9; background:rgba(8,5,12,.5); }
+  .card { max-width:380px; width:100%; padding:18px 18px 16px; text-align:center; }
+  .card h2 { margin:0 0 4px; font-family:Georgia,serif; font-style:italic; font-weight:400; font-size:29px; line-height:1.1; }
+  .card h3 { margin:0 0 10px; font-size:12px; font-weight:600; letter-spacing:.09em; text-transform:uppercase; color:var(--gold); }
+  .card p { margin:0 0 12px; font-size:15px; line-height:1.45; color:#e3dcff; }
+  .card ul { margin:0 0 14px; padding:0 0 0 18px; text-align:left; font-size:13.5px; line-height:1.4; color:#d9d2f4; }
+  .card li { margin-bottom:3px; } .card li b { color:#fff; }
+  .card .stats { display:grid; grid-template-columns:1fr 1fr 1fr; gap:6px; margin:0 0 14px; }
+  .card .stats div { background:rgba(0,0,0,.25); border-radius:6px; padding:7px 4px; }
+  .card .stats b { display:block; font-size:19px; }
+  .card .stats span { font-size:11.5px; color:var(--dim); }
+  .go { appearance:none; border:0; border-radius:22px; min-height:44px; padding:0 22px; font-size:16px; font-weight:700; background:linear-gradient(180deg,#ffe28f,#f0b84a); color:#2a1d05; box-shadow:0 2px 0 rgba(0,0,0,.35); margin:3px; }
+  .go.alt { background:none; color:var(--wt); border:1px solid var(--wb); box-shadow:none; font-weight:500; }
+  #load { position:fixed; inset:0; display:grid; place-items:center; color:var(--dim); background:#120d18; z-index:12; padding:20px; text-align:center; }
+  #err { position:fixed; left:8px; right:8px; top:150px; color:#ffb4a8; font-size:12px; white-space:pre-wrap; pointer-events:none; z-index:13; }
+  @media (max-width:600px) { #banner { top:calc(96px + env(safe-area-inset-top)); } #msg { top:calc(142px + env(safe-area-inset-top)); } }
+  @media (max-width:420px) { #cmd button { font-size:15px; } #cmd button .mp { font-size:12px; } .stat .v { font-size:20px; } #status .name { font-size:17px; } #banner { font-size:17px; } #status { padding:8px 9px 10px; } }
+  @media (max-height:520px) { #cmd,#status { min-height:138px; } #cmd button { min-height:30px; } #cmd button small { display:none; } }
+</style>
+<script type="importmap">
+{ "imports": { "three": "./lib/build/three.module.min.js", "three/addons/": "./lib/examples/jsm/" } }
+</script>
+</head>
+<body>
+<div id="stage"></div>
+<div id="vignette" class="fill"></div>
+<div id="flash" class="fill"></div>
+<div id="barT" class="barx"></div><div id="barB" class="barx"></div>
+<div id="enemy" class="win" hidden>
+  <div class="ename serif"><span id="ename">Shadow Wraith</span><small id="elv"></small></div>
+  <div class="gauge"><i id="ehp"></i></div>
+  <div class="gauge thin" title="Its turn"><i id="eatb"></i></div>
+  <div id="etags"></div>
+</div>
+<div id="top"><button class="hbtn on" id="bSound">Sound on</button><button class="hbtn" id="bPixel">Pixel finish</button></div>
+<div id="banner" class="win serif"></div>
+<div id="msg" class="win"></div>
+<div id="nums"></div>
+<div id="ui" hidden>
+  <div id="cmd" class="win" role="menu" aria-label="Commands"></div>
+  <div id="status" class="win">
+    <div class="name serif"><span>Jester</span><span id="tags"></span></div>
+    <div class="stat"><span class="lbl">HP</span><span id="hp" class="v">0</span><span id="hpm" class="m">/0</span></div>
+    <div class="stat"><span class="lbl">MP</span><span id="mp" class="v" style="font-size:17px">0</span><span id="mpm" class="m">/0</span></div>
+    <div><div class="glbl">Turn</div><div id="atb" class="gauge"><i></i></div></div>
+    <div><div class="glbl">Curtain</div><div id="tr" class="gauge"><i></i></div></div>
+  </div>
+</div>
+<div id="start" class="overlay" hidden><div class="card win" id="startCard"></div></div>
+<div id="end" class="overlay" hidden><div class="card win" id="endCard"></div></div>
+<div id="err"></div>
+<div id="load">Setting the stage&hellip;</div>
+<script>
+setTimeout(function () { var l = document.getElementById('load'); if (l) l.textContent = 'Still loading. If this stays, the 3D library or the model did not arrive: tell Claude.'; }, 25000);
+</script>
+<script src="jester_glb_a.js"></script>
+<script src="jester_glb_b.js"></script>
+<script src="jester_glb_c.js"></script>
+<script src="envoi/wraith.js"></script>
+<script type="module">
+// Night of No Moon: the square, as a turn-based fight.
+// The fight is Envoi's first one (the Shadow Wraith in the night square) with the 3D Jester in the witch's place.
+// rules.js holds every number; this file is the staging: who moves when, the camera, the effects and the windows.
+import * as THREE from 'three';
+import { makePipeline, DECOR } from './pipeline.js';
+import { buildSquare } from './world.js';
+import { loadJester, makeContext, makeBlink } from './core.js';
+import { makeFx } from './fx.js';
+import { makeWraith } from './envoi/foe.js';
+import { SND } from './envoi/snd.js';
+import * as RULES from './rules.js';
+
+const $ = id => document.getElementById(id);
+const errBox = $('err');
+window.addEventListener('error', e => { errBox.textContent += (e.message || e) + '\n'; });
+window.addEventListener('unhandledrejection', e => { errBox.textContent += (e.reason && e.reason.message || e.reason) + '\n'; });
+
+const TEST = location.hash === '#test';
+const V3 = THREE.Vector3, v3 = (x, y, z) => new V3(x, y, z);
+const cl = (x, a = 0, b = 1) => Math.min(b, Math.max(a, x));
+const lerp = (a, b, t) => a + (b - a) * t;
+const rnd = (a, b) => a + Math.random() * (b - a);
+const wrap = a => Math.atan2(Math.sin(a), Math.cos(a));
+const faceYaw = (from, to) => Math.atan2(to.x - from.x, to.z - from.z);
+const toward = (from, to, dist) => { const dx = to.x - from.x, dz = to.z - from.z, d = Math.hypot(dx, dz) || 1; return { x: to.x - dx / d * dist, z: to.z - dz / d * dist }; };
+const SOUL = 0x56ff9c;
+
+// ------------------------------------------------------------------ the picture
+const stage = $('stage');
+const renderer = new THREE.WebGLRenderer({ antialias: false, preserveDrawingBuffer: TEST });
+renderer.outputColorSpace = THREE.SRGBColorSpace; renderer.autoClear = false;
+stage.appendChild(renderer.domElement);
+const pixelRatio = Math.min(devicePixelRatio || 1, 2);
+const scene = new THREE.Scene();
+const camera = new THREE.PerspectiveCamera(46, 1, 0.1, 140);
+const { R, flies, setLight } = buildSquare(scene);
+const decor = o => { o.traverse(x => x.layers.set(DECOR)); return o; };
+const fx = makeFx(scene);
+let dim = 0;
+const pipe = makePipeline(renderer, scene, { flatLight: flat => setLight(flat, dim), onViewport: h => { fx.uH.value = h; } });
+const blobOf = r => { const b = decor(new THREE.Mesh(new THREE.CircleGeometry(r, 32), new THREE.MeshBasicMaterial({ color: 0x06040a, transparent: true, opacity: 0.5, depthWrite: false }))); b.rotation.x = -Math.PI / 2; b.position.y = 0.012; scene.add(b); return b; };
+const blobW = blobOf(0.36), blobE = blobOf(0.62);
+const view = { w: 1, h: 1, ui: 0, usable: 1 };
+
+// ------------------------------------------------------------------ the game clock, and scripts that wait on it
+// Everything that takes time is a script (a generator) that yields what it is waiting for. Scripts run on game time,
+// so a hit-stop or a slow-motion beat holds all of them together, and the checks can step the game by hand.
+const clock = { t: 0, scale: 1, stop: 0, slowT: 0 };
+const tasks = [];
+const wait = sec => { const at = clock.t + sec; return () => clock.t >= at; };
+const until = fn => fn;
+const all = list => () => list.every(t => t.done);
+function spawn(gen) { const t = { gen, cond: null, done: false }; tasks.push(t); advance(t); return t; }
+function advance(t) {
+  for (let guard = 0; guard < 500; guard++) {
+    if (t.cond && !t.cond()) return;
+    const r = t.gen.next(); if (r.done) { t.done = true; return; }
+    t.cond = r.value || null; if (!t.cond) return;
+  }
+}
+function runTasks() { for (const t of tasks.slice()) if (!t.done) advance(t); for (let i = tasks.length - 1; i >= 0; i--) if (tasks[i].done) tasks.splice(i, 1); }
+const hitStop = sec => { clock.stop = Math.max(clock.stop, sec); };
+
+// ------------------------------------------------------------------ the two fighters
+const HOME = { hero: { x: -2.0, z: 0.25 }, foe: { x: 2.0, z: -0.25 } };
+const W = { x: -4.4, z: 0.25, yaw: Math.PI / 2, tyaw: Math.PI / 2, target: null, speed: 1, v: 0, flinch: 0, guardW: 0, downT: -1, winT: -1 };
+const E = { x: 6.2, z: -2.4, yaw: -Math.PI / 2, tyaw: -Math.PI / 2, target: null, speed: 1, phase: 0, moving: 0 };
+let J = null, ctx = null, blink = null, acts = {}, poses = {}, wraith = null;
+const casts = []; let lock = null, slot = 0;
+// How each of her moves is paced here: how fast the wind-up plays, when its steps land after the release, and when she is free again.
+const PACE = {
+  GildedRebuke:   { rate: 1.4, hits: [0.12], free: 0.5 },
+  SealedFate:     { rate: 1.5, hits: [1.0], free: 1.35 },
+  Hush:           { rate: 1.8, hits: [0.95], free: 1.3 },
+  Gravity:        { rate: 1.0, hits: [0.4], free: 0.75 },
+  AgainstAllOdds: { rate: 1.0, hits: [0.3], free: 0.9, tail: 1.8 },      // tail: her blessing's light fades faster once she is free
+  CurtainCall:    { rate: 1.15, hits: [0.1, 0.25, 0.55, 0.85, 1.25], free: 1.7 },
+};
+const heroChest = () => v3(W.x, 1.12, W.z), heroHead = () => v3(W.x, 1.5, W.z);
+const foeChest = () => (wraith ? wraith.anchor('chest', v3()) : v3(E.x, 1.3, E.z));
+const foeTop = () => (wraith ? wraith.height : 2.1);
+function startCast(name, tpos) {
+  const P = PACE[name], c = { name, P, t: 0, slot: slot++ % 4, tpos, live: !!tpos, release: J.info[name].release, dur: J.clips[name].duration, w: 0 };
+  const a = poses[name]; a.reset(); a.setEffectiveWeight(0); a.play(); a.paused = true;
+  casts.push(c); lock = c; return c;
+}
+function* moveTo(who, x, z, speed) { who.target = { x, z }; who.speed = speed; yield until(() => !who.target); }
+
+// ------------------------------------------------------------------ the camera director
+// A shot is a function that says where the camera should be right now; the camera eases toward it.
+const cam = { pos: v3(0, 3, 9), look: v3(0, 1.2, 0), shot: null, rate: 3, shake: 0, orbit: 0, tilt: 0 };
+const dirOf = (yaw, pitch) => v3(Math.sin(yaw) * Math.cos(pitch), Math.sin(pitch), Math.cos(yaw) * Math.cos(pitch));
+function inside(pos, look) {                      // keep the camera in front of the lantern posts and bunting
+  const lim = R - 1.45;
+  if (Math.hypot(pos.x, pos.z) > lim) { let lo = 0, hi = 1; for (let i = 0; i < 12; i++) { const m = (lo + hi) / 2; if (Math.hypot(look.x + (pos.x - look.x) * m, look.z + (pos.z - look.z) * m) > lim) hi = m; else lo = m; } pos.set(look.x + (pos.x - look.x) * lo, look.y + (pos.y - look.y) * Math.max(lo, 0.5), look.z + (pos.z - look.z) * lo); }
+  pos.y = Math.max(0.35, pos.y); return pos;
+}
+function fit(points, yaw, pitch, margin = 0.8, min = 2.5) {       // stand back far enough, in that direction, to hold all the points
+  const d = dirOf(yaw, pitch), focus = new THREE.Box3().setFromPoints(points).getCenter(v3());
+  const right = v3(0, 1, 0).cross(d).normalize(), up = d.clone().cross(right);
+  const tv = Math.tan(camera.fov * Math.PI / 360), tanV = tv * view.usable * margin, tanH = tv * camera.aspect * margin;
+  let D = min;
+  for (const p of points) { const r = p.clone().sub(focus), z = r.dot(d); D = Math.max(D, z + Math.abs(r.dot(right)) / tanH, z + Math.abs(r.dot(up)) / tanV); }
+  return { pos: inside(focus.clone().addScaledVector(d, D), focus), look: focus };
+}
+const bothYaw = () => lerp(-1.2, -0.3, cl((camera.aspect - 0.7) / 0.7));   // tall screens look over her shoulder, wide ones from the side
+const sBoth = (tight = 1) => () => fit([v3(W.x, 0, W.z), v3(W.x, 1.85, W.z), v3(E.x, 0, E.z), v3(E.x, foeTop() + 0.25, E.z)], bothYaw() + cam.orbit, cl(0.2 + cam.tilt, 0.03, 1.1), 0.76 * tight);
+// side: how far round from straight in front, toward the side the wide shot is on (so cuts never cross the line between them)
+const sHero = (dist = 3.4, side = 0.55, h = 1.15, pitch = 0.08) => () => { const look = v3(W.x, h, W.z); return { pos: inside(look.clone().addScaledVector(dirOf(W.yaw - side, pitch), dist), look), look }; };
+const sFoe = (dist = 4.6, side = 0.8, h = 1.3, pitch = 0.1) => () => { const look = v3(E.x, h, E.z); return { pos: inside(look.clone().addScaledVector(dirOf(E.yaw + side, pitch), dist), look), look }; };
+const sMid = (tight = 1) => () => fit([v3(W.x, 0, W.z), v3(W.x, 1.85, W.z), v3(E.x, 0, E.z), v3(E.x, foeTop() + 0.2, E.z)], bothYaw() + 0.12, 0.12, 0.8 * tight);
+// from the wraith's side, looking back at her: what she sets behind herself becomes the backdrop
+const sFront = (tight = 1) => () => fit([v3(W.x, 0, W.z), v3(W.x, 2.4, W.z), v3(E.x, 0, E.z), v3(E.x, foeTop(), E.z)], lerp(1.2, 0.6, cl((camera.aspect - 0.7) / 0.7)), 0.2, 0.8 * tight);
+function shot(fn, o = {}) { cam.shot = fn; cam.rate = o.rate || 3; if (o.cut) { const s = fn(); cam.pos.copy(s.pos); cam.look.copy(s.look); } }
+const addShake = k => { cam.shake = Math.min(1.2, cam.shake + k); };
+
+// ------------------------------------------------------------------ the windows
+const UI = (() => {
+  const el = { hp: $('hp'), hpm: $('hpm'), mp: $('mp'), mpm: $('mpm'), atb: $('atb'), tr: $('tr'), ehp: $('ehp'), eatb: $('eatb'), etags: $('etags'), tags: $('tags'), cmd: $('cmd'), banner: $('banner'), msg: $('msg'), nums: $('nums'), flash: $('flash') };
+  const last = {}, set = (k, v, fn) => { if (last[k] !== v) { last[k] = v; fn(); } };
+  const HAND = '<svg class="hand" viewBox="0 0 26 16" aria-hidden="true"><path fill="#fff" stroke="#000" stroke-width="1" d="M1 6h13V3l11 5-11 5v-3H1z"/></svg>';
+  let items = [], sel = 0, cb = null, bannerT = 0, flashT = 0, flashD = 1, flashA = 0;
+  const nums = [];
+  function draw(title) {
+    el.cmd.innerHTML = (title ? `<div class="title">${title}</div>` : '') + items.map((it, i) => `<button type="button" role="menuitem" data-i="${i}" class="${it.hot ? 'hot ' : ''}${i === sel ? 'sel' : ''}" ${it.disabled ? 'disabled' : ''}>${HAND}<span>${it.label}</span><span class="mp">${it.mp ? it.mp + ' MP' : it.tag || ''}</span>${it.help ? `<small>${it.disabled && it.why ? it.why : it.help}</small>` : ''}</button>`).join('');
+  }
+  $('cmd').addEventListener('click', e => { const b = e.target.closest('button'); if (b && !b.disabled) pick(+b.dataset.i); });
+  function pick(i) { const it = items[i]; if (!it || it.disabled || !cb) return; SND.sfx.select(); cb(it.id); }
+  function move(d) { if (!cb || !items.length) return; for (let n = 0; n < items.length; n++) { sel = (sel + d + items.length) % items.length; if (!items[sel].disabled) break; } SND.sfx.menu(); el.cmd.querySelectorAll('button').forEach((b, i) => b.classList.toggle('sel', i === sel)); }
+  addEventListener('keydown', e => {
+    if (e.code === 'ArrowDown') { move(1); e.preventDefault(); } else if (e.code === 'ArrowUp') { move(-1); e.preventDefault(); }
+    else if (e.code === 'Enter' || e.code === 'Space') { const go = [...document.querySelectorAll('.overlay:not([hidden]) .go')][0]; if (go) go.click(); else pick(sel); e.preventDefault(); }
+    else if (e.code === 'Escape' || e.code === 'Backspace') { const i = items.findIndex(it => it.id === 'back'); if (i >= 0) pick(i); }
+    else if (/^[1-9]$/.test(e.key)) pick(+e.key - 1);
+  });
+  return {
+    open(list, title, onPick) { items = list; cb = onPick; sel = Math.max(0, items.findIndex(it => !it.disabled)); draw(title); },
+    waitMenu() { cb = null; items = []; el.cmd.innerHTML = '<div class="wait">&hellip;</div>'; },
+    get choosing() { return !!cb; }, get items() { return items; }, pick,
+    banner(text, sec = 1.6) { el.banner.textContent = text; el.banner.classList.add('on'); bannerT = sec; },
+    msg(text) { el.msg.textContent = text; el.msg.classList.add('on'); },
+    hideMsg() { el.msg.classList.remove('on'); },
+    flash(color, a, sec) { el.flash.style.background = color; flashA = a; flashD = sec; flashT = sec; },
+    vignette(k) { $('vignette').style.opacity = k; },
+    cinematic(on) { document.body.classList.toggle('cine', !!on); },
+    number(pos, text, cls = '') { const d = document.createElement('div'); d.className = 'num ' + cls; d.textContent = text; el.nums.appendChild(d); nums.push({ d, p: pos.clone(), t: 0, dx: rnd(-14, 14), life: /count|word/.test(cls) ? 1.3 : 1.0 }); },
+    status(S) {
+      const h = S.hero, f = S.foe;
+      set('hp', h.hp, () => { el.hp.textContent = h.hp; el.hp.className = 'v' + (h.hp <= h.maxHp * 0.2 ? ' crit' : h.hp <= h.maxHp * 0.4 ? ' low' : ''); });
+      set('hpm', h.maxHp, () => { el.hpm.textContent = '/' + h.maxHp; }); set('mp', h.mp, () => { el.mp.textContent = h.mp; }); set('mpm', h.maxMp, () => { el.mpm.textContent = '/' + h.maxMp; });
+      set('atb', Math.round(h.atb * 200), () => { el.atb.firstElementChild.style.width = (h.atb * 100).toFixed(1) + '%'; el.atb.classList.toggle('full', h.atb >= 1); });
+      set('tr', Math.round(h.trance * 200), () => { el.tr.firstElementChild.style.width = (h.trance * 100).toFixed(1) + '%'; el.tr.classList.toggle('full', h.trance >= 1); });
+      set('ehp', Math.round(f.hp / f.maxHp * 400), () => { el.ehp.style.width = (f.hp / f.maxHp * 100).toFixed(1) + '%'; });
+      set('eatb', Math.round(f.atb * 200), () => { el.eatb.style.width = (f.atb * 100).toFixed(1) + '%'; });
+      const et = (f.doom > 0 ? `Doom ${f.doom}  ` : '') + (f.silence > 0 ? `Silenced ${f.silence}` : '');
+      set('etags', et, () => { el.etags.textContent = et; });
+      const tg = (h.defending ? '<span>Defend</span>' : '') + (h.haste > 0 ? '<span>Haste</span>' : '') + (h.ward > 0 ? '<span>Ward</span>' : '');
+      set('tags', tg, () => { el.tags.innerHTML = tg; });
+    },
+    tick(dt) {
+      if (bannerT > 0) { bannerT -= dt; if (bannerT <= 0) el.banner.classList.remove('on'); }
+      if (flashT > 0) { flashT -= dt; el.flash.style.opacity = Math.max(0, flashA * flashT / flashD); }
+      const p = v3();
+      for (let i = nums.length - 1; i >= 0; i--) {
+        const n = nums[i]; n.t += dt;
+        p.copy(n.p).project(camera);
+        const x = cl((p.x + 1) / 2 * view.w + n.dx, 34, view.w - 34), y = (1 - p.y) / 2 * view.h - 46 * Math.min(1, n.t / 0.5) - 8 * n.t, pop = 1 + 0.5 * Math.max(0, 1 - n.t / 0.14);
+        n.d.style.transform = `translate(${x.toFixed(1)}px,${y.toFixed(1)}px) translate(-50%,-50%) scale(${pop.toFixed(2)})`;
+        n.d.style.opacity = p.z > 1 ? 0 : cl((n.life - n.t) / 0.3);
+        if (n.t >= n.life) { n.d.remove(); nums.splice(i, 1); }
+      }
+    },
+    clear() { for (const n of nums) n.d.remove(); nums.length = 0; el.banner.classList.remove('on'); el.msg.classList.remove('on'); },
+  };
+})();
+
+// ------------------------------------------------------------------ passing effects, drawn with her spell building blocks
+const sparks = [];           // { t, dur, fn(F, u, t, id), slot }
+let sparkN = 0;
+function spark(dur, fn, done) { const s = { t: 0, dur, fn, done, slot: sparkN++ % 8, over: false }; sparks.push(s); return s; }
+const burst = (pos, color, size = 1) => spark(0.7, (F, u, t, id) => {
+  F.glow('b' + color + id, 3, pos, size * (0.9 + 2.2 * u.ramp(t, 0, 0.12)), u.win(t, 0, 0.03, 0.1, 0.45), color, 2.6);
+  F.motes('m' + color + id, pos, 220, t, { emit: 0.05, life: 0.6, spread: 2.2 * size, rise: 0.2, size: 0.07, color });
+  F.light(pos, color, 10 * size * u.win(t, 0, 0.03, 0.1, 0.4));
+});
+const ringOut = (pos, color, r1, dur = 0.7) => spark(dur, (F, u, t, id) => F.wave('w' + color + id, pos, Q0, 0.3 + r1 * u.ease(t / dur), u.win(t, 0, 0.05, dur * 0.5, dur), 1, color));
+const Q0 = new THREE.Quaternion();
+
+// ------------------------------------------------------------------ the fight
+const B = { state: 'boot', level: 1, S: null, acting: false, t0: 0, dimTo: 0, dim: 0, best: 1 };
+let S = null;
+function show(events, at) {                         // put what just happened on the screen
+  for (const ev of events) {
+    if (ev.k === 'dmg' && ev.to === 'foe') {
+      const p = foeChest(); p.x += rnd(-0.25, 0.25); p.y += rnd(0.1, 0.5);
+      UI.number(p, ev.n, ev.big ? 'big' : '');
+      if (S.foe.hp > 0) wraith.play('hurt');
+      SND.sfx.hit(ev.big ? 1.2 : 0.9); addShake(ev.big ? 0.6 : 0.35); hitStop(ev.big ? 0.1 : 0.06);
+    } else if (ev.k === 'dmg' && ev.to === 'hero') {
+      UI.number(heroHead(), ev.n, ev.blocked ? 'small hurt' : 'hurt'); W.flinch = ev.blocked ? 0.45 : 1;
+      if (ev.blocked) SND.sfx.guard();
+    } else if (ev.k === 'ward') { UI.number(heroHead().add(v3(0, 0.35, 0)), 'Ward ' + ev.n, 'gold'); SND.sfx.guard(); }
+    else if (ev.k === 'heal') { UI.number(heroHead(), '+' + ev.n, 'heal'); SND.sfx.heal(); if (ev.low) UI.number(heroHead().add(v3(0, 0.7, 0)), 'Against all odds!', 'word'); }
+    else if (ev.k === 'mark') {
+      if (ev.what === 'doom') { UI.number(foeChest().add(v3(0, 1.0, 0)), 'Doom', 'word'); SND.sfx.seal(); }
+      else if (ev.what === 'silence') { UI.number(foeChest().add(v3(0, 1.0, 0)), 'Silenced', 'word'); }
+      else if (ev.what === 'haste') UI.number(heroHead().add(v3(0, 0.38, 0)), 'Haste', 'word');
+      else if (ev.what === 'ward') { UI.number(heroHead().add(v3(0, 0.3, 0)), 'Ward', 'word'); SND.sfx.guard(); }
+    } else if (ev.k === 'count') { UI.number(v3(E.x, foeTop() + 0.55, E.z), ev.n, 'count'); SND.sfx.bell(); }     // the chapel bell counts Doom down
+    else if (ev.k === 'doom') { const p = foeChest(); UI.number(p.clone().add(v3(0, 1.0, 0)), 'Doom', 'count'); burst(p, 0xd070ff, 1.5); ringOut(v3(E.x, 0.05, E.z), 0xd070ff, 6); SND.sfx.bell(); SND.sfx.boom(1.2); SND.sfx.blade(); UI.flash('#c9a0ff', 0.3, 0.4); addShake(0.8); }
+    else if (ev.k === 'unmark') UI.number(foeChest().add(v3(0, 1.0, 0)), 'Its voice returns', 'word');
+    else if (ev.k === 'down' && ev.who === 'foe') { clock.scale = 0.25; clock.slowT = 1.2; UI.cinematic(true); }
+  }
+}
+
+// ---- her commands
+function* heroCommand(id) {
+  const c = RULES.CMD[id], steps = RULES.heroSteps(S, id);
+  UI.banner(c.name || c.label, c.trance ? 2.6 : 1.6);
+  W.tyaw = faceYaw(W, E);
+  if (id === 'defend') { show(steps[0]()); SND.sfx.guard(); shot(sHero(3.6, 0.5, 1.0), { rate: 4 }); yield wait(0.7); return; }
+  const self = id === 'odds' || id === 'curtain', P = PACE[c.clip];
+  const k = startCast(c.clip, self ? null : foeChest()), after = n => until(() => k.t >= k.release + n);
+  if (id === 'attack') { shot(sBoth(1.08), { rate: 4 }); SND.sfx.bells(); yield until(() => k.t >= 0.5); SND.sfx.swish(); }
+  else if (id === 'fate') { shot(sHero(3.0, 0.6, 1.25), { rate: 4 }); SND.sfx.chime(); yield after(0); SND.sfx.blade(); shot(sFoe(4.8, 0.75), { rate: 6 }); }
+  else if (id === 'hush') { shot(sHero(2.0, 0.35, 1.45, 0.02), { rate: 4 }); SND.sfx.hush(); yield after(0); shot(sFoe(4.4, 0.8), { rate: 6 }); }
+  else if (id === 'gravity') { shot(sHero(3.2, 0.75, 1.3, 0.05), { rate: 4 }); SND.sfx.gravity(); yield after(0); shot(sFoe(5.4, 0.65, 1.2, 0.42), { rate: 7 }); SND.sfx.eclipse(); }
+  else if (id === 'odds') { shot(sHero(5.2, 0.4, 1.5, -0.02), { rate: 2.5 }); SND.sfx.moon(); }
+  else if (id === 'curtain') {
+    UI.cinematic(true); UI.vignette(0.5); shot(sHero(4.2, 0.3, 1.3, 0.0), { rate: 2 }); SND.sfx.trance(); SND.sfx.moon();
+    yield until(() => k.t >= 3.3); shot(sHero(6.4, 0.15, 1.7, 0.1), { rate: 1.6 }); SND.sfx.chime();
+    yield after(-0.05); shot(sFront(), { rate: 6 }); UI.flash('#ffffff', 0.35, 0.4); SND.sfx.boom(1.3); SND.sfx.bells();
+  }
+  for (let i = 0; i < steps.length; i++) {
+    yield after(P.hits[i]);
+    const ev = steps[i](); show(ev);
+    if (id === 'attack') SND.sfx.bells();
+    if (id === 'gravity') SND.sfx.boom(1.2);
+    if (id === 'fate') SND.sfx.boom(0.7);
+    if (id === 'curtain' && i >= 1 && i <= 3) { SND.sfx.boom(1.1); UI.flash('#ffe9ff', 0.22, 0.25); burst(foeChest(), [0xd070ff, 0xff5fa8, 0xffb040][i - 1], 1.3); }
+    if (S.foe.hp <= 0 && id !== 'curtain') break;
+  }
+  yield until(() => lock !== k);
+  if (id === 'curtain') { UI.vignette(0); if (S.foe.hp > 0) UI.cinematic(false); }
+}
+
+// ---- the wraith's moves, staged as in Envoi
+function* projectile(from, toFn, dur, arc, side, onHit) {
+  const s = { done: false };
+  spark(dur, (F, u, t, id) => {
+    const k = cl(t / dur), to = toFn(), p = from.clone().lerp(to, k); p.y += arc * Math.sin(Math.PI * k); p.z += side * Math.sin(Math.PI * k);
+    F.glow('orb' + id, 0, p, 0.55, 1, SOUL, 2.6); F.glow('halo' + id, 0, p, 1.1, 0.35, SOUL, 1.6);
+    F.motes('tr' + id, p, 90, 0.2 + t % 0.3, { emit: 0.3, life: 0.35, spread: 0.5, rise: 0, size: 0.05, color: SOUL });
+    F.light(p, SOUL, 5);
+  }, () => { s.done = true; onHit(); });
+  yield until(() => s.done);
+}
+const FOE_ACT = {
+  *sweep(steps) {
+    const spot = toward(E, W, 1.55);
+    shot(sBoth(1.05), { rate: 3 });
+    yield* moveTo(E, spot.x, spot.z, 3.4);
+    E.tyaw = faceYaw(E, W); yield wait(0.15);
+    shot(sMid(1.0), { rate: 5 });
+    wraith.play('sweep', true); SND.sfx.shriek(0.6);
+    yield until(() => wraith.progress < 0 || wraith.progress >= 0.42); SND.sfx.swish();
+    yield until(() => wraith.progress < 0 || wraith.progress >= wraith.ACTIONS.sweep.hits[0]);
+    const p = heroChest(); burst(p, SOUL, 1.1); UI.flash('#0b2a16', 0.25, 0.25);
+    SND.sfx.hit(1.1); addShake(0.7); hitStop(0.09); show(steps[0]());
+    yield until(() => !wraith.busy);
+    yield* moveTo(E, HOME.foe.x, HOME.foe.z, 3.2); E.tyaw = faceYaw(HOME.foe, W);
+  },
+  *bolts(steps) {
+    E.tyaw = faceYaw(E, W); shot(sBoth(1), { rate: 3 });
+    wraith.play('cast', true); SND.sfx.shriek(0.5);
+    const flying = [];
+    for (let i = 0; i < steps.length; i++) {
+      yield until(() => wraith.progress < 0 || wraith.progress >= wraith.ACTIONS.cast.hits[i]); SND.sfx.fire();
+      flying.push(spawn(projectile(wraith.anchor('bolt', v3()), heroChest, 0.55, rnd(0.3, 0.9), rnd(-0.3, 0.3), () => { burst(heroChest(), SOUL, 0.7); SND.sfx.hit(0.7); addShake(0.3); hitStop(0.04); show(steps[i]()); })));
+    }
+    yield all(flying); yield until(() => !wraith.busy);
+  },
+  *grasp(steps) {
+    E.tyaw = faceYaw(E, W); shot(sBoth(1), { rate: 3 });
+    const at = v3(W.x, 0.04, W.z);
+    spark(2.3, (F, u, t) => {                        // a green circle opens under her, and the dark comes up through it
+      F.rune('gr', at, Q0, 2.6, -t * 2, u.ramp(t, 0, 0.8), u.win(t, 0, 0.3, 1.8, 2.3), 1, SOUL, 2.0, 11);
+      F.pillar('gp', at, 0.75, 2.6, t * 2, 0.8 * u.win(t, 1.0, 1.15, 1.5, 2.0), 1, SOUL, 1.6);
+      F.motes('gm', v3(W.x, 0.2, W.z), 300, t - 0.9, { emit: 0.4, life: 0.7, spread: 1.0, rise: 1.6, size: 0.06, flatten: 0.2, swirl: 5, color: SOUL });
+      F.light(v3(W.x, 0.8, W.z), SOUL, 5 * u.win(t, 0.2, 1.0, 1.5, 2.2));
+    });
+    wraith.play('grasp', true); SND.sfx.grasp(); B.dimTo = 0.35;
+    yield until(() => wraith.progress < 0 || wraith.progress >= wraith.ACTIONS.grasp.hits[0] - 0.06); shot(sHero(4.0, 0.9, 1.0, 0.25), { rate: 6 });
+    yield until(() => wraith.progress < 0 || wraith.progress >= wraith.ACTIONS.grasp.hits[0]);
+    burst(heroChest(), SOUL, 1.2); SND.sfx.hit(1.2); addShake(0.8); hitStop(0.1); show(steps[0]());
+    B.dimTo = 0; yield until(() => !wraith.busy);
+  },
+  *eclipse(steps) {
+    UI.cinematic(true); UI.vignette(0.85); B.dimTo = 0.85;
+    E.tyaw = faceYaw(E, W); shot(sFoe(5.2, 0.6, 1.9, -0.12), { rate: 3 });
+    wraith.play('eclipse', true); SND.sfx.eclipse(); SND.sfx.shriek(1.4);
+    const dur = wraith.ACTIONS.eclipse.dur, sun = () => wraith.anchor('sun', v3());
+    spark(dur, (F, u, t) => {                        // a black sun over the wraith
+      const p = sun(), k = u.ease(u.ramp(t, 0.1, dur * 0.45)) * (1 - u.ramp(t, dur * 0.8, dur * 0.95)), back = p.clone().sub(camera.position).normalize();
+      F.dark('sun', p, 0.8 * k); F.shell('rim', p, 0.88 * k, k, SOUL, 2.2, 4.0); F.glow('halo', 0, p.clone().addScaledVector(back, 0.95), 4.4 * k, 0.75 * k, SOUL, 1.5);
+      F.rune('cor', p.clone().addScaledVector(back, 1.0), camera.quaternion, 3.6 * k, t * 1.5, 1, 0.9 * k, camera.quaternion, SOUL, 2.0, 13);     // the corona sits behind the black disc
+      F.light(p, SOUL, 7 * k);
+    });
+    yield until(() => wraith.progress < 0 || wraith.progress >= 0.62); shot(sBoth(0.95), { rate: 5 });
+    ringOut(v3(E.x, 0.05, E.z), SOUL, 13, 0.9);
+    yield until(() => wraith.progress < 0 || wraith.progress >= wraith.ACTIONS.eclipse.hits[0]);
+    burst(heroChest(), SOUL, 1.8); UI.flash('#0b2a16', 0.7, 0.4);
+    SND.sfx.boom(1.3); addShake(1.0); hitStop(0.14); show(steps[0]());
+    yield until(() => !wraith.busy);
+    UI.vignette(0); UI.cinematic(false); B.dimTo = 0;
+  },
+};
+
+// ---- turns
+const item = id => { const c = RULES.CMD[id], no = RULES.why(S, id); return { id, label: c.label, mp: c.mp, help: c.help, disabled: !!no, why: no, hot: !!c.trance }; };
+const mainList = () => [S.hero.trance >= 1 ? item('curtain') : null, { id: 'attack', label: 'Attack', tag: 'free' }, { id: 'magic', label: 'Magic' }, { id: 'defend', label: 'Defend' }].filter(Boolean);
+const magicList = () => [...RULES.MAGIC.map(item), { id: 'back', label: 'Back' }];
+function onCmd(id) {
+  if (id === 'magic') return UI.open(magicList(), 'Magic', onCmd);
+  if (id === 'back') return UI.open(mainList(), null, onCmd);
+  if (RULES.CMD[id] && !RULES.why(S, id)) spawn(runHero(id));
+}
+function heroTurn() {
+  B.acting = true; RULES.beginHeroTurn(S);
+  shot(sBoth(), { rate: 3 }); UI.open(mainList(), null, onCmd);
+}
+function* runHero(id) {
+  UI.waitMenu(); UI.hideMsg();
+  yield* heroCommand(id);
+  RULES.endHeroTurn(S);
+  if (S.over === 'won') return yield* victory();
+  if (S.foe.hp < S.foe.maxHp * RULES.FOE.eclipseAt && !S.foe.usedEclipse && !B.warned) { B.warned = true; UI.msg('The wraith gathers the dark. Brace, or hush it.'); spawn((function* () { yield wait(2.6); UI.hideMsg(); })()); }
+  shot(sBoth(), { rate: 3 }); B.acting = false;
+}
+function* foeTurn() {
+  B.acting = true;
+  const id = RULES.pickFoeMove(S), steps = RULES.foeSteps(S, id);
+  UI.banner(RULES.FOE_MOVES[id].label, id === 'eclipse' ? 2.4 : 1.6);
+  yield* FOE_ACT[id](steps);
+  if (S.over === 'lost') return yield* defeat();
+  const ev = RULES.endFoeTurn(S);
+  if (ev.length) { shot(sFoe(5.0, 0.8), { rate: 5 }); yield wait(0.25); show(ev); yield wait(ev.some(e => e.k === 'doom') ? 0.9 : 0.6); }
+  if (S.over === 'won') return yield* victory();
+  shot(sBoth(), { rate: 3 }); B.acting = false;
+}
+
+// ---- story beats
+function* intro(quick) {
+  B.state = 'intro'; UI.clear();
+  W.x = quick ? HOME.hero.x : -4.6; W.z = HOME.hero.z; W.yaw = W.tyaw = Math.PI / 2; W.target = null; W.flinch = 0; W.downT = -1; W.winT = -1;
+  const from = quick ? HOME.foe : { x: 5.6, z: -2.6 };
+  E.x = from.x; E.z = from.z; E.yaw = E.tyaw = faceYaw(from, HOME.hero); E.target = null;
+  wraith.reset(); wraith.setFade(1); wraith.play('appear', true); SND.sfx.shriek(1.1);
+  burst(v3(E.x, 1.3, E.z), SOUL, 1.2); ringOut(v3(E.x, 0.05, E.z), SOUL, 3.5);
+  if (!quick) {
+    shot(sFoe(5.6, 0.7, 1.4, 0.12), { cut: true }); UI.msg('The chapel bell tolls once. Something climbs out of the graveyard…'); SND.sfx.bell();
+    spawn(moveTo(W, HOME.hero.x, HOME.hero.z, 0.95));
+    yield wait(1.9);
+    yield* moveTo(E, HOME.foe.x, HOME.foe.z, 2.4); E.tyaw = faceYaw(HOME.foe, HOME.hero);
+    yield until(() => !W.target);
+  } else { shot(sBoth(), { cut: true }); yield wait(1.2); }
+  $('enemy').hidden = false; $('ui').hidden = false; UI.waitMenu(); UI.status(S); measure();
+  shot(sBoth(), { rate: 2.5 });
+  UI.msg('The Shadow Wraith attacks!'); SND.startMusic();
+  yield wait(1.4); UI.hideMsg();
+  B.state = 'battle'; B.t0 = clock.t;
+}
+function* victory() {
+  B.state = 'over'; UI.waitMenu(); UI.cinematic(true); SND.stopMusic(1.2);
+  yield wait(0.08); clock.scale = 1; clock.slowT = 0;
+  shot(sFoe(5.0, 0.75, 1.3, 0.14), { rate: 3 }); wraith.play('die', true); SND.sfx.shriek(1.8);
+  for (let i = 0; i < 4; i++) { yield wait(0.3); burst(foeChest().add(v3(rnd(-0.3, 0.3), rnd(-0.5, 0.4), 0)), SOUL, 0.8); }
+  ringOut(v3(E.x, 0.05, E.z), SOUL, 5); SND.sfx.boom(0.9);
+  yield wait(0.9); UI.msg('The robe falls empty, and a pale moth rises out of it.');
+  yield until(() => wraith.progress >= 0.99 || wraith.progress < 0);
+  UI.hideMsg(); UI.cinematic(false); $('enemy').hidden = true; $('ui').hidden = true; measure(); SND.sfx.victory();
+  shot(sHero(3.8, 0.35, 1.25, 0.04), { rate: 2.5 }); W.tyaw = W.yaw + 0.5; W.winT = 0;
+  yield wait(2.4);
+  const next = Math.min(RULES.TOP_LEVEL, B.level + 1), sec = clock.t - B.t0;
+  B.best = Math.max(B.best, next);
+  endCard(`<h2>Released</h2><h3>Level ${B.level} cleared</h3><p>Defeat is release, not death. The moth rises past the bell tower toward the dark moon.</p>
+    <div class="stats"><div><b>${Math.floor(sec / 60)}:${String(Math.floor(sec % 60)).padStart(2, '0')}</b><span>Battle time</span></div><div><b>${S.dealt.toLocaleString('en-US')}</b><span>Damage dealt</span></div><div><b>${S.hero.hp}</b><span>HP left</span></div></div>
+    ${next > B.level ? `<p><b>Level up: she is level ${next}.</b> Every number is a fifth bigger, hers and the next wraith's.</p><button type="button" class="go" data-level="${next}">Fight at level ${next}</button>` : ''}<button type="button" class="go alt" data-level="${B.level}">Level ${B.level} again</button>`);
+}
+function* defeat() {
+  B.state = 'over'; UI.waitMenu(); SND.stopMusic(1.0); SND.sfx.defeat();
+  W.downT = 0; shot(sHero(3.6, 0.6, 0.9, 0.2), { rate: 2 }); UI.vignette(0.6); B.dimTo = 0.4;
+  yield wait(2.2);
+  endCard(`<h2>The curtain falls</h2><h3>The wraith had ${Math.round(100 * S.foe.hp / S.foe.maxHp)}% of its HP left</h3><p>The lamps gutter and the square goes dark. She will have to take that bow again.</p><button type="button" class="go" data-level="${B.level}">Try again</button>`);
+}
+function endCard(html) { $('endCard').innerHTML = html; $('end').hidden = false; }
+$('endCard').addEventListener('click', e => { const b = e.target.closest('.go'); if (b) begin(+b.dataset.level, true); });
+function titleCard() {
+  $('startCard').innerHTML = `<h2>The Shadow Wraith</h2><h3>Night of No Moon &middot; the square</h3>
+    <p>The Faire has played its last show. The chapel bell tolls once, and a Shadow Wraith climbs out of the graveyard: what a wisp becomes when nobody helps it.</p>
+    <ul><li>When her <b>Turn</b> bar fills, choose a command. Time waits while you choose.</li>
+    <li><b>Attack</b> is free. <b>Magic</b> costs MP, and MP does not come back.</li>
+    <li>Taking hits fills <b>Curtain</b>. When it is full, <b>Curtain Call</b> appears.</li>
+    <li>The thin bar under the wraith's HP is <b>its</b> turn.</li>
+    <li>Drag the picture while choosing to look around.</li></ul>
+    <button type="button" class="go" id="go">Begin</button>`;
+  $('start').hidden = false; $('go').onclick = () => { SND.init(); begin(1, false); };
+}
+function begin(level, quick) {
+  $('start').hidden = true; $('end').hidden = true; UI.vignette(0); UI.cinematic(false); UI.clear();
+  tasks.length = 0; sparks.length = 0; casts.length = 0; lock = null; for (const n of Object.keys(poses)) poses[n].stop();
+  clock.scale = 1; clock.stop = 0; clock.slowT = 0; B.acting = false; B.dimTo = 0; B.warned = false;
+  if (!wraith || wraith.level !== level) { if (wraith) wraith.dispose(); wraith = makeWraith(scene, { level }); }
+  B.level = level; S = B.S = RULES.newBattle(level);
+  $('elv').textContent = 'Level ' + level; $('enemy').hidden = true; $('ui').hidden = true;
+  spawn(intro(quick));
+}
+
+// ------------------------------------------------------------------ loading, sizes, controls
+loadJester(scene).then(j => {
+  J = j; ctx = makeContext(J); ctx.prime(); blink = makeBlink(J.lids);
+  pipe.setPalette(J.palette);
+  const loop = n => { const a = J.mixer.clipAction(J.clips[n]); a.setLoop(THREE.LoopRepeat, Infinity); a.setEffectiveWeight(0); a.play(); return a; };
+  const held = n => { const a = J.mixer.clipAction(J.clips[n]); a.setLoop(THREE.LoopOnce, 1); a.clampWhenFinished = true; a.setEffectiveWeight(0); a.play(); a.paused = true; return a; };
+  acts = { idle: loop('Idle'), walk: loop('Walk'), guard: held('Squat'), down: held('Kneel'), win: held('ArmsUp') };
+  for (const name of Object.keys(PACE)) { const a = J.mixer.clipAction(J.clips[name]); a.setLoop(THREE.LoopOnce, 1); a.clampWhenFinished = true; a.setEffectiveWeight(0); poses[name] = a; }
+  wraith = makeWraith(scene, { level: 1 }); wraith.setFade(0);
+  $('load').remove(); resize(); shot(() => ({ pos: v3(-5.6, 1.9, 4.6), look: v3(-0.6, 1.25, 0) }), { cut: true }); W.x = HOME.hero.x; titleCard(); api.ready = true;
+}).catch(e => { errBox.textContent += 'Could not load: ' + (e.message || e) + '\n'; });
+
+function measure() { const u = $('ui'); view.ui = u.hidden ? 0 : Math.min(view.h * 0.42, u.getBoundingClientRect().height + 8); applyView(); }
+function applyView() {
+  view.usable = 1 - view.ui / view.h;
+  camera.aspect = view.w / view.h; camera.fov = view.w < view.h ? 58 : 44;
+  camera.setViewOffset(view.w, view.h, 0, Math.round(view.ui / 2), view.w, view.h); camera.updateProjectionMatrix();
+}
+function resize() {
+  view.w = stage.clientWidth; view.h = stage.clientHeight;
+  renderer.setPixelRatio(pixelRatio); renderer.setSize(view.w, view.h, false); pipe.setSize(view.w, view.h, pixelRatio);
+  measure();
+}
+addEventListener('resize', resize);
+{
+  const el = renderer.domElement; let id = null, px = 0, py = 0;
+  el.addEventListener('pointerdown', e => { id = e.pointerId; px = e.clientX; py = e.clientY; el.setPointerCapture(id); });
+  el.addEventListener('pointermove', e => { if (e.pointerId !== id) return; cam.orbit = cl(cam.orbit - (e.clientX - px) * 0.006, -0.9, 1.3); cam.tilt = cl(cam.tilt + (e.clientY - py) * 0.004, -0.15, 0.7); px = e.clientX; py = e.clientY; });
+  const up = e => { if (e.pointerId === id) id = null; }; el.addEventListener('pointerup', up); el.addEventListener('pointercancel', up);
+  let pixel = false;
+  $('bPixel').onclick = () => { pixel = !pixel; state.pixel = pixel; $('bPixel').classList.toggle('on', pixel); };
+  $('bSound').onclick = () => { const m = !SND.muted; SND.setMuted(m); $('bSound').classList.toggle('on', !m); $('bSound').textContent = m ? 'Sound off' : 'Sound on'; };
+}
+const state = { pixel: false };
+
+// ------------------------------------------------------------------ one frame
+const real = new THREE.Clock(); let T = 0;
+function frame(dtOverride, skipDraw) {
+  const rdt = dtOverride !== undefined ? dtOverride : Math.min(real.getDelta(), 0.05);
+  T += rdt; flies(T);
+  let dt = rdt * clock.scale;
+  if (clock.stop > 0) { clock.stop -= rdt; dt = 0; }
+  if (clock.slowT > 0) { clock.slowT -= rdt; if (clock.slowT <= 0) clock.scale = 1; }
+  let spellDim = 0, shake = 0;
+  if (J && wraith) {
+    clock.t += dt;
+    runTasks();
+    if (B.state === 'battle' && !B.acting && dt > 0) { const who = RULES.tick(S, dt); if (who === 'hero') heroTurn(); else if (who === 'foe') spawn(foeTurn()); }
+
+    // her: where she stands, which way she faces, and how her poses mix
+    if (W.target) { const dx = W.target.x - W.x, dz = W.target.z - W.z, d = Math.hypot(dx, dz), stepD = W.speed * dt; W.tyaw = d > 0.05 ? Math.atan2(dx, dz) : W.tyaw; if (d <= stepD + 1e-4) { W.x = W.target.x; W.z = W.target.z; W.target = null; W.tyaw = faceYaw(W, E.target || E); } else { W.x += dx / d * stepD; W.z += dz / d * stepD; } }
+    W.v += ((W.target ? W.speed : 0) - W.v) * Math.min(1, dt * 8);
+    W.yaw += wrap(W.tyaw - W.yaw) * Math.min(1, dt * 7);
+    W.flinch = Math.max(0, W.flinch - dt * 2.6);
+    let cw = 0;
+    for (let i = casts.length - 1; i >= 0; i--) {
+      const c = casts[i];
+      c.t += dt * (c.t < c.release ? c.P.rate : c.t > c.release + c.P.free ? c.P.tail || 1 : 1);
+      if (c.live) c.tpos = foeChest();
+      if (lock === c) {
+        c.w += ((c.t < c.release + c.P.free ? 1 : 0) - c.w) * Math.min(1, dt * 10); cw = c.w;
+        poses[c.name].time = Math.min(c.t, c.dur - 0.01); poses[c.name].setEffectiveWeight(cw);
+        if (c.t >= c.release + c.P.free && c.w < 0.04) { poses[c.name].stop(); lock = null; cw = 0; }
+      }
+      if (c.t >= c.dur) { if (lock === c) { poses[c.name].stop(); lock = null; cw = 0; } casts.splice(i, 1); }
+    }
+    W.guardW += ((S && S.hero.defending && B.state === 'battle' ? 1 : 0) - W.guardW) * Math.min(1, dt * 7);
+    if (W.downT >= 0) W.downT += dt; if (W.winT >= 0) W.winT += dt;
+    const wDown = W.downT >= 0 ? cl(W.downT / 0.3) : 0, wWin = W.winT >= 0 ? cl(W.winT / 0.4) : 0, wWalk = cl(W.v / 0.4);
+    let rem = 1 - wDown; const kWin = wWin * rem; rem *= 1 - wWin; const kCast = cw * rem; rem *= 1 - cw; const kGuard = W.guardW * rem; rem *= 1 - W.guardW;
+    acts.down.time = Math.min(1.4, Math.max(0, W.downT) * 1.1); acts.down.setEffectiveWeight(wDown);
+    acts.win.time = Math.min(1.0, Math.max(0, W.winT) * 0.9); acts.win.setEffectiveWeight(kWin);
+    acts.guard.time = 0.52; acts.guard.setEffectiveWeight(kGuard);
+    if (lock) poses[lock.name].setEffectiveWeight(kCast);
+    acts.walk.setEffectiveWeight(rem * wWalk); acts.walk.timeScale = cl(W.v / 0.93, 0.7, 1.6); acts.idle.setEffectiveWeight(rem * (1 - wWalk));
+    J.mixer.update(dt); if (!TEST) blink(dt);
+    const f = W.flinch * W.flinch;
+    J.root.position.set(W.x - Math.sin(W.yaw) * 0.14 * f, 0, W.z - Math.cos(W.yaw) * 0.14 * f); J.root.rotation.set(-0.2 * f, W.yaw, 0, 'YXZ'); J.root.updateMatrixWorld(true);
+    blobW.position.x = W.x; blobW.position.z = W.z;
+
+    // the wraith
+    E.moving += ((E.target ? 1 : 0) - E.moving) * Math.min(1, dt * 6);
+    if (E.target) { const dx = E.target.x - E.x, dz = E.target.z - E.z, d = Math.hypot(dx, dz), stepD = E.speed * dt; E.tyaw = d > 0.05 ? Math.atan2(dx, dz) : E.tyaw; E.phase += Math.min(d, stepD) * 4.4; if (d <= stepD + 1e-4) { E.x = E.target.x; E.z = E.target.z; E.target = null; } else { E.x += dx / d * stepD; E.z += dz / d * stepD; } }
+    else if (wraith.busy && wraith.dash) { E.x += Math.sin(E.yaw) * wraith.dash * dt; E.z += Math.cos(E.yaw) * wraith.dash * dt; }
+    else if (!wraith.busy && B.state === 'battle') { const k = Math.min(1, dt * 1.5); E.x += (HOME.foe.x - E.x) * k; E.z += (HOME.foe.z - E.z) * k; }     // each blow knocks it back a little; it drifts back to its mark
+    E.yaw += wrap(E.tyaw - E.yaw) * Math.min(1, dt * (E.target ? 5 : 3.5));
+    wraith.root.position.set(E.x, 0, E.z); wraith.root.rotation.y = E.yaw;
+    wraith.animate(E.phase, E.moving, clock.t, dt);
+    blobE.position.x = E.x; blobE.position.z = E.z; blobE.material.opacity = 0.5 * (wraith.gone ? 0 : 1) * (wraith.action === 'die' ? 1 - cl(wraith.progress * 1.5) : 1); blobE.scale.setScalar(1 - 0.3 * cl(wraith.lift || 0));
+
+    // light: her spells, the marks on the wraith, and whatever else is passing
+    fx.F.begin(camera);
+    for (const c of casts) { const x = ctx(c.name, null, c.tpos); fx.cast(c.name, c.t, x, c.slot); spellDim = Math.max(spellDim, x.out.dim); shake = Math.max(shake, x.out.shake); }
+    fx.draw('marks', (F, u) => {
+      if (!S || B.state === 'boot') return;
+      if (S.foe.doom > 0 && S.foe.hp > 0) F.rune('doom', v3(E.x, foeTop() + 0.55, E.z), camera.quaternion, 1.15, T * 2, 1, 0.9, camera.quaternion, u.VIOLET, 2.0, 7);
+      if (S.foe.silence > 0 && S.foe.hp > 0) { const p = wraith.anchor('head', v3()); F.ring('sil', p, camera.quaternion, 1.1, T * 2, 0.8, camera.quaternion, u.DUSK, 1.8); F.shell('silb', p, 0.42, 0.5, u.DUSK, 1.6); }
+      if (W.guardW > 0.02) F.shell('guard', v3(W.x, 0.95, W.z), 1.15, 0.42 * W.guardW, u.GOLD, 1.6, 4.5);
+      if (S.hero.ward > 0) F.shell('ward', v3(W.x, 1.0, W.z), 1.3, 0.3, u.ROSE, 1.5, 5.0);
+      if (S.hero.haste > 0 && B.state === 'battle') F.ring('haste', v3(W.x, 0.06, W.z), Q0, 1.5, T * 5, 0.8, 1, u.GOLD, 1.8);
+      if (S.hero.trance >= 1 && B.state === 'battle') F.rune('tr', v3(W.x, 0.05, W.z), Q0, 2.1, T, 1, 0.55 + 0.2 * Math.sin(T * 4), 1, u.ROSE, 1.7, 5);
+    });
+    fx.draw('pass', (F, u) => {
+      for (let i = sparks.length - 1; i >= 0; i--) { const s = sparks[i]; s.t += dt; if (s.t < s.dur) s.fn(F, u, s.t, 'k' + s.slot); else { sparks.splice(i, 1); if (s.done) s.done(); } }
+    });
+    if (S) UI.status(S);
+  }
+  // the stage lights, and the camera
+  B.dim += (B.dimTo - B.dim) * Math.min(1, rdt * 3); dim = Math.max(spellDim, B.dim);
+  setLight(false, dim);
+  if (cam.shot) { const s = cam.shot(), k = Math.min(1, rdt * cam.rate); cam.pos.lerp(s.pos, k); cam.look.lerp(s.look, k); }
+  cam.shake = Math.max(0, cam.shake - rdt * 2.6); shake = Math.max(shake, cam.shake);
+  camera.position.copy(cam.pos);
+  if (shake > 0 && !TEST) camera.position.add(v3(Math.random() - 0.5, Math.random() - 0.5, Math.random() - 0.5).multiplyScalar(0.14 * shake));
+  camera.lookAt(cam.look); camera.updateMatrixWorld();
+  UI.tick(rdt);
+  if (!skipDraw) pipe.render(camera, state.pixel);
+}
+renderer.setAnimationLoop(() => { if (!TEST) frame(); });
+
+// hooks for automated checks
+const api = window.J = {
+  ready: false, frame, begin, cam, W, E, B, RULES,
+  run(seconds, dt = 1 / 30, draw = true) { for (let t = 0; t < seconds - 1e-6; t += dt) frame(dt, true); if (draw) frame(0); },
+  choose(id) { if (!UI.choosing || B.state !== 'battle') return false; onCmd(id); return !UI.choosing; },
+  look() { return { state: B.state, level: B.level, choosing: UI.choosing, menu: UI.items.map(i => i.id + (i.disabled ? '!' : '')), over: S && S.over, hero: S && { ...S.hero }, foe: S && { ...S.foe, last: undefined }, time: clock.t - B.t0, wraith: wraith && { action: wraith.action, progress: wraith.progress, x: E.x, z: E.z }, casts: casts.length, tasks: tasks.length, sparks: sparks.length }; },
+  errors: () => errBox.textContent,
+};
+</script>
+</body>
+</html>

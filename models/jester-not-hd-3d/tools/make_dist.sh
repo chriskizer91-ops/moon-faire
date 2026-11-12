@@ -1,5 +1,6 @@
 #!/bin/bash
-# Make what gets published: dist/ (the viewer), dist-stage/ (the night square) and dist-game/ (Night of No Moon: the square).
+# Make what gets published: dist/ (the viewer), dist-stage/ (the night square) and dist-game/ (Night of No Moon: the square,
+# the turn-based fight in viewer/battle.html; the earlier real-time try, viewer/game.html, is kept but not published).
 # All load three.js from jsDelivr instead of viewer/lib, and carry the model as text in jester_glb_a/b/c.js.
 set -e
 cd "$(dirname "$0")/.."
@@ -11,5 +12,5 @@ for d in dist dist-stage dist-game; do
 done
 cdn viewer/index.html dist/index.html && mkdir -p dist/ref && cp viewer/ref/*.png dist/ref/
 cdn viewer/stage.html dist-stage/index.html && cp viewer/world.js dist-stage/
-cdn viewer/game.html dist-game/index.html && cp viewer/world.js dist-game/ && mkdir -p dist-game/foes && cp viewer/foes/* dist-game/foes/
+cdn viewer/battle.html dist-game/index.html && cp viewer/world.js viewer/rules.js dist-game/ && mkdir -p dist-game/envoi && cp viewer/envoi/*.js dist-game/envoi/
 du -sh dist dist-stage dist-game

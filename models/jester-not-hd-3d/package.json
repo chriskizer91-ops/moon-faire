@@ -1,6 +1,7 @@
 {
   "name": "jester-not-hd-3d",
   "private": true,
+  "type": "module",
   "description": "Tools for the Jester's not-HD 3D game model: local viewer, stills and checks",
   "dependencies": {
     "gltf-validator": "2.0.0-dev.3.10",
