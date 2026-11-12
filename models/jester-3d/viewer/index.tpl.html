@@ -38,6 +38,9 @@ canvas#stage{display:block;width:100%;height:100%;touch-action:none;cursor:grab}
 #states .chip,#acts .chip,#spells .chip{font-weight:700}
 .notes{color:var(--muted);font-size:14px;max-width:68ch;margin:0}
 .notes b{color:var(--ink);font-weight:700}
+#joy{position:absolute;left:12px;bottom:12px;width:104px;height:104px;border-radius:50%;background:rgba(20,14,28,.46);border:1px solid rgba(214,168,78,.5);touch-action:none;z-index:3}
+#joy[hidden]{display:none}
+#knob{position:absolute;left:50%;top:50%;width:44px;height:44px;margin:-22px 0 0 -22px;border-radius:50%;background:rgba(214,168,78,.78);box-shadow:0 2px 8px rgba(0,0,0,.4);pointer-events:none}
 @media (prefers-reduced-motion:reduce){.chip{transition:none}}
 /* on a phone the three rows of moves slide sideways, so the stage stays in view while you pick */
 @media (max-width:700px){.stagebox{height:min(60vh,120vw)}.slide{flex-wrap:nowrap;overflow-x:auto;scrollbar-width:none;margin-right:-12px;padding-right:12px}.slide::-webkit-scrollbar{display:none}.slide .chip{flex:0 0 auto;white-space:nowrap}}
@@ -53,6 +56,7 @@ canvas#stage{display:block;width:100%;height:100%;touch-action:none;cursor:grab}
     <canvas id="stage" aria-label="3D model of the Jester Witch. Drag to turn her, pinch or scroll to zoom."></canvas>
     <div class="hud" id="hud">Loading</div>
     <canvas id="book" width="390" height="330" aria-label="The flipbook frame for the same moment"></canvas><span class="booktag">Flipbook</span>
+    <div id="joy" hidden aria-label="Walk pad: drag to walk her around"><div id="knob"></div></div>
     <div class="err" id="err" hidden></div>
   </div>
   <section aria-label="How she holds herself"><p class="label">Body</p><div class="chips slide" id="states"></div></section>
@@ -60,7 +64,7 @@ canvas#stage{display:block;width:100%;height:100%;touch-action:none;cursor:grab}
   <section aria-label="Spells"><p class="label">Spells</p><div class="chips slide" id="spells"></div></section>
   <section aria-label="Views"><p class="label">Views</p><div class="chips" id="views"></div></section>
   <section aria-label="Switches"><p class="label">Switches</p><div class="chips" id="toggles"></div></section>
-  <p class="notes">Drag to turn her; pinch or scroll to zoom. <b>Body</b> is how she holds herself: it stays until you pick another. <b>Moves</b> and <b>Spells</b> play once over whatever she is doing, so she can talk while she sits, or cast from her knees. The stool is conjured when she sits and goes when she stands. The first six spells follow her flipbook, and the small picture shows her <b>flipbook frame for the same moment</b>; Ill Omen, Stop, Royal Reversal and The Last Toll are built from the move sheet and have no drawn frames yet. As in the sprites she casts toward her left, where the target stands at screen right. <b>Flipbook look</b> redraws the model at the sprites' pixel size in her own 56 colours.</p>
+  <p class="notes">Drag to turn her; pinch or scroll to zoom. <b>Walk around</b> puts a round pad on the stage: drag it and she walks the way you push, as you see it; push to the edge and she runs. On a keyboard use W A S D or the arrow keys, Shift to run, Space to jump. <b>Body</b> is how she holds herself: it stays until you pick another. <b>Moves</b> and <b>Spells</b> play once over whatever she is doing, so she can talk while she sits, wave as she walks, or cast from her knees. Left standing, she looks about or settles her weight now and then. The first six spells follow her flipbook, and the small picture shows her <b>flipbook frame for the same moment</b>; the rest are built from the move sheet. She casts toward her own left. <b>Flipbook look</b> redraws the model at the sprites' pixel size in her own 56 colours.</p>
 </div>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
 <script>/*PAL*/</script>

@@ -90,6 +90,62 @@
     defAction('talk', 11.4, keys, { outro: 0.7, cues: [1.3 / 11.4, 9.75 / 11.4] });
   })();
 
+  // ---------- more moves for a performer: a wave, a deep bow, a twirl, a laugh, a jig, and two small things she does when left alone ----------
+  defAction('wave', 2.7, [
+    { t: 0.35, hR: [-0.36, 1.50, 0.12], eR: [-1, -0.5, -0.2], fR: FP.open, twR: -0.5, wrR: [-0.15, 0.35], hd: [-0.10, -0.04, -0.08], sp: [-0.05, 0, -0.03], mouth: 2 },
+    { t: 0.62, hR: [-0.42, 1.52, 0.12], wrR: [-0.15, -0.4] }, { t: 0.89, hR: [-0.33, 1.52, 0.12], wrR: [-0.15, 0.4] }, { t: 1.16, hR: [-0.42, 1.52, 0.12], wrR: [-0.15, -0.4] },
+    { t: 1.43, hR: [-0.33, 1.52, 0.12], wrR: [-0.15, 0.4] }, { t: 1.70, hR: [-0.42, 1.52, 0.12], wrR: [-0.15, -0.4] }, { t: 1.97, hR: [-0.36, 1.50, 0.12], wrR: [-0.15, 0.2], mouth: 2 },
+    { t: 2.45, mouth: 0 }
+  ], { outro: 0.6 });
+  defAction('bow', 3.4, [
+    { t: 0.45, hL: [0.52, 1.22, 0.10], eL: [0.4, -1, -0.5], fL: FP.open, twL: 1.2, hR: [-0.34, 1.16, 0.22], eR: [-0.6, -1, -0.3], fR: FP.open, twR: 1.2, ftR: [0.0, 0.03, -0.10, -0.2, 0.3], sp: [0, -0.05, 0], hd: [0, -0.08, 0], mouth: 2 },
+    { t: 0.80, ftR: [0.02, 0.012, -0.26, -0.3, 0.4], hip: [0, -0.02, -0.02] },
+    { t: 1.30, hip: [0, -0.07, -0.09], hipR: [0, 0.30, 0], sp: [0, 0.78, 0], hd: [0, 0.30, 0], hR: [0.07, 0.86, 0.33], eR: [-1, -0.2, 0.3], fR: FP.soft, twR: 0.2, wrR: [0.3, 0], hL: [0.60, 1.00, -0.16], eL: [0.6, 0.6, -1], twL: 0.6, knL: [0.14, 0, 1], eyes: 1, mouth: 0 },
+    { t: 2.05, hip: [0, -0.07, -0.09], hipR: [0, 0.30, 0], sp: [0, 0.76, 0], hd: [0, 0.26, 0], hR: [0.07, 0.87, 0.33], hL: [0.60, 1.01, -0.16], eyes: 1 },
+    { t: 2.65, hip: [0, 0, 0], hipR: [0, 0, 0], sp: [0, -0.04, 0], hd: [0, -0.06, 0], hR: [-0.40, 1.20, 0.16], eR: [-0.6, -1, -0.3], fR: FP.open, twR: 1.2, wrR: [-0.2, 0], hL: [0.40, 1.20, 0.16], eL: [0.6, -1, -0.3], twL: 1.2, ftR: [0, 0.02, -0.10, -0.15, 0.2], eyes: 0, mouth: 2 },
+    { t: 3.05, ftR: 'rest', knL: 'rest', mouth: 2 }
+  ], { outro: 0.4, stand: true });
+  // Twirl: two full turns on the ball of her right foot, the left foot drawn up to her knee; her skirts and veils fly out on their own
+  defAction('twirl', 2.7, [
+    { t: 0.32, hip: [0.02, -0.05, 0], hR: [-0.50, 1.20, 0.10], hL: [0.50, 1.20, 0.10], eR: [-0.4, -1, -0.5], eL: [0.4, -1, -0.5], fR: FP.open, fL: FP.open, twR: 0.6, twL: 0.6, sp: [-0.14, 0.04, 0], hd: [0.15, 0, 0], knR: [-0.2, 0, 1], knL: [0.2, 0, 1] },
+    { t: 0.52, hip: [-0.004, 0.035, 0], ftR: [0.077, 0.055, 0.012, 0.10, 0.62], ftL: [-0.085, 0.33, 0.07, 0.25, 0.95], knL: [1, 0, 0.7], knR: [0, 0, 1], hR: [-0.17, 1.24, 0.21], hL: [0.17, 1.22, 0.21], eR: [-1, -0.4, -0.2], eL: [1, -0.4, -0.2], fR: FP.soft, fL: FP.soft, sp: [0, -0.03, 0], hd: [0, -0.06, 0], mouth: 2 },
+    { t: 1.62, hip: [-0.004, 0.035, 0], ftR: [0.077, 0.055, 0.012, 0.10, 0.62], ftL: [-0.085, 0.33, 0.07, 0.25, 0.95], hR: [-0.17, 1.24, 0.21], hL: [0.17, 1.22, 0.21] },
+    { t: 1.95, hip: [0, -0.04, 0], ftR: 'rest', ftL: [0.03, 0, 0.05, 0.3, 0], knL: 'rest', knR: 'rest', hR: [-0.54, 1.30, 0.06], hL: [0.54, 1.30, 0.06], eR: [-0.4, -1, -0.5], eL: [0.4, -1, -0.5], fR: FP.open, fL: FP.open, twR: 1.2, twL: 1.2, sp: [0, -0.06, 0], hd: [0, -0.10, 0], mouth: 2 },
+    { t: 2.35, hip: [0, 0, 0], hR: [-0.50, 1.24, 0.08], hL: [0.50, 1.24, 0.08], ftL: 'rest', mouth: 2 }
+  ], { outro: 0.3, stand: true, spin: [[0, 0], [0.34, -0.5], [0.56, 0.6], [1.10, 6.9], [1.62, 12.0], [1.92, TAU * 2], [2.7, TAU * 2]] });
+  (function () {
+    const keys = [{ t: 0.25, hd: [0, -0.20, 0.05], sp: [0, -0.07, 0], hL: [0.09, 1.02, 0.17], eL: [1, -0.3, -0.2], fL: FP.soft, wrL: [0.3, 0], hR: [-0.20, 1.34, 0.20], eR: [-1, -0.6, -0.1], fR: FP.soft, twR: 0.7, eyes: 0.85, mouth: 1 }];
+    for (let i = 0; i < 9; i++) { const t = 0.38 + i * 0.17, up = i % 2; keys.push({ t, sh: up ? [0.16, 0.16] : [0.02, 0.02], sp: [0, -0.07 + (up ? 0.035 : 0) + 0.012 * i, 0], hd: [0.03 * (up ? 1 : -1), -0.20 + 0.02 * i + (up ? 0.03 : 0), 0.05], mouth: up ? 1 : 2, eyes: 0.85 }); }
+    keys.push({ t: 2.05, sh: [0, 0], sp: [0, 0.05, 0], hd: [0, 0.05, 0.03], hR: [-0.11, 1.40, 0.13], mouth: 2, eyes: 0.5 }, { t: 2.5, mouth: 2, eyes: 0 });
+    defAction('laugh', 2.9, keys, { outro: 0.5 });
+  })();
+  // A jig: hop from foot to foot, the free foot kicking across, hands on her hips, then arms up to finish
+  (function () {
+    const keys = [], B = 0.34, N = 10, hipsR = [-0.20, 1.01, 0.05], hipsL = [0.20, 1.01, 0.05];
+    keys.push({ t: 0.2, hR: hipsR, hL: hipsL, eR: [-1, -0.1, -0.5], eL: [1, -0.1, -0.5], fR: FP.loose || FP.soft, fL: FP.loose || FP.soft, wrR: [0.5, 0], wrL: [0.5, 0], hip: [0, -0.05, 0], mouth: 2 });
+    for (let i = 0; i < N; i++) {
+      const t = 0.36 + i * B, sd = i % 2 ? 1 : -1, hi = i % 4 >= 2 ? 1 : 0;           // sd: which foot kicks (−1 right)
+      const kick = [sd * -0.07, 0.17 + 0.10 * hi, 0.20 + 0.06 * hi, sd * -0.2, 0.5], stand = [sd * -0.02, 0.0, -0.02, sd * -0.1, 0];
+      keys.push({ t: t - B * 0.5, hip: [sd * -0.015, 0.045, 0], ftR: [0, 0.06, 0, -0.1, 0.55], ftL: [0, 0.06, 0, 0.1, 0.55] });            // in the air between steps
+      keys.push({ t, hip: [sd * 0.03, -0.045, 0], hipR: [sd * -0.10, 0, sd * 0.05], sp: [sd * 0.14, 0.02, sd * -0.06], hd: [sd * -0.08, 0, sd * 0.07], ['ft' + (sd < 0 ? 'R' : 'L')]: kick, ['ft' + (sd < 0 ? 'L' : 'R')]: stand, ['kn' + (sd < 0 ? 'R' : 'L')]: [sd * -0.25, 0, 1] });
+    }
+    const te = 0.36 + N * B;
+    keys.push({ t: te - B * 0.5, hip: [0, 0.05, 0], ftR: [0, 0.07, 0, -0.1, 0.55], ftL: [0, 0.07, 0, 0.1, 0.55] });
+    keys.push({ t: te + 0.05, hip: [0, -0.06, 0], hipR: [0, 0, 0], sp: [0, -0.05, 0], hd: [0, -0.10, 0], ftR: [-0.05, 0, 0, -0.3, 0], ftL: [0.05, 0, 0, 0.3, 0], knR: 'rest', knL: 'rest', hR: [-0.46, 1.42, 0.08], hL: [0.46, 1.42, 0.08], eR: [-0.4, -1, -0.5], eL: [0.4, -1, -0.5], fR: FP.open, fL: FP.open, twR: 0.8, twL: 0.8, wrR: [0, 0], wrL: [0, 0], mouth: 2 });
+    keys.push({ t: te + 0.55, hip: [0, 0, 0], hR: [-0.46, 1.40, 0.08], hL: [0.46, 1.40, 0.08], mouth: 2 });
+    defAction('dance', te + 1.05, keys, { outro: 0.4, stand: true });
+  })();
+  defAction('look_around', 3.2, [
+    { t: 0.5, hd: [0.45, -0.03, 0.03], sp: [0.10, 0, 0], eyes: 0.1 }, { t: 1.1, hd: [0.48, -0.05, 0.04], sp: [0.11, 0, 0] },
+    { t: 1.8, hd: [-0.42, 0.02, -0.03], sp: [-0.10, 0, 0] }, { t: 2.4, hd: [-0.44, -0.02, -0.04], sp: [-0.10, 0, 0] }
+  ], { outro: 0.7 });
+  defAction('settle', 3.6, [
+    { t: 0.8, hip: [0.035, -0.012, 0], hipR: [0, 0, -0.07], sp: [0, 0, 0.06], hd: [0.04, 0, -0.04], knL: [0.30, 0, 1], ftL: [0.02, 0.012, 0.03, 0.18, 0.18], hR: [-0.17, 1.03, 0.19], eR: [-1, -0.3, -0.3], fR: FP.soft, twR: 0.4 },
+    { t: 1.5, hR: [-0.15, 1.05, 0.21], hL: [0.02, 1.06, 0.24], eL: [1, -0.5, -0.1], fL: FP.pinch || FP.soft, twL: 0.5, hd: [-0.06, 0.16, -0.03] },
+    { t: 2.0, hL: [0.01, 1.03, 0.25] }, { t: 2.3, hL: [0.03, 1.07, 0.24] },
+    { t: 2.9, hip: [0.035, -0.012, 0], hipR: [0, 0, -0.07], hd: [0.03, 0.02, -0.03] }
+  ], { outro: 0.7 });
+
   // ---------- the stool she conjures to sit on ----------
   const stool = new THREE.Group(); stool.name = 'stool'; stool.visible = false; stool.position.set(0, 0, STOOL_Z); root.add(stool);
   (function () {

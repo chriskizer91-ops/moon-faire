@@ -14,9 +14,12 @@ with sync_playwright() as p:
     k = 0
     for st in steps:
         label, wait = st.rsplit(':', 1)
-        if label: pg.get_by_role('button', name=label, exact=True).click()
+        if label.startswith('key+'): pg.keyboard.down(label[4:])
+        elif label.startswith('key-'): pg.keyboard.up(label[4:])
+        elif label: pg.get_by_role('button', name=label, exact=True).click()
         pg.wait_for_timeout(int(float(wait) * 1000))
         pg.screenshot(path=out.replace('.png', f'_{k}.png'), full_page=(k == 0)); k += 1
+    print('root:', pg.evaluate("(()=>{const r=JESTER.J.root; return [r.position.x.toFixed(2), r.position.z.toFixed(2), r.rotation.y.toFixed(2), JESTER.J.action, JESTER.J.stanceNow]})()"))
     print('animate ms:', pg.evaluate("(()=>{const J=JESTER.J; let t=1000; const t0=performance.now(); for(let i=0;i<120;i++){t+=1/60; J.animate(0,0,t,1/60);} return (performance.now()-t0)/120;})()"))
     print('fps probe:', pg.evaluate("(async()=>{let n=0;const t0=performance.now();await new Promise(r=>{function f(){n++; if(performance.now()-t0<2000) requestAnimationFrame(f); else r();} requestAnimationFrame(f);}); return n/2;})()"))
     for l in logs[:12]: print(l)

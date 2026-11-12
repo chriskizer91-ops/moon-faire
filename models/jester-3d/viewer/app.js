@@ -6,19 +6,21 @@
   // What she can do. States are how she holds herself and stay until changed; moves and spells play once over whatever state she is in.
   // Each: [id, label, half-width in meters the camera must show, half-height (optional), camera by time (optional): t -> [half-width, shift toward the target]]
   const STATES = [['idle', 'Stand', 0.7], ['walk', 'Walk', 0.7], ['run', 'Run', 0.8], ['kneel', 'Kneel', 0.7], ['squat', 'Squat', 0.7], ['sit_chair', 'Sit on a stool', 0.7], ['sit_ground', 'Sit on the ground', 0.7], ['hover', 'Hover', 0.75]];
-  const ACTS = [['jump', 'Jump', 0.9, 1.42], ['talk', 'Talk', 0.8]];
+  const ACTS = [['jump', 'Jump', 0.9, 1.42], ['talk', 'Talk', 0.8], ['wave', 'Wave', 0.8], ['bow', 'Bow', 0.95], ['twirl', 'Twirl', 1.15], ['laugh', 'Laugh', 0.8], ['dance', 'Dance', 0.95]];
+  const QUIET = [['look_around', 'Stand', 0.7], ['settle', 'Stand', 0.7]];      // small things she does by herself when left standing
   const SPELLS = [['curtain_call', 'Curtain Call', 1.0], ['sealed_fate', 'Sealed Fate', 0.8], ['against_all_odds', 'Against All Odds', 0.82], ['gilded_rebuke', 'Gilded Rebuke', 1.28], ['hush', 'Hush', 1.05], ['gravity', 'Gravity', 1.1],
     ['ill_omen', 'Ill Omen', 0.8, 0, (t) => t > 0.95 ? [1.75, 1.0] : [0.8, 0]], ['stop', 'Stop', 1.0, 0, (t) => t > 2.35 ? [1.8, 1.05] : [1.0, 0.25]],
     ['royal_reversal', 'Royal Reversal', 0.85, 0, (t) => t > 1.8 ? [1.45, -0.55] : [0.85, -0.1]], ['last_toll', 'The Last Toll', 0.9, 0, (t) => t > 3.85 ? [2.0, 0] : [0.9, 0]]];
-  const ALL = STATES.concat(ACTS, SPELLS), find = (id) => ALL.find((x) => x[0] === id);
+  const ALL = STATES.concat(ACTS, SPELLS, QUIET), find = (id) => ALL.find((x) => x[0] === id);
   const VIEWS = [['Front', 0, 0.10, 1], ['Three-quarter', -0.62, 0.14, 1], ['Side', -1.5708, 0.08, 1], ['Back', 3.1416, 0.12, 1], ['Face', 0.22, 0.02, 0.27]];
   const touchPhone = (navigator.maxTouchPoints > 0 || /Mobi|Android|iPhone/i.test(navigator.userAgent)) && Math.min(screen.width, screen.height) < 820;
   const small = location.hash === '#lite' ? true : location.hash === '#full' ? false : touchPhone;      // phones get the lighter model; the Full detail switch overrides
-  let stage, J;
+  let stage, J, JO = null;
   try {
     if (!window.THREE) throw new Error('three.js did not load');
+    JO = { detail: small ? 0.75 : 1, textureScale: small ? 0.75 : 1 };
     stage = makeStage(canvas, { shadow: small ? 1024 : 2048 });
-    J = makeJester({ detail: small ? 0.75 : 1, textureScale: small ? 0.75 : 1 });
+    J = makeJester(JO);
     stage.scene.add(J.root, J.fx);
   } catch (e) { err.hidden = false; err.textContent = 'This page needs WebGL to draw her. ' + (e && e.message ? e.message : ''); return; }
   const orbit = stage.orbit; orbit.az = 0; orbit.el = 0.10; orbit.target.y = 0.95;
@@ -50,6 +52,52 @@
     press(); bookT0 = time;
   }
   for (const [label, az, el, face] of VIEWS) chip(viewRow, label, () => { viewAz = az; viewEl = el; faceTo = face < 1 ? 1 : 0; spin = false; spinChip.setAttribute('aria-pressed', 'false'); });
+  // ---- walking her around: a pad on the stage (or W A S D / arrows, Shift to run, Space to jump); she moves the way the pad points, as the camera sees it ----
+  const ROAM_R = 2.85, WALKS = { talk: 1, jump: 1, wave: 1, laugh: 1 };            // moves she can make while walking
+  const roam = { on: false, x: 0, z: 0, face: 0, vx: 0, vz: 0, jx: 0, jy: 0, keys: {}, idleT: 0, idleNext: 7 };
+  const joy = $('joy'), knob = $('knob'); let joyId = null;
+  const joySet = (e) => { const r = joy.getBoundingClientRect(), R = r.width / 2; let x = (e.clientX - r.left - R) / (R * 0.72), y = (e.clientY - r.top - R) / (R * 0.72); const m = Math.hypot(x, y); if (m > 1) { x /= m; y /= m; } roam.jx = x; roam.jy = -y; knob.style.transform = 'translate(' + (x * R * 0.72) + 'px,' + (y * R * 0.72) + 'px)'; };
+  const joyEnd = (e) => { if (e.pointerId !== joyId) return; joyId = null; roam.jx = roam.jy = 0; knob.style.transform = ''; };
+  joy.addEventListener('pointerdown', (e) => { joyId = e.pointerId; joy.setPointerCapture(e.pointerId); joySet(e); e.preventDefault(); e.stopPropagation(); });
+  joy.addEventListener('pointermove', (e) => { if (e.pointerId === joyId) { joySet(e); e.preventDefault(); } });
+  joy.addEventListener('pointerup', joyEnd); joy.addEventListener('pointercancel', joyEnd);
+  const KEYS = { KeyW: 'u', ArrowUp: 'u', KeyS: 'd', ArrowDown: 'd', KeyA: 'l', ArrowLeft: 'l', KeyD: 'r', ArrowRight: 'r', ShiftLeft: 'run', ShiftRight: 'run' };
+  addEventListener('keydown', (e) => { if (!roam.on || e.target.tagName === 'INPUT') return; if (e.code === 'Space') { setMove('jump'); e.preventDefault(); return; } const k = KEYS[e.code]; if (k) { roam.keys[k] = 1; e.preventDefault(); } });
+  addEventListener('keyup', (e) => { const k = KEYS[e.code]; if (k) roam.keys[k] = 0; });
+  addEventListener('blur', () => { roam.keys = {}; });
+  const roamChip = chip(toggleRow, 'Walk around', (b) => {
+    roam.on = !roam.on; b.setAttribute('aria-pressed', roam.on); joy.hidden = !roam.on; JO.treadmill = roam.on ? false : undefined; stage.lanterns.visible = roam.on;
+    spin = false; spinChip.setAttribute('aria-pressed', 'false');
+    if (roam.on) { if (state === 'walk' || state === 'run') setState('idle'); viewAz = orbit.az; viewEl = 0.22; }
+    else { roam.x = roam.z = roam.face = roam.vx = roam.vz = roam.jx = roam.jy = 0; roam.keys = {}; J.root.position.set(0, 0, 0); J.root.rotation.y = 0; orbit.target.z = 0; stage.follow(0, 0); if (state === 'idle') { wbTo = rbTo = 0; } viewAz = 0; viewEl = 0.10; }
+  }, false);
+  $('states').prepend(roamChip);                    // first in the Body row, right under the stage
+  function roamStep(dt) {
+    let ix = roam.jx + (roam.keys.r ? 1 : 0) - (roam.keys.l ? 1 : 0), iy = roam.jy + (roam.keys.u ? 1 : 0) - (roam.keys.d ? 1 : 0), mag = Math.hypot(ix, iy);
+    if (mag > 1) { ix /= mag; iy /= mag; mag = 1; }
+    const keysOn = roam.keys.u || roam.keys.d || roam.keys.l || roam.keys.r; if (keysOn && !roam.keys.run && mag > 0.55) { ix *= 0.55 / mag; iy *= 0.55 / mag; mag = 0.55; }
+    const a = J.action;
+    if (mag > 0.08) {
+      if (a && !WALKS[a] && find(a) && QUIET.indexOf(find(a)) >= 0) J.stop();          // a small idle thing gives way at once
+      if (J.STANCES.indexOf(state) >= 0) setState('idle');                              // she gets up before she goes
+    }
+    const free = !J.stanceNow && !J.stance && !(J.action && !WALKS[J.action]) && !J.pending;
+    if (!free) mag = 0;
+    const run = Math.max(0, Math.min(1, (mag - 0.6) / 0.35)), speed = mag < 0.08 ? 0 : (0.25 + 0.42 * Math.min(1, mag / 0.6)) * (1 - run) + 2.3 * run;
+    const fx = -Math.sin(orbit.az), fz = -Math.cos(orbit.az), rx = Math.cos(orbit.az), rz = -Math.sin(orbit.az), m = mag > 1e-4 ? speed / mag : 0;
+    const tx = (rx * ix + fx * iy) * m, tz = (rz * ix + fz * iy) * m, k = Math.min(1, dt * 7);
+    roam.vx += (tx - roam.vx) * k; roam.vz += (tz - roam.vz) * k;
+    const v = Math.hypot(roam.vx, roam.vz);
+    roam.x += roam.vx * dt; roam.z += roam.vz * dt;
+    const d = Math.hypot(roam.x, roam.z); if (d > ROAM_R) { roam.x *= ROAM_R / d; roam.z *= ROAM_R / d; }      // the edge of the stage
+    if (v > 0.06) { let df = Math.atan2(roam.vx, roam.vz) - roam.face; df = Math.atan2(Math.sin(df), Math.cos(df)); roam.face += df * Math.min(1, dt * 9); }
+    wbTo = Math.min(1, v / 0.3); rbTo = Math.max(0, Math.min(1, (v - 0.8) / 1.1));
+    wb += (wbTo - wb) * Math.min(1, dt * 8); rb += (rbTo - rb) * Math.min(1, dt * 5);
+    if (wb > 0.001) phase += dt * Math.max(2.2, v * (10.1 * (1 - rb) + 4.2 * rb));       // her feet keep pace with the ground she covers
+    J.root.position.set(roam.x, 0, roam.z); J.root.rotation.y = roam.face + J.spin;
+    orbit.target.x += (roam.x - orbit.target.x) * Math.min(1, dt * 5); orbit.target.z += (roam.z - orbit.target.z) * Math.min(1, dt * 5); stage.follow(roam.x, roam.z);
+    return v;
+  }
   const spinChip = chip(toggleRow, 'Turntable', (b) => { spin = !spin; viewAz = null; b.setAttribute('aria-pressed', spin); }, false);
   chip(toggleRow, 'Flipbook', (b) => { showBook = !showBook; b.setAttribute('aria-pressed', showBook); if (!showBook) $('book').hidden = true; }, true);
   chip(toggleRow, 'Flipbook look', (b) => { stage.look = stage.look === 'flipbook' ? 'smooth' : 'flipbook'; b.setAttribute('aria-pressed', stage.look === 'flipbook'); }, false);
@@ -99,10 +147,14 @@
   function frame(now) {
     requestAnimationFrame(frame);
     let dt = Math.min(0.05, (now - last) / 1000); last = now; if (slow) dt *= 0.5;
-    time += dt; wb += (wbTo - wb) * Math.min(1, dt * 5); rb += (rbTo - rb) * Math.min(1, dt * 3.5); if (wb > 0.001) phase += dt * (4.9 + 4.1 * rb);
+    time += dt; let going = 0;
+    if (roam.on) going = roamStep(dt);
+    else { wb += (wbTo - wb) * Math.min(1, dt * 5); rb += (rbTo - rb) * Math.min(1, dt * 3.5); if (wb > 0.001) phase += dt * (4.9 + 4.1 * rb); J.root.rotation.y = J.spin; }
     if (move && !J.action && !J.pending) { move = ''; press(); bookT0 = time; }
+    // left standing, she looks about or settles her weight now and then
+    if (state === 'idle' && !move && !J.action && going < 0.05 && wbTo === 0) { roam.idleT += dt; if (roam.idleT > roam.idleNext) { roam.idleT = 0; roam.idleNext = 6 + Math.random() * 7; J.play(Math.random() < 0.5 ? 'look_around' : 'settle', false); } } else roam.idleT = 0;
     J.animate(phase, wb, time, dt, rb);
-    { const m = find(move || state), cam = m[4] && J.action === m[0] ? m[4](J.time) : null; needHalf = cam ? cam[0] : m[2]; needV = m[3] || 1.12; camX += ((cam ? cam[1] : 0) - camX) * Math.min(1, dt * 3); orbit.target.x = camX; }
+    { const m = find(move || state), cam = m[4] && J.action === m[0] ? m[4](J.time) : null; needHalf = cam ? cam[0] : m[2]; needV = m[3] || 1.12; camX += ((cam ? cam[1] : 0) - camX) * Math.min(1, dt * 3); if (roam.on) needHalf = Math.max(needHalf, 1.05); else orbit.target.x = camX; }
     // camera: fit the move, ease to a chosen view, or turn slowly
     if (spin) orbit.az += dt * 0.5;
     if (viewAz != null) { let d = viewAz - orbit.az; d = Math.atan2(Math.sin(d), Math.cos(d)); orbit.az += d * Math.min(1, dt * 5); orbit.el += (viewEl - orbit.el) * Math.min(1, dt * 5); if (Math.abs(d) < 0.003) viewAz = null; }

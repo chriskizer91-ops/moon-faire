@@ -31,11 +31,19 @@ function makeStage(canvas, o) {
   const gr = fg.createRadialGradient(256, 256, 0, 256, 256, 256); gr.addColorStop(0, '#463c54'); gr.addColorStop(0.5, '#3c3248'); gr.addColorStop(1, '#383043');
   fg.fillStyle = gr; fg.fillRect(0, 0, 512, 512);
   fg.strokeStyle = 'rgba(214,168,78,0.20)'; fg.lineWidth = 2; for (const r of [70, 74, 150]) { fg.beginPath(); fg.arc(256, 256, r, 0, 7); fg.stroke(); }
+  fg.strokeStyle = 'rgba(214,168,78,0.13)'; fg.lineWidth = 1.5; fg.setLineDash([7, 9]); fg.beginPath(); fg.arc(256, 256, 216, 0, 7); fg.stroke(); fg.setLineDash([]);       // the edge she can walk to
+  for (let k = 0; k < 16; k++) { const a = k / 16 * Math.PI * 2, r0 = k % 2 ? 150 : 74, r1 = 216; fg.strokeStyle = 'rgba(214,168,78,' + (k % 2 ? 0.07 : 0.11) + ')'; fg.beginPath(); fg.moveTo(256 + r0 * Math.cos(a), 256 + r0 * Math.sin(a)); fg.lineTo(256 + r1 * Math.cos(a), 256 + r1 * Math.sin(a)); fg.stroke(); }
+  fg.fillStyle = 'rgba(214,168,78,0.22)'; for (let k = 0; k < 8; k++) { const a = k / 8 * Math.PI * 2; fg.save(); fg.translate(256 + 150 * Math.cos(a), 256 + 150 * Math.sin(a)); fg.rotate(a + Math.PI / 4); fg.fillRect(-3.5, -3.5, 7, 7); fg.restore(); }
   const ft = new THREE.CanvasTexture(fc); ft.encoding = THREE.sRGBEncoding;
   const floor = new THREE.Mesh(new THREE.CircleGeometry(3.4, 64), new THREE.MeshBasicMaterial({ map: ft, toneMapped: false }));
   floor.rotation.x = -Math.PI / 2; scene.add(floor);
   const shadowCatcher = new THREE.Mesh(new THREE.CircleGeometry(3.4, 32), new THREE.ShadowMaterial({ opacity: 0.42, color: 0x120a18 }));
   shadowCatcher.rotation.x = -Math.PI / 2; shadowCatcher.position.y = 0.002; shadowCatcher.receiveShadow = true; scene.add(shadowCatcher);
+  // lanterns round the edge, lit when she is free to walk about
+  const lanterns = new THREE.Group(); lanterns.visible = false; scene.add(lanterns);
+  { const post = new THREE.MeshBasicMaterial({ color: 0x06040a, toneMapped: false }), glow = new THREE.MeshBasicMaterial({ color: 0xffd9a0, toneMapped: false }), halo = new THREE.MeshBasicMaterial({ color: 0xc88cff, transparent: true, opacity: 0.16, depthWrite: false, toneMapped: false });
+    for (let k = 0; k < 8; k++) { const a = (k + 0.5) / 8 * Math.PI * 2, x = 3.12 * Math.sin(a), z = 3.12 * Math.cos(a);
+      const p = new THREE.Mesh(new THREE.CylinderGeometry(0.014, 0.022, 1.0, 8), post); p.position.set(x, 0.5, z); const g = new THREE.Mesh(new THREE.SphereGeometry(0.05, 14, 10), glow); g.position.set(x, 1.06, z); const h = new THREE.Mesh(new THREE.SphereGeometry(0.13, 14, 10), halo); h.position.copy(g.position); lanterns.add(p, g, h); } }
   // orbit: azimuth 0 looks at her face (the camera sits on +Z)
   const orbit = { az: 0, el: 0.06, dist: 6.4, target: new THREE.Vector3(0, 0.93, 0), fov: 22 };
   function placeCamera() {
@@ -75,5 +83,6 @@ function makeStage(canvas, o) {
     renderer.setRenderTarget(rt); renderer.clear(); renderer.render(scene, camera); renderer.setRenderTarget(null);
     renderer.setClearColor(0x000000, oc); renderer.render(postScene, postCam);
   }
-  return Object.assign(api, { renderer, scene, camera, orbit, key, rim, rim2, hemi, fill, floor, shadowCatcher, resize, render, placeCamera, BG });
+  const follow = (x, z) => { key.position.set(x + 1.7, 3.6, z + 3.2); key.target.position.set(x, 0.9, z); key.target.updateMatrixWorld(); };      // the light and its shadow go where she goes
+  return Object.assign(api, { renderer, scene, camera, orbit, key, rim, rim2, hemi, fill, floor, shadowCatcher, lanterns, follow, resize, render, placeCamera, BG });
 }

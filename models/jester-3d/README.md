@@ -118,6 +118,28 @@ bent the wrong way. Feet now have a seventh number: how far the foot follows its
 Not yet done: the bow is stiff (it does not swing); the boot's leather is one piece of colour, with no painted wear; the thick
 sole still bends at the ball when she rises on her toes.
 
+## Walking her around, and more moves (pass 17, November 11, 2026)
+
+Chris: "I want to see more of her moves animated, or like more animation done to her moves, and the ability to walk her around
+a small space".
+
+**Walk around** (viewer only: `viewer/app.js`, `roamStep`). A switch at the head of the Body row puts a round pad on the stage.
+She moves the way the pad points as the camera sees it, turns to face the way she goes, walks at up to about 0.7 m/s and runs
+at 2.3 m/s when the pad is pushed to its edge. Keys: W A S D or arrows, Shift to run, Space to jump. The stage is a circle
+2.85 m in radius with lanterns round it (`stage.lanterns`), and the key light and its shadow follow her (`stage.follow`).
+Her step keeps pace with the ground she covers (the phase advances by distance, about 10.1 a meter walking and 4.2 running).
+The model is told it is not on a treadmill (`opts.treadmill = false`), so the cloth trails from her real motion. She gets up
+before she goes if she is sitting, stands still to cast, and can talk, wave, laugh or jump on the move.
+
+**New moves** (`src/86_moves.js`): `wave`, `bow` (a deep one, one foot drawn back), `twirl` (two turns on the ball of her right
+foot), `laugh`, `dance` (a jig with a finish), and two she does by herself when left standing, `look_around` and `settle`
+(the viewer plays one every 6 to 13 seconds). A move can now turn her whole body: `spin: [[time, angle], ...]` on a move, read
+by the host as `J.spin` and added to the root's turn. The twirl ends on a whole number of turns, so nothing unwinds.
+
+Checked: the new moves over standing, the stool and the hover, and a walk with a wave, ran with no errors; stills were looked
+at; the walk pad was driven with keys in a headless browser and she went where she was sent. Not checked: how any of it feels
+at real speed, and the pad under a real thumb.
+
 ## Building
 
 The scripts use the absolute path `/home/claude/work`. In a fresh session:

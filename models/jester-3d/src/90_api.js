@@ -11,7 +11,7 @@
     return out;
   }
   const torso0inv = torsoM(REST, new THREE.Matrix4()).invert();
-  const LEGS = { hip: 1, hipR: 1, ftR: 1, ftL: 1, knR: 1, knL: 1 };
+  const LEGS = { hip: 1, hipR: 1, ftR: 1, ftL: 1, knR: 1, knL: 1 }; let spinNow = 0;
   function animate(phase, wb, t, dt, rb) {
     dt = dt > 0 ? Math.min(dt, 0.05) : 0; st.time = t; wb = wb || 0; rb = rb || 0;
     // the stance clock: forward to settle into a stance, backward to stand up out of it
@@ -28,11 +28,12 @@
       torsoM(stPose, torsoD).multiply(torso0inv); torsoQ.setFromRotationMatrix(torsoD);
     }
     if (pending && !stance && !stanceTo) { const n = pending; pending = ''; play(n, true); }
-    let P = base;
+    let P = base; spinNow = 0;
     if (act) {
       act.t += dt;
       if (act.t >= act.dur && !act.def.hold) { if (act.def.end) act.def.end(act); act = null; }
       else {
+        if (act.def.spinT) spinNow = evalTrack(act.def.spinT, Math.min(act.t, act.dur));
         const tt = Math.min(act.t, act.dur), tr = act.def.tracks, w = sm(0, 0.18, tt) * (act.def.hold ? 1 : 1 - sm(act.dur - 0.22, act.dur, tt));
         for (const k of CHANS) {
           if (tr[k] && !(stance && LEGS[k])) {
@@ -93,7 +94,8 @@
     root, fx, skeleton, bones, animate, play, ACTIONS, anchor, setFade, state, setStance, STANCES: STANCE_LIST,
     stop() { act = null; pending = ''; },
     reset() { act = null; pending = ''; stance = null; stanceTo = ''; resetCloth(); for (const c of chains) c.reset(); },
-    get stance() { return stanceTo; }, get stanceNow() { return stance ? stance.name : ''; }, get stanceProgress() { return stance ? stance.t / stance.def.dur : 0; }, get pending() { return pending; },
+    get stance() { return stanceTo; }, get spin() { return spinNow; },      // spin: the host adds this to the root's turn (a twirl)
+    get stanceNow() { return stance ? stance.name : ''; }, get stanceProgress() { return stance ? stance.t / stance.def.dur : 0; }, get pending() { return pending; },
     get fade() { return fade; }, get busy() { return !!act && !(act.def.hold && act.t >= act.dur); }, get action() { return act ? act.type : ''; },
     get progress() { return act ? Math.min(1, act.t / act.dur) : -1; }, get time() { return act ? act.t : -1; },
     get triangles() { return triCount; }, get dim() { return dimNow; }, set wind(v) { userWind.copy(v); }, get wind() { return userWind; },
