@@ -1006,7 +1006,7 @@ function makeFox(opts) {
   }
 
   // ---------- head: a sculpted oval with soft features; the face itself is painted (and repainted to blink) ----------
-  const HC = V3(0, 1.555, 0.002), HR = { x: 0.072, yT: 0.092, yB: 0.147, zF: 0.0985, zB: 0.083 };     // skull: lower crown and shallower back, as in her profile
+  const HC = V3(0, 1.555, 0.002), HR = { x: 0.0735, yT: 0.092, yB: 0.1381, zF: 0.0985, zB: 0.083 };     // skull: lower crown and shallower back, as in her profile
   const LAY = (BAKED && BAKED.layout) || {};          // where the features sit in the painted face
   const FC = { eyeY: LAY.eyeY || 1.5246, eyeX: LAY.eyeX || 0.0304, ew: 0.0135, eh: 0.0056, browY: LAY.browY || 1.5368, noseY: LAY.noseY || 1.4877, mouthY: LAY.mouthY || 1.4586 };
   const FACE = { x0: -0.1, x1: 0.1, y0: 1.385, y1: 1.585 };          // the face canvas covers this window, seen from the front
@@ -1015,14 +1015,16 @@ function makeFox(opts) {
   // FACE_MID is the middle line with the nose and lips taken away [height, metres forward of the ear line], NOSE is how far the
   // nose stands out from it, and FACE_V says how the face turns back toward the ears at each height (0: round like an egg;
   // more: straighter from chin to jaw, the way a jaw is; less than 0: flat across, the way a brow is).
-  const FACE_MID = [[1.4174, 0.0825], [1.4200, 0.0861], [1.4240, 0.0887], [1.4300, 0.0884], [1.4380, 0.0891], [1.4454, 0.0908], [1.4520, 0.0921], [1.4586, 0.0941], [1.4630, 0.0952], [1.4680, 0.0954],
-    [1.4747, 0.0956], [1.4800, 0.0956], [1.4900, 0.0947], [1.5000, 0.0943], [1.5100, 0.0948], [1.5220, 0.0946], [1.5300, 0.0964], [1.5387, 0.1000], [1.5500, 0.0989], [1.5550, 0.0985]];
-  const NOSE = [[1.4680, 0], [1.4700, 0.0019], [1.4720, 0.0031], [1.4747, 0.0035], [1.4760, 0.0040], [1.4774, 0.0052], [1.4787, 0.0104], [1.4800, 0.0135], [1.4840, 0.0172], [1.4880, 0.0189], [1.4920, 0.0171], [1.4980, 0.0125], [1.5040, 0.0092], [1.5100, 0.0059], [1.5160, 0.0023], [1.5220, 0.0004], [1.5260, 0]];
-  const NOSE_W = [[1.4680, 0.0050], [1.4760, 0.0050], [1.4800, 0.0064], [1.4880, 0.0094], [1.4960, 0.0078], [1.5080, 0.0060], [1.5260, 0.0056]];
+  const FACE_MID = [[1.4214, 0.0978], [1.4267, 0.0991], [1.4306, 0.0993], [1.4321, 0.0993], [1.4374, 0.0988], [1.4410, 0.0989], [1.4428, 0.0994], [1.4481, 0.1009], [1.4526, 0.1015], [1.4535, 0.1016], [1.4586, 0.1025], [1.4588, 0.1026], [1.4642, 0.1040], [1.4678, 0.1043], [1.4695, 0.1045], [1.4748, 0.1052], [1.4783, 0.1050], [1.4802, 0.1048], [1.4855, 0.1040], [1.4909, 0.1034], [1.4962, 0.1027], [1.5016, 0.1020], [1.5069, 0.1014], [1.5122, 0.1008], [1.5176, 0.1002], [1.5229, 0.0995], [1.5283, 0.0988], [1.5305, 0.0985], [1.5336, 0.0985], [1.5390, 0.0990], [1.5443, 0.0992], [1.5497, 0.0990], [1.5550, 0.0986]];
+  const NOSE = [[1.4783, 0.0000], [1.4816, 0.0017], [1.4848, 0.0095], [1.4881, 0.0144], [1.4914, 0.0167], [1.4934, 0.0174], [1.4946, 0.0174], [1.4979, 0.0161], [1.5011, 0.0135], [1.5044, 0.0101], [1.5077, 0.0078], [1.5109, 0.0060], [1.5142, 0.0042], [1.5174, 0.0026], [1.5207, 0.0009], [1.5240, 0.0000], [1.5272, 0.0000], [1.5305, 0.0000]];
+  const NOSE_W = [[1.4783, 0.0052], [1.4855, 0.0054], [1.4891, 0.0070], [1.4963, 0.0100], [1.5035, 0.0082], [1.5143, 0.0062], [1.5305, 0.0058]];
+  const LIPS = {uy: 1.4678, ua: 0.0029, ly: 1.4526, la: 0.0034, chinY: 1.4306, cheekY: 1.4975, hollowY: 1.4669999999999999};
   const FACE_V = [[1.4150, 0.30], [1.4300, 0.40], [1.4450, 0.44], [1.4586, 0.40], [1.4760, 0.22], [1.4975, 0.02], [1.5246, -0.12], [1.5400, -0.10], [1.5550, 0]];
   // how wide a ring of the lower head is, from 1 at the cheeks to 0 under the chin: the last tenth closes quickly, so the jaw has an edge and a flat underside
-  const SIN9 = Math.sqrt(1 - 0.81), SN9 = Math.pow(SIN9, 0.60), snLow = (sp, t) => (t > 0.9 ? SN9 * Math.pow(sp / SIN9, 0.40) : Math.pow(sp, 0.60));
+  const SIN9 = Math.sqrt(1 - 0.81), SN9 = Math.pow(SIN9, 0.50), snLow = (sp, t) => (t > 0.9 ? SN9 * Math.pow(sp / SIN9, 0.40) : Math.pow(sp, 0.50));
   const T_CHIN = (HC.y - FACE_MID[0][0]) / HR.yB, SN_CHIN = snLow(Math.sqrt(1 - T_CHIN * T_CHIN), T_CHIN), RZ_CHIN = FACE_MID[0][1] - 0.050 * T_CHIN * T_CHIN * T_CHIN;
+  // the underside of her jaw by depth [metres forward of the ear line, height]: nape, under the ear lobe, the corner of the jaw, then the long run forward to the chin
+  const JAW = [[-0.060, 1.490], [-0.030, 1.484], [0.004, 1.472], [0.022, 1.452], [0.040, 1.434], [0.052, 1.4225], [0.090, 1.4185], [0.130, 1.4150]];
   function headPoint(a, ph, grow) {                 // a: angle from the front toward her left; ph: 0 at the crown, PI at the chin
     const yn = Math.cos(ph), s = Math.sin(a), c = Math.cos(a), g = grow || 0, t = Math.max(0, -yn), sn = yn < 0 ? snLow(Math.sin(ph), t) : Math.sin(ph);
     let y = (yn >= 0 ? HR.yT : HR.yB) * yn + g * yn; const Y = HC.y + (yn >= 0 ? HR.yT : HR.yB) * yn;
@@ -1037,20 +1039,21 @@ function makeFox(opts) {
         const f = c, ax = Math.abs(x), G = (dx, dy, wx, wy) => Math.exp(-Math.pow(dx / wx, 2) - Math.pow(dy / wy, 2));
         let d = 0; const NT = FC.noseY;
         // nose: the bridge and the ball of the tip, the wings of the nostrils, the folds where they meet the cheek, the hollows under it
-        if (Y > 1.468 && Y < 1.526) d += spline(NOSE, Y) * Math.exp(-Math.pow(x / spline(NOSE_W, Y), 2));
+        if (Y > NOSE[0][0] && Y < NOSE[NOSE.length - 1][0]) d += spline(NOSE, Y) * Math.exp(-Math.pow(x / spline(NOSE_W, Y), 2));
         d += 0.0062 * G(ax - 0.0116, Y - (NT - 0.0054), 0.0052, 0.0052) - 0.0014 * G(ax - 0.0186, Y - (NT - 0.0040), 0.0030, 0.0066) - 0.0030 * G(ax - 0.0062, Y - (NT - 0.0096), 0.0030, 0.0021);
-        d -= 0.0064 * G(ax - FC.eyeX, Y - FC.eyeY, 0.017, 0.0105) + 0.0026 * G(ax - 0.014, Y - (FC.eyeY - 0.002), 0.007, 0.010);   // eye sockets, deepest beside the bridge
-        d += 0.0030 * G(ax - 0.027, Y - (FC.browY + 0.002), 0.026, 0.008);                        // brow
-        d += 0.0030 * G(ax - FC.eyeX, Y - FC.eyeY, 0.0105, 0.0066) - 0.0010 * G(ax - FC.eyeX, Y - (FC.eyeY + 0.0088), 0.014, 0.0024);   // the eyeball rounding out of its socket, and the crease of the lid above it
-        d += 0.0040 * G(ax - 0.043, Y - 1.4975, 0.020, 0.016) - 0.0022 * G(ax - 0.047, Y - 1.4670, 0.016, 0.014);   // cheekbones, and the hollow under them
+        d -= 0.0080 * G(ax - FC.eyeX, Y - FC.eyeY, 0.017, 0.0105) + 0.0036 * G(ax - 0.014, Y - (FC.eyeY - 0.002), 0.007, 0.010);   // eye sockets, deepest beside the bridge
+        d += 0.0048 * G(ax - 0.030, Y - (FC.browY + 0.002), 0.028, 0.0066);                        // brow
+        d += 0.0040 * G(ax - FC.eyeX, Y - FC.eyeY, 0.0118, 0.0062) - 0.0017 * G(ax - FC.eyeX, Y - (FC.eyeY + 0.0086), 0.014, 0.0022) - 0.0008 * G(ax - FC.eyeX, Y - (FC.eyeY - 0.0090), 0.013, 0.0024);   // the eyeball rounding out of its socket, and the crease of the lid above it
+        d += 0.0040 * G(ax - 0.046, Y - LIPS.cheekY, 0.020, 0.016) - 0.0022 * G(ax - 0.050, Y - LIPS.hollowY, 0.016, 0.014);   // cheekbones, and the hollow under them
         d -= 0.0010 * G(x, Y - (FC.mouthY + 0.0135), 0.0034, 0.0055);                             // the groove under the nose
-        d += 0.0056 * G(x, Y - (FC.mouthY + 0.0058), 0.020, 0.0054) + 0.0044 * G(x, Y - (FC.mouthY - 0.0074), 0.016, 0.0054);  // lips
+        d += LIPS.ua * G(x, Y - LIPS.uy, 0.020, 0.0054) + LIPS.la * G(x, Y - LIPS.ly, 0.016, 0.0054);  // lips
         d -= 0.0016 * G(ax - 0.024, Y - FC.mouthY, 0.006, 0.008);                                 // corners of the mouth
-        d += 0.0026 * G(x, Y - 1.4300, 0.017, 0.0095);                                            // the ball of the chin
+        d += 0.0026 * G(x, Y - LIPS.chinY, 0.017, 0.0095);                                            // the ball of the chin
         z += d * f;
       }
     }
     if (t > 0.86) y += 0.30 * Math.max(0, 0.083 - z) * sm(0.86, 0.985, t);        // under the jaw the skin rises toward the throat
+    if (!g && yn < 0) { const yb = spline(JAW, z) - HC.y, e = 0.0035; y = 0.5 * (y + yb + Math.sqrt((y - yb) * (y - yb) + e * e)); }     // her jawline (C3, profile): nothing of the head hangs below it
     return [HC.x + x, HC.y + y, HC.z + z];
   }
   const wHead = wOne('head'), faceMix = [], faceUvS = [];
@@ -1077,7 +1080,7 @@ function makeFox(opts) {
     }
     // neck
     const np = [V3(0, 1.30, -0.014), V3(0, 1.345, -0.012), V3(0, 1.40, -0.006), V3(0, 1.45, 0)], nr = [0.050, 0.046, 0.043, 0.046];
-    const nrings = tubeRings(curvePts(np, 8), [0.048, 0.046, 0.044, 0.042, 0.041, 0.041, 0.043, 0.046], Q(24, 12), V3(0, 0, 1));
+    const nrings = tubeRings(curvePts(np, 8), [0.029, 0.028, 0.026, 0.025, 0.025, 0.025, 0.026, 0.028], Q(24, 12), V3(0, 0, 1));
     const nk = addPart(MIXED ? 'face' : 'skin', loft(nrings), (x, y) => { const u = sm(1.33, 1.37, y), v = sm(1.385, 1.43, y); return [BI.spine3, 1 - u, BI.neck, u * (1 - v), BI.head, u * v]; }, { out: V3(0, 1.38, -0.01) });
     if (MIXED) for (let i = nk.start; i < nk.start + nk.count; i++) { faceMix.push(0, 1, 1 - 0.38 * sm(1.330, 1.428, FB.pos[i * 3 + 1])); faceUvS.push(0, 0); }     // the neck is plain skin, dim where the jaw shades it
   })();
@@ -1301,15 +1304,15 @@ function makeFox(opts) {
   const HAIR_SEED = { s: 9173 };
   const hrnd = () => (HAIR_SEED.s = (HAIR_SEED.s * 16807) % 2147483647) / 2147483647, hrr = (a, b) => a + (b - a) * hrnd();   // its own stream, so adding hair moves nothing else
   (function foxNeck() {                              // the head shrinks about its joint, which would leave the Jester's neck too thin for her: her own, read off A1
-    const rings = tubeRings([V3(0, 1.335, -0.010), V3(0, 1.356, -0.009), V3(0, 1.378, -0.006), V3(0, 1.400, -0.002), V3(0, 1.420, 0.003)], [[0.054, 0.048], [0.0425, 0.0415], [0.0390, 0.0382], [0.0375, 0.0370], [0.0360, 0.0360]], Q(28, 14), V3(0, 0, 1));
+    const rings = tubeRings([V3(0, 1.335, -0.008), V3(0, 1.356, -0.005), V3(0, 1.378, 0.000), V3(0, 1.398, 0.005), V3(0, 1.420, 0.008), V3(0, 1.450, 0.004), V3(0, 1.480, -0.004)], [[0.055, 0.051], [0.0445, 0.0462], [0.0418, 0.0450], [0.0408, 0.0445], [0.0412, 0.0448], [0.0440, 0.0470], [0.0430, 0.0455]], Q(28, 14), V3(0, 0, 1));      // from C3: about 9 cm through and 9.5 cm across, leaning forward to meet the jaw 4.5 cm behind the chin
     addPart('skin', loft(rings), (x, y) => { const v = sm(1.385, 1.43, y); return [BI.neck, 1 - 0.5 * v, BI.head, 0.5 * v]; }, { out: V3(0, 1.37, 0) });
   })();
 
   (function foxChoker() {                            // the rose leather collar at the foot of her neck, and its brass bell (F1). It also covers the join of neck and chest.
-    const y0 = 1.3755, h = 0.0092, NU = Q(40, 24), rr = (d) => { const ring = []; for (let j = 0; j < NU; j++) { const a = (j / NU) * TAU; ring.push([(0.0440 + d) * Math.sin(a), 0, -0.0075 + (0.0432 + d) * Math.cos(a)]); } return ring; };
-    const lift = (ring, y) => ring.map((p) => [p[0], y + 0.010 * (0.5 - 0.5 * Math.cos(Math.atan2(p[0], p[2] + 0.0075))), p[2]]);      // it sits lower at the front than at the back
+    const y0 = 1.3755, h = 0.0092, NU = Q(40, 24), rr = (d) => { const ring = []; for (let j = 0; j < NU; j++) { const a = (j / NU) * TAU; ring.push([(0.0462 + d) * Math.sin(a), 0, -0.0040 + (0.0482 + d) * Math.cos(a)]); } return ring; };
+    const lift = (ring, y) => ring.map((p) => [p[0], y + 0.010 * (0.5 - 0.5 * Math.cos(Math.atan2(p[0], p[2] + 0.0040))), p[2]]);      // it sits lower at the front than at the back
     addPart('choker', loft([lift(rr(-0.002), y0 - h), lift(rr(0.0024), y0 - h * 0.8), lift(rr(0.0030), y0), lift(rr(0.0024), y0 + h * 0.8), lift(rr(-0.002), y0 + h)]), () => [BI.neck, 1], { out: V3(0, y0, 0) });
-    const zb = -0.0075 + 0.0432 + 0.0105, yb = y0 - h - 0.0125;
+    const zb = -0.0040 + 0.0482 + 0.0105, yb = y0 - h - 0.0125;
     addPart('bellm', spherePart(V3(0, yb, zb), 0.0112, 0.0112, 0.0112, Q(18, 12), Q(12, 8)), () => [BI.neck, 1], { out: V3(0, yb, zb) });
     addPart('bellm', spherePart(V3(0, yb + 0.0125, zb - 0.004), 0.0030, 0.0042, 0.0030, 8, 6), () => [BI.neck, 1], { out: V3(0, yb + 0.0125, zb - 0.004) });
   })();
@@ -1332,7 +1335,7 @@ function makeFox(opts) {
 
   // the body of her hair: a soft dark mass standing off her head at the sides and back, which the curls sit on. None of it over her face.
   const massGrow = (a, ph) => {
-    const side = sm(1.20, 1.55, Math.abs(a)), v = sm(lerp(0.78, 0.40, sm(2.2, 2.8, Math.abs(a))), lerp(1.15, 0.85, sm(2.2, 2.8, Math.abs(a))), ph) * (1 - sm(2.05, 2.45, ph));      // it starts below her costume ears at the sides, higher at the back
+    const side = sm(1.20, 1.55, Math.abs(a)), v = sm(lerp(0.78, 0.40, sm(2.2, 2.8, Math.abs(a))), lerp(1.15, 0.85, sm(2.2, 2.8, Math.abs(a))), ph) * (1 - sm(lerp(1.22, 2.0, sm(1.9, 2.6, Math.abs(a))), lerp(1.50, 2.4, sm(1.9, 2.6, Math.abs(a))), ph)) * lerp(0.62, 1, sm(1.9, 2.6, Math.abs(a)));      // C3: her hair is drawn up off her ears and neck, so at the sides the mass stops above the ear; at the back it runs to the nape
     const lump = 0.008 * Math.sin(a * 5 + ph * 3.1) * Math.sin(ph * 6.3 - a * 2) + 0.005 * Math.sin(a * 11 + ph * 7);
     const full = 0.030 + 0.028 * sm(0.8, 1.7, ph) * (1 - 0.4 * sm(2.0, 2.4, ph));
     return lerp(-0.012, full + lump, side * v);
@@ -1363,7 +1366,7 @@ function makeFox(opts) {
     addPart('curl', loft(rings, { capB: true, u0: hrnd(), uS: 0.22 }), wHead, { out: centroidOf(rings) });
   }
   (function foxBun() {                               // the messy ponytail bun: ringlets spilling every way out of one knot high on the back of her head
-    const B0 = V3(0, 1.668, -0.066), lean = V3(0, 0.45, -0.89).normalize(), N = Q(210, 120);
+    const B0 = V3(0, 1.672, -0.074), lean = V3(0, 0.45, -0.89).normalize(), N = Q(210, 120);
     addPart('scalp', spherePart(B0, 0.062, 0.058, 0.058, Q(28, 14), Q(18, 10)), wHead, { out: B0 });
     for (let k = 0; k < N; k++) {
       let d; do { const u = hrr(-1, 1), th = hrr(0, TAU), s = Math.sqrt(1 - u * u); d = V3(s * Math.cos(th), u, s * Math.sin(th)); } while (d.dot(lean) < -0.25);
@@ -1382,7 +1385,7 @@ function makeFox(opts) {
 
     const NS2 = Q(84, 46);
     for (let k = 0; k < NS2; k++) {                  // wavy locks lying down the mass, from the top of it to its hem
-      const s = k % 2 ? 1 : -1, a0 = s * hrr(1.27, PI), ph0 = hrr(0.80, 1.25), ph1 = hrr(1.9, 2.45), da = hrr(-0.18, 0.18), wob = hrr(0.03, 0.07), f = hrr(2, 4), p0 = hrr(0, TAU);
+      const s = k % 2 ? 1 : -1, a0 = s * hrr(1.27, PI), ph0 = hrr(0.80, 1.25), ph1 = Math.min(hrr(1.9, 2.45), lerp(1.42, 2.3, sm(1.9, 2.6, Math.abs(a0)))), da = hrr(-0.18, 0.18), wob = hrr(0.03, 0.07), f = hrr(2, 4), p0 = hrr(0, TAU);
       ringlet((t) => { const ph = lerp(ph0, ph1, t), a = a0 + da * t + wob * Math.sin(t * f * PI + p0); return V3(...headPoint(a, ph, massGrow(a, ph) + 0.003 + 0.004 * t)); }, hrr(0.004, 0.008), hrr(2.5, 5), hrr(0.0060, 0.0085), hrr(0, TAU));
     }
     for (const s of [-1, 1]) for (let k = 0; k < 11; k++) {      // the hair swept off her parting to each side, over the corners of her forehead
@@ -1392,7 +1395,7 @@ function makeFox(opts) {
     const NF = Q(230, 110);
     for (let k = 0; k < NF; k++) {                   // the halo: shorter curls standing out from the hair itself, all round
       let a = hrr(-PI, PI); if (Math.abs(a) < 1.38) a = Math.sign(a || 1) * hrr(1.38, PI);     // none sprouting over her face
-      const ph = lerp(Math.abs(a) < 2.3 ? 0.98 : 0.5, 2.2, Math.pow(hrnd(), 0.8)), root = V3(...headPoint(a, ph, Math.max(0.006, massGrow(a, ph) - 0.006))), out = root.clone().sub(HC).normalize();
+      const ph = lerp(Math.abs(a) < 2.3 ? 0.98 : 0.5, lerp(1.45, 2.2, sm(1.9, 2.6, Math.abs(a))), Math.pow(hrnd(), 0.8)), root = V3(...headPoint(a, ph, Math.max(0.006, massGrow(a, ph) - 0.006))), out = root.clone().sub(HC).normalize();
       const L = hrr(0.045, 0.095), droop = hrr(0.012, 0.040), tw = V3(hrr(-1, 1), 0, hrr(-1, 1)).multiplyScalar(0.012);
       ringlet((t) => root.clone().addScaledVector(out, L * t).add(V3(tw.x * t * t, -droop * t * t, tw.z * t * t)), hrr(0.0100, 0.0150), hrr(1.2, 2.2), hrr(0.0062, 0.0085), hrr(0, TAU));
     }
@@ -2032,7 +2035,7 @@ function makeFox(opts) {
   const skeleton = new THREE.Skeleton(bones), meshes = {};
   const FOX_K = opts.scale || 1.045;                 // the whole figure, against the Jester's frame: her legs, shoulders and chin all land on her paintings at this one number
   root.scale.setScalar(FOX_K);                       // set here, after the skeleton has taken its rest pose: set any earlier, the bones would grow and the skin would not
-  SK.spine1.scale.setScalar(UPK); SK.head.scale.setScalar(opts.headScale || 0.93); SK.head.position.y -= (opts.headDrop === undefined ? 0.0245 : opts.headDrop); root.updateMatrixWorld(true);   // horns keep their size as the head shrinks       // after the bind, so head, cap, horns and their veils all shrink about the neck
+  SK.spine1.scale.setScalar(UPK); SK.head.scale.setScalar(opts.headScale || 0.903); SK.head.position.y -= (opts.headDrop === undefined ? 0.0200 : opts.headDrop); root.updateMatrixWorld(true);   // horns keep their size as the head shrinks       // after the bind, so head, cap, horns and their veils all shrink about the neck
   let triCount = 0;
   for (const key in buckets) {
     const B = buckets[key], g = new THREE.BufferGeometry();

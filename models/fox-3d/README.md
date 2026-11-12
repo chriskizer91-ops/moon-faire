@@ -51,10 +51,23 @@ python3 shoot_site.py shots/site.png 390 844 "Wave:2" "Kneel:2"     # the page a
 
 The test machine draws about 2 frames a second, so stills can be checked there but motion cannot. Motion has to be looked at on a phone.
 
+## Her head
+
+Sheet C3 (front, 45 degrees, profile) is the master. The shape comes first, the paint second.
+
+```
+python3 -I meas/fox_profile.py       # reads C3: pupils, lip line, the profile line      -> meas/fox_profile.json, shots/c3_marks.jpg
+python3 -I meas/fox_headfit.py       # writes FACE_MID, NOSE, NOSE_W, LIPS into src/40_head.js -> meas/fox_head.json
+python3 -I bake_fox.py               # face from C3 (front panel + profile panel on the sides), corset from B1 and B4
+./build.sh && ./c3cmp.sh g1          # shots/g1_c3cmp.jpg: bare head at three angles beside C3, painted and in plain skin
+```
+
+`JAW` in `src/40_head.js` is the underside of her jaw. `bake_fox_c1.py` is the earlier bake from C1. Notes: `claude/fox-3d-pass2-head.md`.
+
 ## Her numbers
 
 - Height in boots 1.647 m, ear tips 1.717 m. About 9 heads tall, as painted.
-- Written in the Jester's frame, then the whole figure is scaled by `FOX_K = 1.045`. Head bone scale 0.93, head lowered 0.0245. Hand scale 0.86.
+- Written in the Jester's frame, then the whole figure is scaled by `FOX_K = 1.045`. Head bone scale 0.903, head lowered 0.020. Hand scale 0.86.
 - Head landmarks in A1 (rows; columns from x 508): eyes 157, pupils 54 px apart, nose base 186, mouth 208, chin 248, face 108 px wide at row 180, ear bases 88, ear tips 22.
 - Painting scales: A1 861 px a metre (soles on row 1500), B4 851 (soles 970), B1 572.4, B2 574.8.
 
@@ -68,4 +81,5 @@ The test machine draws about 2 frames a second, so stills can be checked there b
 
 ## State
 
-Pass 1 (12 Nov 2026): body, base outfit, head to A1's size with hair, ears, glasses, choker and bell. See `claude/fox-3d-pass1.md` for what is weak and what comes next.
+Pass 1 (12 Nov 2026): body, base outfit, hair, ears, glasses, choker and bell.
+Pass 2 (12 Nov 2026): head sculpted to her own profile from C3, jawline and neck, face repainted from C3. See `claude/fox-3d-pass1.md` for what is weak and what comes next.

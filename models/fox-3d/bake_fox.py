@@ -24,32 +24,57 @@ def backdrop(a, tol=(15, 13, 15)):
     return ndi.binary_dilation(np.isin(lab, e[e > 0]), iterations=2)
 T = {}
 
-# ---------------- the face (C1) ----------------
-# Landmarks read off a gridded copy of C1 (pixels): both pupils, the line between the lips, brow, nostrils, chin, hairline.
+# ---------------- the face (C3: her head from the front, at 45 degrees and in true profile, painted as one sheet) ----------------
+# The head is shaped to this sheet's profile (meas/fox_headfit.py), so the face comes from the same sheet: front panel on the front, profile panel on the sides.
+import json as _json
+HM = _json.load(open(ROOT + 'meas/fox_head.json')); RW = HM['rows']
 EYE_Y, D_EM, S = 1.5246, 0.066, 1024            # the model's eye height and eye-to-lip distance, and the canvas size
 WIN = (-0.1, 0.1, 1.385, 1.585)
-N_EYE = ((435, 497), (822, 497)); N_MOUTH = (630, 893); N_BROW = 390; N_NOSE = 745; N_CHIN = 1198; N_HAIR = 190
-PPM = (N_MOUTH[1] - N_EYE[0][1]) / D_EM; CX = (N_EYE[0][0] + N_EYE[1][0]) / 2; K = S / 0.2 / PPM
+PPM = HM['PPM']; CX = HM['cx']; N_EYE = ((CX - HM['eyeX'] * PPM, HM['eyeRow']), (CX + HM['eyeX'] * PPM, HM['eyeRow'])); N_BROW = HM['eyeRow'] - 27; N_CHIN = RW['men']; N_HAIR = 272
+K = S / 0.2 / PPM
 def n2c(x, y): return ((x - CX) / PPM - WIN[0]) / 0.2 * S, (WIN[3] - (EYE_Y - (y - N_EYE[0][1]) / PPM)) / 0.2 * S
 def warp(src, sx, tx, ty): return src.convert('RGB').transform((S, S), Image.AFFINE, (sx, 0, tx, 0, sx, ty), Image.BICUBIC)
-c1 = Image.open(IN + 'C1.png'); x0, y0 = n2c(0, 0)
-base = arr(warp(c1, 1 / K, -x0 / K, -y0 / K))
-inside = arr(warp(Image.new('RGB', c1.size, (255, 255, 255)), 1 / K, -x0 / K, -y0 / K))[..., 0] > 250
-bd = arr(warp(img(np.repeat(backdrop(arr(c1))[..., None] * 255.0, 3, 2)), 1 / K, -x0 / K, -y0 / K))[..., 0] > 128
-# the face itself: an oval from the hairline to under the chin; outside it (hair, ears' far edges, backdrop) her skin is carried outward
-jj, ii = np.mgrid[0:S, 0:S]; ex0, ey0 = n2c(CX, (N_HAIR + N_CHIN) / 2 + 30); rx_, ry_ = 395 * K, 560 * K
+c3 = Image.open(IN + 'C3.png').convert('RGB'); c1 = c3; x0, y0 = n2c(0, 0)
+from PIL import ImageFilter
+base = arr(warp(c3, 1 / K, -x0 / K, -y0 / K).filter(ImageFilter.UnsharpMask(radius=3, percent=70, threshold=2)))
+inside = arr(warp(Image.new('RGB', c3.size, (255, 255, 255)), 1 / K, -x0 / K, -y0 / K))[..., 0] > 250
+# the face itself: an oval from the hairline to under the chin; outside it (hair, backdrop) her skin is carried outward
+jj, ii = np.mgrid[0:S, 0:S]; ex0, ey0 = n2c(CX, (N_HAIR + N_CHIN) / 2 + 6); rx_, ry_ = 0.0655 * PPM * K, 0.0900 * PPM * K
 oval = ((ii - ex0) / rx_) ** 2 + ((jj - ey0) / ry_) ** 2 < 1
-valid = (oval & inside & ~bd).astype(np.float32)
-fx, fy = n2c(540, 250); gx, gy = n2c(720, 340); skin = np.median(base[int(fy):int(gy), int(fx):int(gx)].reshape(-1, 3), 0)
+# her loose curls cross the corners of the forehead in this panel: anything much darker or browner than skin is left out and filled from the skin beside it
+hairish = (base[..., 0] < 138) | (base[..., 0] - base[..., 2] > 108)
+_mx = (ii / S * 0.2 + WIN[0]); _my = WIN[3] - jj / S * 0.2; _ex = HM['eyeX']         # eyes, brows, nose and mouth are dark too, and stay
+protect = ((((np.abs(_mx) - (_ex - 0.005)) / 0.0215) ** 2 + ((_my - (EYE_Y + 0.006)) / 0.020) ** 2) < 1) | ((np.abs(_mx) < 0.036) & (_my < EYE_Y - 0.012) & (_my > EYE_Y - 0.085)) | ((np.abs(_mx) < 0.020) & (_my < EYE_Y + 0.02) & (_my > EYE_Y - 0.03))
+hairish = ndi.binary_dilation(hairish & ~protect, iterations=6)
+valid = (oval & inside & ~hairish).astype(np.float32)
+fx, fy = n2c(CX - 36, 308); gx, gy = n2c(CX + 36, 334); skin = np.median(base[int(fy):int(gy), int(fx):int(gx)].reshape(-1, 3), 0)
 f1, w1 = fill(base, valid, 16); f2, w2 = fill(base, valid, 60); t1 = np.clip(w1 * 3, 0, 1)[..., None]; t2 = np.clip(w2 * 4, 0, 1)[..., None]
 ext = f1 * t1 + (f2 * t2 + skin * (1 - t2)) * (1 - t1)
-keep = ndi.gaussian_filter(ndi.binary_erosion(valid > 0.5, iterations=10).astype(np.float32), 8)[..., None]; face = base * keep + ext * (1 - keep)
+keep = ndi.gaussian_filter(ndi.binary_erosion(valid > 0.5, iterations=8).astype(np.float32), 7)[..., None]; face = base * keep + ext * (1 - keep)
 T['face'] = uri(img(face), 90); T['skin'] = '#%02x%02x%02x' % tuple(int(v) for v in skin)
-jx0, jy0 = n2c(480, 1090); jx1, jy1 = n2c(780, 1160); T['skinJaw'] = '#%02x%02x%02x' % tuple(int(v) for v in np.median(face[int(jy0):int(jy1), int(jx0):int(jx1)].reshape(-1, 3), 0))
-ex = (N_EYE[1][0] - N_EYE[0][0]) / 2 / PPM
-T['layout'] = {'eyeY': EYE_Y, 'eyeX': round(ex, 4), 'mouthY': round(EYE_Y - D_EM, 4), 'noseY': round(EYE_Y - (N_NOSE - N_EYE[0][1]) / PPM, 4), 'browY': round(EYE_Y + (N_EYE[0][1] - N_BROW) / PPM, 4),
-               'chinY': round(EYE_Y - (N_CHIN - N_EYE[0][1]) / PPM, 4), 'bandY': round(EYE_Y + (N_EYE[0][1] - N_HAIR) / PPM, 4)}
+jx0, jy0 = n2c(CX - 45, RW['pg'] + 2); jx1, jy1 = n2c(CX + 45, RW['men'] - 4); T['skinJaw'] = '#%02x%02x%02x' % tuple(int(v) for v in np.median(face[int(jy0):int(jy1), int(jx0):int(jx1)].reshape(-1, 3), 0))
+T['layout'] = {'eyeY': EYE_Y, 'eyeX': round(HM['eyeX'], 4), 'mouthY': round(EYE_Y - D_EM, 4), 'noseY': HM['L']['tip'][0], 'browY': round(EYE_Y + 27 / PPM, 4), 'chinY': HM['L']['underChin'][0], 'bandY': round(EYE_Y + (N_EYE[0][1] - N_HAIR) / PPM, 4)}
 T['faceEyes'] = [[round(n2c(*N_EYE[i])[0] / S, 4), round(n2c(*N_EYE[i])[1] / S, 4)] for i in (0, 1)]
+# ---- the sides of her face, from the profile panel: cheek, jaw and ear. The model decides where it shows, by which way the skin faces. ----
+a3 = arr(c3); PX0, PX1, PY0, PY1 = 1180, 1536, 200, 660; c7 = a3[PY0:PY1, PX0:PX1]
+skinm = (c7[..., 0] > 140) & (c7[..., 0] - c7[..., 2] > 26) & (c7[..., 0] - c7[..., 2] < 100) & (c7[..., 0] > c7[..., 1] + 8); skinm = ndi.binary_opening(skinm, np.ones((5, 5), bool)); skinm = ndi.binary_closing(skinm, np.ones((9, 9), bool))
+lab, nl = ndi.label(skinm); skinm = ndi.binary_fill_holes(lab == (1 + np.argmax(ndi.sum(skinm, lab, range(1, nl + 1)))))
+edge = np.array([(len(r) - 1 - np.argmax(r[::-1])) if r.any() else -9999 for r in skinm], float)
+tipr, nasr = RW['tip'] - PY0, RW['nas'] - PY0; ZTIP = HM['L']['tip'][1] + 0.002; WINS = (-0.01, 0.13, 1.40, 1.58); OW, OH = 420, 540
+jj2, ii2 = np.mgrid[0:OH, 0:OW]; zz = WINS[0] + (ii2 + 0.5) / OW * (WINS[1] - WINS[0]); yy = WINS[3] - (jj2 + 0.5) / OH * (WINS[3] - WINS[2])
+rowF = HM['eyeRow'] + (EYE_Y - yy) * PPM; rowP = np.interp(rowF, [0, RW['sn'], HM['mouthRow'], RW['men'], 2000], [0, RW['sn'], RW['st'], RW['men'], 2000])
+px = edge[tipr] - (ZTIP - zz) * PPM; py = rowP - PY0
+def samp(a, x, y): return np.stack([ndi.map_coordinates(a[..., c], [y, x], order=1, mode='nearest') for c in range(3)], -1)
+def sms(a, b, x): t = np.clip((x - a) / (b - a), 0, 1); return t * t * (3 - 2 * t)
+col = samp(c7, px, py); m = ndi.map_coordinates(ndi.binary_erosion(skinm, iterations=8).astype(np.float32), [py, px], order=1, mode='constant')
+ed = np.interp(py[:, 0], np.arange(len(edge)), np.where(edge > -9000, edge, edge[tipr] - 200))[:, None]; behind = ed - px
+exx, eyy = edge[nasr] - 0.0227 * PPM, HM['eyeRow'] - PY0 + 2; eye = sms(0.75, 1.15, np.sqrt(((px - exx) / (0.035 * PPM)) ** 2 + ((py - eyy) / (0.019 * PPM)) ** 2))
+alpha = ndi.gaussian_filter(m, 2.0) * sms(0.004 * PPM, 0.015 * PPM, behind) * eye * (1 - sms(0.066 * PPM, 0.080 * PPM, behind))      # cheek and jaw only: her ear is left for a modelled ear
+okm = (m > 0.9).astype(np.float32); fcol, _ = fill(col, okm, 8); col = col * okm[..., None] + fcol * (1 - okm[..., None])
+cx0, cy0 = n2c(CX + 0.048 * PPM, N_EYE[0][1] + (EYE_Y - 1.485) * PPM); front_cheek = face[int(cy0) - 25:int(cy0) + 25, int(cx0) - 20:int(cx0) + 20].reshape(-1, 3).mean(0)
+sel = (alpha > 0.9) & (np.abs(yy - 1.485) < 0.012); side_cheek = col[sel].mean(0) if sel.sum() > 50 else front_cheek; g2 = np.clip(front_cheek / side_cheek, 0.70, 1.25); print('side tone gain', np.round(g2, 3), 'opaque share', round(float((alpha > 0.9).mean()), 3))
+T['faceSide'] = uri(img(col * g2), 90); T['faceSideA'] = uri(img(np.repeat((alpha * 255)[..., None], 3, -1)), 88); T['faceSideWin'] = list(WINS)
+_chk = Image.new('RGB', (S + OW * 2, S), (40, 40, 40)); _chk.paste(img(face), (0, 0)); _chk.paste(img(col * g2), (S, 0)); _chk.paste(img(col * g2 * alpha[..., None] + np.array([0, 255, 0]) * (1 - alpha[..., None])), (S + OW, 0)); _chk.resize((932, 512)).save(ROOT + 'shots/bake_face.png')
 T['faceParts'] = {}
 print('face: pixels a metre', round(PPM), 'skin', T['skin'], T['layout'])
 
