@@ -20,3 +20,28 @@
   function soleTexR() {                              // dark rubber with fine level grooves
     const t = soleTex(); return t;
   }
+
+  // loose curls: fine strands in her three hair colours, running along the lock
+  function lockTexR(cols) {
+    const W = 256, H = 256, c = cvs(W, H), g = c.getContext('2d'); let sd = 733; const r = () => (sd = (sd * 16807) % 2147483647) / 2147483647;
+    g.fillStyle = '#463434'; g.fillRect(0, 0, W, H);
+    for (let i = 0; i < 420; i++) { const x = r() * W, k = r(); g.strokeStyle = rgba(k < 0.30 ? cols[0] : k < 0.62 ? cols[1] : k < 0.90 ? cols[2] : '#cdc0c4', 0.35 + 0.5 * r()); g.lineWidth = 0.6 + 1.6 * r(); g.beginPath(); g.moveTo(x, 0); g.bezierCurveTo(x + 6 * (r() - 0.5), H * 0.33, x + 6 * (r() - 0.5), H * 0.66, x + 4 * (r() - 0.5), H); g.stroke(); }
+    const t = ctex(c); t.wrapS = t.wrapT = THREE.RepeatWrapping; return t;
+  }
+  // the turquoise: blue-green stone with darker veins and a few pale clouds
+  function gemTexR() {
+    const S = 256, c = cvs(S, S), g = c.getContext('2d'); let sd = 9157; const r = () => (sd = (sd * 16807) % 2147483647) / 2147483647;
+    g.fillStyle = '#1a86ad'; g.fillRect(0, 0, S, S);
+    for (let i = 0; i < 70; i++) { const x = r() * S, y = r() * S, q = 14 + 44 * r(), gr = g.createRadialGradient(x, y, 0, x, y, q), col = r() < 0.5 ? '#35b3cf' : r() < 0.6 ? '#0d5f86' : '#1c9bb8'; gr.addColorStop(0, rgba(col, 0.55)); gr.addColorStop(1, rgba(col, 0)); g.fillStyle = gr; g.fillRect(x - q, y - q, 2 * q, 2 * q); }
+    g.strokeStyle = 'rgba(9,52,78,0.55)'; g.lineWidth = 1.1;
+    for (let i = 0; i < 9; i++) { let x = r() * S, y = r() * S; g.beginPath(); g.moveTo(x, y); for (let k = 0; k < 9; k++) { x += 26 * (r() - 0.5); y += 26 * (r() - 0.5); g.lineTo(x, y); } g.stroke(); }
+    return ctex(c);
+  }
+
+  // where a lock has hair: separate strands of different lengths, so its edges and its tip are wispy (root at the bottom of the picture)
+  function lockAlphaR() {
+    const W = 256, H = 512, c = cvs(W, H), g = c.getContext('2d'); let sd = 4409; const r = () => (sd = (sd * 16807) % 2147483647) / 2147483647;
+    g.fillStyle = '#000'; g.fillRect(0, 0, W, H); g.strokeStyle = '#fff'; g.lineCap = 'round';
+    for (let i = 0; i < 64; i++) { const x = r() * W, top = H * (1 - (0.55 + 0.45 * r())); g.lineWidth = 2.2 + 3.2 * r(); g.beginPath(); g.moveTo(x, H); g.bezierCurveTo(x + 10 * (r() - 0.5), H * 0.66, x + 10 * (r() - 0.5), H * 0.4, x + 12 * (r() - 0.5), top); g.stroke(); }
+    const t = ctex(c); t.wrapS = THREE.RepeatWrapping; t.encoding = THREE.LinearEncoding; return t;
+  }

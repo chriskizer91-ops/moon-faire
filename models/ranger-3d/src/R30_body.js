@@ -52,7 +52,11 @@
   })();
 
   // ---------- arms: bare, from the shoulder to the wrist ----------
-  const ARM_R = [[-0.054, 0.003], [-0.050, 0.016], [-0.042, 0.030], [-0.030, 0.0405], [-0.015, 0.0480], [0, 0.0515], [0.04, 0.054], [0.11, 0.050], [0.19, 0.045], [0.245, 0.042], [0.30, 0.040], [0.39, 0.033], [0.455, 0.027], [0.475, 0.0255]];
+  const ARM_R = [[-0.054, 0.003], [-0.050, 0.016], [-0.042, 0.030], [-0.030, 0.0405], [-0.015, 0.0480], [0, 0.0515], [0.04, 0.054], [0.11, 0.050], [0.19, 0.045], [0.245, 0.042], [0.30, 0.040], [0.39, 0.033], [0.425, 0.0290], [0.447, 0.0266], [0.470, 0.0295], [0.482, 0.0305], [0.493, 0.0298]];
+  // The wrist: the forearm narrows to 5.3 cm two centimetres above the joint, then widens and flattens into the heel of the hand and runs
+  // on a little way inside it, so there is no step where they meet. The heel of the hand sits a little toward the thumb and the palm
+  // (measured off the hand itself), and the end of the forearm leans the same way. ARM_T is how thick the arm is as a share of its width.
+  const ARM_T = [[0.28, 1], [0.33, 0.92], [0.39, 0.89], [0.425, 0.80], [0.447, 0.72], [0.470, 0.56], [0.482, 0.51], [0.493, 0.47]];
   function wArm(S, sLen) {
     if (sLen < 0.05) { const u = sm(-0.045, 0.05, sLen); return [BI['clav' + S], (1 - u) * 0.6, BI.spine3, (1 - u) * 0.4, BI['uarm' + S], u]; }
     if (sLen < L_UARM + 0.05) { const u = sm(L_UARM - 0.05, L_UARM + 0.05, sLen); return [BI['uarm' + S], 1 - u, BI['farm' + S], u]; }
@@ -61,9 +65,9 @@
   for (const [S, s] of SIDES) {
     const d = armDir[S], sh = restPts['sh' + S], NS = Q(44, 20), NU = Q(28, 14);
     const pts = [], rad = [], ss = [];
-    for (let i = 0; i <= NS; i++) { const sl = -0.054 + 0.529 * (i < 10 ? 0.07 * (i / 10) : 0.07 + 0.93 * (i - 10) / (NS - 10)); pts.push(sh.clone().addScaledVector(d, sl)); const r = prof(ARM_R, sl, true); rad.push([r, r * (sl > 0.3 ? 0.90 : 1)]); ss.push(sl); }   // the forearm is a little flat toward the wrist
-    const rings = tubeRings(pts, rad, NU, V3(0, 0, 1)), part = loft(rings, { capA: true, vS: 3 }), cols = NU + 1;      // the first rings are close together: they round the shoulder
-    addPart('skin', part, (x, y, z, i) => wArm(S, i < ss.length * cols ? ss[Math.floor(i / cols)] : ss[0]), { out: centroidOf(rings) });
+    for (let i = 0; i <= NS; i++) { const sl = -0.054 + 0.547 * (i < 10 ? 0.07 * (i / 10) : 0.07 + 0.93 * (i - 10) / (NS - 10)); const kw = sm(0.44, 0.482, sl); pts.push(sh.clone().addScaledVector(d, sl).add(V3(s * d.y * 0.0045 * kw, -s * d.x * 0.0045 * kw, 0.0065 * kw))); const r = prof(ARM_R, sl, true); rad.push([r, r * spline(ARM_T, cl(sl, 0.28, 0.493))]); ss.push(sl); }   // the forearm is a little flat toward the wrist
+    const rings = tubeRings(pts, rad, NU, V3(0, 0, 1)), part = loft(rings, { capA: true, capB: true, vS: 3 }), cols = NU + 1;      // the first rings are close together: they round the shoulder
+    addPart('skin', part, (x, y, z, i) => wArm(S, i < ss.length * cols ? ss[Math.floor(i / cols)] : i === ss.length * cols ? ss[0] : ss[ss.length - 1]), { out: centroidOf(rings) });
   }
 
   // ---------- the lace sleeves: a wide bell of black lace from a band round the upper arm to ragged points near the elbow ----------
