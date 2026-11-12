@@ -165,6 +165,15 @@ and next he wants her in a space where she can attack a dummy or a character, as
 Checked: no errors on the page; a hit was forced in a headless browser and the jolt, flash and confetti showed. Not checked:
 all of it at real speed, and whether every spell's effect lines up on the dummy from every angle.
 
+## What is kept here
+
+Everything needed to rebuild her is in this folder: the model source (`src/`), the viewer (`viewer/`), the bake and build scripts,
+the test and measuring tools (`shoot*.py`, `compare.py`, `facecmp.py`, `guides.py`, `prof_cmp.py`, `lib/`; `package.json` names
+the node packages they use), the baked textures and flipbook frames (`out/`), and every reference painting Chris has sent
+(`references/`: 23 character paintings, 2 hands, 5 faces, 8 boots, and the HD flipbook page with its 58 painted frames inside
+it). The paintings are stored as high-quality WebP copies; `lib/restore_refs.py` turns them back into the PNG folders the bake
+reads. Not kept: scratch renders, old copies of the source from each pass, and Chris's phone photos of his screen.
+
 ## Building
 
 The scripts use the absolute path `/home/claude/work`. In a fresh session:
