@@ -148,7 +148,7 @@
     return tracks;
   }
   function defAction(name, dur, keys, o) {
-    ACTS[name] = Object.assign({ dur, tracks: buildTracks(keys, dur, (o && o.outro) || 0.5, false), hits: [], cues: [] }, o || {});
+    ACTS[name] = Object.assign({ dur, keys, tracks: buildTracks(keys, dur, (o && o.outro) || 0.5, false), hits: [], cues: [] }, o || {});      // the keys are kept, so a later move can be built from an earlier one
     if (o && o.spin) ACTS[name].spinT = { ts: o.spin.map((e) => e[0]), vs: o.spin.map((e) => e[1]) };      // a turn of her whole body about the spot she stands on, [[time, angle], ...]
   }
   // a stance is a way of holding the body (kneeling, sitting): its keys run from standing to the held pose, and play backwards to stand up again

@@ -14,6 +14,7 @@
   const LEGS = { hip: 1, hipR: 1, ftR: 1, ftL: 1, knR: 1, knL: 1 }; let spinNow = 0;
   function animate(phase, wb, t, dt, rb) {
     dt = dt > 0 ? Math.min(dt, 0.05) : 0; st.time = t; wb = wb || 0; rb = rb || 0;
+    spinHost = spinNow;                              // the turn the host has just given her root (last frame's spin)
     // the stance clock: forward to settle into a stance, backward to stand up out of it
     if (stance) {
       if (stanceTo !== stance.name) { stance.t -= dt * (stance.def.rise || 1.15); if (stance.t <= 0) { if (stance.def.leave) stance.def.leave(); stance = stanceTo ? { name: stanceTo, def: STANCES[stanceTo], t: 0 } : null; } }
@@ -31,7 +32,8 @@
     let P = base; spinNow = 0;
     if (act) {
       const tPrev = act.t; act.t += dt;
-      for (const h of act.def.hits || []) { const th = h * act.dur; if (tPrev < th && act.t >= th) { state.hitN = (state.hitN || 0) + 1; state.hitK = act.def.impact || 0.55; state.hitName = act.type; } }      // a blow lands: hosts watch state.hitN to shake the picture or knock a target
+      // a blow lands: hosts watch state.hitN to shake the picture or knock a target. A move with several blows can name each one (tags) and weigh each one (impacts).
+      { const hs = act.def.hits || []; for (let i = 0; i < hs.length; i++) { const th = hs[i] * act.dur; if (tPrev < th && act.t >= th) { state.hitN = (state.hitN || 0) + 1; state.hitK = act.def.impacts ? act.def.impacts[i] : (act.def.impact || 0.55); state.hitName = act.type; state.hitI = i; state.hitTag = (act.def.tags && act.def.tags[i]) || ''; if (act.def.onHit) act.def.onHit(act, i); } } }
       if (act.t >= act.dur && !act.def.hold) { if (act.def.end) act.def.end(act); act = null; }
       else {
         if (act.def.spinT) spinNow = evalTrack(act.def.spinT, Math.min(act.t, act.dur));
@@ -99,6 +101,9 @@
     get stanceNow() { return stance ? stance.name : ''; }, get stanceProgress() { return stance ? stance.t / stance.def.dur : 0; }, get pending() { return pending; },
     get fade() { return fade; }, get busy() { return !!act && !(act.def.hold && act.t >= act.dur); }, get action() { return act ? act.type : ''; },
     get progress() { return act ? Math.min(1, act.t / act.dur) : -1; }, get time() { return act ? act.t : -1; },
+    // for the lore's moves: dark is how far the place round her should go black (she and her spell stay lit), shake a rumble to add to the picture,
+    // rings the hits she has taken since her last big spell (each one a ring round her), camera what the effects turn to face, arena how far the open ground runs
+    get dark() { return darkNow; }, get shake() { return shakeNow; }, get rings() { return ringN; }, set rings(n) { setRings(n); }, set camera(c) { vCam = c || null; }, get camera() { return vCam; }, set arena(r) { arenaR = +r > 0 ? +r : 0; }, spellLight,
     get triangles() { return triCount; }, get dim() { return dimNow; }, set wind(v) { userWind.copy(v); }, get wind() { return userWind; },
     debug: { SK, cloths, cur, base, REST, FP, meshes, MATS, chains, applyPose, clonePose }
   };

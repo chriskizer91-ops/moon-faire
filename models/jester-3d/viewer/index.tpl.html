@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Jester Witch 3D</title>
+<title>Jester Witch 3D: the night square</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Jacquard+24&family=Atkinson+Hyperlegible:wght@400;700&family=JetBrains+Mono:wght@400;600&display=swap">
 <style>
@@ -35,13 +35,17 @@ canvas#stage{display:block;width:100%;height:100%;touch-action:none;cursor:grab}
 .chip:hover{border-color:var(--muted)}
 .chip:focus-visible{outline:2px solid var(--pendant);outline-offset:2px}
 .chip[aria-pressed="true"]{background:var(--veil);border-color:var(--gold);color:#fff}
-#states .chip,#acts .chip,#spells .chip{font-weight:700}
+#states .chip,#acts .chip,#spells .chip,#lore .chip{font-weight:700}
+#lore .chip:last-child{font-weight:400;color:var(--muted)}
+#ringNote{font-family:var(--f-mono);font-size:12px;color:var(--muted);margin:8px 0 0}
+#ringNote.full{color:var(--gold)}
 .notes{color:var(--muted);font-size:14px;max-width:68ch;margin:0}
 .notes b{color:var(--ink);font-weight:700}
 #sfx{position:absolute;inset:0;width:100%;height:100%;pointer-events:none;z-index:2}
 #book{top:8px;bottom:auto}.booktag{top:12px;bottom:auto}
-#pad2{position:absolute;right:10px;bottom:10px;z-index:3;display:grid;grid-template-columns:auto auto auto;gap:6px;align-items:center;justify-items:center;touch-action:manipulation}
-#qName{grid-column:2;max-width:92px;text-align:center;font:600 11px/1.15 var(--f-mono);letter-spacing:.04em;color:var(--gold);text-shadow:0 1px 3px #000}
+#pad2{position:absolute;right:10px;bottom:10px;z-index:3;display:grid;grid-template-columns:auto auto auto auto;gap:6px;align-items:center;justify-items:center;touch-action:manipulation}
+#qPrev{grid-column:1;grid-row:1;justify-self:end}#qNext{grid-column:4;grid-row:1}#qHit{grid-column:1;grid-row:2}#qMove{grid-column:2;grid-row:2}#qJump{grid-column:3;grid-row:2}#qCast{grid-column:4;grid-row:2}
+#qName{grid-column:2 / span 2;grid-row:1;max-width:100px;text-align:center;font:600 11px/1.15 var(--f-mono);letter-spacing:.04em;color:var(--gold);text-shadow:0 1px 3px #000}
 .qb{width:48px;height:48px;border-radius:50%;border:1px solid rgba(214,168,78,.6);background:rgba(20,14,28,.6);color:#f0e6f6;font:600 11px/1 var(--f-mono);letter-spacing:.03em;cursor:pointer;-webkit-tap-highlight-color:transparent}
 .qb:active{background:rgba(214,168,78,.5)}.qs{width:32px;height:32px;font-size:20px;line-height:1}.qc{width:62px;height:62px;font-size:13px;background:rgba(190,60,120,.72);border-color:rgba(255,220,150,.8)}
 .qb:focus-visible{outline:2px solid #6fe;outline-offset:2px}
@@ -57,28 +61,32 @@ canvas#stage{display:block;width:100%;height:100%;touch-action:none;cursor:grab}
 <div class="wrap">
   <header>
     <h1>Jester Witch 3D</h1>
-    <p class="sub">The New Moon performer of the Moon Faire in 3D, with her painted face, veil and fabrics baked onto the model.</p>
+    <p class="sub">The New Moon performer of the Moon Faire in 3D, in the night square, with every move she had before and her moves from the lore.</p>
   </header>
   <div class="stagebox" id="stagebox">
-    <canvas id="stage" aria-label="3D model of the Jester Witch. Drag to turn her, pinch or scroll to zoom."></canvas>
+    <canvas id="stage" aria-label="3D model of the Jester Witch in the night square. Drag to turn the view, pinch or scroll to zoom."></canvas>
     <div class="hud" id="hud">Loading</div>
     <canvas id="book" width="390" height="330" aria-label="The flipbook frame for the same moment"></canvas><span class="booktag">Flipbook</span>
     <canvas id="sfx" aria-hidden="true"></canvas>
-    <div id="pad2" aria-label="Quick moves"><button type="button" id="qPrev" class="qb qs" aria-label="Previous spell">&#8249;</button><span id="qName"></span><button type="button" id="qNext" class="qb qs" aria-label="Next spell">&#8250;</button><button type="button" id="qMove" class="qb">Move</button><button type="button" id="qJump" class="qb">Jump</button><button type="button" id="qCast" class="qb qc">Cast</button></div>
+    <div id="pad2" aria-label="Quick moves"><button type="button" id="qPrev" class="qb qs" aria-label="Previous spell">&#8249;</button><span id="qName"></span><button type="button" id="qNext" class="qb qs" aria-label="Next spell">&#8250;</button><button type="button" id="qHit" class="qb" aria-label="Take a hit">Hit</button><button type="button" id="qMove" class="qb">Move</button><button type="button" id="qJump" class="qb">Jump</button><button type="button" id="qCast" class="qb qc">Cast</button></div>
     <div id="joy" hidden aria-label="Walk pad: drag to walk her around"><div id="knob"></div></div>
     <div class="err" id="err" hidden></div>
   </div>
   <section aria-label="How she holds herself"><p class="label">Body</p><div class="chips slide" id="states"></div></section>
   <section aria-label="Moves"><p class="label">Moves</p><div class="chips slide" id="acts"></div></section>
   <section aria-label="Spells"><p class="label">Spells</p><div class="chips slide" id="spells"></div></section>
+  <section aria-label="Her moves from the lore"><p class="label">From the lore</p><div class="chips slide" id="lore"></div><p id="ringNote" aria-live="polite"></p></section>
   <section aria-label="Views"><p class="label">Views</p><div class="chips" id="views"></div></section>
   <section aria-label="Switches"><p class="label">Switches</p><div class="chips" id="toggles"></div></section>
-  <p class="notes">Drag to turn her; pinch or scroll to zoom. <b>Walk around</b> puts a round pad on the stage: drag it and she walks the way you push, as you see it; push to the edge and she runs. On a keyboard use W A S D or the arrow keys, Shift to run, Space to jump. <b>Body</b> is how she holds herself: it stays until you pick another. <b>Moves</b> and <b>Spells</b> play once over whatever she is doing, so she can talk while she sits, wave as she walks, or cast from her knees. Left standing, she looks about or settles her weight now and then. The first six spells follow her flipbook, and the small picture shows her <b>flipbook frame for the same moment</b>; the rest are built from the move sheet. She casts toward her own left. <b>Flipbook look</b> redraws the model at the sprites' pixel size in her own 56 colours.</p>
+  <p class="notes">Drag to turn the view; pinch or scroll to zoom. She stands in the <b>night square</b> of the Moon Faire, with the practice dummy on her casting side. The round pad walks her: drag it and she goes the way you push, as you see it; push to the edge and she runs. On a keyboard use W A S D or the arrow keys, Shift to run, Space to jump. With the pad at rest, <b>Walk</b> and <b>Run</b> send her on a lap of the square. <b>Body</b> is how she holds herself: it stays until you pick another. <b>Moves</b> and <b>Spells</b> play once over whatever she is doing, so she can talk while she sits, wave as she walks, or cast from her knees. Left standing, she looks about or settles her weight now and then. The first six spells follow her flipbook, and the small picture shows her <b>flipbook frame for the same moment</b>; the rest are built from the move sheet. She casts toward her own left.</p>
+  <p class="notes"><b>From the lore</b> holds the moves the lore asks for, added beside the old ones. <b>Take a hit</b> is how her big spell is charged: each hit she takes lights a ring round her. The <b>Big spell</b> is Sealed Fate: she throws the seal and her rings clamp shut on the target. Three hits charge it the first time, four the next, and so on; here the button works at any count so you can watch it. <b>The ending</b> is the cast that finishes the fight, so it runs on into Curtain Call. The <b>Attack taunt</b> drops Gravity out of a jig and a twirl, and the <b>Heal taunt</b> is Against All Odds danced and laughed through. Keys: H takes a hit, B and N are the big spell and its ending, T and Y the taunts.</p>
+  <p class="notes">Switches: <b>Night square</b> puts her back in the little theatre when it is off. <b>Glow</b> lets bright things shine; turn it off if the page runs slowly. <b>Flipbook look</b> redraws her at the sprites' pixel size in her own 56 colours.</p>
 </div>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
 <script>/*PAL*/</script>
 <script>/*FB*/</script>
 <script>/*STAGE*/</script>
+<script>/*SQUARE*/</script>
 <script src="jester_tex.js"></script>
 <script src="jester.js"></script>
 <script>/*APP*/</script>

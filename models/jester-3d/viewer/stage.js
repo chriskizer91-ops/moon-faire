@@ -1,4 +1,7 @@
-// stage.js: the little theatre the Jester stands in: renderer, lights, floor, and an orbiting camera.
+// stage.js: where the Jester stands: renderer, her own lights, the little theatre floor, an orbiting camera, and how a frame is drawn.
+// Two places can be behind her: the little theatre (a flat colour and a worn stage disc), or a world built into stage.world
+// (the night square, square.js). Her lights and the world's lights are kept apart: she is drawn after the world, in her own
+// scene, so the look of her that was tuned in the theatre is the same wherever she stands.
 function makeStage(canvas, o) {
   'use strict';
   o = o || {};
@@ -7,7 +10,8 @@ function makeStage(canvas, o) {
   renderer.shadowMap.enabled = true; renderer.shadowMap.type = THREE.PCFSoftShadowMap;
   const scene = new THREE.Scene(), BG = new THREE.Color('#383043');
   scene.background = BG;
-  const camera = new THREE.PerspectiveCamera(22, 1, 0.1, 60);
+  const world = new THREE.Scene();                     // whatever is behind her (the square); empty until something builds into it
+  const camera = new THREE.PerspectiveCamera(22, 1, 0.1, 160);
   // a soft studio for reflections: plum dark below, lilac above, two warm panels and one violet
   (function env() {
     const es = new THREE.Scene(), g = new THREE.SphereGeometry(10, 32, 16), col = [];
@@ -51,38 +55,101 @@ function makeStage(canvas, o) {
     camera.position.set(orbit.target.x + orbit.dist * Math.sin(orbit.az) * ce, orbit.target.y + orbit.dist * Math.sin(orbit.el), orbit.target.z + orbit.dist * Math.cos(orbit.az) * ce);
     camera.fov = orbit.fov; camera.lookAt(orbit.target); camera.updateProjectionMatrix();
   }
-  function resize(w, h, pr) { renderer.setPixelRatio(pr || 1); renderer.setSize(w, h, false); camera.aspect = w / h; camera.updateProjectionMatrix(); }
+  let glowSized = '';
+  function resize(w, h, pr) { renderer.setPixelRatio(pr || 1); renderer.setSize(w, h, false); camera.aspect = w / h; camera.updateProjectionMatrix(); glowSized = ''; }
   // The Flipbook look: draw her at the sprites' pixel size (4.75 mm a pixel), snap to her palette, ink the outline.
+  // She is drawn small into her own picture and laid over whatever is behind her, so the place she stands in stays smooth.
   const PALETTE = (o.palette || window.JESTER_PALETTE || []).slice(0, 64), NP = Math.max(1, PALETTE.length);
   const palV = []; for (let i = 0; i < 64; i++) { const p = PALETTE[i % NP] || [0, 0, 0]; palV.push(new THREE.Vector3(p[0] / 255, p[1] / 255, p[2] / 255)); }
   const rt = new THREE.WebGLRenderTarget(4, 4, { minFilter: THREE.NearestFilter, magFilter: THREE.NearestFilter, format: THREE.RGBAFormat }); rt.texture.encoding = THREE.sRGBEncoding;
-  const postMat = new THREE.ShaderMaterial({ depthTest: false, depthWrite: false, toneMapped: false,
+  const postMat = new THREE.ShaderMaterial({ depthTest: false, depthWrite: false, toneMapped: false, transparent: true,
+    blending: THREE.CustomBlending, blendSrc: THREE.OneFactor, blendDst: THREE.OneMinusSrcAlphaFactor, blendSrcAlpha: THREE.OneFactor, blendDstAlpha: THREE.OneMinusSrcAlphaFactor,
     uniforms: { tD: { value: rt.texture }, uRes: { value: new THREE.Vector2(4, 4) }, uPal: { value: palV }, uBg: { value: new THREE.Vector3(BG.r, BG.g, BG.b) }, uSnap: { value: 1 } },
     vertexShader: 'varying vec2 vUv; void main(){ vUv = uv; gl_Position = vec4(position.xy, 0.0, 1.0); }',
     fragmentShader: 'precision highp float; uniform sampler2D tD; uniform vec2 uRes; uniform vec3 uPal[64]; uniform vec3 uBg; uniform float uSnap; varying vec2 vUv;\n' +
       'void main(){ vec2 px = 1.0 / uRes; vec2 uv = (floor(vUv * uRes) + 0.5) * px; vec4 c = texture2D(tD, uv);\n' +
       ' float n = max(max(texture2D(tD, uv + vec2(px.x, 0.0)).a, texture2D(tD, uv - vec2(px.x, 0.0)).a), max(texture2D(tD, uv + vec2(0.0, px.y)).a, texture2D(tD, uv - vec2(0.0, px.y)).a));\n' +
       ' float m = min(min(texture2D(tD, uv + vec2(px.x, 0.0)).a, texture2D(tD, uv - vec2(px.x, 0.0)).a), min(texture2D(tD, uv + vec2(0.0, px.y)).a, texture2D(tD, uv - vec2(0.0, px.y)).a));\n' +
-      ' if (c.a < 0.5) { gl_FragColor = vec4(n > 0.6 ? vec3(0.075, 0.05, 0.065) : uBg * (1.0 - c.a) + c.rgb, 1.0); return; }\n' +
+      ' if (c.a < 0.5) { if (n > 0.6) gl_FragColor = vec4(0.075, 0.05, 0.065, 1.0); else gl_FragColor = vec4(c.rgb, c.a); return; }\n' +                          // the inked outline; elsewhere only what light she and her spells add
       ' vec3 col = c.rgb + uBg * (1.0 - c.a); float l = dot(col, vec3(0.30, 0.59, 0.11)); col = clamp(l + (col - l) * 1.4, 0.0, 1.0); col = clamp((col - 0.42) * 1.14 + 0.42, 0.0, 1.0); if (m < 0.4) col *= 0.45;\n' +                       // the rim of the figure, inked
       ' float best = 1e9; vec3 pick = col; for (int i = 0; i < ' + NP + '; i++) { vec3 d = col - uPal[i]; float e = dot(d * d, vec3(0.30, 0.59, 0.11)); if (e < best) { best = e; pick = uPal[i]; } }\n' +
       ' gl_FragColor = vec4(mix(col, pick, uSnap), 1.0); }' });
   const postScene = new THREE.Scene(), postCam = new THREE.OrthographicCamera(-1, 1, 1, -1, 0, 1);
   const postQuad = new THREE.Mesh(new THREE.PlaneGeometry(2, 2), postMat); postQuad.frustumCulled = false; postScene.add(postQuad);
-  const api = { look: 'smooth', mmPerPixel: 4.75, dim: 0 }, _sz = new THREE.Vector2();
+  const api = { look: 'smooth', mmPerPixel: 4.75, dim: 0, dark: 0, square: false, glow: false }, _sz = new THREE.Vector2();
   const LIT = [[hemi, hemi.intensity, 0.7], [key, key.intensity, 0.6], [fill, fill.intensity, 0.7], [backKey, backKey.intensity, 0.6]];
-  function render() {
-    placeCamera();
-    for (const [l, base, k] of LIT) l.intensity = base * (1 - k * api.dim);
-    if (api.look !== 'flipbook') { floor.visible = !api.noFloor; scene.background = api.bg || BG; renderer.render(scene, camera); return; }
+
+  // ---- darkness: the place behind her can be turned down toward black before she and her spells are drawn over it ----
+  const darkMat = new THREE.MeshBasicMaterial({ color: 0x000000, transparent: true, depthTest: false, depthWrite: false, toneMapped: false, blending: THREE.CustomBlending,
+    blendSrc: THREE.ZeroFactor, blendDst: THREE.SrcColorFactor, blendSrcAlpha: THREE.ZeroFactor, blendDstAlpha: THREE.OneFactor });
+  const fsScene = new THREE.Scene(), fsQuad = new THREE.Mesh(new THREE.PlaneGeometry(2, 2), darkMat); fsQuad.frustumCulled = false; fsScene.add(fsQuad);
+  const pass = (mat, target) => { fsQuad.material = mat; renderer.setRenderTarget(target); renderer.render(fsScene, postCam); };
+
+  // ---- glow: whatever is brighter than white spreads a soft light round itself. The frame is drawn into a picture that can
+  //      hold more than white, the bright parts are blurred at four sizes, and the sum is laid back over it. ----
+  const gl2 = renderer.capabilities.isWebGL2 && !!(renderer.extensions.get('EXT_color_buffer_float') || renderer.extensions.get('EXT_color_buffer_half_float'));
+  let main = null, levels = [], glowBad = !gl2;
+  const VS = 'varying vec2 vUv; void main(){ vUv = uv; gl_Position = vec4(position.xy, 0.0, 1.0); }';
+  const fsMat = (frag, uniforms) => new THREE.ShaderMaterial({ vertexShader: VS, fragmentShader: 'precision highp float; varying vec2 vUv;\n' + frag, uniforms, depthTest: false, depthWrite: false, toneMapped: false });
+  const brightMat = fsMat('uniform sampler2D tD; uniform float uLo; uniform float uHi; void main(){ vec3 c = texture2D(tD, vUv).rgb; float l = max(c.r, max(c.g, c.b)); gl_FragColor = vec4(min(c, vec3(4.0)) * smoothstep(uLo, uHi, l), 1.0); }', { tD: { value: null }, uLo: { value: 0.96 }, uHi: { value: 1.3 } });
+  const blurMat = fsMat('uniform sampler2D tD; uniform vec2 uDir; void main(){ vec3 c = texture2D(tD, vUv).rgb * 0.2270270; c += (texture2D(tD, vUv + uDir * 1.3846154).rgb + texture2D(tD, vUv - uDir * 1.3846154).rgb) * 0.3162162; c += (texture2D(tD, vUv + uDir * 3.2307692).rgb + texture2D(tD, vUv - uDir * 3.2307692).rgb) * 0.0702703; gl_FragColor = vec4(c, 1.0); }', { tD: { value: null }, uDir: { value: new THREE.Vector2() } });
+  const outMat = fsMat('uniform sampler2D tD; uniform sampler2D b0; uniform sampler2D b1; uniform sampler2D b2; uniform sampler2D b3; uniform float uK;\n' +
+    'void main(){ vec3 c = texture2D(tD, vUv).rgb; vec3 g = texture2D(b0, vUv).rgb * 1.0 + texture2D(b1, vUv).rgb * 0.8 + texture2D(b2, vUv).rgb * 0.6 + texture2D(b3, vUv).rgb * 0.45; gl_FragColor = vec4(c + g * uK, 1.0); }',
+    { tD: { value: null }, b0: { value: null }, b1: { value: null }, b2: { value: null }, b3: { value: null }, uK: { value: 0.34 } });
+  function glowSize() {
+    renderer.getDrawingBufferSize(_sz); const w = Math.max(8, _sz.x), h = Math.max(8, _sz.y), tag = w + 'x' + h; if (tag === glowSized) return; glowSized = tag;
+    if (main) { main.dispose(); for (const L of levels) { L.a.dispose(); L.b.dispose(); } }
+    const half = { type: THREE.HalfFloatType, format: THREE.RGBAFormat, minFilter: THREE.LinearFilter, magFilter: THREE.LinearFilter, depthBuffer: false, stencilBuffer: false };
+    main = new THREE.WebGLMultisampleRenderTarget(w, h, { type: THREE.HalfFloatType, format: THREE.RGBAFormat, minFilter: THREE.LinearFilter, magFilter: THREE.LinearFilter, depthBuffer: true, stencilBuffer: false });
+    main.samples = o.samples || 4; main.texture.encoding = THREE.sRGBEncoding;      // kept in screen values, so her sheer cloth and her spell light mix exactly as they do drawn straight to the screen
+    levels = [];
+    for (let i = 0, d = 2; i < 4; i++, d *= 2) { const lw = Math.max(2, Math.round(w / d)), lh = Math.max(2, Math.round(h / d)); levels.push({ a: new THREE.WebGLRenderTarget(lw, lh, half), b: new THREE.WebGLRenderTarget(lw, lh, half), w: lw, h: lh }); }
+  }
+  function bloom() {
+    let src = main.texture;
+    for (let i = 0; i < 4; i++) {
+      const L = levels[i];
+      if (i === 0) { brightMat.uniforms.tD.value = src; pass(brightMat, L.b); src = L.b.texture; }
+      blurMat.uniforms.tD.value = src; blurMat.uniforms.uDir.value.set(1 / L.w, 0); pass(blurMat, L.a);
+      blurMat.uniforms.tD.value = L.a.texture; blurMat.uniforms.uDir.value.set(0, 1 / L.h); pass(blurMat, L.b);
+      src = L.b.texture;
+    }
+    const u = outMat.uniforms; u.tD.value = main.texture; u.b0.value = levels[0].b.texture; u.b1.value = levels[1].b.texture; u.b2.value = levels[2].b.texture; u.b3.value = levels[3].b.texture; u.uK.value = api.glowK == null ? 0.34 : api.glowK;
+    pass(outMat, null);
+  }
+  const _black = new THREE.Color(0x000000), _cc = new THREE.Color();
+  function drawHer(target) {                               // her, her spells and whatever stands with her, over what is already there
+    if (api.look !== 'flipbook') { renderer.setRenderTarget(target); renderer.render(scene, camera); return; }
     renderer.getDrawingBufferSize(_sz);
     const vis = 2 * orbit.dist * Math.tan(orbit.fov * Math.PI / 360);
     const want = vis / (api.mmPerPixel / 1000), div = Math.max(1, Math.round(_sz.y / want)), h = Math.max(48, Math.round(_sz.y / div)), w = Math.max(16, Math.round(_sz.x / div));
     if (rt.width !== w || rt.height !== h) { rt.setSize(w, h); postMat.uniforms.uRes.value.set(w, h); }
-    floor.visible = false; scene.background = null; const oc = renderer.getClearAlpha(); renderer.setClearColor(0x000000, 0);
-    renderer.setRenderTarget(rt); renderer.clear(); renderer.render(scene, camera); renderer.setRenderTarget(null);
-    renderer.setClearColor(0x000000, oc); renderer.render(postScene, postCam);
+    const oc = renderer.getClearAlpha(); renderer.getClearColor(_cc); renderer.setClearColor(0x000000, 0);
+    renderer.setRenderTarget(rt); renderer.clear(); renderer.render(scene, camera);
+    renderer.setClearColor(_cc, oc); renderer.setRenderTarget(target); renderer.render(postScene, postCam);
   }
-  const follow = (x, z) => { key.position.set(x + 1.7, 3.6, z + 3.2); key.target.position.set(x, 0.9, z); key.target.updateMatrixWorld(); };      // the light and its shadow go where she goes
-  return Object.assign(api, { renderer, scene, camera, orbit, key, rim, rim2, hemi, fill, floor, shadowCatcher, lanterns, follow, resize, render, placeCamera, BG });
+  function render() {
+    placeCamera();
+    for (const [l, base, k] of LIT) l.intensity = base * (1 - k * api.dim);
+    const sq = api.square && world.children.length > 0, flip = api.look === 'flipbook', glow = api.glow && !glowBad;
+    floor.visible = !sq && !flip && !api.noFloor;
+    if (!sq && !flip && !glow) { scene.background = api.bg || BG; renderer.setRenderTarget(null); renderer.render(scene, camera); return; }      // the plain theatre, drawn straight to the screen as it always was
+    let target = null;
+    if (glow) { try { glowSize(); target = main; } catch (e) { glowBad = true; target = null; } }
+    const ac = renderer.autoClear; renderer.autoClear = false; scene.background = null;
+    renderer.setRenderTarget(target);
+    if (sq) {
+      renderer.setClearColor(_black, 1); renderer.clear();
+      if (api.worldLight) api.worldLight(api.dim, api.dark);
+      renderer.render(world, camera);
+      const d = Math.min(1, Math.max(0, api.dark)); if (d > 0.003) { darkMat.color.setScalar(1 - d); pass(darkMat, target); }
+    } else { const b = api.bg || BG; postMat.uniforms.uBg.value.set(b.r, b.g, b.b); renderer.setClearColor(b, 1); renderer.clear(); }
+    if (sq) postMat.uniforms.uBg.value.set(0.10, 0.075, 0.13);
+    drawHer(target);
+    if (glow) { try { bloom(); } catch (e) { glowBad = true; } }
+    renderer.setRenderTarget(null); renderer.autoClear = ac;
+  }
+  // the light and its shadow go where she goes
+  const follow = (x, z) => { key.position.set(x + 1.7, 3.6, z + 3.2); key.target.position.set(x, 0.9, z); key.target.updateMatrixWorld(); if (api.square) shadowCatcher.position.set(x, 0.002, z); else shadowCatcher.position.set(0, 0.002, 0); };
+  return Object.assign(api, { renderer, scene, world, camera, orbit, key, rim, rim2, hemi, fill, floor, shadowCatcher, lanterns, follow, resize, render, placeCamera, BG, get glowOk() { return !glowBad; } });
 }

@@ -15,6 +15,7 @@ try {
   T.j = makeJester(OPTS);
   T.buildMs = performance.now() - t0;
   T.stage.scene.add(T.j.root); if (T.j.fx) T.stage.scene.add(T.j.fx);
+  T.j.camera = T.stage.camera;
   T.time = 0; T.phase = 0; T.wb = 0; T.rb = 0;
   T.step = (n, dt) => { for (let i = 0; i < n; i++) { T.time += dt; if (T.wb > 0) T.phase += dt * (4.9 + 4.1 * T.rb); T.j.animate(T.phase, T.wb, T.time, dt, T.rb); T.j.root.rotation.y = (T.yaw || 0) + T.j.spin; } };
   T.st = (name, time) => { T.j.setStance(name); T.step(Math.round(time * 60), 1/60); return T.j.stanceProgress; };

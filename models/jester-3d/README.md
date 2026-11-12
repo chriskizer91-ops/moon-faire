@@ -7,7 +7,7 @@ claude.ai Project "Flip Book Art", doc `claude/jester-3d-model.md`. Read that fi
 ## What is here
 
 - `src/`: the model, in numbered parts that `build.sh` joins into `out/jester.js` (`makeJester(opts)`).
-- `viewer/`: the viewer page (stage, body, move and spell buttons, Flipbook look).
+- `viewer/`: the viewer page (stage, the night square, body, move, spell and lore buttons, Flipbook look).
 - `bake.py`: turns the reference paintings into `out/jester_tex.js` (`window.JESTER_TEX`): face, expressions, profile layer,
   hands, bodice, veil and fabric swatches.
 - `out/jester_tex.js`: the current baked textures. `out/palette.js`, `out/fb.json`, `out/fb/`: palette and flipbook frames for the viewer.
@@ -22,6 +22,7 @@ claude.ai Project "Flip Book Art", doc `claude/jester-3d-model.md`. Read that fi
   This is the look to match. `lib/unavif.py` lists and extracts the frames.
 - `bake_hands.py`: makes the hands picture inside `jester_tex.js` (called by `bake.py`; can be run alone).
 - `shoot.py`, `shoot_site.py`, `fit.py`, `lib/`: headless render and comparison tools (Playwright with Chrome and SwiftShader).
+- `shoot_page.py`, `seq.py`: stills of the real page stepped by hand, and of one move at chosen moments. `check_moves.py`: every move over every stance.
 - `shoot2.py`: like `shoot.py`, but each view is a line of script, so the camera can be aimed anywhere. `hshots.sh` renders a hand
   square-on from five sides, `fshots.sh` and `fclose.sh` render the head from eight and six angles, `fref.sh` renders it beside
   the paintings in `references/faces/`, and `prof_cmp.py` prints her
@@ -165,6 +166,87 @@ and next he wants her in a space where she can attack a dummy or a character, as
 Checked: no errors on the page; a hit was forced in a headless browser and the jolt, flash and confetti showed. Not checked:
 all of it at real speed, and whether every spell's effect lines up on the dummy from every angle.
 
+## In the night square, with her moves from the lore (pass 19, November 12, 2026)
+
+Chris: every button stays (standing, sitting, walking, running, laughing, talking, dancing, twirling and the rest); put this HD
+witch into the not-HD night square with the tents and the dummy; and build her spells as the lore describes them
+(the Project's `lore/jester-3d-and-lore.md`), adding, never removing. So nothing that was there is changed: the ten spells and
+the body moves play as before. Everything below is added beside them.
+
+Published as its own page for now, https://claude.ai/artifact/8733piMPdu8AMzQbmPQTjh ("Jester Witch 3D: the night square").
+The first page (the link at the top of this file) still shows pass 18 until Chris has seen this one and says to move it over.
+
+**Where she stands** (`viewer/square.js`, `viewer/stage.js`). The square is the not-HD model's training square
+(branch `claude/jester-not-hd-3d-model`, `viewer/world.js`), rewritten for three.js r128: flagstones round a new-moon
+medallion, lantern posts with bunting, striped tents, stars, the new moon, fireflies. It is turned half round so the big tents
+are behind her, and the moon hangs lower so her long lens can find it.
+
+- The stage now has two scenes. `stage.world` (the square, with its own lights and fog) is drawn first; `stage.scene` (her, her
+  spell effects, the dummy, her own lights and shadow) is drawn over it. Her look is the one tuned in the theatre, wherever
+  she stands. `stage.square = false` goes back to the little theatre, drawn exactly as before.
+- `stage.dark` (0 to 1) turns the world down toward black before she is drawn, so a spell can put the square out and leave
+  her and its own light showing. `stage.dim` still lowers her own lights, as the old spells ask.
+- **Glow** (`stage.glow`). The frame is drawn into a half-float picture kept in screen values (so her sheer cloth and her
+  spell light mix exactly as they do drawn straight to the screen), whatever is brighter than white is blurred at four sizes,
+  and the sum is laid back over it. It needs WebGL 2; without it, or with the switch off, the frame is drawn straight to the
+  screen. Colours in `square.js` and `88_void.js` go brighter than white on purpose.
+- The Flipbook look now lays her pixel picture over whatever is behind her, so the square stays smooth.
+- r128 counts light differently from the newer three.js the not-HD square was tuned in: sun, sky and fill are those values over
+  pi (then a little up), and the lantern lights were refitted by hand.
+- The camera in the square: a 30 degree lens (22 for the Face view and in the theatre), kept inside the ring of lanterns and
+  above the ground; where it cannot back away it widens its lens instead. It is settled before `animate`, so effects that
+  face the camera or hang in front of it are drawn for the frame's own view.
+- The dummy is the not-HD one (burlap, straw, target board), 2.8 m to her casting side. Aimed spells turn her to it whether or
+  not Walk around is on. With the pad at rest, Walk and Run send her on a lap of the square.
+
+**The look of her power** (`src/88_void.js`). The not-HD model's effect building blocks (`viewer/fx.js` on its branch), moved
+into the model: holes with the night sky inside (`VF.voidBall`, `VF.voidFlat`, `VF.hole`), darkness (`VF.shade`), thin cold
+light (`VF.hoop`, `VF.rune`, `VF.wave`, `VF.flare`, `VF.strip`, `VF.orb`, `VF.pillar`), and round star dust (`VF.motes`).
+Each is drawn afresh every frame from the move's own clock under a name; what is not asked for again is hidden next frame.
+The reference-set F pictures were not brought over. Shaders end with `linearToOutputTexel`, and `VF.shade` raises what it
+leaves to the power 0.45, because the frame is kept in screen values.
+
+**Her moves under the lore** (`src/89_lore.js`). Keys go through `autoHold`: a channel holds what it had until shortly before
+its next key, then moves (the older moves let a channel drift from rest toward its first key). Keys taken from an older move
+are marked `raw` and left alone. `defAction` now keeps a move's keys, so a new move can be built from an old one.
+
+- `doom` (5.4 s): her big spell. Sealed Fate's own opening from the flipbook, then she turns, throws the seal, holds her open
+  hand on her target while the rings turn, and closes her fist as they clamp shut into one. Blows: `land`, `clamp`.
+- `doom_end` (12.9 s): the cast that brings every foe to zero. The same, then her flipbook's Curtain Call with the night
+  closing over it: a new moon lit between her hands and lifted in three thin rings, the ground under her the night sky, a
+  black hole falling on what is left of her foe, a new moon rising behind until the sky is stars, and two curtains of night
+  that meet as her arms come down and part on her bow. Blows: `land`, `zero`, `doom`, `gone`.
+- **Rings** (`J.rings`, 0 to 6): one for each hit she has taken since her last big spell, turning round her. The cast takes
+  them: they quicken, gather on the seal, fly with it and clamp. Fewer than three and the seal makes up the count.
+  The price (three hits, then four, and so on) is kept in the viewer, not the model.
+- `taunt_attack` (6.0 s): two steps of her jig, a twirl with the black hole gathering over her raised left hand, the fling up
+  and over, her hand pressing it down onto her target, a laugh. Blows: `press`, `burst`.
+- `taunt_heal` (8.0 s): Against All Odds's opening, then a jig through one full turn with her arms up inside the circle,
+  a laugh, a flourish. Seven stars join into a figure round her and their light runs down into her alone. Blow: `heal`.
+- `hit_laugh`, `hit_dust`: taking a hit at full power. She rocks back, bounces up, and laughs with her hands on her hips or
+  brushes her shoulder off. Her bells jingle and a ring lights. Over a stance only her body above the hips moves.
+- `caper`, `prance`, `juggle`: more dancing and jester acting. Juggle is three small new moons tossed from hand to hand, and
+  works over any stance.
+
+**What the model tells its host** (`src/90_api.js`): `J.dark`, `J.shake` (a rumble), `J.rings`, `J.camera` (set it: effects
+face it), `J.arena` (how far the open ground runs), `J.spellLight`, and for each blow `state.hitTag` and `state.hitI` beside
+`hitN`, `hitName`, `hitK`. A move can name its blows (`tags`), weigh each (`impacts`) and act on one (`onHit`).
+
+**The page** (`viewer/app.js`, `viewer/index.tpl.html`): a From the lore row (Big spell, Big spell: the ending, Attack taunt,
+Heal taunt, Take a hit, Start the count again) with the hit count under it; Caper, Prance and Juggle in the Moves row; a Hit
+quick button; Night square and Glow switches; keys H, B, N, T, Y. The dummy answers each kind of blow: pressed flat, knocked
+back, left hanging at zero, drawn in, taken, and stood up again a few seconds later. `JESTER.step(n, dt)` steps the page by
+hand for checks.
+
+Checked: every move over every stance (`check_moves.py`), no errors and no broken numbers; stills of each new move
+(`seq.py`, `shoot_page.py`) at phone and laptop size, in the square and the theatre, with glow on and off and in the Flipbook
+look. Not checked: any of it at real speed. The headless browser here runs at under two frames a second, so timing and feel,
+the weight of the hit reactions, and how the dances read in motion are Chris's to judge. Not on a real phone either: the
+glow pass is the new cost there.
+
+Not yet done: a guard; a real victory and defeat; expressions beyond her three mouths and eyelids; the battle, the wraith and
+the sound from the not-HD demo; the old six spells still wear their own effects.
+
 ## What is kept here
 
 Everything needed to rebuild her is in this folder: the model source (`src/`), the viewer (`viewer/`), the bake and build scripts,
@@ -186,6 +268,8 @@ python3 -I bake.py                    # out/jester_tex.js (needs Pillow, numpy, 
 ./build.sh                            # out/jester.js
 ./build_site.sh                       # out/site/: index.html, jester.js, jester_tex.js
 python3 build_single.py               # deliver/Jester_Witch_3D.html, one offline file
+python3 check_moves.py                # every move over every stance: errors and broken numbers (about half an hour; name moves to run a few)
+python3 seq.py doom doom "1.3 3.2 4.0"  # stills of one move at chosen seconds on the real page, joined into shots/doom_sheet.png
 python3 shoot.py shots/x 'new Promise(r => setTimeout(() => { T.step(200, 1/60); r(1); }, 2500))' front:0,0.04,7.6,0.86,18,560,820
 ```
 
