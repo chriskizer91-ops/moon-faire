@@ -7,17 +7,18 @@ function rng(seed) { let s = seed >>> 0 || 1; return () => { s ^= s << 13; s >>>
 
 const ok = (S, id) => !R.why(S, id);
 export const PLAYERS = {
-  // plans: opens with Gravity, keeps Doom ticking while holding back MP for a heal, heals when low,
-  // and when the wraith is weak enough to call its Eclipse she hushes it or braces
+  // plans: marks it with Doom at once, then stays alive while the bell counts: Hush so it can only swing its scythe,
+  // Defend, a heal if she is low; and Curtain Call the moment it is ready, because that lands the Doom at once
   'plays well': S => {
-    const h = S.hero, f = S.foe, threat = !f.usedEclipse && f.silence <= 0 && f.hp < f.maxHp * R.FOE.eclipseAt;
+    const h = S.hero, f = S.foe;
     if (ok(S, 'curtain')) return 'curtain';
+    if (ok(S, 'fate')) return 'fate';
     if (h.hp <= 0.4 * h.maxHp && ok(S, 'odds')) return 'odds';
-    if (threat) return ok(S, 'hush') && h.mp - R.CMD.hush.mp >= (h.hp < 0.7 * h.maxHp ? R.CMD.odds.mp : 0) ? 'hush' : 'defend';
-    if (S.turns === 1 && ok(S, 'gravity')) return 'gravity';
-    if (ok(S, 'fate') && h.mp - R.CMD.fate.mp >= R.CMD.odds.mp && f.hp > R.CMD.attack.amount * S.k * 3) return 'fate';
+    if (f.doom > 0) return ok(S, 'hush') ? 'hush' : 'defend';
     return 'attack';
   },
+  // knows Doom ends it, but does nothing to stay alive while it counts
+  'dooms, then attacks': S => (ok(S, 'curtain') ? 'curtain' : ok(S, 'fate') ? 'fate' : 'attack'),
   // heals and attacks, never plans
   'heals and hits': S => (S.hero.hp <= 0.4 * S.hero.maxHp && ok(S, 'odds') ? 'odds' : ok(S, 'curtain') ? 'curtain' : 'attack'),
   'only attacks': () => 'attack',
@@ -42,9 +43,9 @@ export function rate(player, n, level = 1) {
 
 if (process.argv[1] && process.argv[1].endsWith('sim_battle.mjs')) {
   const N = +(process.argv[2] || 4000), LEVEL = +(process.argv[3] || 1);
-  console.log(`${N} fights each at level ${LEVEL}: Jester ${Math.round(R.HERO.hp * R.GROW ** (LEVEL - 1))} HP, ${R.FOE.name} ${Math.round(R.FOE.hp * R.GROW ** (LEVEL - 1))} HP`);
+  { const S = R.newBattle(LEVEL); console.log(`${N} fights each: Jester level ${S.level}, ${S.hero.maxHp} HP; ${R.FOE.name} level ${S.foeLevel}, ${S.foe.maxHp} HP`); }
   for (const [name, player] of Object.entries(PLAYERS)) {
     const r = rate(player, N, LEVEL);
-    console.log(`  ${name.padEnd(16)} wins ${(100 * r.win).toFixed(0).padStart(3)}%   ${r.turns.toFixed(1)} of her turns   ${r.win ? 'HP left when she wins ' + (100 * r.hpLeft).toFixed(0) + '%' : ''}${r.win < 1 ? '   wraith HP left when she loses ' + (100 * r.foeLeft).toFixed(0) + '%' : ''}`);
+    console.log(`  ${name.padEnd(20)} wins ${(100 * r.win).toFixed(0).padStart(3)}%   ${r.turns.toFixed(1)} of her turns   ${r.win ? 'HP left when she wins ' + (100 * r.hpLeft).toFixed(0) + '%' : ''}${r.win < 1 ? '   wraith HP left when she loses ' + (100 * r.foeLeft).toFixed(0) + '%' : ''}`);
   }
 }

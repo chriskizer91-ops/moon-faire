@@ -323,7 +323,7 @@ function show(events, at) {                         // put what just happened on
   for (const ev of events) {
     if (ev.k === 'dmg' && ev.to === 'foe') {
       const p = foeChest(); p.x += rnd(-0.25, 0.25); p.y += rnd(0.1, 0.5);
-      UI.number(p, ev.n, ev.big ? 'big' : '');
+      UI.number(p, ev.n.toLocaleString('en-US'), ev.tag === 'doom' ? 'count' : ev.big ? 'big' : '');
       if (S.foe.hp > 0) wraith.play('hurt');
       SND.sfx.hit(ev.big ? 1.2 : 0.9); addShake(ev.big ? 0.6 : 0.35); hitStop(ev.big ? 0.1 : 0.06);
     } else if (ev.k === 'dmg' && ev.to === 'hero') {
@@ -515,7 +515,7 @@ function* victory() {
   B.best = Math.max(B.best, next);
   endCard(`<h2>Released</h2><h3>Level ${B.level} cleared</h3><p>Defeat is release, not death. The moth rises past the bell tower toward the dark moon.</p>
     <div class="stats"><div><b>${Math.floor(sec / 60)}:${String(Math.floor(sec % 60)).padStart(2, '0')}</b><span>Battle time</span></div><div><b>${S.dealt.toLocaleString('en-US')}</b><span>Damage dealt</span></div><div><b>${S.hero.hp}</b><span>HP left</span></div></div>
-    ${next > B.level ? `<p><b>Level up: she is level ${next}.</b> Every number is a fifth bigger, hers and the next wraith's.</p><button type="button" class="go" data-level="${next}">Fight at level ${next}</button>` : ''}<button type="button" class="go alt" data-level="${B.level}">Level ${B.level} again</button>`);
+    ${next > B.level ? `<p><b>Level up: she is level ${next}.</b> The next wraith is level ${Math.min(RULES.TOP_LEVEL, next + RULES.FOE.ahead)}, and every number is a fifth bigger.</p><button type="button" class="go" data-level="${next}">Fight at level ${next}</button>` : ''}<button type="button" class="go alt" data-level="${B.level}">Level ${B.level} again</button>`);
 }
 function* defeat() {
   B.state = 'over'; UI.waitMenu(); SND.stopMusic(1.0); SND.sfx.defeat();
@@ -527,12 +527,12 @@ function endCard(html) { $('endCard').innerHTML = html; $('end').hidden = false;
 $('endCard').addEventListener('click', e => { const b = e.target.closest('.go'); if (b) begin(+b.dataset.level, true); });
 function titleCard() {
   $('startCard').innerHTML = `<h2>The Shadow Wraith</h2><h3>Night of No Moon &middot; the square</h3>
-    <p>The Faire has played its last show. The chapel bell tolls once, and a Shadow Wraith climbs out of the graveyard: what a wisp becomes when nobody helps it.</p>
+    <p>The chapel bell tolls once, and a Shadow Wraith climbs out of the graveyard, ${RULES.FOE.ahead} levels above her. Any of the other three would run. The Jester ends fights.</p>
     <ul><li>When her <b>Turn</b> bar fills, choose a command. Time waits while you choose.</li>
-    <li><b>Attack</b> is free. <b>Magic</b> costs MP, and MP does not come back.</li>
-    <li>Taking hits fills <b>Curtain</b>. When it is full, <b>Curtain Call</b> appears.</li>
-    <li>The thin bar under the wraith's HP is <b>its</b> turn.</li>
-    <li>Drag the picture while choosing to look around.</li></ul>
+    <li><b>Sealed Fate</b> (in Magic) marks it with Doom. When the bell has counted three of its turns, it is released, however much HP it has.</li>
+    <li>She is frail. Stay alive while the bell counts: <b>Hush</b>, <b>Defend</b>, heal.</li>
+    <li>Taking hits fills <b>Curtain</b>. <b>Curtain Call</b> lands Doom at once.</li>
+    <li>The thin bar under the wraith's HP is <b>its</b> turn. Drag the picture to look around.</li></ul>
     <button type="button" class="go" id="go">Begin</button>`;
   $('start').hidden = false; $('go').onclick = () => { SND.init(); begin(1, false); };
 }
@@ -540,9 +540,9 @@ function begin(level, quick) {
   $('start').hidden = true; $('end').hidden = true; UI.vignette(0); UI.cinematic(false); UI.clear();
   tasks.length = 0; sparks.length = 0; casts.length = 0; lock = null; for (const n of Object.keys(poses)) poses[n].stop();
   clock.scale = 1; clock.stop = 0; clock.slowT = 0; B.acting = false; B.dimTo = 0; B.warned = false;
-  if (!wraith || wraith.level !== level) { if (wraith) wraith.dispose(); wraith = makeWraith(scene, { level }); }
   B.level = level; S = B.S = RULES.newBattle(level);
-  $('elv').textContent = 'Level ' + level; $('enemy').hidden = true; $('ui').hidden = true;
+  if (!wraith || wraith.level !== S.foeLevel) { if (wraith) wraith.dispose(); wraith = makeWraith(scene, { level: S.foeLevel }); }
+  $('elv').textContent = 'Level ' + S.foeLevel; $('enemy').hidden = true; $('ui').hidden = true;
   spawn(intro(quick));
 }
 
@@ -554,7 +554,7 @@ loadJester(scene).then(j => {
   const held = n => { const a = J.mixer.clipAction(J.clips[n]); a.setLoop(THREE.LoopOnce, 1); a.clampWhenFinished = true; a.setEffectiveWeight(0); a.play(); a.paused = true; return a; };
   acts = { idle: loop('Idle'), walk: loop('Walk'), guard: held('Squat'), down: held('Kneel'), win: held('ArmsUp') };
   for (const name of Object.keys(PACE)) { const a = J.mixer.clipAction(J.clips[name]); a.setLoop(THREE.LoopOnce, 1); a.clampWhenFinished = true; a.setEffectiveWeight(0); poses[name] = a; }
-  wraith = makeWraith(scene, { level: 1 }); wraith.setFade(0);
+  wraith = makeWraith(scene, { level: RULES.newBattle(1).foeLevel }); wraith.setFade(0);
   $('load').remove(); resize(); shot(() => ({ pos: v3(-5.6, 1.9, 4.6), look: v3(-0.6, 1.25, 0) }), { cut: true }); W.x = HOME.hero.x; titleCard(); api.ready = true;
 }).catch(e => { errBox.textContent += 'Could not load: ' + (e.message || e) + '\n'; });
 

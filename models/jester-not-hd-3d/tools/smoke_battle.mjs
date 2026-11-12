@@ -1,6 +1,7 @@
 // Play the turn-based fight through in headless Chrome and report how it went and any errors.
 // Frames are stepped by hand (#test), because software rendering here is far slower than a real screen.
-// usage: node tools/smoke_battle.mjs [WxH] [stills dir] [well|attack] [pixel] [levels]
+// usage: node tools/smoke_battle.mjs [WxH] [stills dir] [well|attack|slow] [pixel] [levels]
+//   well: Doom at once, then stay alive. attack: only attacks. slow: no Doom or Curtain Call, to see the long fight
 //   stills dir: saves a picture the first time each command and each wraith move plays, and at the end
 import http from 'node:http'; import fs from 'node:fs'; import path from 'node:path';
 import { chromium } from 'playwright-core';
@@ -32,12 +33,11 @@ await page.click('#go');
 const choose = (s, how) => {
   const h = s.hero, f = s.foe, can = id => s.menuAll.includes(id);
   if (how === 'attack') return 'attack';
-  const threat = !f.usedEclipse && f.silence <= 0 && f.hp < f.maxHp * 0.35;
+  if (how === 'slow') return h.hp <= 0.4 * h.maxHp && can('odds') ? 'odds' : s.turn === 1 && can('gravity') ? 'gravity' : can('hush') && s.turn % 3 === 2 ? 'hush' : s.turn % 2 ? 'attack' : 'defend';
   if (can('curtain')) return 'curtain';
+  if (can('fate')) return 'fate';
   if (h.hp <= 0.4 * h.maxHp && can('odds')) return 'odds';
-  if (threat) return can('hush') && h.mp - 12 >= (h.hp < 0.7 * h.maxHp ? 26 : 0) ? 'hush' : 'defend';
-  if (s.turn === 1 && can('gravity')) return 'gravity';
-  if (can('fate') && h.mp - 18 >= 26 && f.hp > 660 * s.k) return 'fate';
+  if (f.doom > 0) return can('hush') ? 'hush' : 'defend';
   return 'attack';
 };
 const seen = new Set(), used = {}, foeUsed = {}, results = [], trace = [];

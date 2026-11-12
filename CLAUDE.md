@@ -43,5 +43,6 @@
 - `art/foes/` holds Envoi's foes as sprites, cut by `tools/cut_envoi_foes.py` from the sheets in `art/foes/envoi-sheets/` (copied from Envoi's `reference/art/`). `foes.json` gives each sprite's ground point and pixels per metre.
 - `art-pipeline/` holds the cut frames (`frames/` with `meta.json`), the scripts, the original sheets, the smoothing pack (finished October 18) and `frames_pre_smoothing/`. The scripts still carry paths from the old art workspace (`/home/claude/...`). `tools/hd_lossless.py` repeats `build.py`'s HD step; when a new frame prefix appears in `build.py`, add it there too.
 - Read clips from `manifest.json`. Draw every frame on its anchor, and fire gameplay on `release_frame`. Don't mirror spells, because the costumes are asymmetric.
+- Chris said (November 11) that the Jester is the most powerful of the four, overwhelmingly so: her power ends fights. Build the other three around that.
 - Names for the four, the moon and the planets are still open, so keep text in data files.
 - Chris tries things on his phone. Every step should end with something he can open there. Write anything Chris reads in plain words.
