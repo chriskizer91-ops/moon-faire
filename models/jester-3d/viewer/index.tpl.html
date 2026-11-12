@@ -38,6 +38,13 @@ canvas#stage{display:block;width:100%;height:100%;touch-action:none;cursor:grab}
 #states .chip,#acts .chip,#spells .chip{font-weight:700}
 .notes{color:var(--muted);font-size:14px;max-width:68ch;margin:0}
 .notes b{color:var(--ink);font-weight:700}
+#sfx{position:absolute;inset:0;width:100%;height:100%;pointer-events:none;z-index:2}
+#book{top:8px;bottom:auto}.booktag{top:12px;bottom:auto}
+#pad2{position:absolute;right:10px;bottom:10px;z-index:3;display:grid;grid-template-columns:auto auto auto;gap:6px;align-items:center;justify-items:center;touch-action:manipulation}
+#qName{grid-column:2;max-width:92px;text-align:center;font:600 11px/1.15 var(--f-mono);letter-spacing:.04em;color:var(--gold);text-shadow:0 1px 3px #000}
+.qb{width:48px;height:48px;border-radius:50%;border:1px solid rgba(214,168,78,.6);background:rgba(20,14,28,.6);color:#f0e6f6;font:600 11px/1 var(--f-mono);letter-spacing:.03em;cursor:pointer;-webkit-tap-highlight-color:transparent}
+.qb:active{background:rgba(214,168,78,.5)}.qs{width:32px;height:32px;font-size:20px;line-height:1}.qc{width:62px;height:62px;font-size:13px;background:rgba(190,60,120,.72);border-color:rgba(255,220,150,.8)}
+.qb:focus-visible{outline:2px solid #6fe;outline-offset:2px}
 #joy{position:absolute;left:12px;bottom:12px;width:104px;height:104px;border-radius:50%;background:rgba(20,14,28,.46);border:1px solid rgba(214,168,78,.5);touch-action:none;z-index:3}
 #joy[hidden]{display:none}
 #knob{position:absolute;left:50%;top:50%;width:44px;height:44px;margin:-22px 0 0 -22px;border-radius:50%;background:rgba(214,168,78,.78);box-shadow:0 2px 8px rgba(0,0,0,.4);pointer-events:none}
@@ -56,6 +63,8 @@ canvas#stage{display:block;width:100%;height:100%;touch-action:none;cursor:grab}
     <canvas id="stage" aria-label="3D model of the Jester Witch. Drag to turn her, pinch or scroll to zoom."></canvas>
     <div class="hud" id="hud">Loading</div>
     <canvas id="book" width="390" height="330" aria-label="The flipbook frame for the same moment"></canvas><span class="booktag">Flipbook</span>
+    <canvas id="sfx" aria-hidden="true"></canvas>
+    <div id="pad2" aria-label="Quick moves"><button type="button" id="qPrev" class="qb qs" aria-label="Previous spell">&#8249;</button><span id="qName"></span><button type="button" id="qNext" class="qb qs" aria-label="Next spell">&#8250;</button><button type="button" id="qMove" class="qb">Move</button><button type="button" id="qJump" class="qb">Jump</button><button type="button" id="qCast" class="qb qc">Cast</button></div>
     <div id="joy" hidden aria-label="Walk pad: drag to walk her around"><div id="knob"></div></div>
     <div class="err" id="err" hidden></div>
   </div>

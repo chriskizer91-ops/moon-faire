@@ -30,7 +30,8 @@
     if (pending && !stance && !stanceTo) { const n = pending; pending = ''; play(n, true); }
     let P = base; spinNow = 0;
     if (act) {
-      act.t += dt;
+      const tPrev = act.t; act.t += dt;
+      for (const h of act.def.hits || []) { const th = h * act.dur; if (tPrev < th && act.t >= th) { state.hitN = (state.hitN || 0) + 1; state.hitK = act.def.impact || 0.55; state.hitName = act.type; } }      // a blow lands: hosts watch state.hitN to shake the picture or knock a target
       if (act.t >= act.dur && !act.def.hold) { if (act.def.end) act.def.end(act); act = null; }
       else {
         if (act.def.spinT) spinNow = evalTrack(act.def.spinT, Math.min(act.t, act.dur));
@@ -94,7 +95,7 @@
     root, fx, skeleton, bones, animate, play, ACTIONS, anchor, setFade, state, setStance, STANCES: STANCE_LIST,
     stop() { act = null; pending = ''; },
     reset() { act = null; pending = ''; stance = null; stanceTo = ''; resetCloth(); for (const c of chains) c.reset(); },
-    get stance() { return stanceTo; }, get spin() { return spinNow; },      // spin: the host adds this to the root's turn (a twirl)
+    get stance() { return stanceTo; }, set targetDist(v) { tgtK = v > 0 ? cl(v / 2.6, 0.4, 2.6) : 1; }, get spin() { return spinNow; },      // spin: the host adds this to the root's turn (a twirl)
     get stanceNow() { return stance ? stance.name : ''; }, get stanceProgress() { return stance ? stance.t / stance.def.dur : 0; }, get pending() { return pending; },
     get fade() { return fade; }, get busy() { return !!act && !(act.def.hold && act.t >= act.dur); }, get action() { return act ? act.type : ''; },
     get progress() { return act ? Math.min(1, act.t / act.dur) : -1; }, get time() { return act ? act.t : -1; },

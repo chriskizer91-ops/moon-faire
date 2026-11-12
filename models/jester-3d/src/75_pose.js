@@ -61,20 +61,23 @@
     B.eyes = blinkT >= 0 ? Math.sin(cl(blinkT / 0.2, 0, 1) * PI) : 0; B.mouth = 0; B.glow = 0;
     const lw = Math.max(wb, rb || 0), gait = cl(rb || 0, 0, 1);
     if (lw > 0.001) {
-      const W = walkPose, c = Math.cos(ph), sn = Math.sin(ph);
-      W.hip[0] = -0.014 * sn; W.hip[1] = -0.018 - 0.012 * Math.cos(2 * ph); W.hip[2] = 0.01;
-      W.hipR[0] = 0.10 * c; W.hipR[1] = 0.03; W.hipR[2] = -0.035 * sn;
-      W.sp[0] = -0.20 * c; W.sp[1] = 0.05; W.sp[2] = 0.03 * sn;
-      W.hd[0] = 0.08 * c; W.hd[1] = -0.03; W.hd[2] = 0; W.sh[0] = W.sh[1] = 0.02;
+      const W = walkPose, c = Math.cos(ph), sn = Math.sin(ph), c2w = Math.cos(2 * ph), ST = 0.62, TOE = 0.78, yToe = Math.sin(TOE) * 0.085;
+      // A walk, not a jog: one foot is always on the ground (each stays down for 62% of the stride), the heel lands first and the toe leaves last,
+      // the swinging foot stays low, the hips are lowest when both feet are down, and the arms hang and swing from the shoulder.
+      W.hip[0] = -0.020 * sn; W.hip[1] = -0.031 - 0.019 * c2w; W.hip[2] = 0.005;
+      W.hipR[0] = 0.11 * c; W.hipR[1] = 0.02; W.hipR[2] = -0.030 * sn;
+      W.sp[0] = -0.17 * c; W.sp[1] = 0.03; W.sp[2] = 0.035 * sn;
+      W.hd[0] = 0.06 * c; W.hd[1] = -0.02; W.hd[2] = -0.01 * sn; W.sh[0] = W.sh[1] = 0;
       for (const [S, s] of SIDES) {
-        const p = ph + (s < 0 ? 0 : PI), cz = Math.cos(p), sz = Math.sin(p), swing = -cz;      // the arm swings against its own leg
-        const f = W['ft' + S], lift = Math.max(0, -sz), pitch = 0.08 - 0.33 * cz + 0.25 * lift;
-        f[0] = 0; f[1] = 0.085 * lift + Math.max(0, Math.sin(pitch)) * 0.085; f[2] = 0.155 * cz - 0.01; f[3] = s * 0.06; f[4] = pitch;
-        W['kn' + S][0] = s * 0.06; W['kn' + S][1] = 0; W['kn' + S][2] = 1;
-        const h = W['h' + S]; h[0] = s * (0.225 - 0.02 * swing); h[1] = 0.985 + 0.045 * Math.max(0, swing) + 0.01 * Math.cos(2 * ph); h[2] = 0.075 + 0.165 * swing;
-        const e = W['e' + S]; e[0] = s * 0.5; e[1] = -0.3; e[2] = -1;
-        W['tw' + S] = 0.25; W['wr' + S][0] = 0.12; W['wr' + S][1] = 0;
-        for (let i = 0; i < 6; i++) W['f' + S][i] = lerp(FP.relax[i], FP.fist[i], 0.16);      // loose hands as she walks (they were nearly fists, thumb out)
+        const p = ph + (s < 0 ? 0 : PI), q = ((p / TAU) % 1 + 1) % 1, f = W['ft' + S], swing = -Math.cos(p); let z, y, pitch;      // the arm swings against its own leg
+        if (q < ST) { const u = q / ST; z = lerp(0.24, -0.27, u); pitch = u < 0.16 ? lerp(-0.30, 0, u / 0.16) : TOE * Math.pow(sm(0.58, 1, u), 1.2); y = pitch < 0 ? -pitch * 0.04 : Math.sin(pitch) * 0.085; }
+        else { const u = (q - ST) / (1 - ST); z = lerp(-0.27, 0.24, u * u * (3 - 2 * u)); pitch = TOE - (TOE + 0.30) * Math.pow(u, 0.8); y = yToe * (1 - u) * (1 - u) + 0.050 * Math.pow(Math.sin(PI * u), 0.8) + 0.012 * u; }
+        f[0] = -s * 0.015; f[1] = y; f[2] = z; f[3] = s * 0.07; f[4] = pitch; f[5] = 0; f[6] = 0;
+        W['kn' + S][0] = s * 0.05; W['kn' + S][1] = 0; W['kn' + S][2] = 1;
+        const h = W['h' + S]; h[0] = s * (0.262 - 0.012 * swing); h[1] = 0.872 + 0.018 * swing + 0.016 * swing * swing; h[2] = 0.035 + 0.185 * swing;
+        const e = W['e' + S]; e[0] = s * 0.4; e[1] = -0.2; e[2] = -1;
+        W['tw' + S] = 0.10; W['wr' + S][0] = 0.10; W['wr' + S][1] = 0;
+        for (let i = 0; i < 6; i++) W['f' + S][i] = lerp(FP.relax[i], FP.fist[i], 0.10);
       }
       W.eyes = B.eyes; W.mouth = 0; W.glow = 0;
       if (gait > 0.001) {                             // the run: a longer stride, both feet off the ground twice a stride, elbows bent and pumping

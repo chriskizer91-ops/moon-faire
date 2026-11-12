@@ -14,7 +14,8 @@ with sync_playwright() as p:
     k = 0
     for st in steps:
         label, wait = st.rsplit(':', 1)
-        if label.startswith('key+'): pg.keyboard.down(label[4:])
+        if label.startswith('js='): pg.evaluate(label[3:])
+        elif label.startswith('key+'): pg.keyboard.down(label[4:])
         elif label.startswith('key-'): pg.keyboard.up(label[4:])
         elif label: pg.get_by_role('button', name=label, exact=True).click()
         pg.wait_for_timeout(int(float(wait) * 1000))

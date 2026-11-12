@@ -47,6 +47,7 @@
   }
   function setMove(id) {
     if (id === 'idle' || id === 'walk') { J.stop(); move = ''; return setState(id); }      // kept for older callers
+    if (roam.on && dummy.visible && AIMED[id]) { const dx = dummy.position.x - roam.x, dz = dummy.position.z - roam.z; roam.aim = Math.atan2(-dz, dx); J.targetDist = Math.hypot(dx, dz); } else { roam.aim = null; J.targetDist = 0; }
     move = id; faceTo = 0; J.play(id, true);
     if (J.stance === '' && J.STANCES.indexOf(state) >= 0) state = 'idle';             // a jump stands her up first
     press(); bookT0 = time;
@@ -62,11 +63,11 @@
   joy.addEventListener('pointermove', (e) => { if (e.pointerId === joyId) { joySet(e); e.preventDefault(); } });
   joy.addEventListener('pointerup', joyEnd); joy.addEventListener('pointercancel', joyEnd);
   const KEYS = { KeyW: 'u', ArrowUp: 'u', KeyS: 'd', ArrowDown: 'd', KeyA: 'l', ArrowLeft: 'l', KeyD: 'r', ArrowRight: 'r', ShiftLeft: 'run', ShiftRight: 'run' };
-  addEventListener('keydown', (e) => { if (!roam.on || e.target.tagName === 'INPUT') return; if (e.code === 'Space') { setMove('jump'); e.preventDefault(); return; } const k = KEYS[e.code]; if (k) { roam.keys[k] = 1; e.preventDefault(); } });
+  addEventListener('keydown', (e) => { if (e.target.tagName === 'INPUT' || e.metaKey || e.ctrlKey || e.altKey || e.repeat && !KEYS[e.code]) return; if (quickKey(e.code)) { e.preventDefault(); return; } if (!roam.on) return; const k = KEYS[e.code]; if (k) { roam.keys[k] = 1; e.preventDefault(); } });
   addEventListener('keyup', (e) => { const k = KEYS[e.code]; if (k) roam.keys[k] = 0; });
   addEventListener('blur', () => { roam.keys = {}; });
   const roamChip = chip(toggleRow, 'Walk around', (b) => {
-    roam.on = !roam.on; b.setAttribute('aria-pressed', roam.on); joy.hidden = !roam.on; JO.treadmill = roam.on ? false : undefined; stage.lanterns.visible = roam.on;
+    roam.on = !roam.on; b.setAttribute('aria-pressed', roam.on); joy.hidden = !roam.on; JO.treadmill = roam.on ? false : undefined; stage.lanterns.visible = roam.on; dummy.visible = roam.on && dummyOn; J.targetDist = 0;
     spin = false; spinChip.setAttribute('aria-pressed', 'false');
     if (roam.on) { if (state === 'walk' || state === 'run') setState('idle'); viewAz = orbit.az; viewEl = 0.22; }
     else { roam.x = roam.z = roam.face = roam.vx = roam.vz = roam.jx = roam.jy = 0; roam.keys = {}; J.root.position.set(0, 0, 0); J.root.rotation.y = 0; orbit.target.z = 0; stage.follow(0, 0); if (state === 'idle') { wbTo = rbTo = 0; } viewAz = 0; viewEl = 0.10; }
@@ -83,19 +84,21 @@
     }
     const free = !J.stanceNow && !J.stance && !(J.action && !WALKS[J.action]) && !J.pending;
     if (!free) mag = 0;
-    const run = Math.max(0, Math.min(1, (mag - 0.6) / 0.35)), speed = mag < 0.08 ? 0 : (0.25 + 0.42 * Math.min(1, mag / 0.6)) * (1 - run) + 2.3 * run;
+    const run = Math.max(0, Math.min(1, (mag - 0.6) / 0.35)), speed = mag < 0.08 ? 0 : (0.32 + 0.52 * Math.min(1, mag / 0.6)) * (1 - run) + 2.3 * run;
     const fx = -Math.sin(orbit.az), fz = -Math.cos(orbit.az), rx = Math.cos(orbit.az), rz = -Math.sin(orbit.az), m = mag > 1e-4 ? speed / mag : 0;
     const tx = (rx * ix + fx * iy) * m, tz = (rz * ix + fz * iy) * m, k = Math.min(1, dt * 7);
     roam.vx += (tx - roam.vx) * k; roam.vz += (tz - roam.vz) * k;
     const v = Math.hypot(roam.vx, roam.vz);
     roam.x += roam.vx * dt; roam.z += roam.vz * dt;
     const d = Math.hypot(roam.x, roam.z); if (d > ROAM_R) { roam.x *= ROAM_R / d; roam.z *= ROAM_R / d; }      // the edge of the stage
-    if (v > 0.06) { let df = Math.atan2(roam.vx, roam.vz) - roam.face; df = Math.atan2(Math.sin(df), Math.cos(df)); roam.face += df * Math.min(1, dt * 9); }
-    wbTo = Math.min(1, v / 0.3); rbTo = Math.max(0, Math.min(1, (v - 0.8) / 1.1));
+    if (J.action && AIMED[J.action] && roam.aim != null) { let df = roam.aim - roam.face; df = Math.atan2(Math.sin(df), Math.cos(df)); roam.face += df * Math.min(1, dt * 10); }
+    else if (v > 0.06) { let df = Math.atan2(roam.vx, roam.vz) - roam.face; df = Math.atan2(Math.sin(df), Math.cos(df)); roam.face += df * Math.min(1, dt * 9); }
+    wbTo = Math.min(1, v / 0.3); rbTo = Math.max(0, Math.min(1, (v - 1.0) / 1.0));
     wb += (wbTo - wb) * Math.min(1, dt * 8); rb += (rbTo - rb) * Math.min(1, dt * 5);
-    if (wb > 0.001) phase += dt * Math.max(2.2, v * (10.1 * (1 - rb) + 4.2 * rb));       // her feet keep pace with the ground she covers
+    if (wb > 0.001) phase += dt * Math.max(2.0, v * (7.66 * (1 - rb) + 4.2 * rb));       // her feet keep pace with the ground she covers
     J.root.position.set(roam.x, 0, roam.z); J.root.rotation.y = roam.face + J.spin;
-    orbit.target.x += (roam.x - orbit.target.x) * Math.min(1, dt * 5); orbit.target.z += (roam.z - orbit.target.z) * Math.min(1, dt * 5); stage.follow(roam.x, roam.z);
+    const share = dummy.visible && J.action && AIMED[J.action] ? 0.42 : 0, cx = roam.x + (dummy.position.x - roam.x) * share, cz = roam.z + (dummy.position.z - roam.z) * share; roam.wide = share ? Math.hypot(dummy.position.x - roam.x, dummy.position.z - roam.z) * 0.62 + 0.7 : 0;
+    orbit.target.x += (cx - orbit.target.x) * Math.min(1, dt * 5); orbit.target.z += (cz - orbit.target.z) * Math.min(1, dt * 5); stage.follow(roam.x, roam.z);
     return v;
   }
   const spinChip = chip(toggleRow, 'Turntable', (b) => { spin = !spin; viewAz = null; b.setAttribute('aria-pressed', spin); }, false);
@@ -143,6 +146,89 @@
     bctx.imageSmoothingEnabled = true; bctx.drawImage(im, W * wide - f[2] * k, H * 0.97 - f[3] * k, f[0] * k, f[1] * k);
   }
 
+  // ---- quick buttons on the stage: cast the chosen spell, step through the spells, jump, and a flourish; keys: 1 to 0 cast, Q and E choose, F casts, R flourish, Space jumps ----
+  const FLOUR = ['wave', 'bow', 'twirl', 'laugh', 'dance', 'talk']; let qi = 1, fi = 0;
+  const qName = $('qName'), qShow = () => { qName.textContent = SPELLS[qi][1]; };
+  const qStep = (d) => { qi = (qi + d + SPELLS.length) % SPELLS.length; qShow(); };
+  const qCast = () => setMove(SPELLS[qi][0]), qFlour = () => { setMove(FLOUR[fi]); fi = (fi + 1) % FLOUR.length; };
+  $('qPrev').addEventListener('click', () => qStep(-1)); $('qNext').addEventListener('click', () => qStep(1)); $('qCast').addEventListener('click', qCast); $('qJump').addEventListener('click', () => setMove('jump')); $('qMove').addEventListener('click', qFlour);
+  for (const id of ['pad2', 'joy']) $(id).addEventListener('pointerdown', (e) => e.stopPropagation());
+  const DIG = ['Digit1', 'Digit2', 'Digit3', 'Digit4', 'Digit5', 'Digit6', 'Digit7', 'Digit8', 'Digit9', 'Digit0'];
+  function quickKey(code) {
+    const d = DIG.indexOf(code); if (d >= 0 && d < SPELLS.length) { qi = d; qShow(); qCast(); return true; }
+    if (code === 'KeyQ') { qStep(-1); return true; } if (code === 'KeyE') { qStep(1); return true; } if (code === 'KeyF' || code === 'Enter') { qCast(); return true; } if (code === 'KeyR') { qFlour(); return true; }
+    if (code === 'Space') { setMove('jump'); return true; }
+    return false;
+  }
+  qShow();
+  // ---- a practice dummy to cast at (with Walk around): she turns to put it on her casting side, the spell goes to where it stands, and it rocks when struck ----
+  const AIMED = { sealed_fate: 1, gilded_rebuke: 1, hush: 1, gravity: 1, ill_omen: 1, stop: 1, last_toll: 1 };
+  const lin = (h) => new THREE.Color(h).convertSRGBToLinear(), dummy = new THREE.Group(), dBody = new THREE.Group(), dState = { rx: 0, rz: 0, vx: 0, vz: 0, flash: 0 }; let dummyOn = true;
+  dummy.add(dBody); dummy.position.set(1.9, 0, -0.25); dummy.visible = false; stage.scene.add(dummy);
+  const sackM = new THREE.MeshStandardMaterial({ color: lin(0x9a7d55), roughness: 0.95, emissive: lin(0xb070ff), emissiveIntensity: 0 });
+  { const wood = new THREE.MeshStandardMaterial({ color: lin(0x4a3020), roughness: 0.7 }), rope = new THREE.MeshStandardMaterial({ color: lin(0x5e4a32), roughness: 0.9 }), mark = new THREE.MeshStandardMaterial({ color: lin(0x7a2a4a), roughness: 0.8 });
+    const mk = (par, g, m, x, y, z) => { const o = new THREE.Mesh(g, m); o.position.set(x, y, z); o.castShadow = o.receiveShadow = true; par.add(o); return o; };
+    mk(dummy, new THREE.CylinderGeometry(0.25, 0.30, 0.06, 24), wood, 0, 0.03, 0);
+    mk(dBody, new THREE.CylinderGeometry(0.034, 0.046, 0.86, 12), wood, 0, 0.46, 0);
+    mk(dBody, new THREE.SphereGeometry(1, 24, 18), sackM, 0, 1.10, 0).scale.set(0.19, 0.30, 0.15);
+    mk(dBody, new THREE.CylinderGeometry(0.027, 0.027, 0.80, 10), wood, 0, 1.27, 0).rotation.z = Math.PI / 2;
+    mk(dBody, new THREE.SphereGeometry(0.115, 20, 16), sackM, 0, 1.53, 0);
+    for (const [y, r] of [[1.405, 0.062], [0.84, 0.10], [1.27, 0.045]]) mk(dBody, new THREE.TorusGeometry(r, 0.011, 8, 20), rope, 0, y, 0).rotation.x = Math.PI / 2;
+    for (const r of [0.085, 0.045]) { const t = mk(dBody, new THREE.TorusGeometry(r, 0.008, 6, 24), mark, -0.19 * 0.96, 1.12, 0); t.rotation.y = Math.PI / 2; t.scale.z = 0.5; }      // a painted mark on the side she strikes
+  }
+  const dummyChip = chip(toggleRow, 'Dummy', (b) => { dummyOn = !dummyOn; b.setAttribute('aria-pressed', dummyOn); dummy.visible = roam.on && dummyOn; }, true);
+  function dummyStep(dt) {
+    const d = dState; d.vx += (-70 * d.rx - 5.5 * d.vx) * dt; d.vz += (-70 * d.rz - 5.5 * d.vz) * dt; d.rx += d.vx * dt; d.rz += d.vz * dt; d.flash *= Math.exp(-dt * 4.5);
+    dBody.rotation.set(d.rx, 0, d.rz); sackM.emissiveIntensity = 1.6 * d.flash;
+  }
+  function dummyHit(k) { const dx = dummy.position.x - roam.x, dz = dummy.position.z - roam.z, L = Math.hypot(dx, dz) || 1, p = 2.2 + 4.2 * k; dState.vx += dz / L * p; dState.vz += -dx / L * p; dState.flash = Math.min(1, 0.4 + k); }
+  // ---- what a spell does to the room: the picture jolts or sways, light flashes from where it lands, and motes cross the whole stage ----
+  const sfx = $('sfx'), sg = sfx.getContext('2d'), MOTES = [], calm = matchMedia('(prefers-reduced-motion: reduce)').matches, _hp = new THREE.Vector3();
+  const LOOK = { last_toll: ['214,222,255', 'rain', 1], gravity: ['176,116,255', 'fall', 1], stop: ['208,182,255', 'hold', 1], gilded_rebuke: ['255,206,112', 'burst', 0], curtain_call: ['255,206,112', 'confetti', 0], sealed_fate: ['192,124,255', 'burst', 0],
+    hush: ['206,188,255', 'inward', 1], ill_omen: ['156,84,236', 'burst', 0], royal_reversal: ['216,222,255', 'rise', 0], against_all_odds: ['255,216,132', 'rise', 0], jump: ['226,210,255', 'dust', 0] };
+  let shakeK = 0, swayK = 0, swayT = 9, flashK = 0, flashC = '200,150,255', flashX = 0.5, flashY = 0.5, hitSeen = 0;
+  const R = Math.random, mote = (x, y, vx, vy, life, size, c, o) => { if (MOTES.length < 420) MOTES.push(Object.assign({ x, y, vx, vy, life, max: life, size, c, g: 0, drag: 0, kind: 0, a: R() * 6.28, w: 0 }, o || {})); };
+  function roomHit(name, k) {
+    const L = LOOK[name] || ['220,200,255', 'burst', 0], W = sfx.width, H = sfx.height, u = W / 400, c = L[0];
+    let hx = 0.5, hy = 0.5; try { J.anchor(name === 'jump' ? 'feet' : 'hit', _hp).project(stage.camera); if (Math.abs(_hp.x) < 1.4 && Math.abs(_hp.y) < 1.4) { hx = _hp.x * 0.5 + 0.5; hy = -_hp.y * 0.5 + 0.5; } } catch (e) {}
+    const x0 = hx * W, y0 = hy * H;
+    if (!calm) { shakeK = Math.max(shakeK, k); if (L[2]) { swayK = k; swayT = 0; } }
+    if (name !== 'jump') { flashK = 0.55 * k + 0.15; flashC = c; flashX = hx; flashY = hy; }
+    const n = Math.round((L[1] === 'dust' ? 22 : 60 + 70 * k) * (small ? 0.7 : 1));
+    for (let i = 0; i < n; i++) {
+      const a = R() * 6.283, sp = (120 + 620 * R() * R()) * u * (0.6 + k);
+      if (L[1] === 'burst') mote(x0, y0, Math.cos(a) * sp, Math.sin(a) * sp, 0.5 + 0.8 * R(), (1.2 + 2.6 * R()) * u, c, { drag: 2.4, g: 120 * u });
+      else if (L[1] === 'rain') mote(R() * W, -R() * H * 0.9, (R() - 0.5) * 30 * u, (90 + 260 * R()) * u, 1.6 + 1.4 * R(), (0.9 + 1.8 * R()) * u, R() < 0.25 ? '255,255,255' : c, { w: 2 + 3 * R() });
+      else if (L[1] === 'fall') mote(R() * W, R() * H * 0.8, 0, (500 + 700 * R()) * u, 0.45 + 0.4 * R(), (1 + 1.4 * R()) * u, c, { kind: 1, g: 900 * u });
+      else if (L[1] === 'hold') mote(R() * W, R() * H, 0, 0, 0.9 + 0.7 * R(), (1 + 2.4 * R()) * u, R() < 0.3 ? '255,255,255' : c, { w: 6 + 6 * R() });
+      else if (L[1] === 'inward') { const r0 = (0.5 + 0.5 * R()) * Math.hypot(W, H) * 0.6; mote(x0 + Math.cos(a) * r0, y0 + Math.sin(a) * r0, -Math.cos(a) * r0 * 1.5, -Math.sin(a) * r0 * 1.5, 0.55 + 0.25 * R(), (1 + 2 * R()) * u, c, { drag: 0.6 }); }
+      else if (L[1] === 'rise') mote(R() * W, H * (0.45 + 0.6 * R()), (R() - 0.5) * 40 * u, -(60 + 190 * R()) * u, 1.3 + 1.2 * R(), (1 + 2.2 * R()) * u, R() < 0.3 ? '255,255,255' : c, { w: 2 + 2 * R() });
+      else if (L[1] === 'confetti') mote(R() * W, -R() * H * 0.7, (R() - 0.5) * 70 * u, (60 + 130 * R()) * u, 2.2 + 1.6 * R(), (2.4 + 2.6 * R()) * u, R() < 0.5 ? '255,206,112' : R() < 0.5 ? '190,120,255' : '236,110,150', { kind: 2, w: 3 + 4 * R(), g: 40 * u });
+      else mote(x0 + (R() - 0.5) * 60 * u, y0, (R() - 0.5) * 300 * u, -R() * 40 * u, 0.5 + 0.4 * R(), (1.4 + 2 * R()) * u, c, { drag: 3 });
+    }
+  }
+  function roomStep(dt) {
+    const hn = J.state.hitN || 0; if (hn !== hitSeen) { hitSeen = hn; const nm = J.state.hitName, k = J.state.hitK || 0.5; roomHit(nm, k); if (dummy.visible && AIMED[nm]) dummyHit(k); }
+    dummyStep(dt);
+    const bw = canvas.clientWidth, bh = canvas.clientHeight, pr = Math.min(1.5, devicePixelRatio || 1), W = Math.round(bw * pr), H = Math.round(bh * pr); if (sfx.width !== W || sfx.height !== H) { sfx.width = W; sfx.height = H; }
+    shakeK *= Math.exp(-dt * 6.5); swayT += dt; flashK *= Math.exp(-dt * 5);
+    const sw = swayK * Math.exp(-swayT * 2.0), rot = Math.sin(swayT * 7.5) * 0.9 * sw + (R() - 0.5) * 0.5 * shakeK, ox = (R() - 0.5) * 18 * shakeK, oy = (R() - 0.5) * 18 * shakeK, sc = 1 + 0.018 * shakeK + 0.03 * sw * (0.5 + 0.5 * Math.cos(swayT * 7.5));
+    canvas.style.transform = shakeK > 0.004 || sw > 0.004 ? 'translate(' + ox.toFixed(1) + 'px,' + oy.toFixed(1) + 'px) rotate(' + rot.toFixed(3) + 'deg) scale(' + sc.toFixed(4) + ')' : '';
+    sg.clearRect(0, 0, W, H);
+    if (flashK > 0.01) { const g = sg.createRadialGradient(flashX * W, flashY * H, 0, flashX * W, flashY * H, Math.max(W, H) * 0.8); g.addColorStop(0, 'rgba(' + flashC + ',' + (0.55 * flashK).toFixed(3) + ')'); g.addColorStop(0.5, 'rgba(' + flashC + ',' + (0.16 * flashK).toFixed(3) + ')'); g.addColorStop(1, 'rgba(' + flashC + ',0)'); sg.fillStyle = g; sg.fillRect(0, 0, W, H); }
+    sg.globalCompositeOperation = 'lighter';
+    for (let i = MOTES.length - 1; i >= 0; i--) {
+      const m = MOTES[i]; m.life -= dt; if (m.life <= 0) { MOTES[i] = MOTES[MOTES.length - 1]; MOTES.pop(); continue; }
+      m.vy += m.g * dt; if (m.drag) { const f = Math.exp(-m.drag * dt); m.vx *= f; m.vy *= f; } m.a += m.w * dt; m.x += (m.vx + (m.w ? Math.sin(m.a) * 14 : 0)) * dt; m.y += m.vy * dt;
+      const al = Math.min(1, m.life / m.max * 2.2) * Math.min(1, (m.max - m.life) * 8) * (m.w > 5 ? 0.6 + 0.4 * Math.sin(m.a) : 1);
+      sg.fillStyle = sg.strokeStyle = 'rgba(' + m.c + ',' + al.toFixed(3) + ')';
+      if (m.kind === 1) { sg.lineWidth = m.size; sg.beginPath(); sg.moveTo(m.x, m.y); sg.lineTo(m.x, m.y - m.vy * 0.035); sg.stroke(); }
+      else if (m.kind === 2) { sg.save(); sg.translate(m.x, m.y); sg.rotate(m.a); sg.fillRect(-m.size, -m.size * 0.45 * Math.cos(m.a * 1.7), m.size * 2, m.size * 0.9 * Math.cos(m.a * 1.7)); sg.restore(); }
+      else { sg.beginPath(); sg.arc(m.x, m.y, m.size, 0, 6.283); sg.fill(); }
+    }
+    sg.globalCompositeOperation = 'source-over';
+  }
+
   // ---- loop ----
   function frame(now) {
     requestAnimationFrame(frame);
@@ -154,7 +240,7 @@
     // left standing, she looks about or settles her weight now and then
     if (state === 'idle' && !move && !J.action && going < 0.05 && wbTo === 0) { roam.idleT += dt; if (roam.idleT > roam.idleNext) { roam.idleT = 0; roam.idleNext = 6 + Math.random() * 7; J.play(Math.random() < 0.5 ? 'look_around' : 'settle', false); } } else roam.idleT = 0;
     J.animate(phase, wb, time, dt, rb);
-    { const m = find(move || state), cam = m[4] && J.action === m[0] ? m[4](J.time) : null; needHalf = cam ? cam[0] : m[2]; needV = m[3] || 1.12; camX += ((cam ? cam[1] : 0) - camX) * Math.min(1, dt * 3); if (roam.on) needHalf = Math.max(needHalf, 1.05); else orbit.target.x = camX; }
+    { const m = find(move || state), cam = m[4] && J.action === m[0] ? m[4](J.time) : null; needHalf = cam ? cam[0] : m[2]; needV = m[3] || 1.12; camX += ((cam ? cam[1] : 0) - camX) * Math.min(1, dt * 3); if (roam.on) needHalf = Math.max(roam.wide || 0, cam ? 1.05 : needHalf, 1.05); else orbit.target.x = camX; }
     // camera: fit the move, ease to a chosen view, or turn slowly
     if (spin) orbit.az += dt * 0.5;
     if (viewAz != null) { let d = viewAz - orbit.az; d = Math.atan2(Math.sin(d), Math.cos(d)); orbit.az += d * Math.min(1, dt * 5); orbit.el += (viewEl - orbit.el) * Math.min(1, dt * 5); if (Math.abs(d) < 0.003) viewAz = null; }
@@ -164,7 +250,7 @@
     orbit.dist += (want - orbit.dist) * Math.min(1, dt * 3.5);
     orbit.target.y += ((0.95 * (1 - faceMode) + 1.5 * faceMode) - orbit.target.y) * Math.min(1, dt * 4);
     stage.dim = J.dim;
-    stage.render();
+    stage.render(); roomStep(dt);
     if (showBook) drawBook();
     const a = J.action, m = find(move || state);
     hud.textContent = m[1] + (a ? '  ' + J.time.toFixed(1) + ' / ' + J.ACTIONS[a].dur.toFixed(1) + ' s' : '') + '  ·  ' + Math.round(J.triangles / 1000) + 'k triangles';

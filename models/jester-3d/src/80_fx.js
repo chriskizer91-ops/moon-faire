@@ -120,7 +120,8 @@
   }
   const fxHitP = V3();
   function fxHit(out) { return out.copy(fxHitP); }
-  const toward = (out, p, d) => out.copy(p).addScaledVector(_tgt, d);      // a point d meters toward the target
+  let tgtK = 1;                                       // how far off her target stands, as a share of the usual 2.6 m (hosts set targetDist)
+  const toward = (out, p, d) => out.copy(p).addScaledVector(_tgt, d >= 2 ? d * tgtK : d);      // a point d meters toward the target
   const _tgt = V3(1, 0, 0), _h1 = V3(), _h2 = V3(), _h3 = V3(), _h4 = V3();
   const cue = (a, name, at) => { if (a.t >= at && !a.fired[name]) { a.fired[name] = true; return true; } return false; };
   const win = (t, a, b, fade) => sm(a, a + (fade || 0.15), t) * (1 - sm(b - (fade || 0.15), b, t));

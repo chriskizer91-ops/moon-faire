@@ -213,3 +213,6 @@
     show(gX3, _c2.copy(hp).setY(hp.y - 0.22), 0.9, 0.35 * k); light(_c3.copy(ft).setY(0.25), 0.55 * k);
     if (k > 0.05 && Math.random() < 26 * dt * k) { const an = Math.random() * TAU, r = 0.12 + Math.random() * 0.42; _c3.set(ft.x + r * Math.cos(an), 0.03, ft.z + r * Math.sin(an)); motes(_c3, 1, 0.015, 1.5, 0.04, Math.random() < 0.3 ? COL.pale : COL.violet, 0.32); }
   } });
+
+  // how hard each move lands (0 to 1): hosts use it to shake the picture
+  for (const [n, k] of [['last_toll', 1], ['gravity', 0.9], ['gilded_rebuke', 0.85], ['curtain_call', 0.7], ['stop', 0.7], ['sealed_fate', 0.6], ['ill_omen', 0.5], ['against_all_odds', 0.5], ['hush', 0.45], ['royal_reversal', 0.35], ['jump', 0.22]]) if (ACTS[n]) ACTS[n].impact = k;

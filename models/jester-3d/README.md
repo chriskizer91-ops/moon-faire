@@ -140,6 +140,31 @@ Checked: the new moves over standing, the stool and the hover, and a walk with a
 at; the walk pad was driven with keys in a headless browser and she went where she was sent. Not checked: how any of it feels
 at real speed, and the pad under a real thumb.
 
+## A true walk, quick buttons, room effects and a practice dummy (pass 18, November 11, 2026)
+
+Chris: the walk "looks like a slow run" (the run is good); the buttons for spells and moves should be easier; spells should
+"really invoke something happening in her environment", such as a screen shake, a wobble, or particles across the whole screen;
+and next he wants her in a space where she can attack a dummy or a character, as a playable character.
+
+- **Walk** (`fillBase`, `src/75_pose.js`). Rewritten as a walk: each foot is down for 62% of the stride so one is always on the
+  ground, heel first and toe last, the swinging foot low, hips lowest when both feet are down, arms hanging and swinging.
+  One stride covers about 0.82 m, so hosts advance the phase by about 7.66 for each meter walked.
+- **Hits** (`src/90_api.js`). When a move passes one of its hit times the model counts it: `J.state.hitN`, `hitName`, `hitK`
+  (how hard, from `impact` on the move; set per spell at the end of `src/87_spells.js`). `J.targetDist = meters` moves where
+  aimed spells land (the usual 2.6 m is scaled).
+- **Room effects** (viewer, `roomHit` and `roomStep`). On a hit the picture jolts, heavy spells make it sway, light flashes from
+  where the blow lands, and motes cross the whole stage, a different kind for each spell (`LOOK`): silver rain for The Last Toll,
+  motes that hang still for Stop, confetti for Curtain Call, and so on. Jolt and sway are skipped for people who ask their
+  device for reduced motion.
+- **Quick buttons** on the stage (`#pad2`): Cast the chosen spell, arrows to choose it, Jump, and Move (a flourish, a new one
+  each press). Keys: 1 to 0 cast spells, Q and E choose, F casts, R flourish, Space jumps. The flipbook inset moved to the top.
+- **Practice dummy** (viewer, with Walk around; the Dummy switch hides it). When she casts an aimed spell she turns to put the
+  dummy on her casting side, the spell lands where it stands, the camera takes both in, and the dummy rocks and glows when
+  struck. It is the first step toward a space with a real opponent.
+
+Checked: no errors on the page; a hit was forced in a headless browser and the jolt, flash and confetti showed. Not checked:
+all of it at real speed, and whether every spell's effect lines up on the dummy from every angle.
+
 ## Building
 
 The scripts use the absolute path `/home/claude/work`. In a fresh session:
