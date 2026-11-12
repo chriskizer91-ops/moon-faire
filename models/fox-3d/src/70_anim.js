@@ -47,7 +47,7 @@
   // ---------- the Fox's own materials ----------
   const curlTex = (() => {                           // a lock of her hair from root (bottom) to tip (top): dark brown running out to honey gold
     const c = cvs(32, 256), g = c.getContext('2d'), gr = g.createLinearGradient(0, 256, 0, 0);
-    gr.addColorStop(0, '#382212'); gr.addColorStop(0.4, '#6b4426'); gr.addColorStop(0.75, '#a06c36'); gr.addColorStop(1, '#cf9a56'); g.fillStyle = gr; g.fillRect(0, 0, 32, 256);
+    gr.addColorStop(0, '#22130a'); gr.addColorStop(0.45, '#40260f'); gr.addColorStop(0.78, '#754a20'); gr.addColorStop(1, '#c08a46'); g.fillStyle = gr; g.fillRect(0, 0, 32, 256);
     for (let i = 0; i < 60; i++) { g.fillStyle = 'rgba(' + (i % 2 ? '255,220,160' : '30,15,5') + ',0.10)'; g.fillRect(Math.floor(h1(i + 3) * 32), 0, 1 + (i % 3), 256); }
     return ctex(c);
   })();
@@ -65,7 +65,9 @@
     return ctex(c);
   })();
   Object.assign(MATS, {
-    scalp: sheen(std({ map: fabricTex(256, '#6b4628', '#9c6c3c', '#38230f', 2, true), roughness: 0.58 }), '#ffd9a0', 3, 0.28),
+    choker: sheen(std({ color: lin('#b9506f'), roughness: 0.62 }), '#ffc0d0', 3, 0.15),
+    bellm: std({ color: lin('#c9973a'), roughness: 0.28, metalness: 0.9 }),
+    scalp: sheen(std({ map: fabricTex(256, '#2c1a0e', '#4a2f19', '#170d06', 2, true), roughness: 0.58 }), '#ffd9a0', 3, 0.28),
     curl: sheen(std({ map: curlTex, roughness: 0.52 }), '#ffe0a8', 2.6, 0.34),
     ear: sheen(std({ map: earTex, roughness: 0.95 }), '#ffd2a8', 2.2, 0.45),
     frame: std({ color: lin(0x3b2b20), roughness: 0.34, metalness: 0.9, envMapIntensity: 1.3 }),
@@ -76,7 +78,7 @@
   const skeleton = new THREE.Skeleton(bones), meshes = {};
   const FOX_K = opts.scale || 1.045;                 // the whole figure, against the Jester's frame: her legs, shoulders and chin all land on her paintings at this one number
   root.scale.setScalar(FOX_K);                       // set here, after the skeleton has taken its rest pose: set any earlier, the bones would grow and the skin would not
-  SK.spine1.scale.setScalar(UPK); SK.head.scale.setScalar(opts.headScale || 0.80); root.updateMatrixWorld(true);   // horns keep their size as the head shrinks       // after the bind, so head, cap, horns and their veils all shrink about the neck
+  SK.spine1.scale.setScalar(UPK); SK.head.scale.setScalar(opts.headScale || 0.93); SK.head.position.y -= (opts.headDrop === undefined ? 0.0245 : opts.headDrop); root.updateMatrixWorld(true);   // horns keep their size as the head shrinks       // after the bind, so head, cap, horns and their veils all shrink about the neck
   let triCount = 0;
   for (const key in buckets) {
     const B = buckets[key], g = new THREE.BufferGeometry();

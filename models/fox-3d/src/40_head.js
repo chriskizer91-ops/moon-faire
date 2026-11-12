@@ -1,6 +1,6 @@
 
   // ---------- head: a sculpted oval with soft features; the face itself is painted (and repainted to blink) ----------
-  const HC = V3(0, 1.555, 0.002), HR = { x: 0.070, yT: 0.092, yB: 0.140, zF: 0.0985, zB: 0.083 };     // skull: lower crown and shallower back, as in her profile
+  const HC = V3(0, 1.555, 0.002), HR = { x: 0.072, yT: 0.092, yB: 0.147, zF: 0.0985, zB: 0.083 };     // skull: lower crown and shallower back, as in her profile
   const LAY = (BAKED && BAKED.layout) || {};          // where the features sit in the painted face
   const FC = { eyeY: LAY.eyeY || 1.5246, eyeX: LAY.eyeX || 0.0304, ew: 0.0135, eh: 0.0056, browY: LAY.browY || 1.5368, noseY: LAY.noseY || 1.4877, mouthY: LAY.mouthY || 1.4586 };
   const FACE = { x0: -0.1, x1: 0.1, y0: 1.385, y1: 1.585 };          // the face canvas covers this window, seen from the front

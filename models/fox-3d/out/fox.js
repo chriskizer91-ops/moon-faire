@@ -1006,7 +1006,7 @@ function makeFox(opts) {
   }
 
   // ---------- head: a sculpted oval with soft features; the face itself is painted (and repainted to blink) ----------
-  const HC = V3(0, 1.555, 0.002), HR = { x: 0.070, yT: 0.092, yB: 0.140, zF: 0.0985, zB: 0.083 };     // skull: lower crown and shallower back, as in her profile
+  const HC = V3(0, 1.555, 0.002), HR = { x: 0.072, yT: 0.092, yB: 0.147, zF: 0.0985, zB: 0.083 };     // skull: lower crown and shallower back, as in her profile
   const LAY = (BAKED && BAKED.layout) || {};          // where the features sit in the painted face
   const FC = { eyeY: LAY.eyeY || 1.5246, eyeX: LAY.eyeX || 0.0304, ew: 0.0135, eh: 0.0056, browY: LAY.browY || 1.5368, noseY: LAY.noseY || 1.4877, mouthY: LAY.mouthY || 1.4586 };
   const FACE = { x0: -0.1, x1: 0.1, y0: 1.385, y1: 1.585 };          // the face canvas covers this window, seen from the front
@@ -1301,8 +1301,17 @@ function makeFox(opts) {
   const HAIR_SEED = { s: 9173 };
   const hrnd = () => (HAIR_SEED.s = (HAIR_SEED.s * 16807) % 2147483647) / 2147483647, hrr = (a, b) => a + (b - a) * hrnd();   // its own stream, so adding hair moves nothing else
   (function foxNeck() {                              // the head shrinks about its joint, which would leave the Jester's neck too thin for her: her own, read off A1
-    const rings = tubeRings([V3(0, 1.335, -0.010), V3(0, 1.356, -0.009), V3(0, 1.378, -0.006), V3(0, 1.400, -0.002), V3(0, 1.420, 0.003)], [[0.056, 0.050], [0.0455, 0.0445], [0.0425, 0.0415], [0.0410, 0.0405], [0.0385, 0.0385]], Q(28, 14), V3(0, 0, 1));
+    const rings = tubeRings([V3(0, 1.335, -0.010), V3(0, 1.356, -0.009), V3(0, 1.378, -0.006), V3(0, 1.400, -0.002), V3(0, 1.420, 0.003)], [[0.054, 0.048], [0.0425, 0.0415], [0.0390, 0.0382], [0.0375, 0.0370], [0.0360, 0.0360]], Q(28, 14), V3(0, 0, 1));
     addPart('skin', loft(rings), (x, y) => { const v = sm(1.385, 1.43, y); return [BI.neck, 1 - 0.5 * v, BI.head, 0.5 * v]; }, { out: V3(0, 1.37, 0) });
+  })();
+
+  (function foxChoker() {                            // the rose leather collar at the foot of her neck, and its brass bell (F1). It also covers the join of neck and chest.
+    const y0 = 1.3755, h = 0.0092, NU = Q(40, 24), rr = (d) => { const ring = []; for (let j = 0; j < NU; j++) { const a = (j / NU) * TAU; ring.push([(0.0440 + d) * Math.sin(a), 0, -0.0075 + (0.0432 + d) * Math.cos(a)]); } return ring; };
+    const lift = (ring, y) => ring.map((p) => [p[0], y + 0.010 * (0.5 - 0.5 * Math.cos(Math.atan2(p[0], p[2] + 0.0075))), p[2]]);      // it sits lower at the front than at the back
+    addPart('choker', loft([lift(rr(-0.002), y0 - h), lift(rr(0.0024), y0 - h * 0.8), lift(rr(0.0030), y0), lift(rr(0.0024), y0 + h * 0.8), lift(rr(-0.002), y0 + h)]), () => [BI.neck, 1], { out: V3(0, y0, 0) });
+    const zb = -0.0075 + 0.0432 + 0.0105, yb = y0 - h - 0.0125;
+    addPart('bellm', spherePart(V3(0, yb, zb), 0.0112, 0.0112, 0.0112, Q(18, 12), Q(12, 8)), () => [BI.neck, 1], { out: V3(0, yb, zb) });
+    addPart('bellm', spherePart(V3(0, yb + 0.0125, zb - 0.004), 0.0030, 0.0042, 0.0030, 8, 6), () => [BI.neck, 1], { out: V3(0, yb + 0.0125, zb - 0.004) });
   })();
 
   // where her hair starts: the hairline as an angle down from the crown, for each direction round the head (front 0, back PI)
@@ -1318,6 +1327,24 @@ function makeFox(opts) {
       rings.push(ring);
     }
     addPart('scalp', loft(rings, { capA: true, uS: 10, vS: 1.6 }), wHead, { out: HC });
+  })();
+
+
+  // the body of her hair: a soft dark mass standing off her head at the sides and back, which the curls sit on. None of it over her face.
+  const massGrow = (a, ph) => {
+    const side = sm(1.20, 1.55, Math.abs(a)), v = sm(lerp(0.78, 0.40, sm(2.2, 2.8, Math.abs(a))), lerp(1.15, 0.85, sm(2.2, 2.8, Math.abs(a))), ph) * (1 - sm(2.05, 2.45, ph));      // it starts below her costume ears at the sides, higher at the back
+    const lump = 0.008 * Math.sin(a * 5 + ph * 3.1) * Math.sin(ph * 6.3 - a * 2) + 0.005 * Math.sin(a * 11 + ph * 7);
+    const full = 0.030 + 0.028 * sm(0.8, 1.7, ph) * (1 - 0.4 * sm(2.0, 2.4, ph));
+    return lerp(-0.012, full + lump, side * v);
+  };
+  (function foxHairMass() {
+    const NU = Q(84, 44), NR = Q(40, 22), rings = [];
+    for (let i = 0; i <= NR; i++) {
+      const ring = [], ph = lerp(0.20, 2.50, i / NR);
+      for (let j = 0; j < NU; j++) { const a = (j / NU) * TAU - PI; ring.push(headPoint(a, ph, massGrow(a, ph))); }
+      rings.push(ring);
+    }
+    addPart('scalp', loft(rings, { uS: 14, vS: 3 }), wHead, { out: HC });
   })();
 
   // one ringlet: a tube wound round a path. path(t) -> Vector3 for t 0..1; hr: the ringlet's radius; turns; tr: the lock's own thickness
@@ -1347,26 +1374,36 @@ function makeFox(opts) {
   (function foxLooseCurls() {                        // the curls left out all round her face, and the soft halo of shorter ones
     const NH = Q(30, 20);
     for (let k = 0; k < NH; k++) {                   // hanging ringlets: short over the forehead, long in front of her ears
-      const f = (k + hrr(0.15, 0.85)) / NH, a0 = lerp(-1, 1, f), wisp = k % 8 === 3, a = Math.sign(a0 || 1) * (wisp ? hrr(0.12, 0.62) : lerp(1.02, 2.05, Math.abs(a0))), aa = Math.abs(a), root = V3(...headPoint(a, hairLine(a) - hrr(0.02, 0.10), 0.006));
-      const out = root.clone().sub(HC).setY(0).normalize(), L = wisp ? hrr(0.014, 0.026) : aa < 1.35 ? hrr(0.075, 0.120) : hrr(0.110, 0.175), stand = wisp ? hrr(0.006, 0.012) : hrr(0.040, 0.078);
+      const f = (k + hrr(0.15, 0.85)) / NH, a0 = lerp(-1, 1, f), wisp = k % 8 === 3, a = Math.sign(a0 || 1) * (wisp ? hrr(0.12, 0.62) : lerp(1.30, 2.30, Math.abs(a0))), aa = Math.abs(a), root = V3(...headPoint(a, hairLine(a) - hrr(0.02, 0.10), 0.006));
+      const out = root.clone().sub(HC).setY(0).normalize(), L = wisp ? hrr(0.014, 0.026) : aa < 1.35 ? hrr(0.085, 0.130) : hrr(0.130, 0.200), stand = wisp ? hrr(0.006, 0.012) : hrr(0.040, 0.078);
       const swing = V3(-out.z, 0, out.x).multiplyScalar(wisp ? Math.sign(a || 1) * hrr(0.012, 0.024) : hrr(-0.012, 0.012));
       ringlet((t) => root.clone().addScaledVector(out, stand * sm(0, 0.4, t)).add(V3(swing.x * t, -L * t * (0.35 + 0.65 * t), swing.z * t)), wisp ? hrr(0.005, 0.007) : hrr(0.0110, 0.0150), wisp ? hrr(0.8, 1.3) : Math.max(1.5, L / 0.034), wisp ? hrr(0.0026, 0.0034) : hrr(0.0050, 0.0064), hrr(0, TAU));
     }
-    const NF = Q(120, 70);
+
+    const NS2 = Q(84, 46);
+    for (let k = 0; k < NS2; k++) {                  // wavy locks lying down the mass, from the top of it to its hem
+      const s = k % 2 ? 1 : -1, a0 = s * hrr(1.27, PI), ph0 = hrr(0.80, 1.25), ph1 = hrr(1.9, 2.45), da = hrr(-0.18, 0.18), wob = hrr(0.03, 0.07), f = hrr(2, 4), p0 = hrr(0, TAU);
+      ringlet((t) => { const ph = lerp(ph0, ph1, t), a = a0 + da * t + wob * Math.sin(t * f * PI + p0); return V3(...headPoint(a, ph, massGrow(a, ph) + 0.003 + 0.004 * t)); }, hrr(0.004, 0.008), hrr(2.5, 5), hrr(0.0060, 0.0085), hrr(0, TAU));
+    }
+    for (const s of [-1, 1]) for (let k = 0; k < 11; k++) {      // the hair swept off her parting to each side, over the corners of her forehead
+      const u = (k + hrnd()) / 11, a1 = s * lerp(1.22, 1.50, hrnd()), ph0 = lerp(0.55, 1.18, u), ph1 = lerp(1.55, 2.15, hrnd()), a0 = s * hrr(0.03, 0.10), p0 = hrr(0, TAU);
+      ringlet((t) => { const a = lerp(a0, a1, Math.pow(t, 0.75)), ph = lerp(ph0, ph1, Math.pow(t, 1.6)); return V3(...headPoint(a, ph, 0.0135 + Math.max(0, massGrow(a, ph)) * sm(0.5, 1, t) + 0.004 * Math.sin(t * 9 + p0))); }, hrr(0.003, 0.006), hrr(2, 3.5), hrr(0.0065, 0.009), p0);
+    }
+    const NF = Q(230, 110);
     for (let k = 0; k < NF; k++) {                   // the halo: shorter curls standing out from the hair itself, all round
-      let a = hrr(-PI, PI); if (Math.abs(a) < 1.25) a = Math.sign(a || 1) * hrr(1.25, PI);     // none sprouting over her face
-      const ph = lerp(0.45, Math.min(hairLine(a) - 0.05, 2.1), Math.pow(hrnd(), 0.7)), root = V3(...headPoint(a, ph, 0.006)), out = root.clone().sub(HC).normalize();
-      const L = hrr(0.070, 0.135), droop = hrr(0.012, 0.040), tw = V3(hrr(-1, 1), 0, hrr(-1, 1)).multiplyScalar(0.012);
-      ringlet((t) => root.clone().addScaledVector(out, L * t).add(V3(tw.x * t * t, -droop * t * t, tw.z * t * t)), hrr(0.0090, 0.0140), hrr(1.4, 2.4), hrr(0.0048, 0.0062), hrr(0, TAU));
+      let a = hrr(-PI, PI); if (Math.abs(a) < 1.38) a = Math.sign(a || 1) * hrr(1.38, PI);     // none sprouting over her face
+      const ph = lerp(Math.abs(a) < 2.3 ? 0.98 : 0.5, 2.2, Math.pow(hrnd(), 0.8)), root = V3(...headPoint(a, ph, Math.max(0.006, massGrow(a, ph) - 0.006))), out = root.clone().sub(HC).normalize();
+      const L = hrr(0.045, 0.095), droop = hrr(0.012, 0.040), tw = V3(hrr(-1, 1), 0, hrr(-1, 1)).multiplyScalar(0.012);
+      ringlet((t) => root.clone().addScaledVector(out, L * t).add(V3(tw.x * t * t, -droop * t * t, tw.z * t * t)), hrr(0.0100, 0.0150), hrr(1.2, 2.2), hrr(0.0062, 0.0085), hrr(0, TAU));
     }
   })();
 
   (function foxEars() {                              // costume ears, clipped into her hair: a cupped leaf, russet behind and cream inside
     for (const sx of [-1, 1]) {
-      const base = V3(sx * 0.056, 1.652, 0.010), up = V3(sx * 0.30, 0.954, -0.02).normalize(), fwd = V3(sx * 0.30, 0, 0.954).normalize(), right = V3().crossVectors(up, fwd).normalize();
-      const H = 0.118, NV = Q(22, 12), NA = Q(26, 14), rings = [];
+      const base = V3(sx * 0.079, 1.607, 0.030), up = V3(sx * 0.305, 0.951, -0.05).normalize(), fwd = V3(sx * 0.30, 0, 0.954).normalize(), right = V3().crossVectors(up, fwd).normalize();
+      const H = 0.088, NV = Q(22, 12), NA = Q(26, 14), rings = [];
       for (let i = 0; i <= NV; i++) {
-        const v = i / NV, w = 0.039 * Math.pow(1 - v, 0.78) * (0.55 + 0.45 * sm(0, 0.18, v)) + 0.0012, th = 0.0035 + 0.007 * (1 - v), c = base.clone().addScaledVector(up, H * v).addScaledVector(fwd, -0.012 * v * v), ring = [];
+        const v = i / NV, w = 0.037 * Math.pow(1 - v, 0.86) * (0.55 + 0.45 * sm(0, 0.18, v)) + 0.0012, th = 0.0035 + 0.007 * (1 - v), c = base.clone().addScaledVector(up, H * v).addScaledVector(fwd, -0.012 * v * v), ring = [];
         for (let j = 0; j < NA; j++) {
           const ang = (j / NA) * TAU, sn = Math.sin(ang), cs = Math.cos(ang), cup = 0.010 * (1 - v) * (sn * sn);       // the edges come forward: the ear is a shallow cup
           ring.push(c.clone().addScaledVector(right, w * sn).addScaledVector(fwd, th * cs * (cs > 0 ? 0.35 : 1) + cup).toArray());
@@ -1964,7 +2001,7 @@ function makeFox(opts) {
   // ---------- the Fox's own materials ----------
   const curlTex = (() => {                           // a lock of her hair from root (bottom) to tip (top): dark brown running out to honey gold
     const c = cvs(32, 256), g = c.getContext('2d'), gr = g.createLinearGradient(0, 256, 0, 0);
-    gr.addColorStop(0, '#382212'); gr.addColorStop(0.4, '#6b4426'); gr.addColorStop(0.75, '#a06c36'); gr.addColorStop(1, '#cf9a56'); g.fillStyle = gr; g.fillRect(0, 0, 32, 256);
+    gr.addColorStop(0, '#22130a'); gr.addColorStop(0.45, '#40260f'); gr.addColorStop(0.78, '#754a20'); gr.addColorStop(1, '#c08a46'); g.fillStyle = gr; g.fillRect(0, 0, 32, 256);
     for (let i = 0; i < 60; i++) { g.fillStyle = 'rgba(' + (i % 2 ? '255,220,160' : '30,15,5') + ',0.10)'; g.fillRect(Math.floor(h1(i + 3) * 32), 0, 1 + (i % 3), 256); }
     return ctex(c);
   })();
@@ -1982,7 +2019,9 @@ function makeFox(opts) {
     return ctex(c);
   })();
   Object.assign(MATS, {
-    scalp: sheen(std({ map: fabricTex(256, '#6b4628', '#9c6c3c', '#38230f', 2, true), roughness: 0.58 }), '#ffd9a0', 3, 0.28),
+    choker: sheen(std({ color: lin('#b9506f'), roughness: 0.62 }), '#ffc0d0', 3, 0.15),
+    bellm: std({ color: lin('#c9973a'), roughness: 0.28, metalness: 0.9 }),
+    scalp: sheen(std({ map: fabricTex(256, '#2c1a0e', '#4a2f19', '#170d06', 2, true), roughness: 0.58 }), '#ffd9a0', 3, 0.28),
     curl: sheen(std({ map: curlTex, roughness: 0.52 }), '#ffe0a8', 2.6, 0.34),
     ear: sheen(std({ map: earTex, roughness: 0.95 }), '#ffd2a8', 2.2, 0.45),
     frame: std({ color: lin(0x3b2b20), roughness: 0.34, metalness: 0.9, envMapIntensity: 1.3 }),
@@ -1993,7 +2032,7 @@ function makeFox(opts) {
   const skeleton = new THREE.Skeleton(bones), meshes = {};
   const FOX_K = opts.scale || 1.045;                 // the whole figure, against the Jester's frame: her legs, shoulders and chin all land on her paintings at this one number
   root.scale.setScalar(FOX_K);                       // set here, after the skeleton has taken its rest pose: set any earlier, the bones would grow and the skin would not
-  SK.spine1.scale.setScalar(UPK); SK.head.scale.setScalar(opts.headScale || 0.80); root.updateMatrixWorld(true);   // horns keep their size as the head shrinks       // after the bind, so head, cap, horns and their veils all shrink about the neck
+  SK.spine1.scale.setScalar(UPK); SK.head.scale.setScalar(opts.headScale || 0.93); SK.head.position.y -= (opts.headDrop === undefined ? 0.0245 : opts.headDrop); root.updateMatrixWorld(true);   // horns keep their size as the head shrinks       // after the bind, so head, cap, horns and their veils all shrink about the neck
   let triCount = 0;
   for (const key in buckets) {
     const B = buckets[key], g = new THREE.BufferGeometry();
