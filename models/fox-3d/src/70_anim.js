@@ -65,6 +65,9 @@
     return ctex(c);
   })();
   Object.assign(MATS, {
+    patch: (() => { const t = bakedTex('patch', 1024, 1024, '#a03c5c'); t.wrapS = t.wrapT = THREE.RepeatWrapping; return sheen(std({ map: t, color: lin('#d2c8c2'), roughness: 0.86, side: THREE.DoubleSide }), '#ffd0a0', 3, 0.12); })(),      // her patchwork (F9)
+    patch2: (() => { const t = bakedTex('patch2', 768, 768, '#a03c5c'); t.wrapS = t.wrapT = THREE.RepeatWrapping; return sheen(std({ map: t, color: lin('#d2c8c2'), roughness: 0.86, side: THREE.DoubleSide }), '#ffd0a0', 3, 0.12); })(),     // the second sheet (F10), for the upper flounce
+    frill: sheen(std({ color: lin('#a02f6c'), roughness: 0.80, side: THREE.DoubleSide }), '#ff9ad0', 3, 0.2),
     neck: (() => {                                   // her neck: the chest's tone where it leaves the collar, her face's tone above the choker, darkening into the shade under her jaw
       const c = cvs(8, 128), g = c.getContext('2d'), CH = (BAKED && BAKED.skinChest) || SKIN || '#e0a890', J = (BAKED && BAKED.skinJaw) || SKIN || '#c08068', F = SKIN || '#d89780';
       const ratio = (hex, k) => { const a = new THREE.Color(hex), b = new THREE.Color(CH); return 'rgb(' + [a.r / b.r, a.g / b.g, a.b / b.b].map((v) => Math.round(255 * Math.min(1, v * k))).join(',') + ')'; };

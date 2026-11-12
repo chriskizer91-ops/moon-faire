@@ -57,7 +57,7 @@ Since the evening of 12 Nov the Fox has **the Jester's head shape wearing the Fo
 
 ```
 python3 -I bake_fox.py && cp out/fox_tex.js out/fox_tex_own.js
-python3 -I bake_hands_fox.py && python3 -I bake_boot_fox.py     # her hands from D1, her boot leather from E1; they add to the own bake, so run them after bake_fox.py
+python3 -I bake_hands_fox.py && python3 -I bake_boot_fox.py && python3 -I bake_patch_fox.py     # her hands from D1, her boot leather from E1, her patchwork from F9 and F10; they add to the own bake, so run them after bake_fox.py
 python3 make_jface.py && ./build.sh
 ```
 
