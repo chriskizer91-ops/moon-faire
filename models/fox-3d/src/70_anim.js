@@ -257,6 +257,7 @@
   }
   const chains = [];
   for (const [S, s] of SIDES) chains.push(makeChain(hornChains[S].names, 'head', { stiff: [1, 0.55, 0.42, 0.33, 0.27, 0.22, 0.10], damp: 0.90, grav: 3.2, gw: [0, 0.2, 0.3, 0.4, 0.5, 0.6, 2.2] }));
+  for (const names of hairChains) chains.push(makeChain(names, 'head', names.length === 3 ? { stiff: [1, 0.62, 0.46], damp: 0.88, grav: 1.4, gw: [0, 0.4, 0.7] } : { stiff: [1, 0.34, 0.22, 0.16], damp: 0.90, grav: 2.6, gw: [0, 0.6, 1.0, 1.4] }));      // her loose hair; the bun (three bones) is held firmer
   const hipsInv = new THREE.Matrix4(), bellChain = makeChain(['bell0', 'bell1', 'bell2', 'bell3'], 'hips', { stiff: [1, 0.02, 0.012, 0.008], damp: 0.965, grav: 9.0, collide(p, i) {
     _va.copy(p).applyMatrix4(hipsInv); const y = cl(_va.y + SK.hips.userData.rest.y - (i === 3 ? 0.03 : 0), 0.3, 0.985), [rx, rz] = prof(SKIRT_R, y, true), m = 0.034 + (i === 3 ? 0.012 : 0), zc = skirtZc(y);
     const q = Math.pow(_va.x / (rx + m), 2) + Math.pow((_va.z - zc) / (rz + m), 2);
