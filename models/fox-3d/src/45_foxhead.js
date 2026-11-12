@@ -18,6 +18,25 @@
     addPart('bellm', spherePart(V3(0, yb + 0.0125, zb - 0.004), 0.0030, 0.0042, 0.0030, 8, 6), () => [BI.neck, 1], { out: V3(0, yb + 0.0125, zb - 0.004) });
   })();
 
+  (function foxHumanEars() {                         // her own ears (C3, profile): top level with her eyes, lobe level with the foot of her nose, 3.2 cm front to back, the back edge standing off her head
+    const NR = Q(14, 9), NU = Q(40, 24);
+    for (const sx of [-1, 1]) {
+      const O = V3(sx * 0.0685, 1.4975, -0.0065), U = V3(0, 0.985, -0.174), S = V3(sx * 0.42, 0, -0.908).normalize(), N = V3().crossVectors(S, U).multiplyScalar(sx).normalize();
+      const pt = (r, th, back) => {
+        const sn = Math.sin(th), a = 0.0160 * (1 + 0.16 * sn), s2 = r * a * Math.cos(th) + 0.0105, t2 = r * 0.0290 * sn, lobe = sm(-0.95, -0.35, sn);
+        const h = back ? -0.0028 * (1 - 0.55 * r * r)
+          : 0.0030 * Math.exp(-Math.pow((r - 0.86) / 0.11, 2)) * (0.35 + 0.65 * lobe) - 0.0040 * Math.exp(-Math.pow(r / 0.45, 2)) + 0.0014 * Math.exp(-Math.pow((r - 0.52) / 0.10, 2)) * Math.max(0, Math.sin(th - 0.5));      // the rolled rim, the bowl, the ridge inside the rim
+        const p = O.clone().addScaledVector(S, s2).addScaledVector(U, t2).addScaledVector(N, h); return [p.x, p.y, p.z];
+      };
+      const ring = (r, back) => { const o = []; for (let j = 0; j < NU; j++) o.push(pt(r, (sx > 0 ? 1 : -1) * (j / NU) * TAU, back)); return o; };
+      const rings = [];
+      for (let i = 0; i <= NR; i++) rings.push(ring(lerp(1, 0.06, i / NR), false));
+      for (let i = 0; i <= NR; i++) rings.push(ring(lerp(0.06, 1, i / NR), true));
+      rings.push(ring(1, false));
+      addPart('skin', loft(rings), wHead, { out: O.clone().addScaledVector(S, 0.0105).addScaledVector(N, -0.0012) });
+    }
+  })();
+
   // where her hair starts: the hairline as an angle down from the crown, for each direction round the head (front 0, back PI)
   const hairLine = (a) => { const c = Math.cos(a); return 1.24 + (1 - c) * 0.51 + Math.max(0, -c) * 0.60 + 0.05 * Math.sin(a * 9) * Math.max(0, c); };      // a high, uneven hairline at the front
   (function foxScalp() {                             // the hair lying on her head, drawn back and up to the bun

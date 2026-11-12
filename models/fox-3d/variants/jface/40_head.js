@@ -48,7 +48,7 @@
       }
     }
     if (t > 0.86) y += 0.10 * Math.max(0, 0.083 - z) * sm(0.86, 0.985, t);        // under the jaw the skin rises toward the throat
-    if (!g && yn < 0) { const yb = spline(JAW, z) - HC.y, e = 0.0035; y = 0.5 * (y + yb + Math.sqrt((y - yb) * (y - yb) + e * e)); }     // her jawline (C3, profile): nothing of the head hangs below it
+    if (!g && yn < 0) { const yb = spline(JAW, z) - HC.y, e = 0.0060; y = 0.5 * (y + yb + Math.sqrt((y - yb) * (y - yb) + e * e)); }     // her jawline (C3, profile): nothing of the head hangs below it
     return [HC.x + x, HC.y + y, HC.z + z];
   }
   const wHead = wOne('head'), faceMix = [], faceUvS = [];

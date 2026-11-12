@@ -40,7 +40,7 @@ sh = L['tip'][0] - 0.0880                     # the Jester's nose-width table, m
 kk = (L['nasion'][0] - L['subnasale'][0]) / (1.5260 - 1.4680)
 NOSE_W = '[' + ', '.join('[%.4f, %.4f]' % (L['subnasale'][0] + (y - 1.4680) * kk, w) for y, w in ((1.4680, 0.0052), (1.4760, 0.0054), (1.4800, 0.0070), (1.4880, 0.0100), (1.4960, 0.0082), (1.5080, 0.0062), (1.5260, 0.0058))) + ']'
 yB = round(1.555 - (L['underChin'][0] - 0.0035), 4)
-p = W + 'src/40_head.js'; s = open(p).read()
+p = W + 'variants/ownface/40_head.js'; s = open(p).read()      # the Fox's own face is no longer the main build (see make_jface.py)
 s = re.sub(r"const FACE_MID = \[\[.*?\]\];", 'const FACE_MID = ' + FACE_MID + ';', s, count=1, flags=re.S)
 s = re.sub(r"const NOSE = \[\[.*?\]\];", 'const NOSE = ' + NOSE + ';', s, count=1, flags=re.S)
 s = re.sub(r"const NOSE_W = \[\[.*?\]\];", 'const NOSE_W = ' + NOSE_W + ';\n  const LIPS = ' + json.dumps(LIPS).replace('"', '') + ';', s, count=1, flags=re.S) if 'const LIPS' not in s else re.sub(r"const NOSE_W = \[\[.*?\]\];\n  const LIPS = \{.*?\};", 'const NOSE_W = ' + NOSE_W + ';\n  const LIPS = ' + json.dumps(LIPS).replace('"', '') + ';', s, count=1, flags=re.S)

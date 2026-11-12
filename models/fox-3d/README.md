@@ -51,6 +51,16 @@ python3 shoot_site.py shots/site.png 390 844 "Wave:2" "Kneel:2"     # the page a
 
 The test machine draws about 2 frames a second, so stills can be checked there but motion cannot. Motion has to be looked at on a phone.
 
+## Whose face
+
+Since 12 Nov the Fox wears **the Jester's face** (Chris compared both and chose it). `make_jface.py` takes the Jester's head tables and baked face pictures, tones them to the Fox's skin, and writes `src/40_head.js` and `out/fox_tex.js`. Everything else is the Fox's own.
+
+```
+python3 -I bake_fox.py && cp out/fox_tex.js out/fox_tex_own.js && python3 make_jface.py && ./build.sh
+```
+
+Her own face (from sheet C3) is kept in `variants/ownface/`. Make Fox-only changes to the head's shape there, then run `make_jface.py`. The section below describes how her own face was made.
+
 ## Her head
 
 Sheet C3 (front, 45 degrees, profile) is the master. The shape comes first, the paint second.
