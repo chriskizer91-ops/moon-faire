@@ -1,0 +1,503 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+<title>Night of No Moon: the square</title>
+<style>
+  :root { --panel:rgba(22,17,30,.74); --line:#6a5a7c; --ink:#f1e8f4; --dim:#b3a6c0; --gold:#e2b04a; --wine:#8d2f4e; --violet:#9a6cf0; }
+  * { box-sizing:border-box; -webkit-tap-highlight-color:transparent; user-select:none; -webkit-user-select:none; }
+  html,body { margin:0; height:100%; background:#120e1a; color:var(--ink); font:14px/1.3 system-ui,-apple-system,"Segoe UI",sans-serif; overflow:hidden; }
+  #stage { position:fixed; inset:0; touch-action:none; }
+  canvas { display:block; width:100%; height:100%; }
+  button { font:inherit; color:var(--ink); background:var(--panel); border:1px solid var(--line); border-radius:999px; padding:7px 12px; min-height:34px; cursor:pointer; backdrop-filter:blur(5px); }
+  button.on { background:var(--wine); border-color:var(--gold); color:#fff; }
+  #hud { position:fixed; left:10px; top:10px; width:min(46vw,230px); pointer-events:none; text-shadow:0 1px 4px #000; }
+  .bar { position:relative; height:13px; margin:0 0 5px; border-radius:7px; background:rgba(10,8,14,.7); border:1px solid var(--line); overflow:hidden; }
+  .bar i { position:absolute; left:0; top:0; bottom:0; width:100%; transform-origin:left; border-radius:6px; }
+  .bar b { position:absolute; left:7px; top:-2px; font-size:10.5px; font-weight:600; letter-spacing:.04em; }
+  #hp i { background:linear-gradient(#d0486e,#8d2f4e); } #mp i { background:linear-gradient(#a98cff,#6a48c8); } #cu i { background:linear-gradient(#f0c860,#b98428); }
+  #sh { position:absolute; left:0; top:0; bottom:0; background:rgba(255,255,255,.55); border-radius:6px; }
+  #opts { position:fixed; right:10px; top:10px; display:flex; gap:6px; }
+  #boss { position:fixed; left:50%; top:62px; transform:translateX(-50%); width:min(80vw,420px); text-align:center; pointer-events:none; text-shadow:0 1px 5px #000; display:none; }
+  #boss .bar { height:11px; margin-top:3px; } #boss i { background:linear-gradient(#ffb44a,#c2541c); }
+  #banner { position:fixed; left:0; right:0; top:27%; text-align:center; font-size:19px; font-weight:600; letter-spacing:.03em; text-shadow:0 2px 10px #000; pointer-events:none; opacity:0; transition:opacity .6s; padding:0 16px; }
+  #pad { position:fixed; left:16px; bottom:calc(20px + env(safe-area-inset-bottom)); width:120px; height:120px; border-radius:50%; background:var(--panel); border:1px solid var(--line); touch-action:none; backdrop-filter:blur(5px); }
+  #knob { position:absolute; left:50%; top:50%; width:50px; height:50px; margin:-25px 0 0 -25px; border-radius:50%; background:#5b4a6e; border:1px solid var(--gold); pointer-events:none; }
+  #spells { position:fixed; right:10px; bottom:calc(16px + env(safe-area-inset-bottom)); display:grid; grid-template-columns:1fr 1fr; gap:6px; width:min(250px, calc(100vw - 160px)); }
+  #spells button { position:relative; overflow:hidden; border-radius:13px; padding:7px 5px 6px; min-height:46px; line-height:1.12; font-size:12.5px; }
+  #spells button small { display:block; color:var(--dim); font-size:10.5px; margin-top:2px; }
+  #spells button u { position:absolute; left:0; right:0; bottom:0; height:0; background:rgba(8,6,12,.72); pointer-events:none; text-decoration:none; }
+  #spells button.no { color:#8d8298; border-color:#463c52; }
+  #spells button.ult.ready { border-color:var(--gold); box-shadow:0 0 14px rgba(226,176,74,.75); color:#ffe9b0; }
+  #next { position:fixed; right:10px; bottom:calc(178px + env(safe-area-inset-bottom)); font-size:12px; padding:5px 11px; min-height:30px; }
+  #hurt { position:fixed; inset:0; pointer-events:none; opacity:0; box-shadow:inset 0 0 90px 30px rgba(200,30,60,.75); }
+  #veil { position:fixed; inset:0; display:grid; place-items:center; background:rgba(12,9,18,.78); backdrop-filter:blur(3px); padding:16px; }
+  #card { max-width:440px; background:rgba(26,20,36,.94); border:1px solid var(--line); border-radius:18px; padding:20px 20px 18px; text-align:left; }
+  #card h1 { margin:0 0 2px; font-size:22px; letter-spacing:.02em; } #card h2 { margin:0 0 12px; font-size:13px; font-weight:500; color:var(--gold); letter-spacing:.08em; text-transform:uppercase; }
+  #card p { margin:0 0 10px; color:#ddd2e6; } #card ul { margin:0 0 14px; padding-left:18px; color:#cfc4da; font-size:13px; } #card li { margin-bottom:4px; } #card li b { color:var(--ink); }
+  #go { background:var(--wine); border-color:var(--gold); color:#fff; font-size:16px; padding:10px 26px; }
+  #load { position:fixed; inset:0; display:grid; place-items:center; color:var(--dim); background:#120e1a; }
+  #err { position:fixed; left:8px; right:8px; top:96px; color:#ffb4a8; font-size:12px; white-space:pre-wrap; pointer-events:none; }
+</style>
+<script type="importmap">
+{ "imports": { "three": "./lib/build/three.module.min.js", "three/addons/": "./lib/examples/jsm/" } }
+</script>
+</head>
+<body>
+<div id="stage"></div>
+<div id="hurt"></div>
+<div id="hud">
+  <div class="bar" id="hp"><i></i><span id="sh"></span><b></b></div>
+  <div class="bar" id="mp"><i></i><b></b></div>
+  <div class="bar" id="cu"><i></i><b>Curtain</b></div>
+</div>
+<div id="opts"><button id="bPixel">Pixel finish</button></div>
+<div id="boss"><span id="bossName"></span><div class="bar"><i></i></div></div>
+<div id="banner"></div>
+<div id="err"></div>
+<div id="pad"><div id="knob"></div></div>
+<button id="next">Next target</button>
+<div id="spells"></div>
+<div id="veil"><div id="card"></div></div>
+<div id="load">Setting the stage&hellip;</div>
+<script>
+setTimeout(function () { var l = document.getElementById('load'); if (l) l.textContent = 'Still loading. If this stays, the 3D library or the model did not arrive: tell Claude.'; }, 25000);
+</script>
+<script src="jester_glb_a.js"></script>
+<script src="jester_glb_b.js"></script>
+<script src="jester_glb_c.js"></script>
+<script src="foes/foes.js"></script>
+<script type="module">
+import * as THREE from 'three';
+import { makePipeline, DECOR } from './pipeline.js';
+import { buildSquare } from './world.js';
+import { loadJester, makeContext, makeBlink } from './core.js';
+import { makeFx } from './fx.js';
+
+const $ = s => document.querySelector(s);
+const errBox = $('#err');
+window.addEventListener('error', e => { errBox.textContent += (e.message || e) + '\n'; });
+window.addEventListener('unhandledrejection', e => { errBox.textContent += (e.reason && e.reason.message || e.reason) + '\n'; });
+
+const TEST = location.hash === '#test';
+const stage = $('#stage');
+const renderer = new THREE.WebGLRenderer({ antialias: false, preserveDrawingBuffer: TEST });
+renderer.outputColorSpace = THREE.SRGBColorSpace; renderer.autoClear = false;
+stage.appendChild(renderer.domElement);
+const pixelRatio = Math.min(devicePixelRatio || 1, 2);
+const scene = new THREE.Scene();
+const camera = new THREE.PerspectiveCamera(46, 1, 0.1, 140);
+const { R, flies, setLight } = buildSquare(scene);
+const decor = o => { o.traverse(x => x.layers.set(DECOR)); return o; };
+const hdr = (r, g, b) => new THREE.Color().setRGB(r, g, b);
+const cl = (x, a = 0, b = 1) => Math.min(b, Math.max(a, x));
+const turn = (from, to, k) => from + Math.atan2(Math.sin(to - from), Math.cos(to - from)) * k;
+const SOUL = hdr(0.5, 2.2, 1.3);
+
+// ------------------------------------------------------------------ the rules
+// Her numbers and her moves follow assets/design/moves_v03.json. Changed for a short fight in real time:
+// MP comes back faster, cooldowns are shorter, Doom counts 9 seconds instead of 20, and Hush stops the great wraith's breath.
+const HER = { hp: 850, mp: 100, P: 90, M: 260, mpRegen: 2.0 };
+const SPELL = {
+  GildedRebuke:   { label: 'Gilded Rebuke', mp: 0, cd: 0, rate: 1.5, free: 0.45, hit: 0.12, says: 'free hit' },
+  SealedFate:     { label: 'Sealed Fate', mp: 18, cd: 5, rate: 1.1, free: 0.5, hit: 0.34, says: 'Doom in 9 s' },
+  Hush:           { label: 'Hush', mp: 12, cd: 8, rate: 2.0, free: 0.45, hit: 0.4, says: 'silence' },
+  Gravity:        { label: 'Gravity', mp: 24, cd: 10, rate: 1.0, free: 0.3, hit: 0.13, says: 'a quarter of its HP' },
+  AgainstAllOdds: { label: 'Against All Odds', mp: 26, cd: 20, rate: 1.0, free: 0.7, hit: 0, self: true, after: 0.5, says: 'heal and haste' },
+  CurtainCall:    { label: 'Curtain Call', mp: 54, cd: 0, rate: 1.0, free: 1.3, hit: 0.25, self: true, ult: true, says: 'once, when full' },
+};
+const DOOM_S = 9, SILENCE_S = 6, PIN_S = 3;
+const KIND = {
+  wisp:   { name: 'Wisp', hp: 160, speed: 1.7, size: 1.4, hover: 0.45, radius: 0.5 },
+  wraith: { name: 'Shadow Wraith', hp: 800, speed: 0.95, size: 1, hover: 0, radius: 0.8 },
+  great:  { name: 'The great wraith', hp: 3000, speed: 0.6, size: 1, hover: 0, radius: 1.6, boss: true },
+};
+const WAVES = [
+  { say: 'The chapel bell tolls once. Wisps drift in from the graveyard.', foes: ['wisp', 'wisp', 'wisp', 'wisp'] },
+  { say: 'A Shadow Wraith climbs out of the graveyard: what a wisp becomes when nobody helps it.', foes: ['wraith', 'wisp', 'wisp', 'wraith', 'wisp'] },
+  { say: 'The great wraith comes over the bridge. It eats a town\'s light.', foes: ['great', 'wisp', 'wisp'] },
+];
+
+// ------------------------------------------------------------------ small things drawn in the world
+const dotTex = (() => { const c = document.createElement('canvas'); c.width = c.height = 64; const g = c.getContext('2d'), gr = g.createRadialGradient(32, 32, 0, 32, 32, 32); gr.addColorStop(0, 'rgba(255,255,255,1)'); gr.addColorStop(0.3, 'rgba(255,255,255,.5)'); gr.addColorStop(1, 'rgba(255,255,255,0)'); g.fillStyle = gr; g.fillRect(0, 0, 64, 64); return new THREE.CanvasTexture(c); })();
+const ADD = { transparent: true, depthWrite: false, blending: THREE.AdditiveBlending };
+const pops = [];
+function pop(text, pos, color = '#ffffff', size = 0.5) {              // a number or a word that floats up and fades
+  const c = document.createElement('canvas'); c.width = 256; c.height = 64; const g = c.getContext('2d');
+  g.font = '700 44px system-ui, sans-serif'; g.textAlign = 'center'; g.textBaseline = 'middle'; g.lineWidth = 7; g.strokeStyle = 'rgba(10,6,14,.9)'; g.strokeText(text, 128, 34); g.fillStyle = color; g.fillText(text, 128, 34);
+  const t = new THREE.CanvasTexture(c); t.colorSpace = THREE.SRGBColorSpace;
+  const s = decor(new THREE.Sprite(new THREE.SpriteMaterial({ map: t, transparent: true, depthTest: false, depthWrite: false, fog: false })));
+  s.scale.set(size * 4, size, 1); s.position.copy(pos); s.renderOrder = 40; scene.add(s); pops.push({ s, t: 0 });
+}
+const ringGeo = new THREE.RingGeometry(0.9, 1, 64).rotateX(-Math.PI / 2);
+function ground(geo, color, opacity) { const m = decor(new THREE.Mesh(geo, new THREE.MeshBasicMaterial({ color, opacity, side: THREE.DoubleSide, ...ADD }))); m.position.y = 0.05; m.visible = false; scene.add(m); return m; }
+const aim = ground(ringGeo, hdr(1.8, 1.3, 0.4), 0.9);                 // the gold ring under what she will cast at
+
+// ------------------------------------------------------------------ the foes: Envoi's lost souls, as cards that face the camera
+const FO = window.FOES, foeTex = {}, TL = new THREE.TextureLoader();
+for (const k of Object.keys(FO)) { const t = TL.load('foes/' + k + '.png'); t.colorSpace = THREE.SRGBColorSpace; foeTex[k] = t; }
+const plane = new THREE.PlaneGeometry(1, 1);
+const foes = [], bolts = [];
+let released = 0;
+class Foe {
+  constructor(kind, x, z) {
+    const K = KIND[kind]; Object.assign(this, { kind, K, x, z, hp: K.hp, state: 'rise', t: 0, clock: Math.random() * 3, frame: '', silence: 0, pin: 0, stagger: 0, doom: 0, hurt: 0, flash: 0, dead: 0, cast: 4 + Math.random() * 5, breath: 7, yaw: 0, calls: 0 });
+    this.mesh = decor(new THREE.Mesh(plane, new THREE.MeshBasicMaterial({ transparent: true, alphaTest: 0.08, side: THREE.DoubleSide, opacity: 0 })));
+    this.bar = decor(new THREE.Sprite(new THREE.SpriteMaterial({ color: 0x120c16, depthTest: false, fog: false }))); this.fill = decor(new THREE.Sprite(new THREE.SpriteMaterial({ color: 0x7dffb0, depthTest: false, fog: false })));
+    this.fill.center.set(0, 0.5); this.bar.renderOrder = 38; this.fill.renderOrder = 39;
+    this.tele = ground(ringGeo, SOUL, 0.0);
+    if (K.boss) this.fan = ground(new THREE.CircleGeometry(1, 40, Math.PI / 2 - 0.56, 1.12).rotateX(-Math.PI / 2), hdr(2.4, 1.2, 0.3), 0.0);
+    scene.add(this.mesh, this.bar, this.fill);
+    this.show(kind === 'great' ? 'great_front' : kind + '_idle');
+  }
+  get height() { return FO[this.frame].h / FO[this.frame].px_per_m * this.K.size + this.K.hover; }
+  center() { return new THREE.Vector3(this.x, this.K.hover + (this.kind === 'great' ? 2.2 : this.kind === 'wraith' ? 1.25 : 0.55), this.z); }
+  show(frame) { if (this.frame !== frame) { this.frame = frame; this.mesh.material.map = foeTex[frame]; this.mesh.material.needsUpdate = true; } }
+  dist() { return Math.hypot(me.x - this.x, me.z - this.z); }
+  take(d, text, color) {
+    if (this.dead) return 0;
+    d = Math.min(d, this.hp); this.hp -= d; this.hurt = 0.28; this.flash = 1; dealt(d);
+    pop(text || String(Math.round(d)), this.center().add(new THREE.Vector3((Math.random() - 0.5) * 0.5, 0.5, 0)), color || '#ffffff', this.K.boss ? 0.62 : 0.48);
+    if (this.hp <= 0.5) this.release();
+    return d;
+  }
+  release() {                                    // defeat is release, not death: a pale moth rises
+    this.dead = 0.001; this.hp = 0; this.doom = 0; this.tele.visible = false; if (this.fan) this.fan.visible = false; released++;
+    this.show(this.kind === 'wraith' ? 'wraith_kneel' : this.kind + '_released');
+    this.moth = decor(new THREE.Sprite(new THREE.SpriteMaterial({ map: foeTex.wisp_moth, color: hdr(1.8, 1.8, 1.6), transparent: true, depthWrite: false, fog: false }))); this.moth.scale.setScalar(this.K.boss ? 0.7 : 0.34); scene.add(this.moth);
+  }
+  update(dt) {
+    const K = this.K, d = this.dist(), toX = (me.x - this.x) / (d || 1), toZ = (me.z - this.z) / (d || 1);
+    this.t += dt; this.clock += dt; this.hurt -= dt; this.flash = Math.max(0, this.flash - dt * 4); this.silence -= dt; this.pin -= dt; this.stagger -= dt;
+    if (this.dead) { this.dead += dt; return; }
+    if (this.doom > 0) { this.doom -= dt; if (this.doom <= 0) { this.doom = 0; doomRings.push({ p: this.center(), t: 0 }); if (K.boss) this.take(Math.min(0.1 * K.hp, 5 * HER.M), 'Doom', '#d9a0ff'); else this.take(this.hp, 'Doom', '#d9a0ff'); if (this.dead) return; } }
+    const held = this.pin > 0 || this.stagger > 0;
+    const go = sp => { if (held) return; this.x += toX * sp * dt; this.z += toZ * sp * dt; };
+    if (this.state === 'rise') { if (this.t > 1) this.set('chase'); }
+    else if (this.kind === 'wisp') {
+      if (this.state === 'chase') { const w = Math.sin(this.clock * 2.3) * 0.7; if (!held) { this.x += (toX - toZ * w) * K.speed * dt; this.z += (toZ + toX * w) * K.speed * dt; } this.show(this.hurt > 0 ? 'wisp_hurt' : (this.clock % 1 < 0.5 ? 'wisp_idle' : 'wisp_flicker')); if (d < 1.15) this.set('cling'); }
+      else if (this.state === 'cling') { this.show(this.hurt > 0 ? 'wisp_hurt' : 'wisp_cling'); if (d > 1.7) this.set('chase'); else if (this.t > 1 && !held) { this.t = 0; hurtHer(14, this); } }
+    } else {
+      const big = K.boss, reach = big ? 3.0 : 2.0, hitR = big ? 4.0 : 2.6, wind = big ? 1.7 : 1.25, base = big ? 'great' : 'wraith';
+      if (this.state === 'chase') {
+        go(K.speed); this.show(big ? 'great_front' : (this.pin > 0 ? 'wraith_kneel' : 'wraith_idle'));
+        this.cast -= dt; this.breath -= dt;
+        if (held) { /* pressed down or struck dumb */ }
+        else if (d < reach) this.set('raise');
+        else if (!big && this.cast < 0 && d > 4 && this.silence <= 0) this.set('cast');
+        else if (big && this.breath < 0 && this.silence <= 0) { this.set('breath'); this.yaw = Math.atan2(toX, toZ); }
+      } else if (this.state === 'raise') {                       // a swing is coming: the ring shows how far it reaches
+        this.show(big ? 'great_front' : 'wraith_raise'); this.ring(hitR, this.t / wind);
+        if (held) this.set('chase'); else if (this.t > wind) { this.set('sweep'); if (d < hitR) hurtHer(big ? 90 : 60, this); }
+      } else if (this.state === 'sweep') { this.show(base + '_sweep'); if (this.t > 0.55) this.set('rest'); }
+      else if (this.state === 'rest') { this.show(big ? 'great_front' : 'wraith_idle'); if (this.t > (big ? 3.0 : 2.3)) this.set('chase'); }
+      else if (this.state === 'cast') {                          // the wraith throws a slow green light; Hush stops it
+        this.show('wraith_cast'); if (this.t > 1) { bolts.push(new Bolt(this.x, 1.5, this.z)); this.cast = 8 + Math.random() * 4; this.set('chase'); }
+      } else if (this.state === 'breath') {                      // the great wraith breathes stolen fire: step out of the fan, or Hush it
+        this.show('great_breath'); const u = this.t / 3.0;
+        this.fan.visible = true; this.fan.position.set(this.x, 0.06, this.z); this.fan.rotation.y = this.yaw; this.fan.scale.setScalar(10.5); this.fan.material.opacity = 0.12 + 0.5 * u * u;
+        if (u >= 1) {
+          this.fan.visible = false; this.breath = 11; this.set('rest'); fires.push({ x: this.x, z: this.z, yaw: this.yaw, t: 0 });
+          const a = Math.atan2(me.x - this.x, me.z - this.z); if (d < 10.5 && Math.abs(Math.atan2(Math.sin(a - this.yaw), Math.cos(a - this.yaw))) < 0.56) hurtHer(200, this);
+        }
+      }
+      if (big && this.calls < 2 && this.hp < K.hp * (0.66 - 0.33 * this.calls)) { this.calls++; say('It calls more of the lost to it.'); for (let i = 0; i < 2; i++) spawn('wisp'); }
+      if (this.stagger > 0 && big) this.show('great_swallow');
+    }
+    const r = Math.hypot(this.x, this.z); if (r > R - 0.6) { this.x *= (R - 0.6) / r; this.z *= (R - 0.6) / r; }
+  }
+  set(state) { this.state = state; this.t = 0; this.tele.visible = false; if (this.fan && state !== 'breath') this.fan.visible = false; }
+  ring(r, u) { this.tele.visible = true; this.tele.position.set(this.x, 0.05, this.z); this.tele.scale.setScalar(r); this.tele.material.opacity = 0.25 + 0.75 * cl(u); }
+  hush() {                                        // Hush: silence, and whatever it was working up to is lost
+    this.silence = SILENCE_S;
+    if (['cast', 'breath', 'raise'].includes(this.state)) { this.stagger = this.K.boss ? 3.5 : 2; this.breath = 11; this.cast = 6; this.set('chase'); pop('Hushed', this.center().add(new THREE.Vector3(0, 0.9, 0)), '#b9a4ff', 0.5); }
+    else pop('Silenced', this.center().add(new THREE.Vector3(0, 0.9, 0)), '#b9a4ff', 0.45);
+  }
+  draw(camYaw) {
+    const f = FO[this.frame], s = this.K.size, w = f.w / f.px_per_m * s, h = f.h / f.px_per_m * s, m = this.mesh;
+    const rise = this.state === 'rise' ? cl(this.t) : 1, gone = this.dead ? cl(this.dead / 1.5) : 0;
+    const bob = this.K.hover ? this.K.hover + 0.12 * Math.sin(this.clock * 2.6) : 0, lift = gone * 1.4, squash = this.pin > 0 && this.kind !== 'wraith' ? 0.8 : 1;
+    const rx = Math.cos(camYaw), rz = -Math.sin(camYaw), ox = (f.w / 2 - f.gx) / f.px_per_m * s, oy = (f.gy - f.h / 2) / f.px_per_m * s;
+    m.scale.set(w, h * squash, 1); m.rotation.y = camYaw; m.position.set(this.x + rx * ox, oy * squash + bob + lift, this.z + rz * ox);
+    const k = (1 + 1.6 * this.flash) * (this.silence > 0 ? 0.75 : 1); m.material.color.setRGB(k, k, k * (this.silence > 0 ? 1.25 : 1)); m.material.opacity = rise * (1 - gone);
+    const top = h * squash + bob + 0.22, bw = this.K.boss ? 0 : (this.kind === 'wraith' ? 1.1 : 0.7), alive = !this.dead && rise >= 1 && bw > 0;
+    this.bar.visible = this.fill.visible = alive;
+    if (alive) { this.bar.position.set(this.x, top, this.z); this.bar.scale.set(bw + 0.05, 0.11, 1); this.fill.position.set(this.x - rx * bw / 2, top, this.z - rz * bw / 2); this.fill.scale.set(bw * this.hp / this.K.hp, 0.07, 1); }
+    if (this.moth) { this.moth.position.set(this.x + 0.3 * Math.sin(this.dead * 5), 1 + this.dead * 1.9, this.z); this.moth.material.opacity = 1 - cl((this.dead - 2.2) / 0.8); }
+  }
+  remove() { scene.remove(this.mesh, this.bar, this.fill, this.tele); if (this.fan) scene.remove(this.fan); if (this.moth) scene.remove(this.moth); }
+}
+class Bolt {
+  constructor(x, y, z) { this.p = new THREE.Vector3(x, y, z); this.t = 0; this.s = decor(new THREE.Sprite(new THREE.SpriteMaterial({ map: dotTex, color: SOUL, ...ADD }))); this.s.scale.setScalar(0.8); scene.add(this.s); }
+  update(dt) {
+    this.t += dt; const to = new THREE.Vector3(me.x, 1.1, me.z).sub(this.p), d = to.length();
+    this.p.addScaledVector(to.normalize(), 3.6 * dt); this.s.position.copy(this.p); this.s.scale.setScalar(0.7 + 0.15 * Math.sin(this.t * 20));
+    if (d < 0.55) { hurtHer(40, null); return false; }
+    return this.t < 4.5;
+  }
+}
+const fires = [], doomRings = [], later = [], Q0 = new THREE.Quaternion();
+function spawn(kind) {
+  let a, x, z, n = 0;
+  do { a = Math.random() * Math.PI * 2; x = (R - 1.5) * Math.sin(a); z = (R - 1.5) * Math.cos(a); } while (Math.hypot(x - me.x, z - me.z) < 5.5 && ++n < 30);
+  const f = new Foe(kind, x, z); foes.push(f); return f;
+}
+
+// ------------------------------------------------------------------ her
+const fx = makeFx(scene);
+let dim = 0;
+const pipe = makePipeline(renderer, scene, { flatLight: flat => setLight(flat, dim), onViewport: h => { fx.uH.value = h; } });
+const blob = decor(new THREE.Mesh(new THREE.CircleGeometry(0.36, 32), new THREE.MeshBasicMaterial({ color: 0x06040a, transparent: true, opacity: 0.5, depthWrite: false })));
+blob.rotation.x = -Math.PI / 2; blob.position.y = 0.012; scene.add(blob);
+
+let J = null, ctx = null, blink = null, loco = null, poses = {};
+const state = { pixel: false, mode: 'title', wave: -1, waveT: 0, time: 0 };
+const me = { x: 0, z: -1.2, yaw: 0, v: 0, hp: HER.hp, mp: HER.mp, shield: 0, shieldT: 0, curtain: 0, usedUlt: false, haste: 0, heal: 0, cds: {}, down: 0 };
+const cam = { yaw: Math.PI, pitch: 0.27, dist: 6.4, focus: new THREE.Vector3(0, 1.2, 0), d: 6.4, shake: 0 };
+const stick = { x: 0, y: 0 }, keys = {};
+const casts = []; let lock = null, slot = 0, target = null, manual = false;
+const WIDE = { CurtainCall: 3.2, AgainstAllOdds: 1.5 };
+
+loadJester(scene).then(j => {
+  J = j; ctx = makeContext(J); ctx.prime(); blink = makeBlink(J.lids);
+  pipe.setPalette(J.palette);
+  const act = n => { const a = J.mixer.clipAction(J.clips[n]); a.setLoop(THREE.LoopRepeat, Infinity); a.setEffectiveWeight(0); a.play(); return a; };
+  loco = { idle: act('Idle'), walk: act('Walk'), run: act('Run') };
+  for (const name of Object.keys(SPELL)) {
+    const S = SPELL[name], b = document.createElement('button');
+    b.innerHTML = `${S.label}<small>${S.mp ? S.mp + ' MP · ' : ''}${S.says}</small><u></u>`; b.dataset.spell = name; if (S.ult) b.classList.add('ult');
+    b.onclick = () => tryCast(name); $('#spells').appendChild(b);
+    const a = J.mixer.clipAction(J.clips[name]); a.setLoop(THREE.LoopOnce, 1); a.clampWhenFinished = true; a.setEffectiveWeight(0); poses[name] = a;
+  }
+  poses.Kneel = J.mixer.clipAction(J.clips.Kneel); poses.Kneel.setLoop(THREE.LoopOnce, 1); poses.Kneel.clampWhenFinished = true;
+  $('#load').remove(); resize(); title(); api.ready = true;
+}).catch(e => { errBox.textContent += 'Could not load the model: ' + (e.message || e) + '\n'; });
+
+function card(html) { $('#card').innerHTML = html; $('#veil').style.display = 'grid'; $('#go').onclick = begin; }
+function title() {
+  card(`<h1>Night of No Moon</h1><h2>The square</h2>
+    <p>The Faire has played its last show and the square is empty. Then the chapel bell tolls, and the lost come looking for light.</p>
+    <ul><li><b>Move:</b> drag the pad, or WASD. Drag the picture to look around.</li>
+    <li><b>Gilded Rebuke</b> is free. Everything else costs MP, which comes back on its own.</li>
+    <li><b>Sealed Fate</b> marks a foe with Doom. Nine seconds later it is released.</li>
+    <li><b>Hush</b> silences. It stops a wraith's cast and the great wraith's breath.</li>
+    <li><b>Gravity</b> takes a quarter of a foe's HP and pins it. <b>Against All Odds</b> heals and hastens you.</li>
+    <li><b>Curtain Call</b> works once, when the Curtain bar is full: every Doom ends at once and every foe is struck.</li></ul>
+    <button id="go">Begin</button>`);
+}
+function begin() {
+  for (const f of foes) f.remove(); foes.length = 0; for (const b of bolts) scene.remove(b.s); bolts.length = 0; casts.length = 0; later.length = 0; lock = null; target = null; manual = false; released = 0;
+  Object.assign(me, { x: 0, z: -1.2, yaw: 0, v: 0, hp: HER.hp, mp: HER.mp, shield: 0, shieldT: 0, curtain: 0, usedUlt: false, haste: 0, heal: 0, cds: {}, down: 0 });
+  for (const n of Object.keys(poses)) { poses[n].stop(); }
+  Object.assign(state, { mode: 'play', wave: -1, waveT: 1.2, time: 0 }); cam.yaw = Math.PI; $('#veil').style.display = 'none';
+}
+const tally = {};
+let sayT = 0; function say(text) { const b = $('#banner'); b.textContent = text; b.style.opacity = 1; sayT = 3.6; }
+function dealt(d) { me.curtain = Math.min(100, me.curtain + d * 0.02); }
+function hurtHer(d, from) {
+  if (state.mode !== 'play') return;
+  if (lock && lock.name === 'CurtainCall') d *= 0.5;                 // she is hard to shake mid-bow
+  const s = Math.min(me.shield, d); me.shield -= s; d -= s;
+  if (s > 0) pop('Ward ' + Math.round(s), new THREE.Vector3(me.x, 2.1, me.z), '#ffe7a8', 0.42);
+  if (d <= 0) return;
+  tally[from ? from.kind + ':' + from.state : 'bolt'] = (tally[from ? from.kind + ':' + from.state : 'bolt'] || 0) + Math.round(d);
+  me.hp -= d; me.curtain = Math.min(100, me.curtain + d * 0.08); cam.shake = Math.min(1, cam.shake + d / 260); $('#hurt').style.opacity = Math.min(1, 0.35 + d / 300);
+  pop('-' + Math.round(d), new THREE.Vector3(me.x, 2.0, me.z), '#ff8aa6', 0.5);
+  if (me.hp <= 0) { me.hp = 0; state.mode = 'lost'; me.down = 0; poses.Kneel.reset(); poses.Kneel.play(); setTimeout(() => card(`<h1>The curtain falls</h1><h2>Released ${released} of the lost</h2><p>The lamps gutter and the square goes dark. She will have to take that bow again.</p><button id="go">Again</button>`), TEST ? 0 : 2200); }
+}
+function pickTarget() {
+  if (target && !target.dead && manual) return;
+  let best = null, bd = 1e9; for (const f of foes) if (!f.dead && f.state !== 'rise') { const d = f.dist(); if (d < bd) { bd = d; best = f; } }
+  target = best; manual = false;
+}
+$('#next').onclick = () => { const live = foes.filter(f => !f.dead).sort((a, b) => a.dist() - b.dist()); if (!live.length) return; target = live[(live.indexOf(target) + 1) % live.length]; manual = true; };
+function tryCast(name) {
+  if (state.mode !== 'play' || lock || !J) return false;
+  const S = SPELL[name];
+  if ((me.cds[name] || 0) > 0 || me.mp < S.mp) return false;
+  if (S.ult && (me.usedUlt || me.curtain < 100)) return false;
+  pickTarget();
+  if (!S.self && !target) return false;
+  if (name === 'GildedRebuke' && target.dist() > 11) { pop('Too far', new THREE.Vector3(me.x, 2.1, me.z), '#d8cbe4', 0.4); return false; }
+  me.mp -= S.mp; me.cds[name] = S.cd; if (S.ult) me.usedUlt = true;
+  const c = { name, S, t: 0, slot: slot++ % 4, foe: S.self ? null : target, tpos: S.self ? null : target.center(), hit: false, w: 0, release: J.info[name].release, dur: J.clips[name].duration };
+  const a = poses[name]; a.reset(); a.setEffectiveWeight(0); a.play(); a.paused = true;
+  casts.push(c); lock = c; return true;
+}
+function land(c) {                                // what each spell does when it lands
+  const f = c.foe, live = foes.filter(x => !x.dead);
+  if (c.name === 'GildedRebuke') { if (f) f.take(0.9 * HER.P); }
+  else if (c.name === 'SealedFate') { if (f && !f.dead) { const marked = live.filter(x => x.doom > 0 && x !== f).sort((a, b) => a.doom - b.doom); if (marked.length >= 3) marked[2].doom = 0; f.doom = DOOM_S; pop('Doom', f.center().add(new THREE.Vector3(0, 0.9, 0)), '#d9a0ff', 0.5); } }
+  else if (c.name === 'Hush') { if (f && !f.dead) f.hush(); }
+  else if (c.name === 'Gravity') { if (f && !f.dead) { f.take(Math.max(0, Math.min(0.25 * f.hp, 4 * HER.M, f.hp - 1)), null, '#d9a0ff'); f.pin = PIN_S; if (f.state !== 'rise') f.set('chase'); } }
+  else if (c.name === 'AgainstAllOdds') { const low = me.hp <= 0.4 * HER.hp; me.haste = low ? 1.25 : 1.15; me.heal = (low ? 0.6 : 0.3) * HER.hp / ((c.dur - c.release - 1.2) / c.S.after); pop(low ? 'Against all odds!' : 'Regen', new THREE.Vector3(me.x, 2.2, me.z), '#ffe7a8', 0.5); c.buff = true; }
+  else if (c.name === 'CurtainCall') {
+    for (const x of live) if (x.doom > 0) x.doom = 0.001;                                  // every Doom rings at once,
+    later.push({ t: 0.15, fn: () => { for (const x of foes) if (!x.dead) x.take(2 * HER.M, null, '#ffd6f2'); } });   // then every foe is struck,
+    me.shield = 0.75 * HER.M; me.shieldT = 6;                                                // and she is warded
+  }
+}
+
+// ---- controls
+{
+  const pad = $('#pad'), knob = $('#knob'); let id = null;
+  const set = e => { const r = pad.getBoundingClientRect(), R2 = r.width / 2; let x = (e.clientX - r.left - R2) / (R2 - 14), y = -(e.clientY - r.top - R2) / (R2 - 14); const m = Math.hypot(x, y); if (m > 1) { x /= m; y /= m; } stick.x = x; stick.y = y; knob.style.transform = `translate(${x * (R2 - 25)}px,${-y * (R2 - 25)}px)`; };
+  pad.addEventListener('pointerdown', e => { id = e.pointerId; pad.setPointerCapture(id); set(e); });
+  pad.addEventListener('pointermove', e => { if (e.pointerId === id) set(e); });
+  const up = e => { if (e.pointerId === id) { id = null; stick.x = stick.y = 0; knob.style.transform = ''; } };
+  pad.addEventListener('pointerup', up); pad.addEventListener('pointercancel', up);
+  const el = renderer.domElement, pts = new Map(); let pinch = 0;
+  el.addEventListener('pointerdown', e => { pts.set(e.pointerId, [e.clientX, e.clientY]); el.setPointerCapture(e.pointerId); });
+  el.addEventListener('pointermove', e => {
+    const p = pts.get(e.pointerId); if (!p) return;
+    if (pts.size === 1) { cam.yaw -= (e.clientX - p[0]) * 0.006; cam.pitch = Math.min(1.2, Math.max(0.02, cam.pitch + (e.clientY - p[1]) * 0.005)); }
+    p[0] = e.clientX; p[1] = e.clientY;
+    if (pts.size === 2) { const [a, b] = [...pts.values()], d = Math.hypot(a[0] - b[0], a[1] - b[1]); if (pinch) cam.dist = Math.min(14, Math.max(3, cam.dist * pinch / d)); pinch = d; }
+  });
+  const end = e => { pts.delete(e.pointerId); pinch = 0; };
+  el.addEventListener('pointerup', end); el.addEventListener('pointercancel', end);
+  el.addEventListener('wheel', e => { cam.dist = Math.min(14, Math.max(3, cam.dist * (1 + Math.sign(e.deltaY) * 0.1))); e.preventDefault(); }, { passive: false });
+  addEventListener('keydown', e => { keys[e.code] = true; const n = '123456'.indexOf(e.key); if (n >= 0) tryCast(Object.keys(SPELL)[n]); if (e.code === 'Tab') { $('#next').click(); e.preventDefault(); } if (e.code === 'Enter' && state.mode !== 'play' && $('#go')) $('#go').click(); });
+  addEventListener('keyup', e => { keys[e.code] = false; });
+  $('#bPixel').onclick = () => { state.pixel = !state.pixel; $('#bPixel').classList.toggle('on', state.pixel); };
+}
+function resize() {
+  const w = stage.clientWidth, h = stage.clientHeight;
+  renderer.setPixelRatio(pixelRatio); renderer.setSize(w, h, false); pipe.setSize(w, h, pixelRatio);
+  camera.aspect = w / h; camera.fov = w < h ? 60 : 44;
+  camera.setViewOffset(w, h, 0, Math.round(h * (w < h ? 0.10 : 0.04)), w, h);
+  camera.updateProjectionMatrix();
+}
+addEventListener('resize', resize); resize();
+
+function hud() {
+  const bar = (id, v, text) => { $(id + ' i').style.transform = `scaleX(${cl(v)})`; if (text !== undefined) $(id + ' b').textContent = text; };
+  bar('#hp', me.hp / HER.hp, `HP ${Math.ceil(me.hp)}`); $('#sh').style.width = cl(me.shield / HER.hp) * 100 + '%';
+  bar('#mp', me.mp / HER.mp, `MP ${Math.floor(me.mp)}`); bar('#cu', me.curtain / 100, me.usedUlt ? 'Curtain: taken' : me.curtain >= 100 ? 'Curtain: ready' : 'Curtain');
+  for (const b of document.querySelectorAll('#spells button')) {
+    const n = b.dataset.spell, S = SPELL[n], cd = me.cds[n] || 0, ok = me.mp >= S.mp && cd <= 0 && (!S.ult || (!me.usedUlt && me.curtain >= 100));
+    b.classList.toggle('no', !ok); b.classList.toggle('on', !!lock && lock.name === n); if (S.ult) b.classList.toggle('ready', ok);
+    b.querySelector('u').style.height = (S.cd ? cl(cd / S.cd) * 100 : 0) + '%';
+  }
+  const boss = foes.find(f => f.K.boss && !f.dead);
+  $('#boss').style.display = boss ? 'block' : 'none';
+  if (boss) { $('#bossName').textContent = boss.K.name + (boss.doom > 0 ? ` · Doom ${Math.ceil(boss.doom / 3)}` : '') + (boss.silence > 0 ? ' · silenced' : ''); $('#boss i').style.transform = `scaleX(${cl(boss.hp / boss.K.hp)})`; }
+}
+
+const clock = new THREE.Clock(); let T = 0;
+function frame(dtOverride, skipDraw) {
+  const dt = dtOverride !== undefined ? dtOverride : Math.min(clock.getDelta(), 0.05);
+  T += dt; dim = 0; let shake = 0;
+  flies(T);
+  if (sayT > 0) { sayT -= dt; if (sayT <= 0) $('#banner').style.opacity = 0; }
+  const h = $('#hurt'); if (h.style.opacity > 0) h.style.opacity = Math.max(0, h.style.opacity - dt * 2.2);
+  if (J) {
+    const play = state.mode === 'play';
+    if (play) {
+      state.time += dt;
+      // the waves
+      if (!foes.some(f => !f.dead)) {
+        state.waveT -= dt;
+        if (state.waveT <= 0) {
+          if (state.wave + 1 >= WAVES.length) { state.mode = 'won'; setTimeout(() => card(`<h1>The square is quiet</h1><h2>${released} lost souls released in ${Math.round(state.time)} seconds</h2><p>The moths rise past the bell tower toward the dark moon, and somewhere the Faire's tune starts up again.</p><button id="go">Play again</button>`), TEST ? 0 : 2600); }
+          else { state.wave++; const W = WAVES[state.wave]; say(W.say); for (const k of W.foes) spawn(k); state.waveT = 2.6;
+            if (state.wave > 0) { const h = Math.min(HER.hp - me.hp, 0.35 * HER.hp); me.hp += h; me.mp = Math.min(HER.mp, me.mp + 30); if (h > 1) pop('+' + Math.round(h), new THREE.Vector3(me.x, 2.1, me.z), '#a8ffc8', 0.45); } }   // she catches her breath between waves
+        }
+      }
+      me.mp = Math.min(HER.mp, me.mp + HER.mpRegen * dt); if (!me.usedUlt) me.curtain = Math.min(100, me.curtain + dt * 100 / 30);
+      for (const n of Object.keys(me.cds)) me.cds[n] = Math.max(0, me.cds[n] - dt);
+      if (me.shieldT > 0) { me.shieldT -= dt; if (me.shieldT <= 0) me.shield = 0; }
+    }
+    // where she wants to go
+    let sx = stick.x, sy = stick.y;
+    const kx = (keys.KeyD || keys.ArrowRight ? 1 : 0) - (keys.KeyA || keys.ArrowLeft ? 1 : 0), ky = (keys.KeyW || keys.ArrowUp ? 1 : 0) - (keys.KeyS || keys.ArrowDown ? 1 : 0);
+    if (kx || ky) { const m = Math.hypot(kx, ky), s = keys.ShiftLeft || keys.ShiftRight ? 0.5 : 1; sx = kx / m * s; sy = ky / m * s; }
+    const mag = Math.min(1, Math.hypot(sx, sy)), hasteK = me.haste || 1;
+    let want = !play || lock ? 0 : (mag < 0.55 ? mag / 0.55 * 1.05 : 1.05 + (mag - 0.55) / 0.45 * 1.55) * hasteK;
+    if (mag < 0.08) want = 0;
+    me.v += (want - me.v) * Math.min(1, dt * 7);
+    if (want > 0) { const fxv = -Math.sin(cam.yaw), fzv = -Math.cos(cam.yaw), dx = (sx * -fzv + sy * fxv) / mag, dz = (sx * fxv + sy * fzv) / mag; me.yaw = turn(me.yaw, Math.atan2(dx, dz), Math.min(1, dt * 9)); }
+    me.x += Math.sin(me.yaw) * me.v * dt; me.z += Math.cos(me.yaw) * me.v * dt;
+    const r = Math.hypot(me.x, me.z); if (r > R - 0.9) { me.x *= (R - 0.9) / r; me.z *= (R - 0.9) / r; }
+    // the foes
+    if (play) { for (const f of foes) f.update(dt); for (let i = bolts.length - 1; i >= 0; i--) if (!bolts[i].update(dt)) { scene.remove(bolts[i].s); bolts.splice(i, 1); } }
+    else for (const f of foes) { f.t += dt; f.clock += dt; if (f.dead) f.dead += dt; }
+    for (let i = foes.length - 1; i >= 0; i--) if (foes[i].dead > 3.2) { foes[i].remove(); foes.splice(i, 1); }
+    for (const f of foes) for (const g of foes) if (f !== g && !f.dead && !g.dead) { const dx = f.x - g.x, dz = f.z - g.z, d = Math.hypot(dx, dz) || 0.01, min = f.K.radius + g.K.radius; if (d < min) { f.x += dx / d * (min - d) * 0.5; f.z += dz / d * (min - d) * 0.5; } }
+    for (let i = later.length - 1; i >= 0; i--) { later[i].t -= dt; if (later[i].t <= 0) { const l = later.splice(i, 1)[0]; if (play) l.fn(); } }
+    if (play) pickTarget();
+    // her spells: each has its own clock, so its light carries on after she is free to move
+    fx.F.begin(camera);
+    let cw = 0;
+    for (let i = casts.length - 1; i >= 0; i--) {
+      const c = casts[i], S = c.S;
+      c.t += dt * (c.t < c.release ? S.rate * (c.name === 'AgainstAllOdds' ? 1 : hasteK) : (S.after || 1));
+      if (c.foe && !c.foe.dead) c.tpos = c.foe.center();
+      if (!c.hit && c.t >= c.release + S.hit) { c.hit = true; if (play) land(c); }
+      if (c.buff) { if (c.t < c.dur - 1.2 && state.mode === 'play') me.hp = Math.min(HER.hp, me.hp + me.heal * dt); else { c.buff = false; me.haste = 0; me.heal = 0; } }
+      const locked = lock === c;
+      if (locked) {
+        c.w += ((c.t < c.release + S.free ? 1 : 0) - c.w) * Math.min(1, dt * 10); cw = c.w;
+        poses[c.name].time = Math.min(c.t, c.dur - 0.01); poses[c.name].setEffectiveWeight(cw);
+        if (c.tpos) me.yaw = turn(me.yaw, Math.atan2(c.tpos.x - me.x, c.tpos.z - me.z), Math.min(1, dt * 8));
+        if (c.t >= c.release + S.free && c.w < 0.04) { poses[c.name].stop(); lock = null; cw = 0; }
+      }
+      if (c.t >= c.dur) { if (lock === c) { poses[c.name].stop(); lock = null; } casts.splice(i, 1); }
+    }
+    const wRun = cl((me.v - 1.3) / 0.9), wMove = cl(me.v / 0.35), down = state.mode === 'lost' ? 1 : 0;
+    if (down) { me.down += dt; poses.Kneel.time = Math.min(me.down * 1.4, 2.2); poses.Kneel.paused = true; poses.Kneel.setEffectiveWeight(1); }
+    const k = (1 - cw) * (1 - down);
+    loco.idle.setEffectiveWeight((1 - wMove) * k); loco.walk.setEffectiveWeight(wMove * (1 - wRun) * k); loco.run.setEffectiveWeight(wMove * wRun * k);
+    loco.walk.timeScale = cl(me.v / 0.93, 0.7, 1.7); loco.run.timeScale = cl(me.v / 2.58, 0.75, 1.3);
+    J.mixer.update(dt); if (!TEST) blink(dt);
+    J.root.position.set(me.x, 0, me.z); J.root.rotation.y = me.yaw; J.root.updateMatrixWorld(true);
+    blob.position.x = me.x; blob.position.z = me.z;
+    for (const c of casts) { const x = ctx(c.name, null, c.tpos); fx.cast(c.name, c.t, x, c.slot); dim = Math.max(dim, x.out.dim); shake = Math.max(shake, x.out.shake); }
+    // marks, fire and popups
+    aim.visible = play && !!target && !target.dead; if (aim.visible) { aim.position.set(target.x, 0.05, target.z); aim.scale.setScalar(target.K.radius + 0.35 + 0.05 * Math.sin(T * 6)); }
+    fx.draw('marks', (F, u) => {
+      foes.forEach((f, i) => {
+        if (f.doom > 0 && !f.dead) { const p = f.center(); p.y = f.height + 0.75; F.rune('d' + i, p, camera.quaternion, 1.0, T * 2, 1, 1, camera.quaternion, u.VIOLET, 2.0, 7); if (f.doomShown !== Math.ceil(f.doom / 3)) { f.doomShown = Math.ceil(f.doom / 3); pop(String(f.doomShown), p.clone(), '#f0d0ff', 0.6); } }
+        if (f.silence > 0 && !f.dead) F.ring('s' + i, f.center(), camera.quaternion, 0.9 * f.K.size + (f.K.boss ? 1.6 : 0.2), T * 2, 0.8, camera.quaternion, u.DUSK, 1.8);
+        if (f.pin > 0 && !f.dead) F.ring('p' + i, new THREE.Vector3(f.x, 0.06, f.z), Q0, 2.2 * f.K.radius + 0.6, -T * 4, 0.9, 1, u.VIOLET, 2.0);
+        if (f.dead && f.dead < 1.6) F.motes('m' + i, f.center(), 220, f.dead, { emit: 0.25, life: 1.3, spread: 1.6 * (f.K.boss ? 2.4 : 1), rise: 1.1, size: 0.07, color: 0xdff8e8 });
+      });
+      for (let i = doomRings.length - 1; i >= 0; i--) { const d = doomRings[i]; d.t += dt; F.wave('dw' + (i % 4), d.p, camera.quaternion, 0.4 + 4 * u.ease(d.t / 0.6), u.win(d.t, 0, 0.04, 0.3, 0.6), camera.quaternion, u.VIOLET); F.glow('dg' + (i % 4), 3, d.p, 1 + 2 * d.t, u.win(d.t, 0, 0.03, 0.15, 0.5), u.VIOLET, 2.4); if (d.t > 0.7) doomRings.splice(i, 1); }
+      for (let i = fires.length - 1; i >= 0; i--) { const f = fires[i]; f.t += dt; const o = new THREE.Vector3(f.x + Math.sin(f.yaw) * 4.5, 1.3, f.z + Math.cos(f.yaw) * 4.5); F.motes('fire' + (i % 2), o, 900, f.t, { emit: 0.25, life: 0.7, spread: 5.5, rise: 0.6, size: 0.12, color: 0xff8a30, flatten: 0.35 }); F.glow('fg' + (i % 2), 3, o, 6 * u.ramp(f.t, 0, 0.2), u.win(f.t, 0, 0.05, 0.2, 0.7), 0xff9a40, 2.4); F.light(o, 0xff9a40, 12 * u.win(f.t, 0, 0.05, 0.2, 0.7)); if (f.t > 1) fires.splice(i, 1); }
+      if (me.shield > 0) F.shell('ward', new THREE.Vector3(me.x, 1.0, me.z), 1.25, 0.7, u.GOLD, 1.6, 3.0);
+    });
+    for (let i = pops.length - 1; i >= 0; i--) { const p = pops[i]; p.t += dt; p.s.position.y += dt * 0.9; p.s.material.opacity = 1 - cl((p.t - 0.6) / 0.5); if (p.t > 1.1) { scene.remove(p.s); p.s.material.map.dispose(); p.s.material.dispose(); pops.splice(i, 1); } }
+    for (const f of foes) f.draw(cam.yaw);
+    // the camera follows her, keeps what she is fighting in view, and steps back for the big spells
+    const wide = lock ? WIDE[lock.name] || 0 : 0, at = new THREE.Vector3(me.x, 1.25, me.z);
+    if (target && !target.dead) at.lerp(new THREE.Vector3(target.x, 1.25, target.z), 0.22);
+    cam.focus.lerp(at, Math.min(1, dt * 4)); cam.d += (cam.dist + wide - cam.d) * Math.min(1, dt * 2.5);
+    cam.shake = Math.max(0, cam.shake - dt * 2.5); shake = Math.max(shake, cam.shake);
+    if (!skipDraw) hud();
+  }
+  setLight(false, dim);
+  const cp = Math.cos(cam.pitch);
+  camera.position.set(cam.focus.x + cam.d * Math.sin(cam.yaw) * cp, Math.max(0.3, cam.focus.y + cam.d * Math.sin(cam.pitch)), cam.focus.z + cam.d * Math.cos(cam.yaw) * cp);
+  if (shake > 0 && !TEST) camera.position.add(new THREE.Vector3(Math.random() - 0.5, Math.random() - 0.5, Math.random() - 0.5).multiplyScalar(0.16 * shake));
+  { // keep the camera inside the square, in front of the lantern posts and bunting
+    const lim = R - 1.5, p = camera.position, f = cam.focus;
+    if (Math.hypot(p.x, p.z) > lim) { let lo = 0, hi = 1; for (let i = 0; i < 12; i++) { const m = (lo + hi) / 2; if (Math.hypot(f.x + (p.x - f.x) * m, f.z + (p.z - f.z) * m) > lim) hi = m; else lo = m; } p.set(f.x + (p.x - f.x) * lo, f.y + (p.y - f.y) * Math.max(lo, 0.35), f.z + (p.z - f.z) * lo); }
+  }
+  camera.lookAt(cam.focus);
+  if (!skipDraw) pipe.render(camera, state.pixel);
+}
+renderer.setAnimationLoop(() => { if (!TEST) frame(); });
+
+// hooks for automated checks
+const api = window.J = {
+  ready: false, state, me, stick, cam, frame, begin, cast: tryCast,
+  run(seconds, dt = 1 / 30, draw = true) { for (let t = 0; t < seconds - 1e-6; t += dt) frame(dt, true); if (draw) frame(0); },
+  look() { return { mode: state.mode, wave: state.wave, time: state.time, hp: me.hp, mp: me.mp, curtain: me.curtain, usedUlt: me.usedUlt, locked: !!lock, released, cds: { ...me.cds },
+    tally, target: target && !target.dead ? foes.indexOf(target) : -1, foes: foes.map(f => ({ kind: f.kind, hp: f.hp, state: f.state, dead: !!f.dead, doom: f.doom, x: f.x, z: f.z, dist: f.dist() })), x: me.x, z: me.z }; },
+  skip() { for (const f of foes) if (!f.dead) f.release(); },
+  errors: () => errBox.textContent,
+};
+</script>
+</body>
+</html>

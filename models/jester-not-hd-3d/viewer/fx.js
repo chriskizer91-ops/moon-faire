@@ -96,7 +96,9 @@ export function makeFx(scene, base = 'fx/') {
   let cam = null;
   const flat = new THREE.Quaternion().setFromAxisAngle(new THREE.Vector3(1, 0, 0), -Math.PI / 2), tq = new THREE.Quaternion(), sq = new THREE.Quaternion(), zAxis = new THREE.Vector3(0, 0, 1);
 
+  let ns = '';                              // each running spell draws under its own name, so two can be alight at once
   function get(id, make) {
+    id = ns + id;
     let o = pool.get(id);
     if (!o) { o = make(); o.layers.set(FXL); o.renderOrder = 30; o.frustumCulled = false; group.add(o); pool.set(id, o); }
     o.visible = true; return o;
@@ -111,7 +113,7 @@ export function makeFx(scene, base = 'fx/') {
 
   const F = {
     begin(camera) { cam = camera; for (const o of pool.values()) o.visible = false; light.intensity = 0; },
-    light(pos, color, intensity) { light.position.copy(pos); light.color.set(color); light.intensity = Math.max(0, intensity); },
+    light(pos, color, intensity) { if (intensity > light.intensity) { light.position.copy(pos); light.color.set(color); light.intensity = intensity; } },   // the strongest wins
     pic(id, map, pos, rootQ, size, spin, alpha, tilt, color = 0xffffff, gain = 1.7) {
       if (alpha <= 0.003 || size <= 0) return;
       const m = get(id, () => new THREE.Mesh(plane, basic(map, color, gain)));
@@ -340,5 +342,9 @@ export function makeFx(scene, base = 'fx/') {
     },
   };
 
-  return { F, SPELLS, group, light, uH };
+  // Draw one spell at clip time t. 'slot' tells two casts of the same spell apart.
+  function cast(name, t, c, slot = '') { ns = name + slot + ':'; SPELLS[name](t, c); ns = ''; }
+  // Draw anything else with the same building blocks, under a name of its own.
+  function draw(name, fn) { ns = name + ':'; fn(F, { cl, ramp, ease, win, glowTex, VIOLET, GOLD, DUSK, ROSE }); ns = ''; }
+  return { F, SPELLS, cast, draw, group, light, uH };
 }

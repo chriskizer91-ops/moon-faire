@@ -232,7 +232,7 @@ function frame(dtOverride) {
     fx.F.begin(camera);
     if (action && fx.SPELLS[current] && J.info[current] && J.info[current].spell) {
       const c = ctx(current, action, null);
-      fx.SPELLS[current](action.time, c);
+      fx.cast(current, action.time, c);
       dim = c.out.dim;
     }
   }

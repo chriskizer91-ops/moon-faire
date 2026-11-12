@@ -6,3 +6,4 @@ viewer/jester.glb
 viewer/jester_glb*.js
 __pycache__/
 dist-stage/
+dist-game/
