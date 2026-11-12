@@ -99,11 +99,14 @@ P['shut'], l1, a1 = patch(c14, [((219, 727), (EL[0], EL[1] + 11), SC14), ((365, 
 P['half'] = P['shut']                           # there is no half-shut painting yet; a blink goes straight to shut
 # the "oo" mouth (C16, upper right): its pupils are on row 191.8, the middle of the mouth at (1314.6, 356.8)
 P['oh'], l3, a3 = patch(c16, [((1314.6, 356.8), (CX, ERW + (356.8 - 191.8) * SC16), SC16)], [(CX - 66, 464, CX + 66, 548)])
-# the open grin (C14, upper right): pupils on row 188.6, the middle of the mouth at (1253.4, 345)
-P['smile'], l4, a4 = patch(c14, [((1253.4, 345.0), (CX, ERW + (345.0 - 188.6) * SC14), SC14)], [(CX - 74, 456, CX + 74, 553)])
+# Chris, 12 Nov: no teeth, anywhere. The open grin (C14, upper right) is not used; when she laughs she keeps her closed-lip smile and shuts her eyes.
+# Two more talking mouths without teeth, both from C16: lips just parted (upper middle; pupils 141.2 px apart on row 192, mouth middle (804, 349.4))
+# and the pucker (lower right; pupils 148.2 px apart on row 702, mouth middle (1319.4, 868.8)).
+P['oh2'], l4, a4 = patch(c16, [((804.0, 349.4), (CX, ERW + (349.4 - 192.0) * 107.5 / 141.2), 107.5 / 141.2)], [(CX - 66, 464, CX + 66, 548)])
+P['oh3'], l5, a5 = patch(c16, [((1319.4, 868.8), (CX, ERW + (868.8 - 702.0) * 107.5 / 148.2), 107.5 / 148.2)], [(CX - 66, 464, CX + 66, 552)])
 T['faceParts'] = P
 def comp(lay, al): return img(face * (1 - al[..., None]) + lay * al[..., None]).resize((384, 384), Image.LANCZOS)
-_e = Image.new('RGB', (384 * 4, 384)); [_e.paste(c_, (i * 384, 0)) for i, c_ in enumerate((img(face).resize((384, 384), Image.LANCZOS), comp(l1, a1), comp(l3, a3), comp(l4, a4)))]; _e.save(ROOT + 'shots/bake_states.jpg', quality=88)
+_e = Image.new('RGB', (384 * 5, 384)); [_e.paste(c_, (i * 384, 0)) for i, c_ in enumerate((img(face).resize((384, 384), Image.LANCZOS), comp(l1, a1), comp(l3, a3), comp(l4, a4), comp(l5, a5)))]; _e.save(ROOT + 'shots/bake_states.jpg', quality=88)
 # ---- tones for her neck: the chest it rises from (painting B1) and the jaw it meets
 _b1 = arr(Image.open(IN + 'B1.png')); _cy = int(round(1001.0 - 1.345 * 572.4)); _chest = np.median(_b1[_cy - 6:_cy + 6, 467 - 12:467 + 12].reshape(-1, 3), 0)
 T['skinChest'] = '#%02x%02x%02x' % tuple(int(v) for v in _chest); print('tones: face', T['skin'], 'jaw', T['skinJaw'], 'chest', T['skinChest'])

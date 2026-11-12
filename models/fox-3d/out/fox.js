@@ -1088,10 +1088,13 @@ function makeFox(opts) {
   // the face canvas: eyes (0 open .. 1 closed), mouth ('rest', 'open', 'smile'), glow (spell light in her eyes)
   const faceC = cvs(Math.round(1024 * TEXS), Math.round(1024 * TEXS)), faceT = ctex(faceC);
   const faceState = { eyes: -1, mouth: '', glow: -1 }, bakedFace = { base: null, parts: {} }, lastFace = [0, 'rest', 0];
+  // her talking mouths, none showing teeth: each time her mouth opens it takes the next one
+  const TALK = ['oh', 'oh2', 'oh', 'oh3'].filter((n) => BAKED && BAKED.faceParts && BAKED.faceParts[n]); if (!TALK.length) TALK.push('oh'); let talkN = 0;
   function paintFace(eyes, mouth, glow) {
     lastFace[0] = eyes; lastFace[1] = mouth; lastFace[2] = glow;
     const q = Math.round(eyes * 4) / 4, gq = Math.round((glow || 0) * 4) / 4;
     if (q === faceState.eyes && mouth === faceState.mouth && gq === faceState.glow) return;
+    if (mouth === 'open' && faceState.mouth !== 'open') talkN++;
     faceState.eyes = q; faceState.mouth = mouth; faceState.glow = gq;
     const W = faceC.width, H = faceC.height, g = faceC.getContext('2d'), k = W / 0.2, u = k / 1000;     // k: pixels per meter; u: per millimeter
     const X = (x) => (x - FACE.x0) / (FACE.x1 - FACE.x0) * W, Y = (y) => (1 - (y - FACE.y0) / (FACE.y1 - FACE.y0)) * H;
@@ -1099,7 +1102,7 @@ function makeFox(opts) {
       g.drawImage(bakedFace.base, 0, 0, W, H);
       const put = (n) => { const im = bakedFace.parts[n], r = BAKED.faceParts[n]; if (im) g.drawImage(im, r.x * W, r.y * H, r.w * W, r.h * H); };
       if (q >= 0.75) put('shut'); else if (q >= 0.25) put('half');
-      if (mouth === 'open') put('oh'); else if (mouth === 'smile') put('smile');
+      if (mouth === 'open') put(TALK[talkN % TALK.length]); else if (mouth === 'smile') put('smile');
       if (gq > 0 && q < 0.75) for (const e of BAKED.faceEyes) {
         const r = 0.0078 * k, gg = g.createRadialGradient(e[0] * W, e[1] * H, 0, e[0] * W, e[1] * H, r);
         gg.addColorStop(0, rgba('#f0c8ff', 0.95 * gq)); gg.addColorStop(0.55, rgba(PAL.violet, 0.75 * gq)); gg.addColorStop(1, rgba(PAL.violet, 0));

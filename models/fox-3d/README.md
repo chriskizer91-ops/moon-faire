@@ -17,7 +17,7 @@ Method and rules: the project doc `claude/HOW-TO-3d-witch-models.md`. Pass notes
 | `src/70_anim.js` | materials, skeleton, scale, the moves |
 | `bake_fox.py` | paints her face and corset from the paintings into `out/fox_tex.js` |
 | `viewer/` | the page: `index.tpl.html` and `app.js` |
-| `references/round1`, `round2` | her reference paintings, as WebP |
+| `references/round1`, `round2`, `round3` | her reference paintings, as WebP (round 3: tools and spells, not used yet) |
 | `meas/prof.py`, `lib/grid.py` | measuring tools |
 | `compare_fox.py`, `viewset.sh`, `headset.sh` | checking pictures |
 
@@ -73,6 +73,11 @@ Pupils in C3 are typed into `meas/fox_profile.py` from a gridded copy; automatic
 - Written in the Jester's frame, then the whole figure is scaled by `FOX_K = 1.045`. Head bone scale 0.93, head lowered 0.0233. Hand scale 0.86.
 - Head landmarks in A1 (rows; columns from x 508): eyes 157, pupils 54 px apart, nose base 186, mouth 208, chin 248, face 108 px wide at row 180, ear bases 88, ear tips 22.
 - Painting scales: A1 861 px a metre (soles on row 1500), B4 851 (soles 970), B1 572.4, B2 574.8.
+
+## Rules from Chris for her face
+
+- **No teeth, anywhere.** Smiles are closed-lip; talking mouths are the three in C16 that show none.
+- Lay every part over its painting at one scale and send him the overlay.
 
 ## Rules learned on her
 
