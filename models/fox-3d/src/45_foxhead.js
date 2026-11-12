@@ -58,7 +58,7 @@
     const side = sm(1.20, 1.55, Math.abs(a)), v = sm(lerp(0.78, 0.40, sm(2.2, 2.8, Math.abs(a))), lerp(1.15, 0.85, sm(2.2, 2.8, Math.abs(a))), ph) * (1 - sm(lerp(1.22, 2.0, sm(1.9, 2.6, Math.abs(a))), lerp(1.50, 2.4, sm(1.9, 2.6, Math.abs(a))), ph)) * lerp(0.62, 1, sm(1.9, 2.6, Math.abs(a)));      // C3: her hair is drawn up off her ears and neck, so at the sides the mass stops above the ear; at the back it runs to the nape
     const lump = 0.008 * Math.sin(a * 5 + ph * 3.1) * Math.sin(ph * 6.3 - a * 2) + 0.005 * Math.sin(a * 11 + ph * 7);
     const full = 0.030 + 0.028 * sm(0.8, 1.7, ph) * (1 - 0.4 * sm(2.0, 2.4, ph));
-    return lerp(-0.012, full + lump, side * v);
+    return -0.012;      // C10 (her hair alone): there is no body of hair at the sides or back. It is all drawn up, close and dark, into one tall pile of curls on top.
   };
   (function foxHairMass() {
     const NU = Q(84, 44), NR = Q(40, 22), rings = [];
@@ -80,50 +80,50 @@
       else { N.applyQuaternion(new THREE.Quaternion().setFromUnitVectors(T0, Tn)); N.addScaledVector(Tn, -N.dot(Tn)).normalize(); }
       T0 = Tn; const B = V3().crossVectors(Tn, N), ang = ph0 + t * turns * TAU, grow = 0.45 + 0.55 * sm(0, 0.35, t);      // a ringlet opens out from its root
       pts.push(p.clone().addScaledVector(N, Math.cos(ang) * hr * grow).addScaledVector(B, Math.sin(ang) * hr * grow));
-      const r = tr * (0.75 + 0.25 * Math.sin(t * 9 + ph0)) * (1 - 0.55 * sm(0.8, 1, t)); rad.push([r, r * 0.52]);
+      const r = tr * (0.75 + 0.25 * Math.sin(t * 9 + ph0)) * (1 - 0.55 * sm(0.8, 1, t)); rad.push([r, r * 0.72]);
     }
     const rings = tubeRings(pts, rad, 6);
     addPart('curl', loft(rings, { capB: true, u0: hrnd(), uS: 0.22 }), wHead, { out: centroidOf(rings) });
   }
   (function foxBun() {                               // the messy ponytail bun: ringlets spilling every way out of one knot high on the back of her head
-    const B0 = V3(0, 1.672, -0.074), lean = V3(0, 0.45, -0.89).normalize(), N = Q(210, 120);
-    addPart('scalp', spherePart(B0, 0.062, 0.058, 0.058, Q(28, 14), Q(18, 10)), wHead, { out: B0 });
+    const B0 = V3(0, 1.660, -0.112), lean = V3(0, 0.60, -0.80).normalize(), N = Q(300, 150);      // C10: the pile's top stands about 11 cm above her skull and it spills back well behind her head
+    addPart('scalp', spherePart(B0, 0.074, 0.060, 0.074, Q(28, 14), Q(18, 10)), wHead, { out: B0 });
     for (let k = 0; k < N; k++) {
-      let d; do { const u = hrr(-1, 1), th = hrr(0, TAU), s = Math.sqrt(1 - u * u); d = V3(s * Math.cos(th), u, s * Math.sin(th)); } while (d.dot(lean) < -0.25);
-      const L = hrr(0.072, 0.128), droop = hrr(0.018, 0.050), start = B0.clone().addScaledVector(d, 0.016), side = V3(hrr(-1, 1), 0, hrr(-1, 1)).multiplyScalar(0.012);
+      let d; do { const u = hrr(-1, 1), th = hrr(0, TAU), s = Math.sqrt(1 - u * u); d = V3(s * Math.cos(th), u, s * Math.sin(th)); } while (d.dot(lean) < -0.35 || d.z > 0.30);
+      const L = hrr(0.070, 0.130), droop = hrr(0.014, 0.045), start = B0.clone().addScaledVector(d, 0.040), side = V3(hrr(-1, 1), 0, hrr(-1, 1)).multiplyScalar(0.012);
       ringlet((t) => start.clone().addScaledVector(d, L * t).add(V3(side.x * t * t, -droop * t * t, side.z * t * t)), hrr(0.0095, 0.0150), hrr(1.7, 2.8), hrr(0.0050, 0.0066), hrr(0, TAU));
     }
   })();
   (function foxLooseCurls() {                        // the curls left out all round her face, and the soft halo of shorter ones
-    const NH = Q(30, 20);
+    const NH = Q(16, 12);
     for (let k = 0; k < NH; k++) {                   // hanging ringlets: short over the forehead, long in front of her ears
-      const f = (k + hrr(0.15, 0.85)) / NH, a0 = lerp(-1, 1, f), wisp = k % 8 === 3, a = Math.sign(a0 || 1) * (wisp ? hrr(0.12, 0.62) : lerp(1.30, 2.30, Math.abs(a0))), aa = Math.abs(a), root = V3(...headPoint(a, hairLine(a) - hrr(0.02, 0.10), 0.006));
-      const out = root.clone().sub(HC).setY(0).normalize(), L = wisp ? hrr(0.014, 0.026) : aa < 1.35 ? hrr(0.085, 0.130) : hrr(0.130, 0.200), stand = wisp ? hrr(0.006, 0.012) : hrr(0.040, 0.078);
+      const f = (k + hrr(0.15, 0.85)) / NH, a0 = lerp(-1, 1, f), wisp = k % 8 === 3, a = Math.sign(a0 || 1) * (wisp ? hrr(0.12, 0.62) : Math.abs(a0) < 0.42 ? lerp(1.12, 1.40, Math.abs(a0) / 0.42) : lerp(2.55, 3.05, (Math.abs(a0) - 0.42) / 0.58)), aa = Math.abs(a), root = V3(...headPoint(a, hairLine(a) - hrr(0.02, 0.10), 0.006));
+      const out = root.clone().sub(HC).setY(0).normalize(), L = wisp ? hrr(0.014, 0.026) : aa < 2.0 ? hrr(0.120, 0.200) : hrr(0.055, 0.110), stand = wisp ? hrr(0.006, 0.012) : hrr(0.010, 0.026);
       const swing = V3(-out.z, 0, out.x).multiplyScalar(wisp ? Math.sign(a || 1) * hrr(0.012, 0.024) : hrr(-0.012, 0.012));
       ringlet((t) => root.clone().addScaledVector(out, stand * sm(0, 0.4, t)).add(V3(swing.x * t, -L * t * (0.35 + 0.65 * t), swing.z * t)), wisp ? hrr(0.005, 0.007) : hrr(0.0110, 0.0150), wisp ? hrr(0.8, 1.3) : Math.max(1.5, L / 0.034), wisp ? hrr(0.0026, 0.0034) : hrr(0.0050, 0.0064), hrr(0, TAU));
     }
 
-    const NS2 = Q(84, 46);
+    const NS2 = 0;      // none: the sides are close to her head now
     for (let k = 0; k < NS2; k++) {                  // wavy locks lying down the mass, from the top of it to its hem
       const s = k % 2 ? 1 : -1, a0 = s * hrr(1.27, PI), ph0 = hrr(0.80, 1.25), ph1 = Math.min(hrr(1.9, 2.45), lerp(1.42, 2.3, sm(1.9, 2.6, Math.abs(a0)))), da = hrr(-0.18, 0.18), wob = hrr(0.03, 0.07), f = hrr(2, 4), p0 = hrr(0, TAU);
       ringlet((t) => { const ph = lerp(ph0, ph1, t), a = a0 + da * t + wob * Math.sin(t * f * PI + p0); return V3(...headPoint(a, ph, massGrow(a, ph) + 0.003 + 0.004 * t)); }, hrr(0.004, 0.008), hrr(2.5, 5), hrr(0.0060, 0.0085), hrr(0, TAU));
     }
     for (const s of [-1, 1]) for (let k = 0; k < 11; k++) {      // the hair swept off her parting to each side, over the corners of her forehead
-      const u = (k + hrnd()) / 11, a1 = s * lerp(1.22, 1.50, hrnd()), ph0 = lerp(0.55, 1.18, u), ph1 = lerp(1.55, 2.15, hrnd()), a0 = s * hrr(0.03, 0.10), p0 = hrr(0, TAU);
+      const u = (k + hrnd()) / 11, a1 = s * lerp(1.20, 1.60, hrnd()), ph0 = lerp(0.55, 1.18, u), ph1 = lerp(1.18, 1.42, hrnd()), a0 = s * hrr(0.03, 0.10), p0 = hrr(0, TAU);
       ringlet((t) => { const a = lerp(a0, a1, Math.pow(t, 0.75)), ph = lerp(ph0, ph1, Math.pow(t, 1.6)); return V3(...headPoint(a, ph, 0.0135 + Math.max(0, massGrow(a, ph)) * sm(0.5, 1, t) + 0.004 * Math.sin(t * 9 + p0))); }, hrr(0.003, 0.006), hrr(2, 3.5), hrr(0.0065, 0.009), p0);
     }
-    const NF = Q(230, 110);
+    const NF = Q(120, 64);
     for (let k = 0; k < NF; k++) {                   // the halo: shorter curls standing out from the hair itself, all round
-      let a = hrr(-PI, PI); if (Math.abs(a) < 1.38) a = Math.sign(a || 1) * hrr(1.38, PI);     // none sprouting over her face
-      const ph = lerp(Math.abs(a) < 2.3 ? 0.98 : 0.5, lerp(1.45, 2.2, sm(1.9, 2.6, Math.abs(a))), Math.pow(hrnd(), 0.8)), root = V3(...headPoint(a, ph, Math.max(0.006, massGrow(a, ph) - 0.006))), out = root.clone().sub(HC).normalize();
-      const L = hrr(0.045, 0.095), droop = hrr(0.012, 0.040), tw = V3(hrr(-1, 1), 0, hrr(-1, 1)).multiplyScalar(0.012);
+      let a = hrr(-PI, PI); if (Math.abs(a) < 1.05) a = Math.sign(a || 1) * hrr(1.05, PI);     // none sprouting over her face
+      const ph = lerp(0.42, 1.05, hrnd()), root = V3(...headPoint(a, ph, Math.max(0.006, massGrow(a, ph) - 0.006))), out = root.clone().sub(HC).normalize();
+      const L = hrr(0.028, 0.065), droop = hrr(0.008, 0.028), tw = V3(hrr(-1, 1), 0, hrr(-1, 1)).multiplyScalar(0.012);
       ringlet((t) => root.clone().addScaledVector(out, L * t).add(V3(tw.x * t * t, -droop * t * t, tw.z * t * t)), hrr(0.0100, 0.0150), hrr(1.2, 2.2), hrr(0.0062, 0.0085), hrr(0, TAU));
     }
   })();
 
   (function foxEars() {                              // costume ears, clipped into her hair: a cupped leaf, russet behind and cream inside
     for (const sx of [-1, 1]) {
-      const base = V3(sx * 0.079, 1.607, 0.030), up = V3(sx * 0.305, 0.951, -0.05).normalize(), fwd = V3(sx * 0.30, 0, 0.954).normalize(), right = V3().crossVectors(up, fwd).normalize();
+      const base = V3(sx * 0.079, 1.594, 0.030), up = V3(sx * 0.305, 0.951, -0.05).normalize(), fwd = V3(sx * 0.30, 0, 0.954).normalize(), right = V3().crossVectors(up, fwd).normalize();
       const H = 0.088, NV = Q(22, 12), NA = Q(26, 14), rings = [];
       for (let i = 0; i <= NV; i++) {
         const v = i / NV, w = 0.037 * Math.pow(1 - v, 0.86) * (0.55 + 0.45 * sm(0, 0.18, v)) + 0.0012, th = 0.0035 + 0.007 * (1 - v), c = base.clone().addScaledVector(up, H * v).addScaledVector(fwd, -0.012 * v * v), ring = [];

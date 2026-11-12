@@ -25,20 +25,24 @@ def tone(uri):
     head, b = uri.split(',', 1); im = Image.open(io.BytesIO(base64.b64decode(b))); a = np.asarray(im.convert('RGBA')).astype(float); a[..., :3] = np.clip(a[..., :3] * gain, 0, 255); bb = io.BytesIO()
     if im.mode == 'RGBA': Image.fromarray(a.astype(np.uint8), 'RGBA').save(bb, 'WEBP', quality=90, method=6); return 'data:image/webp;base64,' + base64.b64encode(bb.getvalue()).decode()
     Image.fromarray(a[..., :3].astype(np.uint8)).save(bb, 'JPEG', quality=90); return 'data:image/jpeg;base64,' + base64.b64encode(bb.getvalue()).decode()
+PAINT = 'fox'          # whose PAINTING goes on the Jester's head: 'fox' (her own face from sheet C3, Chris 12 Nov: "use the 3D model from the Jester and put a new painting on it") or 'jester'
 N = dict(F)
-for k in ('faceSide', 'faceSideA', 'faceSideWin'): N.pop(k, None)
-for k in ('face', 'faceSide'):
-    if k in T: N[k] = tone(T[k])
-for k in ('faceSideA', 'faceSideWin', 'layout', 'faceEyes'):
-    if k in T: N[k] = T[k]
-def clear_cap_mark(uri):
-    # Above the Jester's forehead her picture still holds a dark smudge where the point of her cap sat. Her cap hid it; the Fox's hair is drawn back, so it shows.
-    # It lies in the smooth skin carried outward above the hairline: fill it across from the clean skin either side.
-    im = Image.open(io.BytesIO(base64.b64decode(uri.split(',', 1)[1]))).convert('RGB'); a = np.asarray(im).astype(float)
-    for y in range(0, 130):
-        l, r = a[y, 452:464].mean(0), a[y, 566:578].mean(0); t = np.linspace(0, 1, 102)[:, None]; a[y, 464:566] = l * (1 - t) + r * t
-    bb = io.BytesIO(); Image.fromarray(np.clip(a, 0, 255).astype(np.uint8)).save(bb, 'JPEG', quality=92); return 'data:image/jpeg;base64,' + base64.b64encode(bb.getvalue()).decode()
-N['face'] = clear_cap_mark(N['face'])
-N['faceParts'] = {n: dict(p, src=tone(p['src'])) for n, p in T['faceParts'].items()}
-N['skinJaw'] = '#%02x%02x%02x' % tuple(int(v) for v in np.clip(rgb(T['skinJaw']) * gain, 0, 255))
+if PAINT == 'jester':
+    for k in ('faceSide', 'faceSideA', 'faceSideWin'): N.pop(k, None)
+    for k in ('face', 'faceSide'):
+        if k in T: N[k] = tone(T[k])
+    for k in ('faceSideA', 'faceSideWin', 'layout', 'faceEyes'):
+        if k in T: N[k] = T[k]
+    N['face'] = clear_cap_mark(N['face'])
+    N['faceParts'] = {n: dict(p, src=tone(p['src'])) for n, p in T['faceParts'].items()}
+    N['skinJaw'] = '#%02x%02x%02x' % tuple(int(v) for v in np.clip(rgb(T['skinJaw']) * gain, 0, 255))
+else:
+    # The Fox's painted face is already laid out on the Jester's lines: eyes at 1.5246, lip line 0.066 below, under the nose and chin within 1.5 mm.
+    # Only her eyes are 1 mm further apart each side. Squeeze her picture and her face states sideways by that much, so each painted eye sits on its sculpted socket.
+    k = T['layout']['eyeX'] / F['layout']['eyeX']; print('sideways fit of her painting to the Jester head: x %.4f' % k)
+    im = Image.open(io.BytesIO(base64.b64decode(F['face'].split(',', 1)[1]))).convert('RGB'); w, h = im.size
+    im = im.transform((w, h), Image.AFFINE, (1 / k, 0, (w / 2) * (1 - 1 / k), 0, 1, 0), Image.BICUBIC); a = np.asarray(im).copy(); m = int(np.ceil(w / 2 * (1 - k))) + 2; a[:, :m] = a[:, m:m + 1]; a[:, -m:] = a[:, -m - 1:-m]
+    bb = io.BytesIO(); Image.fromarray(a).save(bb, 'JPEG', quality=92); N['face'] = 'data:image/jpeg;base64,' + base64.b64encode(bb.getvalue()).decode()
+    N['layout'] = T['layout']; N['faceEyes'] = [[round(0.5 + (x - 0.5) * k, 4), y] for x, y in F['faceEyes']]
+    N['faceParts'] = {n: dict(p, x=round(0.5 + (p['x'] - 0.5) * k, 4), w=round(p['w'] * k, 4)) for n, p in F['faceParts'].items()}
 open(W + 'out/fox_tex.js', 'w').write('window.FOX_TEX=' + json.dumps(N) + ';'); print('keys', [k for k in N if k != 'body'], 'layout', N['layout'])

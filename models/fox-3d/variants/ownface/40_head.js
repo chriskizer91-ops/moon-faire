@@ -17,6 +17,9 @@
   // how wide a ring of the lower head is, from 1 at the cheeks to 0 under the chin: the last tenth closes quickly, so the jaw has an edge and a flat underside
   const SIN9 = Math.sqrt(1 - 0.81), SN9 = Math.pow(SIN9, 0.42), snLow = (sp, t) => (t > 0.9 ? SN9 * Math.pow(sp / SIN9, 0.40) : Math.pow(sp, 0.42));
   const T_CHIN = (HC.y - FACE_MID[0][0]) / HR.yB, SN_CHIN = snLow(Math.sqrt(1 - T_CHIN * T_CHIN), T_CHIN), RZ_CHIN = FACE_MID[0][1] - 0.050 * T_CHIN * T_CHIN * T_CHIN;
+  // Chris, 12 Nov: her forehead was a little tall. The top of the head comes down half an inch (12.7 mm on her, 13.1 here before the head is scaled):
+  // everything above the brow slides down, the brow and all below it stay where they were. The hairline, hair and costume ears come down with it.
+  const FORE_DROP = 0.0131;
   // the underside of her jaw by depth [metres forward of the ear line, height]: nape, under the ear lobe, the corner of the jaw, then the long run forward to the chin
   const JAW = [[-0.060, 1.490], [-0.030, 1.484], [0.004, 1.472], [0.022, 1.452], [0.040, 1.432], [0.052, 1.4200], [0.090, 1.4140], [0.130, 1.4100]];
   function headPoint(a, ph, grow) {                 // a: angle from the front toward her left; ph: 0 at the crown, PI at the chin
@@ -48,7 +51,7 @@
     }
     if (t > 0.86) y += 0.10 * Math.max(0, 0.083 - z) * sm(0.86, 0.985, t);        // under the jaw the skin rises toward the throat
     if (!g && yn < 0) { const yb = spline(JAW, z) - HC.y, e = 0.0060; y = 0.5 * (y + yb + Math.sqrt((y - yb) * (y - yb) + e * e)); }     // her jawline (C3, profile): nothing of the head hangs below it
-    return [HC.x + x, HC.y + y, HC.z + z];
+    const Yw = HC.y + y; return [HC.x + x, Yw - FORE_DROP * sm(1.545, 1.580, Yw), HC.z + z];
   }
   const wHead = wOne('head'), faceMix = [], faceUvS = [];
   (function buildHead() {

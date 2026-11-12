@@ -47,7 +47,7 @@
   // ---------- the Fox's own materials ----------
   const curlTex = (() => {                           // a lock of her hair from root (bottom) to tip (top): dark brown running out to honey gold
     const c = cvs(32, 256), g = c.getContext('2d'), gr = g.createLinearGradient(0, 256, 0, 0);
-    gr.addColorStop(0, '#22130a'); gr.addColorStop(0.45, '#40260f'); gr.addColorStop(0.78, '#754a20'); gr.addColorStop(1, '#c08a46'); g.fillStyle = gr; g.fillRect(0, 0, 32, 256);
+    gr.addColorStop(0, '#24130a'); gr.addColorStop(0.40, '#4c2a11'); gr.addColorStop(0.74, '#96531f'); gr.addColorStop(1, '#d98f3e'); g.fillStyle = gr; g.fillRect(0, 0, 32, 256);
     for (let i = 0; i < 60; i++) { g.fillStyle = 'rgba(' + (i % 2 ? '255,220,160' : '30,15,5') + ',0.10)'; g.fillRect(Math.floor(h1(i + 3) * 32), 0, 1 + (i % 3), 256); }
     return ctex(c);
   })();
@@ -74,7 +74,17 @@
     })(),
     choker: sheen(std({ color: lin('#b9506f'), roughness: 0.62 }), '#ffc0d0', 3, 0.15),
     bellm: std({ color: lin('#c9973a'), roughness: 0.28, metalness: 0.9 }),
-    scalp: sheen(std({ map: fabricTex(256, '#2c1a0e', '#4a2f19', '#170d06', 2, true), roughness: 0.58 }), '#ffd9a0', 3, 0.28),
+    scalp: (() => {                                  // the hair that lies close to her head and the body of hair under the curls: drawn strands, dark at the root with a few gold ones, running back toward the bun
+      const c = cvs(256, 256), g = c.getContext('2d'); g.fillStyle = '#24150a'; g.fillRect(0, 0, 256, 256); let sd = 7;
+      const rn = () => { sd = (sd * 16807) % 2147483647; return sd / 2147483647; }, tones = ['#170d06', '#2c1a0e', '#3e2612', '#553518', '#6f4720', '#8a5c2a', '#b07c3c'];
+      for (let i = 0; i < 420; i++) {
+        const x0 = rn() * 256, amp = 2 + rn() * 5, f = 1 + rn() * 2.5, p0 = rn() * 6.28, k = rn(); g.strokeStyle = tones[Math.floor(k * k * tones.length)]; g.globalAlpha = 0.35 + rn() * 0.5; g.lineWidth = 0.8 + rn() * 2.2; g.beginPath();
+        for (let y = -4; y <= 260; y += 6) { const x = x0 + amp * Math.sin(y / 256 * 6.28 * f + p0); if (y < 0) g.moveTo(x, y); else g.lineTo(x, y); }
+        g.stroke();
+      }
+      g.globalAlpha = 1; const t = ctex(c); t.wrapS = t.wrapT = THREE.RepeatWrapping;
+      return sheen(std({ map: t, roughness: 0.52 }), '#ffd9a0', 3, 0.34);
+    })(),
     curl: sheen(std({ map: curlTex, roughness: 0.52 }), '#ffe0a8', 2.6, 0.34),
     ear: sheen(std({ map: earTex, roughness: 0.95 }), '#ffd2a8', 2.2, 0.45),
     frame: std({ color: lin(0x3b2b20), roughness: 0.34, metalness: 0.9, envMapIntensity: 1.3 }),

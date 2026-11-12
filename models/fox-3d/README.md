@@ -17,7 +17,7 @@ Method and rules: the project doc `claude/HOW-TO-3d-witch-models.md`. Pass notes
 | `src/70_anim.js` | materials, skeleton, scale, the moves |
 | `bake_fox.py` | paints her face and corset from the paintings into `out/fox_tex.js` |
 | `viewer/` | the page: `index.tpl.html` and `app.js` |
-| `references/round1`, `round2`, `round3` | her reference paintings, as WebP (round 3: tools and spells, not used yet) |
+| `references/round1` to `round4` | her reference paintings, as WebP (rounds 3 and 4: tools and spells, not used yet) |
 | `meas/prof.py`, `lib/grid.py` | measuring tools |
 | `compare_fox.py`, `viewset.sh`, `headset.sh` | checking pictures |
 
@@ -53,7 +53,7 @@ The test machine draws about 2 frames a second, so stills can be checked there b
 
 ## Whose face
 
-Since 12 Nov the Fox wears **the Jester's face** (Chris compared both and chose it). `make_jface.py` takes the Jester's head tables and baked face pictures, tones them to the Fox's skin, and writes `src/40_head.js` and `out/fox_tex.js`. Everything else is the Fox's own.
+Since the evening of 12 Nov the Fox has **the Jester's head shape wearing the Fox's own painted face** (Chris: the Jester's face looked good on her but "it's still the Jester"; the four are unique characters). `make_jface.py` writes `src/40_head.js` from the Jester's head tables and `out/fox_tex.js` from the Fox's own bake, squeezed 3% sideways so her painted eyes sit on the sculpted sockets. `PAINT = 'jester'` at its top puts the Jester's painting back. Round 5 (`claude/fox-3d-round5-face-prompts.md`) asks for a sharper face set.
 
 ```
 python3 -I bake_fox.py && cp out/fox_tex.js out/fox_tex_own.js && python3 make_jface.py && ./build.sh
