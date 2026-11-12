@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Fox Witch 3D</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Jacquard+24&family=Atkinson+Hyperlegible:wght@400;700&family=JetBrains+Mono:wght@400;600&display=swap">
+<style>
+/* One stage like a puppet theatre, the move chips under it, then views and switches. Dark on purpose: she was painted on night-purple. */
+:root{
+  --velvet:#17121e; --curtain:#221a2c; --stage:#383043; --gold:#d6a84e; --veil:#b8407e; --pendant:#3fc2b4; --ink:#efe6f2; --muted:#a597b3; --line:#3a3049;
+  --f-display:"Jacquard 24","Georgia",serif; --f-body:"Atkinson Hyperlegible",system-ui,-apple-system,"Segoe UI",sans-serif; --f-mono:"JetBrains Mono",ui-monospace,Menlo,monospace;
+  color-scheme:dark;
+}
+*,*::before,*::after{box-sizing:border-box}
+html,body{margin:0;background:var(--velvet);color:var(--ink)}
+body{font-family:var(--f-body);font-size:15px;line-height:1.5;padding:16px 14px 40px}
+.wrap{max-width:900px;margin:0 auto;display:flex;flex-direction:column;gap:14px}
+header{display:flex;flex-wrap:wrap;align-items:baseline;gap:2px 14px}
+h1{font-family:var(--f-display);font-weight:400;font-size:clamp(38px,9vw,60px);line-height:.95;margin:0;color:var(--gold);letter-spacing:.01em}
+.sub{color:var(--muted);font-size:14px;margin:0;max-width:60ch}
+.stagebox{position:relative;background:var(--stage);border:1px solid var(--line);border-radius:6px;overflow:hidden;width:100%;height:min(74vh,125vw);min-height:340px;touch-action:none}
+canvas#stage{display:block;width:100%;height:100%;touch-action:none;cursor:grab}
+.stagebox.px canvas#stage{image-rendering:pixelated}
+.hud{position:absolute;left:10px;top:8px;font-family:var(--f-mono);font-size:12px;color:var(--muted);background:rgba(23,18,30,.7);padding:2px 8px;border-radius:4px;font-variant-numeric:tabular-nums;pointer-events:none;max-width:calc(100% - 20px)}
+#book{position:absolute;right:8px;bottom:8px;width:min(30%,180px);aspect-ratio:13/11;background:var(--stage);border:1px solid var(--gold);border-radius:4px;pointer-events:none;box-shadow:0 4px 18px rgba(0,0,0,.45)}
+.booktag{position:absolute;right:14px;bottom:12px;font-family:var(--f-mono);font-size:10px;letter-spacing:.1em;text-transform:uppercase;color:var(--gold);pointer-events:none;text-shadow:0 1px 2px #000}
+#book[hidden],#book[hidden]+.booktag{display:none}
+.err[hidden]{display:none}
+.err{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;padding:24px;text-align:center;color:var(--ink);background:var(--stage)}
+.label{font-family:var(--f-mono);font-size:11px;letter-spacing:.12em;text-transform:uppercase;color:var(--muted);margin:0 0 6px}
+.chips{display:flex;flex-wrap:wrap;gap:8px}
+.chip{font:inherit;font-size:14px;color:var(--ink);background:var(--curtain);border:1px solid var(--line);border-radius:999px;padding:9px 14px;min-height:40px;cursor:pointer;transition:background .15s,border-color .15s}
+.chip:hover{border-color:var(--muted)}
+.chip:focus-visible{outline:2px solid var(--pendant);outline-offset:2px}
+.chip[aria-pressed="true"]{background:var(--veil);border-color:var(--gold);color:#fff}
+#states .chip,#acts .chip,#spells .chip{font-weight:700}
+.notes{color:var(--muted);font-size:14px;max-width:68ch;margin:0}
+.notes b{color:var(--ink);font-weight:700}
+#sfx{position:absolute;inset:0;width:100%;height:100%;pointer-events:none;z-index:2}
+#book{top:8px;bottom:auto}.booktag{top:12px;bottom:auto}
+#pad2{position:absolute;right:10px;bottom:10px;z-index:3;display:grid;grid-template-columns:auto auto auto;gap:6px;align-items:center;justify-items:center;touch-action:manipulation}
+#qName{grid-column:2;max-width:92px;text-align:center;font:600 11px/1.15 var(--f-mono);letter-spacing:.04em;color:var(--gold);text-shadow:0 1px 3px #000}
+.qb{width:48px;height:48px;border-radius:50%;border:1px solid rgba(214,168,78,.6);background:rgba(20,14,28,.6);color:#f0e6f6;font:600 11px/1 var(--f-mono);letter-spacing:.03em;cursor:pointer;-webkit-tap-highlight-color:transparent}
+.qb:active{background:rgba(214,168,78,.5)}.qs{width:32px;height:32px;font-size:20px;line-height:1}.qc{width:62px;height:62px;font-size:13px;background:rgba(190,60,120,.72);border-color:rgba(255,220,150,.8)}
+.qb:focus-visible{outline:2px solid #6fe;outline-offset:2px}
+#joy{position:absolute;left:12px;bottom:12px;width:104px;height:104px;border-radius:50%;background:rgba(20,14,28,.46);border:1px solid rgba(214,168,78,.5);touch-action:none;z-index:3}
+#joy[hidden]{display:none}
+#knob{position:absolute;left:50%;top:50%;width:44px;height:44px;margin:-22px 0 0 -22px;border-radius:50%;background:rgba(214,168,78,.78);box-shadow:0 2px 8px rgba(0,0,0,.4);pointer-events:none}
+@media (prefers-reduced-motion:reduce){.chip{transition:none}}
+/* on a phone the three rows of moves slide sideways, so the stage stays in view while you pick */
+@media (max-width:700px){.stagebox{height:min(60vh,120vw)}.slide{flex-wrap:nowrap;overflow-x:auto;scrollbar-width:none;margin-right:-12px;padding-right:12px}.slide::-webkit-scrollbar{display:none}.slide .chip{flex:0 0 auto;white-space:nowrap}}
+#book,.booktag{display:none!important}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <h1>Fox Witch 3D</h1>
+    <p class="sub">The Fox of the Moon Faire in 3D. Pass 1: her body, measured from her paintings, in her base outfit, with her face and bodice baked on. Trousers, belt, choker and spells come next.</p>
+  </header>
+  <div class="stagebox" id="stagebox">
+    <canvas id="stage" aria-label="3D model of the Fox Witch. Drag to turn her, pinch or scroll to zoom."></canvas>
+    <div class="hud" id="hud">Loading</div>
+    <canvas id="book" width="390" height="330" aria-label="The flipbook frame for the same moment"></canvas><span class="booktag">Flipbook</span>
+    <canvas id="sfx" aria-hidden="true"></canvas>
+    <div id="pad2" aria-label="Quick moves"><button type="button" id="qPrev" class="qb qs" aria-label="Previous spell">&#8249;</button><span id="qName"></span><button type="button" id="qNext" class="qb qs" aria-label="Next spell">&#8250;</button><button type="button" id="qMove" class="qb">Move</button><button type="button" id="qJump" class="qb">Jump</button><button type="button" id="qCast" class="qb qc">Cast</button></div>
+    <div id="joy" hidden aria-label="Walk pad: drag to walk her around"><div id="knob"></div></div>
+    <div class="err" id="err" hidden></div>
+  </div>
+  <section aria-label="How she holds herself"><p class="label">Body</p><div class="chips slide" id="states"></div></section>
+  <section aria-label="Moves"><p class="label">Moves</p><div class="chips slide" id="acts"></div></section>
+  <section aria-label="Spells"><p class="label">Spells</p><div class="chips slide" id="spells"></div></section>
+  <section aria-label="Views"><p class="label">Views</p><div class="chips" id="views"></div></section>
+  <section aria-label="Switches"><p class="label">Switches</p><div class="chips" id="toggles"></div></section>
+  <p class="notes">Drag to turn her; pinch or scroll to zoom. <b>Walk around</b> puts a round pad on the stage: drag it and she walks the way you push; push to the edge and she runs. On a keyboard use W A S D or the arrow keys, Shift to run, Space to jump. <b>Body</b> is how she holds herself: it stays until you pick another. <b>Moves</b> play once over whatever she is doing. She has no spells yet. What you see under her bodice is charcoal leggings, as in painting B4: that is her body before the trousers go on.</p>
+</div>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+<script>/*PAL*/</script>
+<script>/*FB*/</script>
+<script>/*STAGE*/</script>
+<script src="fox_tex.js"></script>
+<script src="fox.js"></script>
+<script>/*APP*/</script>
+</body>
+</html>
