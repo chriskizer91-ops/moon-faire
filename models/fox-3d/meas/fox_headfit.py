@@ -39,7 +39,7 @@ NOSE = '[' + ', '.join('[%.4f, %.4f]' % (y, v) for y, v in zip(yn, nv)) + ']'
 sh = L['tip'][0] - 0.0880                     # the Jester's nose-width table, moved to the height of her nose and stretched to its length
 kk = (L['nasion'][0] - L['subnasale'][0]) / (1.5260 - 1.4680)
 NOSE_W = '[' + ', '.join('[%.4f, %.4f]' % (L['subnasale'][0] + (y - 1.4680) * kk, w) for y, w in ((1.4680, 0.0052), (1.4760, 0.0054), (1.4800, 0.0070), (1.4880, 0.0100), (1.4960, 0.0082), (1.5080, 0.0062), (1.5260, 0.0058))) + ']'
-yB = round(1.555 - (L['underChin'][0] - 0.0005), 4)
+yB = round(1.555 - (L['underChin'][0] - 0.0035), 4)
 p = W + 'src/40_head.js'; s = open(p).read()
 s = re.sub(r"const FACE_MID = \[\[.*?\]\];", 'const FACE_MID = ' + FACE_MID + ';', s, count=1, flags=re.S)
 s = re.sub(r"const NOSE = \[\[.*?\]\];", 'const NOSE = ' + NOSE + ';', s, count=1, flags=re.S)

@@ -10,7 +10,8 @@ lum = a.mean(-1)
 def dark_blob(cx, cy, r=26):
     win = lum[cy - r:cy + r, cx - r:cx + r]; m = win < np.percentile(win, 9); m = ndi.binary_opening(m, np.ones((3, 3), bool)); lab, n = ndi.label(m)
     k = 1 + int(np.argmax(ndi.sum(m, lab, range(1, n + 1)))); yy, xx = np.nonzero(lab == k); return cx - r + xx.mean(), cy - r + yy.mean()
-eR = dark_blob(227, 383); eL = dark_blob(335, 383); eyeRow = (eR[1] + eL[1]) / 2; cx = (eR[0] + eL[0]) / 2; PD = eL[0] - eR[0]
+# Pupils read by eye off a gridded copy (shots/c3_grid.jpg). Automatic finding caught the dark lash corners instead and made her eyes 20% too far apart.
+eR = (235.0, 381.0); eL = (342.5, 379.0); eyeRow = (eR[1] + eL[1]) / 2; cx = (eR[0] + eL[0]) / 2; PD = eL[0] - eR[0]
 col = lum[430:540, int(cx) - 14:int(cx) + 14].mean(1); mouthRow = 430 + int(np.argmin(ndi.gaussian_filter1d(col, 2)))
 PPM = (mouthRow - eyeRow) / 0.066
 # profile panel

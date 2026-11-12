@@ -1006,7 +1006,7 @@ function makeFox(opts) {
   }
 
   // ---------- head: a sculpted oval with soft features; the face itself is painted (and repainted to blink) ----------
-  const HC = V3(0, 1.555, 0.002), HR = { x: 0.0735, yT: 0.092, yB: 0.1381, zF: 0.0985, zB: 0.083 };     // skull: lower crown and shallower back, as in her profile
+  const HC = V3(0, 1.555, 0.002), HR = { x: 0.0700, yT: 0.092, yB: 0.1414, zF: 0.0985, zB: 0.083 };     // skull: lower crown and shallower back, as in her profile
   const LAY = (BAKED && BAKED.layout) || {};          // where the features sit in the painted face
   const FC = { eyeY: LAY.eyeY || 1.5246, eyeX: LAY.eyeX || 0.0304, ew: 0.0135, eh: 0.0056, browY: LAY.browY || 1.5368, noseY: LAY.noseY || 1.4877, mouthY: LAY.mouthY || 1.4586 };
   const FACE = { x0: -0.1, x1: 0.1, y0: 1.385, y1: 1.585 };          // the face canvas covers this window, seen from the front
@@ -1015,20 +1015,20 @@ function makeFox(opts) {
   // FACE_MID is the middle line with the nose and lips taken away [height, metres forward of the ear line], NOSE is how far the
   // nose stands out from it, and FACE_V says how the face turns back toward the ears at each height (0: round like an egg;
   // more: straighter from chin to jaw, the way a jaw is; less than 0: flat across, the way a brow is).
-  const FACE_MID = [[1.4214, 0.0978], [1.4267, 0.0991], [1.4306, 0.0993], [1.4321, 0.0993], [1.4374, 0.0988], [1.4410, 0.0989], [1.4428, 0.0994], [1.4481, 0.1009], [1.4526, 0.1015], [1.4535, 0.1016], [1.4586, 0.1025], [1.4588, 0.1026], [1.4642, 0.1040], [1.4678, 0.1043], [1.4695, 0.1045], [1.4748, 0.1052], [1.4783, 0.1050], [1.4802, 0.1048], [1.4855, 0.1040], [1.4909, 0.1034], [1.4962, 0.1027], [1.5016, 0.1020], [1.5069, 0.1014], [1.5122, 0.1008], [1.5176, 0.1002], [1.5229, 0.0995], [1.5283, 0.0988], [1.5305, 0.0985], [1.5336, 0.0985], [1.5390, 0.0990], [1.5443, 0.0992], [1.5497, 0.0990], [1.5550, 0.0986]];
-  const NOSE = [[1.4783, 0.0000], [1.4816, 0.0017], [1.4848, 0.0095], [1.4881, 0.0144], [1.4914, 0.0167], [1.4934, 0.0174], [1.4946, 0.0174], [1.4979, 0.0161], [1.5011, 0.0135], [1.5044, 0.0101], [1.5077, 0.0078], [1.5109, 0.0060], [1.5142, 0.0042], [1.5174, 0.0026], [1.5207, 0.0009], [1.5240, 0.0000], [1.5272, 0.0000], [1.5305, 0.0000]];
-  const NOSE_W = [[1.4783, 0.0052], [1.4855, 0.0054], [1.4891, 0.0070], [1.4963, 0.0100], [1.5035, 0.0082], [1.5143, 0.0062], [1.5305, 0.0058]];
-  const LIPS = {uy: 1.4678, ua: 0.0029, ly: 1.4526, la: 0.0034, chinY: 1.4306, cheekY: 1.4975, hollowY: 1.4669999999999999};
-  const FACE_V = [[1.4150, 0.30], [1.4300, 0.40], [1.4450, 0.44], [1.4586, 0.40], [1.4760, 0.22], [1.4975, 0.02], [1.5246, -0.12], [1.5400, -0.10], [1.5550, 0]];
+  const FACE_MID = [[1.4211, 0.0977], [1.4265, 0.0989], [1.4304, 0.0992], [1.4318, 0.0992], [1.4372, 0.0987], [1.4409, 0.0987], [1.4425, 0.0992], [1.4479, 0.1008], [1.4525, 0.1015], [1.4532, 0.1015], [1.4586, 0.1025], [1.4639, 0.1038], [1.4679, 0.1041], [1.4693, 0.1043], [1.4747, 0.1051], [1.4785, 0.1049], [1.4800, 0.1046], [1.4854, 0.1039], [1.4907, 0.1032], [1.4961, 0.1026], [1.5014, 0.1019], [1.5068, 0.1013], [1.5122, 0.1007], [1.5175, 0.1001], [1.5229, 0.0995], [1.5282, 0.0988], [1.5310, 0.0984], [1.5336, 0.0983], [1.5389, 0.0988], [1.5443, 0.0991], [1.5496, 0.0990], [1.5550, 0.0986]];
+  const NOSE = [[1.4785, 0.0000], [1.4818, 0.0019], [1.4851, 0.0099], [1.4883, 0.0145], [1.4916, 0.0169], [1.4936, 0.0176], [1.4949, 0.0176], [1.4982, 0.0163], [1.5015, 0.0135], [1.5048, 0.0102], [1.5080, 0.0080], [1.5113, 0.0061], [1.5146, 0.0043], [1.5179, 0.0026], [1.5212, 0.0010], [1.5244, 0.0000], [1.5277, 0.0000], [1.5310, 0.0000]];
+  const NOSE_W = [[1.4785, 0.0052], [1.4857, 0.0054], [1.4894, 0.0070], [1.4966, 0.0100], [1.5038, 0.0082], [1.5147, 0.0062], [1.5310, 0.0058]];
+  const LIPS = {uy: 1.4679, ua: 0.003, ly: 1.4525, la: 0.0033, chinY: 1.4304, cheekY: 1.4975, hollowY: 1.4669999999999999};
+  const FACE_V = [[1.4150, 0.20], [1.4300, 0.26], [1.4450, 0.26], [1.4586, 0.20], [1.4760, 0.06], [1.4975, -0.08], [1.5246, -0.14], [1.5400, -0.10], [1.5550, 0]];      // her face is rounder than the Jester's: fuller cheeks and jaw as it turns (C3 at 34 degrees)
   // how wide a ring of the lower head is, from 1 at the cheeks to 0 under the chin: the last tenth closes quickly, so the jaw has an edge and a flat underside
-  const SIN9 = Math.sqrt(1 - 0.81), SN9 = Math.pow(SIN9, 0.50), snLow = (sp, t) => (t > 0.9 ? SN9 * Math.pow(sp / SIN9, 0.40) : Math.pow(sp, 0.50));
+  const SIN9 = Math.sqrt(1 - 0.81), SN9 = Math.pow(SIN9, 0.42), snLow = (sp, t) => (t > 0.9 ? SN9 * Math.pow(sp / SIN9, 0.40) : Math.pow(sp, 0.42));
   const T_CHIN = (HC.y - FACE_MID[0][0]) / HR.yB, SN_CHIN = snLow(Math.sqrt(1 - T_CHIN * T_CHIN), T_CHIN), RZ_CHIN = FACE_MID[0][1] - 0.050 * T_CHIN * T_CHIN * T_CHIN;
   // the underside of her jaw by depth [metres forward of the ear line, height]: nape, under the ear lobe, the corner of the jaw, then the long run forward to the chin
-  const JAW = [[-0.060, 1.490], [-0.030, 1.484], [0.004, 1.472], [0.022, 1.452], [0.040, 1.434], [0.052, 1.4225], [0.090, 1.4185], [0.130, 1.4150]];
+  const JAW = [[-0.060, 1.490], [-0.030, 1.484], [0.004, 1.472], [0.022, 1.452], [0.040, 1.432], [0.052, 1.4200], [0.090, 1.4140], [0.130, 1.4100]];
   function headPoint(a, ph, grow) {                 // a: angle from the front toward her left; ph: 0 at the crown, PI at the chin
     const yn = Math.cos(ph), s = Math.sin(a), c = Math.cos(a), g = grow || 0, t = Math.max(0, -yn), sn = yn < 0 ? snLow(Math.sin(ph), t) : Math.sin(ph);
     let y = (yn >= 0 ? HR.yT : HR.yB) * yn + g * yn; const Y = HC.y + (yn >= 0 ? HR.yT : HR.yB) * yn;
-    const x = ((HR.x * sn) * (1 - 0.16 * sm(0.5, 1.0, t)) + g * Math.min(1, sn * 3)) * s;      // the outline from the front, narrowing to the jaw
+    const x = ((HR.x * sn) * (1 - 0.08 * sm(0.5, 1.0, t)) + g * Math.min(1, sn * 3)) * s;      // the outline from the front, narrowing to the jaw
     const zc = 0.050 * t * t * t;                   // the lower head sits forward, so the chin hangs under the mouth; the corners of the jaw stay back near the ears
     let z;
     if (c < 0) z = zc * (1 - 0.95 * sm(0, -0.9, c)) + (HR.zB + g) * sn * c;      // only the face comes forward: the back of the head runs straight down into the nape
@@ -1041,9 +1041,9 @@ function makeFox(opts) {
         // nose: the bridge and the ball of the tip, the wings of the nostrils, the folds where they meet the cheek, the hollows under it
         if (Y > NOSE[0][0] && Y < NOSE[NOSE.length - 1][0]) d += spline(NOSE, Y) * Math.exp(-Math.pow(x / spline(NOSE_W, Y), 2));
         d += 0.0062 * G(ax - 0.0116, Y - (NT - 0.0054), 0.0052, 0.0052) - 0.0014 * G(ax - 0.0186, Y - (NT - 0.0040), 0.0030, 0.0066) - 0.0030 * G(ax - 0.0062, Y - (NT - 0.0096), 0.0030, 0.0021);
-        d -= 0.0080 * G(ax - FC.eyeX, Y - FC.eyeY, 0.017, 0.0105) + 0.0036 * G(ax - 0.014, Y - (FC.eyeY - 0.002), 0.007, 0.010);   // eye sockets, deepest beside the bridge
-        d += 0.0048 * G(ax - 0.030, Y - (FC.browY + 0.002), 0.028, 0.0066);                        // brow
-        d += 0.0040 * G(ax - FC.eyeX, Y - FC.eyeY, 0.0118, 0.0062) - 0.0017 * G(ax - FC.eyeX, Y - (FC.eyeY + 0.0086), 0.014, 0.0022) - 0.0008 * G(ax - FC.eyeX, Y - (FC.eyeY - 0.0090), 0.013, 0.0024);   // the eyeball rounding out of its socket, and the crease of the lid above it
+        d -= 0.0064 * G(ax - FC.eyeX, Y - FC.eyeY, 0.017, 0.0105) + 0.0028 * G(ax - 0.014, Y - (FC.eyeY - 0.002), 0.007, 0.010);   // eye sockets, deepest beside the bridge
+        d += 0.0034 * G(ax - 0.028, Y - (FC.browY + 0.002), 0.027, 0.0075);                        // brow
+        d += 0.0036 * G(ax - FC.eyeX, Y - FC.eyeY, 0.0112, 0.0064) - 0.0012 * G(ax - FC.eyeX, Y - (FC.eyeY + 0.0088), 0.014, 0.0024) - 0.0008 * G(ax - FC.eyeX, Y - (FC.eyeY - 0.0090), 0.013, 0.0024);   // the eyeball rounding out of its socket, and the crease of the lid above it
         d += 0.0040 * G(ax - 0.046, Y - LIPS.cheekY, 0.020, 0.016) - 0.0022 * G(ax - 0.050, Y - LIPS.hollowY, 0.016, 0.014);   // cheekbones, and the hollow under them
         d -= 0.0010 * G(x, Y - (FC.mouthY + 0.0135), 0.0034, 0.0055);                             // the groove under the nose
         d += LIPS.ua * G(x, Y - LIPS.uy, 0.020, 0.0054) + LIPS.la * G(x, Y - LIPS.ly, 0.016, 0.0054);  // lips
@@ -1052,7 +1052,7 @@ function makeFox(opts) {
         z += d * f;
       }
     }
-    if (t > 0.86) y += 0.30 * Math.max(0, 0.083 - z) * sm(0.86, 0.985, t);        // under the jaw the skin rises toward the throat
+    if (t > 0.86) y += 0.10 * Math.max(0, 0.083 - z) * sm(0.86, 0.985, t);        // under the jaw the skin rises toward the throat
     if (!g && yn < 0) { const yb = spline(JAW, z) - HC.y, e = 0.0035; y = 0.5 * (y + yb + Math.sqrt((y - yb) * (y - yb) + e * e)); }     // her jawline (C3, profile): nothing of the head hangs below it
     return [HC.x + x, HC.y + y, HC.z + z];
   }
@@ -1074,7 +1074,7 @@ function makeFox(opts) {
     const FB = buckets.face, MIXED = !!(BAKED && BAKED.faceSide), Wn = (BAKED && BAKED.faceSideWin) || [-0.01, 0.13, 1.40, 1.58];
     for (let i = info.start; i < info.start + info.count; i++) {
       const nx = FB.nor[i * 3], ny = FB.nor[i * 3 + 1], px = FB.pos[i * 3], py = FB.pos[i * 3 + 1], pz = FB.pos[i * 3 + 2];
-      const under = sm(-0.22, -0.66, ny) * sm(1.444, 1.428, py), plain = Math.max(under, sm(0.010, -0.006, pz - HC.z));      // only under the jaw: the nose and lips have undersides too, and keep their paint
+      const jf = spline(JAW, pz - HC.z), under = sm(-0.22, -0.66, ny) * sm(jf + 0.014, jf + 0.004, py), plain = Math.max(under, sm(0.010, -0.006, pz - HC.z));      // only under the jaw: the nose and lips have undersides too, and keep their paint
       const side = sm(0.70, 0.93, Math.abs(nx)) * sm(0.034, 0.050, Math.abs(px)) * sm(Wn[0] + 0.004, Wn[0] + 0.022, pz) * sm(Wn[2] + 0.002, Wn[2] + 0.014, py) * sm(Wn[3] - 0.002, Wn[3] - 0.014, py) * (1 - plain);
       faceMix.push(side, plain, 1 - 0.40 * under); faceUvS.push((pz - Wn[0]) / (Wn[1] - Wn[0]), (py - Wn[2]) / (Wn[3] - Wn[2]));
     }
@@ -2035,7 +2035,7 @@ function makeFox(opts) {
   const skeleton = new THREE.Skeleton(bones), meshes = {};
   const FOX_K = opts.scale || 1.045;                 // the whole figure, against the Jester's frame: her legs, shoulders and chin all land on her paintings at this one number
   root.scale.setScalar(FOX_K);                       // set here, after the skeleton has taken its rest pose: set any earlier, the bones would grow and the skin would not
-  SK.spine1.scale.setScalar(UPK); SK.head.scale.setScalar(opts.headScale || 0.903); SK.head.position.y -= (opts.headDrop === undefined ? 0.0200 : opts.headDrop); root.updateMatrixWorld(true);   // horns keep their size as the head shrinks       // after the bind, so head, cap, horns and their veils all shrink about the neck
+  SK.spine1.scale.setScalar(UPK); SK.head.scale.setScalar(opts.headScale || 0.93); SK.head.position.y -= (opts.headDrop === undefined ? 0.0233 : opts.headDrop); root.updateMatrixWorld(true);   // horns keep their size as the head shrinks       // after the bind, so head, cap, horns and their veils all shrink about the neck
   let triCount = 0;
   for (const key in buckets) {
     const B = buckets[key], g = new THREE.BufferGeometry();

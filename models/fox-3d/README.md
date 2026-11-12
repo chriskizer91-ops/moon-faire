@@ -62,12 +62,15 @@ python3 -I bake_fox.py               # face from C3 (front panel + profile panel
 ./build.sh && ./c3cmp.sh g1          # shots/g1_c3cmp.jpg: bare head at three angles beside C3, painted and in plain skin
 ```
 
+python3 -I prof_check.py              # the model's middle line against the painted profile, gap by height (aim: within 1 mm)
+
+Pupils in C3 are typed into `meas/fox_profile.py` from a gridded copy; automatic finding was wrong by 20%. C3's middle panel is at 34 degrees. Method: `claude/HOW-TO-3d-witch-faces.md`.
 `JAW` in `src/40_head.js` is the underside of her jaw. `bake_fox_c1.py` is the earlier bake from C1. Notes: `claude/fox-3d-pass2-head.md`.
 
 ## Her numbers
 
 - Height in boots 1.647 m, ear tips 1.717 m. About 9 heads tall, as painted.
-- Written in the Jester's frame, then the whole figure is scaled by `FOX_K = 1.045`. Head bone scale 0.903, head lowered 0.020. Hand scale 0.86.
+- Written in the Jester's frame, then the whole figure is scaled by `FOX_K = 1.045`. Head bone scale 0.93, head lowered 0.0233. Hand scale 0.86.
 - Head landmarks in A1 (rows; columns from x 508): eyes 157, pupils 54 px apart, nose base 186, mouth 208, chin 248, face 108 px wide at row 180, ear bases 88, ear tips 22.
 - Painting scales: A1 861 px a metre (soles on row 1500), B4 851 (soles 970), B1 572.4, B2 574.8.
 

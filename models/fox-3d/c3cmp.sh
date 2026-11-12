@@ -1,15 +1,15 @@
 #!/bin/bash
 # usage: c3cmp.sh prefix [yawsign]
-# Her bare head (no hair, ears or glasses) from the front, at 45 degrees and in profile, beside sheet C3's three panels at one scale (C3's pixels x2).
+# Her bare head (no hair, ears or glasses) from the front, at 34 degrees (the angle C3's middle panel is really painted at, worked out from how close together its pupils are) and in profile, beside sheet C3's three panels at one scale (C3's pixels x2).
 # Top row: C3. Middle: the model with her face painted on. Bottom: the model in plain skin, to judge the shape alone. Lines: eyes, nose tip, lip line, under the chin.
-cd /home/claude/fox3d && S=${2:--1} && V="0.19851,680,760" && python3 shoot2.py shots/$1 'new Promise(r => setTimeout(() => { T.stage.camera.far = 300; T.step(40, 1/60); T.clean("color"); T.only(["face", "skin"]); r(1); }, 1500))' \
- "pf:T.view(0,0,60,1.5374,$V)" "pq:T.view($S*Math.PI/4,0,60,1.5374,$V)" "ps:(T.j.root.position.z = -0.05, T.view($S*Math.PI/2,0,60,1.5374,$V))" \
- "cf:(T.j.debug.meshes.face.material = new THREE.MeshStandardMaterial({ color: new THREE.Color(0xd79680).convertSRGBToLinear(), roughness: 0.62, skinning: true }), T.view(0,0,60,1.5374,$V))" "cq:(T.j.root.position.z = 0, T.view($S*Math.PI/4,0,60,1.5374,$V))" "cs:(T.j.root.position.z = -0.05, T.view($S*Math.PI/2,0,60,1.5374,$V))" 2>&1 | tail -1
+cd /home/claude/fox3d && S=${2:--1} && V="0.20600,680,760" && python3 shoot2.py shots/$1 'new Promise(r => setTimeout(() => { T.stage.camera.far = 300; T.step(40, 1/60); T.clean("color"); T.only(["face", "skin"]); r(1); }, 1500))' \
+ "pf:T.view(0,0,60,1.5371,$V)" "pq:T.view($S*0.595,0,60,1.5371,$V)" "ps:(T.j.root.position.z = -0.05, T.view($S*Math.PI/2,0,60,1.5371,$V))" \
+ "cf:(T.j.debug.meshes.face.material = new THREE.MeshStandardMaterial({ color: new THREE.Color(0xd79680).convertSRGBToLinear(), roughness: 0.62, skinning: true }), T.view(0,0,60,1.5371,$V))" "cq:(T.j.root.position.z = 0, T.view($S*0.595,0,60,1.5371,$V))" "cs:(T.j.root.position.z = -0.05, T.view($S*Math.PI/2,0,60,1.5371,$V))" 2>&1 | tail -1
 python3 -I - $1 <<'PY'
 import sys, json
 from PIL import Image, ImageDraw
 W = '/home/claude/fox3d/'; HM = json.load(open(W + 'meas/fox_head.json')); c3 = Image.open(W + 'refs/C3.png').convert('RGB'); n = sys.argv[1]
-cen = [HM['cx'], 742, HM['cRef'] - 82]; sh = Image.new('RGB', (2040, 2280), (20, 18, 26))
+cen = [HM['cx'], 772, HM['cRef'] - 84]; sh = Image.new('RGB', (2040, 2280), (20, 18, 26))
 for i, c in enumerate(cen): sh.paste(c3.crop((int(c - 170), 230, int(c + 170), 610)).resize((680, 760), Image.LANCZOS), (i * 680, 0))
 for j, row in enumerate(('p', 'c')):
     for i, v in enumerate('fqs'): sh.paste(Image.open(W + f'shots/{n}_{row}{v}.png').convert('RGB').resize((680, 760)), (i * 680, 760 * (j + 1)))
