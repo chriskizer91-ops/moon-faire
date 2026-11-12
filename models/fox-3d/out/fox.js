@@ -606,6 +606,16 @@ function makeFox(opts) {
       const rings = tubeRings(pts, rad, NU, V3(0, 0, 1)), cols = NU + 1;
       addPart('skin', loft(rings, { capA: true }), (x, y, z, i) => wArm(S, i < ss.length * cols ? ss[Math.floor(i / cols)] : ss[0]), { out: centroidOf(rings) });
     }
+    {                                              // her bracelets (F2), three strands stacked above each wrist: large dark wood beads, small gold ones, medium wood ones
+      const bz = V3(0, 0, 1), by = V3().crossVectors(bz, d).normalize(), bx = V3().crossVectors(d, by).normalize();
+      for (const [sl, br, nb, key, ph] of [[0.4130, 0.0056, 13, 'woodbead', 0.0], [0.4285, 0.0031, 27, 'bellm', 0.3], [0.4420, 0.0040, 20, 'woodbead', 0.7]]) {
+        const c = sh.clone().addScaledVector(d, sl), R = spline(ARM_R, sl) + br * 0.80, wf = (() => { const w = wArm(S, sl); return () => w; })();
+        for (let k = 0; k < nb; k++) {
+          const a = ph + (k / nb) * TAU, q = c.clone().addScaledVector(bx, Math.cos(a) * R).addScaledVector(by, Math.sin(a) * R * 0.94);
+          addPart(key, spherePart(q, br, br, br, 8, 6), wf, { out: q });
+        }
+      }
+    }
     {                                              // the sleeve: one gathered sheet, open at the ruffle
       const NP = Q(34, 16), NV = Q(72, 36), rings = [], ss = [], GATH = 15;
       const ax = d.clone(), bz = V3(0, 0, 1), by = V3().crossVectors(bz, ax).normalize();
@@ -2006,10 +2016,10 @@ function makeFox(opts) {
     cloth: sheen(std({ map: fabricTex(256, BLK, BLK_HI, BLK_LO, 3), roughness: 0.94 }), WARM, 3, 0.3),
     leggings: sheen(std({ color: lin('#3a393d'), roughness: 0.78 }), '#b888b0', 3, 0.1),      // the same plain charcoal and the same finish as the hips in the torso's picture, so they read as one cloth
     emerald: sheen(std({ map: fabricTex(256, PAL.emerald, PAL.emeraldHi, PAL.emeraldDk, 3, false), roughness: 0.9, side: THREE.DoubleSide }), '#6fd0b0', 2.6, 0.38),
-    boot: (() => { const n = crinkleTex(), k = new THREE.Vector2(0.6, 0.6); return phys({ color: lin(0x4a2a1b), roughness: 0.56, clearcoat: 0.25, clearcoatRoughness: 0.5, envMapIntensity: 0.6, normalMap: n, normalScale: k, clearcoatNormalMap: n, clearcoatNormalScale: k }); })(),
+    boot: (() => { const n = crinkleTex(), k = new THREE.Vector2(0.6, 0.6); const lt = BAKED && BAKED.bootLeather ? bakedTex('bootLeather', 512, 512, '#4a2a1b') : null; if (lt) { lt.wrapS = lt.wrapT = THREE.RepeatWrapping; lt.repeat.set(2, 2); } return phys({ color: lt ? lin(0xfff0d6) : lin(0x4a2a1b), map: lt, roughness: 0.56, clearcoat: 0.25, clearcoatRoughness: 0.5, envMapIntensity: 0.6, normalMap: n, normalScale: k, clearcoatNormalMap: n, clearcoatNormalScale: k }); })(),
     stitch: std({ color: lin(0xd9a24a), roughness: 0.7 }), eyelet: std({ color: lin(0xb89148), roughness: 0.32, metalness: 1, envMapIntensity: 1.5 }), aglet: std({ color: lin(0xb08a3e), roughness: 0.35, metalness: 0.9 }),
     sock: std({ map: sockTex(), roughness: 0.95 }), lace: std({ color: lin(0xc98a34), roughness: 0.82 }),
-    sole: std({ map: soleTex(), color: lin(0xb89a84), roughness: 0.82 }),
+    sole: std({ map: soleTex(), color: lin(0xffd2a6), emissive: lin(0x2a1608), emissiveIntensity: 0.55, roughness: 0.82 }),      // her soles are dark brown rubber, not black
     leather: std({ color: lin(0x1a1418), roughness: 0.42, envMapIntensity: 0.8 }),
     gold: std({ color: lin(0xd8a546), roughness: 0.3, metalness: 1, envMapIntensity: 1.6 }),
     bells: std({ color: lin(0xe0ad48), roughness: 0.22, metalness: 1, envMapIntensity: 1.8 }),
@@ -2071,6 +2081,7 @@ function makeFox(opts) {
     })(),
     choker: sheen(std({ color: lin('#b9506f'), roughness: 0.62 }), '#ffc0d0', 3, 0.15),
     bellm: std({ color: lin('#c9973a'), roughness: 0.28, metalness: 0.9 }),
+    woodbead: std({ color: lin('#4a2416'), roughness: 0.34, clearcoat: 0.5, clearcoatRoughness: 0.3 }),
     scalp: (() => {                                  // the hair that lies close to her head and the body of hair under the curls: drawn strands, dark at the root with a few gold ones, running back toward the bun
       const c = cvs(256, 256), g = c.getContext('2d'); g.fillStyle = '#24150a'; g.fillRect(0, 0, 256, 256); let sd = 7;
       const rn = () => { sd = (sd * 16807) % 2147483647; return sd / 2147483647; }, tones = ['#170d06', '#2c1a0e', '#3e2612', '#553518', '#6f4720', '#8a5c2a', '#b07c3c'];

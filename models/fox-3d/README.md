@@ -56,7 +56,9 @@ The test machine draws about 2 frames a second, so stills can be checked there b
 Since the evening of 12 Nov the Fox has **the Jester's head shape wearing the Fox's own painted face** (Chris: the Jester's face looked good on her but "it's still the Jester"; the four are unique characters). `make_jface.py` writes `src/40_head.js` from the Jester's head tables and `out/fox_tex.js` from the Fox's own bake, squeezed 3% sideways so her painted eyes sit on the sculpted sockets. `PAINT = 'jester'` at its top puts the Jester's painting back. Round 5 (`claude/fox-3d-round5-face-prompts.md`) asks for a sharper face set.
 
 ```
-python3 -I bake_fox.py && cp out/fox_tex.js out/fox_tex_own.js && python3 make_jface.py && ./build.sh
+python3 -I bake_fox.py && cp out/fox_tex.js out/fox_tex_own.js
+python3 -I bake_hands_fox.py && python3 -I bake_boot_fox.py     # her hands from D1, her boot leather from E1; they add to the own bake, so run them after bake_fox.py
+python3 make_jface.py && ./build.sh
 ```
 
 Her own face (from sheet C3) is kept in `variants/ownface/`. Make Fox-only changes to the head's shape there, then run `make_jface.py`. The section below describes how her own face was made.
@@ -100,4 +102,5 @@ Pupils in C3 are typed into `meas/fox_profile.py` from a gridded copy; automatic
 ## State
 
 Pass 1 (12 Nov 2026): body, base outfit, hair, ears, glasses, choker and bell.
-Pass 2 (12 Nov 2026): head sculpted to her own profile from C3, jawline and neck, face repainted from C3. See `claude/fox-3d-pass1.md` for what is weak and what comes next.
+Pass 2 (12 Nov 2026): head, face, ears, hair (see `claude/fox-3d-pass2-head.md`).
+Pass 3 (12 Nov 2026, in progress): painted hands, bracelets, boot leather and soles (see `claude/fox-3d-pass3-hands-boots.md`). See `claude/fox-3d-pass1.md` for what is weak and what comes next.

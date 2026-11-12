@@ -78,6 +78,16 @@
       const rings = tubeRings(pts, rad, NU, V3(0, 0, 1)), cols = NU + 1;
       addPart('skin', loft(rings, { capA: true }), (x, y, z, i) => wArm(S, i < ss.length * cols ? ss[Math.floor(i / cols)] : ss[0]), { out: centroidOf(rings) });
     }
+    {                                              // her bracelets (F2), three strands stacked above each wrist: large dark wood beads, small gold ones, medium wood ones
+      const bz = V3(0, 0, 1), by = V3().crossVectors(bz, d).normalize(), bx = V3().crossVectors(d, by).normalize();
+      for (const [sl, br, nb, key, ph] of [[0.4130, 0.0056, 13, 'woodbead', 0.0], [0.4285, 0.0031, 27, 'bellm', 0.3], [0.4420, 0.0040, 20, 'woodbead', 0.7]]) {
+        const c = sh.clone().addScaledVector(d, sl), R = spline(ARM_R, sl) + br * 0.80, wf = (() => { const w = wArm(S, sl); return () => w; })();
+        for (let k = 0; k < nb; k++) {
+          const a = ph + (k / nb) * TAU, q = c.clone().addScaledVector(bx, Math.cos(a) * R).addScaledVector(by, Math.sin(a) * R * 0.94);
+          addPart(key, spherePart(q, br, br, br, 8, 6), wf, { out: q });
+        }
+      }
+    }
     {                                              // the sleeve: one gathered sheet, open at the ruffle
       const NP = Q(34, 16), NV = Q(72, 36), rings = [], ss = [], GATH = 15;
       const ax = d.clone(), bz = V3(0, 0, 1), by = V3().crossVectors(bz, ax).normalize();
