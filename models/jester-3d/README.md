@@ -216,24 +216,23 @@ are marked `raw` and left alone. `defAction` now keeps a move's keys, so a new m
   closing over it: a new moon lit between her hands and lifted in three thin rings, the ground under her the night sky, a
   black hole falling on what is left of her foe, a new moon rising behind until the sky is stars, and two curtains of night
   that meet as her arms come down and part on her bow. Blows: `land`, `zero`, `doom`, `gone`.
-- **Rings** (`J.rings`, 0 to 6): one for each hit she has taken since her last big spell, turning round her. The cast takes
-  them: they quicken, gather on the seal, fly with it and clamp. Fewer than three and the seal makes up the count.
-  The price (three hits, then four, and so on) is kept in the viewer, not the model.
+- **The charge** (`J.charge`, 0 to 1; pass 20, below). In pass 19 this was a ring for each hit; Chris chose dust instead.
 - `taunt_attack` (6.0 s): two steps of her jig, a twirl with the black hole gathering over her raised left hand, the fling up
   and over, her hand pressing it down onto her target, a laugh. Blows: `press`, `burst`.
 - `taunt_heal` (8.0 s): Against All Odds's opening, then a jig through one full turn with her arms up inside the circle,
   a laugh, a flourish. Seven stars join into a figure round her and their light runs down into her alone. Blow: `heal`.
 - `hit_laugh`, `hit_dust`: taking a hit at full power. She rocks back, bounces up, and laughs with her hands on her hips or
-  brushes her shoulder off. Her bells jingle and a ring lights. Over a stance only her body above the hips moves.
+  brushes her shoulder off. Her bells jingle. Over a stance only her body above the hips moves.
 - `caper`, `prance`, `juggle`: more dancing and jester acting. Juggle is three small new moons tossed from hand to hand, and
   works over any stance.
 
-**What the model tells its host** (`src/90_api.js`): `J.dark`, `J.shake` (a rumble), `J.rings`, `J.camera` (set it: effects
+**What the model tells its host** (`src/90_api.js`): `J.dark`, `J.shake` (a rumble), `J.charge`, `J.camera` (set it: effects
 face it), `J.arena` (how far the open ground runs), `J.spellLight`, and for each blow `state.hitTag` and `state.hitI` beside
-`hitN`, `hitName`, `hitK`. A move can name its blows (`tags`), weigh each (`impacts`) and act on one (`onHit`).
+`hitN`, `hitName`, `hitK`. A move can name its blows (`tags`), weigh each (`impacts`) and act on one (`onHit`). A hit
+reaction's blow is tagged `struck`.
 
 **The page** (`viewer/app.js`, `viewer/index.tpl.html`): a From the lore row (Big spell, Big spell: the ending, Attack taunt,
-Heal taunt, Take a hit, Start the count again) with the hit count under it; Caper, Prance and Juggle in the Moves row; a Hit
+Heal taunt, Take a hit, Empty the charge) with what she has absorbed under it; Caper, Prance and Juggle in the Moves row; a Hit
 quick button; Night square and Glow switches; keys H, B, N, T, Y. The dummy answers each kind of blow: pressed flat, knocked
 back, left hanging at zero, drawn in, taken, and stood up again a few seconds later. `JESTER.step(n, dt)` steps the page by
 hand for checks.
@@ -246,6 +245,26 @@ glow pass is the new cost there.
 
 Not yet done: a guard; a real victory and defeat; expressions beyond her three mouths and eyelids; the battle, the wraith and
 the sound from the not-HD demo; the old six spells still wear their own effects.
+
+## The charge as dust (pass 20, November 12, 2026)
+
+Chris, after seeing pass 19: the charge counts damage, not hits. Every blow aimed at her charges her, whether or not she drew it
+by taunting, and it is full when the blows add up to 75% of her own HP. She is the tank; how little of that damage she really
+takes (halved, or healed back) is balance for later. On screen it is "an aura of dust that gets thicker and thicker until she
+uses it", and then it "manifests out of the air as those rings". He likes the moves and their timing as they are.
+
+- **Model** (`src/89_lore.js`). `J.charge` is 0 to 1; the model does not know what a blow is worth. The dust is one `THREE.Points`
+  of up to 560 single points (420 on a phone) moved in the vertex shader, so it is one draw call and no work per frame on
+  the processor. A point comes out when the charge passes its own mark, so the dust thickens evenly; the dust a blow has just
+  added shows brighter for a moment; the light near her dims a little (`VF.shade`). Points are about one sprite pixel wide.
+- **The cast** (`fxDoom`). The dust draws into a band round her (`dustBand`), her rings come out of the air one after another
+  (three at the least, five from a full charge), and what is left streams to the seal (`dustPull`). From there the cast is
+  as it was in pass 19. The charge is spent at the release.
+- **Page** (`viewer/app.js`). `HER_HP` (1,000), `FULL` (75% of it) and `BLOW` (160 to 320 a hit) are stand-ins so the charge
+  can be watched. A hit reaction's blow (`struck`) adds to `J.charge`. The Big spell button works at any charge.
+
+Checked: the lore's moves and the two flipbook spells they are built from over every stance; stills of the dust at each
+charge, in the cast, walking, in the theatre and in the Flipbook look. Not checked: at real speed, or on a real phone.
 
 ## What is kept here
 

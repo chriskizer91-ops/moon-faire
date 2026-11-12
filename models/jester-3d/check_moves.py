@@ -10,7 +10,7 @@ JS = r"""
     let f = ''; J.fx.traverse((o) => { if (o.visible && !(isFinite(o.position.x + o.position.y + o.position.z + o.scale.x + o.scale.y + o.quaternion.w))) f = 'fx ' + (o.name || o.type); }); return f; };
   let n = 0;
   for (const s of stances) for (const a of names) { n++;
-    try { J.reset(); J.rings = 2; J.setStance(s); T.step(Math.round(2.4 * 20), 1 / 20); J.play(a, true); const fr = Math.round((J.ACTIONS[a].dur + 2.4) * 30);
+    try { J.reset(); J.charge = 0.7; J.setStance(s); T.step(Math.round(2.4 * 20), 1 / 20); J.play(a, true); const fr = Math.round((J.ACTIONS[a].dur + 2.4) * 30);
       for (let i = 0; i < fr; i++) { T.step(1, 1 / 30); if (i % 45 === 20) T.stage.render(); const f = finite(); if (f) { bad.push([s || 'stand', a, 't=' + (i / 30).toFixed(2), f]); break; } }
       if (J.action === a) bad.push([s || 'stand', a, 'did not end']);
     } catch (e) { bad.push([s || 'stand', a, String(e && e.stack || e).slice(0, 300)]); } }

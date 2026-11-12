@@ -1,10 +1,10 @@
   // ---------- her moves under the lore (claude.ai Project "Flip Book Art", lore/jester-3d-and-lore.md and lore/discussion-notes.md) ----------
   // Nothing above this file is changed by it: her ten spells and her body moves play as before. These are added beside them:
-  //   doom          her big spell: Sealed Fate, with a ring for each hit she has taken. She throws the seal and the rings clamp shut on her target.
+  //   doom          her big spell: Sealed Fate. The dust of the blows she has absorbed draws into rings; she throws the seal and they clamp shut on her target.
   //   doom_end      the cast that brings every foe to zero: the same, running on into Curtain Call, the end of the show.
   //   taunt_attack  her attack taunt: Gravity gathered over her hand in a jig and a twirl, dropped on her target, and a laugh.
   //   taunt_heal    her heal taunt: Against All Odds, danced and laughed through. It heals only her.
-  //   hit_laugh, hit_dust   taking a hit at full power: she rocks back, bounces up, and laughs or dusts herself off. Each lights a ring.
+  //   hit_laugh, hit_dust   taking a hit at full power: she rocks back, bounces up, and laughs or dusts herself off. The host adds the blow to her charge.
   //   caper, prance, juggle more dancing and jester acting.
   // The effects are the not-HD model's look for her (88_void.js), keyed to these moves' own clocks.
   const _rq0 = Qt(), _rp = V3(), _Lq1 = Qt(), _Lq2 = Qt(), _l1 = V3(), _l2 = V3(), _l3 = V3(), _l4 = V3(), _l5 = V3();
@@ -40,22 +40,46 @@
     return t + n * 0.16;
   }
 
-  // ---- the rings: one for each hit she has taken since her last big spell. They turn round her until she casts it. ----
-  let ringN = 0; const ringBorn = [0, 0, 0, 0, 0, 0];
+  // ---- the charge: the blows aimed at her gather round her as dust, thicker the more she has absorbed. The host keeps the sum and sets J.charge
+  //      (0 to 1, full when she can cast her big spell): the model does not know what a blow is worth. The dust is single points, drawn in one call
+  //      and moved by the graphics chip, so it costs next to nothing. When she casts, it draws into a band round her, her rings come out of it,
+  //      and what is left streams to the seal. ----
+  let chargeK = 0, chargeShown = 0, chargePrev = 0, chargeAt = -9, dustBand = 0, dustPull = 0, dustSpin = 0; const dustSeal = V3();
+  function setCharge(v) { v = cl(+v || 0, 0, 1); if (v > chargeK + 1e-4) { chargePrev = chargeK; chargeAt = st.time; } chargeK = v; if (v <= 0) chargeShown = 0; }
   const RING_TILT = [0.30, -0.62, 0.95, -1.20, 0.50, -0.85], RING_HEAD = [0, 2.1, 4.2, 1.0, 3.1, 5.2], RING_W = [0.55, -0.42, 0.36, -0.60, 0.48, -0.38], RING_COL = [V_STAR, V_VIOLET, V_STAR, V_GOLD, V_STAR, V_VIOLET];
-  function setRings(n) { n = cl(Math.round(+n || 0), 0, 6); for (let i = ringN; i < n; i++) ringBorn[i] = st.time; ringN = n; }
   const ringQ = (i, t, fast, out) => out.setFromAxisAngle(Y_AX, RING_HEAD[i] + RING_W[i] * t + (fast || 0) * (i % 2 ? -1 : 1)).multiply(_Lq2.setFromAxisAngle(X_AX, RING_TILT[i])).multiply(vFlatQ);
   const ringSize = (i) => 1.5 + 0.11 * i;
-  fxTicks.push((t) => {
-    if (!ringN || (act && act.ringsTaken)) return;                      // while she casts her big spell the cast draws them itself
-    vNs = 'rings:';
-    const c = anchor('chest', _l1); c.y -= 0.18;
-    for (let i = 0; i < ringN; i++) {
-      const age = t - ringBorn[i], k = vease(vramp(age, 0, 0.55));
-      VF.hoop('r' + i, c, V_ID, ringSize(i) * (1 + 1.3 * (1 - k)), t * (i % 2 ? -0.8 : 0.9), vramp(age, 0, 0.25), ringQ(i, t, 0, _Lq1), RING_COL[i], 2.2);
-      if (age < 0.6) VF.orb('f' + i, c, 0.5 + 2.2 * age, 0.5 * (1 - age / 0.6), V_STAR, 1.6);      // a flash as it lights
+  const dust = new THREE.Points(vSeeds(Q(560, 160)), new THREE.ShaderMaterial(Object.assign({
+    uniforms: { uOrigin: { value: V3() }, uSeal: { value: V3() }, uT: { value: 0 }, uK: { value: 0 }, uPrev: { value: 0 }, uFlash: { value: 0 }, uBand: { value: 0 }, uPull: { value: 0 }, uSpin: { value: 0 }, uPx: { value: 2 }, uColor: { value: vC(V_STAR, 1.25) } },
+    vertexShader: `attribute vec4 aSeed; uniform vec3 uOrigin, uSeal; uniform float uT, uK, uPrev, uFlash, uBand, uPull, uSpin, uPx; varying float vA;
+      void main(){
+        float on = smoothstep(aSeed.w - 0.05, aSeed.w + 0.01, uK);                                 // each speck comes out as the charge passes its own mark
+        float dir = aSeed.x > 0.5 ? 1.0 : -1.0, a = aSeed.y * 6.28318 + (uT * (0.22 + 0.5 * fract(aSeed.x * 7.7)) + uSpin) * dir;
+        float r = 0.24 + 0.56 * aSeed.z * (0.8 + 0.2 * uK), h = fract(aSeed.w * 7.31 + aSeed.x * 3.7 + uT * 0.035 * (0.4 + aSeed.y));       // close about her, thickest near her
+        vec3 p = uOrigin + vec3(r * cos(a), 0.05 + 1.95 * h + 0.04 * sin(uT * 1.3 + aSeed.z * 40.0), r * sin(a));
+        float band = clamp(uBand * 1.5 - aSeed.z * 0.5, 0.0, 1.0); band = band * band * (3.0 - 2.0 * band);       // drawing into a band round her
+        vec3 pb = uOrigin + vec3(0.76 * cos(a), 1.02 + 0.5 * (h - 0.5) * (1.0 - band) + 0.06 * sin(a * 2.0 + aSeed.z * 9.0), 0.76 * sin(a));
+        p = mix(p, pb, band);
+        float pull = clamp(uPull * 1.6 - aSeed.y * 0.6, 0.0, 1.0); pull = pull * pull * (3.0 - 2.0 * pull);           // and from the band to the seal
+        p = mix(p, uSeal, pull);
+        vec4 mv = viewMatrix * vec4(p, 1.0); gl_Position = projectionMatrix * mv;
+        gl_PointSize = uPx * (0.8 + 0.9 * fract(aSeed.x * 13.7));
+        float tw = 0.6 + 0.4 * sin(uT * (1.5 + 3.0 * aSeed.y) + aSeed.z * 50.0), edge = mix(sin(3.14159 * h), 1.0, band);
+        vA = on * tw * edge * (1.0 - 0.45 * band) * (1.0 - pull * pull) * (1.0 + 1.6 * uFlash * step(uPrev, aSeed.w));    // the dust a blow has just added shows brighter for a moment
+        if (vA <= 0.003) gl_Position = vec4(2.0, 2.0, 2.0, 1.0);
+      }`,
+    fragmentShader: 'varying float vA; uniform vec3 uColor; void main(){ gl_FragColor = vec4(uColor, vA);' + V_END }, VBLEND)));
+  dust.frustumCulled = false; dust.renderOrder = 30; dust.visible = false; fx.add(dust);
+  dust.onBeforeRender = (r) => { const rt = r.getRenderTarget(); dust.material.uniforms.uPx.value = Math.max(1.5, (rt ? rt.height : r.getDrawingBufferSize(_vsz).y) / 520); };
+  fxTicks.push((t, dt) => {
+    chargeShown += (chargeK - chargeShown) * Math.min(1, dt * 3 + (dt === 0 ? 1 : 0));
+    dust.visible = chargeShown > 0.004;
+    if (dust.visible) {
+      const u = dust.material.uniforms; root.getWorldPosition(u.uOrigin.value); u.uSeal.value.copy(dustSeal);
+      u.uT.value = t; u.uK.value = chargeShown; u.uPrev.value = chargePrev; u.uFlash.value = cl(1 - (t - chargeAt) / 0.8, 0, 1); u.uBand.value = dustBand; u.uPull.value = dustPull; u.uSpin.value = dustSpin;
+      vNs = 'aura:'; VF.shade('s', anchor('chest', _l1), 2.9, 0.26 * chargeShown * (1 - dustPull)); vNs = '';      // the light near her dims as it thickens
     }
-    vNs = '';
+    dustBand = 0; dustPull = 0; dustSpin = 0;
   });
 
   // ---- the big spell: Sealed Fate as the lore has it. Her flipbook's opening (the seal drawn over her right palm, eyes closed), then she turns
@@ -84,15 +108,17 @@
       for (let k = 0; k < 3; k++) { const an = T * 1.6 + k * 2.094; VF.orb('o' + k, _l3.copy(held).addScaledVector(camRight(_l4), 0.38 * Math.cos(an) * grow).addScaledVector(UP, 0.38 * Math.sin(an) * grow), 0.09, grow, V_STAR, 2.4); }
       VF.motes('draw', held, 220, T - 1.0, { emit: 1.9, life: 0.9, spread: 1.7, size: 0.035, inward: true, rise: 0, swirl: 3, color: V_STAR });
       light(held, 0.9 * grow, V_ICE);
-      // her rings quicken round her, then leave her for the seal; if she has fewer than three, the seal makes up the count
+      // the dust round her draws into a band, her rings come out of the air one after another, quicken, and leave her for the seal
       const g = vease(vramp(T, 1.9, 2.7)), fast = 2.2 * T * vease(vramp(T, 0.3, 2.6));
+      dustBand = vease(vramp(T, 0.1, 1.2)); dustPull = vease(vramp(T, 1.5, 2.5)); dustSpin = 1.6 * T * vease(vramp(T, 0.1, 2.0)); dustSeal.copy(held);
       for (let i = 0; i < n; i++) {
-        const carried = i < a.carried, gi = carried ? g : 1; if (!carried && g <= 0) continue;
-        _l3.copy(chest).lerp(held, gi);
-        VF.hoop('g' + i, _l3, V_ID, lerp(ringSize(i) * (1 - 0.2 * vease(vramp(T, 0.4, 1.9))), 0.60 + 0.075 * i, gi), T * (i % 2 ? -1.6 : 1.8), carried ? 1 : g, ringQ(i, T, fast, _Lq1), RING_COL[i], 2.2);
+        const t0 = 0.22 + 0.2 * i, k = vease(vramp(T, t0, t0 + 0.55)); if (T < t0) continue;
+        _l3.copy(chest).lerp(held, g);
+        VF.hoop('g' + i, _l3, V_ID, lerp(ringSize(i) * (1 + 0.6 * (1 - k)) * (1 - 0.2 * vease(vramp(T, 0.4, 1.9))), 0.60 + 0.075 * i, g), T * (i % 2 ? -1.6 : 1.8), vramp(T, t0, t0 + 0.3), ringQ(i, T, fast, _Lq1), RING_COL[i], 2.2);
+        if (T < t0 + 0.6) VF.orb('gf' + i, chest, 0.4 + 1.6 * (T - t0), 0.4 * (1 - (T - t0) / 0.6), V_STAR, 1.5);
       }
     } else {
-      if (!a.fired.rel) { a.fired.rel = true; a.tg = tgt0(a.tg || V3()); a.gr = (a.gr || V3()).copy(a.tg); a.gr.y = _rp.y + 0.03; fxHitP.copy(a.tg); ringN = 0; }      // the rings are spent
+      if (!a.fired.rel) { a.fired.rel = true; a.tg = tgt0(a.tg || V3()); a.gr = (a.gr || V3()).copy(a.tg); a.gr.y = _rp.y + 0.03; fxHitP.copy(a.tg); setCharge(0); }      // the charge is spent
       const from = a.from || held, tg = a.tg, fly = vease(r / 0.32), at = _l3.copy(from).lerp(tg, fly);
       if (r < 0.34) {
         VF.shade('sh', at, 2.4, 0.8); VF.voidFlat('seal', at, camQ, 0.46 + 0.5 * fly, T, 1, 0, V_STAR, 2.8);
@@ -113,7 +139,7 @@
     }
     vNs = '';
   }
-  const doomStart = (a) => { a.carried = ringN; a.n = Math.max(3, ringN); a.ringsTaken = true; };
+  const doomStart = (a) => { a.n = 3 + Math.round(2 * chargeK); };      // three rings at the least, five from a full charge
   defLore('doom', 5.4, K_DOOM.concat([
     { t: 4.95, hR: [0.08, 1.04, 0.20], fR: FP.loose, twR: 0.3, wrR: [0.1, 0], eR: [-1, -0.6, -0.3], sp: [0.12, 0, 0], hipR: [0, 0, 0], hd: [0.12, 0, 0], hip: [0, 0, 0], hL: 'rest', fL: FP.relax },
     { t: 5.2, mouth: 0 }
@@ -286,7 +312,7 @@
   })();
 
   // ---- taking a hit at full power. The blow comes from her casting side. She rocks back, bounces up, and laughs it off or dusts herself off;
-  //      her bells jingle, and a ring lights. Over a stance only her body above the hips moves. ----
+  //      her bells jingle. Over a stance only her body above the hips moves. ----
   function fxHitTaken(a) {
     const T = a.t; loreFrame(); vNs = 'hit:';
     const c = anchor('chest', _h1), from = _l1.copy(c).addScaledVector(_l2.set(1, 0, 0.3).applyQuaternion(_rq0), 0.2), camQ = camNow().quaternion;
@@ -298,7 +324,6 @@
     const j = vwin(T, 0.15, 0.25, 0.7, 1.1); if (j > 0.01) show(gGold, anchor('bells', _l3), 0.22 + 0.06 * Math.sin(T * 40), 0.5 * j);
     vNs = '';
   }
-  const hitGain = () => setRings(ringN + 1);
   (function () {
     const keys = [
       { t: 0.10, hip: [-0.07, -0.04, -0.05], hipR: [-0.10, -0.10, 0.06], sp: [-0.22, -0.26, 0.10], hd: [0.20, 0.22, 0.10], hR: [-0.52, 1.28, 0.00], hL: [0.42, 1.36, 0.06], eR: [-0.6, -0.6, -0.6], eL: [0.6, -0.6, -0.6], fR: FP.open, fL: FP.open, ftR: [-0.16, 0, -0.14, -0.3, 0], eyes: 1, mouth: 1 },
@@ -308,7 +333,7 @@
       { t: 1.00, hip: [0, 0, 0], hR: HIPS_R, hL: HIPS_L, eR: [-1, -0.1, -0.5], eL: [1, -0.1, -0.5], fR: FP.loose, fL: FP.loose, wrR: [0.5, 0], wrL: [0.5, 0], hd: [0.25, -0.16, 0.05], sp: [0.08, -0.06, 0], eyes: 0.8, mouth: 1 }];
     const t = laughShakes(keys, 1.12, 5, 0.25, 0.08);
     keys.push({ t: t + 0.12, sh: [0, 0], hd: [0.15, 0, 0.03], sp: [0.04, 0, 0], mouth: 2, eyes: 0 });
-    defLore('hit_laugh', t + 0.62, keys, { outro: 0.45, hits: [0.10 / (t + 0.62)], tags: ['ring'], impact: 0.45, onHit: hitGain, fx: fxHitTaken });
+    defLore('hit_laugh', t + 0.62, keys, { outro: 0.45, hits: [0.10 / (t + 0.62)], tags: ['struck'], impact: 0.45, fx: fxHitTaken });
   })();
   defLore('hit_dust', 2.9, [
     { t: 0.10, hip: [-0.06, -0.03, -0.03], hipR: [-0.16, -0.06, 0.05], sp: [-0.36, -0.14, 0.10], hd: [0.26, 0.16, 0.08], hL: [0.50, 1.22, 0.02], hR: [-0.40, 1.10, 0.14], eL: [0.6, -0.6, -0.6], fL: FP.open, fR: FP.open, ftL: [0.02, 0.02, 0, 0.1, 0.3], eyes: 1 },
@@ -318,7 +343,7 @@
     { t: 1.22, hR: [0.255, 1.345, 0.115] }, { t: 1.38, hR: [0.150, 1.385, 0.150] }, { t: 1.54, hR: [0.255, 1.345, 0.115] }, { t: 1.70, hR: [0.155, 1.380, 0.150] },
     { t: 1.95, hR: [-0.30, 1.16, 0.22], fR: FP.open, twR: 1.0, wrR: [-0.3, 0], eR: [-0.6, -1, -0.3], hd: [0.22, -0.05, 0.05] },
     { t: 2.35, hR: [-0.30, 0.92, 0.08], fR: FP.relax, twR: 0.1, wrR: 'rest', hd: [0.10, 0, 0.02], sp: [0, 0, 0], mouth: 2 }
-  ], { outro: 0.45, hits: [0.10 / 2.9], tags: ['ring'], impact: 0.45, onHit: hitGain, fx: fxHitTaken });
+  ], { outro: 0.45, hits: [0.10 / 2.9], tags: ['struck'], impact: 0.45, fx: fxHitTaken });
 
   // ---- more dancing and jester acting ----
   // Caper: four leaps from side to side with her heels clicked together in the air, then a turn in the air and a pose

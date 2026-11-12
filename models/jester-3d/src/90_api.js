@@ -102,8 +102,8 @@
     get fade() { return fade; }, get busy() { return !!act && !(act.def.hold && act.t >= act.dur); }, get action() { return act ? act.type : ''; },
     get progress() { return act ? Math.min(1, act.t / act.dur) : -1; }, get time() { return act ? act.t : -1; },
     // for the lore's moves: dark is how far the place round her should go black (she and her spell stay lit), shake a rumble to add to the picture,
-    // rings the hits she has taken since her last big spell (each one a ring round her), camera what the effects turn to face, arena how far the open ground runs
-    get dark() { return darkNow; }, get shake() { return shakeNow; }, get rings() { return ringN; }, set rings(n) { setRings(n); }, set camera(c) { vCam = c || null; }, get camera() { return vCam; }, set arena(r) { arenaR = +r > 0 ? +r : 0; }, spellLight,
+    // charge how full her big spell is (0 to 1: the host adds up the blows aimed at her; it shows as dust round her), camera what the effects turn to face, arena how far the open ground runs
+    get dark() { return darkNow; }, get shake() { return shakeNow; }, get charge() { return chargeK; }, set charge(v) { setCharge(v); }, set camera(c) { vCam = c || null; }, get camera() { return vCam; }, set arena(r) { arenaR = +r > 0 ? +r : 0; }, spellLight,
     get triangles() { return triCount; }, get dim() { return dimNow; }, set wind(v) { userWind.copy(v); }, get wind() { return userWind; },
     debug: { SK, cloths, cur, base, REST, FP, meshes, MATS, chains, applyPose, clonePose }
   };

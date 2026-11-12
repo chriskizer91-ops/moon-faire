@@ -52,10 +52,12 @@
   for (const [id, label] of SPELLS) moveChips[id] = chip($('spells'), label, () => setMove(id), false);
   for (const [id, label] of LORE) moveChips[id] = chip($('lore'), label, () => setMove(id), false);
   const press = () => { for (const k in moveChips) moveChips[k].setAttribute('aria-pressed', k === state || k === move || (k === 'hit' && /^hit_/.test(move)) ? 'true' : 'false'); };
-  // The price of her big spell: it is charged by the hits she takes. Three the first time, one more each time after (lore/discussion-notes.md).
-  // Here the button always works, so the move can be watched at any count; a game would make her wait.
-  let need = 3, hitTurn = 0; const ringNote = $('ringNote');
-  chip($('lore'), 'Start the count again', () => { need = 3; J.rings = 0; }, null);
+  // What charges her big spell (Chris, November 12; lore/discussion-notes.md): the damage aimed at her, whether or not she drew it by taunting.
+  // It is full when that adds up to three-quarters of her own HP. Her HP and the size of a blow here are stand-ins, so the charge can be watched;
+  // balance comes later. The button always works, so the move can be watched at any charge; a game would make her wait.
+  const HER_HP = 1000, FULL = 0.75 * HER_HP, BLOW = [160, 320];          // a blow on this page is somewhere between these
+  let hitTurn = 0, blowNext = 0, blowLast = 0; const ringNote = $('ringNote');
+  chip($('lore'), 'Empty the charge', () => { J.charge = 0; blowLast = 0; }, null);
   function setState(id) {
     state = id; faceTo = 0; wbTo = id === 'walk' || id === 'run' ? 1 : 0; rbTo = id === 'run' ? 1 : 0;
     J.setStance(J.STANCES.indexOf(id) >= 0 ? id : '');
@@ -64,8 +66,7 @@
   }
   function setMove(id) {
     if (id === 'idle' || id === 'walk') { J.stop(); move = ''; return setState(id); }      // kept for older callers
-    if (id === 'hit') { id = HITS[hitTurn % HITS.length][0]; hitTurn++; }
-    if ((id === 'doom' || id === 'doom_end') && J.rings >= need) need = Math.min(6, need + 1);
+    if (id === 'hit') { id = HITS[hitTurn % HITS.length][0]; hitTurn++; blowNext = Math.round((BLOW[0] + (BLOW[1] - BLOW[0]) * Math.random()) / 10) * 10; }
     if (dummyUp() && AIMED[id]) { const dx = dummy.position.x - roam.x, dz = dummy.position.z - roam.z; roam.aim = Math.atan2(-dz, dx); J.targetDist = Math.hypot(dx, dz); } else { roam.aim = null; J.targetDist = 0; }
     move = id; faceTo = 0; J.play(id, true);
     if (J.stance === '' && J.STANCES.indexOf(state) >= 0) state = 'idle';             // a jump stands her up first
@@ -286,7 +287,8 @@
     }
   }
   function roomStep(dt) {
-    const hn = J.state.hitN || 0; if (hn !== hitSeen) { hitSeen = hn; const nm = J.state.hitName, k = J.state.hitK || 0.5, tag = J.state.hitTag || ''; if (!QUIETHIT[tag]) roomHit(nm, k, tag); if (dummy.visible && AIMED[nm]) dummyHit(k, tag); }
+    const hn = J.state.hitN || 0; if (hn !== hitSeen) { hitSeen = hn; const nm = J.state.hitName, k = J.state.hitK || 0.5, tag = J.state.hitTag || ''; if (tag === 'struck') { blowLast = blowNext; J.charge = Math.min(1, J.charge + blowNext / FULL); }      // the blow lands on her: all of it goes to her charge
+      if (!QUIETHIT[tag]) roomHit(nm, k, tag); if (dummy.visible && AIMED[nm]) dummyHit(k, tag); }
     dummyStep(dt);
     if (!calm && J.shake > 0.01) shakeK = Math.max(shakeK, 0.7 * J.shake);        // the long rumbles her darker spells ask for
     const bw = canvas.clientWidth, bh = canvas.clientHeight, pr = Math.min(1.5, devicePixelRatio || 1), W = Math.round(bw * pr), H = Math.round(bh * pr); if (sfx.width !== W || sfx.height !== H) { sfx.width = W; sfx.height = H; }
@@ -357,15 +359,15 @@
     stage.dim = J.dim;
     if (draw) stage.render(); roomStep(dt);
     if (showBook && draw) drawBook();
-    const a = J.action, m = find(move || state), rn = J.rings | 0;
+    const a = J.action, m = find(move || state), got = Math.round(J.charge * FULL / 10) * 10;
     hud.textContent = m[1] + (a ? '  ' + J.time.toFixed(1) + ' / ' + J.ACTIONS[a].dur.toFixed(1) + ' s' : '') + '  ·  ' + Math.round(J.triangles / 1000) + 'k triangles';
-    const rs = rn + '/' + need; if (rs !== ringShown) { ringShown = rs; ringNote.textContent = rn >= need ? 'Charged: ' + rn + ' hits taken, ' + need + ' needed' : rn + ' of ' + need + ' hits taken'; ringNote.classList.toggle('full', rn >= need); }
+    const rs = got + '/' + blowLast; if (rs !== ringShown) { ringShown = rs; const full = J.charge >= 0.999; ringNote.textContent = full ? 'Charged: ' + FULL + ' of ' + FULL + ' absorbed' : 'Absorbed ' + got + ' of ' + FULL + (blowLast && got ? ' (last blow ' + blowLast + ')' : ''); ringNote.classList.toggle('full', full); }
   }
   loadClip('idle');
   place();
   if (stage.square && QS.get('walk') !== '0') setRoam(true); else if (stage.square) { viewEl = 0.14; viewAz = 0; }
   requestAnimationFrame((t) => { last = t; frame(t); });
-  window.JESTER = { J, stage, SQ, setMove, setState, setRoam, STATES, ACTS, SPELLS, LORE, roam, dummy, dS, orbit, get need() { return need; },
+  window.JESTER = { J, stage, SQ, setMove, setState, setRoam, STATES, ACTS, SPELLS, LORE, roam, dummy, dS, orbit,
     // for checks: step the page by hand (n frames of dt seconds, drawing the last), or hand it back to the clock
     set zoom(v) { zoomUser = v; }, view(az, el) { viewAz = az; viewEl = el; },
     step(n, dt) { manual = true; for (let i = 0; i < n; i++) advance(dt || 1 / 30, i === n - 1); }, run() { manual = false; last = performance.now(); } };
