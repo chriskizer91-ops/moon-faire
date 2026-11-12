@@ -65,6 +65,13 @@
     return ctex(c);
   })();
   Object.assign(MATS, {
+    neck: (() => {                                   // her neck: the chest's tone where it leaves the collar, her face's tone above the choker, darkening into the shade under her jaw
+      const c = cvs(8, 128), g = c.getContext('2d'), CH = (BAKED && BAKED.skinChest) || SKIN || '#e0a890', J = (BAKED && BAKED.skinJaw) || SKIN || '#c08068', F = SKIN || '#d89780';
+      const ratio = (hex, k) => { const a = new THREE.Color(hex), b = new THREE.Color(CH); return 'rgb(' + [a.r / b.r, a.g / b.g, a.b / b.b].map((v) => Math.round(255 * Math.min(1, v * k))).join(',') + ')'; };
+      const gr = g.createLinearGradient(0, 128, 0, 0); gr.addColorStop(0, '#ffffff'); gr.addColorStop(0.24, '#ffffff'); gr.addColorStop(0.34, ratio(F, 1.0)); gr.addColorStop(0.50, ratio(F, 0.93)); gr.addColorStop(0.62, ratio(J, 0.92)); gr.addColorStop(1, ratio(J, 0.85));
+      g.fillStyle = gr; g.fillRect(0, 0, 8, 128); const t = ctex(c);
+      return sheen(std({ color: lin('#d8ccc6').multiply(lin(CH)), map: t, emissive: lin(CH), emissiveMap: t, emissiveIntensity: 0.44, roughness: 0.64, envMapIntensity: 0.2 }), '#ffb49a', 3.2, 0.1);
+    })(),
     choker: sheen(std({ color: lin('#b9506f'), roughness: 0.62 }), '#ffc0d0', 3, 0.15),
     bellm: std({ color: lin('#c9973a'), roughness: 0.28, metalness: 0.9 }),
     scalp: sheen(std({ map: fabricTex(256, '#2c1a0e', '#4a2f19', '#170d06', 2, true), roughness: 0.58 }), '#ffd9a0', 3, 0.28),

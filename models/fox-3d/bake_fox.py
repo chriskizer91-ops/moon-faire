@@ -39,7 +39,7 @@ from PIL import ImageFilter
 base = arr(warp(c3, 1 / K, -x0 / K, -y0 / K).filter(ImageFilter.UnsharpMask(radius=3, percent=70, threshold=2)))
 inside = arr(warp(Image.new('RGB', c3.size, (255, 255, 255)), 1 / K, -x0 / K, -y0 / K))[..., 0] > 250
 # the face itself: an oval from the hairline to under the chin; outside it (hair, backdrop) her skin is carried outward
-jj, ii = np.mgrid[0:S, 0:S]; ex0, ey0 = n2c(CX, (N_HAIR + N_CHIN) / 2 + 6); rx_, ry_ = 0.0655 * PPM * K, 0.0900 * PPM * K
+jj, ii = np.mgrid[0:S, 0:S]; ex0, ey0 = n2c(CX, (N_HAIR + N_CHIN) / 2 + 6); rx_, ry_ = 0.0610 * PPM * K, 0.0880 * PPM * K      # kept inside the shade her hair throws on the edge of her face, so that shade is not carried round her cheeks
 oval = ((ii - ex0) / rx_) ** 2 + ((jj - ey0) / ry_) ** 2 < 1
 # her loose curls cross the corners of the forehead in this panel: anything much darker or browner than skin is left out and filled from the skin beside it
 hairish = (base[..., 0] < 138) | (base[..., 0] - base[..., 2] > 108)
@@ -75,7 +75,38 @@ cx0, cy0 = n2c(CX + 0.048 * PPM, N_EYE[0][1] + (EYE_Y - 1.485) * PPM); front_che
 sel = (alpha > 0.9) & (np.abs(yy - 1.485) < 0.012); side_cheek = col[sel].mean(0) if sel.sum() > 50 else front_cheek; g2 = np.clip(front_cheek / side_cheek, 0.70, 1.25); print('side tone gain', np.round(g2, 3), 'opaque share', round(float((alpha > 0.9).mean()), 3))
 T['faceSide'] = uri(img(col * g2), 90); T['faceSideA'] = uri(img(np.repeat((alpha * 255)[..., None], 3, -1)), 88); T['faceSideWin'] = list(WINS)
 _chk = Image.new('RGB', (S + OW * 2, S), (40, 40, 40)); _chk.paste(img(face), (0, 0)); _chk.paste(img(col * g2), (S, 0)); _chk.paste(img(col * g2 * alpha[..., None] + np.array([0, 255, 0]) * (1 - alpha[..., None])), (S + OW, 0)); _chk.resize((932, 512)).save(ROOT + 'shots/bake_face.png')
-T['faceParts'] = {}
+# ---- her face states: eyes shut, an "oo" mouth for talking, the open grin. Only the eyes or the mouth are lifted from the expression sheets
+# (C14, C16), as soft-edged patches set into the neutral face, with their tone matched to it round the rim. Nothing else moves.
+# Every point below was read by eye off a gridded copy (shots/C14_grid.jpg, shots/C16_grid.jpg). Pupils in those sheets are 142 px apart; in C3, 107.5.
+c14 = Image.open(IN + 'C14.png').convert('RGB'); c16 = Image.open(IN + 'C16.png').convert('RGB')
+def rrect(x0, y0, x1, y1, fe):       # a feathered box, in C3 pixels -> canvas mask
+    (a_, b_), (c_, d_) = n2c(x0, y0), n2c(x1, y1); m = np.zeros((S, S), np.float32); f = fe * K; m[int(b_ + f):int(d_ - f), int(a_ + f):int(c_ - f)] = 1; return np.clip(ndi.gaussian_filter(m, f / 1.6), 0, 1)
+def patch(sheet, pairs, boxes, fe=7):
+    # pairs: [(point in the sheet, the point in C3 it must land on, C3 pixels per sheet pixel)], one per box
+    lay = np.zeros((S, S, 3), np.float32); al = np.zeros((S, S), np.float32)
+    for (sp, tp, sc), bx in zip(pairs, boxes):
+        cx_, cy_ = n2c(*tp); s_ = 1 / (sc * K); w = arr(warp(sheet, s_, sp[0] - cx_ * s_, sp[1] - cy_ * s_)); m = rrect(*bx, fe)
+        ring = (m > 0.05) & (m < 0.5); w = w + (face[ring].mean(0) - w[ring].mean(0))
+        sel = (m > 0.002)[..., None]; lay = np.where(sel, w, lay); al = np.maximum(al, m)
+    ys_, xs_ = np.where(al > 0.01); xa, xb, ya, yb_ = xs_.min(), xs_.max() + 1, ys_.min(), ys_.max() + 1
+    rgba = np.dstack([np.clip(lay, 0, 255), al * 255])[ya:yb_, xa:xb].astype(np.uint8); bb = io.BytesIO(); Image.fromarray(rgba, 'RGBA').save(bb, 'WEBP', quality=90, method=6)
+    return {'src': 'data:image/webp;base64,' + base64.b64encode(bb.getvalue()).decode(), 'x': round(xa / S, 4), 'y': round(ya / S, 4), 'w': round((xb - xa) / S, 4), 'h': round((yb_ - ya) / S, 4)}, lay, al
+EL, ER = (235.0, 381.0), (342.5, 379.0); ERW = HM['eyeRow']; SC14, SC16 = 107.5 / 142.0, 107.5 / 143.2       # C3: her right pupil (image left), her left pupil
+EB = [(EL[0] - 38, EL[1] - 24, EL[0] + 38, EL[1] + 22), (ER[0] - 38, ER[1] - 24, ER[0] + 38, ER[1] + 22)]
+P = {}
+# eyes shut (C14, lower left): the middle of each closed lash line goes a little under where the pupil was
+P['shut'], l1, a1 = patch(c14, [((219, 727), (EL[0], EL[1] + 11), SC14), ((365, 727), (ER[0], ER[1] + 11), SC14)], EB)
+P['half'] = P['shut']                           # there is no half-shut painting yet; a blink goes straight to shut
+# the "oo" mouth (C16, upper right): its pupils are on row 191.8, the middle of the mouth at (1314.6, 356.8)
+P['oh'], l3, a3 = patch(c16, [((1314.6, 356.8), (CX, ERW + (356.8 - 191.8) * SC16), SC16)], [(CX - 66, 464, CX + 66, 548)])
+# the open grin (C14, upper right): pupils on row 188.6, the middle of the mouth at (1253.4, 345)
+P['smile'], l4, a4 = patch(c14, [((1253.4, 345.0), (CX, ERW + (345.0 - 188.6) * SC14), SC14)], [(CX - 74, 456, CX + 74, 553)])
+T['faceParts'] = P
+def comp(lay, al): return img(face * (1 - al[..., None]) + lay * al[..., None]).resize((384, 384), Image.LANCZOS)
+_e = Image.new('RGB', (384 * 4, 384)); [_e.paste(c_, (i * 384, 0)) for i, c_ in enumerate((img(face).resize((384, 384), Image.LANCZOS), comp(l1, a1), comp(l3, a3), comp(l4, a4)))]; _e.save(ROOT + 'shots/bake_states.jpg', quality=88)
+# ---- tones for her neck: the chest it rises from (painting B1) and the jaw it meets
+_b1 = arr(Image.open(IN + 'B1.png')); _cy = int(round(1001.0 - 1.345 * 572.4)); _chest = np.median(_b1[_cy - 6:_cy + 6, 467 - 12:467 + 12].reshape(-1, 3), 0)
+T['skinChest'] = '#%02x%02x%02x' % tuple(int(v) for v in _chest); print('tones: face', T['skin'], 'jaw', T['skinJaw'], 'chest', T['skinChest'])
 print('face: pixels a metre', round(PPM), 'skin', T['skin'], T['layout'])
 
 # ---------------- the bodice and hips: [front | back] ----------------
