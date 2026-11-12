@@ -41,7 +41,7 @@ canvas#stage{display:block;width:100%;height:100%;touch-action:none;cursor:grab}
   <header>
     <p class="eyebrow">Moon Faire · Stage two of her build</p>
     <h1>The <em>Ranger</em></h1>
-    <p class="sub">Stage two: her face, hair, headband and glasses, on the body from stage one. Drag to turn her, pinch or scroll to zoom. The Head buttons bring you in close; "Painting beside her" shows your painting for that view.</p>
+    <p class="sub">Her head is now the Jester's face model at her size, wearing her own face painting until the new face-only pictures arrive. Drag to turn her, pinch or scroll to zoom. The Head buttons bring you in close; "Painting beside her" shows your painting for that view.</p>
   </header>
   <div class="stagebox" id="box">
     <canvas id="stage"></canvas>
@@ -54,18 +54,17 @@ canvas#stage{display:block;width:100%;height:100%;touch-action:none;cursor:grab}
   <div><p class="label">Arms and legs</p><div class="chips" id="poses"></div></div>
   <div><p class="label">Show</p><div class="chips" id="shows"></div></div>
   <div class="notes">
-    <h2>New in stage two</h2>
+    <h2>Her head now</h2>
     <ul>
-      <li>Her face: your painting C1, on a head shaped from her profile in C3. From brow to chin the middle line of her face is within half a millimetre of the painted profile.</li>
-      <li>Ears, shaped and painted from the profile.</li>
-      <li>Hair: one form that swells into the bun, wearing four of your paintings (side, front, back and top), with a few loose locks.</li>
-      <li>Headband with its knot and two tails, the turquoise in its gold setting, and the drop on her forehead.</li>
-      <li>Glasses: thin wire and lilac lenses, sized from C2. There is a button to take them off.</li>
-      <li>Wrists: the forearm now narrows and runs into the hand.</li>
+      <li>The shape of her head and face is the Jester's face model, unchanged, worn at 94% of its size so it fits her body. Behind the jaw it is drawn in to her neck, because her hair is up.</li>
+      <li>Her face is still her own painting, C1, laid on by her pupils and the line of her lips. It was painted with the band and the gem in it; both are painted out.</li>
+      <li>Her profile is now the Jester's, so it no longer follows her own profile painting. Her nose is a little sharper from the side.</li>
+      <li>Ears, hair, headband, gem, glasses and loose locks are as before, refitted to this head.</li>
     </ul>
     <h2 style="margin-top:12px">Rough, or not here yet</h2>
     <ul class="m">
-      <li>Her face does not move yet: no blink and no change of expression.</li>
+      <li>Her face does not move yet: no blink and no change of expression. The new face pictures bring those.</li>
+      <li>Close up her face is a little soft, and the join of jaw and neck is plain. Both wait for the new pictures.</li>
       <li>The fine flyaway wisps round her hair are missing, and the loose locks are simple.</li>
       <li>Earrings and necklaces, with the rest of her jewellery.</li>
       <li>Painted detail on her arms and hands.</li>
@@ -135,7 +134,7 @@ canvas#stage{display:block;width:100%;height:100%;touch-action:none;cursor:grab}
     if (easing) { let d = want.az - orbit.az; d = Math.atan2(Math.sin(d), Math.cos(d)); const k = Math.min(1, dt * 5); orbit.az += d * k; orbit.el += (want.el - orbit.el) * k; orbit.dist += (want.dist - orbit.dist) * k; orbit.target.y += (want.ty - orbit.target.y) * k; }
     stage.render();
   }
-  $('hud').textContent = 'Stage two · ' + Math.round(R.triangles / 1000) + 'k triangles';
+  $('hud').textContent = 'Stage two, Jester face model · ' + Math.round(R.triangles / 1000) + 'k triangles';
   window.RANGER = { stage, R, step() { fit(); stage.render(); } };
   requestAnimationFrame(frame);
 })();

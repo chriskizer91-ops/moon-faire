@@ -42,9 +42,11 @@
     const NU = Q(132, 52), rings = [], K = [-1, -0.55, 0, 0.55, 1], cs = []; let s = 0, prev = null, knot = null;
     for (let j = 0; j <= NU; j++) {                 // from the knot at the nape, round her right side to the forehead and back by her left
       const a = -PI + (j / NU) * TAU, pb = bandPh(a), pc = hairPt(a, pb, 0, pb, 0.003, true);
-      const p1 = hairPt(a, pb - 0.01, 0, pb, 0, true), p2 = hairPt(a, pb + 0.01, 0, pb, 0, true), dph = (BAND.w / 2) / (Math.hypot(p2[0] - p1[0], p2[1] - p1[1], p2[2] - p1[2]) / 0.02), ring = [];
-      for (const k of K) ring.push(hairPt(a, pb + k * dph, 0, pb, 0.0030 + 0.0012 * (1 - k * k), true));
-      for (const k of [0.8, 0, -0.8]) ring.push(hairPt(a, pb + k * dph, 0, pb, 0.0005, true));
+      // the band is a strip of even width: how far to step up and down the head for half its width is worked out on each side separately
+      const step = (sgn) => { let lo = 0, hi = 0.6; for (let it = 0; it < 18; it++) { const m = (lo + hi) / 2, q = hairPt(a, pb + sgn * m, 0, pb, 0, true); if (Math.hypot(q[0] - pc0[0], q[1] - pc0[1], q[2] - pc0[2]) < BAND.w / 2) lo = m; else hi = m; } return (lo + hi) / 2; };
+      const pc0 = hairPt(a, pb, 0, pb, 0, true), dUp = step(-1), dDn = step(1), ring = [];
+      for (const k of K) ring.push(hairPt(a, pb + k * (k < 0 ? dUp : dDn), 0, pb, 0.0030 + 0.0012 * (1 - k * k), true));
+      for (const k of [0.8, 0, -0.8]) ring.push(hairPt(a, pb + k * (k < 0 ? dUp : dDn), 0, pb, 0.0005, true));
       rings.push(ring);
       if (prev) s += Math.hypot(pc[0] - prev[0], pc[1] - prev[1], pc[2] - prev[2]);
       prev = pc; cs.push(s); if (j === 0) knot = pc;
