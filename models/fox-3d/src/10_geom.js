@@ -94,9 +94,14 @@
   // part = { pos: [x,y,z,...], uv: [u,v,...], idx: [...] }; wf(x, y, z, i) -> [bone, weight, ...] (up to 4 pairs)
   // o.out: a point the surface should face away from (winding is fixed to match); o.flip: reverse the winding
   const FOX_SKIP = { wine: 1, cloth: 1, sock: 1, hair: 1, cap: 1, velvet: 1, fur: 1, ruffle: 1, gold: 1, gem: 1, leather: 1, bells: 1, bellslit: 1, pearl: 1 };   // the Jester's costume: sleeves, sock, cap, horns, pompoms, ruff and cuffs, pendant, belt, bells
+  const FOX_BOOT = { boot: 1, sole: 1, stitch: 1, eyelet: 1, lace: 1, aglet: 1 };
   function addPart(key, part, wf, o) {
     o = o || {};
     if (FOX_SKIP[key]) return { key, start: 0, count: 0 };
+    if (FOX_BOOT[key]) {                             // her boot's shape (painting E1, measured as fractions of its length): thinner sole, shorter shaft, deeper at the padded collar
+      const p = part.pos;
+      for (let i = 0; i < p.length; i += 3) { const y = p[i + 1]; if (y < 0.30) { p[i + 2] = -0.012 + (p[i + 2] + 0.012) * (1 + 0.28 * sm(0.09, 0.20, y)); p[i + 1] = y < 0.066 ? y * 0.757 : 0.050 + (y - 0.066) * 0.878; } }
+    }
     const B = bucket(key), pos = part.pos, n = pos.length / 3; let idx = part.idx;
     let nor = o.nor || computeNormals(pos, idx, o.weld);            // o.nor: normals worked out by the caller
     let flip = !!o.flip;

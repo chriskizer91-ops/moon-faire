@@ -70,6 +70,7 @@
     if (sLen < L_UARM + 0.05) { const u = sm(L_UARM - 0.05, L_UARM + 0.05, sLen); return [BI['uarm' + S], 1 - u, BI['farm' + S], u]; }
     const u = sm(L_UARM + L_FARM - 0.02, L_UARM + L_FARM + 0.012, sLen); return [BI['farm' + S], 1 - u, BI['hand' + S], u];
   }
+  const braceletChains = [];                       // each strand of beads hangs on its own little spring, so the three knock about out of step
   for (const [S, s] of SIDES) {
     const d = armDir[S], sh = restPts['sh' + S], NS = Q(40, 18), NU = Q(28, 14);
     {                                              // the arm
@@ -81,7 +82,9 @@
     {                                              // her bracelets (F2), three strands stacked above each wrist: large dark wood beads, small gold ones, medium wood ones
       const bz = V3(0, 0, 1), by = V3().crossVectors(bz, d).normalize(), bx = V3().crossVectors(d, by).normalize();
       for (const [sl, br, nb, key, ph] of [[0.4130, 0.0056, 13, 'woodbead', 0.0], [0.4285, 0.0031, 27, 'bellm', 0.3], [0.4420, 0.0040, 20, 'woodbead', 0.7]]) {
-        const c = sh.clone().addScaledVector(d, sl), R = spline(ARM_R, sl) + br * 0.80, wf = (() => { const w = wArm(S, sl); return () => w; })();
+        const c = sh.clone().addScaledVector(d, sl), R = spline(ARM_R, sl) + br * 0.80, c2 = c.clone().addScaledVector(d, 0.035), bn = 'br' + S + Math.round(sl * 1000);
+        addBone(bn + 'a', 'farm' + S, c.x, c.y, c.z); addBone(bn + 'b', bn + 'a', c2.x, c2.y, c2.z); braceletChains.push({ names: [bn + 'a', bn + 'b'], anchor: 'farm' + S, k: 0.14 + 0.5 * br * 20 });
+        const wf = (() => { const w = [BI[bn + 'a'], 1]; return () => w; })();
         for (let k = 0; k < nb; k++) {
           const a = ph + (k / nb) * TAU, q = c.clone().addScaledVector(bx, Math.cos(a) * R).addScaledVector(by, Math.sin(a) * R * 0.94);
           addPart(key, spherePart(q, br, br, br, 8, 6), wf, { out: q });
@@ -112,7 +115,7 @@
     [0.686, [0.088, 0.0995, 0.0995, 0.0900, 0.033]], [0.652, [0.079, 0.0928, 0.0928, 0.0880, 0.031]], [0.618, [0.072, 0.0832, 0.0832, 0.0870, 0.029]], [0.585, [0.066, 0.0731, 0.0731, 0.0860, 0.028]],
     [0.551, [0.0621, 0.0664, 0.0664, 0.0855, 0.0236]], [0.517, [0.0576, 0.0619, 0.0619, 0.0850, 0.0146]], [0.483, [0.057, 0.0602, 0.0602, 0.0845, 0.0018]], [0.450, [0.063, 0.0635, 0.0635, 0.0845, -0.0084]],
     [0.416, [0.0663, 0.067, 0.067, 0.0840, -0.0118]], [0.382, [0.0653, 0.0658, 0.0658, 0.0835, -0.014]], [0.348, [0.0596, 0.0613, 0.0613, 0.0830, -0.0152]], [0.315, [0.0522, 0.054, 0.054, 0.0825, -0.0146]],
-    [0.281, [0.0455, 0.0475, 0.0475, 0.0820, -0.0129]], [0.247, [0.0400, 0.0430, 0.0430, 0.0815, -0.0118]]];
+    [0.281, [0.0455, 0.0475, 0.0475, 0.0820, -0.0129]], [0.247, [0.0400, 0.0430, 0.0430, 0.0815, -0.0118]], [0.200, [0.0385, 0.0415, 0.0420, 0.0815, -0.0118]]];
   const LEG_UP = LEG.slice().reverse();              // spline() wants heights rising
   function wLeg(S, y) {
     if (y > 0.78) { const u = sm(0.78, 0.87, y); return [BI['thigh' + S], 1 - u, BI.hips, u]; }

@@ -349,9 +349,14 @@ function makeFox(opts) {
   // part = { pos: [x,y,z,...], uv: [u,v,...], idx: [...] }; wf(x, y, z, i) -> [bone, weight, ...] (up to 4 pairs)
   // o.out: a point the surface should face away from (winding is fixed to match); o.flip: reverse the winding
   const FOX_SKIP = { wine: 1, cloth: 1, sock: 1, hair: 1, cap: 1, velvet: 1, fur: 1, ruffle: 1, gold: 1, gem: 1, leather: 1, bells: 1, bellslit: 1, pearl: 1 };   // the Jester's costume: sleeves, sock, cap, horns, pompoms, ruff and cuffs, pendant, belt, bells
+  const FOX_BOOT = { boot: 1, sole: 1, stitch: 1, eyelet: 1, lace: 1, aglet: 1 };
   function addPart(key, part, wf, o) {
     o = o || {};
     if (FOX_SKIP[key]) return { key, start: 0, count: 0 };
+    if (FOX_BOOT[key]) {                             // her boot's shape (painting E1, measured as fractions of its length): thinner sole, shorter shaft, deeper at the padded collar
+      const p = part.pos;
+      for (let i = 0; i < p.length; i += 3) { const y = p[i + 1]; if (y < 0.30) { p[i + 2] = -0.012 + (p[i + 2] + 0.012) * (1 + 0.28 * sm(0.09, 0.20, y)); p[i + 1] = y < 0.066 ? y * 0.757 : 0.050 + (y - 0.066) * 0.878; } }
+    }
     const B = bucket(key), pos = part.pos, n = pos.length / 3; let idx = part.idx;
     let nor = o.nor || computeNormals(pos, idx, o.weld);            // o.nor: normals worked out by the caller
     let flip = !!o.flip;
@@ -775,6 +780,7 @@ function makeFox(opts) {
     if (sLen < L_UARM + 0.05) { const u = sm(L_UARM - 0.05, L_UARM + 0.05, sLen); return [BI['uarm' + S], 1 - u, BI['farm' + S], u]; }
     const u = sm(L_UARM + L_FARM - 0.02, L_UARM + L_FARM + 0.012, sLen); return [BI['farm' + S], 1 - u, BI['hand' + S], u];
   }
+  const braceletChains = [];                       // each strand of beads hangs on its own little spring, so the three knock about out of step
   for (const [S, s] of SIDES) {
     const d = armDir[S], sh = restPts['sh' + S], NS = Q(40, 18), NU = Q(28, 14);
     {                                              // the arm
@@ -786,7 +792,9 @@ function makeFox(opts) {
     {                                              // her bracelets (F2), three strands stacked above each wrist: large dark wood beads, small gold ones, medium wood ones
       const bz = V3(0, 0, 1), by = V3().crossVectors(bz, d).normalize(), bx = V3().crossVectors(d, by).normalize();
       for (const [sl, br, nb, key, ph] of [[0.4130, 0.0056, 13, 'woodbead', 0.0], [0.4285, 0.0031, 27, 'bellm', 0.3], [0.4420, 0.0040, 20, 'woodbead', 0.7]]) {
-        const c = sh.clone().addScaledVector(d, sl), R = spline(ARM_R, sl) + br * 0.80, wf = (() => { const w = wArm(S, sl); return () => w; })();
+        const c = sh.clone().addScaledVector(d, sl), R = spline(ARM_R, sl) + br * 0.80, c2 = c.clone().addScaledVector(d, 0.035), bn = 'br' + S + Math.round(sl * 1000);
+        addBone(bn + 'a', 'farm' + S, c.x, c.y, c.z); addBone(bn + 'b', bn + 'a', c2.x, c2.y, c2.z); braceletChains.push({ names: [bn + 'a', bn + 'b'], anchor: 'farm' + S, k: 0.14 + 0.5 * br * 20 });
+        const wf = (() => { const w = [BI[bn + 'a'], 1]; return () => w; })();
         for (let k = 0; k < nb; k++) {
           const a = ph + (k / nb) * TAU, q = c.clone().addScaledVector(bx, Math.cos(a) * R).addScaledVector(by, Math.sin(a) * R * 0.94);
           addPart(key, spherePart(q, br, br, br, 8, 6), wf, { out: q });
@@ -817,7 +825,7 @@ function makeFox(opts) {
     [0.686, [0.088, 0.0995, 0.0995, 0.0900, 0.033]], [0.652, [0.079, 0.0928, 0.0928, 0.0880, 0.031]], [0.618, [0.072, 0.0832, 0.0832, 0.0870, 0.029]], [0.585, [0.066, 0.0731, 0.0731, 0.0860, 0.028]],
     [0.551, [0.0621, 0.0664, 0.0664, 0.0855, 0.0236]], [0.517, [0.0576, 0.0619, 0.0619, 0.0850, 0.0146]], [0.483, [0.057, 0.0602, 0.0602, 0.0845, 0.0018]], [0.450, [0.063, 0.0635, 0.0635, 0.0845, -0.0084]],
     [0.416, [0.0663, 0.067, 0.067, 0.0840, -0.0118]], [0.382, [0.0653, 0.0658, 0.0658, 0.0835, -0.014]], [0.348, [0.0596, 0.0613, 0.0613, 0.0830, -0.0152]], [0.315, [0.0522, 0.054, 0.054, 0.0825, -0.0146]],
-    [0.281, [0.0455, 0.0475, 0.0475, 0.0820, -0.0129]], [0.247, [0.0400, 0.0430, 0.0430, 0.0815, -0.0118]]];
+    [0.281, [0.0455, 0.0475, 0.0475, 0.0820, -0.0129]], [0.247, [0.0400, 0.0430, 0.0430, 0.0815, -0.0118]], [0.200, [0.0385, 0.0415, 0.0420, 0.0815, -0.0118]]];
   const LEG_UP = LEG.slice().reverse();              // spline() wants heights rising
   function wLeg(S, y) {
     if (y > 0.78) { const u = sm(0.78, 0.87, y); return [BI['thigh' + S], 1 - u, BI.hips, u]; }
@@ -2443,6 +2451,11 @@ function makeFox(opts) {
   const chains = [];
   for (const [S, s] of SIDES) chains.push(makeChain(hornChains[S].names, 'head', { stiff: [1, 0.55, 0.42, 0.33, 0.27, 0.22, 0.10], damp: 0.90, grav: 3.2, gw: [0, 0.2, 0.3, 0.4, 0.5, 0.6, 2.2] }));
   for (const names of hairChains) chains.push(makeChain(names, 'head', names.length === 3 ? { stiff: [1, 0.62, 0.46], damp: 0.88, grav: 1.4, gw: [0, 0.4, 0.7] } : { stiff: [1, 0.34, 0.22, 0.16], damp: 0.90, grav: 2.6, gw: [0, 0.6, 1.0, 1.4] }));      // her loose hair; the bun (three bones) is held firmer
+  for (const c of braceletChains) {                // her bracelets: each strand tips and knocks on its own spring, but never more than 24 degrees, so it cannot swing through her arm
+    const ch = makeChain(c.names, c.anchor, { stiff: [1, c.k], damp: 0.90, grav: 5.0, gw: [0, 1] }), b = SK[c.names[0]], inner = ch.update, qi = new THREE.Quaternion();
+    ch.update = (dt) => { inner(dt); const a = 2 * Math.acos(Math.min(1, Math.abs(b.quaternion.w))); if (a > 0.42) b.quaternion.copy(qi.set(0, 0, 0, 1).slerp(b.quaternion, 0.42 / a)); };
+    chains.push(ch);
+  }
   const hipsInv = new THREE.Matrix4(), bellChain = makeChain(['bell0', 'bell1', 'bell2', 'bell3'], 'hips', { stiff: [1, 0.02, 0.012, 0.008], damp: 0.965, grav: 9.0, collide(p, i) {
     _va.copy(p).applyMatrix4(hipsInv); const y = cl(_va.y + SK.hips.userData.rest.y - (i === 3 ? 0.03 : 0), 0.3, 0.985), [rx, rz] = prof(SKIRT_R, y, true), m = 0.034 + (i === 3 ? 0.012 : 0), zc = skirtZc(y);
     const q = Math.pow(_va.x / (rx + m), 2) + Math.pow((_va.z - zc) / (rz + m), 2);
