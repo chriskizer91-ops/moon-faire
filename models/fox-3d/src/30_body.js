@@ -64,7 +64,7 @@
   // Read off A1 (arms hanging, 861 px a metre) and A5 (arms out): 7 cm at the elbow, 7.5 across the swell just below it, 4.8 two thirds of the way
   // down, then flattening into the wrist of her hand (4.4 by 2.8 cm). Above the sleeve's hem it is hidden, and sized to fit inside the band.
   const ARM_S = [[-0.022, [0.030, 0.030]], [0, [0.038, 0.040]], [0.04, [0.040, 0.042]], [0.11, [0.0345, 0.0360]], [0.17, [0.0332, 0.0352]], [0.205, [0.0325, 0.0340]], [0.232, [0.0322, 0.0322]], [0.245, [0.0335, 0.0316]],
-    [0.2785, [0.0372, 0.0360]], [0.309, [0.0349, 0.0347]], [0.334, [0.0310, 0.0318]], [0.358, [0.0270, 0.0284]], [0.383, [0.0230, 0.0254]], [0.408, [0.0194, 0.0233]], [0.436, [0.0163, 0.0219]], [0.460, [0.0146, 0.0216]], [0.478, [0.0140, 0.0218]]];
+    [0.2785, [0.0372, 0.0360]], [0.309, [0.0349, 0.0347]], [0.334, [0.0310, 0.0318]], [0.358, [0.0270, 0.0284]], [0.383, [0.0230, 0.0254]], [0.408, [0.0194, 0.0233]], [0.436, [0.0170, 0.0224]], [0.460, [0.0162, 0.0226]], [0.478, [0.0156, 0.0228]]];      // at the wrist it is a millimetre or two bigger than her hand's own wrist, which it sleeves
   // The sleeve, read off A1, A3 and the blouse sheet F5: [distance along the arm, radius, fine gathers, broad folds, how far into the ruffle].
   // A ball of linen from the shoulder seam (it stands 5 cm above the joint) to a shirred band 14 cm down, which it overhangs a little; then a 5 cm ruffle.
   const SLEEVE = [[-0.050, 0.006, 0, 0, 0], [-0.044, 0.016, 0.08, 0, 0], [-0.037, 0.024, 0.10, 0, 0], [-0.022, 0.040, 0.08, 0.010, 0], [-0.0085, 0.0517, 0.05, 0.020, 0], [0.012, 0.0610, 0.025, 0.030, 0],

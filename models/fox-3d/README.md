@@ -23,7 +23,7 @@ Method and rules: the project doc `claude/HOW-TO-3d-witch-models.md`. Pass notes
 | `bake_fox.py` | paints her corset from the paintings into `out/fox_tex.js` (and the older face from C3) |
 | `bake_face_r5.py` | her face, blink and mouths from the round 5 set (F1, F2) |
 | `bake_gear_fox.py` | cuts the belt, pouch (F7) and sheath (G3) paintings into one picture, `gear`, with a map of where each piece sits |
-| `tone_skin_fox.py` | shifts the skin on her painted body and hands to her face's tone |
+| `match_skin_fox.py` | one skin for all of her: brings her painted chest and hands to her face's tone, takes the painted shine off her chest, softens her hands, and paints her arms from the forearms in D1 and D2. Run it last. (It replaces `tone_skin_fox.py`.) |
 | `viewer/` | the page: `index.tpl.html` and `app.js` |
 | `references/round1` to `round5` | her reference paintings, as WebP (rounds 3 and 4: tools and spells, not used yet; round 5: her face set) |
 | `meas/prof.py`, `lib/grid.py` | measuring tools |
@@ -43,7 +43,7 @@ python3 -I bake_fox.py && cp out/fox_tex.js out/fox_tex_own.js     # corset
 python3 -I bake_face_r5.py           # her face from round 5
 python3 -I bake_hands_fox.py && python3 -I bake_boot_fox.py && python3 -I bake_patch_fox.py     # hands (D1), boot leather (E1), patchwork (F9, F10)
 python3 -I bake_gear_fox.py          # belt, pouch and sheath leather (F7, G3)
-python3 -I tone_skin_fox.py          # body skin to the face's tone
+python3 -I match_skin_fox.py         # one skin: chest, hands and arms to her face's tone and finish. Always last, and only once per fresh bake
 python3 make_jface.py                # copies her head and her bake into place
 ./build.sh                           # src/*.js  ->  out/fox.js
 ./build_site.sh                      # out/site/
@@ -57,6 +57,7 @@ Checks (Playwright with Chrome, software drawing):
 ./headset.sh f1                      # shots/f1_heads.png  four head views
 ./headcmp.sh f1                      # shots/f1_headcmp.png  her head beside A1's on one numbered grid
 ./check_moves.sh                     # every stance with every move, looking for broken numbers
+./handcmp.sh h1                      # shots/h1_handcmp.jpg  her hanging arm and hand beside A1 (front) and A2 (back) at A1's scale
 ./armcmp.sh a1                       # shots/a1_armcmp.jpg  her left arm and sleeve beside A1's at A1's own scale, one numbered grid
 ./poseset.sh p1                      # shots/p1_poses.jpg  eight poses in a strip, for a before-and-after look when the pose solver changes
 python3 -I meas/arm_width.py refs/A1.png 600 900 490 720     # the arm's edges row by row, in a painting or a render
@@ -113,6 +114,8 @@ Pupils in C3 are typed into `meas/fox_profile.py` from a gridded copy; automatic
 - Phones get the lighter build by default (`#lite`: detail 0.75, 283k triangles). The test machine is not a phone, so it shows the full build unless the address ends in `#lite`. Check both.
 - The limb solver's lengths are multiplied by `FOX_K` (`src/70_anim.js`). Without that every hand and foot target looked 4.5% too far, so her arms hung dead straight.
 - The stage camera sees 60 m and no further. `T.view` in `test.html` now moves the near and far planes with the distance. Before 13 Nov, views from 60 m away (most of the side-by-side pictures) cut off whatever lay behind her middle: back hair, elbows.
+- **One skin.** Every bare part of her (face, neck, chest, arms, hands) uses the same recipe: tint `#d8ccc6`, 44% of its own picture as glow, roughness 0.66, a fifth of the sky's light, the same soft rim. The tone is `skin` in the bake, read off the middle of her painted face, not her forehead. The painted skin on her body is picked out pixel by pixel by `bodySkin` and lit by that recipe inside the torso material.
+- Run the bakes from the top when a skin step changes. `match_skin_fox.py` flattens the chest's painted shine, so running it twice on the same bake flattens it twice.
 - A hard piece that has a painting of each face (pouch, sheath) is built as separate faces, each given the painting of that face looked at straight on. One shared skin would smear the paintings where the faces meet.
 - Brass studs and snaps are real domes placed exactly over the painted ones, so the paint and the metal agree.
 - The sheath is its own bone (`sheath`), turned each frame to follow her right thigh; the flounce under it is held nearly still (`underSheath` in `src/71_foxcloth.js`). Her shears are two halves on two bones (`shears`, `shearB`) inside it, ready to be drawn and opened in the tools round.
@@ -126,4 +129,5 @@ Pass 3 (12 Nov 2026): painted hands, bracelets on springs, boots, trousers (see 
 Pass 4 (12 Nov 2026): her own face from round 5, head sized to the standing painting, skin tone, belt, pouch, sheath, and the trouser flounces as real cloth (see `claude/fox-3d-pass4-face-round5.md`).
 Pass 5 (13 Nov 2026): sleeves and arms against A1, A2 and F5 (see `claude/fox-3d-pass5-sleeves-arms.md`).
 Pass 6 (13 Nov 2026): belt, pouch, sheath and shears rebuilt from F7, G1 and G3 (see `claude/fox-3d-pass6-belt-pouch-shears.md`).
-Still to do: her face; ruffles at the neckline and peplum are flat paint; tools and spells (rounds 3 and 4) are not started.
+Pass 7 (13 Nov 2026): one skin from face to hands, painted arms, softer hands, palms turned in at rest (see `claude/fox-3d-pass7-one-skin.md`).
+Still to do: her face from off-centre (the shape of her head in depth; waiting on Chris); ruffles at the neckline and peplum are flat paint; tools and spells (rounds 3 and 4) are not started.

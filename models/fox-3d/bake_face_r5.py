@@ -24,7 +24,9 @@ mx = ii / S * 0.2 + WIN[0]; my = WIN[3] - jj / S * 0.2; exx = PD / 2 / PPM
 hairish = (base[..., 0] < 105) | (base[..., 0] - base[..., 2] > 128)          # dark hair and backdrop, gold curls. Her skin here is warm and freckled (red minus blue up to about 115), so the test is set above that
 protect = (((mx / 0.052) ** 2 + ((my - 1.495) / 0.078) ** 2) < 1) | ((((np.abs(mx) - (exx - 0.004)) / 0.0225) ** 2 + ((my - (EYE_Y + 0.006)) / 0.021) ** 2) < 1) | ((np.abs(mx) < 0.038) & (my < EYE_Y - 0.012) & (my > EYE_Y - 0.090)) | ((np.abs(mx) < 0.020) & (my < EYE_Y + 0.02) & (my > EYE_Y - 0.03))
 hairish = ndi.binary_dilation(hairish & ~protect, iterations=6); valid = (oval & inside & ~hairish).astype(np.float32)
-fa, fb = n2c(CX - 60, 250), n2c(CX + 60, 330); skin = np.median(base[int(fa[1]):int(fb[1]), int(fa[0]):int(fb[0])].reshape(-1, 3), 0)
+# Her skin tone, for everything that is not painted: the middle tone of the painted skin of her face (lips, eyes and brows left out). It used to be
+# read off her forehead, the lightest part of her, which left her arms, neck and the edges of her own face paler and less ruddy than her face (Chris, 13 Nov).
+_sk = (valid > 0.5) & (base[..., 0] > 150) & (base[..., 0] - base[..., 2] > 60) & (base[..., 1] > 95); skin = np.median(base[_sk], 0)
 f1_, w1 = fill(base, valid, 16); f2_, w2 = fill(base, valid, 60); t1 = np.clip(w1 * 3, 0, 1)[..., None]; t2 = np.clip(w2 * 4, 0, 1)[..., None]; ext = f1_ * t1 + (f2_ * t2 + skin * (1 - t2)) * (1 - t1)
 keep = ndi.gaussian_filter(ndi.binary_erosion(valid > 0.5, iterations=8).astype(np.float32), 7)[..., None]; face = base * keep + ext * (1 - keep)
 T = {}; T['face'] = uri(img(face)); T['skin'] = '#%02x%02x%02x' % tuple(int(v) for v in skin)

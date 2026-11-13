@@ -3,7 +3,7 @@
   // ---------- applying a pose: spine by angles, arms and legs onto their targets, then springs and cloth ----------
   const SPF = [0.25, 0.35, 0.40], MOUTHS = ['rest', 'open', 'smile'];
   const _T = V3(), _A = V3(), _P = V3(), _pq = Qt(), _mq = Qt(), _rq = Qt(), _fq = Qt();
-  const HANG_IN = opts.hangIn === undefined ? 1.0 : opts.hangIn, HANG_TW = opts.hangTw === undefined ? -1.35 : opts.hangTw;
+  const HANG_IN = opts.hangIn === undefined ? 1.0 : opts.hangIn, HANG_TW = opts.hangTw === undefined ? -0.85 : opts.hangTw, REST_WR = opts.restWr || [0.16, 0.0];
   function applyPose(P) {
     const hips = SK.hips, hh = hips.userData.home;
     hips.position.set(hh.x + P.hip[0], hh.y + P.hip[1], hh.z + P.hip[2]); hips.rotation.set(P.hipR[1], P.hipR[0], P.hipR[2], 'YXZ');
@@ -57,7 +57,7 @@
       const h = B['h' + S], r = R['h' + S];
       h[0] = r[0] + s * 0.004 * br + 0.004 * sw; h[1] = r[1] + 0.006 * br2 - 0.002; h[2] = r[2] + 0.008 * sw2 * s + 0.004 * br;
       B['e' + S][0] = R['e' + S][0]; B['e' + S][1] = R['e' + S][1]; B['e' + S][2] = R['e' + S][2];
-      B['tw' + S] = 0.05 * sw * s; B['wr' + S][0] = 0.1 + 0.03 * br2; B['wr' + S][1] = 0;
+      B['tw' + S] = 0.05 * sw * s; B['wr' + S][0] = REST_WR[0] + 0.03 * br2; B['wr' + S][1] = REST_WR[1];
       for (let i = 0; i < 6; i++) B['f' + S][i] = R['f' + S][i] + 0.03 * Math.sin(t * 0.9 + i + s);
       for (let i = 0; i < 7; i++) B['ft' + S][i] = R['ft' + S][i];
       for (let i = 0; i < 3; i++) B['kn' + S][i] = R['kn' + S][i];

@@ -600,7 +600,7 @@ function makeFox(opts) {
   // Read off A1 (arms hanging, 861 px a metre) and A5 (arms out): 7 cm at the elbow, 7.5 across the swell just below it, 4.8 two thirds of the way
   // down, then flattening into the wrist of her hand (4.4 by 2.8 cm). Above the sleeve's hem it is hidden, and sized to fit inside the band.
   const ARM_S = [[-0.022, [0.030, 0.030]], [0, [0.038, 0.040]], [0.04, [0.040, 0.042]], [0.11, [0.0345, 0.0360]], [0.17, [0.0332, 0.0352]], [0.205, [0.0325, 0.0340]], [0.232, [0.0322, 0.0322]], [0.245, [0.0335, 0.0316]],
-    [0.2785, [0.0372, 0.0360]], [0.309, [0.0349, 0.0347]], [0.334, [0.0310, 0.0318]], [0.358, [0.0270, 0.0284]], [0.383, [0.0230, 0.0254]], [0.408, [0.0194, 0.0233]], [0.436, [0.0163, 0.0219]], [0.460, [0.0146, 0.0216]], [0.478, [0.0140, 0.0218]]];
+    [0.2785, [0.0372, 0.0360]], [0.309, [0.0349, 0.0347]], [0.334, [0.0310, 0.0318]], [0.358, [0.0270, 0.0284]], [0.383, [0.0230, 0.0254]], [0.408, [0.0194, 0.0233]], [0.436, [0.0170, 0.0224]], [0.460, [0.0162, 0.0226]], [0.478, [0.0156, 0.0228]]];      // at the wrist it is a millimetre or two bigger than her hand's own wrist, which it sleeves
   // The sleeve, read off A1, A3 and the blouse sheet F5: [distance along the arm, radius, fine gathers, broad folds, how far into the ruffle].
   // A ball of linen from the shoulder seam (it stands 5 cm above the joint) to a shirred band 14 cm down, which it overhangs a little; then a 5 cm ruffle.
   const SLEEVE = [[-0.050, 0.006, 0, 0, 0], [-0.044, 0.016, 0.08, 0, 0], [-0.037, 0.024, 0.10, 0, 0], [-0.022, 0.040, 0.08, 0.010, 0], [-0.0085, 0.0517, 0.05, 0.020, 0], [0.012, 0.0610, 0.025, 0.030, 0],
@@ -2309,8 +2309,8 @@ function makeFox(opts) {
     bells: std({ color: lin(0xe0ad48), roughness: 0.22, metalness: 1, envMapIntensity: 1.8 }),
     bellslit: std({ color: lin(0x1a1206), roughness: 0.9 }),
     cord: std({ color: lin(0x3a3038), roughness: 0.85 }),
-    skin: sheen(std({ color: SKIN ? lin('#d8ccc6').multiply(lin(SKIN)) : lin('#dcb49c'), roughness: 0.64, envMapIntensity: 0.2, emissive: lin(SKIN || PAL.skin), emissiveIntensity: SKIN ? 0.44 : 0.42 }), '#ffb49a', 3.2, 0.1),
-    hand: (() => { const t = bakedTex('hands', 1024, 1024, SKIN || '#d99f91'); return sheen(std({ map: t, color: lin('#d8ccc6'), roughness: 0.62, envMapIntensity: 0.2, emissive: lin('#ffffff'), emissiveMap: t, emissiveIntensity: 0.44 }), '#ffb49a', 3.2, 0.08); })(),
+    skin: sheen(std({ color: SKIN ? lin('#d8ccc6').multiply(lin(SKIN)) : lin('#dcb49c'), roughness: 0.66, envMapIntensity: 0.2, emissive: lin(SKIN || PAL.skin), emissiveIntensity: SKIN ? 0.44 : 0.42 }), '#ffb49a', 3.2, 0.08),
+    hand: (() => { const t = bakedTex('hands', 1024, 1024, SKIN || '#d99f91'); return sheen(std({ map: t, color: lin('#d8ccc6'), roughness: 0.66, envMapIntensity: 0.2, emissive: lin('#ffffff'), emissiveMap: t, emissiveIntensity: 0.44 }), '#ffb49a', 3.2, 0.08); })(),
     nail: phys({ color: lin(0xd8a39a), roughness: 0.3, clearcoat: 0.6, clearcoatRoughness: 0.2 }),
     face: (() => {
       const m = sheen(std({ map: faceT, color: lin('#d8ccc6'), roughness: 0.66, envMapIntensity: 0.2, emissive: lin('#ffffff'), emissiveMap: faceT, emissiveIntensity: 0.44 }), '#ffb49a', 3.2, 0.08);
@@ -2335,6 +2335,20 @@ function makeFox(opts) {
     ruffle: sheen(std({ map: tLace.map, color: lin(BAKED && BAKED.ruffle ? '#b4a8b0' : '#9a8a92'), side: THREE.DoubleSide, roughness: 0.95, emissive: lin('#ffffff'), emissiveMap: tLace.map, emissiveIntensity: BAKED && BAKED.ruffle ? 0.14 : 0 }), WARM, 2.4, 0.14),
     pearl: phys({ color: lin(0x8f8a98), roughness: 0.22, clearcoat: 1, clearcoatRoughness: 0.15, envMapIntensity: 1.2 })
   };
+  // The skin painted on her body (chest and back) is lit exactly as her face, neck, arms and hands are: the same tint, the same glow of its own, the same
+  // dull finish, the same small share of the sky's light. The corset round it keeps its own cloth finish. 'bodySkin' says which is which, pixel by pixel.
+  // Before this her chest was cloth-lit: brighter, shinier and paler than her face, and it made her face look wrong (Chris, 13 Nov).
+  if (BAKED && BAKED.bodySkin) {
+    const m = MATS.torso, mk = bakedTex('bodySkin', 512, 384, '#000000'), first = m.onBeforeCompile;
+    m.onBeforeCompile = (sh) => {
+      if (first) first(sh); sh.uniforms.uSkinM = { value: mk }; sh.uniforms.uSkinTint = { value: lin('#d8ccc6') };
+      sh.fragmentShader = sh.fragmentShader.replace('#include <common>', '#include <common>\nuniform sampler2D uSkinM; uniform vec3 uSkinTint; float gSk; vec3 gSkEm;')
+        .replace('#include <map_fragment>', 'vec4 texelColor = mapTexelToLinear( texture2D( map, vUv ) );\n gSk = texture2D( uSkinM, vUv ).r;\n gSkEm = texelColor.rgb * gSk * 0.44;\n diffuseColor *= texelColor;\n diffuseColor.rgb *= mix( vec3( 1.0 ), uSkinTint, gSk );')
+        .replace('#include <roughnessmap_fragment>', '#include <roughnessmap_fragment>\n roughnessFactor = mix( roughnessFactor, 0.66, gSk );')
+        .replace('#include <emissivemap_fragment>', '#include <emissivemap_fragment>\n totalEmissiveRadiance += gSkEm;')
+        .replace('#include <lights_fragment_maps>', '#include <lights_fragment_maps>\n iblIrradiance *= mix( 1.0, 0.2, gSk ); radiance *= mix( 1.0, 0.2, gSk );');
+    };
+  }
   // ---------- the Fox's own materials ----------
   const curlTex = (() => {                           // a lock of her hair from root (bottom) to tip (top): dark brown running out to honey gold
     const c = cvs(32, 256), g = c.getContext('2d'), gr = g.createLinearGradient(0, 256, 0, 0);
@@ -2367,22 +2381,9 @@ function makeFox(opts) {
     beltm: (() => { const t = bakedTex('beltTex', 128, 128, '#4a2c1c'); t.wrapS = t.wrapT = THREE.RepeatWrapping; return sheen(std({ map: t, color: lin('#d6ccc4'), roughness: 0.62 }), '#ffc890', 3, 0.10); })(),
     gearIn: std({ color: lin('#1a100b'), roughness: 0.9, side: THREE.DoubleSide }),
     brass: std({ color: lin('#b8893a'), roughness: 0.36, metalness: 0.88 }),
-    arm: (() => {                                    // the skin of her arms: her face's tone, a little paler down the inside, flushed at the elbow, freckled as in A1 and A5.
-      // Across the picture: outside of the arm, front, inside, back. Down it: shoulder to wrist.
-      const W = 512, H = 1024, c = cvs(W, H), g = c.getContext('2d'), base = SKIN || '#d89780'; g.fillStyle = base; g.fillRect(0, 0, W, H); let sd = 4177;
-      const rn = () => { sd = (sd * 16807) % 2147483647; return sd / 2147483647; }, yOf = (sl) => H * (sl + 0.022) / 0.500;
-      const soft = (x, y, rx, ry, col, al) => { for (const dx of [-W, 0, W]) { g.save(); g.translate(x + dx, y); g.scale(rx, ry); const gr = g.createRadialGradient(0, 0, 0, 0, 0, 1); gr.addColorStop(0, col.replace('A', String(al))); gr.addColorStop(1, col.replace('A', '0')); g.fillStyle = gr; g.beginPath(); g.arc(0, 0, 1, 0, 6.2832); g.fill(); g.restore(); } };
-      for (let i = 0; i < 46; i++) soft(rn() * W, rn() * H, 30 + rn() * 60, 40 + rn() * 90, rn() < 0.5 ? 'rgba(236,150,128,A)' : 'rgba(246,208,186,A)', 0.05 + rn() * 0.05);      // skin is never one flat tone
-      soft(W * 0.40, yOf(0.36), W * 0.20, H * 0.24, 'rgba(250,222,204,A)', 0.20);                 // the paler inside of the forearm
-      soft(W * 0.75, yOf(0.244), W * 0.13, H * 0.036, 'rgba(206,104,92,A)', 0.30);                // the elbow
-      soft(W * 0.25, yOf(0.249), W * 0.12, H * 0.006, 'rgba(160,84,66,A)', 0.30);                 // the crease inside it
-      soft(W * 0.80, yOf(0.455), W * 0.08, H * 0.016, 'rgba(214,120,104,A)', 0.18);               // the wrist bone
-      for (let i = 0; i < 300; i++) {                                                             // freckles: most on the outside and back of the forearm
-        const u = (0.88 + (rn() + rn() + rn() - 1.5) * 0.42 + 1) % 1, sl = 0.18 + 0.27 * Math.pow(rn(), 0.8), r = 1.1 + rn() * rn() * 3.0;
-        soft(u * W, yOf(sl), r, r * 1.15, 'rgba(150,80,52,A)', 0.34 + rn() * 0.42);
-      }
-      const t = ctex(c); t.wrapS = THREE.RepeatWrapping;
-      return sheen(std({ map: t, color: lin('#d8ccc6'), roughness: 0.64, envMapIntensity: 0.2, emissive: lin('#ffffff'), emissiveMap: t, emissiveIntensity: 0.44 }), '#ffb49a', 3.2, 0.1);
+    arm: (() => {                                    // the skin of her arms, painted from the forearms in the hand paintings (match_skin_fox.py). Across: outside, front, inside, back. Down: shoulder to wrist.
+      const t = bakedTex('arm', 512, 1024, SKIN || '#d89780'); t.wrapS = THREE.RepeatWrapping;
+      return sheen(std({ map: t, color: lin('#d8ccc6'), roughness: 0.66, envMapIntensity: 0.2, emissive: lin('#ffffff'), emissiveMap: t, emissiveIntensity: 0.44 }), '#ffb49a', 3.2, 0.08);
     })(),
     emerald: (() => {                                // the blouse's dark green linen (A1, F5): a plain weave with slubs, uneven threads and a soft mottle
       const S = 256, c = cvs(S, S), g = c.getContext('2d'); g.fillStyle = '#283b39'; g.fillRect(0, 0, S, S); let sd = 9241;
@@ -2400,7 +2401,7 @@ function makeFox(opts) {
       const ratio = (hex, k) => { const a = new THREE.Color(hex), b = new THREE.Color(CH); return 'rgb(' + [a.r / b.r, a.g / b.g, a.b / b.b].map((v) => Math.round(255 * Math.min(1, v * k))).join(',') + ')'; };
       const gr = g.createLinearGradient(0, 128, 0, 0); gr.addColorStop(0, '#ffffff'); gr.addColorStop(0.24, '#ffffff'); gr.addColorStop(0.34, ratio(F, 1.0)); gr.addColorStop(0.50, ratio(F, 0.93)); gr.addColorStop(0.62, ratio(J, 0.92)); gr.addColorStop(1, ratio(J, 0.85));
       g.fillStyle = gr; g.fillRect(0, 0, 8, 128); const t = ctex(c);
-      return sheen(std({ color: lin('#d8ccc6').multiply(lin(CH)), map: t, emissive: lin(CH), emissiveMap: t, emissiveIntensity: 0.44, roughness: 0.64, envMapIntensity: 0.2 }), '#ffb49a', 3.2, 0.1);
+      return sheen(std({ color: lin('#d8ccc6').multiply(lin(CH)), map: t, emissive: lin(CH), emissiveMap: t, emissiveIntensity: 0.44, roughness: 0.66, envMapIntensity: 0.2 }), '#ffb49a', 3.2, 0.08);
     })(),
     choker: sheen(std({ color: lin('#b9506f'), roughness: 0.62 }), '#ffc0d0', 3, 0.15),
     bellm: std({ color: lin('#c9973a'), roughness: 0.28, metalness: 0.9 }),
@@ -2476,7 +2477,7 @@ function makeFox(opts) {
     return mid;
   }
   // finger poses: [thumb, index, middle, ring, little, spread]; 0 is straight, 1 is curled shut
-  const FP = { relax: [0.32, 0.30, 0.36, 0.42, 0.48, 0.12], open: [0.04, 0.03, 0.02, 0.05, 0.09, 0.95], soft: [0.14, 0.12, 0.17, 0.22, 0.28, 0.55], point: [0.62, 0.0, 0.86, 0.92, 0.94, 0.08],
+  const FP = { relax: opts.fpRelax || [0.34, 0.33, 0.39, 0.45, 0.51, 0.04], open: [0.04, 0.03, 0.02, 0.05, 0.09, 0.95], soft: [0.14, 0.12, 0.17, 0.22, 0.28, 0.55], point: [0.62, 0.0, 0.86, 0.92, 0.94, 0.08],
     fist: [0.72, 0.95, 0.96, 0.96, 0.95, 0], cup: [0.18, 0.30, 0.36, 0.42, 0.48, 0.55], grip: [0.6, 0.8, 0.86, 0.88, 0.88, 0], weave: [0.36, 0.10, 0.46, 0.56, 0.62, 0.7] };
   const handAxes = {};
   for (const [S, s] of SIDES) {
@@ -2631,7 +2632,7 @@ function makeFox(opts) {
   // ---------- applying a pose: spine by angles, arms and legs onto their targets, then springs and cloth ----------
   const SPF = [0.25, 0.35, 0.40], MOUTHS = ['rest', 'open', 'smile'];
   const _T = V3(), _A = V3(), _P = V3(), _pq = Qt(), _mq = Qt(), _rq = Qt(), _fq = Qt();
-  const HANG_IN = opts.hangIn === undefined ? 1.0 : opts.hangIn, HANG_TW = opts.hangTw === undefined ? -1.35 : opts.hangTw;
+  const HANG_IN = opts.hangIn === undefined ? 1.0 : opts.hangIn, HANG_TW = opts.hangTw === undefined ? -0.85 : opts.hangTw, REST_WR = opts.restWr || [0.16, 0.0];
   function applyPose(P) {
     const hips = SK.hips, hh = hips.userData.home;
     hips.position.set(hh.x + P.hip[0], hh.y + P.hip[1], hh.z + P.hip[2]); hips.rotation.set(P.hipR[1], P.hipR[0], P.hipR[2], 'YXZ');
@@ -2685,7 +2686,7 @@ function makeFox(opts) {
       const h = B['h' + S], r = R['h' + S];
       h[0] = r[0] + s * 0.004 * br + 0.004 * sw; h[1] = r[1] + 0.006 * br2 - 0.002; h[2] = r[2] + 0.008 * sw2 * s + 0.004 * br;
       B['e' + S][0] = R['e' + S][0]; B['e' + S][1] = R['e' + S][1]; B['e' + S][2] = R['e' + S][2];
-      B['tw' + S] = 0.05 * sw * s; B['wr' + S][0] = 0.1 + 0.03 * br2; B['wr' + S][1] = 0;
+      B['tw' + S] = 0.05 * sw * s; B['wr' + S][0] = REST_WR[0] + 0.03 * br2; B['wr' + S][1] = REST_WR[1];
       for (let i = 0; i < 6; i++) B['f' + S][i] = R['f' + S][i] + 0.03 * Math.sin(t * 0.9 + i + s);
       for (let i = 0; i < 7; i++) B['ft' + S][i] = R['ft' + S][i];
       for (let i = 0; i < 3; i++) B['kn' + S][i] = R['kn' + S][i];
