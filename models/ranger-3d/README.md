@@ -69,7 +69,17 @@ four strap hooks as real objects, standing still. About 355,000 triangles.
     swinging. `pose()` lets them come to rest at once. The page has "Give them a swing" and a "Legs apart" pose.
   - Strap hooks take the skin's own weights (the six nearest skin points, `wNear`), so the outer curls ride her shoulder when her
     arm lifts. The strap is redrawn over the top of each shoulder in the body picture (`strap_over` in `bake_ranger.py`).
-- Waiting for his notes: stage two (head), stage three (hands and arms), stage 4b (hair) and stage five.
+- **Stage 5c, an experiment with her face.** Chris: "Could we also experiment with giving her the Fox's face or making a younger
+  version of her face." Nothing is decided. `bake_looks_r.py` adds two more face pictures (with their blink and mouth patches) and
+  the page's "Try a face" row swaps them on her head with `setLook('own' | 'young' | 'fox')` (`LOOKS` in `src/R40_head.js`).
+  - `young`: her own J1 face with the lines of age lifted (forehead lines, crow's feet, shade under the eyes, folds by the mouth),
+    eyes, brows, lashes, lips and mole kept. Hair unchanged.
+  - `fox`: the Fox's painted face as baked for the Fox's model (`refs_fox/fox_face.json`, copied from branch `claude/fox-3d-model`,
+    commit f7cac64, `models/fox-3d/out/fox_tex_own.js`). Both heads are the Jester's face model with the same picture window, so it
+    lays straight on; her eye band is slid 2.8 mm outward to the Ranger's eye sockets and her skin toned to the Ranger's cheek.
+  - Only the front picture changes: the side pictures of cheeks and ears stay her own.
+- Waiting for his notes: which face (hers, younger, the Fox's), stage two (head), stage three (hands and arms), stage 4b (hair)
+  and stage five.
 
 Rough or not built yet: her face does not move (no blink, no expressions); the hair has a smooth edge with none of the painted
 flyaway wisps, and the loose locks are simple; earrings and necklaces; fingers that bend; bracelets; each charm is one stiff piece on a hinge (its chain does not bend, charms can
@@ -290,8 +300,9 @@ python3 -I bake_ranger.py             # out/ranger_tex.js: body (needs Pillow, n
 python3 -I bake_head.py               # adds the head, hair and band pictures to it (also needs opencv)
 python3 -I bake_hands_r.py            # adds her hands and arms from D1 and D2
 python3 -I bake_gear_r.py             # adds the leather of her bags and belts from F6
+python3 -I bake_looks_r.py            # adds the two trial faces (younger, the Fox's)
 ./build_r.sh                          # tools/tables.py, then out/ranger.js
-python3 -I build_single_r.py          # deliver/Ranger_3D_stage5b.html, one offline file
+python3 -I build_single_r.py          # deliver/Ranger_3D_stage5c.html, one offline file
 python3 tools/shoot_hand.py shots/hand_L.jpg L hand   # one hand from four sides beside D1 or D2; also R, and arm
 python3 tools/wrist_sections.py                       # forearm and hand, slice by slice through the wrist
 python3 tools/page_test.py                            # the page at phone size: belt, bag, hook, boot, hand and body buttons, a drag
@@ -303,7 +314,7 @@ python3 shoot.py shots/x 'T.j.pose({arm:24,leg:3})' face:0,0,1.25,1.53,22,520,60
 python3 shoot_page_r.py               # the real page at phone and laptop size (slow: run it in the background)
 ```
 
-Always run `bake_ranger.py`, then `bake_head.py`, then `bake_hands_r.py`, then `bake_gear_r.py`: each adds to the file the first writes. Baking from the WebP copies
+Always run `bake_ranger.py`, then `bake_head.py`, then `bake_hands_r.py`, then `bake_gear_r.py`, then `bake_looks_r.py`: each adds to the file the first writes. Baking from the WebP copies
 gives pictures a hair different from the ones kept in `out/` (those came from the original PNGs). The paintings are data: run
 Python that reads them with `-I`.
 

@@ -96,15 +96,21 @@
   // mouths, her smile (J2). The states and their names are stored as the Jester's are, so her blink and talk code will work here unchanged.
   const faceC = cvs(1024, 1024), faceT = ctex(faceC), bakedFace = { base: null, parts: {} }, faceNow = { eyes: 0, mouth: 'rest' };
   { const g0 = faceC.getContext('2d'); g0.fillStyle = (BAKED && BAKED.skinChest) || '#dc9e81'; g0.fillRect(0, 0, 1024, 1024); }
+  // Faces she can try on (bake_looks_r.py): 'own' is hers; 'young' is hers with the lines of age taken out; 'fox' is the Fox's painted face.
+  const LOOKS = { own: bakedFace }; bakedFace.rects = (BAKED && BAKED.faceParts) || {}; let lookNow = 'own';
+  function setLook(name) { lookNow = LOOKS[name] ? name : 'own'; paintFace(faceNow.eyes, faceNow.mouth); return lookNow; }
   function paintFace(eyes, mouth) {                 // eyes: 0 open .. 1 shut; mouth: 'rest', 'open', 'oo' or 'smile'
-    faceNow.eyes = eyes; faceNow.mouth = mouth; if (!bakedFace.base) return;
-    const W = faceC.width, H = faceC.height, g = faceC.getContext('2d'), put = (n) => { const im = bakedFace.parts[n], r = BAKED.faceParts[n]; if (im) g.drawImage(im, r.x * W, r.y * H, r.w * W, r.h * H); };
-    g.drawImage(bakedFace.base, 0, 0, W, H);
+    faceNow.eyes = eyes; faceNow.mouth = mouth; const L = LOOKS[lookNow] && LOOKS[lookNow].base ? LOOKS[lookNow] : LOOKS.own; if (!L.base) return;
+    const W = faceC.width, H = faceC.height, g = faceC.getContext('2d'), put = (n) => { const im = L.parts[n], r = L.rects[n]; if (im && r) g.drawImage(im, r.x * W, r.y * H, r.w * W, r.h * H); };
+    g.drawImage(L.base, 0, 0, W, H);
     if (eyes >= 0.75) put('shut'); else if (eyes >= 0.25) put('half');
     if (mouth === 'open') put('oh'); else if (mouth === 'oo') put('oo'); else if (mouth === 'smile') put('smile');
     faceT.needsUpdate = true;
   }
   onBaked('face', (im) => { bakedFace.base = im; paintFace(faceNow.eyes, faceNow.mouth); });
+  for (const [nm, fk, pk] of [['young', 'faceYoung', 'facePartsYoung'], ['fox', 'faceFox', 'facePartsFox']]) if (BAKED && BAKED[fk]) { const L = LOOKS[nm] = { base: null, parts: {}, rects: BAKED[pk] || {} };
+    onBaked(fk, (im) => { L.base = im; if (lookNow === nm) paintFace(faceNow.eyes, faceNow.mouth); });
+    for (const n in L.rects) onBaked(pk + '_' + n, (im) => { L.parts[n] = im; if (lookNow === nm) paintFace(faceNow.eyes, faceNow.mouth); }, L.rects[n].src); }
   if (BAKED && BAKED.faceParts) for (const n in BAKED.faceParts) onBaked('facePart_' + n, (im) => { bakedFace.parts[n] = im; paintFace(faceNow.eyes, faceNow.mouth); }, BAKED.faceParts[n].src);
   // ---------- ears: a dished shell standing off the side of the head, wearing the profile painting ----------
   (function buildEars() {
