@@ -1,0 +1,176 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Moon Faire: people from a template</title>
+<style>
+  :root { --bg: #1d1826; --panel: #2a2336; --line: #43395a; --ink: #efe8f6; --soft: #b9aecb; --gold: #e7b867; --good: #9fd6a8; }
+  * { box-sizing: border-box; } [hidden] { display: none !important; }
+  html, body { margin: 0; background: var(--bg); color: var(--ink); font: 16px/1.5 Georgia, 'Times New Roman', serif; }
+  main { max-width: 980px; margin: 0 auto; padding: 18px 14px 60px; }
+  h1 { font-size: 1.7rem; margin: 6px 0 4px; color: var(--gold); font-weight: normal; } h2 { font-size: 1.2rem; margin: 30px 0 8px; color: var(--gold); font-weight: normal; }
+  p { margin: 8px 0; } .soft { color: var(--soft); } .small { font-size: 0.9rem; }
+  #stagebox { position: relative; background: #383043; border: 1px solid var(--line); border-radius: 10px; overflow: hidden; height: min(68vh, 620px); }
+  #stage { display: block; width: 100%; height: 100%; touch-action: pan-y; }
+  #who { position: absolute; left: 10px; top: 8px; right: 10px; font-size: 0.95rem; text-shadow: 0 1px 3px #000; pointer-events: none; }
+  .bar { display: flex; flex-wrap: wrap; gap: 8px; margin: 10px 0; align-items: center; }
+  select, button, input, textarea { font: inherit; color: var(--ink); background: var(--panel); border: 1px solid var(--line); border-radius: 8px; padding: 9px 12px; }
+  button { cursor: pointer; } button.on { border-color: var(--gold); color: var(--gold); } button:disabled { opacity: 0.5; cursor: default; }
+  select { max-width: 100%; } textarea { width: 100%; min-height: 76px; } input[type=password] { flex: 1 1 220px; min-width: 0; }
+  table { border-collapse: collapse; width: 100%; margin: 8px 0; } th, td { text-align: left; padding: 7px 8px; border-bottom: 1px solid var(--line); vertical-align: top; } th { color: var(--soft); font-weight: normal; font-size: 0.9rem; }
+  td.n { white-space: nowrap; }
+  .card { background: var(--panel); border: 1px solid var(--line); border-radius: 10px; padding: 12px 14px; margin: 10px 0; }
+  .shots img { width: 100%; display: block; border-radius: 6px; margin: 4px 0 2px; background: #383043; }
+  .shots figure { margin: 10px 0 16px; } .shots figcaption { color: var(--soft); font-size: 0.9rem; }
+  #log { white-space: pre-wrap; font: 0.85rem/1.45 ui-monospace, Menlo, Consolas, monospace; color: var(--soft); max-height: 240px; overflow: auto; margin-top: 8px; }
+  #sheet { width: 100%; border-radius: 6px; margin-top: 8px; }
+  ul { margin: 6px 0; padding-left: 20px; } li { margin: 4px 0; }
+</style></head>
+<body><main>
+<h1>People from a template</h1>
+<p class="soft">A test for Moon Faire, November 13. The Jester's finished model is the template. A Claude model reads one line about a person and writes a small file: colours, skin, a repainted face, hair, a hat, simple clothes. The Jester's skeleton and all her moves are reused, so every person can already stand, turn and walk.</p>
+
+<div id="stagebox"><canvas id="stage"></canvas><div id="who"></div></div>
+<div class="bar">
+  <select id="pick" aria-label="Person"></select>
+  <button id="bTurn" class="on">Turning</button><button id="bWalk">Walking</button>
+</div>
+<p class="soft small" id="facts"></p>
+
+<h2>What it cost</h2>
+<p>Twelve people were made through your key: the same four one-line descriptions, given to three Claude models. Each model wrote the file, was shown one picture of what it had built, and could fix it twice. The whole test cost <b>/*TOTAL*/</b>.</p>
+<table><thead><tr><th>Model</th><th>Each person</th><th>First try alone</th><th>Time</th></tr></thead><tbody id="costs"></tbody></table>
+<ul id="notes"></ul>
+<p class="soft small">Prices are the list prices on Anthropic's pricing page on November 13, 2026, applied to the token counts each reply reported. "First try alone" is what a person costs if the model is never shown a picture.</p>
+<div class="card">
+  <b>What this says</b>
+  <ul>
+    <li>With the template already built, a new background person costs between half a cent and about 18 cents, and takes under a minute.</li>
+    <li>The cheapest model makes a person you can recognise from the description. The two dearer ones make cleaner clothes and fix more of their own mistakes after seeing the picture.</li>
+    <li>Each person is about 12 thousand triangles and 15 draws. The Jester took 106 thousand when she walked the fair square on your laptop, so a person is about a ninth of her. No Claude session can measure speed on your laptop, so how many people a scene can hold still needs a test there.</li>
+    <li>What the template cannot do yet: every person has the Jester's body and the shape of her face, so men and stout people only look right from a distance and under a coat or apron. That is a limit of the template, not of the model writing the file, and a second template body would lift it.</li>
+  </ul>
+</div>
+
+<h2>Make one yourself</h2>
+<p class="soft">This part works when the page is opened as a file on your computer (the copy sent in the chat). It talks to Anthropic directly from your browser with your key, so it uses API credit and no Claude subscription. The key stays in this page's memory and is gone when you close it.</p>
+<div class="card">
+  <textarea id="desc" placeholder="One line about the person. For example: A stern ferryman in a long oilskin coat and a flat cap, grey stubble, a coil of rope over one shoulder."></textarea>
+  <div class="bar">
+    <select id="model"><option value="claude-haiku-5-5">Haiku 5.5 (about half a cent)</option><option value="claude-sonnet-5-5" selected>Sonnet 5.5 (about 11 cents)</option><option value="claude-opus-5-5">Opus 5.5 (about 18 cents)</option></select>
+    <select id="rounds"><option value="1">One try, no fixing</option><option value="2">Fix once</option><option value="3" selected>Fix twice</option></select>
+    <input id="key" type="password" placeholder="Your Anthropic API key" autocomplete="off">
+    <button id="go">Make this person</button>
+  </div>
+  <div class="bar"><button id="save" hidden>Save this person's file</button></div>
+  <div id="log"></div><img id="sheet" hidden alt="The picture the model was shown">
+</div>
+
+<h2>The twelve test people</h2>
+<p class="soft">The four descriptions are stand-ins written for this test, not Moon Faire lore. Each picture shows front, three-quarter, side, back, walking, and the face twice.</p>
+<div class="shots" id="shots"></div>
+</main>
+/*SCRIPTS*/
+<script>
+(function () {
+  'use strict';
+  const $ = (id) => document.getElementById(id), D = window.MF_PEOPLE_DATA, canvas = $('stage');
+  const PRICES = { 'claude-haiku-5-5': [0.10, 0.50, 0.125, 0.01], 'claude-sonnet-5-5': [2, 10, 2.5, 0.10], 'claude-opus-5-5': [4, 20, 5, 0.20] };
+  const NAMES = { 'claude-haiku-5-5': 'Haiku 5.5', 'claude-sonnet-5-5': 'Sonnet 5.5', 'claude-opus-5-5': 'Opus 5.5', hand: 'made by hand' };
+  const BANNED = ['fetch(', 'XMLHttpRequest', 'document.', 'window.', 'eval(', 'Function(', 'import(', 'import ', 'localStorage', 'location', 'navigator', 'WebSocket', 'require(', 'globalThis', 'setTimeout', 'setInterval', 'while (true', 'while(true'];
+  const money = (v) => v >= 1 ? '$' + v.toFixed(2) : (v * 100).toFixed(v < 0.01 ? 2 : v < 0.1 ? 1 : 0) + ' cents';
+  let stage, J = null, t = 0, last = performance.now(), turn = true, walk = false, spin = 0.5, busy = false, made = null;
+  try { stage = makeMFStage(canvas, { preserve: true, shadow: 1024, maxPixelRatio: 2 }); stage.painting = false; } catch (e) { $('who').textContent = 'This page needs WebGL to draw.'; return; }
+
+  function camera(w, h, deg, y, dist) {
+    stage.setScene({ kind: 'fight', frame: [w, h], camera: { fov: 11, h: 1, z: 10, pitch: 0 } });
+    const a = deg * Math.PI / 180; stage.camera.position.set(Math.sin(a) * dist, y, Math.cos(a) * dist); stage.camera.lookAt(0, y, 0); stage.camera.updateMatrixWorld();
+  }
+  function drop() { if (!J) return; stage.cast.remove(J.root, J.fx); J.root.traverse((m) => { if (m.geometry) m.geometry.dispose(); }); for (const x of (J.debug.textures || [])) x.dispose(); J = null; }
+  async function show(code) {
+    const person = new Function(code + '\n;return PERSON;')();
+    const prepared = await MF_PERSON.prepare(person); drop();
+    J = MF_PERSON.make(person, prepared); J.fx.remove(J.spellLight); stage.cast.add(J.root, J.fx); J.camera = stage.camera; stage.follow(0, 0);
+    await new Promise((r) => setTimeout(r, 500));                       // her paintings load a moment after she is built
+    for (let i = 0; i < 40; i++) { t += 1 / 30; J.animate(0, 0, t, 1 / 30, 0); }
+    let tris = 0; const own = {}; J.root.traverse((m) => { if (m.isSkinnedMesh && m.visible && m.geometry.index) tris += m.geometry.index.count / 3; });
+    for (const k in J.debug.meshes) if (k.slice(0, 2) === 'p_') own[k.slice(2)] = J.debug.meshes[k].geometry.index.count / 3;
+    return { errors: J.personErrors, triangles: Math.round(tris), own };
+  }
+  function frame(now) {
+    requestAnimationFrame(frame); const dt = Math.min(0.05, (now - last) / 1000); last = now; if (!J || busy) return;
+    t += dt; if (turn) spin += dt * 0.6; J.animate(walk ? t * 1.9 : 0, walk ? 1 : 0, t, dt, 0);
+    stage.resize(); const w = canvas.clientWidth, h = canvas.clientHeight, k = (J.person.height || 1), need = Math.max(2.05 * k, 1.5 * h / w);
+    camera(w, h, spin * 180 / Math.PI, 0.98 * k, need / 2 / Math.tan(5.5 * Math.PI / 180)); stage.render();
+  }
+  // the picture a model is shown: five views of the body and two of the face, on one sheet
+  function sheet() {
+    const R = stage.renderer, out = document.createElement('canvas'), g = out.getContext('2d'), k = J.person.height || 1; out.width = 1556; out.height = 561; g.fillStyle = '#383043'; g.fillRect(0, 0, 1556, 561);
+    const shot = (w, h, deg, y, dist, x, yy, sw, sh) => { R.setPixelRatio(1); R.setSize(w, h, false); camera(w, h, deg, y, dist); stage.render(); g.drawImage(canvas, x, yy, sw, sh); };
+    [0, 35, 90, 180].forEach((a, i) => shot(300, 560, a, 0.98 * k, 12.22, 255 * i, 42, 255, 476));
+    for (let i = 0; i < 40; i++) { t += 1 / 30; J.animate(t * 1.9, 1, t, 1 / 30, 0); } shot(300, 560, 35, 0.98 * k, 12.22, 1020, 42, 255, 476);
+    for (let i = 0; i < 20; i++) { t += 1 / 30; J.animate(0, 0, t, 1 / 30, 0); }
+    shot(330, 330, 0, 1.5 * k, 2.6, 1275, 0, 281, 281); shot(330, 330, 40, 1.5 * k, 2.6, 1275, 281, 281, 280);
+    canvas.width = 0; stage.resize(); return out.toDataURL('image/jpeg', 0.8);
+  }
+
+  // ---------- the people already made ----------
+  const pick = $('pick');
+  function option(p, i) { const o = document.createElement('option'); o.value = i; o.textContent = p.name + ' (' + (NAMES[p.model] || p.model) + ')'; pick.appendChild(o); }
+  D.people.forEach(option);
+  async function choose(i) {
+    const p = D.people[i]; busy = true; $('who').textContent = 'Building…';
+    try { const f = await show(p.code); $('who').textContent = p.desc; $('facts').textContent = 'Built here just now from a ' + Math.round(p.code.length / 100) / 10 + ' KB file: ' + f.triangles.toLocaleString() + ' triangles.' + (p.cost ? ' Made by ' + NAMES[p.model] + ' for ' + money(p.cost) + '.' : ' Made by hand as the worked example in the instructions.'); }
+    catch (e) { $('who').textContent = 'This one did not build: ' + e.message; }
+    busy = false;
+  }
+  pick.onchange = () => choose(+pick.value);
+  $('bTurn').onclick = () => { turn = !turn; $('bTurn').classList.toggle('on', turn); };
+  $('bWalk').onclick = () => { walk = !walk; $('bWalk').classList.toggle('on', walk); };
+  let drag = null; canvas.addEventListener('pointerdown', (e) => { drag = e.clientX; }); window.addEventListener('pointerup', () => { drag = null; });
+  window.addEventListener('pointermove', (e) => { if (drag != null) { spin -= (e.clientX - drag) * 0.01; drag = e.clientX; } });
+
+  // ---------- the cost table and the pictures ----------
+  for (const r of D.models) { const tr = document.createElement('tr'); tr.innerHTML = '<td>' + NAMES[r.model] + '</td><td class="n">' + money(r.each) + '</td><td class="n">' + money(r.first) + '</td><td class="n">' + Math.round(r.secs) + ' s</td>'; $('costs').appendChild(tr); const li = document.createElement('li'); li.innerHTML = '<b>' + NAMES[r.model] + '.</b> ' + r.note; $('notes').appendChild(li); }
+  for (const s of D.shots) { const f = document.createElement('figure'); f.innerHTML = '<img loading="lazy" alt=""><figcaption></figcaption>'; f.firstChild.src = s.src; f.lastChild.textContent = s.caption; $('shots').appendChild(f); }
+
+  // ---------- making a new one, straight from this page ----------
+  const log = (s) => { $('log').textContent += s + '\n'; $('log').scrollTop = 1e9; };
+  window.MF_ASK = async (body, key) => {
+    const r = await fetch('https://api.anthropic.com/v1/messages', { method: 'POST', headers: { 'x-api-key': key, 'anthropic-version': '2023-06-01', 'content-type': 'application/json', 'anthropic-dangerous-direct-browser-access': 'true' }, body: JSON.stringify(body) });
+    const j = await r.json(); if (!r.ok) throw new Error((j.error && j.error.message) || ('the API answered ' + r.status)); return j;
+  };
+  const cost = (m, u) => { const p = PRICES[m]; return ((u.input_tokens || 0) * p[0] + (u.output_tokens || 0) * p[1] + (u.cache_creation_input_tokens || 0) * p[2] + (u.cache_read_input_tokens || 0) * p[3]) / 1e6; };
+  async function makeOne() {
+    const desc = $('desc').value.trim(), key = $('key').value.trim(), model = $('model').value, rounds = +$('rounds').value;
+    if (!desc) return log('Write one line about the person first.'); if (!key) return log('Paste your API key first.');
+    $('go').disabled = true; $('log').textContent = ''; $('save').hidden = true; $('sheet').hidden = true; let total = 0, good = null;
+    const messages = [{ role: 'user', content: 'Person: ' + desc }];
+    try {
+      for (let n = 1; n <= rounds; n++) {
+        log('Asking ' + NAMES[model] + (n > 1 ? ' to look at the picture…' : '…')); const t0 = performance.now();
+        const res = await window.MF_ASK({ model, max_tokens: 12000, system: [{ type: 'text', text: D.kit, cache_control: { type: 'ephemeral' } }], messages }, key);
+        const c = cost(model, res.usage); total += c; const text = res.content.filter((b) => b.type === 'text').map((b) => b.text).join('');
+        log('  ' + (res.usage.input_tokens + (res.usage.cache_creation_input_tokens || 0) + (res.usage.cache_read_input_tokens || 0)).toLocaleString() + ' tokens in, ' + res.usage.output_tokens.toLocaleString() + ' out, ' + ((performance.now() - t0) / 1000).toFixed(0) + ' s, ' + money(c));
+        messages.push({ role: 'assistant', content: res.content });
+        if (/^\s*DONE/i.test(text) && good) { log('  It is happy with it.'); break; }
+        const m = text.match(/```(?:js|javascript)?\s*\n([\s\S]*?)```/), code = (m ? m[1] : text).trim(), bad = BANNED.filter((b) => code.indexOf(b) >= 0);
+        let facts = null, pic = null, errs = [];
+        if (code.indexOf('const PERSON') < 0) errs = ['the reply held no "const PERSON = {...}" code block']; else if (bad.length) errs = ['not allowed in a person file: ' + bad.join(', ')];
+        else { busy = true; try { facts = await show(code); errs = facts.errors; pic = sheet(); good = code; $('sheet').src = pic; $('sheet').hidden = false; $('who').textContent = desc; $('facts').textContent = 'Built from the file the model wrote: ' + facts.triangles.toLocaleString() + ' triangles.'; } catch (e) { errs = ['the file did not run: ' + e.message]; } busy = false; }
+        if (errs.length) log('  Problems: ' + errs.join(' | '));
+        if (n === rounds) break;
+        const content = []; if (pic) content.push({ type: 'image', source: { type: 'base64', media_type: 'image/jpeg', data: pic.split(',')[1] } });
+        content.push({ type: 'text', text: (errs.length ? 'Errors: ' + errs.join(' | ') + ' ' : '') + (facts ? 'Built: your own shapes ' + JSON.stringify(facts.own) + ' triangles. ' : '') + (pic ? 'The picture shows it as built: front, three-quarter, side, back and walking, then the face from the front and from the side. ' : 'Nothing could be drawn. ') + 'If it is right, reply DONE. If not, reply with the whole corrected file.' });
+        messages.push({ role: 'user', content });
+      }
+      log('Finished. This person cost ' + money(total) + '.');
+      if (good) { made = good; $('save').hidden = false; const p = { name: 'Yours: ' + desc.slice(0, 40), model, desc, code: good, cost: total }; D.people.push(p); option(p, D.people.length - 1); pick.value = D.people.length - 1; }
+    } catch (e) { log('Stopped: ' + e.message + (location.protocol !== 'file:' ? '\nThis part only works in the copy of the page opened as a file on your computer.' : '')); }
+    $('go').disabled = false;
+  }
+  $('go').onclick = makeOne;
+  $('save').onclick = () => { const a = document.createElement('a'); a.href = URL.createObjectURL(new Blob([made + '\n'], { type: 'text/javascript' })); a.download = 'person.js'; a.click(); };
+  window.MF_MAKER = { makeOne, choose, sheet, ready: false };
+  choose(0).then(() => { window.MF_MAKER.ready = true; }); requestAnimationFrame(frame);
+})();
+</script>
+</body></html>

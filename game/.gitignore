@@ -4,3 +4,5 @@ __pycache__/
 checks/*.png
 checks/*.jpg
 checks/*.log
+people/out/person-stage.html
+people/runs/*/v*.jpg

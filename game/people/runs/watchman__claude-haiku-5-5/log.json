@@ -1,0 +1,118 @@
+{
+ "model": "claude-haiku-5-5",
+ "id": "watchman",
+ "desc": "An old night-watchman with dark brown skin and a short white beard: a long grey coat to the knees, a red scarf, a tall dark felt hat and heavy black boots.",
+ "rounds": [
+  {
+   "n": 1,
+   "seconds": 23.4,
+   "usage": {
+    "input_tokens": 64,
+    "output_tokens": 5032,
+    "cache_creation_input_tokens": 0,
+    "cache_read_input_tokens": 4920
+   },
+   "cost": 0.0025716,
+   "thought": true,
+   "stop": "end_turn",
+   "facts": {
+    "errors": [],
+    "prepareMs": 255,
+    "buildMs": 313,
+    "triangles": 12009,
+    "parts": 24,
+    "own": {
+     "coat": 288,
+     "scarf": 40,
+     "hat": 216,
+     "hair": 120,
+     "beard": 48
+    },
+    "draws": 15,
+    "drawn_triangles": 9469
+   },
+   "said": "file"
+  },
+  {
+   "n": 2,
+   "seconds": 7.5,
+   "usage": {
+    "input_tokens": 6392,
+    "output_tokens": 1560,
+    "cache_creation_input_tokens": 0,
+    "cache_read_input_tokens": 4920
+   },
+   "cost": 0.0014684000000000001,
+   "thought": true,
+   "stop": "end_turn",
+   "facts": {
+    "errors": [],
+    "prepareMs": 290,
+    "buildMs": 315,
+    "triangles": 12033,
+    "parts": 23,
+    "own": {
+     "coat": 288,
+     "scarf": 40,
+     "hat": 216,
+     "beard": 192
+    },
+    "draws": 14,
+    "drawn_triangles": 9493
+   },
+   "said": "file"
+  },
+  {
+   "n": 3,
+   "seconds": 4.2,
+   "usage": {
+    "input_tokens": 9241,
+    "output_tokens": 947,
+    "cache_creation_input_tokens": 0,
+    "cache_read_input_tokens": 4920
+   },
+   "cost": 0.0014468,
+   "thought": true,
+   "stop": "end_turn",
+   "facts": {
+    "errors": [],
+    "prepareMs": 258,
+    "buildMs": 470,
+    "triangles": 12033,
+    "parts": 23,
+    "own": {
+     "coat": 288,
+     "scarf": 40,
+     "hat": 216,
+     "beard": 192
+    },
+    "draws": 14,
+    "drawn_triangles": 9493
+   },
+   "said": "file"
+  }
+ ],
+ "kit_chars": 10707,
+ "final": 3,
+ "cost": 0.0054868,
+ "seconds": 35.1,
+ "input_tokens": 15697,
+ "output_tokens": 7539,
+ "cache_creation_input_tokens": 0,
+ "cache_read_input_tokens": 14760,
+ "final_facts": {
+  "errors": [],
+  "prepareMs": 241,
+  "buildMs": 223,
+  "triangles": 12033,
+  "parts": 23,
+  "own": {
+   "coat": 288,
+   "scarf": 40,
+   "hat": 216,
+   "beard": 192
+  },
+  "draws": 14,
+  "drawn_triangles": 9493
+ }
+}

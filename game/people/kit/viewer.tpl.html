@@ -1,0 +1,43 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Person kit test stage</title>
+<style>html, body { margin: 0; background: #383043; } canvas { display: block; width: 100vw; height: 100vh; }</style></head>
+<body><canvas id="c"></canvas>
+/*SCRIPTS*/
+<script>
+// The test stage for the person kit: the witches' own lights, one person, fixed views. Used by the tools, not by Chris.
+(function () {
+  'use strict';
+  const canvas = document.getElementById('c');
+  const stage = makeMFStage(canvas, { preserve: true, shadow: 1024 });
+  stage.painting = false;
+  const VIEWS = { front: [0, 0.98, 2.35, 0], threeq: [35, 0.98, 2.35, 0], side: [90, 0.98, 2.35, 0], back: [180, 0.98, 2.35, 0], face: [0, 1.50, 0.50, 0], faceq: [40, 1.50, 0.50, 0], top: [20, 1.3, 1.6, 35] };
+  let J = null, t = 0;
+  function view(name, heightK) {
+    const v = VIEWS[name] || VIEWS.front, k = heightK || 1, a = v[0] * Math.PI / 180, e = v[3] * Math.PI / 180, d = v[2] * 5.2 * (name.slice(0, 4) === 'face' ? 1 : 1), y = v[1] * k;
+    const w = canvas.clientWidth, h = canvas.clientHeight; stage.resize();
+    stage.setScene({ kind: 'fight', frame: [w, h], camera: { fov: 11, h: 1, z: 10, pitch: 0 } });
+    stage.camera.position.set(Math.sin(a) * Math.cos(e) * d, y + Math.sin(e) * d, Math.cos(a) * Math.cos(e) * d); stage.camera.lookAt(0, y, 0); stage.camera.updateMatrixWorld();
+  }
+  function drop() { if (!J) return; stage.cast.remove(J.root, J.fx); J.root.traverse((m) => { if (m.geometry) m.geometry.dispose(); }); for (const x of (J.debug.textures || [])) x.dispose(); J = null; }
+  window.PV = {
+    stage, get J() { return J; },
+    // person: the object, or the text of a file that sets PERSON
+    async show(person) {
+      drop();
+      if (typeof person === 'string') person = new Function(person + '\n;return PERSON;')();
+      const a = performance.now(), prepared = await MF_PERSON.prepare(person), b = performance.now();
+      J = MF_PERSON.make(person, prepared); J.fx.remove(J.spellLight); stage.cast.add(J.root, J.fx); J.camera = stage.camera; stage.follow(0, 0);
+      const c = performance.now(); t = 0; PV.step(1 / 30, 45);
+      let tris = 0, parts = 0; J.root.traverse((m) => { if (m.isMesh && m.visible && m.geometry && m.geometry.index) { tris += m.geometry.index.count / 3; parts++; } });
+      const own = {}; for (const k in J.debug.meshes) if (k.slice(0, 2) === 'p_') own[k.slice(2)] = J.debug.meshes[k].geometry.index.count / 3;
+      return { errors: J.personErrors, prepareMs: Math.round(b - a), buildMs: Math.round(c - b), triangles: Math.round(tris), parts, own };
+    },
+    // walking: phase runs with the steps; standing: phase 0
+    step(dt, n, walk) { for (let i = 0; i < (n || 1); i++) { t += dt; J.animate(walk ? t * 1.9 : 0, walk ? 1 : 0, t, dt, 0); } },
+    draw(name) { view(name, J && J.person ? (J.person.height || 1) : 1); stage.render(); const i = stage.info(); return i; },
+    faceURL() { return null; },
+  };
+  window.PV.ready = true;
+})();
+</script></body></html>

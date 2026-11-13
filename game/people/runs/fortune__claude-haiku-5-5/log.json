@@ -1,0 +1,122 @@
+{
+ "model": "claude-haiku-5-5",
+ "id": "fortune",
+ "desc": "A tall, thin fortune-teller: pale, with dark eye make-up and long black hair, a deep blue robe to the ankles with a gold-striped sash, and a plum headscarf.",
+ "rounds": [
+  {
+   "n": 1,
+   "seconds": 20.4,
+   "usage": {
+    "input_tokens": 70,
+    "output_tokens": 4556,
+    "cache_creation_input_tokens": 0,
+    "cache_read_input_tokens": 4920
+   },
+   "cost": 0.0023342,
+   "thought": true,
+   "stop": "end_turn",
+   "facts": {
+    "errors": [],
+    "prepareMs": 251,
+    "buildMs": 794,
+    "triangles": 12349,
+    "parts": 25,
+    "own": {
+     "torso": 240,
+     "skirt": 224,
+     "belt": 0,
+     "sash": 60,
+     "hair": 256,
+     "kerchief": 272
+    },
+    "draws": 15,
+    "drawn_triangles": 9809
+   },
+   "said": "file"
+  },
+  {
+   "n": 2,
+   "seconds": 11.4,
+   "usage": {
+    "input_tokens": 5932,
+    "output_tokens": 2539,
+    "cache_creation_input_tokens": 0,
+    "cache_read_input_tokens": 4920
+   },
+   "cost": 0.0019119,
+   "thought": true,
+   "stop": "end_turn",
+   "facts": {
+    "errors": [],
+    "prepareMs": 298,
+    "buildMs": 320,
+    "triangles": 12349,
+    "parts": 24,
+    "own": {
+     "torso": 240,
+     "skirt": 224,
+     "sash": 60,
+     "hair": 256,
+     "kerchief": 272
+    },
+    "draws": 15,
+    "drawn_triangles": 9809
+   },
+   "said": "file"
+  },
+  {
+   "n": 3,
+   "seconds": 8.8,
+   "usage": {
+    "input_tokens": 9770,
+    "output_tokens": 2039,
+    "cache_creation_input_tokens": 0,
+    "cache_read_input_tokens": 4920
+   },
+   "cost": 0.0020457,
+   "thought": true,
+   "stop": "end_turn",
+   "facts": {
+    "errors": [],
+    "prepareMs": 247,
+    "buildMs": 337,
+    "triangles": 12349,
+    "parts": 24,
+    "own": {
+     "bodice": 240,
+     "skirt": 224,
+     "sash": 60,
+     "hair": 256,
+     "kerchief": 272
+    },
+    "draws": 15,
+    "drawn_triangles": 9809
+   },
+   "said": "file"
+  }
+ ],
+ "kit_chars": 10707,
+ "final": 3,
+ "cost": 0.0062918,
+ "seconds": 40.6,
+ "input_tokens": 15772,
+ "output_tokens": 9134,
+ "cache_creation_input_tokens": 0,
+ "cache_read_input_tokens": 14760,
+ "final_facts": {
+  "errors": [],
+  "prepareMs": 240,
+  "buildMs": 249,
+  "triangles": 12349,
+  "parts": 24,
+  "own": {
+   "bodice": 240,
+   "skirt": 224,
+   "sash": 60,
+   "hair": 256,
+   "kerchief": 272
+  },
+  "draws": 15,
+  "drawn_triangles": 9809
+ }
+}

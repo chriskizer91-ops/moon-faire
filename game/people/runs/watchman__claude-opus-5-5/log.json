@@ -1,0 +1,108 @@
+{
+ "model": "claude-opus-5-5",
+ "id": "watchman",
+ "desc": "An old night-watchman with dark brown skin and a short white beard: a long grey coat to the knees, a red scarf, a tall dark felt hat and heavy black boots.",
+ "rounds": [
+  {
+   "n": 1,
+   "seconds": 31.5,
+   "usage": {
+    "input_tokens": 64,
+    "output_tokens": 3245,
+    "cache_creation_input_tokens": 0,
+    "cache_read_input_tokens": 4920
+   },
+   "cost": 0.06614,
+   "thought": true,
+   "stop": "end_turn",
+   "facts": {
+    "errors": [],
+    "prepareMs": 281,
+    "buildMs": 349,
+    "triangles": 12305,
+    "parts": 25,
+    "own": {
+     "coat": 468,
+     "belt": 48,
+     "scarf": 156,
+     "hair": 120,
+     "beard": 48,
+     "hat": 168
+    },
+    "draws": 16,
+    "drawn_triangles": 9765
+   },
+   "said": "file"
+  },
+  {
+   "n": 2,
+   "seconds": 13.4,
+   "usage": {
+    "input_tokens": 4613,
+    "output_tokens": 1573,
+    "cache_creation_input_tokens": 0,
+    "cache_read_input_tokens": 4920
+   },
+   "cost": 0.050896,
+   "thought": true,
+   "stop": "end_turn",
+   "facts": {
+    "errors": [],
+    "prepareMs": 325,
+    "buildMs": 366,
+    "triangles": 12305,
+    "parts": 25,
+    "own": {
+     "coat": 468,
+     "belt": 48,
+     "scarf": 156,
+     "hair": 120,
+     "beard": 48,
+     "hat": 168
+    },
+    "draws": 16,
+    "drawn_triangles": 9765
+   },
+   "said": "file"
+  },
+  {
+   "n": 3,
+   "seconds": 1.1,
+   "usage": {
+    "input_tokens": 7490,
+    "output_tokens": 47,
+    "cache_creation_input_tokens": 0,
+    "cache_read_input_tokens": 4920
+   },
+   "cost": 0.031884,
+   "thought": true,
+   "stop": "end_turn",
+   "said": "DONE"
+  }
+ ],
+ "kit_chars": 10707,
+ "final": 2,
+ "cost": 0.14892,
+ "seconds": 46.0,
+ "input_tokens": 12167,
+ "output_tokens": 4865,
+ "cache_creation_input_tokens": 0,
+ "cache_read_input_tokens": 14760,
+ "final_facts": {
+  "errors": [],
+  "prepareMs": 262,
+  "buildMs": 267,
+  "triangles": 12305,
+  "parts": 25,
+  "own": {
+   "coat": 468,
+   "belt": 48,
+   "scarf": 156,
+   "hair": 120,
+   "beard": 48,
+   "hat": 168
+  },
+  "draws": 16,
+  "drawn_triangles": 9765
+ }
+}

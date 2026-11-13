@@ -1,0 +1,105 @@
+{
+ "model": "claude-opus-5-5",
+ "id": "baker",
+ "desc": "A stout, cheerful baker: red cheeks, a brown beard, a white cap, a cream apron over a tan shirt with the sleeves rolled to the elbow, brown trousers.",
+ "rounds": [
+  {
+   "n": 1,
+   "seconds": 33.1,
+   "usage": {
+    "input_tokens": 70,
+    "output_tokens": 3234,
+    "cache_creation_input_tokens": 4920,
+    "cache_read_input_tokens": 0
+   },
+   "cost": 0.08956,
+   "thought": true,
+   "stop": "end_turn",
+   "facts": {
+    "errors": [],
+    "prepareMs": 290,
+    "buildMs": 633,
+    "triangles": 12289,
+    "parts": 24,
+    "own": {
+     "shirt": 392,
+     "apron": 192,
+     "hair": 120,
+     "beard": 72,
+     "cap": 216
+    },
+    "draws": 15,
+    "drawn_triangles": 9749
+   },
+   "said": "file"
+  },
+  {
+   "n": 2,
+   "seconds": 14.9,
+   "usage": {
+    "input_tokens": 4600,
+    "output_tokens": 1811,
+    "cache_creation_input_tokens": 0,
+    "cache_read_input_tokens": 4920
+   },
+   "cost": 0.055604,
+   "thought": true,
+   "stop": "end_turn",
+   "facts": {
+    "errors": [],
+    "prepareMs": 291,
+    "buildMs": 432,
+    "triangles": 12289,
+    "parts": 24,
+    "own": {
+     "shirt": 392,
+     "apron": 192,
+     "hair": 120,
+     "beard": 72,
+     "cap": 216
+    },
+    "draws": 15,
+    "drawn_triangles": 9749
+   },
+   "said": "file"
+  },
+  {
+   "n": 3,
+   "seconds": 1.3,
+   "usage": {
+    "input_tokens": 7707,
+    "output_tokens": 27,
+    "cache_creation_input_tokens": 0,
+    "cache_read_input_tokens": 4920
+   },
+   "cost": 0.032352,
+   "thought": true,
+   "stop": "end_turn",
+   "said": "DONE"
+  }
+ ],
+ "kit_chars": 10707,
+ "final": 2,
+ "cost": 0.177516,
+ "seconds": 49.3,
+ "input_tokens": 12377,
+ "output_tokens": 5072,
+ "cache_creation_input_tokens": 4920,
+ "cache_read_input_tokens": 9840,
+ "final_facts": {
+  "errors": [],
+  "prepareMs": 264,
+  "buildMs": 417,
+  "triangles": 12289,
+  "parts": 24,
+  "own": {
+   "shirt": 392,
+   "apron": 192,
+   "hair": 120,
+   "beard": 72,
+   "cap": 216
+  },
+  "draws": 15,
+  "drawn_triangles": 9749
+ }
+}

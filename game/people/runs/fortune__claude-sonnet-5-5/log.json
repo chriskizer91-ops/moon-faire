@@ -1,0 +1,105 @@
+{
+ "model": "claude-sonnet-5-5",
+ "id": "fortune",
+ "desc": "A tall, thin fortune-teller: pale, with dark eye make-up and long black hair, a deep blue robe to the ankles with a gold-striped sash, and a plum headscarf.",
+ "rounds": [
+  {
+   "n": 1,
+   "seconds": 49.1,
+   "usage": {
+    "input_tokens": 70,
+    "output_tokens": 6392,
+    "cache_creation_input_tokens": 0,
+    "cache_read_input_tokens": 4920
+   },
+   "cost": 0.064552,
+   "thought": true,
+   "stop": "end_turn",
+   "facts": {
+    "errors": [],
+    "prepareMs": 271,
+    "buildMs": 364,
+    "triangles": 12345,
+    "parts": 24,
+    "own": {
+     "robe": 280,
+     "trim": 56,
+     "sash": 144,
+     "hair": 256,
+     "scarf": 312
+    },
+    "draws": 15,
+    "drawn_triangles": 9805
+   },
+   "said": "file"
+  },
+  {
+   "n": 2,
+   "seconds": 16.7,
+   "usage": {
+    "input_tokens": 7759,
+    "output_tokens": 2455,
+    "cache_creation_input_tokens": 0,
+    "cache_read_input_tokens": 4920
+   },
+   "cost": 0.04056,
+   "thought": true,
+   "stop": "end_turn",
+   "facts": {
+    "errors": [],
+    "prepareMs": 404,
+    "buildMs": 549,
+    "triangles": 12405,
+    "parts": 24,
+    "own": {
+     "robe": 280,
+     "trim": 56,
+     "sash": 144,
+     "hair": 256,
+     "scarf": 372
+    },
+    "draws": 15,
+    "drawn_triangles": 9865
+   },
+   "said": "file"
+  },
+  {
+   "n": 3,
+   "seconds": 1.0,
+   "usage": {
+    "input_tokens": 11511,
+    "output_tokens": 5,
+    "cache_creation_input_tokens": 0,
+    "cache_read_input_tokens": 4920
+   },
+   "cost": 0.023564,
+   "thought": false,
+   "stop": "end_turn",
+   "said": "DONE"
+  }
+ ],
+ "kit_chars": 10707,
+ "final": 2,
+ "cost": 0.128676,
+ "seconds": 66.8,
+ "input_tokens": 19340,
+ "output_tokens": 8852,
+ "cache_creation_input_tokens": 0,
+ "cache_read_input_tokens": 14760,
+ "final_facts": {
+  "errors": [],
+  "prepareMs": 238,
+  "buildMs": 292,
+  "triangles": 12405,
+  "parts": 24,
+  "own": {
+   "robe": 280,
+   "trim": 56,
+   "sash": 144,
+   "hair": 256,
+   "scarf": 372
+  },
+  "draws": 15,
+  "drawn_triangles": 9865
+ }
+}

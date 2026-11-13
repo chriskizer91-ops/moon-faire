@@ -1,0 +1,77 @@
+{
+ "model": "claude-haiku-5-5",
+ "id": "baker",
+ "desc": "A stout, cheerful baker: red cheeks, a brown beard, a white cap, a cream apron over a tan shirt with the sleeves rolled to the elbow, brown trousers.",
+ "rounds": [
+  {
+   "n": 1,
+   "seconds": 13.8,
+   "usage": {
+    "input_tokens": 70,
+    "output_tokens": 2901,
+    "cache_creation_input_tokens": 4920,
+    "cache_read_input_tokens": 0
+   },
+   "cost": 0.0020725,
+   "thought": true,
+   "stop": "end_turn",
+   "facts": {
+    "errors": [],
+    "prepareMs": 326,
+    "buildMs": 467,
+    "triangles": 12113,
+    "parts": 25,
+    "own": {
+     "shirt": 288,
+     "belt": 48,
+     "apron": 120,
+     "hair": 120,
+     "beard": 72,
+     "cap": 168
+    },
+    "draws": 16,
+    "drawn_triangles": 9573
+   },
+   "said": "file"
+  },
+  {
+   "n": 2,
+   "seconds": 5.8,
+   "usage": {
+    "input_tokens": 4274,
+    "output_tokens": 896,
+    "cache_creation_input_tokens": 0,
+    "cache_read_input_tokens": 4920
+   },
+   "cost": 0.0009246000000000001,
+   "thought": true,
+   "stop": "end_turn",
+   "said": "DONE"
+  }
+ ],
+ "kit_chars": 10707,
+ "final": 1,
+ "cost": 0.0029971000000000004,
+ "seconds": 19.6,
+ "input_tokens": 4344,
+ "output_tokens": 3797,
+ "cache_creation_input_tokens": 4920,
+ "cache_read_input_tokens": 4920,
+ "final_facts": {
+  "errors": [],
+  "prepareMs": 313,
+  "buildMs": 464,
+  "triangles": 12113,
+  "parts": 25,
+  "own": {
+   "shirt": 288,
+   "belt": 48,
+   "apron": 120,
+   "hair": 120,
+   "beard": 72,
+   "cap": 168
+  },
+  "draws": 16,
+  "drawn_triangles": 9573
+ }
+}

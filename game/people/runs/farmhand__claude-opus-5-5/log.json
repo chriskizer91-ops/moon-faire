@@ -1,0 +1,124 @@
+{
+ "model": "claude-opus-5-5",
+ "id": "farmhand",
+ "desc": "A farm lad with freckles and sandy hair under a wide straw hat: a mustard shirt with bare forearms, a green waistcoat, brown trousers and muddy boots.",
+ "rounds": [
+  {
+   "n": 1,
+   "seconds": 39.0,
+   "usage": {
+    "input_tokens": 67,
+    "output_tokens": 3769,
+    "cache_creation_input_tokens": 0,
+    "cache_read_input_tokens": 4920
+   },
+   "cost": 0.076632,
+   "thought": true,
+   "stop": "end_turn",
+   "facts": {
+    "errors": [],
+    "prepareMs": 180,
+    "buildMs": 342,
+    "triangles": 12097,
+    "parts": 24,
+    "own": {
+     "hair": 120,
+     "trousers": 192,
+     "waistcoat": 208,
+     "straw": 232,
+     "band": 48
+    },
+    "draws": 15,
+    "drawn_triangles": 9557
+   },
+   "said": "file"
+  },
+  {
+   "n": 2,
+   "seconds": 16.5,
+   "usage": {
+    "input_tokens": 5134,
+    "output_tokens": 1940,
+    "cache_creation_input_tokens": 0,
+    "cache_read_input_tokens": 4920
+   },
+   "cost": 0.06032,
+   "thought": true,
+   "stop": "end_turn",
+   "facts": {
+    "errors": [],
+    "prepareMs": 247,
+    "buildMs": 345,
+    "triangles": 12409,
+    "parts": 25,
+    "own": {
+     "hair": 120,
+     "shirt": 312,
+     "trousers": 192,
+     "waistcoat": 208,
+     "straw": 232,
+     "band": 48
+    },
+    "draws": 16,
+    "drawn_triangles": 9869
+   },
+   "said": "file"
+  },
+  {
+   "n": 3,
+   "seconds": 10.0,
+   "usage": {
+    "input_tokens": 8381,
+    "output_tokens": 1333,
+    "cache_creation_input_tokens": 0,
+    "cache_read_input_tokens": 4920
+   },
+   "cost": 0.061168,
+   "thought": true,
+   "stop": "end_turn",
+   "facts": {
+    "errors": [],
+    "prepareMs": 199,
+    "buildMs": 322,
+    "triangles": 12409,
+    "parts": 25,
+    "own": {
+     "hair": 120,
+     "shirt": 312,
+     "trousers": 192,
+     "waistcoat": 208,
+     "straw": 232,
+     "band": 48
+    },
+    "draws": 16,
+    "drawn_triangles": 9869
+   },
+   "said": "file"
+  }
+ ],
+ "kit_chars": 10707,
+ "final": 3,
+ "cost": 0.19812000000000002,
+ "seconds": 65.5,
+ "input_tokens": 13582,
+ "output_tokens": 7042,
+ "cache_creation_input_tokens": 0,
+ "cache_read_input_tokens": 14760,
+ "final_facts": {
+  "errors": [],
+  "prepareMs": 214,
+  "buildMs": 248,
+  "triangles": 12409,
+  "parts": 25,
+  "own": {
+   "hair": 120,
+   "shirt": 312,
+   "trousers": 192,
+   "waistcoat": 208,
+   "straw": 232,
+   "band": 48
+  },
+  "draws": 16,
+  "drawn_triangles": 9869
+ }
+}

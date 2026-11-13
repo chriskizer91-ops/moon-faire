@@ -1,0 +1,117 @@
+{
+ "model": "claude-haiku-5-5",
+ "id": "farmhand",
+ "desc": "A farm lad with freckles and sandy hair under a wide straw hat: a mustard shirt with bare forearms, a green waistcoat, brown trousers and muddy boots.",
+ "rounds": [
+  {
+   "n": 1,
+   "seconds": 22.9,
+   "usage": {
+    "input_tokens": 67,
+    "output_tokens": 4917,
+    "cache_creation_input_tokens": 0,
+    "cache_read_input_tokens": 4920
+   },
+   "cost": 0.0025143999999999995,
+   "thought": true,
+   "stop": "end_turn",
+   "facts": {
+    "errors": [],
+    "prepareMs": 191,
+    "buildMs": 380,
+    "triangles": 11911,
+    "parts": 23,
+    "own": {
+     "waist": 240,
+     "hair": 120,
+     "straw": 210,
+     "band": 44
+    },
+    "draws": 14,
+    "drawn_triangles": 9371
+   },
+   "said": "file"
+  },
+  {
+   "n": 2,
+   "seconds": 9.1,
+   "usage": {
+    "input_tokens": 6271,
+    "output_tokens": 2110,
+    "cache_creation_input_tokens": 0,
+    "cache_read_input_tokens": 4920
+   },
+   "cost": 0.0017312999999999999,
+   "thought": true,
+   "stop": "end_turn",
+   "facts": {
+    "errors": [],
+    "prepareMs": 197,
+    "buildMs": 625,
+    "triangles": 11959,
+    "parts": 23,
+    "own": {
+     "waist": 288,
+     "hair": 120,
+     "straw": 210,
+     "band": 44
+    },
+    "draws": 14,
+    "drawn_triangles": 9419
+   },
+   "said": "file"
+  },
+  {
+   "n": 3,
+   "seconds": 6.7,
+   "usage": {
+    "input_tokens": 9668,
+    "output_tokens": 1564,
+    "cache_creation_input_tokens": 0,
+    "cache_read_input_tokens": 4920
+   },
+   "cost": 0.0017980000000000001,
+   "thought": true,
+   "stop": "end_turn",
+   "facts": {
+    "errors": [],
+    "prepareMs": 209,
+    "buildMs": 376,
+    "triangles": 11719,
+    "parts": 23,
+    "own": {
+     "belt": 48,
+     "hair": 120,
+     "straw": 210,
+     "band": 44
+    },
+    "draws": 14,
+    "drawn_triangles": 9179
+   },
+   "said": "file"
+  }
+ ],
+ "kit_chars": 10707,
+ "final": 3,
+ "cost": 0.006043699999999999,
+ "seconds": 38.7,
+ "input_tokens": 16006,
+ "output_tokens": 8591,
+ "cache_creation_input_tokens": 0,
+ "cache_read_input_tokens": 14760,
+ "final_facts": {
+  "errors": [],
+  "prepareMs": 183,
+  "buildMs": 292,
+  "triangles": 11719,
+  "parts": 23,
+  "own": {
+   "belt": 48,
+   "hair": 120,
+   "straw": 210,
+   "band": 44
+  },
+  "draws": 14,
+  "drawn_triangles": 9179
+ }
+}

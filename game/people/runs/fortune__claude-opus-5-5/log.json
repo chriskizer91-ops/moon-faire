@@ -1,0 +1,117 @@
+{
+ "model": "claude-opus-5-5",
+ "id": "fortune",
+ "desc": "A tall, thin fortune-teller: pale, with dark eye make-up and long black hair, a deep blue robe to the ankles with a gold-striped sash, and a plum headscarf.",
+ "rounds": [
+  {
+   "n": 1,
+   "seconds": 32.6,
+   "usage": {
+    "input_tokens": 70,
+    "output_tokens": 3270,
+    "cache_creation_input_tokens": 0,
+    "cache_read_input_tokens": 4920
+   },
+   "cost": 0.066664,
+   "thought": true,
+   "stop": "end_turn",
+   "facts": {
+    "errors": [],
+    "prepareMs": 245,
+    "buildMs": 349,
+    "triangles": 12385,
+    "parts": 23,
+    "own": {
+     "robe": 448,
+     "sash": 108,
+     "hair": 256,
+     "scarf": 276
+    },
+    "draws": 14,
+    "drawn_triangles": 9845
+   },
+   "said": "file"
+  },
+  {
+   "n": 2,
+   "seconds": 15.2,
+   "usage": {
+    "input_tokens": 4630,
+    "output_tokens": 1757,
+    "cache_creation_input_tokens": 0,
+    "cache_read_input_tokens": 4920
+   },
+   "cost": 0.054644,
+   "thought": true,
+   "stop": "end_turn",
+   "facts": {
+    "errors": [],
+    "prepareMs": 254,
+    "buildMs": 369,
+    "triangles": 12385,
+    "parts": 23,
+    "own": {
+     "robe": 448,
+     "sash": 108,
+     "hair": 256,
+     "scarf": 276
+    },
+    "draws": 14,
+    "drawn_triangles": 9845
+   },
+   "said": "file"
+  },
+  {
+   "n": 3,
+   "seconds": 13.2,
+   "usage": {
+    "input_tokens": 7677,
+    "output_tokens": 1527,
+    "cache_creation_input_tokens": 0,
+    "cache_read_input_tokens": 4920
+   },
+   "cost": 0.062232,
+   "thought": true,
+   "stop": "end_turn",
+   "facts": {
+    "errors": [],
+    "prepareMs": 255,
+    "buildMs": 331,
+    "triangles": 12385,
+    "parts": 23,
+    "own": {
+     "robe": 448,
+     "sash": 108,
+     "hair": 256,
+     "scarf": 276
+    },
+    "draws": 14,
+    "drawn_triangles": 9845
+   },
+   "said": "file"
+  }
+ ],
+ "kit_chars": 10707,
+ "final": 3,
+ "cost": 0.18354,
+ "seconds": 61.0,
+ "input_tokens": 12377,
+ "output_tokens": 6554,
+ "cache_creation_input_tokens": 0,
+ "cache_read_input_tokens": 14760,
+ "final_facts": {
+  "errors": [],
+  "prepareMs": 258,
+  "buildMs": 300,
+  "triangles": 12385,
+  "parts": 23,
+  "own": {
+   "robe": 448,
+   "sash": 108,
+   "hair": 256,
+   "scarf": 276
+  },
+  "draws": 14,
+  "drawn_triangles": 9845
+ }
+}

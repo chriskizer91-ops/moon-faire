@@ -1,0 +1,108 @@
+{
+ "model": "claude-sonnet-5-5",
+ "id": "baker",
+ "desc": "A stout, cheerful baker: red cheeks, a brown beard, a white cap, a cream apron over a tan shirt with the sleeves rolled to the elbow, brown trousers.",
+ "rounds": [
+  {
+   "n": 1,
+   "seconds": 31.8,
+   "usage": {
+    "input_tokens": 70,
+    "output_tokens": 4093,
+    "cache_creation_input_tokens": 4920,
+    "cache_read_input_tokens": 0
+   },
+   "cost": 0.05337,
+   "thought": true,
+   "stop": "end_turn",
+   "facts": {
+    "errors": [],
+    "prepareMs": 338,
+    "buildMs": 479,
+    "triangles": 12385,
+    "parts": 25,
+    "own": {
+     "shirt": 320,
+     "apron": 264,
+     "tie": 48,
+     "cap": 264,
+     "hair": 120,
+     "beard": 72
+    },
+    "draws": 16,
+    "drawn_triangles": 9845
+   },
+   "said": "file"
+  },
+  {
+   "n": 2,
+   "seconds": 10.4,
+   "usage": {
+    "input_tokens": 5467,
+    "output_tokens": 1577,
+    "cache_creation_input_tokens": 0,
+    "cache_read_input_tokens": 4920
+   },
+   "cost": 0.027196,
+   "thought": true,
+   "stop": "end_turn",
+   "facts": {
+    "errors": [],
+    "prepareMs": 392,
+    "buildMs": 809,
+    "triangles": 12361,
+    "parts": 25,
+    "own": {
+     "shirt": 320,
+     "apron": 264,
+     "tie": 48,
+     "cap": 264,
+     "hair": 120,
+     "beard": 48
+    },
+    "draws": 16,
+    "drawn_triangles": 9821
+   },
+   "said": "file"
+  },
+  {
+   "n": 3,
+   "seconds": 1.8,
+   "usage": {
+    "input_tokens": 8348,
+    "output_tokens": 5,
+    "cache_creation_input_tokens": 0,
+    "cache_read_input_tokens": 4920
+   },
+   "cost": 0.017238,
+   "thought": false,
+   "stop": "end_turn",
+   "said": "DONE"
+  }
+ ],
+ "kit_chars": 10707,
+ "final": 2,
+ "cost": 0.097804,
+ "seconds": 44.0,
+ "input_tokens": 13885,
+ "output_tokens": 5675,
+ "cache_creation_input_tokens": 4920,
+ "cache_read_input_tokens": 9840,
+ "final_facts": {
+  "errors": [],
+  "prepareMs": 270,
+  "buildMs": 318,
+  "triangles": 12361,
+  "parts": 25,
+  "own": {
+   "shirt": 320,
+   "apron": 264,
+   "tie": 48,
+   "cap": 264,
+   "hair": 120,
+   "beard": 48
+  },
+  "draws": 16,
+  "drawn_triangles": 9821
+ }
+}

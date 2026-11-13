@@ -1,0 +1,108 @@
+{
+ "model": "claude-sonnet-5-5",
+ "id": "watchman",
+ "desc": "An old night-watchman with dark brown skin and a short white beard: a long grey coat to the knees, a red scarf, a tall dark felt hat and heavy black boots.",
+ "rounds": [
+  {
+   "n": 1,
+   "seconds": 38.5,
+   "usage": {
+    "input_tokens": 64,
+    "output_tokens": 5185,
+    "cache_creation_input_tokens": 0,
+    "cache_read_input_tokens": 4920
+   },
+   "cost": 0.05247,
+   "thought": true,
+   "stop": "end_turn",
+   "facts": {
+    "errors": [],
+    "prepareMs": 250,
+    "buildMs": 336,
+    "triangles": 12445,
+    "parts": 25,
+    "own": {
+     "coat": 416,
+     "belt": 48,
+     "scarf": 204,
+     "hair": 120,
+     "beard": 48,
+     "hat": 312
+    },
+    "draws": 16,
+    "drawn_triangles": 9905
+   },
+   "said": "file"
+  },
+  {
+   "n": 2,
+   "seconds": 14.7,
+   "usage": {
+    "input_tokens": 6553,
+    "output_tokens": 2126,
+    "cache_creation_input_tokens": 0,
+    "cache_read_input_tokens": 4920
+   },
+   "cost": 0.034858,
+   "thought": true,
+   "stop": "end_turn",
+   "facts": {
+    "errors": [],
+    "prepareMs": 259,
+    "buildMs": 396,
+    "triangles": 12389,
+    "parts": 25,
+    "own": {
+     "coat": 416,
+     "belt": 48,
+     "scarf": 204,
+     "hair": 64,
+     "beard": 48,
+     "hat": 312
+    },
+    "draws": 16,
+    "drawn_triangles": 9849
+   },
+   "said": "file"
+  },
+  {
+   "n": 3,
+   "seconds": 1.5,
+   "usage": {
+    "input_tokens": 9983,
+    "output_tokens": 5,
+    "cache_creation_input_tokens": 0,
+    "cache_read_input_tokens": 4920
+   },
+   "cost": 0.020508,
+   "thought": false,
+   "stop": "end_turn",
+   "said": "DONE"
+  }
+ ],
+ "kit_chars": 10707,
+ "final": 2,
+ "cost": 0.107836,
+ "seconds": 54.7,
+ "input_tokens": 16600,
+ "output_tokens": 7316,
+ "cache_creation_input_tokens": 0,
+ "cache_read_input_tokens": 14760,
+ "final_facts": {
+  "errors": [],
+  "prepareMs": 223,
+  "buildMs": 216,
+  "triangles": 12389,
+  "parts": 25,
+  "own": {
+   "coat": 416,
+   "belt": 48,
+   "scarf": 204,
+   "hair": 64,
+   "beard": 48,
+   "hat": 312
+  },
+  "draws": 16,
+  "drawn_triangles": 9849
+ }
+}

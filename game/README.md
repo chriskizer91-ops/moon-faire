@@ -155,6 +155,27 @@ python3 checks/auto.py              # the engine's styles through the real page 
   painting's height in place of 15 m, so she is this size at the painting's own sharpness.
 - Fair folk: Claude's answer and a test are in the project doc `claude/moon-faire-fair-folk-npcs-plan.md`.
 
+## People from a template (November 13)
+
+A test Chris asked for: with the Jester's model as the template, how little does it cost to have a Claude model make a new background person through the API?
+
+- Page: https://claude.ai/artifact/S2zzMgXm1qwoGEF2Nk491T (file: `people/out/moon-faire-people.html`). It shows the people in 3D, the costs, and a box that makes a new person straight from the browser with an API key (that box works in the file copy only).
+- `models/jester/jester_kit.js` is `jester_lod.js` with one added step (`models/tools/patch_person_kit.py`): when `opts.lod.person` is given, her costume cloth is dropped and new parts can be added before the model is bound. Without it every line behaves as before. The game still loads `jester_lod.js`.
+- `people/kit/person-kit.js` (`window.MF_PERSON`) builds a person from a small object: `height`, `build`, `head`, `skin`, `colors` for the body she already has, `parts` (materials), `face(F)` (paint over `face_plain.webp`, her face with the make-up painted out by `make_plain_face.py`) and `make(K)` (shells, panels, tubes, balls, ready-made hair and beards, bound to her bones). Built at the Lightest weight without the merged materials: about 12 thousand triangles and 15 draws.
+- `people/kit/PERSON-KIT.md` is the whole instruction a model is given (about 4,900 tokens, cached). `people/lampseller.js` is the worked example in it, made by hand.
+- `people/kit/make_person.py` asks a model for a person, draws it in headless Chrome (`shoot.py`, on `people/out/person-stage.html` from `build_viewer.py`), shows the model one picture, lets it fix the file up to twice, and prices every reply from its `usage`. The key is read from `~/.mf/key` (or `MF_KEY_FILE`) and is never written anywhere in the repo.
+- `people/runs/<person>__<model>/` holds each run: every version of the file, `final.jpg` and `log.json` (tokens, seconds, cost per round). `people/kit/reshoot.py` redraws them all after a kit change without calling the API. `people/kit/build_maker.py` builds the page.
+
+Measured on four one-line test descriptions (`people/kit/test-people.json`, stand-ins, not lore), list prices of November 13, 2026:
+
+| Model | Each person | First try alone | Time |
+|---|---|---|---|
+| Haiku 5.5 | 0.52 cents | 0.24 cents | 34 s |
+| Sonnet 5.5 | 11 cents | 5.4 cents | 58 s |
+| Opus 5.5 | 18 cents | 7.5 cents | 55 s |
+
+The whole test cost $1.19. Limits found: every person has the Jester's body and face shape (men and stout people only pass under a coat or apron, at a distance); shapes are stiff, so nothing sways; the painted beard only reaches round the mouth. Not measured: speed on Chris's laptop with several people in a scene.
+
 ## Next
 
 Step 5, and the two-person fair-folk test if Chris wants it: the remaining twelve prompts (with the lane lesson built in), every scene traced, the
