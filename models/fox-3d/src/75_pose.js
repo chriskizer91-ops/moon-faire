@@ -47,6 +47,7 @@
       { const tw = -s * (P['tw' + S] + hang * HANG_TW), ad = armDir[S]; SK['ftwA' + S].quaternion.setFromAxisAngle(ad, tw / 3); SK['ftwB' + S].quaternion.setFromAxisAngle(ad, tw * 2 / 3); SK['ftwC' + S].quaternion.setFromAxisAngle(ad, tw); }
       const HA = handAxes[S], w = P['wr' + S];
       _qa.setFromAxisAngle(HA.curl, w[0]); _qb.setFromAxisAngle(HA.palm, w[1]); SK['hand' + S].quaternion.copy(_qb).multiply(_qa);
+      if (SK['wrm' + S]) SK['wrm' + S].quaternion.set(0, 0, 0, 1).slerp(SK['hand' + S].quaternion, 0.5);
       poseFingers(S, P['f' + S]);
       // leg
       hips.getWorldQuaternion(_pq); SK['thigh' + S].getWorldPosition(_A);

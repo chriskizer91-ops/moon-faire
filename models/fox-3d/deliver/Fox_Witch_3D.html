@@ -288,6 +288,7 @@ function makeFox(opts) {
     // wrist is shared out among them, so a turned hand twists the forearm along its whole length, as a real one does, instead of wringing it at the elbow.
     for (const [nm, f] of [['ftwA', 0.44], ['ftwB', 0.67], ['ftwC', 0.90]]) { const q = el.clone().addScaledVector(d, L_FARM * f); addBone(nm + S, 'farm' + S, q.x, q.y, q.z); }
     addBone('hand' + S, 'ftwC' + S, wr.x, wr.y, wr.z);
+    addBone('wrm' + S, 'ftwC' + S, wr.x, wr.y, wr.z);      // at the wrist, turning half as far as the hand: the bracelet that lies on the join of arm and hand rides on it
     addBone('thigh' + S, 'hips', s * 0.085, 0.835, 0);
     addBone('shin' + S, 'thigh' + S, s * 0.083, 0.47, 0.006);
     addBone('foot' + S, 'shin' + S, s * 0.081, 0.105, -0.012);
@@ -310,10 +311,15 @@ function makeFox(opts) {
   // read off the young-hand painting: 1 pixel = 0.2366 mm, the middle finger's axis at z 0.0085, its web at y -0.089.
   // The knuckle joints sit inside the back of the hand, a little above the webs, as on a real hand.
   const FINGERS = [['idx', 0.0291, -0.0725, 0.0916, 0.0073, 1.5 * DEG, 0.013], ['mid', 0.0085, -0.0760, 0.0970, 0.0071, 0, 0.013], ['rng', -0.0100, -0.0725, 0.0897, 0.0067, -1.6 * DEG, 0.013], ['pnk', -0.0282, -0.0709, 0.0633, 0.0058, -5.0 * DEG, 0.011]];
+  // Chris, 13 Nov: her fingers "slightly too long". They were: these lengths are the Jester's, and her own painting (D1) was scaled to them by its
+  // middle finger, so her palm was never checked. In D1 her middle finger, web to tip, is 0.88 to 0.91 of her palm (web to wrist); on the model it
+  // was 0.94. At 0.95 of their length her fingers are 0.89 of her palm. The thumb's two free bones take the same.
+  const FINGER_K = opts.fingerLen === undefined ? 0.95 : +opts.fingerLen;
+  for (const f of FINGERS) f[3] *= FINGER_K;
   const PHAL = [0.50, 0.255, 0.245];
   const fingerDir = (a) => [0, -Math.cos(a), Math.sin(a)];
   // the thumb's first bone lies inside the heel of the hand, from the wrist to where the thumb comes free
-  const THUMB = { base: [0.008, -0.0062, 0.0286], dir: [0.12, -0.92, 0.37], len: [0.0432, 0.0310, 0.0256], r: 0.0077, roll: 60 * DEG };
+  const THUMB = { base: [0.008, -0.0062, 0.0286], dir: [0.12, -0.92, 0.37], len: [0.0432, 0.0310 * FINGER_K, 0.0256 * FINGER_K], r: 0.0077, roll: 60 * DEG };
   for (const [S, s] of SIDES) {
     for (const [fn, fz, fy, fl, fr, fa] of FINGERS) {
       let par = 'hand' + S, t = 0; const fd = fingerDir(fa);
@@ -801,6 +807,7 @@ function makeFox(opts) {
     const u = sm(W0, L_UARM + L_FARM + 0.012, sLen); return [BI['ftwC' + S], 1 - u, BI['hand' + S], u];
   }
   const braceletChains = [];                       // each strand of beads hangs on its own little spring, so the three knock about out of step
+  const braceletLater = [];                        // the beads themselves are strung once her hands exist (33_bracelets.js), so a strand can lie on her hand
   // Both arms are built as her left one and mirrored, with each ring's points taken in the opposite order so the skin still faces out;
   // the picture's left-to-right is flipped to match (u), so front, back, inside and outside mean the same on both arms.
   const gsA = (x, w) => Math.exp(-x * x / (w * w));
@@ -852,18 +859,33 @@ function makeFox(opts) {
       // the gold beads sewn round the band
       const NB = 21, wB = [BI['uarm' + S], 1];
       for (let k = 0; k < NB; k++) { const a = ((k + 0.5) / NB) * TAU, p = at(BAND_S, Math.cos(a) * (BAND_R + 0.0024), Math.sin(a) * (BAND_R + 0.0024)), q = V3(s * p[0], p[1], p[2]); addPart('bellm', spherePart(q, 0.0034, 0.0034, 0.0034, 9, 7), () => wB, { out: q }); }
-      // her bracelets (F2), three strands stacked above each wrist: large dark wood beads, small gold ones, medium wood ones. Each lies on the wrist's own flattened shape.
-      for (const [sl, br, nb, key, ph] of [[0.4470, 0.0056, 13, 'woodbead', 0.0], [0.4630, 0.0031, 27, 'bellm', 0.3], [0.4775, 0.0040, 20, 'woodbead', 0.7]]) {      // right at the wrist, as in A1; the last strand sits on the line where arm meets hand
+      // her bracelets (F2), three strands stacked above each wrist: large dark wood beads, small gold ones, medium wood ones. Each lies on the wrist's
+      // own flattened shape, and where her hand is wider than her wrist (the root of her thumb), on her hand: Chris, 13 Nov, the lowest strand "disappeared
+      // inside ... her thumb". That strand sits on the line where arm meets hand, so it rides a bone that turns half as far as her hand does.
+      for (const [sl, br, nb, key, ph] of [[0.4470, 0.0056, 13, 'woodbead', 0.0], [0.4630, 0.0031, 27, 'bellm', 0.3], [0.4775, 0.0040, 20, 'woodbead', 0.7]]) {
         const [hx, hz] = armAt(sl), cFr = 0.0040 * sm(0.40, 0.47, sl), ex = hx + br * 0.80, ez = hz + br * 0.80, c0 = at(sl, 0, cFr), c1 = at(sl + 0.035, 0, cFr), bn = 'br' + S + Math.round(sl * 1000);
-        addBone(bn + 'a', 'ftwC' + S, s * c0[0], c0[1], c0[2]); addBone(bn + 'b', bn + 'a', s * c1[0], c1[1], c1[2]); braceletChains.push({ names: [bn + 'a', bn + 'b'], anchor: 'ftwC' + S, k: 0.14 + 0.5 * br * 20 });
+        const on = sl > 0.47 && BI['wrm' + S] !== undefined ? 'wrm' + S : 'ftwC' + S;
+        addBone(bn + 'a', on, s * c0[0], c0[1], c0[2]); addBone(bn + 'b', bn + 'a', s * c1[0], c1[1], c1[2]); braceletChains.push({ names: [bn + 'a', bn + 'b'], anchor: on, k: 0.14 + 0.5 * br * 20 });
         const wf = (() => { const w = [BI[bn + 'a'], 1]; return () => w; })();
-        const M = 360, cum = [0]; let px = ex, pz = 0;                                             // equal steps round the oval, not equal angles
-        for (let m = 1; m <= M; m++) { const a = (m / M) * TAU, x = Math.cos(a) * ex, z = Math.sin(a) * ez; cum.push(cum[m - 1] + Math.hypot(x - px, z - pz)); px = x; pz = z; }
-        for (let k = 0, m = 0; k < nb; k++) {
-          const want = ((k / nb + ph / TAU) % 1) * cum[M]; while (m < M && cum[m + 1] < want) m++; if (cum[m] > want) { m = 0; while (m < M && cum[m + 1] < want) m++; }
-          const a = ((m + (want - cum[m]) / Math.max(1e-9, cum[m + 1] - cum[m])) / M) * TAU, p = at(sl, Math.cos(a) * ex, cFr + Math.sin(a) * ez), q = V3(s * p[0], p[1], p[2]);
-          addPart(key, spherePart(q, br, br, br, 8, 6), wf, { out: q });
-        }
+        braceletLater.push(() => {
+          // the ring's own frame: o its middle, ux across her wrist, uz toward her thumb side, ua down her arm
+          const P3 = (p) => V3(s * p[0], p[1], p[2]), o = P3(c0), ux = P3(at(sl, 1, cFr)).sub(o).normalize(), uz = P3(at(sl, 0, cFr + 1)).sub(o).normalize(), ua = P3(at(sl + 0.01, 0, cFr)).sub(o).normalize();
+          // how far her hand stands out from that middle in each direction, within the width of a bead of this ring
+          const NB = 72, far = new Float32Array(NB), hp = (buckets.hand || { pos: [] }).pos, d = V3();
+          for (let i = 0; i < hp.length; i += 3) { d.set(hp[i] - o.x, hp[i + 1] - o.y, hp[i + 2] - o.z); if (Math.abs(d.dot(ua)) > br + 0.003) continue; const x = d.dot(ux), z = d.dot(uz), r = Math.hypot(x, z); if (r > 0.06) continue;
+            const b = ((Math.round(Math.atan2(z, x) / TAU * NB) % NB) + NB) % NB; if (r > far[b]) far[b] = r; }
+          const wide = new Float32Array(NB); for (let b = 0; b < NB; b++) { let m = 0; for (let j = -2; j <= 2; j++) m = Math.max(m, far[(b + j + NB) % NB]); wide[b] = m; }
+          const soft = new Float32Array(NB); for (let b = 0; b < NB; b++) { let m = 0; for (let j = -2; j <= 2; j++) m += wide[(b + j + NB) % NB]; soft[b] = m / 5; }
+          const R = (th) => { const c = Math.cos(th), sn = Math.sin(th), oval = ex * ez / Math.hypot(ez * c, ex * sn), u = ((th / TAU) % 1 + 1) % 1 * NB, b0 = Math.floor(u) % NB, f = u - Math.floor(u);
+            return Math.max(oval, lerp(soft[b0], soft[(b0 + 1) % NB], f) + br * 0.85); };
+          const M = 360, cum = [0]; let px = R(0), pz = 0;                                          // equal steps round the ring, not equal angles
+          for (let m = 1; m <= M; m++) { const a = (m / M) * TAU, r = R(a), x = Math.cos(a) * r, z = Math.sin(a) * r; cum.push(cum[m - 1] + Math.hypot(x - px, z - pz)); px = x; pz = z; }
+          for (let k = 0, m = 0; k < nb; k++) {
+            const want = ((k / nb + ph / TAU) % 1) * cum[M]; while (m < M && cum[m + 1] < want) m++; if (cum[m] > want) { m = 0; while (m < M && cum[m + 1] < want) m++; }
+            const a = ((m + (want - cum[m]) / Math.max(1e-9, cum[m + 1] - cum[m])) / M) * TAU, r = R(a), q = P3(at(sl, Math.cos(a) * r, cFr + Math.sin(a) * r));
+            addPart(key, spherePart(q, br, br, br, 8, 6), wf, { out: q });
+          }
+        });
       }
     }
   }
@@ -1249,6 +1271,9 @@ function makeFox(opts) {
       addPart('nail', loft(rings, { capA: true, capB: true }), wOne(D.name + '2' + S), { out: handPt(s, c[0], c[1], c[2]) });
     }
   }
+
+  // ---------- her bracelets are strung now that her hands exist (see 30_body.js) ----------
+  for (const f of braceletLater) f();
 
   // ---------- head: a sculpted oval with soft features; the face itself is painted (and repainted to blink) ----------
   const HC = V3(0, 1.555, 0.002), HR = { x: 0.0700, yT: 0.092, yB: 0.1414, zF: 0.0985, zB: 0.083 };     // skull: lower crown and shallower back, as in her profile
@@ -2898,6 +2923,7 @@ function makeFox(opts) {
       { const tw = -s * (P['tw' + S] + hang * HANG_TW), ad = armDir[S]; SK['ftwA' + S].quaternion.setFromAxisAngle(ad, tw / 3); SK['ftwB' + S].quaternion.setFromAxisAngle(ad, tw * 2 / 3); SK['ftwC' + S].quaternion.setFromAxisAngle(ad, tw); }
       const HA = handAxes[S], w = P['wr' + S];
       _qa.setFromAxisAngle(HA.curl, w[0]); _qb.setFromAxisAngle(HA.palm, w[1]); SK['hand' + S].quaternion.copy(_qb).multiply(_qa);
+      if (SK['wrm' + S]) SK['wrm' + S].quaternion.set(0, 0, 0, 1).slerp(SK['hand' + S].quaternion, 0.5);
       poseFingers(S, P['f' + S]);
       // leg
       hips.getWorldQuaternion(_pq); SK['thigh' + S].getWorldPosition(_A);
@@ -3761,8 +3787,8 @@ function makeFox(opts) {
     const eD = (s) => [s * 0.7, -1, -0.2], mix3 = (a, b, k) => [lerp(a[0], b[0], k), lerp(a[1], b[1], k), lerp(a[2], b[2], k)];
     // Where a hand has to land on her (a fingertip on her glasses, her bell, her lips): worked out on the model with bench/contacts.js, for the lean and
     // head turn she has at that moment. If her head, neck or arms change size, run that again and paste the new numbers here.
-    const POUCH_L = [0.20, 0.99, 0.19], GLASSES = [0.086, 1.394, 0.170], BELL = [-0.143, 1.380, 0.085], SHH = [0.079, 1.316, 0.170];
-    const HIDE0 = [-0.040, 1.371, 0.222], HIDE1 = [-0.051, 1.326, 0.262], PEEK = [-0.118, 1.286, 0.164], DIP_SHH = [0.084, 1.150, 0.155];
+    const POUCH_L = [0.20, 0.99, 0.19], GLASSES = [0.082, 1.396, 0.171], BELL = [-0.138, 1.381, 0.089], SHH = [0.075, 1.319, 0.171];
+    const HIDE0 = [-0.036, 1.369, 0.220], HIDE1 = [-0.047, 1.325, 0.261], PEEK = [-0.114, 1.288, 0.165], DIP_SHH = [0.081, 1.153, 0.156];
 
     // Talk: she explains something with a thread that is not there. Only her arms, head and face move, so it plays over any stance, or as she walks.
     (function () {
@@ -4040,8 +4066,8 @@ function makeFox(opts) {
       case 'crown': return at('head', 0, 1.70, 0);
       case 'handR': { const p = handPt(-1, 0.018, -0.06, 0.004); return at('handR', p.x, p.y, p.z); }
       case 'handL': { const p = handPt(1, 0.018, -0.06, 0.004); return at('handL', p.x, p.y, p.z); }
-      case 'tipR': { const p = handPt(-1, 0, -0.164, 0.0315); return at('idx2R', p.x, p.y, p.z); }
-      case 'tipL': { const p = handPt(1, 0, -0.165, 0.027); return at('idx2L', p.x, p.y, p.z); }
+      case 'tipR': { const p = handPt(-1, 0, FINGERS[0][2] - FINGERS[0][3], 0.0315); return at('idx2R', p.x, p.y, p.z); }      // the tip of her first finger, whatever its length
+      case 'tipL': { const p = handPt(1, 0, FINGERS[0][2] - FINGERS[0][3] - 0.001, 0.027); return at('idx2L', p.x, p.y, p.z); }
       case 'bells': return at('bell3', bellRest[3].x, bellRest[3].y - 0.035, bellRest[3].z);
       case 'feet': return out.set(0, 0, 0).applyMatrix4(root.matrixWorld);
       case 'pendant': { const tp = prof(TORSO, 1.306, true); return at('spine3', 0, 1.306, tp[3] + tp[1] + 0.012); }

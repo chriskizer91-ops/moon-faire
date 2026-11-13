@@ -15,8 +15,8 @@
     const eD = (s) => [s * 0.7, -1, -0.2], mix3 = (a, b, k) => [lerp(a[0], b[0], k), lerp(a[1], b[1], k), lerp(a[2], b[2], k)];
     // Where a hand has to land on her (a fingertip on her glasses, her bell, her lips): worked out on the model with bench/contacts.js, for the lean and
     // head turn she has at that moment. If her head, neck or arms change size, run that again and paste the new numbers here.
-    const POUCH_L = [0.20, 0.99, 0.19], GLASSES = [0.086, 1.394, 0.170], BELL = [-0.143, 1.380, 0.085], SHH = [0.079, 1.316, 0.170];
-    const HIDE0 = [-0.040, 1.371, 0.222], HIDE1 = [-0.051, 1.326, 0.262], PEEK = [-0.118, 1.286, 0.164], DIP_SHH = [0.084, 1.150, 0.155];
+    const POUCH_L = [0.20, 0.99, 0.19], GLASSES = [0.082, 1.396, 0.171], BELL = [-0.138, 1.381, 0.089], SHH = [0.075, 1.319, 0.171];
+    const HIDE0 = [-0.036, 1.369, 0.220], HIDE1 = [-0.047, 1.325, 0.261], PEEK = [-0.114, 1.288, 0.165], DIP_SHH = [0.081, 1.153, 0.156];
 
     // Talk: she explains something with a thread that is not there. Only her arms, head and face move, so it plays over any stance, or as she walks.
     (function () {

@@ -29,6 +29,7 @@
     // wrist is shared out among them, so a turned hand twists the forearm along its whole length, as a real one does, instead of wringing it at the elbow.
     for (const [nm, f] of [['ftwA', 0.44], ['ftwB', 0.67], ['ftwC', 0.90]]) { const q = el.clone().addScaledVector(d, L_FARM * f); addBone(nm + S, 'farm' + S, q.x, q.y, q.z); }
     addBone('hand' + S, 'ftwC' + S, wr.x, wr.y, wr.z);
+    addBone('wrm' + S, 'ftwC' + S, wr.x, wr.y, wr.z);      // at the wrist, turning half as far as the hand: the bracelet that lies on the join of arm and hand rides on it
     addBone('thigh' + S, 'hips', s * 0.085, 0.835, 0);
     addBone('shin' + S, 'thigh' + S, s * 0.083, 0.47, 0.006);
     addBone('foot' + S, 'shin' + S, s * 0.081, 0.105, -0.012);
@@ -51,10 +52,15 @@
   // read off the young-hand painting: 1 pixel = 0.2366 mm, the middle finger's axis at z 0.0085, its web at y -0.089.
   // The knuckle joints sit inside the back of the hand, a little above the webs, as on a real hand.
   const FINGERS = [['idx', 0.0291, -0.0725, 0.0916, 0.0073, 1.5 * DEG, 0.013], ['mid', 0.0085, -0.0760, 0.0970, 0.0071, 0, 0.013], ['rng', -0.0100, -0.0725, 0.0897, 0.0067, -1.6 * DEG, 0.013], ['pnk', -0.0282, -0.0709, 0.0633, 0.0058, -5.0 * DEG, 0.011]];
+  // Chris, 13 Nov: her fingers "slightly too long". They were: these lengths are the Jester's, and her own painting (D1) was scaled to them by its
+  // middle finger, so her palm was never checked. In D1 her middle finger, web to tip, is 0.88 to 0.91 of her palm (web to wrist); on the model it
+  // was 0.94. At 0.95 of their length her fingers are 0.89 of her palm. The thumb's two free bones take the same.
+  const FINGER_K = opts.fingerLen === undefined ? 0.95 : +opts.fingerLen;
+  for (const f of FINGERS) f[3] *= FINGER_K;
   const PHAL = [0.50, 0.255, 0.245];
   const fingerDir = (a) => [0, -Math.cos(a), Math.sin(a)];
   // the thumb's first bone lies inside the heel of the hand, from the wrist to where the thumb comes free
-  const THUMB = { base: [0.008, -0.0062, 0.0286], dir: [0.12, -0.92, 0.37], len: [0.0432, 0.0310, 0.0256], r: 0.0077, roll: 60 * DEG };
+  const THUMB = { base: [0.008, -0.0062, 0.0286], dir: [0.12, -0.92, 0.37], len: [0.0432, 0.0310 * FINGER_K, 0.0256 * FINGER_K], r: 0.0077, roll: 60 * DEG };
   for (const [S, s] of SIDES) {
     for (const [fn, fz, fy, fl, fr, fa] of FINGERS) {
       let par = 'hand' + S, t = 0; const fd = fingerDir(fa);

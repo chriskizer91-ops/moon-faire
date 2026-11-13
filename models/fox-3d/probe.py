@@ -7,6 +7,8 @@ with sync_playwright() as p:
     pg.on('pageerror', lambda e: print('PAGEERR', str(e)[:500]))
     pg.goto('file:///home/claude/fox3d/test.html' + os.environ.get('Q',''))
     pg.wait_for_function('window.T && (T.ok || T.err)', timeout=180000)
+    err = pg.evaluate('T.err || ""')
+    if err: print('BUILD ERROR', err); sys.exit(1)
     pg.evaluate('''() => { T.step(60, 1/60);
       T.bb = (key, filt) => { const m = T.j.debug.meshes[key], g = m.geometry, p = g.attributes.position, v = new THREE.Vector3(), lo = [9,9,9], hi = [-9,-9,-9], K = 1.045; m.updateMatrixWorld(true);
         const st = Math.max(1, Math.floor(p.count / 6000));

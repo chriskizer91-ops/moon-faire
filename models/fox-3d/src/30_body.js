@@ -84,6 +84,7 @@
     const u = sm(W0, L_UARM + L_FARM + 0.012, sLen); return [BI['ftwC' + S], 1 - u, BI['hand' + S], u];
   }
   const braceletChains = [];                       // each strand of beads hangs on its own little spring, so the three knock about out of step
+  const braceletLater = [];                        // the beads themselves are strung once her hands exist (33_bracelets.js), so a strand can lie on her hand
   // Both arms are built as her left one and mirrored, with each ring's points taken in the opposite order so the skin still faces out;
   // the picture's left-to-right is flipped to match (u), so front, back, inside and outside mean the same on both arms.
   const gsA = (x, w) => Math.exp(-x * x / (w * w));
@@ -135,18 +136,33 @@
       // the gold beads sewn round the band
       const NB = 21, wB = [BI['uarm' + S], 1];
       for (let k = 0; k < NB; k++) { const a = ((k + 0.5) / NB) * TAU, p = at(BAND_S, Math.cos(a) * (BAND_R + 0.0024), Math.sin(a) * (BAND_R + 0.0024)), q = V3(s * p[0], p[1], p[2]); addPart('bellm', spherePart(q, 0.0034, 0.0034, 0.0034, 9, 7), () => wB, { out: q }); }
-      // her bracelets (F2), three strands stacked above each wrist: large dark wood beads, small gold ones, medium wood ones. Each lies on the wrist's own flattened shape.
-      for (const [sl, br, nb, key, ph] of [[0.4470, 0.0056, 13, 'woodbead', 0.0], [0.4630, 0.0031, 27, 'bellm', 0.3], [0.4775, 0.0040, 20, 'woodbead', 0.7]]) {      // right at the wrist, as in A1; the last strand sits on the line where arm meets hand
+      // her bracelets (F2), three strands stacked above each wrist: large dark wood beads, small gold ones, medium wood ones. Each lies on the wrist's
+      // own flattened shape, and where her hand is wider than her wrist (the root of her thumb), on her hand: Chris, 13 Nov, the lowest strand "disappeared
+      // inside ... her thumb". That strand sits on the line where arm meets hand, so it rides a bone that turns half as far as her hand does.
+      for (const [sl, br, nb, key, ph] of [[0.4470, 0.0056, 13, 'woodbead', 0.0], [0.4630, 0.0031, 27, 'bellm', 0.3], [0.4775, 0.0040, 20, 'woodbead', 0.7]]) {
         const [hx, hz] = armAt(sl), cFr = 0.0040 * sm(0.40, 0.47, sl), ex = hx + br * 0.80, ez = hz + br * 0.80, c0 = at(sl, 0, cFr), c1 = at(sl + 0.035, 0, cFr), bn = 'br' + S + Math.round(sl * 1000);
-        addBone(bn + 'a', 'ftwC' + S, s * c0[0], c0[1], c0[2]); addBone(bn + 'b', bn + 'a', s * c1[0], c1[1], c1[2]); braceletChains.push({ names: [bn + 'a', bn + 'b'], anchor: 'ftwC' + S, k: 0.14 + 0.5 * br * 20 });
+        const on = sl > 0.47 && BI['wrm' + S] !== undefined ? 'wrm' + S : 'ftwC' + S;
+        addBone(bn + 'a', on, s * c0[0], c0[1], c0[2]); addBone(bn + 'b', bn + 'a', s * c1[0], c1[1], c1[2]); braceletChains.push({ names: [bn + 'a', bn + 'b'], anchor: on, k: 0.14 + 0.5 * br * 20 });
         const wf = (() => { const w = [BI[bn + 'a'], 1]; return () => w; })();
-        const M = 360, cum = [0]; let px = ex, pz = 0;                                             // equal steps round the oval, not equal angles
-        for (let m = 1; m <= M; m++) { const a = (m / M) * TAU, x = Math.cos(a) * ex, z = Math.sin(a) * ez; cum.push(cum[m - 1] + Math.hypot(x - px, z - pz)); px = x; pz = z; }
-        for (let k = 0, m = 0; k < nb; k++) {
-          const want = ((k / nb + ph / TAU) % 1) * cum[M]; while (m < M && cum[m + 1] < want) m++; if (cum[m] > want) { m = 0; while (m < M && cum[m + 1] < want) m++; }
-          const a = ((m + (want - cum[m]) / Math.max(1e-9, cum[m + 1] - cum[m])) / M) * TAU, p = at(sl, Math.cos(a) * ex, cFr + Math.sin(a) * ez), q = V3(s * p[0], p[1], p[2]);
-          addPart(key, spherePart(q, br, br, br, 8, 6), wf, { out: q });
-        }
+        braceletLater.push(() => {
+          // the ring's own frame: o its middle, ux across her wrist, uz toward her thumb side, ua down her arm
+          const P3 = (p) => V3(s * p[0], p[1], p[2]), o = P3(c0), ux = P3(at(sl, 1, cFr)).sub(o).normalize(), uz = P3(at(sl, 0, cFr + 1)).sub(o).normalize(), ua = P3(at(sl + 0.01, 0, cFr)).sub(o).normalize();
+          // how far her hand stands out from that middle in each direction, within the width of a bead of this ring
+          const NB = 72, far = new Float32Array(NB), hp = (buckets.hand || { pos: [] }).pos, d = V3();
+          for (let i = 0; i < hp.length; i += 3) { d.set(hp[i] - o.x, hp[i + 1] - o.y, hp[i + 2] - o.z); if (Math.abs(d.dot(ua)) > br + 0.003) continue; const x = d.dot(ux), z = d.dot(uz), r = Math.hypot(x, z); if (r > 0.06) continue;
+            const b = ((Math.round(Math.atan2(z, x) / TAU * NB) % NB) + NB) % NB; if (r > far[b]) far[b] = r; }
+          const wide = new Float32Array(NB); for (let b = 0; b < NB; b++) { let m = 0; for (let j = -2; j <= 2; j++) m = Math.max(m, far[(b + j + NB) % NB]); wide[b] = m; }
+          const soft = new Float32Array(NB); for (let b = 0; b < NB; b++) { let m = 0; for (let j = -2; j <= 2; j++) m += wide[(b + j + NB) % NB]; soft[b] = m / 5; }
+          const R = (th) => { const c = Math.cos(th), sn = Math.sin(th), oval = ex * ez / Math.hypot(ez * c, ex * sn), u = ((th / TAU) % 1 + 1) % 1 * NB, b0 = Math.floor(u) % NB, f = u - Math.floor(u);
+            return Math.max(oval, lerp(soft[b0], soft[(b0 + 1) % NB], f) + br * 0.85); };
+          const M = 360, cum = [0]; let px = R(0), pz = 0;                                          // equal steps round the ring, not equal angles
+          for (let m = 1; m <= M; m++) { const a = (m / M) * TAU, r = R(a), x = Math.cos(a) * r, z = Math.sin(a) * r; cum.push(cum[m - 1] + Math.hypot(x - px, z - pz)); px = x; pz = z; }
+          for (let k = 0, m = 0; k < nb; k++) {
+            const want = ((k / nb + ph / TAU) % 1) * cum[M]; while (m < M && cum[m + 1] < want) m++; if (cum[m] > want) { m = 0; while (m < M && cum[m + 1] < want) m++; }
+            const a = ((m + (want - cum[m]) / Math.max(1e-9, cum[m + 1] - cum[m])) / M) * TAU, r = R(a), q = P3(at(sl, Math.cos(a) * r, cFr + Math.sin(a) * r));
+            addPart(key, spherePart(q, br, br, br, 8, 6), wf, { out: q });
+          }
+        });
       }
     }
   }

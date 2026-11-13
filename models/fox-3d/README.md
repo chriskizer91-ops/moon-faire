@@ -143,7 +143,14 @@ Pass 7 (13 Nov 2026): one skin from face to hands, painted arms, softer hands, p
 Pass 8 (13 Nov 2026): painted neck, chest shading back, purple off her shoulders, bracelets on the wrist, and the two head options to choose from (see `claude/fox-3d-pass8-neck-chest-head-options.md`).
 Pass 9 (13 Nov 2026): head 10% larger and the depth reshaping built in; her own talk, laugh, dance, curtsey and pounce (see `claude/fox-3d-pass9-head-locked-own-moves.md`).
 Pass 10 (13 Nov 2026): Chris approved the five moves and keeps the Jester's bow, twirl, wave and jump; how her arms and hands move (see `claude/fox-3d-pass10-arms-hands-motion.md`).
+Pass 11 (13 Nov 2026): the lowest bracelet no longer sinks into the root of her thumb; her fingers are 5% shorter, which is their length in her own painting (see `claude/fox-3d-pass11-bracelet-fingers.md`).
 Still to do: rounds 3 and 4 (her tools in her hands, her spells, her three flipbook moves): the paintings are in `references/round3` and `round4`, none used yet. Ruffles at the neckline and peplum are flat paint; her choker is plain where A1's has studs and a larger bell; under her jaw and the sides of her head are plain skin tone.
+
+## Her fingers and bracelets (pass 11)
+
+- **Fingers.** `FINGER_K = 0.95` in `src/10_geom.js` scales the four fingers and the thumb's two free bones. The lengths in `FINGERS` are the Jester's; her painting D1 had been scaled to them by its middle finger, so her palm was never checked. In D1 her middle finger (web to tip) is 0.88 to 0.91 of her palm (web to wrist); the model was 0.94 and is now 0.89. Picture: `deliver/Fox_fingers_vs_painting.jpg`. `makeFox({ fingerLen: 1 })` gives the old length. The fingertip anchors (`tipR`, `tipL`) follow the table, and the seven touch keys were worked out again.
+- **Not changed:** her fingers are also about 12% thinner than in D1 (measured across all four at two heights). Chris asked only for the length.
+- **Bracelets.** The beads are strung in `src/33_bracelets.js`, after her hands exist, so each strand lies on whatever is under it: the wrist's oval, or her hand where her hand is wider (the root of her thumb). The lowest strand, on the line where arm meets hand, rides the bone `wrm`, which turns half as far as her hand, so a bent wrist does not push her hand through it. Check: `./wristset.sh w1` (ten views at rest).
 
 ## How her arms and hands move (pass 10)
 
