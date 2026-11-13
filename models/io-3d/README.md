@@ -10,7 +10,8 @@ Body and base outfit, checked against her round 1 paintings. Nothing moves yet.
 
 - **Built:** torso with the bodice painted on (B3 front and back, B2 at the sides), bare arms and legs, the skirt as eight
   stiff tiers with the slit over her left leg, boots, hands, a plain head form. 232,000 triangles.
-- **Page:** `deliver/Io_3D_stage1.html` (one offline file, 1.4 MB). Views, three poses, the painting beside her, the skirt on
+- **Page:** `deliver/Io_3D_stage1.html` (one offline file, 1.4 MB), published at
+  https://claude.ai/artifact/Uvz35Hj97w5yjyA5j2Z6Ep. Republish each stage's page to that link. Views, three poses, the painting beside her, the skirt on
   or off. `deliver/Io_stage1_vs_paintings.jpg` is the model beside B3 and B2 at one scale with the outlines laid over.
 - **Stand-ins:** the skirt is stiff and its lace is solid (one tier cut from B4, with a drawn scalloped hem); the boots are
   the Jester's boot made 5.5 cm taller and a little wider (no strap, buckle or gold stitching yet); arms, legs and hands are
