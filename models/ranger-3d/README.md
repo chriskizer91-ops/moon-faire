@@ -90,7 +90,21 @@ four strap hooks as real objects, standing still. About 355,000 triangles.
   - **A first walk** (`walk(true)`, `animate(dt)` in `src/R99_static.js`): a plain cycle on the spot written here (thighs, knees,
     feet, arms, hips dropping 4 cm at each step, a turn of the spine), period 1.08 s. Bags and charms move with her through the
     code from stage 5b. The Jester's full moves still come over at the movement stage and replace it.
-- Waiting for his notes: stage two (head), stage three (hands and arms) and stage five.
+- **Stage 6b, her own first moves.** Chris: younger face as made, hair left grey. "Working on making her walk look better is where
+  we are now, and then making her body and her fabric and materials move on her body as she walks." The Jester's set of moves is
+  the reference, "but she should have her own moves as the character that she is": dexterous, acrobatic, the sporty one, draws a
+  bow, good with a sword, quick on her feet. She needs her own talking animation (the four must not share one) and a couple of
+  emotes with face, hands and body.
+  - `play(name)` in `src/R99_static.js` (`moves` lists them): `idle` (ready: breath, weight shift, a double bounce on her toes
+    every 4 seconds), `walk` (heel strike, toe push-off, knee giving on landing, pelvis turn and dip, shoulders against hips, head
+    held on her heading; period 0.98 s), `jog` (the same cycle slid quicker: lean, heels up, elbows pumping; 0.62 s), `talk`
+    (weight on one hip, one quick hand at chest height, nods, mouths from J2), and three that end by themselves: `aim` (bow arm
+    out to her left, head turned, draw to the jaw, squint, hold, release; no bow yet), `cheer` (dip, jump, arm up, smile),
+    `limber` (toe bounces, shoulder rolls, arms shaken out). She blinks in every move.
+  - How it is written: each frame every bone goes back to rest and the layers are added (`restAll`, `add`); walking and jogging
+    share one cycle and blend. `pose()` stops everything for checking against the paintings.
+  - First drafts, tuned from stills only. Fingers do not curl; sleeves, band tails and loose locks are still stiff.
+- Waiting for his notes: the moves; stage two (head), stage three (hands and arms) and stage five.
 
 Rough or not built yet: her face does not move (no blink, no expressions); the hair has a smooth edge with none of the painted
 flyaway wisps, and the loose locks are simple; earrings and necklaces; fingers that bend; bracelets; each charm is one stiff piece on a hinge (its chain does not bend, charms can
@@ -313,7 +327,7 @@ python3 -I bake_hands_r.py            # adds her hands and arms from D1 and D2
 python3 -I bake_gear_r.py             # adds the leather of her bags and belts from F6
 python3 -I bake_looks_r.py            # adds the two trial faces (younger, the Fox's)
 ./build_r.sh                          # tools/tables.py, then out/ranger.js
-python3 -I build_single_r.py          # deliver/Ranger_3D_stage6.html, one offline file
+python3 -I build_single_r.py          # deliver/Ranger_3D_stage6b.html, one offline file
 python3 tools/shoot_hand.py shots/hand_L.jpg L hand   # one hand from four sides beside D1 or D2; also R, and arm
 python3 tools/wrist_sections.py                       # forearm and hand, slice by slice through the wrist
 python3 tools/page_test.py                            # the page at phone size: belt, bag, hook, boot, hand and body buttons, a drag

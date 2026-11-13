@@ -39,9 +39,9 @@ canvas#stage{display:block;width:100%;height:100%;touch-action:none;cursor:grab}
 <body>
 <div class="wrap">
   <header>
-    <p class="eyebrow">Moon Faire · Stage six: she walks</p>
+    <p class="eyebrow">Moon Faire · Stage six: her own moves</p>
     <h1>The <em>Ranger</em></h1>
-    <p class="sub">She walks: press "Walk on the spot" and watch her bags and charms move with her. Her bun now sits on the back of her head, and she wears the younger face you chose. Drag to turn her, pinch or scroll to zoom.</p>
+    <p class="sub">Her first moves are in the "Movement" row: a ready stance, a better walk, a jog, her own way of talking, and three short ones (take aim, cheer, limber up). Her face is the younger one and her hair stays grey, as you chose. Drag to turn her, pinch or scroll to zoom.</p>
   </header>
   <div class="stagebox" id="box">
     <canvas id="stage"></canvas>
@@ -60,11 +60,20 @@ canvas#stage{display:block;width:100%;height:100%;touch-action:none;cursor:grab}
   <div><p class="label">Movement</p><div class="chips" id="moves"></div></div>
   <div><p class="label">Show</p><div class="chips" id="shows"></div></div>
   <div class="notes">
-    <h2>New: she walks, her hair, her younger face</h2>
+    <h2>New: her own first moves</h2>
     <ul>
-      <li><b>Walk on the spot</b> (under "Movement") sets her walking. Her bags bump on her hips, her thighs push them, and the charms sway with each step. It is a plain first walk, written for this page; the Jester's full moves come over later.</li>
-      <li><b>Her hair:</b> the top of her head now slopes back from the band, and the bun sits on the back of her head instead of up high. The surface is smoother: the curls on the bun are a third as deep and the painted light-and-dark is softened.</li>
-      <li><b>Her face</b> is the younger one now, as you chose, with the sides of her cheeks treated the same way. The first painting and the Fox's are still there to compare.</li>
+      <li>Written for her as the quick, sporty one. The Jester's set was the reference for what a set should hold, not copied.</li>
+      <li><b>Ready:</b> she breathes, shifts her weight, and every few seconds bounces twice on her toes. She blinks.</li>
+      <li><b>Walk:</b> rebuilt. She lands on her heel and pushes off her toes, her knee gives as each foot lands, her hips turn and dip with each stride, her shoulders turn against her hips and her head stays on where she is going.</li>
+      <li><b>Jog:</b> the same stride made quick: leaning in, heels kicking up, elbows bent and pumping.</li>
+      <li><b>Talk:</b> her own. Weight on one hip, one quick hand at chest height, small nods, her mouth moving through her painted mouths.</li>
+      <li><b>Take aim:</b> she raises her bow arm, turns her head to it, draws to her jaw, narrows her eyes, holds, and lets go. The bow itself is not built yet.</li>
+      <li><b>Cheer:</b> a dip, a jump with one arm thrown up, a soft landing, a smile. <b>Limber up:</b> bouncing on her toes, rolling her shoulders, shaking out her arms.</li>
+      <li>Her bags and charms move with all of it.</li>
+    </ul>
+    <h2 style="margin-top:12px">Her hair and face</h2>
+    <ul>
+      <li>The younger face, with her hair left grey, as you chose. The top of her head slopes back from the band and the bun sits on the back of her head.</li>
     </ul>
     <h2 style="margin-top:12px">The faces</h2>
     <ul>
@@ -110,7 +119,9 @@ canvas#stage{display:block;width:100%;height:100%;touch-action:none;cursor:grab}
       <li>Rings, bracelets, earrings and necklaces.</li>
       <li>Each charm is one stiff piece on a hinge: its chain does not bend, and charms can pass through each other.</li>
       <li>The gold caps on the stones are plain, without the leaf work in your charm sheet.</li>
-      <li>She does not walk yet, so things only swing when you press the button. Once she moves they will swing with her.</li>
+      <li>These moves are first drafts, tuned from still pictures. I cannot watch them play, so the timing needs your eye.</li>
+      <li>Her sleeves, headband tails and loose locks are still stiff. Making cloth and hair move with her is the next job.</li>
+      <li>Her fingers do not curl yet, so her hands stay open in every move.</li>
       <li>With her arms straight out the iron curls bend a little with her skin, as if soft.</li>
       <li>Sleeves and the headband tails as hanging cloth. For now they are stiff.</li>
       <li>Bow, sword, knives, and all movement.</li>
@@ -178,7 +189,7 @@ canvas#stage{display:block;width:100%;height:100%;touch-action:none;cursor:grab}
   const applyVis = () => { for (const k in R.meshes) { let v = true; if (['wire', 'lens', 'pad'].includes(k)) v = vis.glasses; if (['lacesl', 'laceband'].includes(k)) v = vis.sleeves; if (GEARK.includes(k)) v = vis.gear; if (HOOKK.includes(k)) v = vis.hooks; if (CHARMK.includes(k)) v = vis.charms; if (vis.boots && !BOOTK.includes(k)) v = false; R.meshes[k].visible = v; } };
   toggle($('shows'), 'glassB', 'Glasses', true, (v) => { vis.glasses = v; applyVis(); });
   toggle($('shows'), 'sleeveB', 'Lace sleeves', true, (v) => { vis.sleeves = v; applyVis(); });
-  toggle($('moves'), 'walkB', 'Walk on the spot', false, (v) => { R.walk(v); if (v) { pickView(VIEWS[1], 'views'); $('views').children[1].setAttribute('aria-pressed', 'true'); } });
+  chips($('moves'), [['Stand still', 'pose'], ['Ready', 'idle'], ['Walk', 'walk'], ['Jog', 'jog'], ['Talk', 'talk'], ['Take aim', 'aim'], ['Cheer', 'cheer'], ['Limber up', 'limber']], (v) => { if (v[1] === 'pose') { setPose(1); return; } R.play(v[1]); const cam = v[1] === 'talk' ? [HVIEWS[6], 'hviews', 6] : [VIEWS[1], 'views', 1]; pickView(cam[0], cam[1]); $(cam[1]).children[cam[2]].setAttribute('aria-pressed', 'true'); }, 0);
   toggle($('shows'), 'gearB', 'Belts and bags', true, (v) => { vis.gear = v; applyVis(); });
   toggle($('shows'), 'hooksB', 'Strap hooks', true, (v) => { vis.hooks = v; applyVis(); });
   toggle($('shows'), 'charmsB', 'Charms', true, (v) => { vis.charms = v; applyVis(); });
@@ -203,7 +214,7 @@ canvas#stage{display:block;width:100%;height:100%;touch-action:none;cursor:grab}
     if (easing) { let d = want.az - orbit.az; d = Math.atan2(Math.sin(d), Math.cos(d)); const k = Math.min(1, dt * 5); orbit.az += d * k; orbit.el += (want.el - orbit.el) * k; orbit.dist += (want.dist - orbit.dist) * k; orbit.target.y += (want.ty - orbit.target.y) * k; orbit.target.x += ((want.tx || 0) - orbit.target.x) * k; orbit.target.z += ((want.tz || 0) - orbit.target.z) * k; }
     stage.render();
   }
-  $('hud').textContent = 'Walking, new hair, younger face · ' + Math.round(R.triangles / 1000) + 'k triangles';
+  $('hud').textContent = 'Her first moves · ' + Math.round(R.triangles / 1000) + 'k triangles';
   window.RANGER = { stage, R, step() { fit(); stage.render(); } };
   requestAnimationFrame(frame);
 })();

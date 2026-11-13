@@ -96,30 +96,77 @@
     root.add(m); m.bind(skeleton, new THREE.Matrix4()); meshes[key] = m; triCount += B.idx.length / 3;
   }
   // stage one has no motion yet: pose() sets a few bone turns by hand, for checking her against the paintings
-  // pose() sets a few bone turns by hand, for checking her against the paintings. walk(true) sets her walking on the spot: a plain
-  // cycle written here (legs, arms, hips, a turn of the spine), so her bags and charms can be seen moving with her. The Jester's
-  // full moves come over at the movement stage and replace it.
-  let lastPose = { arm: 15, leg: 0 }, walkOn = false, walkAmt = 0, walkPh = 0;
+  // ---------- her moves (a first set, written for her: she is the quick, sporty one) ----------
+  // pose() holds her still for checking against the paintings. play(name) starts a move: 'idle' (ready, light on her feet), 'walk',
+  // 'jog', 'talk' (her own: one quick hand, weight on one hip), and three short ones that end by themselves: 'aim' (she draws a bow
+  // that is not built yet), 'cheer' (a jump with an arm thrown up) and 'limber' (she shakes out and bounces). Every frame the bones
+  // are set back to rest and the layers are added on top. The Jester's moves are the reference for what a full set holds, not copied.
+  let lastPose = { arm: 15, leg: 0 }, mv = { name: 'pose', t: 0 }, wk = 0, jg = 0, gph = 0, clock = 0, blinkAt = 2.4, blinkT = -1, mouthAt = 0, mouthNow = 'rest', facePainted = '';
+  const SHOTS = { aim: 3.0, cheer: 1.5, limber: 2.6 }, MOVES = ['pose', 'idle', 'walk', 'jog', 'talk', 'aim', 'cheer', 'limber'];
+  const add = (b, x, y, z) => { const r = SK[b].rotation; r.x += x; r.y += y; r.z += z; };
+  function restAll() { for (const k in SK) if (!/^(bag|charm)/.test(k)) SK[k].rotation.set(0, 0, 0); SK.hips.position.copy(SK.hips.userData.home); }
   function pose(o) {
-    o = o || {}; lastPose = { arm: o.arm == null ? 15 : o.arm, leg: o.leg || 0 }; const arm = lastPose.arm * DEG - A_POSE, leg = lastPose.leg * DEG;
-    for (const [S, s] of SIDES) { SK['uarm' + S].rotation.set(0, 0, s * arm); SK['farm' + S].rotation.set(0, 0, 0); SK['thigh' + S].rotation.set(0, 0, s * leg); SK['shin' + S].rotation.set(0, 0, 0); SK['foot' + S].rotation.set(0, 0, -s * leg); }
-    SK.hips.position.copy(SK.hips.userData.home); SK.hips.rotation.set(0, 0, 0); SK.spine2.rotation.set(0, 0, 0);
+    o = o || {}; mv = { name: 'pose', t: 0 }; wk = 0; jg = 0; lastPose = { arm: o.arm == null ? 15 : o.arm, leg: o.leg || 0 }; const arm = lastPose.arm * DEG - A_POSE, leg = lastPose.leg * DEG;
+    restAll(); for (const [S, s] of SIDES) { SK['uarm' + S].rotation.z = s * arm; SK['thigh' + S].rotation.z = s * leg; SK['foot' + S].rotation.z = -s * leg; }
     root.updateMatrixWorld(true);
     if (gearSettle) { gearSettle(); root.updateMatrixWorld(true); }       // the bags come to rest against her in the new pose
   }
-  function walk(on) { walkOn = !!on; return walkOn; }
+  function play(name) { if (!MOVES.includes(name) || name === 'pose') { pose(lastPose); return 'pose'; } mv = { name, t: 0 }; return name; }
+  function walk(on) { return play(on ? 'walk' : 'pose') === 'walk'; }
   function animate(dt) {
-    dt = dt > 0 ? Math.min(dt, 0.05) : 0;
-    const was = walkAmt; walkAmt += ((walkOn ? 1 : 0) - walkAmt) * Math.min(1, dt * 3.5); if (!walkOn && walkAmt < 0.004) walkAmt = 0;
-    if (walkAmt > 0) { walkPh += dt * TAU / 1.08; const w = walkAmt, sn = Math.sin(walkPh), arm = lerp(lastPose.arm * DEG - A_POSE, 9 * DEG - A_POSE, w), leg = lastPose.leg * DEG * (1 - w);
-      for (const [S, s] of SIDES) { const p = walkPh + (s < 0 ? 0 : PI), si = Math.sin(p), co = Math.cos(p);
-        const th = -(0.36 * si + 0.06) * w, kn = (1.02 * Math.pow(Math.max(0, co), 1.4) + 0.10 * Math.max(0, si)) * w;       // thigh forward and back; the knee folds as the leg swings through
-        SK['thigh' + S].rotation.set(th, 0, s * leg); SK['shin' + S].rotation.set(kn, 0, 0); SK['foot' + S].rotation.set(-(th + kn) * 0.55, 0, -s * leg);
-        SK['uarm' + S].rotation.set(0.36 * si * w, 0, s * arm); SK['farm' + S].rotation.set(-(0.20 + 0.20 * Math.max(0, -si)) * w, 0, 0); }
-      const hp = SK.hips; hp.position.copy(hp.userData.home); hp.position.y -= 0.042 * w * sn * sn; hp.position.x += 0.011 * w * Math.cos(walkPh); hp.rotation.set(0, 0.075 * w * sn, 0.022 * w * Math.cos(walkPh));
-      SK.spine2.rotation.set(0.03 * w, -0.11 * w * sn, 0);
-    } else if (was > 0) pose(lastPose);
-    if (gearTick) gearTick(dt);       // the bags and charms swing
+    dt = dt > 0 ? Math.min(dt, 0.05) : 0; clock += dt;
+    if (mv.name === 'pose') { if (gearTick) gearTick(dt); return; }
+    mv.t += dt; if (SHOTS[mv.name] && mv.t >= SHOTS[mv.name]) mv = { name: 'idle', t: 0 };
+    const N = mv.name, T = mv.t; restAll();
+    wk += ((N === 'walk' ? 1 : 0) - wk) * Math.min(1, dt * 4.5); jg += ((N === 'jog' ? 1 : 0) - jg) * Math.min(1, dt * 4.5);
+    const go = Math.min(1, wk + jg), g = wk + jg > 1e-4 ? jg / (wk + jg) : 0, L = (a, b) => a + (b - a) * g, still = 1 - go;
+    for (const [S, s] of SIDES) SK['uarm' + S].rotation.z = s * (9 * DEG - A_POSE);       // arms hang close
+    const bounce = (h) => { if (h <= 0) return; const a = h / 0.10; SK.hips.position.y += h; for (const [S] of SIDES) { add('foot' + S, a, 0, 0); add('toe' + S, -a, 0, 0); } };       // up on the balls of her feet
+    // always: breath, and a small shift of weight when she stands
+    const br = Math.sin(clock * 1.7), sway = Math.sin(clock * 0.9);
+    add('spine2', 0.012 * br, 0, 0); add('spine3', 0.010 * br, 0, 0); for (const [S, s] of SIDES) add('clav' + S, 0, 0, s * 0.014 * br);
+    SK.hips.position.x += 0.007 * sway * still; add('hips', 0, 0, 0.012 * sway * still); add('spine1', 0, 0, -0.012 * sway * still);
+    if (N === 'idle') { const c = clock % 4.2; if (c < 0.7) bounce(0.024 * Math.pow(Math.sin(c / 0.35 * PI), 2) * (c < 0.35 ? 1 : 0.6)); }       // light on her feet: a quick double bounce now and then
+    // walking and jogging share one cycle; g slides from one to the other
+    if (go > 0.001) { gph += dt * TAU / L(0.98, 0.62); const A = L(0.40, 0.58), sn = Math.sin(gph), cs = Math.cos(gph);
+      for (const [S, s] of SIDES) { const p = gph + (s < 0 ? 0 : PI), si = Math.sin(p), co = Math.cos(p), sw = Math.max(0, co), st = Math.max(0, -co);
+        const th = -(A * si + L(0.05, 0.16)) * go, kn = (L(1.05, 1.75) * Math.pow(sw, 1.3) + L(0.20, 0.38) * Math.pow(Math.max(0, Math.sin(p - 0.5)), 3) * st + L(0.04, 0.22)) * go;       // thigh; knee folding in the swing and giving a little as the foot lands
+        const up = 0.22 * Math.pow(Math.max(0, si), 3) * go, off = L(0.55, 0.75) * Math.max(0, -si) * st * go;       // toes up to land on the heel; heel up to push off
+        add('thigh' + S, th, 0, 0); add('shin' + S, kn, 0, 0); add('foot' + S, -(th + kn) * 0.92 - up + off, 0, 0); add('toe' + S, -off * 0.9, 0, 0);
+        add('uarm' + S, (L(0.42, 0.72) * si + L(0, 0.18)) * go, 0, 0); add('farm' + S, -(L(0.28, 1.45) + L(0.30, 0.22) * Math.max(0, -si)) * go, 0, 0); }
+      SK.hips.position.y += (-L(0.045, 0) * sn * sn - L(0, 0.036) * cs * cs + L(0, 0.02)) * go; SK.hips.position.x += L(0.013, 0.006) * cs * go;
+      add('hips', L(0.02, 0.09) * go, L(0.10, 0.14) * sn * go, L(0.035, 0.02) * cs * go);       // lean, the turn of the pelvis with each stride, and its dip on the swinging side
+      add('spine1', L(0.02, 0.05) * go, -0.05 * sn * go, -0.02 * cs * go); add('spine2', 0, -L(0.09, 0.12) * sn * go, -0.02 * cs * go); add('spine3', 0, -0.05 * sn * go, 0);
+      add('neck', -L(0.03, 0.10) * go, L(0.09, 0.13) * sn * go, 0); }       // her shoulders turn against her hips; her head stays on the way she is going
+    // talking: weight on one hip, one quick hand at chest height, small nods
+    if (N === 'talk') { const k = sm(0, 0.4, T), a1 = Math.sin(T * 4.4), a2 = Math.sin(T * 2.3 + 1), a3 = Math.sin(T * 6.1);
+      SK.hips.position.x += 0.016 * k; add('hips', 0, 0.10 * k, 0.03 * k); add('spine1', 0, -0.06 * k, -0.035 * k);
+      add('uarmR', -(0.55 + 0.12 * a2) * k, 0, -0.10 * k); add('farmR', -(1.55 + 0.28 * a1) * k, 0, 0); add('handR', 0.25 * a3 * k, 0.5 * a2 * k, 0);
+      add('uarmL', 0.06 * a2 * k, 0, 0); add('farmL', -0.22 * k, 0, 0);
+      add('head', (0.05 * a1 + 0.03) * k, 0.10 * a2 * k, 0.05 * Math.sin(T * 1.3) * k); add('neck', 0, 0.06 * a2 * k, 0);
+      if (clock > mouthAt) { mouthAt = clock + 0.10 + 0.09 * Math.abs(Math.sin(clock * 37.7)); const r = Math.abs(Math.sin(clock * 91.3)); mouthNow = r < 0.28 ? 'rest' : r < 0.62 ? 'open' : r < 0.86 ? 'oo' : 'smile'; }
+    } else mouthNow = N === 'cheer' && T > 0.2 && T < 1.3 ? 'smile' : 'rest';
+    let squint = 0;
+    // taking aim: bow arm out to her left, head turned to it, the other hand drawn back to her jaw, a held breath, the release
+    if (N === 'aim') { const k1 = sm(0, 0.5, T), k2 = sm(0.5, 1.3, T), rel = sm(1.95, 2.02, T), out = 1 - sm(2.4, 3.0, T), hold = k2 * (1 - rel);
+      add('uarmL', 0, 0, (86 - 9) * DEG * k1 * out); add('uarmR', 0, 0, -(100 - 9) * DEG * k1 * out); add('farmR', -(1.7 * k1 + 1.1 * k2 - 1.0 * rel) * out, 0, 0); add('uarmR', 0, -0.35 * rel * out, 0);
+      add('neck', 0, 0.5 * k1 * out, 0); add('head', 0, 0.62 * k1 * out, 0.04 * hold); add('spine2', 0, 0.12 * k1 * out, -0.05 * k2 * out);
+      for (const [S, s] of SIDES) { add('thigh' + S, 0, 0, s * 0.10 * k1 * out); add('foot' + S, 0, 0, -s * 0.10 * k1 * out); }
+      add('farmL', 0, 0, 0.012 * Math.sin(T * 31) * hold); squint = hold > 0.6 ? 0.5 : 0; }
+    // a cheer: she dips, jumps, throws an arm up, lands soft
+    if (N === 'cheer') { const c1 = sm(0, 0.22, T) * (1 - sm(0.22, 0.36, T)), u = cl((T - 0.36) / 0.5, 0, 1), air = Math.sin(PI * u), c2 = sm(0.84, 0.94, T) * (1 - sm(0.94, 1.3, T)), c = c1 + 0.8 * c2, k = sm(0.2, 0.45, T) * (1 - sm(1.0, 1.45, T));
+      for (const [S] of SIDES) { add('thigh' + S, -0.45 * c - 0.25 * air, 0, 0); add('shin' + S, 0.9 * c + 0.5 * air, 0, 0); add('foot' + S, -0.45 * c + 0.2 * air, 0, 0); }
+      SK.hips.position.y += -0.075 * c + 0.20 * 4 * u * (1 - u);
+      add('uarmR', -2.7 * k, 0, 0); add('farmR', -0.45 * k, 0, 0); add('uarmL', -1.1 * k, 0, 0); add('farmL', -1.9 * k, 0, 0); add('head', -0.18 * k, 0, 0); add('spine2', -0.08 * k, 0, 0); }
+    // limbering up: bouncing on her toes, shoulders rolling, arms shaken loose, her head from side to side
+    if (N === 'limber') { const k = sm(0, 0.3, T) * (1 - sm(2.2, 2.6, T));
+      bounce(0.020 * Math.abs(Math.sin(T * 9.5)) * k); for (const [S, s] of SIDES) { add('clav' + S, 0, 0, s * 0.16 * Math.sin(T * 5 + (s > 0 ? 1.6 : 0)) * k); add('uarm' + S, 0.14 * Math.sin(T * 9 + s) * k, 0, s * 0.06 * k); add('farm' + S, -(0.5 + 0.2 * Math.sin(T * 11 + s)) * k, 0, 0); add('shin' + S, 0.10 * k, 0, 0); add('thigh' + S, -0.05 * k, 0, 0); }
+      add('head', 0, 0, 0.22 * Math.sin(T * 2.4) * k); add('neck', 0.04 * k, 0, 0.08 * Math.sin(T * 2.4) * k); }
+    // her face: she blinks; her mouth moves when she talks
+    if (clock > blinkAt) { blinkT = clock; blinkAt = clock + 2.2 + 2.6 * Math.abs(Math.sin(clock * 12.9)); }
+    const bt = clock - blinkT, eyes = Math.max(squint, bt < 0.05 ? 0.5 : bt < 0.10 ? 1 : bt < 0.15 ? 0.5 : 0), key = eyes + '|' + mouthNow;
+    if (key !== facePainted) { paintFace(eyes, mouthNow); facePainted = key; }
+    if (gearTick) gearTick(dt);       // the bags and charms swing with her
   }
-  return { root, skeleton, bones, SK, animate, pose, walk, swing: () => { if (gearKick) gearKick(); }, setLook, meshes, spin: 0, time: 0, stanceProgress: 1, setStance() {}, play() {}, setFace: (eyes, mouth) => paintFace(eyes || 0, mouth || 'rest'), debug: { SK, meshes, cloths: [], headPoint, JH, hairPt, phOfY }, get triangles() { return triCount; } };
+  return { root, skeleton, bones, SK, animate, pose, play, moves: MOVES, walk, swing: () => { if (gearKick) gearKick(); }, setLook, meshes, spin: 0, time: 0, stanceProgress: 1, setStance() {}, setFace: (eyes, mouth) => paintFace(eyes || 0, mouth || 'rest'), debug: { SK, meshes, cloths: [], headPoint, JH, hairPt, phOfY }, get triangles() { return triCount; } };
 }
