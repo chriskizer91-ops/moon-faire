@@ -69,6 +69,8 @@ details.more>div{margin-top:10px}
   <div class="notes">
     <h2>Changed in this pass</h2>
     <ul>
+      <li>"Flipbook look" is a new switch beside "Half speed". It redraws her at her sprites' pixel size, in the 56 colours all four witches share, with an inked outline. It starts off.</li>
+      <li>Sleeves again: a folded elbow now gathers the lace small and close round her upper arm, short of her forearm, and the loop rides a little above her arm instead of lying on it.</li>
       <li>Sleeves, done again: each is now a loop of cloth round her arm. It rests on the top of her arm and hangs below it, her forearm pushes it aside and gathers it toward her shoulder when her elbow folds, and her arm always stays inside it. It follows on a spring, so it sways.</li>
       <li>Soft things: her lace sleeves, the two tails of her headband and her sixteen loose locks now hang and swing. Each lags when she moves and settles when she stops. A sleeve hangs further down the more her elbow folds, so in "Take aim" her forearm no longer passes through it.</li>
       <li>Her shoulders: each arm now turns in her shoulder like a ball in a socket, so nothing pinches or steps where arm meets body when she raises it. Her armpit opens a little as it lifts. Her shape standing still is unchanged.</li>
@@ -211,6 +213,7 @@ details.more>div{margin-top:10px}
   toggle($('shows'), 'sleeveB', 'Lace sleeves', true, (v) => { vis.sleeves = v; applyVis(); });
   chips($('moves'), [['Stand still', 'pose'], ['Ready', 'idle'], ['Walk', 'walk'], ['Jog', 'jog'], ['Talk', 'talk'], ['Take aim', 'aim'], ['Cheer', 'cheer'], ['Limber up', 'limber']], (v) => { if (v[1] === 'pose') setPose(1); else R.play(v[1]); }, 1);
   toggle($('extra'), 'slowB', 'Half speed', false, (v) => { speed = v ? 0.45 : 1; });
+  toggle($('extra'), 'flipB', 'Flipbook look', false, (v) => { stage.look = v ? 'flipbook' : 'smooth'; });       // claude/HOW-TO-flipbook-look.md: a switch, off when the page opens
   toggle($('shows'), 'gearB', 'Belts and bags', true, (v) => { vis.gear = v; applyVis(); });
   toggle($('shows'), 'hooksB', 'Strap hooks', true, (v) => { vis.hooks = v; applyVis(); });
   toggle($('shows'), 'charmsB', 'Charms', true, (v) => { vis.charms = v; applyVis(); });

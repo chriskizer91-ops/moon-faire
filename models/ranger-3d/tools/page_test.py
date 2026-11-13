@@ -2,7 +2,7 @@
 import sys
 from playwright.sync_api import sync_playwright
 from PIL import Image
-PAGE = sys.argv[1] if len(sys.argv) > 1 else '/home/claude/ranger/deliver/Ranger_3D_stage7b.html'
+PAGE = sys.argv[1] if len(sys.argv) > 1 else '/home/claude/ranger/deliver/Ranger_3D_stage8.html'
 ARGS = ['--use-angle=swiftshader', '--enable-unsafe-swiftshader', '--ignore-gpu-blocklist', '--allow-file-access-from-files']
 with sync_playwright() as p:
     b = p.chromium.launch(executable_path='/usr/bin/google-chrome', args=ARGS)
@@ -16,6 +16,7 @@ with sync_playwright() as p:
     for host, label in (('moves', 'Walk'), ('cam', 'Side'), ('moves', 'Jog'), ('cam', 'Hips'), ('moves', 'Stand still'), ('gear', 'Charms'), ('poses', 'Legs apart'), ('boots', 'Outer side'), ('hands', 'Left hand'), ('views', 'Front'), ('hviews', 'Face')):
         pg.evaluate('window.scrollTo(0,0)'); pg.click('#%s >> text="%s"' % (host, label)); pg.wait_for_timeout(6500); shot(host + '_' + label.replace(' ', '_'))
     pg.evaluate('window.scrollTo(0,0)'); pg.click('#gear >> text="Charms"'); pg.wait_for_timeout(5000); pg.click('#swingB'); pg.wait_for_timeout(260); shot('swing'); pg.wait_for_timeout(5000); print('after the swing, bag and charm turns:', pg.evaluate('Object.keys(RANGER.R.SK).filter((k) => /bag|charm/.test(k)).map((k) => +(1 - RANGER.R.SK[k].quaternion.w).toFixed(4))'))
+    pg.evaluate('window.scrollTo(0,0)'); pg.click('#cam >> text="Whole body"'); pg.click('#moves >> text="Ready"'); pg.click('#flipB'); pg.wait_for_timeout(6000); shot('flipbook'); pg.click('#cam >> text="Head"'); pg.wait_for_timeout(6000); shot('flipbook_head'); pg.click('#flipB')
     print('after Face: target', pg.evaluate('RANGER.stage.orbit.target.toArray().map((v) => +v.toFixed(3))'), 'pressed pose:', pg.evaluate('[...document.querySelectorAll("#poses .chip")].filter((c) => c.getAttribute("aria-pressed") === "true").map((c) => c.textContent)'))
     az0 = pg.evaluate('RANGER.stage.orbit.az'); cx, cy = bx['x'] + bx['width'] / 2, bx['y'] + bx['height'] / 2
     pg.mouse.move(cx, cy); pg.mouse.down(); pg.wait_for_timeout(300)

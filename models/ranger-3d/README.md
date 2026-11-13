@@ -136,6 +136,16 @@ four strap hooks as real objects, standing still. About 355,000 triangles.
   her arm (2.6 cm at the hem, on top of the 1.9 cm built in), and away from her forearm as her elbow folds (up to 4 cm), which
   also gathers the cloth toward her shoulder (hem scaled to 72%). The slide is capped at 4.4 cm, short of the loop's slack, so
   her arm stays inside. It follows on a spring. Tails and locks keep the stage-seven swing.
+- **Stage eight, the Flipbook look and the sleeves once more.** Chris: "Her arms are still passing through the lace. Also, can you
+  add the flipbook look button", with the note that all four witches share the same 56 colours and that the 56 have no green.
+  - Flipbook look: a switch on her page ("Flipbook look", beside "Half speed"), off when the page opens, done exactly as the
+    project doc `claude/HOW-TO-flipbook-look.md` says: it sets `stage.look` to `'flipbook'` or `'smooth'`. `viewer/stage.js` and
+    `out/palette.js` were already in place. Seen on her for the first time here: her face, glasses, outline and skin read well;
+    **her grey hair lands on olive brown**, because the 56 have no grey near it. The fix the how-to gives (up to eight extra
+    colours, taken from her own flipbook frames and passed as `makeStage(canvas, { palette })`) is not done yet.
+  - Sleeves: a folded elbow gathers the hem to 55% of its size, close round her upper arm and short of her forearm, and the slide
+    allowed shrinks with it so her upper arm stays inside. The slide toward the ground is 1.7 cm (was 2.6), so the loop rides a
+    little above her raised arm instead of lying on it, where its ragged folds dipped into her skin.
 - Waiting for his notes: the moves again; stage two (head), stage three (hands and arms) and stage five.
 
 Rough or not built yet: her face does not move (no blink, no expressions); the hair has a smooth edge with none of the painted
@@ -359,7 +369,7 @@ python3 -I bake_hands_r.py            # adds her hands and arms from D1 and D2
 python3 -I bake_gear_r.py             # adds the leather of her bags and belts from F6
 python3 -I bake_looks_r.py            # adds the two trial faces (younger, the Fox's)
 ./build_r.sh                          # tools/tables.py, then out/ranger.js
-python3 -I build_single_r.py          # deliver/Ranger_3D_stage7b.html, one offline file
+python3 -I build_single_r.py          # deliver/Ranger_3D_stage8.html, one offline file
 python3 tools/shoot_hand.py shots/hand_L.jpg L hand   # one hand from four sides beside D1 or D2; also R, and arm
 python3 tools/wrist_sections.py                       # forearm and hand, slice by slice through the wrist
 python3 tools/page_test.py                            # the page at phone size: belt, bag, hook, boot, hand and body buttons, a drag
