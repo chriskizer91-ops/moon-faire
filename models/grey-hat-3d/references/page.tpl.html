@@ -1,0 +1,201 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Grey Hat Reference Paintings</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans:wght@400;500;600&family=Jacquard+24&display=swap" rel="stylesheet">
+<style>
+:root{
+  /* layout: one narrow column of cards under a sticky row of set letters; everything is visible at rest */
+  /* one visual world on purpose: the plum backdrop his paintings are made on, with the cream, red and gold of his costume */
+  color-scheme: dark;
+  --plum:#2a2130;      /* page: a shade under the paintings' backdrop #3B2F43 */
+  --panel:#352a3c;     /* cards */
+  --well:#211a26;      /* prompt text wells */
+  --line:#4e4058;
+  --ink:#f2eadd;       /* his linen */
+  --dim:#b9abbf;
+  --red:#c5453d;       /* the flowers on his trousers */
+  --red-deep:#9c2f2a;
+  --gold:#dcb565;      /* the scroll */
+  --ok:#3f8a63;
+  --display:"Jacquard 24", "UnifrakturCook", Georgia, serif;
+  --body:"IBM Plex Sans", system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  --mono:"IBM Plex Mono", ui-monospace, Menlo, Consolas, monospace;
+}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth;scroll-padding-top:64px}
+@media (prefers-reduced-motion:reduce){html{scroll-behavior:auto}}
+body{margin:0;background:var(--plum);color:var(--ink);font:16px/1.55 var(--body)}
+main{max-width:780px;margin:0 auto;padding:20px 16px 72px;display:flex;flex-direction:column;gap:30px}
+img{max-width:100%;display:block}
+p,ol,ul,figure,h1,h2,h3,pre,table{margin:0}
+a{color:var(--gold)}
+:focus-visible{outline:2px solid var(--gold);outline-offset:2px}
+
+.eyebrow{font:500 12px/1.3 var(--mono);letter-spacing:.14em;text-transform:uppercase;color:var(--gold)}
+.dim{color:var(--dim)}
+.num{font-variant-numeric:tabular-nums;color:var(--ink)}
+
+.top{display:grid;grid-template-columns:minmax(0,1fr) 128px;gap:16px;align-items:start}
+.top .words{display:flex;flex-direction:column;gap:10px}
+h1{font:400 58px/.92 var(--display);letter-spacing:.01em;text-wrap:balance}
+h1 small{display:block;font:500 12px/1.4 var(--mono);letter-spacing:.14em;text-transform:uppercase;color:var(--dim);margin-top:10px}
+.top img{width:100%;height:auto;border-radius:10px;border:1px solid var(--line)}
+@media (min-width:620px){.top{grid-template-columns:minmax(0,1fr) 210px;gap:26px}h1{font-size:84px}}
+
+.rounds{display:grid;grid-template-columns:1fr;gap:10px}
+@media (min-width:620px){.rounds{grid-template-columns:repeat(3,1fr)}}
+.round{border:1px solid var(--line);border-left:4px solid var(--red);border-radius:10px;padding:12px 14px;display:flex;flex-direction:column;gap:3px;background:var(--panel)}
+.round .rn{font:500 12px/1.3 var(--mono);letter-spacing:.14em;text-transform:uppercase;color:var(--gold)}
+.round .rc{font:600 20px/1.2 var(--body)}
+.round .rd{font-size:14px;color:var(--dim)}
+
+nav.jump{position:sticky;top:0;z-index:5;margin:0 -16px;padding:8px 16px;background:rgba(42,33,48,.94);border-bottom:1px solid var(--line);display:flex;gap:6px;overflow-x:auto}
+nav.jump a{flex:0 0 auto;min-width:40px;text-align:center;padding:7px 11px;border:1px solid var(--line);border-radius:999px;font:500 14px/1.2 var(--mono);color:var(--ink);text-decoration:none;background:var(--panel)}
+nav.jump a:hover{border-color:var(--gold)}
+
+section{display:flex;flex-direction:column;gap:12px}
+section>header{display:flex;flex-direction:column;gap:6px}
+h2{font:600 23px/1.2 var(--body);text-wrap:balance}
+h3{font:600 17px/1.3 var(--body)}
+ol,ul{padding-left:22px;display:flex;flex-direction:column;gap:7px}
+
+.refs{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+@media (min-width:620px){.refs{grid-template-columns:repeat(3,1fr)}}
+.ref{display:flex;flex-direction:column;gap:7px}
+.ref img{width:100%;aspect-ratio:1/1;object-fit:contain;background:var(--well);border:1px solid var(--line);border-radius:10px}
+.ref figcaption{font-size:13.5px;line-height:1.45;color:var(--dim)}
+.ref figcaption b{color:var(--ink);font-weight:600}
+.ref .when{display:block;color:var(--gold);font:500 11.5px/1.5 var(--mono);letter-spacing:.06em;text-transform:uppercase}
+.ref .fn{display:block;font:400 11.5px/1.5 var(--mono);word-break:break-all}
+
+.card{background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:14px;display:flex;flex-direction:column;gap:9px}
+.row{display:flex;justify-content:space-between;align-items:flex-start;gap:12px}
+.code{display:inline-block;background:var(--red-deep);color:var(--ink);border-radius:6px;padding:0 7px;margin-right:3px;font:500 13.5px/1.6 var(--mono)}
+.meta{font-size:14.5px;color:var(--dim)}
+.shape{display:inline-block;border:1px solid var(--line);border-radius:999px;padding:0 9px;margin-right:4px;font:500 12px/1.7 var(--mono);color:var(--ink);white-space:nowrap}
+.attach{font-size:14.5px;border-left:3px solid var(--gold);padding-left:10px}
+.attach b{color:var(--gold);font-weight:600}
+pre{white-space:pre-wrap;word-break:break-word;background:var(--well);border:1px solid var(--line);border-radius:9px;padding:12px;font:13.5px/1.55 var(--mono);max-height:230px;overflow:auto}
+pre.long{max-height:340px}
+button.copy{width:100%;min-height:46px;border:0;border-radius:9px;background:var(--red-deep);color:var(--ink);font:600 16px/1 var(--body);cursor:pointer}
+button.copy:hover{background:var(--red)}
+button.copy.done{background:var(--ok)}
+.kept{flex:0 0 auto;display:flex;align-items:center;gap:6px;font-size:14px;color:var(--dim);white-space:nowrap;cursor:pointer;padding:2px 0}
+.kept input{width:20px;height:20px;accent-color:var(--ok);margin:0}
+
+.plain{background:none;border:1px solid var(--line);border-radius:12px;padding:14px}
+table{border-collapse:collapse;width:100%;font-size:14.5px}
+th,td{text-align:left;vertical-align:top;padding:8px 10px 8px 0;border-top:1px solid var(--line)}
+th{font-weight:600;white-space:nowrap;padding-right:16px}
+tr:first-child th,tr:first-child td{border-top:0}
+</style>
+</head>
+<body>
+<main>
+
+<header class="top">
+  <div class="words">
+    <p class="eyebrow">Moon Faire · a character the four meet</p>
+    <h1>[[CAP]]<small>working name · [[N]] reference paintings</small></h1>
+    <p>These are the prompts for his reference paintings, to run in ChatGPT the way the witches' were. They turn the one picture of him into realistic paintings on flat plum, in fixed views, that I can measure and build his 3D model from.</p>
+    <p class="dim">Round 1 is enough to start building. Nothing here is lore: his name, who he is and what he can do are yours to decide.</p>
+  </div>
+  <img src="[[HERO]]" alt="The picture of him: a man in a grey witch's hat, cream shirt, black corset and torn red and black trousers, hands on his hips" width="520" height="780">
+</header>
+
+<div class="rounds">[[ROUNDS]]</div>
+
+<nav class="jump" aria-label="Jump to a set">[[CHIPS]]</nav>
+
+<section id="how">
+  <header><p class="eyebrow">Before you start</p><h2>How to run it</h2></header>
+  <ol>[[STEPS]]</ol>
+</section>
+
+<section id="attach">
+  <header><p class="eyebrow">Seven images</p><h2>Pictures to attach</h2>
+  <p class="dim">The first five go into every new chat, in this order. All seven are in the zip I sent with this page, under the file names shown. Attach them from the zip: it holds them at full size.</p></header>
+  <div class="refs">[[FIGS]]</div>
+</section>
+
+<section id="rules">
+  <header><p class="eyebrow">Paste first</p><h2>Standing rules</h2>
+  <p class="dim">Paste this once at the start of every new chat, with the five starters attached, and wait for "ready".</p></header>
+  <article class="card">
+    <pre class="long" id="t-rules">[[RULES]]</pre>
+    <button class="copy" type="button" data-t="t-rules">Copy the standing rules</button>
+  </article>
+</section>
+
+[[CARDS]]
+
+<section id="check">
+  <header><p class="eyebrow">Each image</p><h2>Check before you keep one</h2></header>
+  <ul>[[CHECK]]</ul>
+</section>
+
+<section id="guesses">
+  <header><p class="eyebrow">For you to correct</p><h2>What I read from his picture, and where I guessed</h2>
+  <p class="dim">He has one picture, from the front. You know the outfit, so correct anything here before you run the list.</p></header>
+  <ul>[[GUESSES]]</ul>
+</section>
+
+<section id="plan">
+  <header><p class="eyebrow">A proposal</p><h2>What I plan to build first</h2></header>
+  <div class="plain"><table>[[PLAN]]</table></div>
+  <p class="dim">No magic and no spells until you decide what he is.</p>
+</section>
+
+</main>
+<script>
+(function(){
+  var STORE = '[[STORE]]';
+  function fallback(t){
+    return new Promise(function(res, rej){
+      var a = document.createElement('textarea');
+      a.value = t; a.setAttribute('readonly', ''); a.style.cssText = 'position:fixed;left:0;top:0;opacity:0';
+      document.body.appendChild(a); a.select(); a.setSelectionRange(0, t.length);
+      var ok = false; try { ok = document.execCommand('copy'); } catch (e) {}
+      document.body.removeChild(a); ok ? res() : rej();
+    });
+  }
+  function copyText(t){
+    if (navigator.clipboard && navigator.clipboard.writeText) {
+      return navigator.clipboard.writeText(t).catch(function(){ return fallback(t); });
+    }
+    return fallback(t);
+  }
+  document.querySelectorAll('button.copy').forEach(function(b){
+    var label = b.textContent;
+    b.addEventListener('click', function(){
+      var t = document.getElementById(b.dataset.t).textContent;
+      copyText(t).then(function(){ b.textContent = 'Copied'; b.classList.add('done'); },
+                       function(){ b.textContent = 'Press and hold the text to copy'; });
+      setTimeout(function(){ b.textContent = label; b.classList.remove('done'); }, 1800);
+    });
+  });
+  var boxes = document.querySelectorAll('.kept input');
+  function count(){
+    document.querySelectorAll('.num[data-set], .num[data-round]').forEach(function(n){
+      var key = n.dataset.set ? 'set' : 'round', want = n.dataset[key], c = 0;
+      boxes.forEach(function(x){ if (x.checked && x.dataset[key] === want) c++; });
+      n.textContent = c;
+    });
+  }
+  boxes.forEach(function(c){
+    try { c.checked = localStorage.getItem(STORE + c.dataset.k) === '1'; } catch (e) {}
+    c.addEventListener('change', function(){
+      try { localStorage.setItem(STORE + c.dataset.k, c.checked ? '1' : '0'); } catch (e) {}
+      count();
+    });
+  });
+  count();
+})();
+</script>
+</body>
+</html>
