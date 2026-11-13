@@ -75,12 +75,27 @@
     m.name = key; m.castShadow = !/^(lens|pad|wisp)$/.test(key); m.receiveShadow = true; m.frustumCulled = false;
     root.add(m); m.bind(skeleton, new THREE.Matrix4()); meshes[key] = m; triCount += B.idx.length / 3;
   }
-  // stage one has no motion yet: pose() sets a few bone turns by hand, for checking her against the paintings
-  function animate() {}
+  // Her body does not move yet: pose() sets a few bone turns by hand, for checking her against the paintings.
+  // Her face does: she blinks by herself, and talk(true) moves her mouth through her painted mouths (C9) with small nods.
+  // setFace(eyes, mouth) holds a face still (eyes 0 open .. 1 shut; mouth 'rest', 'open', 'oo' or 'smile'); setFace() lets go.
+  let clock = 0, blinkAt = 1.6, blinkT = -1, mouthAt = 0, mouthNow = 'rest', facePainted = '', talking = false, held = null, blinking = true;
+  function animate(a0, a1, a2, a3) {
+    let dt = a3 !== undefined ? a3 : a0; dt = dt > 0 ? Math.min(dt, 0.05) : 0; clock += dt;
+    if (blinking && clock > blinkAt) { blinkT = clock; blinkAt = clock + 2.2 + 2.6 * Math.abs(Math.sin(clock * 12.9)); }
+    const bt = clock - blinkT; let eyes = bt < 0.05 ? 0.5 : bt < 0.11 ? 1 : bt < 0.17 ? 0.5 : 0, mouth = 'rest';
+    if (talking) {
+      if (clock > mouthAt) { mouthAt = clock + 0.10 + 0.09 * Math.abs(Math.sin(clock * 37.7)); const r = Math.abs(Math.sin(clock * 91.3)); mouthNow = r < 0.30 ? 'rest' : r < 0.66 ? 'open' : r < 0.92 ? 'oo' : 'smile'; }
+      mouth = mouthNow; SK.head.rotation.set(0.030 * Math.sin(clock * 4.4) + 0.015, 0.045 * Math.sin(clock * 2.3 + 1), 0.020 * Math.sin(clock * 1.3)); SK.neck.rotation.set(0, 0.025 * Math.sin(clock * 2.3 + 1), 0);
+    } else if (SK.head.rotation.x || SK.head.rotation.y) { SK.head.rotation.set(0, 0, 0); SK.neck.rotation.set(0, 0, 0); }
+    if (held) { if (held.eyes != null) eyes = held.eyes; if (held.mouth) mouth = held.mouth; }
+    const key = eyes + '|' + mouth; if (key !== facePainted) { paintFace(eyes, mouth); facePainted = key; }
+  }
+  const talk = (on) => { talking = !!on; mouthAt = 0; return talking; };
+  const setFace = (eyes, mouth) => { held = eyes == null && !mouth ? null : { eyes, mouth }; facePainted = ''; animate(0); };
   function pose(o) {
     o = o || {}; const arm = (o.arm == null ? 15 : o.arm) * DEG - A_POSE, leg = (o.leg || 0) * DEG;
     for (const [S, s] of SIDES) { SK['uarm' + S].rotation.set(0, 0, s * arm); SK['thigh' + S].rotation.set(0, 0, s * leg); SK['foot' + S].rotation.set(0, 0, -s * leg); }
     root.updateMatrixWorld(true);
   }
-  return { root, skeleton, bones, SK, animate, pose, meshes, spin: 0, time: 0, stanceProgress: 1, setStance() {}, play() {}, setFace: (eyes, mouth) => paintFace(eyes || 0, mouth || 'rest'), debug: { SK, meshes, cloths: [], headPoint, headHalfW, JH, HC, FC }, get triangles() { return triCount; } };
+  return { root, skeleton, bones, SK, animate, pose, meshes, spin: 0, time: 0, stanceProgress: 1, setStance() {}, play() {}, talk, setFace, setBlink: (on) => { blinking = !!on; }, debug: { SK, meshes, cloths: [], headPoint, headHalfW, JH, HC, FC }, get triangles() { return triCount; } };
 }

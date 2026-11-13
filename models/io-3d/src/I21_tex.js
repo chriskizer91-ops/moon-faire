@@ -40,8 +40,11 @@
   // where a tress has hair: all of it for most of its length (the bottom half of the picture), then strands that end at different lengths, so its tip is a wisp
   function hairAlphaIo() {
     const W = 2048, H = 512, c = cvs(W, H), g = c.getContext('2d'); let sd = 4409; const r = () => (sd = (sd * 16807) % 2147483647) / 2147483647;
-    g.fillStyle = '#000'; g.fillRect(0, 0, W, H); g.fillStyle = '#fff'; g.fillRect(0, H * 0.5, W, H * 0.5); g.strokeStyle = '#fff'; g.lineCap = 'round';
-    for (let i = 0; i < 900; i++) { const x = r() * W, top = H * (1 - (0.56 + 0.44 * Math.pow(r(), 0.8))); g.lineWidth = 3 + 7 * r(); g.beginPath(); g.moveTo(x, H * 0.52); g.bezierCurveTo(x + 8 * (r() - 0.5), H * 0.42, x + 8 * (r() - 0.5), H * 0.3, x + 10 * (r() - 0.5), top); g.stroke(); }
+    g.fillStyle = '#000'; g.fillRect(0, 0, W, H); g.fillStyle = '#fff'; g.fillRect(0, H * 0.5, W, H * 0.5);
+    for (let i = 0; i < 1000; i++) {                // each strand narrows to a point, so a tress ends in fine tips and not in a row of square teeth
+      const x = r() * W, top = H * (1 - (0.56 + 0.44 * Math.pow(r(), 0.8))), w = 4 + 9 * r(), lean = 14 * (r() - 0.5), y0 = H * 0.52, ym = (y0 + top) / 2;
+      g.beginPath(); g.moveTo(x - w / 2, y0); g.quadraticCurveTo(x - w * 0.42 + lean * 0.4, ym, x + lean, top); g.quadraticCurveTo(x + w * 0.42 + lean * 0.4, ym, x + w / 2, y0); g.closePath(); g.fill();
+    }
     const t = ctex(c); t.wrapS = THREE.RepeatWrapping; t.encoding = THREE.LinearEncoding; return t;
   }
   // a wisp of fringe: separate strands with gaps between them, ending at different lengths (the root at the bottom of the picture)

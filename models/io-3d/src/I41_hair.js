@@ -59,9 +59,9 @@
   }
   // a tress: a flat ribbon of strands along a middle line, waving from side to side and a little in and out, turning as it waves
   let tressN = 0;
-  function tress(key, mid, o) {                     // o: { w, th, amp, lam, ph, out: +1 or -1 (which way is away from her), tip, sway }
+  function tress(key, mid, o) {                     // o: { w, th, amp, lam, ph, out: +1 or -1 (which way is away from her), tip, sway, wisp }
     const n = mid.length, len = [0]; for (let i = 1; i < n; i++) len.push(len[i - 1] + mid[i].distanceTo(mid[i - 1]));
-    const L = len[n - 1], NC = 6, rings = [], vs = [], w0 = o.w, sub = Q(2, 1), M = (n - 1) * sub, q1 = o.ph * 1.7, q2 = o.ph * 0.9;
+    const L = len[n - 1], NC = 6, rings = [], vs = [], w0 = o.w, sub = Q(2, 1), M = (n - 1) * sub, q1 = o.ph * 1.7, q2 = o.ph * 0.9, T0 = 1 - (o.wisp || 0.14);       // wisp: how much of its length thins out into separate strands
     for (let k = 0; k <= M; k++) {
       const f = k / sub, i0 = Math.min(n - 2, Math.floor(f)), u = f - i0, P = mid[i0].clone().lerp(mid[i0 + 1], u), s = lerp(len[i0], len[i0 + 1], u), t = s / L;
       const a = mid[Math.max(0, i0 - 1)], b = mid[Math.min(n - 1, i0 + 2)], T = V3(b.x - a.x, b.y - a.y, b.z - a.z).normalize();
@@ -70,7 +70,7 @@
       P.addScaledVector(Bv, o.amp * env * Math.sin(ph) + (o.sway || 0) * t * t).addScaledVector(N, o.amp * 0.42 * env * (0.5 + 0.5 * Math.cos(ph * 1.0 + 0.9)));
       const tau = 0.75 * env * Math.cos(ph), ct = Math.cos(tau), st = Math.sin(tau), wd = w0 * (0.30 + 0.70 * sm(0.01, 0.08, s)) * (1 - (1 - (o.tip == null ? 0.25 : o.tip)) * Math.pow(t, 2.2)), th = o.th * (1 - 0.5 * t), ring = [];
       for (let j = 0; j < NC; j++) { const an = (j / NC) * TAU, cx = Math.cos(an) * wd, cy = Math.sin(an) * th; ring.push([P.x + (Bv.x * ct + N.x * st) * cx + (N.x * ct - Bv.x * st) * cy, P.y + (Bv.y * ct + N.y * st) * cx + (N.y * ct - Bv.y * st) * cy, P.z + (Bv.z * ct + N.z * st) * cx + (N.z * ct - Bv.z * st) * cy]); }
-      rings.push(ring); vs.push(t < 0.86 ? 0.5 * t / 0.86 : 0.5 + 0.5 * (t - 0.86) / 0.14);
+      rings.push(ring); vs.push(t < T0 ? 0.5 * t / T0 : 0.5 + 0.5 * (t - T0) / (1 - T0));
     }
     const part = loft(rings, { v: vs }); tressN++;
     for (let i = 0; i < part.uv.length; i += 2) part.uv[i] = part.uv[i] * 0.075 + 0.0917 * tressN;       // each tress takes its own strip of the strand picture, so some are darker and some lighter
@@ -116,25 +116,25 @@
       const v = (k + 0.5 + hrr(-0.3, 0.3)) / cnt, y1 = yEnd + hrr(-0.06, 0.08) + (v < 0.25 ? 0.08 : 0), mid = bunchPts(s, v, off + hrr(-0.002, 0.004), y1, hrr(-0.006, 0.006));
       tress(key, mid, { w: hrr(0.016, 0.022), th: 0.0055, amp: hrr(0.013, 0.019), lam: hrr(0.110, 0.145), ph: s * v * 3.0 + hrr(0, 2.4), out: 1, tip: 0.2, sway: s * hrr(-0.004, 0.014) });
     }
-    // ----- the fringe: curtain bangs, parted in the middle. Flat wisps of separate strands lie on her forehead, sweeping out to each
-    // temple; the longest run on down the edge of her cheek to her jaw. [start x, end x, end height, clearance, half-width]
-    const FR = [[0.004, 0.056, 1.500, 0.0030, 0.0130, 1], [0.010, 0.058, 1.462, 0.0045, 0.0125, 1], [0.002, 0.044, 1.522, 0.0026, 0.0115, 1], [0.012, 0.036, 1.530, 0.0022, 0.0100, 1], [0.018, 0.058, 1.418, 0.0060, 0.0110, 0],
-      [0.006, 0.050, 1.510, 0.0052, 0.0105, 1], [0.022, 0.057, 1.440, 0.0075, 0.0105, 0], [0.001, 0.026, 1.540, 0.0020, 0.0085, 0], [0.008, 0.040, 1.516, 0.0064, 0.0095, 0], [0.003, 0.052, 1.482, 0.0070, 0.0105, 0],
-      [0.026, 0.054, 1.520, 0.0034, 0.0120, 1], [0.016, 0.048, 1.506, 0.0080, 0.0100, 0], [0.030, 0.056, 1.488, 0.0056, 0.0110, 1]];      // the last number: 1 for a full lock, 0 for a wisp
-    let frN = 0;
-    for (const s of [-1, 1]) FR.forEach(([x0, x1, yE, off, w, full], k) => {
-      const NP = Q(30, 14), y0 = 1.578, rows = [], vs = [], ph = k * 1.9 + (s > 0 ? 0.7 : 0);
-      const at = (t) => { const x = s * (x0 + (x1 - x0) * Math.pow(t, 0.72)) + 0.0025 * Math.sin(t * 9 + ph) * t, y = y0 - (y0 - yE) * Math.pow(t, 1.28); return V3(x, y, 0); };
-      const lift = (P, o) => { const lim = headHalfW(P.y) - 0.0015; P.x = cl(P.x, -lim, lim); let f = FMAP(P.x, P.y); if (f < -8) f = FMAP(P.x * 0.9, P.y); if (f < -8) f = HB.c.z + 0.03; P.z = f + o; return P; };
+    // ----- the fringe: curtain bangs, parted in the middle -----
+    // Chris, November 13: nothing of her hair is painted on her face; "the hair that's in front of her face is actually like 3D
+    // rendered hair hanging in front of her face". So each lock of the fringe is a small tress like the rest: it leaves her hairline
+    // under the hat, stands a centimetre or so clear of her forehead, sweeps out toward her temple and hangs. The short ones stop
+    // above her glasses; the longer ones pass outside the rims and hang in front of her cheek to her jaw.
+    // [start x, end x, end height, how far it stands off her skin, half-width, wave]
+    const FR = [[0.002, 0.014, 1.546, 0.006, 0.0085, 0.0025], [0.005, 0.026, 1.538, 0.008, 0.0100, 0.0030], [0.010, 0.038, 1.533, 0.010, 0.0105, 0.0035], [0.016, 0.048, 1.531, 0.008, 0.0105, 0.0035],
+      [0.004, 0.052, 1.528, 0.012, 0.0110, 0.0040], [0.024, 0.056, 1.532, 0.006, 0.0100, 0.0035], [0.030, 0.062, 1.522, 0.009, 0.0105, 0.0040],
+      [0.012, 0.066, 1.498, 0.012, 0.0115, 0.0055], [0.022, 0.069, 1.476, 0.009, 0.0110, 0.0060], [0.008, 0.070, 1.452, 0.015, 0.0115, 0.0065], [0.032, 0.071, 1.488, 0.007, 0.0105, 0.0055],
+      [0.018, 0.073, 1.424, 0.012, 0.0115, 0.0070], [0.010, 0.075, 1.398, 0.017, 0.0120, 0.0075]];
+    for (const s of [-1, 1]) FR.forEach(([x0, x1, yE, off, w, amp], k) => {
+      const y0 = hatOpenY(HAT.oc[2] + HAT.ob) + 0.004, NP = Math.max(8, Math.round((y0 - yE) / 0.008)), pts = []; let z = null;
       for (let i = 0; i <= NP; i++) {
-        const t = i / NP, P = lift(at(t), off), Pn = lift(at(Math.min(1, t + 0.02)), off), T = Pn.clone().sub(P).normalize(), Bv = V3().crossVectors(T, V3(s * 0.5, 0, 1).normalize()).normalize(), ww = w * (0.45 + 0.55 * sm(0, 0.12, t)) * (1 - 0.35 * t);
-        const L = lift(P.clone().addScaledVector(Bv, -ww), off), R = lift(P.clone().addScaledVector(Bv, ww), off), C = lift(P.clone(), off + 0.0012);
-        rows.push([[L.x, L.y, L.z], [C.x, C.y, C.z], [R.x, R.y, R.z]]); vs.push(t);
+        const t = i / NP, x = s * (x0 + (x1 - x0) * Math.pow(t, 0.62)), y = y0 - (y0 - yE) * Math.pow(t, 1.25), f = FMAP(cl(x, -0.088, 0.088), y), of = 0.003 + (off - 0.003) * sm(0.0, 0.30, t);
+        const skin = f > -8 ? f + of : -9; z = z == null ? (skin > -8 ? skin : HB.c.z + 0.05) : Math.max(z - 0.0016, skin);       // it hangs, and rests clear of her skin where it meets it
+        pts.push(V3(x, y, z));
       }
-      for (let q = 0; q < 2; q++) for (let i = 1; i < rows.length - 1; i++) for (let j = 0; j < 3; j++) rows[i][j][2] = (rows[i - 1][j][2] + 2 * rows[i][j][2] + rows[i + 1][j][2]) / 4;
-      const part = loft(rows, { open: true, v: vs }); frN++;
-      for (let i = 0; i < part.uv.length; i += 2) part.uv[i] = part.uv[i] * 0.05 + 0.137 * frN;
-      addPart(full ? 'lock' : 'wisp', part, wHair, { out: V3(0, 1.5, -0.2) });
+      for (let q = 0; q < 3; q++) for (let i = 1; i < pts.length - 1; i++) pts[i].z = (pts[i - 1].z + 2 * pts[i].z + pts[i + 1].z) / 4;
+      tress(k % 4 === 3 ? 'tressIn' : 'tress', pts, { w, th: 0.0034, amp, lam: 0.066 + 0.005 * (k % 4), ph: k * 1.9 + (s > 0 ? 0.7 : 0), out: 1, tip: 0.35, sway: s * 0.004, wisp: yE > 1.51 ? 0.45 : 0.30 });
     });
     // ----- the plain dark sheet under the tresses: down her back, and down the front of each shoulder -----
     { const NU = 30, NY = 84, rings = [];

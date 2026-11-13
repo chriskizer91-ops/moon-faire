@@ -85,6 +85,19 @@ hairish = ~((r3 > 118) & (r3 - b3 > 34) & (r3 - g3 > 12))                    # n
 zone = np.zeros(C3.shape[:2], bool); zone[:, :1300] = True; zone[:345, :] = True; zone[:480, :1352] = True; zone[:372, :1425] = True; zone[395:530, 1188:1270] = False       # ... but leave the ear and the face alone
 hairish = ndi.binary_dilation(ndi.binary_opening(hairish & zone, iterations=1), iterations=4) & zone
 side_src = fill(C3, bad | hairish, 3.0)
+# Chris, November 13: her painted face is to carry no hair at all; the hair in front of her face is real hair on the model.
+# So the fine strands that cross her temple, cheek, ear and neck in C3 are painted out too: anything on her skin (clear of her brow,
+# eye, nostril and lips) that is darker than the skin round it is repainted from the skin beside it.
+import cv2
+sk8 = np.clip(side_src, 0, 255).astype(np.uint8); lum = sk8.astype(np.float32).mean(-1)
+loc = cv2.medianBlur(cv2.GaussianBlur(sk8, (0, 0), 3).mean(-1).astype(np.uint8), 41).astype(np.float32)
+strand = (lum < loc * 0.90) | ((sk8[..., 0].astype(np.float32) - sk8[..., 2]) < 26)
+zs = np.zeros(C3.shape[:2], bool); zs[300:900, 1046:1372] = True; zs[300:372, 1046:1425] = True; zs[430:900, 1046:1430] = True       # her temple, cheek, jaw, ear and neck
+zs[428:520, 1205:1250] = False                                                                                                         # ... but not the hollow of her ear
+zs[480:600, 1440:1536] = False
+strand = ndi.binary_dilation(strand & zs & fg3, iterations=2)
+side_src = cv2.inpaint(sk8, strand.astype(np.uint8) * 255, 6, cv2.INPAINT_TELEA).astype(np.float32)
+print('painted strands taken out of the side picture: %.1f%% of her skin there' % (100.0 * strand.sum() / max(1, (zs & fg3).sum())))
 PXS = (556.0 - 420.0) / 0.066; TIPX = 1513.0; ANS = [(J_EYE, 420.0), (1.4586, 556.0), (1.4165, 644.0)]
 ck_f = np.median(C1[690:770, 800:880].reshape(-1, 3), 0); ck_s = np.median(C3[470:520, 1380:1420].reshape(-1, 3), 0); gain = np.clip(ck_f / ck_s, 0.70, 1.20)      # the profile's tone matched to the front cheek
 SZ0, SZ1, SY0, SY1 = -0.075, 0.125, 1.385, 1.585; S2 = 512
@@ -109,6 +122,49 @@ Image.fromarray(np.clip(face, 0, 255).astype(np.uint8)).save(SH + 'bake_face.jpg
 T['skinNeck'] = hexc(nk18 * chB3 / ch18); T['skinFaceChest'] = hexc(ck1 * G)
 T['skinJaw'] = hexc(med(C1, 1060, 1150, 560, 700))
 print('face gain', np.round(G, 3), 'cheek C1', hexc(ck1), '| C18 cheek', hexc(ck18), 'neck', hexc(nk18), 'chest', hexc(ch18), '| skinNeck', T['skinNeck'], 'chest by C18', T['skinFaceChest'], 'skinChest (B3)', T.get('skinChest'), 'skinJaw', T['skinJaw'])
+# ---------- her states, from C9: six faces in a grid, three across and two down, each 512 px square ----------
+# neutral, eyes shut, eyes half shut / lips parted, 'oo', smile. Cell 1 is C1's face again, so it is settled onto C1 picture against
+# picture (starting from its pupils: (217.5, 224) and (332.5, 224)), and every other cell onto cell 1 by the parts that did not
+# change. Then only the eyes or the mouth are lifted, as soft-edged patches with their tone matched to the face round the rim.
+C9 = load(REF + 'C9.png'); cells = [C9[512 * i:512 * (i + 1), 512 * j:512 * (j + 1)] for i in range(2) for j in range(3)]
+gray = lambda a: cv2.cvtColor(np.clip(a, 0, 255).astype(np.uint8), cv2.COLOR_RGB2GRAY).astype(np.float32)
+crit = (cv2.TERM_CRITERIA_EPS | cv2.TERM_CRITERIA_COUNT, 400, 1e-7)
+tmpl = cv2.resize(gray(C1), (627, 627), interpolation=cv2.INTER_AREA); k0 = 115.0 / 140.0
+W1 = np.array([[k0, 0, 275.0 - 313.5 * k0], [0, k0, 224.0 - 267.0 * k0]], np.float32)       # half-size C1 -> cell 1, to start from
+fm = np.zeros((512, 512), np.uint8); cv2.ellipse(fm, (275, 285), (98, 138), 0, 0, 360, 255, -1)
+_, W1 = cv2.findTransformECC(tmpl, gray(cells[0]), W1, cv2.MOTION_AFFINE, crit, fm, 5)
+WK = {}
+for k in range(1, 6):
+    mk = fm.copy()
+    if k in (1, 2): mk[190:252, :] = 0              # the eyes changed
+    else: mk[296:400, 170:380] = 0                  # the mouth changed (and the cheeks beside it, in the smile)
+    _, WK[k] = cv2.findTransformECC(gray(cells[0]), gray(cells[k]), np.eye(2, 3, dtype=np.float32), cv2.MOTION_EUCLIDEAN, crit, mk, 5)
+print('cell 1 on C1:', np.round(W1, 4).tolist(), '| shifts of the others (px):', {k + 1: [round(float(WK[k][0, 2]), 2), round(float(WK[k][1, 2]), 2)] for k in WK})
+def to_cell(k, col, row):                           # C1 pixel -> pixel in cell k
+    x = W1[0, 0] * col / 2 + W1[0, 1] * row / 2 + W1[0, 2]; y = W1[1, 0] * col / 2 + W1[1, 1] * row / 2 + W1[1, 2]
+    if k == 0: return x, y
+    Wk = WK[k]; return Wk[0, 0] * x + Wk[0, 1] * y + Wk[0, 2], Wk[1, 0] * x + Wk[1, 1] * y + Wk[1, 2]
+def webp_rgba(rgb, al):
+    im = Image.fromarray(np.dstack([np.clip(rgb, 0, 255), np.clip(al * 255, 0, 255)]).astype(np.uint8), 'RGBA'); b = io.BytesIO(); im.save(b, 'WEBP', quality=90, method=6)
+    return 'data:image/webp;base64,' + base64.b64encode(b.getvalue()).decode()
+def state(name, k, x0, x1, y0, y1, ells):            # ells: [centre x, centre height, half-width, half-height] in the picture's measure
+    j0, j1 = int((x0 - FX0) / (FX1 - FX0) * S), int(np.ceil((x1 - FX0) / (FX1 - FX0) * S)); i0, i1 = int((FY1 - y1) / (FY1 - FY0) * S), int(np.ceil((FY1 - y0) / (FY1 - FY0) * S))
+    X = FXg[i0:i1, j0:j1]; Y = FYg[i0:i1, j0:j1]; cx, cy = to_cell(k, col_of(X), row_of(Y))
+    pt = np.stack([ndi.map_coordinates(cells[k][..., c], [cy, cx], order=1, mode='nearest') for c in range(3)], -1)
+    al = np.zeros(X.shape, np.float32)
+    for ex, ey, rx, ry in ells: rho = np.sqrt(((X - ex) / rx) ** 2 + ((Y - ey) / ry) ** 2); t = np.clip((1 - rho) / 0.38, 0, 1); al = np.maximum(al, t * t * (3 - 2 * t))
+    base = face[i0:i1, j0:j1]; rim = (al > 0.04) & (al < 0.55); gain = np.clip(base[rim].mean(0) / pt[rim].mean(0), 0.80, 1.30); pt = pt * gain
+    T['faceParts'][name] = dict(src=webp_rgba(pt, al), x=round(j0 / S, 5), y=round(i0 / S, 5), w=round((j1 - j0) / S, 5), h=round((i1 - i0) / S, 5))
+    out = face.copy(); out[i0:i1, j0:j1] = base * (1 - al[..., None]) + pt * al[..., None]; return out, np.round(gain, 3)
+T['faceParts'] = {}
+EYES = [[-EYEXU, J_EYE - 0.0010, 0.0240, 0.0135], [EYEXU, J_EYE - 0.0010, 0.0240, 0.0135]]
+shots = [face]
+for name, k, box, ells in (('shut', 1, (-0.064, 0.064, J_EYE - 0.018, J_EYE + 0.016), EYES), ('half', 2, (-0.064, 0.064, J_EYE - 0.018, J_EYE + 0.016), EYES),
+                           ('oh', 3, (-0.050, 0.050, 1.4350, 1.4800), [[0, 1.4574, 0.0460, 0.0200]]), ('oo', 4, (-0.050, 0.050, 1.4350, 1.4800), [[0, 1.4574, 0.0460, 0.0200]]),
+                           ('smile', 5, (-0.058, 0.058, 1.4330, 1.4820), [[0, 1.4578, 0.0540, 0.0225]])):
+    o, gn = state(name, k, *box, ells); shots.append(o); print(' ', name, 'tone gain', gn.tolist(), len(T['faceParts'][name]['src']) // 1024, 'KB')
+sheet = np.concatenate([np.concatenate([s_[250:900:2, 150:874:2] for s_ in shots[:3]], 1), np.concatenate([s_[250:900:2, 150:874:2] for s_ in shots[3:]], 1)], 0)
+Image.fromarray(np.clip(sheet, 0, 255).astype(np.uint8)).save(SH + 'bake_states.jpg', quality=88)
 js = 'window.IO_TEX=' + json.dumps(T, separators=(',', ':')) + ';'
 open(OUT + 'io_tex.js', 'w').write(js); print('io_tex.js', len(js) // 1024, 'KB', list(T.keys()))
 

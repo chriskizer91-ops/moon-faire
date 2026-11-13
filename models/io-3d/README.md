@@ -6,21 +6,25 @@ the Ranger's stage-one recipe: this folder began as a copy of the Ranger's stage
 
 ## Where she stands: stage two (November 13, 2026)
 
-Body and base outfit (stage one), and now her head, face, glasses, hair and hat. Nothing moves yet.
+Body and base outfit (stage one), and now her head, face, glasses, hair and hat. She blinks and can talk; her body does not move yet.
 
 - **Page:** https://claude.ai/artifact/Uvz35Hj97w5yjyA5j2Z6Ep (republish each stage's page to that link). The same page as one
-  offline file is `deliver/Io_3D_stage2.html` (2.3 MB). Twelve views, three poses, the painting beside her, and buttons to take
-  off her hat, glasses, hair and skirt. `deliver/Io_stage2_vs_paintings.jpg` is her head, hat and hair beside C4 and C5 at one scale.
-- **Stage two built:** her face (C1) on a head shaped to her profile (C3), ears, neck; round glasses; about 110 wavy tresses of
-  hair with curtain bangs; the hat with its brim, lace band, chain, three crosses, ringed cross, two horns and slumping crown.
-  548,000 triangles.
+  offline file is `deliver/Io_3D_stage2.html` (2.4 MB). Twelve views, six faces (blinking, talking, four held), three poses, the
+  painting beside her, and buttons to take off her hat, glasses, hair and skirt. `deliver/Io_stage2_vs_paintings.jpg` is her head, hat and hair beside C4 and C5 at one scale.
+- **Stage two built:** her face (C1) on a head shaped to her profile (C3), ears, neck; her blink and talking mouths (C9); round
+  glasses; about 110 wavy tresses of hair and a fringe of 26 hanging locks; the hat with its brim, lace band, chain, three
+  crosses, ringed cross, two horns and slumping crown. 551,000 triangles.
+- **Stage two, second pass (Chris, November 13):** "her face needs to be her face without hair in the painted on image. And then
+  the hair that's in front of her face is actually like 3D rendered hair hanging in front of her face"; the hat down by 15% of
+  the way from its bottom edge to the top of her glasses; blinking and talking; the fringe; "a little sharp edge that points
+  out" at the very bottom of her chin from the side. All five are done (see "Second pass" under the rules below). He called her
+  face "almost perfect": do not reshape it while fixing details.
 - **Stage one, approved by Chris** ("round one is fantastic", "The body looks fantastic as it is"): torso with the bodice painted
   on (B3 front and back, B2 at the sides), bare arms and legs, the skirt as eight stiff tiers with the slit over her left leg,
   boots, hands. Do not reshape these without asking. Stage two only cleaned the tops of her shoulders in the body picture (a dark
   patch and purple streaks) and carried the bodice straps over them.
 - **Stand-ins and rough spots:** her hair is stiff (no movement, does not part round raised arms), a tress reads as a ribbon up
-  close and its end is blunt; her fringe is thinner than painted; the top of her head under the hat is bare; her face has no
-  blink or expressions yet; the hat's crown has soft creases, not the deep folds of the paintings; the skirt is stiff with solid
+  close; the top of her head under the hat is bare; her brows do not move and the emotions in C10 are not in; the hat's crown has soft creases, not the deep folds of the paintings; the skirt is stiff with solid
   lace; the boots are the Jester's boot made taller; arms, legs and hands are plain skin.
 - **Not built:** robe, belt, pouch, crystal, necklaces, bracelets, book, sickle, dagger, cloth that hangs, movement, spells.
 
@@ -90,9 +94,10 @@ stays where her whole-figure paintings put it (1.408 m), so her **eye line is 1.
   C1 and C3, with the eyes as far apart. The close-ups are the master for her face, as on the Ranger.
 - A1's eyes are at y 198, not 186.5 as first read (that was the top of her glasses). A1 is 878 px a metre by its eye line.
   Nothing was measured off A1 in stage one, so nothing built is affected.
-- Hat: the opening is 17 by 25 cm on a plane rising to the front (1.578 m in front, 1.518 m behind); the brim 33 by 39 cm,
-  level in front, 4.5 cm lower at the sides and 9 cm lower behind; the band 4.6 cm; the top of the crown 1.72 m; its tip
-  hangs behind her right shoulder at 1.40 m.
+- Hat: the opening is 17 by 25 cm on a plane rising to the front (1.570 m in front, 1.511 m behind); the brim 33 by 39 cm,
+  level in front, 4.5 cm lower at the sides and 9 cm lower behind; the band 4.6 cm; the top of the crown 1.71 m; its tip
+  hangs behind her right shoulder at 1.39 m. These are 7 mm lower than first measured: Chris asked for the hat down by 15% of
+  the gap between its bottom edge in front (then 1.577 m) and the top of her glasses (1.529 m).
 - Hair: the curtain down her back is 33 cm wide at her shoulder blades and ends about 0.72 m up; the bunches in front end
   between her waist and hips; waves are 11 to 15 cm long.
 - Glasses: C2 and C14 show thin 44 mm rings; every whole-figure painting shows them bigger and darker. Built at 50 mm, dark bronze.
@@ -152,6 +157,23 @@ The paintings are data: run Python that reads them with `-I`.
   measurements along its middle line and was still 5 cm too tall and far too thin.
 - Where a strand rule needs a surface that is not there, give it a fallback: three points went nine metres away.
 
+### Second pass (the same day)
+
+- **No hair is painted on her face.** The front picture (C1) never had any. The side picture (C3) had fine strands across her
+  temple, cheek, ear and neck; `bake_head_io.py` now paints out anything on her skin there that is darker than the skin round it.
+- **Hair in front of her face is geometry.** The fringe was flat strips lying on her skin, and read as painted. It is now 13 small
+  tresses a side that leave her hairline under the hat, stand 0.5 to 1.7 cm clear of her skin and hang (`FR` in `I41_hair.js`).
+- **Strand ends are pointed.** The picture that says where a tress has hair drew each strand as a bar with a round end, so a
+  tress ended in a row of square teeth. Each strand now narrows to a point (`hairAlphaIo` in `I21_tex.js`).
+- **The point under her chin** was the profile fit overshooting at its lowest key (0.0943 between 0.0889 and 0.0926). The fit is
+  unsteady there because the outline runs nearly level. The bottom four keys of `FACE_MID` were set by hand to a round chin. If
+  `fit_prof_io.py` is run again, check those keys afterwards.
+- **Her faces** come from C9 the way the Ranger's come from J2: cell 1 is settled onto C1 picture against picture, the other
+  cells onto cell 1 by what did not change, and only the eyes or the mouth are lifted as soft patches. The cells sit up to 24
+  pixels off their grid, so do not assume the faces are centred. The mouth patches must reach past the corners of her resting
+  mouth, or its corners show beside a pursed one. `animate(dt)` runs the blink; `talk(true)` the mouths and small nods;
+  `setFace(eyes, mouth)` holds a face and `setFace()` lets go.
+
 ## Round 2 paintings (arrived November 13, 2026, after stage one was built)
 
 All 21 arrived and match their index. Nothing is built from them yet.
@@ -199,7 +221,7 @@ They also show her whole look from many sides, with the robe: useful when the ro
 
 ## Next stages, in the how-to's order
 
-1. Her face moving: blink, talking mouths and smile from C9, the emotions in C10; a fuller fringe; hair on top of her head.
+1. The emotions in C10 and moving brows; hair on top of her head.
 2. Hands and painted arms (D1 to D4), and her legs painted from B5; her neck and chest painted from C18.
 3. Her own boots (E1 to E8).
 4. Robe as cloth (A1 to A5, F4 to F6, F10, F12), skirt as cloth with see-through lace (F8, F11).
