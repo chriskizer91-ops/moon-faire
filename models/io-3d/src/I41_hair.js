@@ -94,11 +94,11 @@
       tress(k % 2 ? 'tress' : 'tressIn', mid, { w: hrr(0.017, 0.023), th: 0.0055, amp: hrr(0.013, 0.019), lam: hrr(0.115, 0.150), ph: u * 5.0 + hrr(0, 2.4), out: -1, tip: 0.2, sway: s * hrr(0, 0.012) });
     }
     // ----- a bunch over the front of each shoulder -----
-    // Rooted along the side of her head from above the ear to behind it, each tress lies on the side of her head (clear of her cheek,
+    // Rooted along the side of her head from her temple to behind her ear, each tress lies on the side of her head (clear of her cheek,
     // over her ear), so her profile stays clear as in C4. As it passes her neck it is led forward, and from there it lies on the
     // front of her shoulder and chest and hangs to her waist or hips. The middle of her chest stays bare.
     function bunchPts(s, v, off, y1, jit, n) {       // v: 0 the tress nearest her face .. 1 the one furthest back
-      const a = lerp(1.38, 1.98, v), ca = Math.cos(a), zr = HB.c.z + (ca >= 0 ? HB.rzF : HB.rzB) * ca * 0.92, y0 = hatOpenY(zr) + 0.004, xc = lerp(0.086, 0.174, Math.pow(v, 0.9)) + (jit || 0), pts = [], yT = 1.49 + 14 * (jit || 0) * 0.5;
+      const a = lerp(1.14, 1.98, v), ca = Math.cos(a), zr = HB.c.z + (ca >= 0 ? HB.rzF : HB.rzB) * ca * 0.92, y0 = hatOpenY(zr) + 0.004, xc = lerp(0.086, 0.174, Math.pow(v, 0.9)) + (jit || 0), pts = [], yT = 1.49 + 14 * (jit || 0) * 0.5;
       n = n || Math.max(4, Math.round((y0 - y1) / 0.011)); let z = zr, wide = 0;
       for (let i = 0; i <= n; i++) {
         const y = lerp(y0, y1, i / n), down = sm(yT, 1.22, y), of = lerp(Math.min(off, 0.004), off, sm(y0 - 0.012, y0 - 0.085, y));
@@ -111,30 +111,32 @@
       for (let k = 0; k < 6; k++) for (let i = 1; i < pts.length - 1; i++) pts[i].z = (pts[i - 1].z + 2 * pts[i].z + pts[i + 1].z) / 4;
       return pts;
     }
-    const LAYF = [[0.004, 7, 0.98, 'tressIn'], [0.017, 7, 0.90, 'tress'], [0.031, 6, 0.86, 'tress']];
+    const LAYF = [[0.004, 9, 0.98, 'tressIn'], [0.017, 9, 0.90, 'tress'], [0.031, 7, 0.86, 'tress']];
     for (const s of [-1, 1]) for (const [off, cnt, yEnd, key] of LAYF) for (let k = 0; k < cnt; k++) {
       const v = (k + 0.5 + hrr(-0.3, 0.3)) / cnt, y1 = yEnd + hrr(-0.06, 0.08) + (v < 0.25 ? 0.08 : 0), mid = bunchPts(s, v, off + hrr(-0.002, 0.004), y1, hrr(-0.006, 0.006));
-      tress(key, mid, { w: hrr(0.016, 0.022), th: 0.0055, amp: hrr(0.013, 0.019), lam: hrr(0.110, 0.145), ph: s * v * 3.0 + hrr(0, 2.4), out: 1, tip: 0.2, sway: s * hrr(-0.004, 0.014) });
+      const nr = sm(0.0, 0.28, v);       // the tresses nearest her face are slimmer and wave less, so they frame it and do not cross it
+      tress(key, mid, { w: hrr(0.016, 0.022) * (0.62 + 0.38 * nr), th: 0.0055, amp: hrr(0.013, 0.019) * (0.45 + 0.55 * nr), lam: hrr(0.110, 0.145), ph: s * v * 3.0 + hrr(0, 2.4), out: 1, tip: 0.2, sway: s * hrr(0.002, 0.014) });
     }
-    // ----- the fringe: curtain bangs, parted in the middle -----
+    // ----- the fringe: curtain bangs, parted in the middle, swept back to frame her face -----
     // Chris, November 13: nothing of her hair is painted on her face; "the hair that's in front of her face is actually like 3D
-    // rendered hair hanging in front of her face". So each lock of the fringe is a small tress like the rest: it leaves her hairline
-    // under the hat, stands a centimetre or so clear of her forehead, sweeps out toward her temple and hangs. The short ones stop
-    // above her glasses; the longer ones pass outside the rims and hang in front of her cheek to her jaw.
-    // [start x, end x, end height, how far it stands off her skin, half-width, wave]
-    const FR = [[0.002, 0.014, 1.546, 0.006, 0.0085, 0.0025], [0.005, 0.026, 1.538, 0.008, 0.0100, 0.0030], [0.010, 0.038, 1.533, 0.010, 0.0105, 0.0035], [0.016, 0.048, 1.531, 0.008, 0.0105, 0.0035],
-      [0.004, 0.052, 1.528, 0.012, 0.0110, 0.0040], [0.024, 0.056, 1.532, 0.006, 0.0100, 0.0035], [0.030, 0.062, 1.522, 0.009, 0.0105, 0.0040],
-      [0.012, 0.066, 1.498, 0.012, 0.0115, 0.0055], [0.022, 0.069, 1.476, 0.009, 0.0110, 0.0060], [0.008, 0.070, 1.452, 0.015, 0.0115, 0.0065], [0.032, 0.071, 1.488, 0.007, 0.0105, 0.0055],
-      [0.018, 0.073, 1.424, 0.012, 0.0115, 0.0070], [0.010, 0.075, 1.398, 0.017, 0.0120, 0.0075]];
-    for (const s of [-1, 1]) FR.forEach(([x0, x1, yE, off, w, amp], k) => {
-      const y0 = hatOpenY(HAT.oc[2] + HAT.ob) + 0.004, NP = Math.max(8, Math.round((y0 - yE) / 0.008)), pts = []; let z = null;
-      for (let i = 0; i <= NP; i++) {
-        const t = i / NP, x = s * (x0 + (x1 - x0) * Math.pow(t, 0.62)), y = y0 - (y0 - yE) * Math.pow(t, 1.25), f = FMAP(cl(x, -0.088, 0.088), y), of = 0.003 + (off - 0.003) * sm(0.0, 0.30, t);
-        const skin = f > -8 ? f + of : -9; z = z == null ? (skin > -8 ? skin : HB.c.z + 0.05) : Math.max(z - 0.0016, skin);       // it hangs, and rests clear of her skin where it meets it
-        pts.push(V3(x, y, z));
-      }
-      for (let q = 0; q < 3; q++) for (let i = 1; i < pts.length - 1; i++) pts[i].z = (pts[i - 1].z + 2 * pts[i].z + pts[i + 1].z) / 4;
-      tress(k % 4 === 3 ? 'tressIn' : 'tress', pts, { w, th: 0.0034, amp, lam: 0.066 + 0.005 * (k % 4), ph: k * 1.9 + (s > 0 ? 0.7 : 0), out: 1, tip: 0.35, sway: s * 0.004, wisp: yE > 1.51 ? 0.45 : 0.30 });
+    // rendered hair hanging in front of her face". Then, the same day: "her bangs should frame her face, not obscure her face ...
+    // slide them back so that there's no gap between her bangs and the rest of her hair. And her face is more open".
+    // So each lock is a small tress that leaves her parting under the hat, sweeps out across the top of her forehead above her brows,
+    // reaches her temple, and from there lies along the side of her face with the tresses of the bunch. Nothing of it crosses her
+    // brows, eyes, glasses or cheeks. [start x, how far down the side of her face it runs (height), clearance, half-width, wave]
+    const FR = [[0.003, 1.500, 0.0050, 0.0085, 0.0030], [0.007, 1.468, 0.0065, 0.0095, 0.0035], [0.012, 1.530, 0.0045, 0.0085, 0.0025], [0.017, 1.440, 0.0080, 0.0100, 0.0040],
+      [0.022, 1.486, 0.0055, 0.0095, 0.0035], [0.028, 1.522, 0.0045, 0.0085, 0.0025], [0.034, 1.455, 0.0070, 0.0100, 0.0040], [0.040, 1.505, 0.0050, 0.0090, 0.0030],
+      [0.046, 1.425, 0.0085, 0.0100, 0.0045], [0.010, 1.538, 0.0090, 0.0075, 0.0020], [0.024, 1.412, 0.0100, 0.0100, 0.0045], [0.050, 1.476, 0.0060, 0.0090, 0.0035]];
+    for (const s of [-1, 1]) FR.forEach(([x0, yE, off, w, amp], k) => {
+      const yB = hatOpenY(HAT.oc[2] + HAT.ob), y0 = yB + 0.004, yBrow = FC.browY + 0.007, pts = [], NA = 12;
+      // across her forehead: from the parting out to her temple, dropping from under the brim to just above her brow
+      const xT = headHalfW(yBrow) - 0.004, yT = Math.max(yBrow, yB - 0.016 - 0.004 * (k % 3));
+      for (let i = 0; i <= NA; i++) { const t = i / NA, x = lerp(x0, xT, Math.pow(t, 0.85)), y = lerp(y0, yT, Math.pow(t, 1.6)), f = FMAP(Math.min(x, 0.088), y); pts.push(V3(s * x, y, (f > -8 ? f : HB.c.z + 0.04) + 0.003 + (off - 0.003) * sm(0, 0.4, t))); }
+      // down the side of her face: outside her cheek all the way, drawing back a little as it hangs
+      let wide = xT, z = pts[NA].z; const NB = Math.max(2, Math.round((yT - yE) / 0.009));
+      for (let i = 1; i <= NB && yE < yT - 0.004; i++) { const y = lerp(yT, yE, i / NB); wide = Math.max(wide, y > 1.44 ? headHalfW(y) : 0); z = Math.max(z - 0.0030, HB.c.z + 0.030 + 0.004 * (k % 4)); pts.push(V3(s * (wide + off + 0.003 + 0.006 * sm(yT, yT - 0.05, y)), y, z)); }
+      for (let q = 0; q < 3; q++) for (let i = 1; i < pts.length - 1; i++) { pts[i].x = (pts[i - 1].x + 2 * pts[i].x + pts[i + 1].x) / 4; pts[i].z = (pts[i - 1].z + 2 * pts[i].z + pts[i + 1].z) / 4; }
+      tress(k % 4 === 3 ? 'tressIn' : 'tress', pts, { w, th: 0.0034, amp, lam: 0.070 + 0.005 * (k % 4), ph: k * 1.9 + (s > 0 ? 0.7 : 0), out: 1, tip: 0.35, sway: s * 0.003, wisp: 0.30 });
     });
     // ----- the plain dark sheet under the tresses: down her back, and down the front of each shoulder -----
     { const NU = 30, NY = 84, rings = [];

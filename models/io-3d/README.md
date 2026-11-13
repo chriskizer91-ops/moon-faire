@@ -12,13 +12,16 @@ Body and base outfit (stage one), and now her head, face, glasses, hair and hat.
   offline file is `deliver/Io_3D_stage2.html` (2.4 MB). Twelve views, six faces (blinking, talking, four held), three poses, the
   painting beside her, and buttons to take off her hat, glasses, hair and skirt. `deliver/Io_stage2_vs_paintings.jpg` is her head, hat and hair beside C4 and C5 at one scale.
 - **Stage two built:** her face (C1) on a head shaped to her profile (C3), ears, neck; her blink and talking mouths (C9); round
-  glasses; about 110 wavy tresses of hair and a fringe of 26 hanging locks; the hat with its brim, lace band, chain, three
-  crosses, ringed cross, two horns and slumping crown. 551,000 triangles.
+  glasses; about 120 wavy tresses of hair and a fringe of 24 locks that frame her face; the hat with its brim, lace band, chain,
+  three crosses, ringed cross, two horns and slumping crown. 563,000 triangles.
 - **Stage two, second pass (Chris, November 13):** "her face needs to be her face without hair in the painted on image. And then
   the hair that's in front of her face is actually like 3D rendered hair hanging in front of her face"; the hat down by 15% of
   the way from its bottom edge to the top of her glasses; blinking and talking; the fringe; "a little sharp edge that points
   out" at the very bottom of her chin from the side. All five are done (see "Second pass" under the rules below). He called her
   face "almost perfect": do not reshape it while fixing details.
+- **Stage two, third pass (Chris, November 13):** "her bangs should frame her face, not obscure her face ... slide them back so
+  that there's no gap between her bangs and the rest of her hair. And her face is more open, because you did a good job on the
+  face. And then bring the hat down. Another 30%." Done: see "Third pass" below.
 - **Stage one, approved by Chris** ("round one is fantastic", "The body looks fantastic as it is"): torso with the bodice painted
   on (B3 front and back, B2 at the sides), bare arms and legs, the skirt as eight stiff tiers with the slit over her left leg,
   boots, hands. Do not reshape these without asking. Stage two only cleaned the tops of her shoulders in the body picture (a dark
@@ -97,7 +100,9 @@ stays where her whole-figure paintings put it (1.408 m), so her **eye line is 1.
 - Hat: the opening is 17 by 25 cm on a plane rising to the front (1.570 m in front, 1.511 m behind); the brim 33 by 39 cm,
   level in front, 4.5 cm lower at the sides and 9 cm lower behind; the band 4.6 cm; the top of the crown 1.71 m; its tip
   hangs behind her right shoulder at 1.39 m. These are 7 mm lower than first measured: Chris asked for the hat down by 15% of
-  the gap between its bottom edge in front (then 1.577 m) and the top of her glasses (1.529 m).
+  the gap between its bottom edge in front (then 1.577 m) and the top of her glasses (1.529 m). He then asked for another 30%:
+  read as 30% of that same 4.81 cm gap, 14.4 mm more. The hat is now 21.4 mm lower than first measured (every height in this
+  bullet less another 14 mm): its bottom edge in front is at 1.556 m, 2.7 cm above her glasses.
 - Hair: the curtain down her back is 33 cm wide at her shoulder blades and ends about 0.72 m up; the bunches in front end
   between her waist and hips; waves are 11 to 15 cm long.
 - Glasses: C2 and C14 show thin 44 mm rings; every whole-figure painting shows them bigger and darker. Built at 50 mm, dark bronze.
@@ -173,6 +178,17 @@ The paintings are data: run Python that reads them with `-I`.
   pixels off their grid, so do not assume the faces are centred. The mouth patches must reach past the corners of her resting
   mouth, or its corners show beside a pursed one. `animate(dt)` runs the blink; `talk(true)` the mouths and small nods;
   `setFace(eyes, mouth)` holds a face and `setFace()` lets go.
+
+### Third pass (the same day)
+
+- **Bangs frame, they do not cover.** Each lock leaves her parting under the hat, runs out across the top of her forehead
+  above her brows to her temple, and from there lies along the side of her face, outside her cheek. Nothing crosses her brows,
+  eyes, glasses or cheeks (`FR` in `I41_hair.js`: start x, how far down the side it runs, clearance, half-width, wave).
+- **No gap between bangs and the rest.** The bunches over her shoulders used to start above her ear; they now start at her
+  temple (`bunchPts`: 1.14 rad round from the front, was 1.38). The tresses nearest her face are slimmer and wave less.
+- **A lower hat meets a wider forehead.** Dropped 14 mm, the foot of the crown cut through her forehead and the roots of her
+  fringe. The foot is now squarer at its corners and sits 11 mm further forward (`crown.pt` in `I43_hat.js`). When the hat
+  moves again, look at the band from the three-quarter views and from above.
 
 ## Round 2 paintings (arrived November 13, 2026, after stage one was built)
 

@@ -2,12 +2,12 @@
   // ---------- hat: wine-red felt, a wide floppy brim, a tall soft crown that slumps to HER RIGHT and hangs behind her shoulder ----------
   // Measured off C4 (front: 1370 px a metre; profile: 1290 px a metre, the tip of her nose at x 1432) and C5, with the details in C15 to C17.
   //   the opening: an ellipse 17 cm across and 25 cm front to back, lying on a plane that rises toward the front (at her hairline in
-  //     front, 1.571 m; just above her eye line at the back, 1.511 m);
+  //     front, 1.556 m; at the back, 1.497 m);
   //   the brim: 33 cm across and 39 cm front to back, level in front, drooping 4.5 cm at the sides and 9 cm at the back;
   //   the band: black lace 4.6 cm high, a silver chain round it, three small gold crosses in front, the big ringed cross toward her
   //     left, a cream horn at each side;
   //   the crown: up 15 cm, over to her right and back, then down behind her right shoulder to the height of her chin.
-  const HAT = { oc: [0, 1.541, -0.041], oa: 0.084, ob: 0.127, slope: 0.056 / 0.234, bandH: 0.046, ec: -0.015, ea: 0.166, eb: 0.186 };
+  const HAT = { oc: [0, 1.5266, -0.030], oa: 0.084, ob: 0.127, slope: 0.056 / 0.234, bandH: 0.046, ec: -0.015, ea: 0.166, eb: 0.186 };
   const hatOpen = (a, grow) => { const g = grow || 0, x = (HAT.oa + g) * Math.sin(a), z = HAT.oc[2] + (HAT.ob + g) * Math.cos(a); return [x, HAT.oc[1] + (z - HAT.oc[2]) * HAT.slope, z]; };
   const hatDrop = (a) => 0.004 - 0.092 * Math.pow((1 - Math.cos(a)) / 2, 0.9);            // how far the brim's edge hangs below the opening, by direction
   function brimPt(a, t) {                            // t: 0 at the opening .. 1 at the edge
@@ -18,9 +18,11 @@
   // the crown's middle line and its half-widths (across, front to back) at each station
   // Read off both views of C4: a dome as wide as the band, 1.72 m at its top; the rest of the crown comes off the back of the dome on
   // her right, 10 cm thick where it starts, and hangs down behind her right shoulder, thinning to its tip at 1.40 m.
-  // Chris, November 13: the hat down by 15% of the way from its bottom edge in front to the top of her glasses (7 mm). Every height below has that taken off.
-  const CROWN = [[0, 1.541, -0.041, 0.082, 0.125], [0, 1.589, -0.050, 0.082, 0.120], [-0.004, 1.629, -0.058, 0.078, 0.108], [-0.026, 1.657, -0.082, 0.068, 0.086], [-0.074, 1.659, -0.128, 0.058, 0.062],
-    [-0.118, 1.627, -0.160, 0.050, 0.051], [-0.140, 1.569, -0.172, 0.043, 0.044], [-0.150, 1.509, -0.171, 0.034, 0.035], [-0.158, 1.453, -0.176, 0.024, 0.025], [-0.172, 1.413, -0.190, 0.012, 0.012], [-0.178, 1.393, -0.200, 0.004, 0.004]];
+  // Chris, November 13: the hat down by 15% of the way from its bottom edge in front to the top of her glasses (7 mm), and later the
+  // same day by another 30% of that way (14.4 mm more). The way was 4.81 cm; the hat now sits 45% of it lower, 21.4 mm. Every height
+  // below has that taken off.
+  const CROWN = [[0, 1.5266, -0.030, 0.084, 0.125], [0, 1.5746, -0.042, 0.083, 0.120], [-0.004, 1.6146, -0.054, 0.078, 0.108], [-0.026, 1.6426, -0.082, 0.068, 0.086], [-0.074, 1.6446, -0.128, 0.058, 0.062],
+    [-0.118, 1.6126, -0.160, 0.050, 0.051], [-0.140, 1.5546, -0.172, 0.043, 0.044], [-0.150, 1.4946, -0.171, 0.034, 0.035], [-0.158, 1.4386, -0.176, 0.024, 0.025], [-0.172, 1.3986, -0.190, 0.012, 0.012], [-0.178, 1.3786, -0.200, 0.004, 0.004]];
   const crown = (function () {
     const NS = Q(96, 40), ctr = curvePts(CROWN.map((c) => V3(c[0], c[1], c[2])), NS + 1), fr = [], len = [0];
     const al = Math.atan(HAT.slope); let T0 = V3(0, Math.cos(al), -Math.sin(al)), N = V3(1, 0, 0);
@@ -40,7 +42,10 @@
         k += env * (0.105 * Math.sin(L * 50 + 1.8 * Math.sin(a + 2 * s * 6) + 4 * fbm(a * 0.7 + 3, L * 9)) + 0.060 * Math.sin(3 * a + L * 14 + 1) + 0.12 * (fbm(Math.cos(a) * 1.4 + 9, L * 16 + Math.sin(a)) - 0.47));
         k += 0.035 * sm(0.02, 0.12, s) * (1 - env) * Math.sin(2 * a + 1.2);
       }
-      const cx = (ra * k + (grow || 0)) * Math.sin(a), cz = (rb * k + (grow || 0)) * Math.cos(a);
+      // Lower on her head the hat meets her forehead where it is wider, so the foot of the crown is squarer than an ellipse at its
+      // four corners (and sits 11 mm further forward than first built): her forehead and the roots of her fringe stay inside it.
+      const e = 2 / lerp(2.45, 2, sm(0.0, 0.22, s)), sa = Math.sin(a), ca = Math.cos(a);
+      const cx = (ra * k + (grow || 0)) * Math.sign(sa) * Math.pow(Math.abs(sa), e), cz = (rb * k + (grow || 0)) * Math.sign(ca) * Math.pow(Math.abs(ca), e);
       return [f.C.x + f.N.x * cx + f.F.x * cz, f.C.y + f.N.y * cx + f.F.y * cz, f.C.z + f.N.z * cx + f.F.z * cz];
     };
     let iBand = 1; while (iBand < NS && len[iBand] < HAT.bandH) iBand++;
