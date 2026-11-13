@@ -23,6 +23,7 @@ Body and base outfit, checked against her round 1 paintings. Nothing moves yet.
 - `references/starters/`: the 14 images Chris attaches in ChatGPT. `references/prompts/`: the 104 prompts and the scripts
   that build `Io_Reference_Prompts.html` (see the README text below and `claude/io-3d-reference-prompts.md` in the project).
 - `references/round1/`: the 43 round 1 paintings (A1 to E8) as WebP, with the index Chris's zips came with.
+- `references/round2/`: the 21 round 2 paintings (F1 to F12, G1 to G9) as WebP, with their index. Not used yet; see "Round 2" below.
 - `src/`: the model, joined in this order by `build_io.sh` into `out/io.js` (one function, `makeIo(opts)`):
   `00_util`, `I05_tables` (written by `tools/tables.py`), `10_geom` (skeleton and part builders), `20_tex`, `I21_tex`,
   `I30_body` (torso, arms, legs, skirt), `I31_boots`, `32_hands`, `I40_head` (the plain form), `I99_static` (materials, and
@@ -92,6 +93,32 @@ The paintings are data: run Python that reads them with `-I`.
 - When patching a line, never leave a `//` comment in the middle of a statement (it swallowed a `const`).
 - The legs must start inside the hips, and the hips must be narrower than the skirt that covers them, or skin shows through.
 - Check the scale of a part painting (B5) against a full figure by something both show (the boot), not by its own height.
+
+## Round 2 paintings (arrived November 13, 2026, after stage one was built)
+
+All 21 arrived and match their index. Nothing is built from them yet.
+
+| Painting | Shows | For |
+|---|---|---|
+| F1, F2 | both necklaces, the six bracelets; the pendant front and side | jewellery |
+| F3 | belt laid flat, pouch from three sides, the crystal on its chain | belt stage |
+| F4, F5, F6 | robe laid flat front and back, the sleeve on an arm, drape, trim, shoulder cut-out, hem point | robe as cloth |
+| F7 | bodice front, back and neckline close-up | a sharper bodice than B3 gives |
+| F8 | skirt alone, one tier, the tulle underlayer | skirt as cloth |
+| F9 | eight swatches (felt, two laces, bodice cloth, two black leathers, horn, brown leather) | materials |
+| F10, F11, F12 | chiffon square, lace square, trim strip | repeating textures |
+| G1, G2, G3 | the book shut, open, and four spreads | the book |
+| G4, G5 | pendant turning into the sickle; the sickle | plain attack |
+| G6 | dagger and sheath | Thornwake |
+| G7 | herbs, leaves, seed, bottles, cup | small props |
+| G8 | where she carries everything, front, side and back | placing things on her |
+| G9 | her hands holding the book, sickle, dagger and a leaf | grips |
+
+- F4, F8 and F11 are on light grey, not plum (the prompts asked for that so the sheer cloth reads). `tools/sil.py` keys on
+  plum, so cut these with their own background colour.
+- F7's bodice back is laced; B3's back has a plain middle seam. The model wears B3's for now. Her hair and robe cover most of
+  it. Chris to choose.
+- F3's pouch carries a gold filigree and a hanging gold ball; G8 shows the pouch on her right hip and the dagger on her left.
 
 ## Next stages, in the how-to's order
 
