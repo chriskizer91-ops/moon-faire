@@ -39,9 +39,9 @@ canvas#stage{display:block;width:100%;height:100%;touch-action:none;cursor:grab}
 <body>
 <div class="wrap">
   <header>
-    <p class="eyebrow">Moon Faire · Stage two of her build</p>
+    <p class="eyebrow">Moon Faire · Stage five of her build</p>
     <h1>The <em>Ranger</em></h1>
-    <p class="sub">Her hair is lower over her forehead: it now climbs from the band back to the crown, as in your side painting. Drag to turn her, pinch or scroll to zoom. "Painting beside her" shows your painting for the view you pick.</p>
+    <p class="sub">She now wears her two belts, her satchel, her pouch and her four strap hooks as real objects. Drag to turn her, pinch or scroll to zoom. "Painting beside her" shows your painting for the view you pick.</p>
   </header>
   <div class="stagebox" id="box">
     <canvas id="stage"></canvas>
@@ -49,6 +49,7 @@ canvas#stage{display:block;width:100%;height:100%;touch-action:none;cursor:grab}
     <img id="ref" alt="The painting for this view" hidden><span class="reftag">Painting</span>
     <div class="err" id="err" hidden></div>
   </div>
+  <div><p class="label">Belts, bags and hooks</p><div class="chips" id="gear"></div></div>
   <div><p class="label">Head</p><div class="chips" id="hviews"></div></div>
   <div><p class="label">Her face</p><div class="chips" id="faces"></div></div>
   <div><p class="label">Boots</p><div class="chips" id="boots"></div></div>
@@ -57,7 +58,15 @@ canvas#stage{display:block;width:100%;height:100%;touch-action:none;cursor:grab}
   <div><p class="label">Arms and legs</p><div class="chips" id="poses"></div></div>
   <div><p class="label">Show</p><div class="chips" id="shows"></div></div>
   <div class="notes">
-    <h2>Her hair</h2>
+    <h2>Her belts, bags and strap hooks</h2>
+    <ul>
+      <li>Two studded belts, each a real loop tilted round her hips. One sits high on her right hip and carries the ring buckle; the other sits high on her left and carries the square buckle and the blue keeper. They cross in the middle, front and back. Each is 2.4 cm wide, as measured on your front painting, with its end tucked past the buckle and punched with holes.</li>
+      <li>The satchel hangs by two loops from the ring-buckle belt and rests on her right hip. It is built to its own painting: tooled flap, pointed tab with brass studs, two buckled straps, stitched sides. 20 cm across, 19 tall.</li>
+      <li>The pouch hangs from the other belt behind her left hip. 9 cm across, 14 tall.</li>
+      <li>Four strap hooks, front and back: a brass buckle on each strap with a black iron curl either side, lying on her skin. In front the buckle is an oval ring with an upright prong; behind it is a narrow bar. The flat painted hooks that were underneath are painted out.</li>
+      <li>A choice I made: your paintings draw each bag face-on in every view, which one bag cannot do. The satchel hangs on the side of her right hip turned a little forward, and the pouch behind her left hip, so each can be seen from the front, the side and the back. Say if you would rather have the satchel further round to the front.</li>
+    </ul>
+    <h2 style="margin-top:12px">Her hair</h2>
     <ul>
       <li>The swell over her forehead stood 2.5 to 4.6 cm too high just behind the band. It is lowered to the slope in your side painting (within 3 mm). Her crown, bun, band and face are untouched.</li>
     </ul>
@@ -77,7 +86,10 @@ canvas#stage{display:block;width:100%;height:100%;touch-action:none;cursor:grab}
       <li>Under the sole the tread is simple bars, not the crosses in E7.</li>
       <li>From earlier stages: the paint on her fingers is drawn out a little; the edge of the hand is soft paint; a step where her arm meets her shoulder; her hair is still painted from the old pictures.</li>
       <li>Rings, bracelets, earrings and necklaces.</li>
-      <li>Belts, satchel, pouch, charms, the strap hooks as real objects.</li>
+      <li>The bags are stiff. They do not swing yet, and when her legs move a thigh can pass through one.</li>
+      <li>When she lifts her arms the outer iron curls stay where they are instead of riding her shoulder.</li>
+      <li>At her back the straps blur just above the buckles, where the old painting ran out.</li>
+      <li>The charms that hang from the belts, and the small rings they hang from.</li>
       <li>Sleeves and the headband tails as hanging cloth. For now they are stiff.</li>
       <li>Bow, sword, knives, and all movement.</li>
     </ul>
@@ -101,8 +113,8 @@ canvas#stage{display:block;width:100%;height:100%;touch-action:none;cursor:grab}
     R = makeRanger({});
     stage.scene.add(R.root);
   } catch (e) { $('err').hidden = false; $('err').textContent = 'She could not be drawn on this device: ' + (e && e.message ? e.message : e); return; }
-  const orbit = stage.orbit; orbit.az = -Math.PI / 2; orbit.el = 0.06; orbit.dist = 1.7; orbit.fov = 20; orbit.target.set(0, 1.56, 0);
-  let want = { az: orbit.az, el: orbit.el, dist: orbit.dist, ty: 1.56, tx: 0, tz: 0 }, easing = true, spin = false;
+  const orbit = stage.orbit; orbit.az = 0; orbit.el = 0.05; orbit.dist = 2.3; orbit.fov = 20; orbit.target.set(0, 0.92, 0);
+  let want = { az: orbit.az, el: orbit.el, dist: orbit.dist, ty: 0.92, tx: 0, tz: 0 }, easing = true, spin = false;
   const VIEWS = [['Front', 0, 0.05, 5.6, 0.86, 'front'], ['Three-quarter', 0.7, 0.08, 5.6, 0.86, 'front'], ['Side', Math.PI / 2, 0.05, 5.6, 0.86, 'side'], ['Back', Math.PI, 0.05, 5.6, 0.86, 'back'],
     ['Corset', 0.25, 0.05, 2.6, 1.16, 'front'], ['Legs', 0.3, 0.05, 3.6, 0.48, 'legs'], ['Boots', 0.6, 0.18, 1.9, 0.17, 'boot']];
   const HVIEWS = [['Face', 0, 0.02, 1.5, 1.512, 'face'], ['Three-quarter', 0.7, 0.03, 1.5, 1.512, 'faceq'], ['Profile', -Math.PI / 2, 0.02, 1.6, 1.53, 'prof'], ['Back of head', Math.PI, 0.05, 1.6, 1.53, 'hback'], ['From above', 0.25, 0.78, 1.7, 1.56, 'top'], ['From below', 0.2, -0.28, 1.5, 1.49, 'below'], ['Head and shoulders', 0.5, 0.04, 2.1, 1.47, 'faceq'], ['Hair from the side', -Math.PI / 2, 0.06, 1.7, 1.56, 'hairS']];
@@ -111,8 +123,11 @@ canvas#stage{display:block;width:100%;height:100%;touch-action:none;cursor:grab}
     ['Left arm', 1.25, 0.10, 2.7, 1.02, 'armL', 0.27, 1], ['Right arm', -1.25, 0.10, 2.7, 1.02, 'armR', -0.27, 1]];
   // boots: name, azimuth, elevation, distance, target height, painting, target x, pose, target z
   const BOOTS = [['Three-quarter', -0.72, 0.36, 1.5, 0.16, 'bootQ', -0.081, 1, 0.05], ['Outer side', -Math.PI / 2, 0.05, 1.6, 0.16, 'bootS', -0.081, 1, 0.05], ['Front', 0, 0.10, 1.6, 0.17, 'bootF', 0, 1, 0.05], ['Back', Math.PI, 0.10, 1.6, 0.17, 'bootB', 0, 1, 0.0], ['From above', -0.35, 1.05, 1.5, 0.14, 'bootT', -0.081, 1, 0.05]];
+  // belts, bags and hooks: name, azimuth, elevation, distance, target height, painting, target x, pose, target z
+  const GEAR = [['Belts', 0, 0.05, 2.3, 0.92, 'gearF', 0, 1, 0], ['Satchel', -1.2, 0.10, 1.25, 0.885, 'gearSat', -0.13, 1, 0.04], ['Pouch', 2.03, 0.10, 1.05, 0.90, 'gearPou', 0.14, 1, -0.05], ['From behind', Math.PI, 0.05, 2.3, 0.92, 'gearB', 0, 1, 0],
+    ['Buckles', 0, 0.06, 0.85, 0.975, 'gearBk', 0, 1, 0.08], ['Strap hook', -0.3, 0.10, 0.72, 1.322, 'hookF', -0.115, 1, 0.07], ['Hook, behind', Math.PI - 0.3, 0.12, 0.72, 1.335, 'hookB', 0.112, 1, -0.07]];
   const POSES = [['At rest', { arm: 15, leg: 0 }], ['As painted', { arm: 24, leg: 3 }], ['Arms out', { arm: 90, leg: 0 }]];
-  let refKey = 'hairS', showRef = true;
+  let refKey = 'gearF', showRef = true;
   function chips(host, items, onPick, first) {
     items.forEach((it, i) => { const b = document.createElement('button'); b.className = 'chip'; b.type = 'button'; b.textContent = it[0]; b.setAttribute('aria-pressed', i === first ? 'true' : 'false');
       b.addEventListener('click', () => { [...host.children].forEach((c) => c.setAttribute('aria-pressed', 'false')); b.setAttribute('aria-pressed', 'true'); onPick(it); }); host.appendChild(b); });
@@ -120,9 +135,10 @@ canvas#stage{display:block;width:100%;height:100%;touch-action:none;cursor:grab}
   function setRef() { const im = $('ref'), src = REFS[refKey]; im.hidden = !(showRef && src); if (src && im.getAttribute('src') !== src) im.src = src; }
   const setPose = (i) => { R.pose(POSES[i][1]); [...$('poses').children].forEach((c, k) => c.setAttribute('aria-pressed', k === i ? 'true' : 'false')); };
   const pickView = (v, host) => { want = { az: v[1], el: v[2], dist: v[3], ty: v[4], tx: v[6] || 0, tz: v[8] != null ? v[8] : (v[6] ? -0.014 : 0), low: host === 'hands' && v[7] === 2 }; easing = true; spin = false; refKey = v[5]; setRef(); $('spinB').setAttribute('aria-pressed', 'false');
-    for (const id of ['hviews', 'views', 'hands', 'boots']) if (id !== host) [...$(id).children].forEach((c) => c.setAttribute('aria-pressed', 'false'));
+    for (const id of ['gear', 'hviews', 'views', 'hands', 'boots']) if (id !== host) [...$(id).children].forEach((c) => c.setAttribute('aria-pressed', 'false'));
     if (v[7] != null) setPose(v[7]); };
-  chips($('hviews'), HVIEWS, (v) => pickView(v, 'hviews'), 7);
+  chips($('gear'), GEAR, (v) => pickView(v, 'gear'), 0);
+  chips($('hviews'), HVIEWS, (v) => pickView(v, 'hviews'), -1);
   chips($('views'), VIEWS, (v) => pickView(v, 'views'), -1);
   chips($('hands'), HANDS, (v) => pickView(v, 'hands'), -1);
   chips($('boots'), BOOTS, (v) => pickView(v, 'boots'), -1);
@@ -133,10 +149,12 @@ canvas#stage{display:block;width:100%;height:100%;touch-action:none;cursor:grab}
     b.addEventListener('click', () => { const v = b.getAttribute('aria-pressed') !== 'true'; b.setAttribute('aria-pressed', v ? 'true' : 'false'); fn(v); }); host.appendChild(b); };
   toggle($('shows'), 'refB', 'Painting beside her', true, (v) => { showRef = v; setRef(); });
   toggle($('shows'), 'spinB', 'Turn slowly', false, (v) => { spin = v; easing = false; });
-  const vis = { glasses: true, sleeves: true, boots: false }, BOOTK = ['boot', 'sole', 'stitch', 'eyelet', 'lace', 'aglet', 'sock', 'hole'];
-  const applyVis = () => { for (const k in R.meshes) { let v = true; if (['wire', 'lens', 'pad'].includes(k)) v = vis.glasses; if (['lacesl', 'laceband'].includes(k)) v = vis.sleeves; if (vis.boots && !BOOTK.includes(k)) v = false; R.meshes[k].visible = v; } };
+  const vis = { glasses: true, sleeves: true, boots: false, gear: true, hooks: true }, BOOTK = ['boot', 'sole', 'stitch', 'eyelet', 'lace', 'aglet', 'sock', 'hole'], GEARK = ['belt', 'gear', 'steel', 'keeperB', 'gearBrass', 'beltHole'], HOOKK = ['iron', 'hookBrass'];
+  const applyVis = () => { for (const k in R.meshes) { let v = true; if (['wire', 'lens', 'pad'].includes(k)) v = vis.glasses; if (['lacesl', 'laceband'].includes(k)) v = vis.sleeves; if (GEARK.includes(k)) v = vis.gear; if (HOOKK.includes(k)) v = vis.hooks; if (vis.boots && !BOOTK.includes(k)) v = false; R.meshes[k].visible = v; } };
   toggle($('shows'), 'glassB', 'Glasses', true, (v) => { vis.glasses = v; applyVis(); });
   toggle($('shows'), 'sleeveB', 'Lace sleeves', true, (v) => { vis.sleeves = v; applyVis(); });
+  toggle($('shows'), 'gearB', 'Belts and bags', true, (v) => { vis.gear = v; applyVis(); });
+  toggle($('shows'), 'hooksB', 'Strap hooks', true, (v) => { vis.hooks = v; applyVis(); });
   toggle($('shows'), 'bootsB', 'Boots only', false, (v) => { vis.boots = v; applyVis(); });
   setRef();
   // drag to turn, pinch or wheel to zoom
@@ -157,7 +175,7 @@ canvas#stage{display:block;width:100%;height:100%;touch-action:none;cursor:grab}
     if (easing) { let d = want.az - orbit.az; d = Math.atan2(Math.sin(d), Math.cos(d)); const k = Math.min(1, dt * 5); orbit.az += d * k; orbit.el += (want.el - orbit.el) * k; orbit.dist += (want.dist - orbit.dist) * k; orbit.target.y += (want.ty - orbit.target.y) * k; orbit.target.x += ((want.tx || 0) - orbit.target.x) * k; orbit.target.z += ((want.tz || 0) - orbit.target.z) * k; }
     stage.render();
   }
-  $('hud').textContent = 'Hair lowered over her forehead · ' + Math.round(R.triangles / 1000) + 'k triangles';
+  $('hud').textContent = 'Belts, bags and strap hooks · ' + Math.round(R.triangles / 1000) + 'k triangles';
   window.RANGER = { stage, R, step() { fit(); stage.render(); } };
   requestAnimationFrame(frame);
 })();

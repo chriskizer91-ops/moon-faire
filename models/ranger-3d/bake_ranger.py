@@ -96,8 +96,40 @@ atlas = col * conf[..., None] + fl * (1 - conf[..., None])
 jj0, jj1 = int((AY1 - 1.345) / (AY1 - AY0) * H), int((AY1 - 1.300) / (AY1 - AY0) * H); cu = (np.abs(us - 0.5) < 0.045)
 chest = np.median(atlas[jj0:jj1][:, cu].reshape(-1, 3), 0); T['skinChest'] = '#%02x%02x%02x' % tuple(int(round(v)) for v in chest); print('chest skin', T['skinChest'])
 NECK = np.array([190.0, 127.0, 98.0]); T['skinNeck'] = '#be7f62'      # her neck in J3, between collarbones and chin: darker and warmer than her chest
-ub = np.minimum(us, 1 - us)[None, :]; lower = 0.030 * smooth(0.30, 0.18, ub)       # at her back the band's tails, loose hair and their shadows hang lower in the painting, so plain skin starts lower there
+ub = np.minimum(us, 1 - us)[None, :]; lower = 0.030 * smooth(0.30, 0.18, ub) * smooth(0.020, 0.034, np.abs(ub - 0.1115))       # but not on her straps, which run on up over her shoulders       # at her back the band's tails, loose hair and their shadows hang lower in the painting, so plain skin starts lower there
 nk = smooth(1.350, 1.398, Y)[..., None]; fade = smooth(1.352 - lower, 1.392 - lower, Y)[..., None]; atlas = atlas * (1 - fade) + (chest[None, None] * (1 - nk) + NECK[None, None] * nk) * fade
+# her strap hooks and their buckles are real objects now (src/R45_gear.js): the flat painted ones are painted out of the picture.
+# Dark iron and its shadow beside each strap becomes the skin around it; the brass on the strap becomes the blue beside it.
+HOOKS = [(0.383, 1.321, -1), (0.617, 1.321, 1), (0.1115, 1.337, 1), (0.8885, 1.337, -1)]       # u, height, which way her side is
+def paint_out(atlas):
+    j0, j1 = int((AY1 - 1.374) / (AY1 - AY0) * H), int((AY1 - 1.286) / (AY1 - AY0) * H)
+    band = atlas[j0:j1].copy(); r, g, b = band[..., 0], band[..., 1], band[..., 2]; lum = 0.3 * r + 0.59 * g + 0.11 * b
+    uu = np.broadcast_to(us[None, :], lum.shape); yy = Y[j0:j1]
+    box = np.zeros(lum.shape, np.float32); small = np.zeros(lum.shape, bool)
+    for ub, yb, outer in HOOKS:
+        du = (uu - ub) * outer; lo = 0.023 if yb < 1.33 else 0.037       # the curls hang lower from the bar at her back
+        box = np.maximum(box, smooth(-0.064, -0.050, du) * smooth(0.112, 0.098, du) * smooth(yb - lo - 0.009, yb - lo, yy) * smooth(yb + 0.034, yb + 0.026, yy))
+        small |= (np.abs(uu - ub) < 0.030) & (np.abs(yy - yb) < 0.026)
+    # the strap, whole: the blue, joined up through the buckle that crosses it
+    blue = b > r + 12
+    whole = ndi.binary_closing(blue, structure=np.ones((61, 1), bool)) | blue; whole = ndi.binary_closing(whole, structure=np.ones((1, 13), bool)) | whole
+    whole = np.where(small, whole, blue); strap = ndi.binary_dilation(whole, iterations=3)
+    # iron and its shadow, beside the strap -> the skin around it
+    dark = (box > 0.02) & ~strap & ((lum < 92) | (small & (r - b > 112)))
+    dark = ndi.binary_dilation(dark, iterations=11) & ~strap
+    ok = ~dark & ~ndi.binary_dilation(whole, iterations=9) & (lum > 120); w = ok.astype(np.float32)
+    num = np.stack([ndi.gaussian_filter(band[..., k] * w, 18, mode='wrap') for k in range(3)], -1); den = ndi.gaussian_filter(w, 18, mode='wrap')[..., None]
+    fillc = np.where(den > 0.01, num / np.maximum(den, 1e-5), chest[None, None])
+    m = np.clip(ndi.gaussian_filter(dark.astype(np.float32), 2.5) * 1.6, 0, 1) * box; band = band * (1 - m[..., None]) + fillc * m[..., None]
+    # brass and iron on the strap -> the blue beside it
+    r, g, b = band[..., 0], band[..., 1], band[..., 2]
+    bad = small & strap & ~(b > r + 22); bad = ndi.binary_dilation(bad, iterations=2) & strap & small
+    ok = (b > r + 25) & ~bad; w = ok.astype(np.float32)
+    num = np.stack([ndi.gaussian_filter(band[..., k] * w, 6, mode='wrap') for k in range(3)], -1); den = ndi.gaussian_filter(w, 6, mode='wrap')[..., None]
+    m = np.clip(ndi.gaussian_filter((bad & whole).astype(np.float32), 1.2)[..., None] * 1.8, 0, 1) * (den > 0.01)
+    band = band * (1 - m) + (num / np.maximum(den, 1e-5)) * m
+    atlas[j0:j1] = band; print('painted out: %d px of iron, %d px of brass' % (int(dark.sum()), int(bad.sum()))); return atlas
+atlas = paint_out(atlas)
 T['body'] = uri(atlas, 90); Image.fromarray(np.clip(atlas, 0, 255).astype(np.uint8)).save('/home/claude/ranger/shots/bake_body.jpg', quality=90)
 print('body atlas', atlas.shape, 'low-confidence share %.3f' % float((conf < 0.5).mean()))
 

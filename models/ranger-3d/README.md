@@ -4,11 +4,13 @@ The code-built three.js (r128) model of the Ranger, made the same way as the Jes
 paintings baked on as textures. The method is the claude.ai Project "Flip Book Art", doc `claude/HOW-TO-3d-witch-models.md`.
 Published at https://claude.ai/artifact/NqGHWjWfKvmjcprckzUN7v (republish every stage to that link). Project notes:
 `claude/ranger-3d-stage1-body.md`, `claude/ranger-3d-stage2-head.md`, `claude/ranger-3d-stage2b-jester-face.md`,
-`claude/ranger-3d-round4-face-prompts.md` and `claude/ranger-3d-stage2c-new-face.md`.
+`claude/ranger-3d-round4-face-prompts.md`, `claude/ranger-3d-stage2c-new-face.md`, `claude/ranger-3d-stage2d-fidelity.md`,
+`claude/ranger-3d-stage3-hands-arms.md`, `claude/ranger-3d-stage4-boots.md` and `claude/ranger-3d-stage5-belts-bags-hooks.md`.
 
-## Where she stands: stage four (November 13, 2026)
+## Where she stands: stage five (November 13, 2026)
 
-Body, base outfit, head, face, hair, headband and glasses, standing still. 324,628 triangles.
+Body, base outfit, head, face, hair, headband, glasses, painted hands and arms, boots, and now her two belts, satchel, pouch and
+four strap hooks as real objects, standing still. About 355,000 triangles.
 
 - **Approved by Chris (November 12): her body and base outfit** ("This looks very good so far"). Do not reshape them without asking.
 - **Stage 2b, the same day.** Chris: "just use the jester witch 3d face model And then we will make specific new images of just her
@@ -35,12 +37,34 @@ Body, base outfit, head, face, hair, headband and glasses, standing still. 324,6
   at the ball (it was 12), shaft and toe narrower, shaft shallower front to back with the eyelets set back from the front edge, sock
   lower and smaller (top 29.1 cm up, it was 32). Lacing, seams, heel counter, back strap with a pull loop, welt stitching, lugs and
   the leather, sole and sock pictures all follow the paintings now (`src/R31_boots.js`, `src/R21_tex.js`).
-- Stage two, waiting for his notes: face, ears, hair with the bun, headband with knot, tails, gem and drop, glasses, loose locks,
-  and a wrist that joins the hand.
+- **Approved by Chris (November 13): her boots** ("the boots look perfect as they are"). Do not reshape them without asking.
+- **Stage 4b, her hair lowered.** Chris: "her hair is too big above the hairband ... lowered the elevation of the front bulge of
+  it", with everything else on her head the same. The swell of hair just behind the band stood 2.5 to 4.6 cm above the slope in
+  C3's side view. It now follows that slope to within 3 mm (`FRONT_LOW` in `hairPt`, `src/R41_hair.js`). Crown, bun, band and face
+  are untouched. C3's own front view draws the hair lower and wider than its side view; the side view was followed.
+- **Stage five, belts, satchel, pouch and strap hooks.** Chris: "Let's move on to her belts, satchels, pouch, and strap hooks as
+  real objects." All in `src/R45_gear.js`, wearing the leather of F6 (`bake_gear_r.py`).
+  - Two belts, each a loop lying in a tilted plane round her hips (slope 0.38, crossing 96.2 cm up at the middle, front and back).
+    Belt A is high on her right hip with a steel ring buckle at her front right; belt B is high on her left with a square buckle
+    and a blue keeper, and lies on top where they cross. 2.4 cm wide, one steel stud every 2.2 cm, each with a tucked end with
+    punched holes past its buckle.
+  - The satchel (20 cm across, 19 tall, 6.5 deep at the foot) hangs by two loops from belt A on her right hip, a little forward of
+    her side. The pouch (9.3 by 14 cm) hangs by one loop from belt B behind her left hip. Each is built to its own painting in F6:
+    back, front, gusset, flap with a rim, straps or tab lifted off the leather, steel buckles, brass studs. Each hangs from its
+    belt like a hinge, swung in until its back rests on her hip and turned until both halves touch (`bag()`).
+  - Four strap hooks, front and back: a brass buckle on the strap (an oval ring with an upright prong in front, a narrow bar with
+    a tooth behind) and a black iron curl either side, the outer one bigger, shapes read off A1 and A2. They lie on the real
+    outer surface of chest and shoulder, found by looking straight through the built torso and arms. The flat painted hooks are
+    painted out of the body picture (`paint_out` in `bake_ranger.py`), and the straps at her back no longer fade to skin above
+    the buckles.
+  - A choice made here, told to Chris: the paintings draw each bag face-on in every view. The satchel is on the side of her hip
+    turned a little forward and the pouch behind her left hip, so each shows from the front, the side and the back.
+- Waiting for his notes: stage two (head), stage three (hands and arms), stage 4b (hair) and stage five.
 
 Rough or not built yet: her face does not move (no blink, no expressions); the hair has a smooth edge with none of the painted
-flyaway wisps, and the loose locks are simple; earrings and necklaces; fingers that bend; the strap hooks as real objects,
-belts, satchel, pouch, charms, bracelets; sleeves and headband tails as hanging cloth; bow, sword, knives; all movement and spells.
+flyaway wisps, and the loose locks are simple; earrings and necklaces; fingers that bend; the charms on her belts and the rings they hang from; bracelets; the bags are stiff (no
+swing, and a moving thigh can pass through one); with her arms raised the outer iron curls stay put instead of riding her shoulder;
+sleeves and headband tails as hanging cloth; bow, sword, knives; all movement and spells.
 
 ## What is here
 
@@ -54,6 +78,7 @@ belts, satchel, pouch, charms, bracelets; sleeves and headband tails as hanging 
   - `R40_head.js`: the head (the Jester's face model, scaled and placed on her body), face mix, ears, neck.
   - `R41_hair.js`: hair with the bun, headband with knot and tails, the gem and its drop, loose locks.
   - `R42_glasses.js`: glasses.
+  - `R45_gear.js`: belts with buckles, studs and tucked ends; satchel and pouch; the four strap hooks.
   - `R99_static.js`: materials, binding and `pose({arm, leg})`. This stands in for the animation files until they are brought over.
 - `tools/tables.py`: the one place her body tables live. The model and the body bake both read them.
 - `tools/sil.py`: lifts a figure off a painting's flat background. `tools/measure.py` and `tools/more.py` print widths and depths
@@ -65,6 +90,8 @@ belts, satchel, pouch, charms, bracelets; sleeves and headband tails as hanging 
   model's, millimetre by millimetre. `tools/cmp_head.py`: her head beside C3 from the side or the front, outlines overlaid.
 - `bake_hands_r.py`: hand and arm textures (`hands`, `handsR`, `armL`, `armR`), added to the same file; `hand_marks.json` holds the
   finger, web and wrist landmarks of D1 and D2.
+- `bake_gear_r.py`: the leather of her bags and belts from F6 (`gear`, a 1024 atlas, with `gearLayout` saying where each piece
+  sits and which F6 pixels it holds; `beltTex`, one stud's length of belt, and `beltPitch`).
 - `bake_ranger.py`: body textures. `bake_head.py`: head textures, added to the same file. Both write `out/ranger_tex.js`
   (`window.RANGER_TEX`).
 - `out/ranger_tex.js`: the baked textures in the published page (made from the original PNGs). `out/palette.js`: stage colours.
@@ -87,7 +114,9 @@ Every full figure is 1.665 m from the top of her hair to her soles.
 | A1 (master, front) | 898 | centre x 512.5, soles y 1507 |
 | B1 front / back | 591.6 | centre x 484.0 / 1049.0, soles y 998 |
 | B2 left-facing / right-facing | 592.2 / 592.8 | centre x 488.9 / 1048.0 |
+| A2 (master, back) | 898 | centre x 507, soles y 1505 |
 | B3 (legs, front) | 898 | centre x 308.0, soles y 961 |
+| F6 (satchel, pouch, belt) | satchel 0.474 mm a pixel | satchel front x 60 to 482, y 512 to 910; pouch front x 1278 to 1474, y 564 to 862 |
 | C1 (face, front) | 4541 | middle x 633.5, eyes y 628 |
 | C3 profile (right figure) | 1837 | eye y 381, tip of the nose x 1498 |
 | C3 front (left figure) | about 1970 | middle x 287.5, eyes y 384 |
@@ -101,6 +130,11 @@ Head heights: under the chin 1.405, mouth 1.4494, under the nose 1.466, tip of t
 to 1.5218, middle of the headband on the forehead 1.589, knot at the nape 1.4935, top of the bun about 1.67. Her pupils are 61 mm
 apart. Forward of the body's middle line: tip of the nose 0.107, ear line -0.0215. The scale of C1 comes from her pupils (61 mm in
 A1 and B1); the scale of the profile comes from eye-to-chin being the same as in C1.
+
+Belts and bags, read off A1 in metres (x to her left, height): ring buckle (-0.077, 0.992), square buckle (0.090, 0.986), the belts
+cross at (-0.005, 0.965), belt width 0.022 to 0.025; satchel x -0.262 to -0.104, height 0.791 to 0.984; pouch x 0.146 to 0.215, top
+about 0.976. Strap hooks sit where the body picture had them painted: 0.117 either side of the middle at 1.321 in front, 0.1115 either
+side at 1.337 behind (u 0.5 -+ 0.117 and 0 +- 0.1115 round the torso).
 
 In the side paintings she leans: her hips are about 5.7 cm ahead of her shins in B2. The model stands upright, and the bakes
 take the lean out. Her arms keep the Jester's bone lengths (0.63 m; the paintings give about 0.60 m).
@@ -221,9 +255,15 @@ Stage four was looked at with `tools/cmp_boot.py` (each view beside its painting
 tables of both outlines in millimetres) and `tools/page_test.py`. Side view: back edge within 3 mm from sole to collar; front view:
 widths within 3 mm from sole to collar, sock within 6; whole boot 257 mm long and 295 mm tall against 257 and 296 painted.
 
+Stage five was looked at beside A1 and A2 at one scale from the front and the back, from both sides, from above and close up, in
+three arm poses, and with `tools/page_test.py`. Built against painted: ring buckle (-0.078, 0.992) against (-0.077, 0.992); square
+buckle (0.090, 0.996) against (0.090, 0.986); crossing 0.962 against 0.965; satchel in the front view x -0.268 to -0.115 and height
+0.783 to 0.976 against -0.262 to -0.104 and 0.791 to 0.984; pouch x 0.138 to 0.239 against 0.146 to 0.215, 14 cm tall where the body
+paintings draw about 12 (F6's shape was kept).
+
 Known rough spots: the boot leather is one worn texture all over (the paintings rub paler on toe cap and heel), the shaft has no
 ankle creases, and the tread under the sole is plain bars, not the crosses in E7; the thin edge of the hand (little-finger side, round the base of the thumb) is soft paint with no detail, because
-neither painting shows it; the paint on the fingers is drawn out; the arm meets the shoulder with a step; the sides of the torso under the arms are filled in from thin evidence; the painted strap hooks are flat;
+neither painting shows it; the paint on the fingers is drawn out; the arm meets the shoulder with a step; the sides of the torso under the arms are filled in from thin evidence; at her back the straps blur just above the buckles; the satchel's loops sit 2 cm nearer its middle than F6 paints them, to hang clear of the ring buckle;
 the shins are straight where the front painting has them angled a little outward; the hair pictures still come from C3, C5 and C8 with the band painted out, so just behind
 the band the hair is folded-over texture, which can read as crimped (J3 shows her hair without the band and is the source for the hair pass); a faint line remains where forearm skin meets hand skin until both are painted.
 
@@ -239,11 +279,12 @@ python3 -I lib/restore_refs.py        # PNG copies of the paintings into refs/
 python3 -I bake_ranger.py             # out/ranger_tex.js: body (needs Pillow, numpy, scipy)
 python3 -I bake_head.py               # adds the head, hair and band pictures to it (also needs opencv)
 python3 -I bake_hands_r.py            # adds her hands and arms from D1 and D2
+python3 -I bake_gear_r.py             # adds the leather of her bags and belts from F6
 ./build_r.sh                          # tools/tables.py, then out/ranger.js
-python3 -I build_single_r.py          # deliver/Ranger_3D_stage4.html, one offline file
+python3 -I build_single_r.py          # deliver/Ranger_3D_stage5.html, one offline file
 python3 tools/shoot_hand.py shots/hand_L.jpg L hand   # one hand from four sides beside D1 or D2; also R, and arm
 python3 tools/wrist_sections.py                       # forearm and hand, slice by slice through the wrist
-python3 tools/page_test.py                            # the page at phone size: boot, hand and body buttons, a drag
+python3 tools/page_test.py                            # the page at phone size: belt, bag, hook, boot, hand and body buttons, a drag
 python3 tools/cmp_boot.py shots/boot                  # her boot beside E1 to E7 at one scale, with outline tables in mm
 python3 tools/cmp_j3.py shots/cj3.jpg                 # head beside J3's three views, with widths and depths by height
 python3 tools/cmp_head.py shots/ch_side.jpg side      # head beside C3 with outlines; also front
@@ -252,15 +293,15 @@ python3 shoot.py shots/x 'T.j.pose({arm:24,leg:3})' face:0,0,1.25,1.53,22,520,60
 python3 shoot_page_r.py               # the real page at phone and laptop size (slow: run it in the background)
 ```
 
-Always run `bake_ranger.py`, then `bake_head.py`, then `bake_hands_r.py`: each adds to the file the first writes. Baking from the WebP copies
+Always run `bake_ranger.py`, then `bake_head.py`, then `bake_hands_r.py`, then `bake_gear_r.py`: each adds to the file the first writes. Baking from the WebP copies
 gives pictures a hair different from the ones kept in `out/` (those came from the original PNGs). The paintings are data: run
 Python that reads them with `-I`.
 
 ## Next stages
 
-In the order of the how-to: strap hooks, belts, satchel and
-pouch as solid things; sleeves and headband tails as cloth; necklaces, earrings, charms and bracelets; bow, sword and knives
+In the order of the how-to: sleeves and headband tails as cloth; necklaces, earrings, bracelets, and the charms on her belts (F7); bow, sword and knives
 (G1 to G7); then the Jester's body moves in her clothes; a face that blinks and changes expression (C10, C11); then her own moves
 and spells with their effects (I1 to I6); then the full page.
 
-Waiting on Chris: his notes on her new face, and the choices listed in the project docs.
+Waiting on Chris: his notes on stage five (above all whether the satchel should sit further round to the front), on her hair, hands
+and face, and the choices listed in the project docs.
