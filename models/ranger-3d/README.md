@@ -158,12 +158,44 @@ four strap hooks as real objects, standing still. About 355,000 triangles.
   `handROver`: the same geometry, only the triangles that follow forearm, hand and finger bones) are drawn once more on top. So
   where forearm and lace cross, her forearm is whole and the lace lies behind it, and the sleeve keeps its painted length in
   every pose. Known cost: a forearm that is truly behind her own sleeve still shows in front of it.
+- **Stage nine: fingers that curl, her bow, Moonsteel Draw.** Chris: "Yes, let's continue to her spells and attacks, starting
+  with fingers that curl and her bow. In Moonsteel, draw. Yes, go."
+  - **Fingers** (`src/R99_static.js`: `FP`, `fingersTick`). A hand shape is [thumb, index, middle, ring, little, spread], 0
+    straight and 1 shut; a finger may also be three joint angles. Shapes: `relax`, `soft`, `open`, `fist`, `grip` (bow hand),
+    `hold`, `hook` (three fingers on the string). The axes and angles are the Jester's (`70_anim.js`); the shapes are hers.
+    Hands ease from shape to shape. `pose()` leaves them straight, for checking against the paintings.
+  - **Bow** (`src/R46_bow.js`; materials `moon`, `bowWrap`, `bowGem`). Built open and upright in a place of its own
+    (`BOWK.G0`): up the grip is +Y, the arrow flies +X. The bone `bow` is a child of `root`, not of her body, so placing that
+    bone places the bow. 96 cm tip to tip (read off her figure in H2; the G1 prompt said 130 cm, the paintings show it
+    smaller), a 9.7 cm grip wound in dark blue leather with a moonsteel collar at each end, a crescent holding a blue gem
+    8.2 cm either side of the middle, and limbs of two rails with a vine and nine leaves, closing to one stem and a curl.
+    The string line is 10.4 cm behind the grip. Each limb has twelve bones (`bowU0..11`, `bowD0..11`); `BOWK.set(open,
+    flex, shake)` rolls it up from the tip like a fern (20 to 56 degrees a joint; it unrolls from the grip outward, so the
+    curl never sweeps across her hand). Folded it is 37 cm, and rides upright on her back (`BACK`: on `spine3`, 1.9 cm off).
+  - **Reach** (`reach(S, W, qH, hint, k)`). Her wrist is put at a point and her arm worked out from it: two bones, a hinge
+    at the elbow, six tenths of any wrist twist given to the forearm. All in the space of `root`. It returns how far the
+    point was beyond her arm (0 when reached).
+  - **Moonsteel Draw** (move `draw`; `play('aim')` still works; `armsAndBow(T, dt)`). The bow's own way is written out (off
+    her back, round her right side `K1`, to the front `K2`, out to full reach `K3`, which is worked out from her left
+    shoulder and from `ANCH`, the corner of her jaw) and her hands follow the bow. In the move's own seconds: right hand
+    behind her 0.02 to 0.27, bow brought round 0.28 to 0.80, left hand on the grip 0.58 to 0.84, limbs unroll 0.84 to 1.26,
+    sparks 1.02 to 1.26, string 1.20 to 1.32, bow pushed out and string pulled back together 1.28 to 1.86, held, loosed at
+    2.45 (`TR`), bow dips 2.5 to 2.8, rolls up and comes back 2.95 to 3.4, passed to her right hand 3.2 to 3.6, on her back
+    by 4.1. `SHOTS.draw` 5.5 s, `SLOW.draw` 1.22.
+  - **Light** (`FX`, `LT`): string, sparks, arrow (shaft, head, tail, trail). Small solid shapes in metres with `glowOnly`
+    blending (HOW-TO-flipbook-look, section 6): never inked or snapped. `R.light` is the group.
+  - `seek(name, t)` puts her at one moment of a move with hands and soft things settled. `tools/seq.sh` takes a row of
+    stills with it and prints how far each hand fell short.
+  - Page: "Moonsteel Draw" replaces "Take aim" and turns the camera to the front; "Back" joins the camera row; "Bow" is a
+    switch under "More views and switches".
+  - Rough: tuned from stills, not watched; her feet slide to the wide stance; nothing holds the bow to her back; from
+    behind her fingers go a little into the curl as she takes hold; in the Flipbook look the thin silver is mostly ink.
 - Waiting for his notes: the moves again; stage two (head), stage three (hands and arms) and stage five.
 
 Rough or not built yet: her face does not move (no blink, no expressions); the hair has a smooth edge with none of the painted
-flyaway wisps, and the loose locks are simple; earrings and necklaces; fingers that bend; bracelets; each charm is one stiff piece on a hinge (its chain does not bend, charms can
+flyaway wisps, and the loose locks are simple; earrings and necklaces; bracelets; each charm is one stiff piece on a hinge (its chain does not bend, charms can
 pass through each other); the caps on the stones are plain cones; with her arms straight out the iron curls bend with her skin;
-sleeves and headband tails as hanging cloth; bow, sword, knives; all movement and spells.
+sword and knives; Silverglass and the gem; hit reactions, a dodge, a win and a fall.
 
 ## What is here
 
@@ -177,8 +209,9 @@ sleeves and headband tails as hanging cloth; bow, sword, knives; all movement an
   - `R40_head.js`: the head (the Jester's face model, scaled and placed on her body), face mix, ears, neck.
   - `R41_hair.js`: hair with the bun, headband with knot and tails, the gem and its drop, loose locks.
   - `R42_glasses.js`: glasses.
-  - `R45_gear.js`: belts with buckles, studs and tucked ends; satchel and pouch; the four strap hooks.
-  - `R99_static.js`: materials, binding and `pose({arm, leg})`. This stands in for the animation files until they are brought over.
+  - `R45_gear.js`: belts with buckles, studs and tucked ends; satchel and pouch; the four strap hooks; charms.
+  - `R46_bow.js`: her bow, open and rolled up (stage nine).
+  - `R99_static.js`: materials, binding, `pose({arm, leg})`, her moves, her fingers, the reach solver, the bow at work and its light.
 - `tools/tables.py`: the one place her body tables live. The model and the body bake both read them.
 - `tools/sil.py`: lifts a figure off a painting's flat background. `tools/measure.py` and `tools/more.py` print widths and depths
   by height. `tools/cmp_r.py` puts the model beside a painting at one scale with the two outlines laid over each other.
@@ -330,6 +363,12 @@ take the lean out. Her arms keep the Jester's bone lengths (0.63 m; the painting
 
 ## Checking
 
+- Stage nine: stills at 23 moments of Moonsteel Draw from the front (`tools/seq.sh`), the take from behind, close-ups of
+  her face and both hands at full draw, the bow on her back from behind and the side, the Flipbook look at three moments,
+  and her hands in Ready, Talk, Cheer and Jog. At every still both hands reached where they were wanted (0 mm short).
+  `tools/page_test.py` at phone size, now in two halves (`PART=1` the bow and the draw, `PART=2` the rest): no errors in
+  either. A drag turns her (0.64 rad).
+
 - Body outlines, model against painting (`tools/cmp_r.py`): front (B1) hips 0.376 m wide against 0.386, waist 0.204 against 0.202,
   calves 0.116 against about 0.119; side (B2) hips 0.238 m deep against 0.234, bust 0.235 against 0.239, thigh 0.176 against 0.182,
   knee 0.131 against 0.134, calf 0.123 against 0.130.
@@ -398,6 +437,11 @@ gives pictures a hair different from the ones kept in `out/` (those came from th
 Python that reads them with `-I`.
 
 ## Next stages
+
+Done at stage nine: fingers, the bow, Moonsteel Draw. Next, in the order Chris agreed: the sword with a fencer's guard and a full
+cut (G4, H7); the knives with their throw (G5, H8); Silverglass (H6) and the gem (H9); then hit reactions, a dodge, a win and
+a fall. The older list below is kept for what is still open in it.
+
 
 In the order of the how-to: sleeves and headband tails as cloth; necklaces, earrings and bracelets; bow, sword and knives
 (G1 to G7); then the Jester's body moves in her clothes; a face that blinks and changes expression (C10, C11); then her own moves

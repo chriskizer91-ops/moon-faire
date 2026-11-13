@@ -69,6 +69,16 @@ details.more>div{margin-top:10px}
   <div class="notes">
     <h2>Changed in this pass</h2>
     <ul>
+      <li>Her fingers curl. Her hands hang relaxed, close round what she holds, open when she talks and make a fist when she cheers.</li>
+      <li>Her bow is built from your bow paintings: moonsteel, a dark blue leather grip, a crescent holding a blue gem at each end of the grip, and open limbs of two rails with a vine and leaves between them. It is 96 cm from tip to tip.</li>
+      <li>Folded, each limb rolls up toward its tip like a fern, and the bow rides upright on the middle of her back, 37 cm long. It stays there while she walks, jogs, talks and cheers.</li>
+      <li>"Take aim" is now "Moonsteel Draw". She pulls the bow from her back with her right hand, brings it round her side, takes the grip in her left, and the limbs unroll. Sparks show where the string will be, then the string of light. She hooks it with three fingers, pushes the bow out and pulls back to the corner of her jaw, holds with her eyes narrowed, and lets go. The arrow of light flies toward screen right, her hand springs back with the fingers open, the bow dips, rolls up and goes back on her back.</li>
+      <li>Her arms are now worked out from where her hands need to be, so her left hand stays on the grip and her right on the string all the way through.</li>
+      <li>The string, the sparks and the arrow are light only. In the Flipbook look they stay soft and get no ink line.</li>
+      <li>New buttons: "Back" in the camera row, and a "Bow" switch under "More views and switches".</li>
+    </ul>
+    <h2 style="margin-top:12px">Earlier: sleeves, soft things, feet, the page</h2>
+    <ul>
       <li>Sleeves, a different way altogether: the lace keeps its painted length and shape in every pose. Her forearms and hands are simply always drawn in front of the lace, so wherever they cross you see her whole arm with the lace behind it.</li>
       <li>Sleeves, a different way: as soon as her elbow bends, the lace is pushed up her arm, shorter and closer, so its hem ends well above her elbow and her forearm has nothing to pass through. With her arm straight it hangs to her elbow as painted.</li>
       <li>"Flipbook look" is a new switch beside "Half speed". It redraws her at her sprites' pixel size, in the 56 colours all four witches share, with an inked outline. It starts off.</li>
@@ -89,7 +99,7 @@ details.more>div{margin-top:10px}
       <li><b>Walk:</b> rebuilt. She lands on her heel and pushes off her toes, her knee gives as each foot lands, her hips turn and dip with each stride, her shoulders turn against her hips and her head stays on where she is going.</li>
       <li><b>Jog:</b> the same stride made quick: leaning in, heels kicking up, elbows bent and pumping.</li>
       <li><b>Talk:</b> her own. Weight on one hip, one quick hand at chest height, small nods, her mouth moving through her painted mouths.</li>
-      <li><b>Take aim:</b> she raises her bow arm, turns her head to it, draws to her jaw, narrows her eyes, holds, and lets go. The bow itself is not built yet.</li>
+      <li><b>Moonsteel Draw:</b> the bow from her back, the full draw, the arrow loosed, the bow put away. It replaces "Take aim".</li>
       <li><b>Cheer:</b> a dip, a jump with one arm thrown up, a soft landing, a smile. <b>Limber up:</b> bouncing on her toes, rolling her shoulders, shaking out her arms.</li>
       <li>Her bags and charms move with all of it.</li>
     </ul>
@@ -143,10 +153,13 @@ details.more>div{margin-top:10px}
       <li>The gold caps on the stones are plain, without the leaf work in your charm sheet.</li>
       <li>These moves are first drafts, tuned from still pictures. I cannot watch them play, so the timing needs your eye.</li>
       <li>Sleeves, tails and locks swing as single pieces that bend near the root. They do not fold or ripple yet, and a lock can pass through her neck or shoulder when she turns her head far.</li>
-      <li>Her fingers do not curl yet, so her hands stay open in every move.</li>
       <li>With her arms straight out the iron curls bend a little with her skin, as if soft.</li>
-      <li>Sleeves and the headband tails as hanging cloth. For now they are stiff.</li>
-      <li>Bow, sword, knives, and all movement.</li>
+      <li>Moonsteel Draw is tuned from still pictures, like the other moves. Its timing needs your eye.</li>
+      <li>Her feet slide out to the wide stance instead of stepping.</li>
+      <li>Nothing holds the folded bow to her back yet: no clip or loop.</li>
+      <li>Seen from behind, her fingers go a little way into the bow's curl as she takes hold of it.</li>
+      <li>In the Flipbook look the bow's thin silver is mostly ink line, so it reads dark.</li>
+      <li>Still to come: sword, knives, Silverglass, the gem, hit reactions, a dodge, a win and a fall.</li>
     </ul>
   </div>
   </details>
@@ -195,7 +208,7 @@ details.more>div{margin-top:10px}
     for (const id of ['cam', 'gear', 'hviews', 'views', 'hands', 'boots']) if (id !== host) [...$(id).children].forEach((c) => c.setAttribute('aria-pressed', 'false'));
     if (v[7] != null) setPose(v[7]); };
   chips($('gear'), GEAR, (v) => pickView(v, 'gear'), -1);
-  chips($('cam'), [['Whole body', 0.6, 0.06, 5.4, 0.88, 'front'], ['Front', 0, 0.05, 5.6, 0.86, 'front'], ['Side', Math.PI / 2, 0.05, 5.6, 0.86, 'side'], ['Head', 0.5, 0.04, 2.1, 1.47, 'faceq'], ['Hips', 0, 0.05, 2.3, 0.92, 'gearF']], (v) => pickView(v, 'cam'), 0);
+  chips($('cam'), [['Whole body', 0.6, 0.06, 5.4, 0.88, 'front'], ['Front', 0, 0.05, 5.6, 0.86, 'front'], ['Side', Math.PI / 2, 0.05, 5.6, 0.86, 'side'], ['Back', Math.PI, 0.05, 5.6, 0.86, 'back'], ['Head', 0.5, 0.04, 2.1, 1.47, 'faceq'], ['Hips', 0, 0.05, 2.3, 0.92, 'gearF']], (v) => pickView(v, 'cam'), 0);
   { const b = document.createElement('button'); b.className = 'chip'; b.type = 'button'; b.id = 'swingB'; b.textContent = 'Give them a swing'; b.addEventListener('click', () => R.swing()); $('extra').appendChild(b); }
   chips($('hviews'), HVIEWS, (v) => pickView(v, 'hviews'), -1);
   chips($('views'), VIEWS, (v) => pickView(v, 'views'), -1);
@@ -209,16 +222,18 @@ details.more>div{margin-top:10px}
     b.addEventListener('click', () => { const v = b.getAttribute('aria-pressed') !== 'true'; b.setAttribute('aria-pressed', v ? 'true' : 'false'); fn(v); }); host.appendChild(b); };
   toggle($('shows'), 'refB', 'Painting beside her', false, (v) => { showRef = v; setRef(); });
   toggle($('shows'), 'spinB', 'Turn slowly', false, (v) => { spin = v; easing = false; });
-  const vis = { glasses: true, sleeves: true, boots: false, gear: true, hooks: true, charms: true }, BOOTK = ['boot', 'sole', 'stitch', 'eyelet', 'lace', 'aglet', 'sock', 'hole'], GEARK = ['belt', 'gear', 'steel', 'keeperB', 'gearBrass', 'beltHole'], HOOKK = ['iron', 'hookBrass'], CHARMK = ['charmGold', 'teal', 'pearl', 'amber', 'crystal'];
-  const applyVis = () => { for (const k in R.meshes) { let v = true; if (['wire', 'lens', 'pad'].includes(k)) v = vis.glasses; if (['lacesl', 'laceband'].includes(k)) v = vis.sleeves; if (GEARK.includes(k)) v = vis.gear; if (HOOKK.includes(k)) v = vis.hooks; if (CHARMK.includes(k)) v = vis.charms; if (vis.boots && !BOOTK.includes(k)) v = false; R.meshes[k].visible = v; } };
+  const vis = { glasses: true, sleeves: true, boots: false, gear: true, hooks: true, charms: true, bow: true }, BOWKEYS = ['moon', 'bowWrap', 'bowGem'], BOOTK = ['boot', 'sole', 'stitch', 'eyelet', 'lace', 'aglet', 'sock', 'hole'], GEARK = ['belt', 'gear', 'steel', 'keeperB', 'gearBrass', 'beltHole'], HOOKK = ['iron', 'hookBrass'], CHARMK = ['charmGold', 'teal', 'pearl', 'amber', 'crystal'];
+  const applyVis = () => { for (const k in R.meshes) { let v = true; if (['wire', 'lens', 'pad'].includes(k)) v = vis.glasses; if (['lacesl', 'laceband'].includes(k)) v = vis.sleeves; if (GEARK.includes(k)) v = vis.gear; if (HOOKK.includes(k)) v = vis.hooks; if (CHARMK.includes(k)) v = vis.charms; if (BOWKEYS.includes(k)) v = vis.bow; if (vis.boots && !BOOTK.includes(k)) v = false; R.meshes[k].visible = v; } if (R.light) R.light.visible = vis.bow && !vis.boots; };
   toggle($('shows'), 'glassB', 'Glasses', true, (v) => { vis.glasses = v; applyVis(); });
   toggle($('shows'), 'sleeveB', 'Lace sleeves', true, (v) => { vis.sleeves = v; applyVis(); });
-  chips($('moves'), [['Stand still', 'pose'], ['Ready', 'idle'], ['Walk', 'walk'], ['Jog', 'jog'], ['Talk', 'talk'], ['Take aim', 'aim'], ['Cheer', 'cheer'], ['Limber up', 'limber']], (v) => { if (v[1] === 'pose') setPose(1); else R.play(v[1]); }, 1);
+  chips($('moves'), [['Stand still', 'pose'], ['Ready', 'idle'], ['Walk', 'walk'], ['Jog', 'jog'], ['Talk', 'talk'], ['Moonsteel Draw', 'draw'], ['Cheer', 'cheer'], ['Limber up', 'limber']], (v) => { if (v[1] === 'pose') setPose(1); else R.play(v[1]);
+    if (v[1] === 'draw') { want = { az: 0.1, el: 0.05, dist: 5.9, ty: 0.98, tx: 0.2, tz: 0 }; easing = true; spin = false; $('spinB').setAttribute('aria-pressed', 'false'); [...$('cam').children].forEach((c) => c.setAttribute('aria-pressed', 'false')); } }, 1);       // the draw is shown from the front, with room for the bow at screen right
   toggle($('extra'), 'slowB', 'Half speed', false, (v) => { speed = v ? 0.45 : 1; });
   toggle($('extra'), 'flipB', 'Flipbook look', false, (v) => { stage.look = v ? 'flipbook' : 'smooth'; });       // claude/HOW-TO-flipbook-look.md: a switch, off when the page opens
   toggle($('shows'), 'gearB', 'Belts and bags', true, (v) => { vis.gear = v; applyVis(); });
   toggle($('shows'), 'hooksB', 'Strap hooks', true, (v) => { vis.hooks = v; applyVis(); });
   toggle($('shows'), 'charmsB', 'Charms', true, (v) => { vis.charms = v; applyVis(); });
+  toggle($('shows'), 'bowB', 'Bow', true, (v) => { vis.bow = v; applyVis(); });
   toggle($('shows'), 'bootsB', 'Boots only', false, (v) => { vis.boots = v; applyVis(); });
   setRef();
   // drag to turn, pinch or wheel to zoom
