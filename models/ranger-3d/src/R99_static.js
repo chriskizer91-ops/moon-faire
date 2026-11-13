@@ -157,7 +157,7 @@
     let squint = 0;
     // taking aim: bow arm out to her left, head turned to it, the other hand drawn back to her jaw, a held breath, the release
     if (N === 'aim') { const k1 = sm(0, 0.5, T), k2 = sm(0.5, 1.3, T), rel = sm(1.95, 2.02, T), out = 1 - sm(2.4, 3.0, T), hold = k2 * (1 - rel);
-      add('uarmL', 0, 0, (86 - 9) * DEG * k1 * out); add('uarmR', 0, 0, -(100 - 9) * DEG * k1 * out); add('farmR', -(1.7 * k1 + 1.1 * k2 - 1.0 * rel) * out, 0, 0); add('uarmR', 0, -0.35 * rel * out, 0);
+      add('uarmL', 0, 0, (86 - 9) * DEG * k1 * out); add('uarmR', 0, 0, -(92 - 9) * DEG * k1 * out); add('farmR', -(1.7 * k1 + 1.1 * k2 - 1.0 * rel) * out, 0, 0); add('uarmR', 0, -0.35 * rel * out, 0);
       add('neck', 0, 0.5 * k1 * out, 0); add('head', 0, 0.62 * k1 * out, 0.04 * hold); add('spine2', 0, 0.12 * k1 * out, -0.05 * k2 * out);
       for (const [S, s] of SIDES) { add('thigh' + S, 0, 0, s * 0.10 * k1 * out); add('foot' + S, 0, 0, -s * 0.10 * k1 * out); }
       add('farmL', 0, 0, 0.012 * Math.sin(T * 31) * hold); squint = hold > 0.6 ? 0.5 : 0; }

@@ -16,6 +16,9 @@
     const k = 0.75 * sm(0.085, 0.15, ax) * sm(1.19, 1.27, y);       // the shoulder girdle follows the collarbone
     if (k > 0.001) { for (let i = 1; i < w.length; i += 2) w[i] *= 1 - k; w.push(BI['clav' + S], k); }
     if (y > 1.33) { const n = sm(1.33, 1.40, y) * (1 - sm(0.05, 0.1, ax)); if (n > 0.001) { for (let i = 1; i < w.length; i += 2) w[i] *= 1 - n; w.push(BI.neck, n); } }
+    // Under each shoulder joint the skin goes a little way with the upper arm, so her armpit opens when she raises her arm.
+    if (z !== undefined && ax > 0.085 && y > 1.20 && w.length <= 6) { const d = Math.hypot(ax - R_SHOULDER[0], y - R_SHOULDER[1], z - R_SHOULDER[2]), ku = 0.30 * sm(0.10, 0.04, d) * sm(0.085, 0.125, ax) * sm(R_SHOULDER[1] + 0.005, R_SHOULDER[1] - 0.03, y);       // only under the joint: the top of her shoulder stays, her armpit opens
+      if (ku > 0.001) { for (let i = 1; i < w.length; i += 2) w[i] *= 1 - ku; w.push(BI['uarm' + S], ku); } }
     return w;
   }
 
@@ -61,7 +64,7 @@
   const ARM_T = [[0.28, 1], [0.33, 0.92], [0.39, 0.89], [0.425, 0.80], [0.447, 0.740], [0.458, 0.671], [0.464, 0.610], [0.470, 0.519], [0.482, 0.416], [0.493, 0.350]];
   const ARM_PALM = [[0.43, 0], [0.447, 0.0002], [0.458, 0.0003], [0.464, 0.0003], [0.470, 0.0004], [0.482, 0.00065], [0.493, 0.00035]], ARM_Z = (sl) => 0.0062 * sm(0.25, 0.45, sl);
   function wArm(S, sLen) {
-    if (sLen < 0.05) { const u = sm(-0.045, 0.05, sLen); return [BI['clav' + S], (1 - u) * 0.6, BI.spine3, (1 - u) * 0.4, BI['uarm' + S], u]; }
+    if (sLen < -0.02) { const u = sm(-0.06, -0.02, sLen); return [BI['clav' + S], (1 - u) * 0.6, BI.spine3, (1 - u) * 0.4, BI['uarm' + S], u]; }       // The arm turns in her shoulder like a ball in a socket: all of it that shows moves as one piece, so nothing pinches at the joint. Only its hidden tip inside her body stays behind.
     if (sLen < L_UARM + 0.05) { const u = sm(L_UARM - 0.05, L_UARM + 0.05, sLen); return [BI['uarm' + S], 1 - u, BI['farm' + S], u]; }
     const u = sm(L_UARM + L_FARM - 0.02, L_UARM + L_FARM + 0.012, sLen); return [BI['farm' + S], 1 - u, BI['hand' + S], u];
   }
