@@ -104,7 +104,18 @@ four strap hooks as real objects, standing still. About 355,000 triangles.
   - How it is written: each frame every bone goes back to rest and the layers are added (`restAll`, `add`); walking and jogging
     share one cycle and blend. `pose()` stops everything for checking against the paintings.
   - First drafts, tuned from stills only. Fingers do not curl; sleeves, band tails and loose locks are still stiff.
-- Waiting for his notes: the moves; stage two (head), stage three (hands and arms) and stage five.
+- **Stage 6c, his notes on the moves.** Chris: her feet bent unnaturally at the back of each step, walking and running; she was
+  too stiff ("Terminator running"); the bags and charms moving "are great"; the short moves were too fast to see; the page had too
+  many buttons.
+  - Feet: the ankle is clamped to what an ankle can do (0.26 rad up, 0.30 down) while the foot is on the ground, hangs loose and
+    toes-down in the air, and the toe bone no longer folds (stiff boots).
+  - Looser: spine, neck and head each follow a beat behind the part below; forearm and hand trail the upper arm; the shoulder
+    rides with the arm; a slow drift of the head. The ready stance looks about and breathes into her knees and arms.
+  - Jog: lighter and more upright (cycle 0.72 s, less lean, softer arms).
+  - Short moves play slower (`SLOW`), and repeat after a pause while chosen. The page has "Half speed".
+  - Page: "Her moves" and "Camera" on top, opening on her whole body in the ready stance; every other row and the notes are folded
+    under "More".
+- Waiting for his notes: the moves again; stage two (head), stage three (hands and arms) and stage five.
 
 Rough or not built yet: her face does not move (no blink, no expressions); the hair has a smooth edge with none of the painted
 flyaway wisps, and the loose locks are simple; earrings and necklaces; fingers that bend; bracelets; each charm is one stiff piece on a hinge (its chain does not bend, charms can
@@ -327,7 +338,7 @@ python3 -I bake_hands_r.py            # adds her hands and arms from D1 and D2
 python3 -I bake_gear_r.py             # adds the leather of her bags and belts from F6
 python3 -I bake_looks_r.py            # adds the two trial faces (younger, the Fox's)
 ./build_r.sh                          # tools/tables.py, then out/ranger.js
-python3 -I build_single_r.py          # deliver/Ranger_3D_stage6b.html, one offline file
+python3 -I build_single_r.py          # deliver/Ranger_3D_stage6c.html, one offline file
 python3 tools/shoot_hand.py shots/hand_L.jpg L hand   # one hand from four sides beside D1 or D2; also R, and arm
 python3 tools/wrist_sections.py                       # forearm and hand, slice by slice through the wrist
 python3 tools/page_test.py                            # the page at phone size: belt, bag, hook, boot, hand and body buttons, a drag

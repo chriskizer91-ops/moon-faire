@@ -102,7 +102,7 @@
   // that is not built yet), 'cheer' (a jump with an arm thrown up) and 'limber' (she shakes out and bounces). Every frame the bones
   // are set back to rest and the layers are added on top. The Jester's moves are the reference for what a full set holds, not copied.
   let lastPose = { arm: 15, leg: 0 }, mv = { name: 'pose', t: 0 }, wk = 0, jg = 0, gph = 0, clock = 0, blinkAt = 2.4, blinkT = -1, mouthAt = 0, mouthNow = 'rest', facePainted = '';
-  const SHOTS = { aim: 3.0, cheer: 1.5, limber: 2.6 }, MOVES = ['pose', 'idle', 'walk', 'jog', 'talk', 'aim', 'cheer', 'limber'];
+  const SHOTS = { aim: 4.65, cheer: 1.5, limber: 3.9 }, SLOW = { aim: 1.55, limber: 1.5 }, MOVES = ['pose', 'idle', 'walk', 'jog', 'talk', 'aim', 'cheer', 'limber'];
   const add = (b, x, y, z) => { const r = SK[b].rotation; r.x += x; r.y += y; r.z += z; };
   function restAll() { for (const k in SK) if (!/^(bag|charm)/.test(k)) SK[k].rotation.set(0, 0, 0); SK.hips.position.copy(SK.hips.userData.home); }
   function pose(o) {
@@ -116,8 +116,8 @@
   function animate(dt) {
     dt = dt > 0 ? Math.min(dt, 0.05) : 0; clock += dt;
     if (mv.name === 'pose') { if (gearTick) gearTick(dt); return; }
-    mv.t += dt; if (SHOTS[mv.name] && mv.t >= SHOTS[mv.name]) mv = { name: 'idle', t: 0 };
-    const N = mv.name, T = mv.t; restAll();
+    mv.t += dt; if (SHOTS[mv.name] && mv.t >= SHOTS[mv.name] + 1.2) mv.t = 0;       // a short move plays again after a pause, for as long as it is the one chosen
+    const N = SHOTS[mv.name] && mv.t >= SHOTS[mv.name] ? 'idle' : mv.name, T = mv.t / (SLOW[N] || 1); restAll();
     wk += ((N === 'walk' ? 1 : 0) - wk) * Math.min(1, dt * 4.5); jg += ((N === 'jog' ? 1 : 0) - jg) * Math.min(1, dt * 4.5);
     const go = Math.min(1, wk + jg), g = wk + jg > 1e-4 ? jg / (wk + jg) : 0, L = (a, b) => a + (b - a) * g, still = 1 - go;
     for (const [S, s] of SIDES) SK['uarm' + S].rotation.z = s * (9 * DEG - A_POSE);       // arms hang close
@@ -126,18 +126,26 @@
     const br = Math.sin(clock * 1.7), sway = Math.sin(clock * 0.9);
     add('spine2', 0.012 * br, 0, 0); add('spine3', 0.010 * br, 0, 0); for (const [S, s] of SIDES) add('clav' + S, 0, 0, s * 0.014 * br);
     SK.hips.position.x += 0.007 * sway * still; add('hips', 0, 0, 0.012 * sway * still); add('spine1', 0, 0, -0.012 * sway * still);
-    if (N === 'idle') { const c = clock % 4.2; if (c < 0.7) bounce(0.024 * Math.pow(Math.sin(c / 0.35 * PI), 2) * (c < 0.35 ? 1 : 0.6)); }       // light on her feet: a quick double bounce now and then
+    if (N === 'idle') { const lk = Math.sin(clock * 0.37) + 0.5 * Math.sin(clock * 0.83 + 1); add('neck', 0, 0.07 * lk, 0); add('head', 0.02 * Math.sin(clock * 0.6), 0.10 * lk, 0.02 * Math.sin(clock * 0.45)); add('spine2', 0, 0.03 * lk, 0);
+      for (const [S, s] of SIDES) { add('uarm' + S, 0.03 * Math.sin(clock * 0.9 + s), 0, 0); add('farm' + S, -0.10 - 0.03 * br, 0, 0); add('shin' + S, 0.03 + 0.02 * br, 0, 0); add('thigh' + S, -0.015 - 0.01 * br, 0, 0); add('foot' + S, -0.015 - 0.01 * br, 0, 0); }
+      const c = clock % 4.2; if (c < 0.7) bounce(0.024 * Math.pow(Math.sin(c / 0.35 * PI), 2) * (c < 0.35 ? 1 : 0.6)); }       // light on her feet: a quick double bounce now and then
     // walking and jogging share one cycle; g slides from one to the other
-    if (go > 0.001) { gph += dt * TAU / L(0.98, 0.62); const A = L(0.40, 0.58), sn = Math.sin(gph), cs = Math.cos(gph);
+    if (go > 0.001) { gph += dt * TAU / L(1.02, 0.72); const A = L(0.40, 0.50), sn = Math.sin(gph), cs = Math.cos(gph);
       for (const [S, s] of SIDES) { const p = gph + (s < 0 ? 0 : PI), si = Math.sin(p), co = Math.cos(p), sw = Math.max(0, co), st = Math.max(0, -co);
-        const th = -(A * si + L(0.05, 0.16)) * go, kn = (L(1.05, 1.75) * Math.pow(sw, 1.3) + L(0.20, 0.38) * Math.pow(Math.max(0, Math.sin(p - 0.5)), 3) * st + L(0.04, 0.22)) * go;       // thigh; knee folding in the swing and giving a little as the foot lands
-        const up = 0.22 * Math.pow(Math.max(0, si), 3) * go, off = L(0.55, 0.75) * Math.max(0, -si) * st * go;       // toes up to land on the heel; heel up to push off
-        add('thigh' + S, th, 0, 0); add('shin' + S, kn, 0, 0); add('foot' + S, -(th + kn) * 0.92 - up + off, 0, 0); add('toe' + S, -off * 0.9, 0, 0);
-        add('uarm' + S, (L(0.42, 0.72) * si + L(0, 0.18)) * go, 0, 0); add('farm' + S, -(L(0.28, 1.45) + L(0.30, 0.22) * Math.max(0, -si)) * go, 0, 0); }
-      SK.hips.position.y += (-L(0.045, 0) * sn * sn - L(0, 0.036) * cs * cs + L(0, 0.02)) * go; SK.hips.position.x += L(0.013, 0.006) * cs * go;
-      add('hips', L(0.02, 0.09) * go, L(0.10, 0.14) * sn * go, L(0.035, 0.02) * cs * go);       // lean, the turn of the pelvis with each stride, and its dip on the swinging side
-      add('spine1', L(0.02, 0.05) * go, -0.05 * sn * go, -0.02 * cs * go); add('spine2', 0, -L(0.09, 0.12) * sn * go, -0.02 * cs * go); add('spine3', 0, -0.05 * sn * go, 0);
-      add('neck', -L(0.03, 0.10) * go, L(0.09, 0.13) * sn * go, 0); }       // her shoulders turn against her hips; her head stays on the way she is going
+        const th = -(A * si + L(0.05, 0.12)) * go, kn = (L(1.05, 1.50) * Math.pow(sw, 1.3) + L(0.20, 0.38) * Math.pow(Math.max(0, Math.sin(p - 0.5)), 3) * st + L(0.04, 0.22)) * go;       // thigh; knee folding in the swing and giving a little as the foot lands
+        // Her ankle bends only as far as an ankle can. On the ground the sole lies flat until the leg is too far back, then the heel
+        // lifts. In the air the foot hangs loose, toes down, and comes up to land on the heel. Her boots are stiff: the toe never folds.
+        const onG = sm(-0.2, 0.2, -co), ank = cl(-(th + kn), -0.26, 0.30) * onG + lerp(L(0.32, 0.45), -0.12, (si + 1) / 2) * (1 - onG);
+        add('thigh' + S, th, 0, 0); add('shin' + S, kn, 0, 0); add('foot' + S, ank * go, 0, 0);
+        // arms hang loose: forearm and hand trail the upper arm, the shoulder rides with it, the hand comes a little across her body
+        const sl = Math.sin(p - 0.45), sl2 = Math.sin(p - 0.9);
+        add('uarm' + S, (L(0.40, 0.52) * si + L(0, 0.10)) * go, -s * L(0.10, 0.24) * Math.max(0, -si) * go, 0); add('farm' + S, -(L(0.30, 1.20) + L(0.28, 0.38) * Math.max(0, -sl)) * go, 0, 0);
+        add('hand' + S, 0.20 * sl2 * go, 0, 0); add('clav' + S, 0, -s * 0.05 * si * go, s * 0.035 * Math.max(0, -si) * go); }
+      const lag = Math.sin(gph - 0.5), lag2 = Math.sin(gph - 0.9), bob2 = Math.cos(2 * gph - 0.7), drift = Math.sin(clock * 0.53);       // each part a beat behind the one below it, so she is not one stiff block
+      SK.hips.position.y += (-L(0.045, 0) * sn * sn - L(0, 0.045) * cs * cs + L(0, 0.03)) * go; SK.hips.position.x += L(0.014, 0.010) * cs * go;
+      add('hips', L(0.02, 0.04) * go, L(0.10, 0.13) * sn * go, L(0.045, 0.035) * cs * go);
+      add('spine1', L(0.02, 0.035) * go, -0.06 * lag * go, -L(0.035, 0.03) * cs * go); add('spine2', 0.012 * bob2 * go, -L(0.10, 0.15) * lag * go, -0.02 * cs * go); add('spine3', 0.012 * bob2 * go, -0.06 * lag2 * go, 0.012 * cs * go);
+      add('neck', (-L(0.03, 0.05) + 0.015 * bob2) * go, (L(0.11, 0.16) * lag + 0.04 * drift) * go, 0.01 * cs * go); add('head', 0.02 * Math.cos(2 * gph - 1.3) * go, (0.05 * lag2 + 0.05 * drift) * go, 0.012 * drift * go); }
     // talking: weight on one hip, one quick hand at chest height, small nods
     if (N === 'talk') { const k = sm(0, 0.4, T), a1 = Math.sin(T * 4.4), a2 = Math.sin(T * 2.3 + 1), a3 = Math.sin(T * 6.1);
       SK.hips.position.x += 0.016 * k; add('hips', 0, 0.10 * k, 0.03 * k); add('spine1', 0, -0.06 * k, -0.035 * k);

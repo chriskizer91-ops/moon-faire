@@ -34,6 +34,9 @@ canvas#stage{display:block;width:100%;height:100%;touch-action:none;cursor:grab}
 .notes ul{margin:0;padding-left:18px;display:grid;gap:5px;color:var(--ink)}
 .notes li::marker{color:var(--blue)}
 .notes .m{color:var(--muted)}
+details.more{margin-top:14px;border-top:1px solid var(--line);padding-top:10px}
+details.more>summary{cursor:pointer;font:600 12px var(--mono);letter-spacing:.06em;color:var(--gold);padding:6px 0}
+details.more>div{margin-top:10px}
 </style>
 </head>
 <body>
@@ -41,7 +44,7 @@ canvas#stage{display:block;width:100%;height:100%;touch-action:none;cursor:grab}
   <header>
     <p class="eyebrow">Moon Faire · Stage six: her own moves</p>
     <h1>The <em>Ranger</em></h1>
-    <p class="sub">Her first moves are in the "Movement" row: a ready stance, a better walk, a jog, her own way of talking, and three short ones (take aim, cheer, limber up). Her face is the younger one and her hair stays grey, as you chose. Drag to turn her, pinch or scroll to zoom.</p>
+    <p class="sub">Pick a move, pick a camera. "Half speed" slows everything so you can watch it; the short moves play again by themselves. Drag to turn her, pinch or scroll to zoom.</p>
   </header>
   <div class="stagebox" id="box">
     <canvas id="stage"></canvas>
@@ -49,6 +52,9 @@ canvas#stage{display:block;width:100%;height:100%;touch-action:none;cursor:grab}
     <img id="ref" alt="The painting for this view" hidden><span class="reftag">Painting</span>
     <div class="err" id="err" hidden></div>
   </div>
+  <div><p class="label">Her moves</p><div class="chips" id="moves"></div><div class="chips" id="extra" style="margin-top:6px"></div></div>
+  <div><p class="label">Camera</p><div class="chips" id="cam"></div></div>
+  <details class="more"><summary>More views and switches (for checking her against the paintings)</summary>
   <div><p class="label">Belts, bags and hooks</p><div class="chips" id="gear"></div></div>
   <div><p class="label">Head</p><div class="chips" id="hviews"></div></div>
   <div><p class="label">Her face: younger, as you chose</p><div class="chips" id="looks"></div></div>
@@ -57,10 +63,19 @@ canvas#stage{display:block;width:100%;height:100%;touch-action:none;cursor:grab}
   <div><p class="label">Hands and arms</p><div class="chips" id="hands"></div></div>
   <div><p class="label">Body</p><div class="chips" id="views"></div></div>
   <div><p class="label">Arms and legs</p><div class="chips" id="poses"></div></div>
-  <div><p class="label">Movement</p><div class="chips" id="moves"></div></div>
   <div><p class="label">Show</p><div class="chips" id="shows"></div></div>
+  </details>
+  <details class="more"><summary>Notes on this build</summary>
   <div class="notes">
-    <h2>New: her own first moves</h2>
+    <h2>Changed in this pass</h2>
+    <ul>
+      <li>Her feet: the ankle now bends only as far as an ankle can, the foot hangs loose while it is in the air, and her stiff boots no longer fold at the toe.</li>
+      <li>Less stiff: each part of her body moves a beat behind the one below it, her arms hang loose, her head drifts a little.</li>
+      <li>The jog is lighter and more upright, with softer arms.</li>
+      <li>The short moves are slower and repeat; "Half speed" slows everything.</li>
+      <li>The page: moves and camera on top, everything else folded under "More".</li>
+    </ul>
+    <h2 style="margin-top:12px">Her own first moves</h2>
     <ul>
       <li>Written for her as the quick, sporty one. The Jester's set was the reference for what a set should hold, not copied.</li>
       <li><b>Ready:</b> she breathes, shifts her weight, and every few seconds bounces twice on her toes. She blinks.</li>
@@ -127,6 +142,7 @@ canvas#stage{display:block;width:100%;height:100%;touch-action:none;cursor:grab}
       <li>Bow, sword, knives, and all movement.</li>
     </ul>
   </div>
+  </details>
 </div>
 <script>/*THREE*/</script>
 <script>/*PAL*/</script>
@@ -146,8 +162,8 @@ canvas#stage{display:block;width:100%;height:100%;touch-action:none;cursor:grab}
     R = makeRanger({});
     stage.scene.add(R.root);
   } catch (e) { $('err').hidden = false; $('err').textContent = 'She could not be drawn on this device: ' + (e && e.message ? e.message : e); return; }
-  const orbit = stage.orbit; orbit.az = 0; orbit.el = 0.05; orbit.dist = 2.3; orbit.fov = 20; orbit.target.set(0, 0.92, 0);
-  let want = { az: orbit.az, el: orbit.el, dist: orbit.dist, ty: 0.92, tx: 0, tz: 0 }, easing = true, spin = false;
+  const orbit = stage.orbit; orbit.az = 0.6; orbit.el = 0.06; orbit.dist = 5.4; orbit.fov = 20; orbit.target.set(0, 0.88, 0);
+  let want = { az: orbit.az, el: orbit.el, dist: orbit.dist, ty: 0.88, tx: 0, tz: 0 }, easing = true, spin = false, speed = 1;
   const VIEWS = [['Front', 0, 0.05, 5.6, 0.86, 'front'], ['Three-quarter', 0.7, 0.08, 5.6, 0.86, 'front'], ['Side', Math.PI / 2, 0.05, 5.6, 0.86, 'side'], ['Back', Math.PI, 0.05, 5.6, 0.86, 'back'],
     ['Corset', 0.25, 0.05, 2.6, 1.16, 'front'], ['Legs', 0.3, 0.05, 3.6, 0.48, 'legs'], ['Boots', 0.6, 0.18, 1.9, 0.17, 'boot']];
   const HVIEWS = [['Face', 0, 0.02, 1.5, 1.512, 'face'], ['Three-quarter', 0.7, 0.03, 1.5, 1.512, 'faceq'], ['Profile', -Math.PI / 2, 0.02, 1.6, 1.53, 'prof'], ['Back of head', Math.PI, 0.05, 1.6, 1.53, 'hback'], ['From above', 0.25, 0.78, 1.7, 1.56, 'top'], ['From below', 0.2, -0.28, 1.5, 1.49, 'below'], ['Head and shoulders', 0.5, 0.04, 2.1, 1.47, 'faceq'], ['Hair from the side', -Math.PI / 2, 0.06, 1.7, 1.56, 'hairS']];
@@ -161,7 +177,7 @@ canvas#stage{display:block;width:100%;height:100%;touch-action:none;cursor:grab}
     ['Buckles', 0, 0.06, 0.85, 0.975, 'gearBk', 0, 1, 0.08], ['Strap hook', -0.3, 0.10, 0.72, 1.322, 'hookF', -0.115, 1, 0.07], ['Hook, behind', Math.PI - 0.3, 0.12, 0.72, 1.335, 'hookB', 0.112, 1, -0.07],
     ['Charms', 0, 0.02, 1.8, 0.83, 'charmF', 0, 1, 0.03], ['Under the satchel', -1.1, 0.03, 0.95, 0.74, 'charmS', -0.17, 1, 0.03]];
   const POSES = [['At rest', { arm: 15, leg: 0 }], ['As painted', { arm: 24, leg: 3 }], ['Arms out', { arm: 90, leg: 0 }], ['Legs apart', { arm: 40, leg: 20 }]];
-  let refKey = 'gearF', showRef = true;
+  let refKey = 'front', showRef = false;
   function chips(host, items, onPick, first) {
     items.forEach((it, i) => { const b = document.createElement('button'); b.className = 'chip'; b.type = 'button'; b.textContent = it[0]; b.setAttribute('aria-pressed', i === first ? 'true' : 'false');
       b.addEventListener('click', () => { [...host.children].forEach((c) => c.setAttribute('aria-pressed', 'false')); b.setAttribute('aria-pressed', 'true'); onPick(it); }); host.appendChild(b); });
@@ -169,10 +185,11 @@ canvas#stage{display:block;width:100%;height:100%;touch-action:none;cursor:grab}
   function setRef() { const im = $('ref'), src = REFS[refKey]; im.hidden = !(showRef && src); if (src && im.getAttribute('src') !== src) im.src = src; }
   const setPose = (i) => { R.pose(POSES[i][1]); [...$('poses').children].forEach((c, k) => c.setAttribute('aria-pressed', k === i ? 'true' : 'false')); };
   const pickView = (v, host) => { want = { az: v[1], el: v[2], dist: v[3], ty: v[4], tx: v[6] || 0, tz: v[8] != null ? v[8] : (v[6] ? -0.014 : 0), low: host === 'hands' && v[7] === 2 }; easing = true; spin = false; refKey = v[5]; setRef(); $('spinB').setAttribute('aria-pressed', 'false');
-    for (const id of ['gear', 'hviews', 'views', 'hands', 'boots']) if (id !== host) [...$(id).children].forEach((c) => c.setAttribute('aria-pressed', 'false'));
+    for (const id of ['cam', 'gear', 'hviews', 'views', 'hands', 'boots']) if (id !== host) [...$(id).children].forEach((c) => c.setAttribute('aria-pressed', 'false'));
     if (v[7] != null) setPose(v[7]); };
-  chips($('gear'), GEAR, (v) => pickView(v, 'gear'), 0);
-  { const b = document.createElement('button'); b.className = 'chip'; b.type = 'button'; b.id = 'swingB'; b.textContent = 'Give them a swing'; b.addEventListener('click', () => R.swing()); $('moves').appendChild(b); }
+  chips($('gear'), GEAR, (v) => pickView(v, 'gear'), -1);
+  chips($('cam'), [['Whole body', 0.6, 0.06, 5.4, 0.88, 'front'], ['Front', 0, 0.05, 5.6, 0.86, 'front'], ['Side', Math.PI / 2, 0.05, 5.6, 0.86, 'side'], ['Head', 0.5, 0.04, 2.1, 1.47, 'faceq'], ['Hips', 0, 0.05, 2.3, 0.92, 'gearF']], (v) => pickView(v, 'cam'), 0);
+  { const b = document.createElement('button'); b.className = 'chip'; b.type = 'button'; b.id = 'swingB'; b.textContent = 'Give them a swing'; b.addEventListener('click', () => R.swing()); $('extra').appendChild(b); }
   chips($('hviews'), HVIEWS, (v) => pickView(v, 'hviews'), -1);
   chips($('views'), VIEWS, (v) => pickView(v, 'views'), -1);
   chips($('hands'), HANDS, (v) => pickView(v, 'hands'), -1);
@@ -180,16 +197,17 @@ canvas#stage{display:block;width:100%;height:100%;touch-action:none;cursor:grab}
   chips($('faces'), [['At rest', 0, 'rest'], ['Blink', 1, 'rest'], ['Half shut', 0.5, 'rest'], ['Talking', 0, 'open'], ['Oo', 0, 'oo'], ['Smile', 0, 'smile']], (v) => R.setFace(v[1], v[2]), 0);
   chips($('looks'), [['Younger (your pick)', 'young'], ['As first painted', 'own'], ["The Fox's", 'fox']], (v) => { R.setLook(v[1]); pickView(HVIEWS[0], 'hviews'); $('hviews').children[0].setAttribute('aria-pressed', 'true'); }, 0);
   chips($('poses'), POSES, (p) => R.pose(p[1]), 1);
-  R.pose(POSES[1][1]);
+  R.pose(POSES[1][1]); R.play('idle');
   const toggle = (host, id, label, on, fn) => { const b = document.createElement('button'); b.className = 'chip'; b.type = 'button'; b.id = id; b.textContent = label; b.setAttribute('aria-pressed', on ? 'true' : 'false');
     b.addEventListener('click', () => { const v = b.getAttribute('aria-pressed') !== 'true'; b.setAttribute('aria-pressed', v ? 'true' : 'false'); fn(v); }); host.appendChild(b); };
-  toggle($('shows'), 'refB', 'Painting beside her', true, (v) => { showRef = v; setRef(); });
+  toggle($('shows'), 'refB', 'Painting beside her', false, (v) => { showRef = v; setRef(); });
   toggle($('shows'), 'spinB', 'Turn slowly', false, (v) => { spin = v; easing = false; });
   const vis = { glasses: true, sleeves: true, boots: false, gear: true, hooks: true, charms: true }, BOOTK = ['boot', 'sole', 'stitch', 'eyelet', 'lace', 'aglet', 'sock', 'hole'], GEARK = ['belt', 'gear', 'steel', 'keeperB', 'gearBrass', 'beltHole'], HOOKK = ['iron', 'hookBrass'], CHARMK = ['charmGold', 'teal', 'pearl', 'amber', 'crystal'];
   const applyVis = () => { for (const k in R.meshes) { let v = true; if (['wire', 'lens', 'pad'].includes(k)) v = vis.glasses; if (['lacesl', 'laceband'].includes(k)) v = vis.sleeves; if (GEARK.includes(k)) v = vis.gear; if (HOOKK.includes(k)) v = vis.hooks; if (CHARMK.includes(k)) v = vis.charms; if (vis.boots && !BOOTK.includes(k)) v = false; R.meshes[k].visible = v; } };
   toggle($('shows'), 'glassB', 'Glasses', true, (v) => { vis.glasses = v; applyVis(); });
   toggle($('shows'), 'sleeveB', 'Lace sleeves', true, (v) => { vis.sleeves = v; applyVis(); });
-  chips($('moves'), [['Stand still', 'pose'], ['Ready', 'idle'], ['Walk', 'walk'], ['Jog', 'jog'], ['Talk', 'talk'], ['Take aim', 'aim'], ['Cheer', 'cheer'], ['Limber up', 'limber']], (v) => { if (v[1] === 'pose') { setPose(1); return; } R.play(v[1]); const cam = v[1] === 'talk' ? [HVIEWS[6], 'hviews', 6] : [VIEWS[1], 'views', 1]; pickView(cam[0], cam[1]); $(cam[1]).children[cam[2]].setAttribute('aria-pressed', 'true'); }, 0);
+  chips($('moves'), [['Stand still', 'pose'], ['Ready', 'idle'], ['Walk', 'walk'], ['Jog', 'jog'], ['Talk', 'talk'], ['Take aim', 'aim'], ['Cheer', 'cheer'], ['Limber up', 'limber']], (v) => { if (v[1] === 'pose') setPose(1); else R.play(v[1]); }, 1);
+  toggle($('extra'), 'slowB', 'Half speed', false, (v) => { speed = v ? 0.45 : 1; });
   toggle($('shows'), 'gearB', 'Belts and bags', true, (v) => { vis.gear = v; applyVis(); });
   toggle($('shows'), 'hooksB', 'Strap hooks', true, (v) => { vis.hooks = v; applyVis(); });
   toggle($('shows'), 'charmsB', 'Charms', true, (v) => { vis.charms = v; applyVis(); });
@@ -209,12 +227,12 @@ canvas#stage{display:block;width:100%;height:100%;touch-action:none;cursor:grab}
   let last = 0;
   function frame(now) {
     requestAnimationFrame(frame); const dt = Math.min(0.05, (now - last) / 1000 || 0.016); last = now; fit();
-    R.animate(dt);
+    R.animate(dt * speed);
     if (spin) orbit.az += dt * 0.5;
     if (easing) { let d = want.az - orbit.az; d = Math.atan2(Math.sin(d), Math.cos(d)); const k = Math.min(1, dt * 5); orbit.az += d * k; orbit.el += (want.el - orbit.el) * k; orbit.dist += (want.dist - orbit.dist) * k; orbit.target.y += (want.ty - orbit.target.y) * k; orbit.target.x += ((want.tx || 0) - orbit.target.x) * k; orbit.target.z += ((want.tz || 0) - orbit.target.z) * k; }
     stage.render();
   }
-  $('hud').textContent = 'Her first moves · ' + Math.round(R.triangles / 1000) + 'k triangles';
+  $('hud').textContent = 'Her moves · ' + Math.round(R.triangles / 1000) + 'k triangles';
   window.RANGER = { stage, R, step() { fit(); stage.render(); } };
   requestAnimationFrame(frame);
 })();
