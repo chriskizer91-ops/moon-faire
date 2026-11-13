@@ -41,7 +41,7 @@ canvas#stage{display:block;width:100%;height:100%;touch-action:none;cursor:grab}
 <body>
 <div class="wrap">
   <header>
-    <p class="eyebrow">Moon Faire · the man they meet · first build, paused</p>
+    <p class="eyebrow">Moon Faire · the man they meet · first build</p>
     <h1>Noiz, <em>the Grey Hat</em></h1>
     <p class="sub">Where he stands right now, part-way through his first build: no hat, belt or jewellery yet. Drag to turn him, pinch or scroll to zoom. "Blank doll" shows his shape without paint. "Walk" shows the gold dust following his boots.</p>
   </header>
@@ -57,9 +57,19 @@ canvas#stage{display:block;width:100%;height:100%;touch-action:none;cursor:grab}
   <div><p class="label">Show</p><div class="chips" id="shows"></div></div>
   <div class="notes">
     <div>
-      <h2>Where he is: paused part-way</h2>
+      <h2>Changed on November 13</h2>
       <ul>
-        <li>You asked to see him as he stands, so this is a build stopped in the middle, not a finished stage.</li>
+        <li><b>His face was missing on your screen. That was my mistake.</b> One line of his neck was cut short. A phone's graphics chip will not draw a shape with a line cut short, so his whole head went. The test renderer I use here draws it anyway, which is why I never saw it. It is fixed, and the build now stops if it ever happens again.</li>
+        <li>I still cannot see a real phone from here. <b>If his face is still missing, tell me.</b></li>
+        <li><b>His sleeves.</b> Each sleeve now gathers into a band below the elbow. A lace ruffle in two tiers hangs from the band as its own piece of cloth, and his bare forearm comes out from inside it. Before, the ruffle was only a swelling of the arm.</li>
+        <li>A sharp flap at each upper arm is gone. The measuring had taken part of his body for sleeve.</li>
+        <li>The same fix cleaned his neck: it is plain skin now, with no streaks.</li>
+      </ul>
+    </div>
+    <div>
+      <h2>Where he is: first build</h2>
+      <ul>
+        <li>You said he looks pretty good and not to remake him from scratch, so everything else is as it was.</li>
         <li><b>His head is now the head the witches wear</b> (the Jester's face model, at a man's size, with a wider jaw and a lower crown), with his own face from C1 painted on it and his profile from C3 at the sides. Press "Blank doll" to see the shape with no paint.</li>
         <li>His glasses are a real object. His hair is one smooth shell for now.</li>
         <li>His body is measured from B1 and B2 and wears those paintings, laid on from four sides. His sleeves take their sides from A3.</li>
@@ -78,9 +88,9 @@ canvas#stage{display:block;width:100%;height:100%;touch-action:none;cursor:grab}
     <div>
       <h2>Rough, or not built</h2>
       <ul class="m">
-        <li><b>His neck</b> is a plain panel with streaked paint at its sides. It is the roughest thing on him.</li>
+        <li><b>His neck</b> is one plain skin colour, with no painting on it.</li>
         <li><b>His hair</b> reads as a hood: one smooth shell with a hard edge, and patches of the wrong colour where it turns in beside his neck.</li>
-        <li><b>His body is his clothes as one smooth skin,</b> not a body with clothes on it. The ruffles, lace, corset straps, buckles, trouser holes and boot straps are paint, not shapes, and the paint is soft up close.</li>
+        <li><b>His body is his clothes as one smooth skin,</b> not a body with clothes on it. The chest ruffles, lace, corset straps, buckles, trouser holes and boot straps are paint, not shapes, and the paint is soft up close. Only the sleeve ruffles are real shapes.</li>
         <li>Under his arms and between his legs the paint is drawn out, because no painting looks there.</li>
         <li>His face does not blink or talk yet (C2 is not used yet). His hand paintings (D) and boot paintings (E) are not used yet either.</li>
         <li>Not built: the hat, the belt and its ring, the pouch, the scroll, the charms, the dagger, the pearls and the feather earring. Rounds 1 and 2 of your paintings for all of these are saved.</li>
@@ -150,7 +160,7 @@ canvas#stage{display:block;width:100%;height:100%;touch-action:none;cursor:grab}
     if (easing) { let d = want.az - orbit.az; d = Math.atan2(Math.sin(d), Math.cos(d)); const k = Math.min(1, dt * 5); orbit.az += d * k; orbit.el += (want.el - orbit.el) * k; orbit.dist += (want.dist - orbit.dist) * k; orbit.target.y += (want.ty - orbit.target.y) * k; orbit.target.x += ((want.tx || 0) - orbit.target.x) * k; orbit.target.z += ((want.tz || 0) - orbit.target.z) * k; }
     stage.render();
   }
-  $('hud').textContent = 'First build, paused · ' + Math.round(R.triangles / 1000) + 'k triangles · ' + R.dust.count + ' points of gold';
+  $('hud').textContent = 'First build · ' + Math.round(R.triangles / 1000) + 'k triangles · ' + R.dust.count + ' points of gold';
   window.NOIZ = { stage, R, step() { fit(); stage.render(); } };
   requestAnimationFrame(frame);
 })();

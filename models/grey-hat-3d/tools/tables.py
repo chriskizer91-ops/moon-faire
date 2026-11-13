@@ -152,9 +152,12 @@ def arm_profile(F, sgn):
     return np.array(prof), float(np.degrees(np.arctan2(d[0], -d[1]))), float(Ld)
 pL, angL, lenL = arm_profile(FR, 1); pR, angR, lenR = arm_profile(FR, -1)
 P = 0.5 * (pL + pR); ARM = []
+k16 = (P[:, 0] >= 0.16) & (P[:, 0] <= 0.20); SAG = float((P[k16, 2] - P[k16, 1]).mean())        # how much lower the sleeve hangs than it rises, just clear of the trunk
 for s, out, inn in P:
-    # near the shoulder the inner side runs into the trunk: keep the outer side and mirror it
-    if s < 0.13: inn = min(inn, out + 0.02 * (s / 0.13))
+    # Near the shoulder the under-side of the sleeve runs into the trunk in the painting, and only stands clear from 16 cm out. So there the
+    # under-side is grown from the top side: even at the shoulder, sagging by SAG at 16 cm. (Before November 13 this stopped at 13 cm, and
+    # the three readings after it took the trunk for sleeve: a lump that folded through itself and stuck out as a sharp flap.)
+    if s < 0.16: t = s / 0.16; inn = out + SAG * t * t * (3 - 2 * t)
     ARM.append([s, (out + inn) / 2, (out - inn) / 2])
 ARM = np.array(ARM); ARM[:, 1] = smooth(ARM[:, 1], 5); ARM[:, 2] = smooth(ARM[:, 2], 5)
 ARMT = [[round(float(r[0]), 3), R(r[1:])] for r in ARM[::2]]

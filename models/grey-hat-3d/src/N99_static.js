@@ -43,7 +43,7 @@
     }
   };
   // the trunk, legs and boots take their sides from B2 (arms held out of the way); the arms take theirs from A3 (arms hanging)
-  MATS.proj = mkProj('sideR', 'sideL'); MATS.projArm = mkProj('armR', 'armL'); MATS.projHair = mkProj('sideR', 'sideL'); MATS.projHair.side = THREE.DoubleSide;
+  MATS.proj = mkProj('sideR', 'sideL'); MATS.projArm = mkProj('armR', 'armL'); MATS.projHair = mkProj('sideR', 'sideL'); MATS.projHair.side = THREE.DoubleSide; MATS.projRuffle = mkProj('armR', 'armL'); MATS.projRuffle.side = THREE.DoubleSide;
   Object.assign(MATS, {
     // the head wears three pictures at once, mixed by which way the skin faces (N40_head.js): the front painting, the profile painting, a plain colour
     face: (() => {
@@ -147,7 +147,10 @@
   // the blank doll: every part in one plain clay colour, so his shape can be judged without his paintings on it
   const CLAY = std({ color: lin('#b7a797'), roughness: 0.92, envMapIntensity: 0.15 }), CLAY2 = std({ color: lin('#b7a797'), roughness: 0.92, envMapIntensity: 0.15, side: THREE.DoubleSide });
   let blank = false;
-  function setBlank(on) { blank = !!on; for (const k in meshes) { const m = meshes[k]; m.material = !blank ? m.userData.painted : k === 'projHair' ? CLAY2 : /^(lens|nail)$/.test(k) ? m.userData.painted : CLAY; if (k === 'lens' || k === 'nail') m.visible = !blank; } return blank; }
+  function setBlank(on) { blank = !!on; for (const k in meshes) { const m = meshes[k]; m.material = !blank ? m.userData.painted : /^(projHair|projRuffle)$/.test(k) ? CLAY2 : /^(lens|nail)$/.test(k) ? m.userData.painted : CLAY; if (k === 'lens' || k === 'nail') m.visible = !blank; } return blank; }
+  // Every list a mesh carries must be as long as its list of points. A real graphics chip refuses to draw a mesh with a short list, so the
+  // whole mesh vanishes (his face did, November 13), while the software renderer the tools here use draws it anyway. So it is caught here.
+  for (const k in meshes) { const g = meshes[k].geometry, n = g.attributes.position.count; for (const a in g.attributes) if (g.attributes[a].count !== n) throw new Error('mesh "' + k + '": ' + a + ' has ' + g.attributes[a].count + ' entries for ' + n + ' points'); }
   const api = { root, fx, skeleton, bones, SK, animate, pose, play, moves: MOVES, meshes, dust: DUST, setBlank, get blank() { return blank; }, walkOnSpot: true, walkSpeed: WALK_SPEED, name: 'Noiz', debug: { SK, meshes, trunkPt, legPt, bootPt, headPoint, hairPt }, get triangles() { return triCount; } };
   pose(lastPose);
   return api;

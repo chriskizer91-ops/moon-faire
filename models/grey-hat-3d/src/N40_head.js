@@ -137,6 +137,6 @@
     const info = addPart('face', loft(nr), wNeck, { out: V3(0, 1.53, -0.025) }), FB = buckets.face, Wn = SIDE_WIN;
     for (let i = info.start; i < info.start + info.count; i++) {
       const nx = FB.nor[i * 3], py = FB.pos[i * 3 + 1], pz = FB.pos[i * 3 + 2], sd = sm(0.50, 0.85, Math.abs(nx)) * sm(Wn[2] + 0.004, Wn[2] + 0.028, py);
-      faceMix.push(sd, 1 - sd, (0.70 + 0.30 * sm(1.575, 1.47, py)) * (1 - 0.10 * sm(0.2, 0.9, Math.abs(nx))), 1);      // his beard and jaw shade the top of his neck faceUvS.push((pz - Wn[0]) / (Wn[1] - Wn[0]), (py - Wn[2]) / (Wn[3] - Wn[2]));
+      faceMix.push(sd, 1 - sd, (0.70 + 0.30 * sm(1.575, 1.47, py)) * (1 - 0.10 * sm(0.2, 0.9, Math.abs(nx))), 1); faceUvS.push((pz - Wn[0]) / (Wn[1] - Wn[0]), (py - Wn[2]) / (Wn[3] - Wn[2]));      // his beard and jaw shade the top of his neck
     }
   })();

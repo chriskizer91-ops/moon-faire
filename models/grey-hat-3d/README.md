@@ -10,6 +10,32 @@ something or just talks to them", and he gets his own folder because he is a cha
   Project docs `claude/HOW-TO-3d-witch-models.md` and `claude/HOW-TO-3d-witch-faces.md`. Read both before writing any code.
 - Project note for this folder: `claude/grey-hat-3d-reference-prompts.md`.
 
+## Second step: his face on a phone, and his sleeves (November 13, 2026)
+
+What Chris said on seeing the first build on his phone: "I think I don't want you to spend a bunch of time like remaking him
+from scratch. It actually looks pretty good. The transition from his arms to his sleeves could be better. Also in the artifact
+I'm looking at ... he doesn't have a face".
+
+**So he is not to be rebuilt from scratch.** Improve him in place, one thing at a time.
+
+- **The missing face was a bug in `src/N40_head.js`.** In the neck, a `//` comment sat in the middle of a line and swallowed
+  the half that fills `uvSide`, so that list was 399 entries short (7 neck rings of 57 points). A real graphics chip refuses to
+  draw a mesh with a short list, so the whole `face` mesh (head, ears and neck) vanished on his phone. SwiftShader, the software
+  renderer `shoot.py` uses, drew it anyway, so every test picture showed a face. **A headless picture does not prove a mesh draws
+  on a phone.** `src/N99_static.js` now throws if any mesh carries a list of the wrong length, so the build fails instead.
+  The same bug was what streaked his neck; it is plain skin now.
+- **Never put a `//` comment in the middle of a line** when patching: it eats the rest of the line. (The witches' how-to says
+  this too.)
+- **Sleeve to arm** (`src/N30_body.js`, `A_BAND`, `A_EDGE`, `A_CUFF`, `armAt`, `tier`): the sleeve ends at a gathered band
+  0.318 m down the arm. A lace ruffle in two fluted tiers (its own bucket, `projRuffle`, drawn from both sides, moving with
+  the forearm) hangs from the band to a free hem at 0.405 m, and the bare forearm (radius about 0.04 m) runs on inside it to
+  the leather cuff. Before, the ruffle was only a swelling of the arm tube, smoothed into a funnel.
+- **A sharp flap at each upper arm is gone** (`tools/tables.py`). Out to 16 cm from the shoulder the under-side of the sleeve
+  runs into the trunk in B1, and the old repair stopped at 13 cm, so three readings took the trunk for sleeve: a lump that
+  folded through itself. The under-side is now grown from the top side over that stretch.
+- About 345,000 triangles. Page version `1794593239-df79`.
+- Not checked: a real phone. Chris has not yet said whether the face shows for him.
+
 ## Where he stands: first build, paused part-way (November 13, 2026)
 
 Page: https://claude.ai/artifact/L25hB8DWnPBxJm44MAfiJe (republish every change to that link). About 330,000 triangles.
@@ -42,10 +68,10 @@ What exists:
 
 Rough, and why Chris stopped it:
 
-- **The body is not a doll yet.** It is his clothes as one smooth skin, built outline-first and painted by projection. The
-  witches were built as a good blank doll first, then painted. Redo him that way: a man's body under the clothes (B3 and B5
-  show it), then shirt, corset and trousers as their own layers.
-- His neck is a plain panel with streaked paint at its sides. His hair reads as a hood, with wrong-coloured patches where it
+- **The body is his clothes as one smooth skin,** built outline-first and painted by projection, where the witches were built
+  as a good blank doll first, then painted. Chris has since said not to remake him from scratch (see the second step above),
+  so this stays unless he asks.
+- His neck is one plain skin colour (the streaks were the bug fixed in the second step). His hair reads as a hood, with wrong-coloured patches where it
   turns in beside his neck. Up close the body paint is soft (it comes from whole-figure paintings).
 - Not used yet: C2 (blink and talking mouths), C4 to C14 (hair, hat, glasses), D (hands), E (boots), all of round 2.
 - Not built: hat, belt and ring, pouch, scroll, charms, dagger, pearls, feather earring.
