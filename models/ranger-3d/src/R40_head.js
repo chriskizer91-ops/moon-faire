@@ -64,8 +64,9 @@
   function headPoint(a, ph, grow) { const p = JH.headPoint(a, ph, (grow || 0) / HS); return [p[0] * HS, jy(p[1]), jz(p[2])]; }
   const headHalfW = (y) => JH.halfW(toJy(y)) * HS;        // half the width of her head at a height
   const wHead = wOne('head'), faceMix = [], faceUvS = [];
-  // her ear, read off the profile painting: its middle, half its width and height, and how far its top leans back
-  const EAR = { z: -0.0226, y: 1.4913, a: 0.0158, b: 0.0299, tilt: 9 * DEG };
+  // her ear, read off the profile in J3: its middle, half its width and height, and how far its top leans back. J3 paints the ear a little
+  // larger than her front view (J1) allows, so the ear is built 6% smaller than its picture and the picture is drawn in to fit (texK)
+  const EAR = { z: -0.0254, y: 1.4906, a: 0.0165, b: 0.0302, tilt: 11 * DEG, texK: 1.066 };
   const earR = (z, y) => { const c = Math.cos(EAR.tilt), sn = Math.sin(EAR.tilt), dz = z - EAR.z, dy = y - EAR.y, lz = dz * c + dy * sn, ly = dy * c - dz * sn; return Math.sqrt(lz * lz / (EAR.a * EAR.a) + ly * ly / (EAR.b * EAR.b)); };
   const SIDE_WIN = (BAKED && BAKED.faceSideWin) || [jz(-0.075), jz(0.125), jy(1.385), jy(1.585)];      // the side painting covers this window: forward from, to; height from, to
   (function buildHead() {
@@ -91,6 +92,20 @@
       faceMix.push(side, plain, 1 - 0.40 * under); faceUvS.push((pz - Wn[0]) / (Wn[1] - Wn[0]), (py - Wn[2]) / (Wn[3] - Wn[2]));
     }
   })();
+  // Her painted face is kept on a canvas, so the painted eyes or mouth of another state can be set into it: her blink, her talking
+  // mouths, her smile (J2). The states and their names are stored as the Jester's are, so her blink and talk code will work here unchanged.
+  const faceC = cvs(1024, 1024), faceT = ctex(faceC), bakedFace = { base: null, parts: {} }, faceNow = { eyes: 0, mouth: 'rest' };
+  { const g0 = faceC.getContext('2d'); g0.fillStyle = (BAKED && BAKED.skinChest) || '#dc9e81'; g0.fillRect(0, 0, 1024, 1024); }
+  function paintFace(eyes, mouth) {                 // eyes: 0 open .. 1 shut; mouth: 'rest', 'open', 'oo' or 'smile'
+    faceNow.eyes = eyes; faceNow.mouth = mouth; if (!bakedFace.base) return;
+    const W = faceC.width, H = faceC.height, g = faceC.getContext('2d'), put = (n) => { const im = bakedFace.parts[n], r = BAKED.faceParts[n]; if (im) g.drawImage(im, r.x * W, r.y * H, r.w * W, r.h * H); };
+    g.drawImage(bakedFace.base, 0, 0, W, H);
+    if (eyes >= 0.75) put('shut'); else if (eyes >= 0.25) put('half');
+    if (mouth === 'open') put('oh'); else if (mouth === 'oo') put('oo'); else if (mouth === 'smile') put('smile');
+    faceT.needsUpdate = true;
+  }
+  onBaked('face', (im) => { bakedFace.base = im; paintFace(faceNow.eyes, faceNow.mouth); });
+  if (BAKED && BAKED.faceParts) for (const n in BAKED.faceParts) onBaked('facePart_' + n, (im) => { bakedFace.parts[n] = im; paintFace(faceNow.eyes, faceNow.mouth); }, BAKED.faceParts[n].src);
   // ---------- ears: a dished shell standing off the side of the head, wearing the profile painting ----------
   (function buildEars() {
     const NT = Q(72, 30), N1 = Q(16, 8), N2 = Q(7, 4), c0 = Math.cos(EAR.tilt), s0 = Math.sin(EAR.tilt);
@@ -123,7 +138,7 @@
       for (let i = info.start; i < info.start + info.count; i++) {
         const k = kind[Math.min(kind.length - 1, Math.floor((i - info.start) / cols))] || 0, py = FB.pos[i * 3 + 1], pz = FB.pos[i * 3 + 2];
         if ((i - info.start) >= rings.length * cols || k === 0) faceMix.push(1, 0, 1); else if (k === 1) faceMix.push(0.5, 0.5, 0.95); else faceMix.push(0, 1, 0.82);
-        faceUvS.push((pz - Wn[0]) / (Wn[1] - Wn[0]), (py - Wn[2]) / (Wn[3] - Wn[2]));
+        faceUvS.push((EAR.z + (pz - EAR.z) * EAR.texK - Wn[0]) / (Wn[1] - Wn[0]), (EAR.y + (py - EAR.y) * EAR.texK - Wn[2]) / (Wn[3] - Wn[2]));
       }
     }
   })();
@@ -134,5 +149,5 @@
     for (const [y, rx, zf, zb] of [[1.396, 0.0505, 0.0245, -0.0785], [1.410, 0.0495, 0.0290, -0.0775], [1.424, 0.0482, 0.0345, -0.0770], [1.440, 0.0470, 0.0385, -0.0772], [1.460, 0.0468, 0.0380, -0.0785], [1.490, 0.0460, 0.0300, -0.0795]])
       nr.push(ringXZ(0, y, (zf + zb) / 2, rx, (zf - zb) / 2, (zf - zb) / 2, NU));
     const info = addPart('face', loft(nr), wNeck, { out: V3(0, 1.44, -0.025) }), FB = buckets.face;
-    for (let i = info.start; i < info.start + info.count; i++) { const py = FB.pos[i * 3 + 1], pz = FB.pos[i * 3 + 2]; faceMix.push(0, 1, 1 - 0.36 * sm(1.380, 1.418, py) * sm(-0.030, 0.015, pz)); faceUvS.push(0, 0); }
+    for (let i = info.start; i < info.start + info.count; i++) { const py = FB.pos[i * 3 + 1], pz = FB.pos[i * 3 + 2]; faceMix.push(0, 1, 1 - 0.36 * sm(1.403, 1.432, py) * sm(-0.030, 0.015, pz)); faceUvS.push(0, 0); }
   })();

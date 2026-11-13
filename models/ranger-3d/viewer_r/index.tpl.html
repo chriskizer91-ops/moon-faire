@@ -41,7 +41,7 @@ canvas#stage{display:block;width:100%;height:100%;touch-action:none;cursor:grab}
   <header>
     <p class="eyebrow">Moon Faire · Stage two of her build</p>
     <h1>The <em>Ranger</em></h1>
-    <p class="sub">Her head is now the Jester's face model at her size, wearing her own face painting until the new face-only pictures arrive. Drag to turn her, pinch or scroll to zoom. The Head buttons bring you in close; "Painting beside her" shows your painting for that view.</p>
+    <p class="sub">Her new face is on: your J1 on the Jester's face model, with her blink, talking mouths and smile from J2 under "Her face". Drag to turn her, pinch or scroll to zoom. The Head buttons bring you in close; "Painting beside her" shows your painting for that view.</p>
   </header>
   <div class="stagebox" id="box">
     <canvas id="stage"></canvas>
@@ -50,21 +50,24 @@ canvas#stage{display:block;width:100%;height:100%;touch-action:none;cursor:grab}
     <div class="err" id="err" hidden></div>
   </div>
   <div><p class="label">Head</p><div class="chips" id="hviews"></div></div>
+  <div><p class="label">Her face</p><div class="chips" id="faces"></div></div>
   <div><p class="label">Body</p><div class="chips" id="views"></div></div>
   <div><p class="label">Arms and legs</p><div class="chips" id="poses"></div></div>
   <div><p class="label">Show</p><div class="chips" id="shows"></div></div>
   <div class="notes">
     <h2>Her head now</h2>
     <ul>
-      <li>The shape of her head and face is the Jester's face model, unchanged, worn at 94% of its size so it fits her body. Behind the jaw it is drawn in to her neck, because her hair is up.</li>
-      <li>Her face is still her own painting, C1, laid on by her pupils and the line of her lips. It was painted with the band and the gem in it; both are painted out.</li>
-      <li>Her profile is now the Jester's, so it no longer follows her own profile painting. Her nose is a little sharper from the side.</li>
-      <li>Ears, hair, headband, gem, glasses and loose locks are as before, refitted to this head.</li>
+      <li>Her face is J1, the picture you made for this head. It is laid on by her eyes, her nose and the line of her lips. Nothing had to be painted out of it.</li>
+      <li>The buttons under "Her face" set J2's eyes or mouth into it: blink, half shut, talking, "oo", smile. Only the eyes or the mouth change; the rest of her face stays put.</li>
+      <li>Her cheeks, jaw and ears at the sides are painted from the side view in J3.</li>
+      <li>The shape is still the Jester's face model at 94% of its size, drawn in to her neck behind the jaw.</li>
+      <li>Hair, headband, gem, glasses and loose locks are as before.</li>
     </ul>
     <h2 style="margin-top:12px">Rough, or not here yet</h2>
     <ul class="m">
-      <li>Her face does not move yet: no blink and no change of expression. The new face pictures bring those.</li>
-      <li>Close up her face is a little soft, and the join of jaw and neck is plain. Both wait for the new pictures.</li>
+      <li>Her face changes only when you press a button. Blinking and talking on their own come with movement.</li>
+      <li>The join of jaw and neck is plain.</li>
+      <li>Her hair is still painted from the old pictures, with the band painted out of them.</li>
       <li>The fine flyaway wisps round her hair are missing, and the loose locks are simple.</li>
       <li>Earrings and necklaces, with the rest of her jewellery.</li>
       <li>Painted detail on her arms and hands.</li>
@@ -107,6 +110,7 @@ canvas#stage{display:block;width:100%;height:100%;touch-action:none;cursor:grab}
   const pickView = (v, other) => { want = { az: v[1], el: v[2], dist: v[3], ty: v[4] }; easing = true; spin = false; refKey = v[5]; setRef(); $('spinB').setAttribute('aria-pressed', 'false'); [...$(other).children].forEach((c) => c.setAttribute('aria-pressed', 'false')); };
   chips($('hviews'), HVIEWS, (v) => pickView(v, 'views'), 6);
   chips($('views'), VIEWS, (v) => pickView(v, 'hviews'), -1);
+  chips($('faces'), [['At rest', 0, 'rest'], ['Blink', 1, 'rest'], ['Half shut', 0.5, 'rest'], ['Talking', 0, 'open'], ['Oo', 0, 'oo'], ['Smile', 0, 'smile']], (v) => R.setFace(v[1], v[2]), 0);
   chips($('poses'), POSES, (p) => R.pose(p[1]), 1);
   R.pose(POSES[1][1]);
   const toggle = (host, id, label, on, fn) => { const b = document.createElement('button'); b.className = 'chip'; b.type = 'button'; b.id = id; b.textContent = label; b.setAttribute('aria-pressed', on ? 'true' : 'false');
@@ -134,7 +138,7 @@ canvas#stage{display:block;width:100%;height:100%;touch-action:none;cursor:grab}
     if (easing) { let d = want.az - orbit.az; d = Math.atan2(Math.sin(d), Math.cos(d)); const k = Math.min(1, dt * 5); orbit.az += d * k; orbit.el += (want.el - orbit.el) * k; orbit.dist += (want.dist - orbit.dist) * k; orbit.target.y += (want.ty - orbit.target.y) * k; }
     stage.render();
   }
-  $('hud').textContent = 'Stage two, Jester face model · ' + Math.round(R.triangles / 1000) + 'k triangles';
+  $('hud').textContent = 'Stage two, her new face · ' + Math.round(R.triangles / 1000) + 'k triangles';
   window.RANGER = { stage, R, step() { fit(); stage.render(); } };
   requestAnimationFrame(frame);
 })();

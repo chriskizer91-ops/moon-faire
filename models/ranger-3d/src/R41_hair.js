@@ -4,7 +4,7 @@
   // back, top), mixed by which way the hair faces (the hair material). The headband is a strip wrapped round the hair in a tilted
   // plane: high on the forehead, down behind the ears to the knot at the nape (heights and slope read off the profile in C3).
   const phOfY = (Y) => Math.acos(cl((Y - HC.y) / (Y >= HC.y ? HR.yT : HR.yB), -1, 1));
-  const HAIR_EDGE = [[0, 1.582], [0.5, 1.579], [0.95, 1.562], [1.25, 1.534], [1.57, 1.528], [1.92, 1.505], [2.36, 1.470], [PI, 1.452]];     // [angle round from the front, height of the hairline]
+  const HAIR_EDGE = [[0, 1.591], [0.5, 1.587], [0.95, 1.566], [1.25, 1.534], [1.57, 1.528], [1.92, 1.505], [2.36, 1.470], [PI, 1.452]];     // [angle round from the front, height of the hairline]
   const BUN_D = V3(0, 0.575, -0.818), BUN = { amp: 0.061, sig: 37 * DEG };
   const BAND = { yF: 1.589, zF: 0.080, slope: 0.514, w: 0.032 }, bandY = (z) => BAND.yF - (BAND.zF - z) * BAND.slope;
   function hairPt(a, ph, u, phB, add, plain) {      // u: 0 at the crown .. 1 at the hairline; phB: where the band presses the hair; add: extra metres out

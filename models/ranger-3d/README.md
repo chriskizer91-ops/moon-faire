@@ -3,8 +3,8 @@
 The code-built three.js (r128) model of the Ranger, made the same way as the Jester's (`models/jester-3d/`), with Chris's
 paintings baked on as textures. The method is the claude.ai Project "Flip Book Art", doc `claude/HOW-TO-3d-witch-models.md`.
 Published at https://claude.ai/artifact/NqGHWjWfKvmjcprckzUN7v (republish every stage to that link). Project notes:
-`claude/ranger-3d-stage1-body.md`, `claude/ranger-3d-stage2-head.md`, `claude/ranger-3d-stage2b-jester-face.md` and
-`claude/ranger-3d-round4-face-prompts.md`.
+`claude/ranger-3d-stage1-body.md`, `claude/ranger-3d-stage2-head.md`, `claude/ranger-3d-stage2b-jester-face.md`,
+`claude/ranger-3d-round4-face-prompts.md` and `claude/ranger-3d-stage2c-new-face.md`.
 
 ## Where she stands: stage two (November 12, 2026)
 
@@ -13,7 +13,10 @@ Body, base outfit, head, face, hair, headband and glasses, standing still. 324,6
 - **Approved by Chris (November 12): her body and base outfit** ("This looks very good so far"). Do not reshape them without asking.
 - **Stage 2b, the same day.** Chris: "just use the jester witch 3d face model And then we will make specific new images of just her
   face so you can paint that onto the jester witch 3D face model". Her head is now the Jester's face model (see "The Jester's face
-  model" below), wearing her own C1 painting until the new pictures (J1 to J3, `face_prompts/`) arrive.
+  model" below), wearing her own face.
+- **Stage 2c, the same evening.** The three face pictures arrived (J1, J2, J3; `references/chatgpt/`). Her face is now J1, her
+  blink, half-shut eyes, two talking mouths and smile come from J2 (buttons on the page, `setFace(eyes, mouth)` on the model), and
+  her cheeks, jaw and ears at the sides are painted from the profile in J3. About 325,000 triangles.
 - Stage two, waiting for his notes: face, ears, hair with the bun, headband with knot, tails, gem and drop, glasses, loose locks,
   and a wrist that joins the hand.
 
@@ -48,7 +51,7 @@ belts, satchel, pouch, charms, bracelets; sleeves and headband tails as hanging 
 - `viewer/stage.js`: the lit stage, as in the Jester's viewer. `viewer_r/index.tpl.html`: her page.
 - `build_single_r.py`: makes the one offline file. `test_r.html`, `shoot.py`, `shoot_page_r.py`: headless render and page tests
   (Playwright with Chrome and SwiftShader).
-- `references/chatgpt/`: her 67 reference paintings, named by code (A1 to I6), as WebP at quality 95.
+- `references/chatgpt/`: her 70 reference paintings, named by code (A1 to I6, and the face set J1 to J3), as WebP at quality 95.
   `references/ranger-3d-reference-prompts.md`: the prompts that made them, and what each code is.
   `lib/restore_refs.py` turns the paintings back into the PNG folder (`refs/`) the tools read.
 
@@ -101,13 +104,20 @@ take the lean out. Her arms keep the Jester's bone lengths (0.63 m; the painting
   Ranger's paintings have them. That puts the chin at 1.409 m and makes the face 6.4 cm wide at the eyes, both as painted. One thing
   is added (`TUCK`): below the ears the back of each ring is drawn in to the neck, because her hair is up and the Jester's cap and
   ruff are not there to hide it. The method is the project doc `claude/HOW-TO-3d-witch-faces.md`.
-- **Face paint.** One material mixes three pictures by the Jester's rules: C1 from the front wherever it can see; the C3 profile
+- **Face paint.** One material mixes three pictures by the Jester's rules: J1 from the front wherever it can see; the J3 profile
   only where the skin faces sideways and lies more than 34 to 50 mm from the middle line, its tone matched to the front cheek;
-  plain chest-toned skin under the jaw and behind the ear line. `bake_head.py` lays C1 on by her pupils and lip line (`layout`:
-  the sculpted eyes are placed from the same numbers), moves under-the-nose and under-the-chin a few pixels to the head's heights,
-  keeps the painting only inside the outline of her face and carries her skin outward beyond it, and paints out band, gem, drop
-  and earrings. The neck leans forward to meet the jaw about 4 cm behind the chin and darkens toward it.
-- **Ears.** A dished shell on each side wearing the profile painting; the painted ear under it on the head is blanked.
+  plain chest-toned skin under the jaw and behind the ear line. `bake_head.py` lays J1 on by landmarks read off a gridded copy by
+  eye (they are written in the script): eye line to lip line is 0.066 m of the head's frame; under the nose and under the chin sit
+  on the head's heights. Her nose and mouth are 11 px to one side of the middle of her eyes in J1, so each half of the picture is
+  scaled on its own: the nose lands on the head's middle line and each eye on its own socket (`layout.eyeX`). The painting is kept
+  only inside the outline of her face and her skin is carried outward beyond it. Nothing had to be painted out of J1.
+- **States** (`faceParts` in `out/ranger_tex.js`, stored as the Jester's are): `shut`, `half`, `oh` (lips parted), `oo`, `smile`. J2 is
+  a grid of six faces. Its first cell is settled onto J1 picture against picture (OpenCV's ECC, started from a rough reading of
+  its pupils), and each other cell onto the first by the parts that did not change. Only the eyes or the mouth are lifted, as
+  soft-edged patches with their tone matched to J1 round the rim. `paintFace(eyes, mouth)` in `src/R40_head.js` draws J1 on a canvas
+  and sets the patches into it; the names are the Jester's, so her blink and talk code will work unchanged.
+- **Ears.** A dished shell on each side wearing the profile in J3; the painted ear under it on the head is blanked. J3 paints the ear
+  larger than J1's front view allows, so the ear is built 6% smaller than its picture and the picture is drawn in to fit.
 - **Hair** (`src/R41_hair.js`). One shell: the head grown outward by a thickness that is small where the band presses it and
   lifts behind the band, plus a mound for the bun (`BUN_D`, `BUN`), narrower side to side than it is tall. It wears four paintings
   at once, each laid on from its own side (C3 profile, C3 front, C5 from behind, C8 from above) and mixed in the hair material by
@@ -136,8 +146,8 @@ take the lean out. Her arms keep the Jester's bone lengths (0.63 m; the painting
   screen, every button pressed, and a drag turns her. Not checked: on a real phone.
 
 Known rough spots: the sides of the torso under the arms are filled in from thin evidence; the painted strap hooks are flat;
-the shins are straight where the front painting has them angled a little outward; the hair just behind the band is folded-over
-texture, which can read as crimped; a faint line remains where forearm skin meets hand skin until both are painted; a pale smudge shows at the base of the back of her neck, left from stage one.
+the shins are straight where the front painting has them angled a little outward; the hair pictures still come from C3, C5 and C8 with the band painted out, so just behind
+the band the hair is folded-over texture, which can read as crimped (J3 shows her hair without the band and is the source for the hair pass); a faint line remains where forearm skin meets hand skin until both are painted; a pale smudge shows at the base of the back of her neck, left from stage one.
 
 ## Building
 
@@ -151,7 +161,7 @@ python3 -I lib/restore_refs.py        # PNG copies of the paintings into refs/
 python3 -I bake_ranger.py             # out/ranger_tex.js: body (needs Pillow, numpy, scipy)
 python3 -I bake_head.py               # adds the head, hair and band pictures to it (also needs opencv)
 ./build_r.sh                          # tools/tables.py, then out/ranger.js
-python3 -I build_single_r.py          # deliver/Ranger_3D_stage2b.html, one offline file
+python3 -I build_single_r.py          # deliver/Ranger_3D_stage2c.html, one offline file
 python3 tools/cmp_head.py shots/ch_side.jpg side      # head beside C3 with outlines; also front
 python3 tools/cmp_r.py shots/cmp_front.jpg front      # body beside B1 with outlines; also back, sideR, sideL
 python3 shoot.py shots/x 'T.j.pose({arm:24,leg:3})' face:0,0,1.25,1.53,22,520,600   # a still; angles are in radians
@@ -169,6 +179,4 @@ pouch as solid things; sleeves and headband tails as cloth; necklaces, earrings,
 (G1 to G7); then the Jester's body moves in her clothes; a face that blinks and changes expression (C10, C11); then her own moves
 and spells with their effects (I1 to I6); then the full page.
 
-Waiting on Chris: the three face pictures J1 to J3 (`face_prompts/`), his notes on her head, and the choices listed in the project docs.
-When J1 to J3 arrive: read pupils and lip line off a gridded copy, bake J1 in place of C1 (no band to paint out), cut the states from
-J2 into `faceParts` as the Jester's bake does, and use J3's profile for the side picture and as the check.
+Waiting on Chris: his notes on her new face, and the choices listed in the project docs.

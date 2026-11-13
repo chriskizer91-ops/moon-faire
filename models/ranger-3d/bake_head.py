@@ -1,8 +1,9 @@
 # The Ranger's head textures, cut from her paintings and added to out/ranger_tex.js (window.RANGER_TEX). Run after bake_ranger.py.
-#   face     : the front painting C1, laid on the Jester head's own window (x -0.1..0.1 m, height 1.385..1.585 m in the head's frame)
-#              by her pupils and lip line; under the nose and under the chin are moved a few pixels to the head's heights.
-#   faceSide : the profile painting C3 on the head's side window, fixed at the tip of the nose, tone matched to the front cheek.
-#   Headband, gem, earrings and background are painted out of both, because those are real objects on the model.
+#   face      : J1 (round 4, her face painted for this head), laid on the Jester head's own window (x -0.1..0.1 m, height 1.385..1.585 m
+#               in the head's frame) by her eyes, nose and lip line.
+#   faceParts : her states from J2 (eyes shut, half shut, lips parted, 'oo', smile), as soft patches that sit on the face picture.
+#   faceSide  : the profile in J3 on the head's side window, fixed at the tip of the nose, tone matched to the front cheek.
+#   The hair pictures still come from C3, C5 and C8, with the headband painted out.
 # The paintings are data: run with python3 -I.
 import sys, io, json, base64
 import numpy as np
@@ -50,37 +51,38 @@ def sample(a, rows, cols):
 txt = open(OUT + 'ranger_tex.js').read(); T = json.loads(txt[txt.index('{'):txt.rindex('}') + 1])
 for k in [k for k in T if k.startswith('hc')]: del T[k]                # pictures from an abandoned trial
 
-# ---------- front ----------
-C1 = load(REF + 'C1.png')
-band = blue_band(C1) & (np.arange(C1.shape[0])[:, None] < 640)
-for x0, y0, x1, y1 in ((560, 190, 706, 352), (606, 330, 660, 414)): band[y0:y1, x0:x1] = True     # the gem and its drop
-front = fill_down(C1, band)
-front, em = paint_out(front, ((300, 800, 400, 1090), (870, 800, 970, 1090)))                        # both earrings
+# ---------- front: J1, her face painted for this head (round 4: no band, gem, glasses, earrings or loose hair in it) ----------
 # The head is the Jester's face model, in its own frame: eyes at 1.5246 m, lip line 0.066 m below. The model wears it at HS of its
 # size with the eye line at 1.512 m and the tip of the nose 0.107 m forward (src/R40_head.js). The pictures are made in the head's frame.
 HS, J_EYE, J_TIP, R_EYE, R_TIP = 0.94, 1.5246, 0.1158, 1.512, 0.107
 jy = lambda Y: R_EYE + (Y - J_EYE) * HS
 jz = lambda Z: R_TIP + (Z - J_TIP) * HS
-MIDX, EYE1 = 633.5, 628.0; EYE_H = 1.512
-PXJ = (902.0 - 628.0) / 0.066                     # C1 pixels per metre of the head's frame, from eye line to lip line
-ANCH = [(J_EYE, 628.0), (1.4775, 822.0), (1.4586, 902.0), (1.4165, 1092.0)]      # height in the head's frame -> row in C1: eyes, under the nose, lip line, under the chin
-def row_of(Y):
-    Y = np.asarray(Y, np.float64); r = np.where(Y >= J_EYE, EYE1 - (Y - J_EYE) * PXJ, 0.0)
-    for (ya, ra), (yb, rb) in zip(ANCH[:-1], ANCH[1:]):
+EYE_H = 1.512
+J1 = load(REF + 'J1.png')
+# Read off a gridded copy by eye (lib/grid.py refs/J1.png out 250,400,1010,1200 50): pupils (436, 541) and (823.5, 541); the middles
+# of the two eye openings x 442.5 and 838.5; the middle of her nose and mouth x 651; brows y 452; under the nose 810; lip line 928;
+# under the chin 1168. Her nose and mouth sit 11 px to one side of the middle of her eyes, so each half of the picture is scaled
+# on its own: the nose lands on the middle line of the head and each eye on its own socket.
+EYE1, NOSEX, EL, ER = 541.0, 651.0, 442.5, 838.5
+PXJ = (928.0 - EYE1) / 0.066                      # J1 pixels per metre of the head's frame, from eye line to lip line
+EYEX = (ER - EL) / 2 / PXJ
+ANCH = [(J_EYE, 541.0), (1.4775, 810.0), (1.4586, 928.0), (1.4165, 1168.0)]      # height in the head's frame -> row in J1
+def piece(Y, anch, top, pxm):
+    Y = np.asarray(Y, np.float64); r = np.where(Y >= anch[0][0], top - (Y - anch[0][0]) * pxm, 0.0)
+    for (ya, ra), (yb, rb) in zip(anch[:-1], anch[1:]):
         sel = (Y < ya) & (Y >= yb); r = np.where(sel, ra + (ya - Y) / (ya - yb) * (rb - ra), r)
-    yb, rb = ANCH[-1]; r = np.where(Y < yb, rb + (yb - Y) * PXJ, r)
-    return r
+    yb, rb = anch[-1]; return np.where(Y < yb, rb + (yb - Y) * pxm, r)
+row_of = lambda Y: piece(Y, ANCH, EYE1, PXJ)
+def col_of(X):
+    X = np.asarray(X, np.float64); return np.where(X < 0, NOSEX + X * (NOSEX - EL) / EYEX, NOSEX + X * (ER - NOSEX) / EYEX)
 # Keep the painting inside the outline of her face and on her neck. Outside it, carry her skin outward, so hair, ears and
-# backdrop are not pulled onto the cheek where the surface turns (step 4 of the face how-to).
-OUTL = [(340, 0), (350, 120), (380, 150), (420, 185), (470, 222), (520, 250), (560, 268), (628, 278), (700, 276), (800, 266), (850, 251), (900, 244), (950, 227), (975, 217), (1000, 199), (1025, 176), (1050, 142), (1075, 94), (1092, 28)]
-Hh, Ww = front.shape[:2]; rr = np.arange(Hh); hw = np.interp(rr, [a for a, _ in OUTL], [b for _, b in OUTL], left=0, right=0)
-xx = np.abs(np.arange(Ww)[None, :] - MIDX); inside = xx < hw[:, None] - 6
-inside |= (rr[:, None] > 1078) & (xx < 185)                                        # her neck under the chin
-# where the gem's drop hung on her brow: each row is repainted from her own skin just left and right of it
-for r in range(340, 428):
-    lc = C1[r, 578:588].mean(0); rc = C1[r, 678:688].mean(0); k = np.linspace(0, 1, 90)[:, None]
-    front[r, 588:678] = lc * (1 - k) + rc * k
-front[336:432, 584:682] = np.stack([ndi.gaussian_filter(front[336:432, 584:682, c], (2.5, 1.0)) for c in range(3)], -1)
+# backdrop are not pulled onto the cheek where the surface turns (step 4 of the face how-to). [row, left edge, right edge]
+EDGE = [(150, 480, 800), (187, 400, 880), (250, 322, 958), (300, 287, 988), (350, 270, 1002), (400, 263, 1007), (450, 262, 1007), (540, 256, 1003), (650, 254, 1000), (760, 262, 998), (800, 272, 995),
+        (850, 280, 992), (900, 290, 985), (950, 302, 972), (1000, 322, 950), (1050, 362, 908), (1100, 430, 850), (1140, 520, 765), (1168, 620, 665)]
+front = J1.copy(); Hh, Ww = front.shape[:2]; rr = np.arange(Hh); cc_ = np.arange(Ww)[None, :]
+eL = np.interp(rr, [e[0] for e in EDGE], [e[1] for e in EDGE]); eR = np.interp(rr, [e[0] for e in EDGE], [e[2] for e in EDGE])
+inside = (cc_ > eL[:, None] + 9) & (cc_ < eR[:, None] - 9) & (rr[:, None] <= 1168)
+inside |= (rr[:, None] > 1125) & (cc_ > 352) & (cc_ < 918)                             # her neck under the chin
 r_, g_, b_ = front[..., 0], front[..., 1], front[..., 2]
 skin = ndi.binary_erosion(inside, iterations=8) & (r_ > 112) & (r_ - b_ > 40) & (r_ - g_ > 14)
 def carry(sig):
@@ -91,30 +93,75 @@ k1 = np.clip(d1 / 0.08, 0, 1)[..., None]; k2 = np.clip(d2 / 0.03, 0, 1)[..., Non
 carried = c1 * k1 + (c2 * k2 + mid * (1 - k2)) * (1 - k1)
 wi = ndi.gaussian_filter(inside.astype(np.float32), 5.0)[..., None]
 front = front * wi + carried * (1 - wi)
-Image.fromarray(np.clip(front, 0, 255).astype(np.uint8)).resize((627, 627)).save(SH + 'bake_c1_clean.jpg', quality=88)
 S = 1024; FX0, FX1, FY0, FY1 = -0.1, 0.1, 1.385, 1.585
 ii, jj = np.mgrid[0:S, 0:S]
-Y = FY1 - (ii + 0.5) / S * (FY1 - FY0); X = FX0 + (jj + 0.5) / S * (FX1 - FX0)
-face = sample(front, row_of(Y), MIDX + X * PXJ)
+FYg = FY1 - (ii + 0.5) / S * (FY1 - FY0); FXg = FX0 + (jj + 0.5) / S * (FX1 - FX0)
+face = sample(front, row_of(FYg), col_of(FXg))
 T['face'] = uri(face, 93); Image.fromarray(np.clip(face, 0, 255).astype(np.uint8)).save(SH + 'bake_face.jpg', quality=90)
-T['layout'] = dict(eyeY=J_EYE, eyeX=round(138.5 / PXJ, 4), browY=round(J_EYE + 60.0 / PXJ, 4), noseY=1.4877, mouthY=1.4586)       # the sculpted features are placed from these
+T['layout'] = dict(eyeY=J_EYE, eyeX=round(EYEX, 4), browY=round(J_EYE + (EYE1 - 452.0) / PXJ, 4), noseY=1.4877, mouthY=1.4586)       # the sculpted features are placed from these
 T['headFrame'] = dict(scale=HS, eye=R_EYE, tip=R_TIP)
 
-# ---------- side ----------
-C3 = load(REF + 'C3.png'); fg3, _ = mask_of(C3)
-band3 = blue_band(C3); band3[185:290, 1395:1478] = True; band3[:, :1010] = False                   # the band, the gem and its drop on the profile figure
-side_src = fill_down(C3, band3)
-side_src, em3 = paint_out(side_src, ((1252, 452, 1316, 600),))                                       # earring
-PXM3, NOSE_X, NOSE_Z, EYE3 = 1837.0, 1498.0, 0.107, 381.0       # the profile in her own measure (used for the hair below)
-PXS = (496.0 - 381.0) / 0.066                    # profile pixels per metre of the head's frame, from eye line to lip line
-# match the profile's tone to the cheek of the front painting, so there is no step where one takes over from the other
-ck_f = np.median(C1[760:850, 800:860].reshape(-1, 3), 0); ck_s = np.median(C3[425:475, 1392:1432].reshape(-1, 3), 0); gain = np.clip(ck_f / ck_s, 0.70, 1.20)
+# ---------- her states, from J2: six faces in a grid, three across and two down, each 512 px square ----------
+# Cell 1 is J1 again, so it is settled onto J1 picture against picture (starting from a rough reading of its pupils), and every
+# other cell is settled onto cell 1 by the parts that did not change. Then only the eyes or the mouth are lifted, as soft-edged
+# patches with their tone matched to J1 round the rim, and stored as the Jester's are (faceParts: shut, half, oh, oo, smile).
+import cv2
+J2 = load(REF + 'J2.png'); cells = [J2[512 * i:512 * (i + 1), 512 * j:512 * (j + 1)] for i in range(2) for j in range(3)]
+gray = lambda a: cv2.cvtColor(np.clip(a, 0, 255).astype(np.uint8), cv2.COLOR_RGB2GRAY).astype(np.float32)
+crit = (cv2.TERM_CRITERIA_EPS | cv2.TERM_CRITERIA_COUNT, 400, 1e-7)
+tmpl = cv2.resize(gray(J1), (627, 627), interpolation=cv2.INTER_AREA)
+W1 = np.array([[2 / 2.25, 0, 258 - 629.75 / 2.25], [0, 2 / 2.25, 161 - 541 / 2.25]], np.float32)       # half-size J1 -> cell 1, to start from
+fm = np.zeros((512, 512), np.uint8); cv2.ellipse(fm, (262, 222), (112, 150), 0, 0, 360, 255, -1)
+_, W1 = cv2.findTransformECC(tmpl, gray(cells[0]), W1, cv2.MOTION_AFFINE, crit, fm, 5)
+def to_cell(k, col, row):                           # J1 pixel -> pixel in cell k
+    x = W1[0, 0] * col / 2 + W1[0, 1] * row / 2 + W1[0, 2]; y = W1[1, 0] * col / 2 + W1[1, 1] * row / 2 + W1[1, 2]
+    if k == 0: return x, y
+    Wk = WK[k]; return Wk[0, 0] * x + Wk[0, 1] * y + Wk[0, 2], Wk[1, 0] * x + Wk[1, 1] * y + Wk[1, 2]
+WK = {}
+for k in range(1, 6):
+    mk = fm.copy()
+    if k in (1, 2): mk[118:205, :] = 0              # the eyes changed
+    else: mk[270:410, 150:380] = 0                  # the mouth changed (and the cheeks beside it, in the smile)
+    _, WK[k] = cv2.findTransformECC(gray(cells[0]), gray(cells[k]), np.eye(2, 3, dtype=np.float32), cv2.MOTION_EUCLIDEAN, crit, mk, 5)
+print('cell 1 on J1:', np.round(W1, 4).tolist(), '| shifts of the others (px):', {k + 1: [round(float(WK[k][0, 2]), 2), round(float(WK[k][1, 2]), 2)] for k in WK})
+def webp_rgba(rgb, al):
+    im = Image.fromarray(np.dstack([np.clip(rgb, 0, 255), np.clip(al * 255, 0, 255)]).astype(np.uint8), 'RGBA'); b = io.BytesIO(); im.save(b, 'WEBP', quality=90, method=6)
+    return 'data:image/webp;base64,' + base64.b64encode(b.getvalue()).decode()
+def state(name, k, x0, x1, y0, y1, ells):            # ells: [centre x, centre height, half-width, half-height] in the head's frame
+    j0, j1 = int((x0 - FX0) / (FX1 - FX0) * S), int(np.ceil((x1 - FX0) / (FX1 - FX0) * S)); i0, i1 = int((FY1 - y1) / (FY1 - FY0) * S), int(np.ceil((FY1 - y0) / (FY1 - FY0) * S))
+    X = FXg[i0:i1, j0:j1]; Y = FYg[i0:i1, j0:j1]; cx, cy = to_cell(k, col_of(X), row_of(Y))
+    pt = np.stack([ndi.map_coordinates(cells[k][..., c], [cy, cx], order=1, mode='nearest') for c in range(3)], -1)
+    al = np.zeros(X.shape, np.float32)
+    for ex, ey, rx, ry in ells: rho = np.sqrt(((X - ex) / rx) ** 2 + ((Y - ey) / ry) ** 2); t = np.clip((1 - rho) / 0.38, 0, 1); al = np.maximum(al, t * t * (3 - 2 * t))
+    base = face[i0:i1, j0:j1]; rim = (al > 0.04) & (al < 0.55); gain = np.clip(base[rim].mean(0) / pt[rim].mean(0), 0.85, 1.18); pt = pt * gain
+    T['faceParts'][name] = dict(src=webp_rgba(pt, al), x=round(j0 / S, 5), y=round(i0 / S, 5), w=round((j1 - j0) / S, 5), h=round((i1 - i0) / S, 5))
+    out = face.copy(); out[i0:i1, j0:j1] = base * (1 - al[..., None]) + pt * al[..., None]; return out, np.round(gain, 3)
+T['faceParts'] = {}
+EYES = [[-EYEX, J_EYE - 0.0010, 0.0228, 0.0128], [EYEX, J_EYE - 0.0010, 0.0228, 0.0128]]
+shots = [face]
+for name, k, box, ells in (('shut', 1, (-0.060, 0.060, J_EYE - 0.017, J_EYE + 0.015), EYES), ('half', 2, (-0.060, 0.060, J_EYE - 0.017, J_EYE + 0.015), EYES),
+                           ('oh', 3, (-0.038, 0.038, 1.4390, 1.4770), [[0, 1.4574, 0.0345, 0.0168]]), ('oo', 4, (-0.038, 0.038, 1.4390, 1.4770), [[0, 1.4574, 0.0345, 0.0168]]),
+                           ('smile', 5, (-0.050, 0.050, 1.4360, 1.4790), [[0, 1.4578, 0.0465, 0.0200]])):
+    o, gn = state(name, k, *box, ells); shots.append(o); print(' ', name, 'tone gain', gn.tolist(), len(T['faceParts'][name]['src']) // 1024, 'KB')
+sheet = np.concatenate([np.concatenate([s_[250:900:2, 150:874:2] for s_ in shots[:3]], 1), np.concatenate([s_[250:900:2, 150:874:2] for s_ in shots[3:]], 1)], 0)
+Image.fromarray(np.clip(sheet, 0, 255).astype(np.uint8)).save(SH + 'bake_states.jpg', quality=88)
+
+# ---------- side: the profile in J3 (right-hand figure), for her cheeks, jaw and ears ----------
+# Read off a gridded copy by eye: eye y 405; tip of the nose x 1502.5; lip line y 535; under the chin y 627; ear x 1187..1262, y 382..519.
+J3 = load(REF + 'J3.png'); fgj, _ = mask_of(J3); badj = ~ndi.binary_erosion(fgj, iterations=3); badj[:, :1012] = True
+side_src = fill(J3, badj, 3.0)
+PXS = (535.0 - 405.0) / 0.066; TIPX = 1502.5; ANS = [(J_EYE, 405.0), (1.4586, 535.0), (1.4165, 627.0)]
+ck_f = np.median(J1[700:780, 850:930].reshape(-1, 3), 0); ck_s = np.median(J3[470:520, 1380:1420].reshape(-1, 3), 0); gain = np.clip(ck_f / ck_s, 0.70, 1.20)      # the profile's tone matched to the front cheek
 SZ0, SZ1, SY0, SY1 = -0.075, 0.125, 1.385, 1.585; S2 = 512
 ii, jj = np.mgrid[0:S2, 0:S2]
 Y = SY1 - (ii + 0.5) / S2 * (SY1 - SY0); Z = SZ0 + (jj + 0.5) / S2 * (SZ1 - SZ0)
-side = sample(side_src, EYE3 + (J_EYE - Y) * PXS, NOSE_X + (Z - J_TIP) * PXS) * gain
+side = sample(side_src, piece(Y, ANS, 405.0, PXS), TIPX + (Z - J_TIP) * PXS) * gain
 T['faceSide'] = uri(side, 92); T['faceSideA'] = uri(np.full((8, 8, 3), 255.0), 90); T['faceSideWin'] = [round(jz(SZ0), 5), round(jz(SZ1), 5), round(jy(SY0), 5), round(jy(SY1), 5)]
 Image.fromarray(np.clip(side, 0, 255).astype(np.uint8)).save(SH + 'bake_side.jpg', quality=90); print('profile tone gain', np.round(gain, 3))
+# C3 is still the source of her hair pictures (below)
+C3 = load(REF + 'C3.png'); fg3, _ = mask_of(C3)
+band3 = blue_band(C3); band3[185:290, 1395:1478] = True; band3[:, :1010] = False
+PXM3, NOSE_X, NOSE_Z, EYE3 = 1837.0, 1498.0, 0.107, 381.0       # the profile in C3, in her own measure
 
 # ---------- hair: four views of her hair, each laid on the hair from its own side (the model mixes them by which way the hair faces) ----------
 #   hairSide  : C3 profile, 1837 px/m, window forward -0.16..0.11, height 1.43..1.70 (mirrored for her left side)
@@ -175,7 +222,7 @@ strip[-int((r1 - r0) * 0.0):, :] = strip[-int((r1 - r0) * 0.0):, :]
 bt = np.asarray(Image.fromarray(np.clip(strip, 0, 255).astype(np.uint8)).resize((1024, 64), Image.LANCZOS)).astype(np.float32)
 T['band'] = uri(bt, 92); Image.fromarray(bt.astype(np.uint8)).save(SH + 'bake_band.jpg', quality=90); print('band rows', r0, r1, 'hair colours', T['hairCols'])
 # skin under the jaw and on the neck: the neck just under her chin in C1, where it is evenly lit
-nk = front[1120:1170, 560:710].reshape(-1, 3); T['skinJaw'] = '#%02x%02x%02x' % tuple(int(v) for v in np.median(nk, 0))
+nk = J1[1200:1250, 560:740].reshape(-1, 3); T['skinJaw'] = '#%02x%02x%02x' % tuple(int(v) for v in np.median(nk, 0))
 print('skinJaw', T['skinJaw'], 'skinChest', T.get('skinChest'))
 js = 'window.RANGER_TEX=' + json.dumps(T, separators=(',', ':')) + ';'
 open(OUT + 'ranger_tex.js', 'w').write(js); print('ranger_tex.js', len(js) // 1024, 'KB', list(T.keys()))
