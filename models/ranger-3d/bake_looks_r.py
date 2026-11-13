@@ -41,6 +41,14 @@ for n, p in T['faceParts'].items():
     im = np.asarray(dec(p['src']).convert('RGBA'), np.float32); sc = (im.shape[1] / (p['w'] * W))
     T['facePartsYoung'][n] = dict(src=enc_rgba(younger(im[..., :3], sc), im[..., 3]), x=p['x'], y=p['y'], w=p['w'], h=p['h'])
 
+# The younger face is the one Chris chose (November 13), so the side picture of her cheeks and ears takes the same treatment.
+if 'faceSide' in T:
+    sd = np.asarray(dec(T['faceSide']).convert('RGB'), np.float32); T['faceSideYoung'] = enc(younger(sd, sd.shape[1] / 1024 * 1.6), 92)
+# "Her hair needs to be smoothed out": the four hair pictures lose a third of their fine light-and-dark, which read as lumps.
+for k in ('hairSide', 'hairFront', 'hairBack', 'hairTop'):
+    if k in T:
+        hp = np.asarray(dec(T[k]).convert('RGB'), np.float32); lo = np.stack([ndi.gaussian_filter(hp[..., c], 7.0) for c in range(3)], -1); T[k + 'Soft'] = enc(lo + (hp - lo) * 0.55, 90)
+
 # ---------- the Fox's ----------
 fox = np.asarray(dec(F['face']).convert('RGB'), np.float32); gain = np.clip(SKIN / cheek(fox), 0.86, 1.16); print('fox cheek', cheek(fox).round(0).tolist(), 'gain', gain.round(3).tolist(), 'canvas', fox.shape)
 SHIFT = T['layout']['eyeX'] - F['layout']['eyeX']

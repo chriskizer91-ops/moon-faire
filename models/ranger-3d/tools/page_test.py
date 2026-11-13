@@ -2,7 +2,7 @@
 import sys
 from playwright.sync_api import sync_playwright
 from PIL import Image
-PAGE = sys.argv[1] if len(sys.argv) > 1 else '/home/claude/ranger/deliver/Ranger_3D_stage5c.html'
+PAGE = sys.argv[1] if len(sys.argv) > 1 else '/home/claude/ranger/deliver/Ranger_3D_stage6.html'
 ARGS = ['--use-angle=swiftshader', '--enable-unsafe-swiftshader', '--ignore-gpu-blocklist', '--allow-file-access-from-files']
 with sync_playwright() as p:
     b = p.chromium.launch(executable_path='/usr/bin/google-chrome', args=ARGS)
@@ -13,7 +13,7 @@ with sync_playwright() as p:
     bx = pg.locator('#stage').bounding_box(); clip = {'x': bx['x'], 'y': bx['y'], 'width': bx['width'], 'height': bx['height']}; shots = []
     def shot(name): pg.evaluate('window.scrollTo(0,0)'); pg.wait_for_timeout(300); f = '/tmp/pt_%s.png' % name; pg.screenshot(path=f, clip=clip); shots.append(f)
     shot('open')
-    for host, label in (('looks', 'Younger'), ('looks', "The Fox's"), ('looks', 'Her own'), ('gear', 'Charms'), ('gear', 'Under the satchel'), ('gear', 'Satchel'), ('gear', 'Strap hook'), ('poses', 'Legs apart'), ('boots', 'Outer side'), ('hands', 'Left hand'), ('views', 'Front'), ('hviews', 'Face')):
+    for host, label in (('moves', 'Walk on the spot'), ('hviews', 'Profile'), ('moves', 'Walk on the spot'), ('gear', 'Charms'), ('poses', 'Legs apart'), ('boots', 'Outer side'), ('hands', 'Left hand'), ('views', 'Front'), ('hviews', 'Face')):
         pg.evaluate('window.scrollTo(0,0)'); pg.click('#%s >> text="%s"' % (host, label)); pg.wait_for_timeout(6500); shot(host + '_' + label.replace(' ', '_'))
     pg.evaluate('window.scrollTo(0,0)'); pg.click('#gear >> text="Charms"'); pg.wait_for_timeout(5000); pg.click('#swingB'); pg.wait_for_timeout(260); shot('swing'); pg.wait_for_timeout(5000); print('after the swing, bag and charm turns:', pg.evaluate('Object.keys(RANGER.R.SK).filter((k) => /bag|charm/.test(k)).map((k) => +(1 - RANGER.R.SK[k].quaternion.w).toFixed(4))'))
     print('after Face: target', pg.evaluate('RANGER.stage.orbit.target.toArray().map((v) => +v.toFixed(3))'), 'pressed pose:', pg.evaluate('[...document.querySelectorAll("#poses .chip")].filter((c) => c.getAttribute("aria-pressed") === "true").map((c) => c.textContent)'))

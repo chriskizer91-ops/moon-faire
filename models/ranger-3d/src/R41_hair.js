@@ -5,21 +5,22 @@
   // plane: high on the forehead, down behind the ears to the knot at the nape (heights and slope read off the profile in C3).
   const phOfY = (Y) => Math.acos(cl((Y - HC.y) / (Y >= HC.y ? HR.yT : HR.yB), -1, 1));
   const HAIR_EDGE = [[0, 1.591], [0.5, 1.587], [0.95, 1.566], [1.25, 1.534], [1.57, 1.528], [1.92, 1.505], [2.36, 1.470], [PI, 1.452]];     // [angle round from the front, height of the hairline]
-  const BUN_D = V3(0, 0.575, -0.818), BUN = { amp: 0.061, sig: 37 * DEG };
+  const BUN_D = V3(0, 0.292, -0.956), BUN = { amp: 0.052, sig: 33 * DEG };       // Chris, November 13: the bun on the back of her head, not up high (it pointed 35 degrees up; now 17)
   const BAND = { yF: 1.589, zF: 0.080, slope: 0.514, w: 0.032 }, bandY = (z) => BAND.yF - (BAND.zF - z) * BAND.slope;
   // Chris, November 13: "her hair is too big above the hairband": the swell over her forehead is lowered so the hair climbs from the band to the
   // crown on the slope of C3's side view (measured with tools/cmp_head.py: it stood 25 to 46 mm too high just behind the band). Nothing else moved.
   const FRONT_LOW = 0.70;
   function hairPt(a, ph, u, phB, add, plain) {      // u: 0 at the crown .. 1 at the hairline; phB: where the band presses the hair; add: extra metres out
     const rise = phB == null ? 1 : sm(phB - 0.02, phB - 0.46, ph);       // the band holds the hair flat; behind it the hair lifts as it is swept back to the bun
-    let g = (0.0070 + 0.011 * sm(0.1, -0.6, Math.cos(a)) * sm(1.88, 2.08, ph)) * (phB == null ? 1 : 1 - 0.45 * Math.exp(-Math.pow((ph - phB) / 0.16, 2))) + (0.027 * sm(1.50, 0.50, ph) * (0.55 + 0.45 * Math.cos(a) * Math.cos(a)) * (1 - FRONT_LOW * sm(-0.05, 0.62, Math.cos(a)) * sm(0.15, 0.55, ph)) + 0.009 * sm(0.9, 1.5, ph) * sm(2.1, 1.5, ph) + 0.016 * sm(1.15, 1.6, ph) * sm(2.25, 1.75, ph) * sm(0.2, -0.5, Math.cos(a))) * rise;      // rounder on top, fuller at the back of the head (J3's side view)
+    let g = (0.0070 + 0.011 * sm(0.1, -0.6, Math.cos(a)) * sm(1.88, 2.08, ph)) * (phB == null ? 1 : 1 - 0.45 * Math.exp(-Math.pow((ph - phB) / 0.16, 2))) + (0.011 * sm(1.50, 0.50, ph) * (0.55 + 0.45 * Math.cos(a) * Math.cos(a)) * (1 - FRONT_LOW * sm(-0.05, 0.62, Math.cos(a)) * sm(0.15, 0.55, ph)) + 0.009 * sm(0.9, 1.5, ph) * sm(2.1, 1.5, ph) + 0.016 * sm(1.15, 1.6, ph) * sm(2.25, 1.75, ph) * sm(0.2, -0.5, Math.cos(a))) * rise;      // rounder on top, fuller at the back of the head (J3's side view)
     g *= 0.30 + 0.70 * sm(1.0, 0.72, u);
     const p = headPoint(a, ph, g + (add || 0)), dx = p[0] - HC.x, dy = p[1] - HC.y, dz = p[2] - HC.z, L = Math.hypot(dx, dy, dz) || 1;
     const Lv = Math.hypot(dy, dz) || 1, av = Math.acos(cl((dy * BUN_D.y + dz * BUN_D.z) / Lv, -1, 1)), al = Math.asin(cl(Math.abs(dx) / L, 0, 1)), ang = Math.hypot(av, 1.32 * al);      // the bun is narrower from side to side than it is tall
     let b = BUN.amp * Math.exp(-Math.pow(ang / BUN.sig, 3));
+    if (phB != null) b *= sm(phB - 0.03, phB - 0.30, ph);       // the bun stops above the band, so the band is never buried
     if (!plain) {                                   // curls on the bun, combed ridges elsewhere
       const k = Math.exp(-Math.pow(ang / (BUN.sig * 1.15), 3));
-      b += k * 0.0100 * (fbm(Math.sin(a) * 4 + 20, ph * 7 + Math.cos(a) * 4) - 0.47) * 2 + (1 - k) * 0.0013 * Math.sin(a * 46 + 5 * fbm(Math.sin(a) * 3 + 7, ph * 4)) * sm(1.0, 0.8, u);
+      b += k * 0.0032 * (fbm(Math.sin(a) * 4 + 20, ph * 7 + Math.cos(a) * 4) - 0.47) * 2 + (1 - k) * 0.0008 * Math.sin(a * 46 + 5 * fbm(Math.sin(a) * 3 + 7, ph * 4)) * sm(1.0, 0.8, u);
     }
     const s = 1 + b / L;
     return [HC.x + dx * s, HC.y + dy * s, HC.z + dz * s];

@@ -78,8 +78,19 @@ four strap hooks as real objects, standing still. About 355,000 triangles.
     commit f7cac64, `models/fox-3d/out/fox_tex_own.js`). Both heads are the Jester's face model with the same picture window, so it
     lays straight on; her eye band is slid 2.8 mm outward to the Ranger's eye sockets and her skin toned to the Ranger's cheek.
   - Only the front picture changes: the side pictures of cheeks and ears stay her own.
-- Waiting for his notes: which face (hers, younger, the Fox's), stage two (head), stage three (hands and arms), stage 4b (hair)
-  and stage five.
+- **Stage six, the same day.** Chris: "I like the younger face but her hair needs to be smoothed out ... slope the top of her head
+  back more and have her bun of hair be on the back of her head. Not up as high as it is ... we need to get the animation of her
+  skeleton in so we can see her walking with all of these different things."
+  - **Younger face chosen.** `lookNow` starts as `young`; the side picture of her cheeks and ears gets the same treatment
+    (`faceSideYoung`). The first painting (`own`) and the Fox's stay on the page to compare.
+  - **Hair** (`src/R41_hair.js`): the bun points 17 degrees above straight back (it was 35), 5.2 cm proud, and stops above the band
+    so the band is never buried; the swell on top of her head is 1.1 cm (was 2.7), so the top slopes back from the band; the curls
+    on the bun are a third as deep; the four hair pictures lose some fine light-and-dark (`hairSideSoft` and so on). By his eye,
+    not measured from a painting. It overrides stage 4b's match to C3 above the band.
+  - **A first walk** (`walk(true)`, `animate(dt)` in `src/R99_static.js`): a plain cycle on the spot written here (thighs, knees,
+    feet, arms, hips dropping 4 cm at each step, a turn of the spine), period 1.08 s. Bags and charms move with her through the
+    code from stage 5b. The Jester's full moves still come over at the movement stage and replace it.
+- Waiting for his notes: stage two (head), stage three (hands and arms) and stage five.
 
 Rough or not built yet: her face does not move (no blink, no expressions); the hair has a smooth edge with none of the painted
 flyaway wisps, and the loose locks are simple; earrings and necklaces; fingers that bend; bracelets; each charm is one stiff piece on a hinge (its chain does not bend, charms can
@@ -302,7 +313,7 @@ python3 -I bake_hands_r.py            # adds her hands and arms from D1 and D2
 python3 -I bake_gear_r.py             # adds the leather of her bags and belts from F6
 python3 -I bake_looks_r.py            # adds the two trial faces (younger, the Fox's)
 ./build_r.sh                          # tools/tables.py, then out/ranger.js
-python3 -I build_single_r.py          # deliver/Ranger_3D_stage5c.html, one offline file
+python3 -I build_single_r.py          # deliver/Ranger_3D_stage6.html, one offline file
 python3 tools/shoot_hand.py shots/hand_L.jpg L hand   # one hand from four sides beside D1 or D2; also R, and arm
 python3 tools/wrist_sections.py                       # forearm and hand, slice by slice through the wrist
 python3 tools/page_test.py                            # the page at phone size: belt, bag, hook, boot, hand and body buttons, a drag

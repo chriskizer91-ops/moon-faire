@@ -97,7 +97,7 @@
   const faceC = cvs(1024, 1024), faceT = ctex(faceC), bakedFace = { base: null, parts: {} }, faceNow = { eyes: 0, mouth: 'rest' };
   { const g0 = faceC.getContext('2d'); g0.fillStyle = (BAKED && BAKED.skinChest) || '#dc9e81'; g0.fillRect(0, 0, 1024, 1024); }
   // Faces she can try on (bake_looks_r.py): 'own' is hers; 'young' is hers with the lines of age taken out; 'fox' is the Fox's painted face.
-  const LOOKS = { own: bakedFace }; bakedFace.rects = (BAKED && BAKED.faceParts) || {}; let lookNow = 'own';
+  const LOOKS = { own: bakedFace }; bakedFace.rects = (BAKED && BAKED.faceParts) || {}; let lookNow = (BAKED && BAKED.faceYoung) ? 'young' : 'own';       // Chris, November 13: "I like the younger face"
   function setLook(name) { lookNow = LOOKS[name] ? name : 'own'; paintFace(faceNow.eyes, faceNow.mouth); return lookNow; }
   function paintFace(eyes, mouth) {                 // eyes: 0 open .. 1 shut; mouth: 'rest', 'open', 'oo' or 'smile'
     faceNow.eyes = eyes; faceNow.mouth = mouth; const L = LOOKS[lookNow] && LOOKS[lookNow].base ? LOOKS[lookNow] : LOOKS.own; if (!L.base) return;

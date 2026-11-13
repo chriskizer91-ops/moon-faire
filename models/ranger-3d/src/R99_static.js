@@ -14,7 +14,7 @@
     face: (() => {
       const t = faceT;
       const m = sheen(std({ map: t, color: lin('#b9b2b6'), roughness: 0.66, envMapIntensity: 0.2, emissive: lin('#ffffff'), emissiveMap: t, emissiveIntensity: 0.34 }), '#ffb49a', 3.2, 0.06);
-      const ts = bakedTex('faceSide', 512, 512, SKIN_C), ta = bakedTex('faceSideA', 512, 512, '#000000'), first = m.onBeforeCompile;
+      const ts = bakedTex(BAKED && BAKED.faceSideYoung ? 'faceSideYoung' : 'faceSide', 512, 512, SKIN_C), ta = bakedTex('faceSideA', 512, 512, '#000000'), first = m.onBeforeCompile;
       m.onBeforeCompile = (sh) => {
         if (first) first(sh);
         sh.uniforms.uSide = { value: ts }; sh.uniforms.uSideA = { value: ta }; sh.uniforms.uPlain = { value: lin(SKIN_C) }; sh.uniforms.uPlain2 = { value: lin((BAKED && BAKED.skinNeck) || '#be7f62') };       // plain skin is her chest tone, so neck and chest are one colour; the shade under the jaw comes from faceMix
@@ -28,7 +28,7 @@
     })(),
     // her hair wears four paintings at once: each is laid on from its own side, and they are mixed by which way the hair faces
     hair: (() => {
-      const tS = bakedTex('hairSide', 512, 512, '#3e282a'), tF = bakedTex('hairFront', 512, 512, '#3e282a'), tB = bakedTex('hairBack', 512, 512, '#3e282a'), tT = bakedTex('hairTop', 512, 512, '#3e282a');
+      const hk = (k) => (BAKED && BAKED[k + 'Soft'] ? k + 'Soft' : k), tS = bakedTex(hk('hairSide'), 512, 512, '#3e282a'), tF = bakedTex(hk('hairFront'), 512, 512, '#3e282a'), tB = bakedTex(hk('hairBack'), 512, 512, '#3e282a'), tT = bakedTex(hk('hairTop'), 512, 512, '#3e282a');
       const HW = (BAKED && BAKED.hairWin) || { side: [-0.16, 0.11, 1.43, 1.70], fb: [-0.135, 0.135, 1.43, 1.70], top: [-0.135, 0.135, -0.17, 0.10] };
       const m = sheen(std({ map: tS, color: lin('#b9b2b6'), roughness: 0.62, envMapIntensity: 0.25, emissive: lin('#ffffff'), emissiveIntensity: 0.36 }), '#c9b6c4', 3, 0.10), first = m.onBeforeCompile;
       m.onBeforeCompile = (sh) => {
@@ -96,12 +96,30 @@
     root.add(m); m.bind(skeleton, new THREE.Matrix4()); meshes[key] = m; triCount += B.idx.length / 3;
   }
   // stage one has no motion yet: pose() sets a few bone turns by hand, for checking her against the paintings
-  function animate(dt) { if (gearTick) gearTick(dt); }       // the bags and charms swing; nothing else moves yet
+  // pose() sets a few bone turns by hand, for checking her against the paintings. walk(true) sets her walking on the spot: a plain
+  // cycle written here (legs, arms, hips, a turn of the spine), so her bags and charms can be seen moving with her. The Jester's
+  // full moves come over at the movement stage and replace it.
+  let lastPose = { arm: 15, leg: 0 }, walkOn = false, walkAmt = 0, walkPh = 0;
   function pose(o) {
-    o = o || {}; const arm = (o.arm == null ? 15 : o.arm) * DEG - A_POSE, leg = (o.leg || 0) * DEG;
-    for (const [S, s] of SIDES) { SK['uarm' + S].rotation.set(0, 0, s * arm); SK['thigh' + S].rotation.set(0, 0, s * leg); SK['foot' + S].rotation.set(0, 0, -s * leg); }
+    o = o || {}; lastPose = { arm: o.arm == null ? 15 : o.arm, leg: o.leg || 0 }; const arm = lastPose.arm * DEG - A_POSE, leg = lastPose.leg * DEG;
+    for (const [S, s] of SIDES) { SK['uarm' + S].rotation.set(0, 0, s * arm); SK['farm' + S].rotation.set(0, 0, 0); SK['thigh' + S].rotation.set(0, 0, s * leg); SK['shin' + S].rotation.set(0, 0, 0); SK['foot' + S].rotation.set(0, 0, -s * leg); }
+    SK.hips.position.copy(SK.hips.userData.home); SK.hips.rotation.set(0, 0, 0); SK.spine2.rotation.set(0, 0, 0);
     root.updateMatrixWorld(true);
     if (gearSettle) { gearSettle(); root.updateMatrixWorld(true); }       // the bags come to rest against her in the new pose
   }
-  return { root, skeleton, bones, SK, animate, pose, swing: () => { if (gearKick) gearKick(); }, setLook, meshes, spin: 0, time: 0, stanceProgress: 1, setStance() {}, play() {}, setFace: (eyes, mouth) => paintFace(eyes || 0, mouth || 'rest'), debug: { SK, meshes, cloths: [], headPoint, JH, hairPt, phOfY }, get triangles() { return triCount; } };
+  function walk(on) { walkOn = !!on; return walkOn; }
+  function animate(dt) {
+    dt = dt > 0 ? Math.min(dt, 0.05) : 0;
+    const was = walkAmt; walkAmt += ((walkOn ? 1 : 0) - walkAmt) * Math.min(1, dt * 3.5); if (!walkOn && walkAmt < 0.004) walkAmt = 0;
+    if (walkAmt > 0) { walkPh += dt * TAU / 1.08; const w = walkAmt, sn = Math.sin(walkPh), arm = lerp(lastPose.arm * DEG - A_POSE, 9 * DEG - A_POSE, w), leg = lastPose.leg * DEG * (1 - w);
+      for (const [S, s] of SIDES) { const p = walkPh + (s < 0 ? 0 : PI), si = Math.sin(p), co = Math.cos(p);
+        const th = -(0.36 * si + 0.06) * w, kn = (1.02 * Math.pow(Math.max(0, co), 1.4) + 0.10 * Math.max(0, si)) * w;       // thigh forward and back; the knee folds as the leg swings through
+        SK['thigh' + S].rotation.set(th, 0, s * leg); SK['shin' + S].rotation.set(kn, 0, 0); SK['foot' + S].rotation.set(-(th + kn) * 0.55, 0, -s * leg);
+        SK['uarm' + S].rotation.set(0.36 * si * w, 0, s * arm); SK['farm' + S].rotation.set(-(0.20 + 0.20 * Math.max(0, -si)) * w, 0, 0); }
+      const hp = SK.hips; hp.position.copy(hp.userData.home); hp.position.y -= 0.042 * w * sn * sn; hp.position.x += 0.011 * w * Math.cos(walkPh); hp.rotation.set(0, 0.075 * w * sn, 0.022 * w * Math.cos(walkPh));
+      SK.spine2.rotation.set(0.03 * w, -0.11 * w * sn, 0);
+    } else if (was > 0) pose(lastPose);
+    if (gearTick) gearTick(dt);       // the bags and charms swing
+  }
+  return { root, skeleton, bones, SK, animate, pose, walk, swing: () => { if (gearKick) gearKick(); }, setLook, meshes, spin: 0, time: 0, stanceProgress: 1, setStance() {}, play() {}, setFace: (eyes, mouth) => paintFace(eyes || 0, mouth || 'rest'), debug: { SK, meshes, cloths: [], headPoint, JH, hairPt, phOfY }, get triangles() { return triCount; } };
 }

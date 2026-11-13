@@ -39,9 +39,9 @@ canvas#stage{display:block;width:100%;height:100%;touch-action:none;cursor:grab}
 <body>
 <div class="wrap">
   <header>
-    <p class="eyebrow">Moon Faire · Stage five of her build, second pass</p>
+    <p class="eyebrow">Moon Faire · Stage six: she walks</p>
     <h1>The <em>Ranger</em></h1>
-    <p class="sub">Two things to look at. "Try a face" swaps her face for a younger version or for the Fox's. And her six charms are on, with bags and charms that swing: press "Give them a swing". Drag to turn her, pinch or scroll to zoom.</p>
+    <p class="sub">She walks: press "Walk on the spot" and watch her bags and charms move with her. Her bun now sits on the back of her head, and she wears the younger face you chose. Drag to turn her, pinch or scroll to zoom.</p>
   </header>
   <div class="stagebox" id="box">
     <canvas id="stage"></canvas>
@@ -51,15 +51,22 @@ canvas#stage{display:block;width:100%;height:100%;touch-action:none;cursor:grab}
   </div>
   <div><p class="label">Belts, bags and hooks</p><div class="chips" id="gear"></div></div>
   <div><p class="label">Head</p><div class="chips" id="hviews"></div></div>
-  <div><p class="label">Try a face (an experiment)</p><div class="chips" id="looks"></div></div>
+  <div><p class="label">Her face: younger, as you chose</p><div class="chips" id="looks"></div></div>
   <div><p class="label">Her face</p><div class="chips" id="faces"></div></div>
   <div><p class="label">Boots</p><div class="chips" id="boots"></div></div>
   <div><p class="label">Hands and arms</p><div class="chips" id="hands"></div></div>
   <div><p class="label">Body</p><div class="chips" id="views"></div></div>
   <div><p class="label">Arms and legs</p><div class="chips" id="poses"></div></div>
+  <div><p class="label">Movement</p><div class="chips" id="moves"></div></div>
   <div><p class="label">Show</p><div class="chips" id="shows"></div></div>
   <div class="notes">
-    <h2>An experiment: three faces</h2>
+    <h2>New: she walks, her hair, her younger face</h2>
+    <ul>
+      <li><b>Walk on the spot</b> (under "Movement") sets her walking. Her bags bump on her hips, her thighs push them, and the charms sway with each step. It is a plain first walk, written for this page; the Jester's full moves come over later.</li>
+      <li><b>Her hair:</b> the top of her head now slopes back from the band, and the bun sits on the back of her head instead of up high. The surface is smoother: the curls on the bun are a third as deep and the painted light-and-dark is softened.</li>
+      <li><b>Her face</b> is the younger one now, as you chose, with the sides of her cheeks treated the same way. The first painting and the Fox's are still there to compare.</li>
+    </ul>
+    <h2 style="margin-top:12px">The faces</h2>
     <ul>
       <li>"Try a face" swaps the face painted on her head. Her head shape, hair, band and glasses do not change. Blink, talk and smile work on all three.</li>
       <li><b>Younger</b> is her own painted face with the lines of age taken out: forehead lines, crow's feet, the shade under her eyes and the folds beside her mouth are lifted toward the skin round them. Eyes, brows, lashes, lips and her mole are kept. Her hair is still grey.</li>
@@ -154,13 +161,13 @@ canvas#stage{display:block;width:100%;height:100%;touch-action:none;cursor:grab}
     for (const id of ['gear', 'hviews', 'views', 'hands', 'boots']) if (id !== host) [...$(id).children].forEach((c) => c.setAttribute('aria-pressed', 'false'));
     if (v[7] != null) setPose(v[7]); };
   chips($('gear'), GEAR, (v) => pickView(v, 'gear'), 0);
-  { const b = document.createElement('button'); b.className = 'chip'; b.type = 'button'; b.id = 'swingB'; b.textContent = 'Give them a swing'; b.addEventListener('click', () => R.swing()); $('poses').parentNode.insertBefore(b, null); b.style.marginTop = '6px'; }
+  { const b = document.createElement('button'); b.className = 'chip'; b.type = 'button'; b.id = 'swingB'; b.textContent = 'Give them a swing'; b.addEventListener('click', () => R.swing()); $('moves').appendChild(b); }
   chips($('hviews'), HVIEWS, (v) => pickView(v, 'hviews'), -1);
   chips($('views'), VIEWS, (v) => pickView(v, 'views'), -1);
   chips($('hands'), HANDS, (v) => pickView(v, 'hands'), -1);
   chips($('boots'), BOOTS, (v) => pickView(v, 'boots'), -1);
   chips($('faces'), [['At rest', 0, 'rest'], ['Blink', 1, 'rest'], ['Half shut', 0.5, 'rest'], ['Talking', 0, 'open'], ['Oo', 0, 'oo'], ['Smile', 0, 'smile']], (v) => R.setFace(v[1], v[2]), 0);
-  chips($('looks'), [['Her own', 'own'], ['Younger', 'young'], ["The Fox's", 'fox']], (v) => { R.setLook(v[1]); pickView(HVIEWS[0], 'hviews'); $('hviews').children[0].setAttribute('aria-pressed', 'true'); }, 0);
+  chips($('looks'), [['Younger (your pick)', 'young'], ['As first painted', 'own'], ["The Fox's", 'fox']], (v) => { R.setLook(v[1]); pickView(HVIEWS[0], 'hviews'); $('hviews').children[0].setAttribute('aria-pressed', 'true'); }, 0);
   chips($('poses'), POSES, (p) => R.pose(p[1]), 1);
   R.pose(POSES[1][1]);
   const toggle = (host, id, label, on, fn) => { const b = document.createElement('button'); b.className = 'chip'; b.type = 'button'; b.id = id; b.textContent = label; b.setAttribute('aria-pressed', on ? 'true' : 'false');
@@ -171,6 +178,7 @@ canvas#stage{display:block;width:100%;height:100%;touch-action:none;cursor:grab}
   const applyVis = () => { for (const k in R.meshes) { let v = true; if (['wire', 'lens', 'pad'].includes(k)) v = vis.glasses; if (['lacesl', 'laceband'].includes(k)) v = vis.sleeves; if (GEARK.includes(k)) v = vis.gear; if (HOOKK.includes(k)) v = vis.hooks; if (CHARMK.includes(k)) v = vis.charms; if (vis.boots && !BOOTK.includes(k)) v = false; R.meshes[k].visible = v; } };
   toggle($('shows'), 'glassB', 'Glasses', true, (v) => { vis.glasses = v; applyVis(); });
   toggle($('shows'), 'sleeveB', 'Lace sleeves', true, (v) => { vis.sleeves = v; applyVis(); });
+  toggle($('moves'), 'walkB', 'Walk on the spot', false, (v) => { R.walk(v); if (v) { pickView(VIEWS[1], 'views'); $('views').children[1].setAttribute('aria-pressed', 'true'); } });
   toggle($('shows'), 'gearB', 'Belts and bags', true, (v) => { vis.gear = v; applyVis(); });
   toggle($('shows'), 'hooksB', 'Strap hooks', true, (v) => { vis.hooks = v; applyVis(); });
   toggle($('shows'), 'charmsB', 'Charms', true, (v) => { vis.charms = v; applyVis(); });
@@ -195,7 +203,7 @@ canvas#stage{display:block;width:100%;height:100%;touch-action:none;cursor:grab}
     if (easing) { let d = want.az - orbit.az; d = Math.atan2(Math.sin(d), Math.cos(d)); const k = Math.min(1, dt * 5); orbit.az += d * k; orbit.el += (want.el - orbit.el) * k; orbit.dist += (want.dist - orbit.dist) * k; orbit.target.y += (want.ty - orbit.target.y) * k; orbit.target.x += ((want.tx || 0) - orbit.target.x) * k; orbit.target.z += ((want.tz || 0) - orbit.target.z) * k; }
     stage.render();
   }
-  $('hud').textContent = 'Faces to try, charms, swinging bags · ' + Math.round(R.triangles / 1000) + 'k triangles';
+  $('hud').textContent = 'Walking, new hair, younger face · ' + Math.round(R.triangles / 1000) + 'k triangles';
   window.RANGER = { stage, R, step() { fit(); stage.render(); } };
   requestAnimationFrame(frame);
 })();
