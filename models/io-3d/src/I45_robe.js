@@ -62,7 +62,8 @@
       };
       const AS = []; for (let j = 0; j <= 32; j++) AS.push((j / 32) * TAU);
       const wl = (a) => Math.pow(0.5 + 0.5 * Math.cos(a - 3.9), 2.2);                  // the long point hangs at the back of her arm, on the side toward her body
-      [[0.085, 0.255, 0.035, 0.052, 0.085, 0.080, 0.012], [0.20, 0.415, 0.040, 0.058, 0.105, 0.098, 0.014], [0.33, 0.47, 0.39, 0.062, 0.120, 0.112, 0.020]].forEach(([s0, s1, lng, r0, ro, rf, zz], ti) => {
+      // the lower two tiers stop short of her wrist on the outside, so her bracelets show
+      [[0.085, 0.255, 0.035, 0.052, 0.085, 0.080, 0.012], [0.20, 0.385, 0.045, 0.058, 0.105, 0.098, 0.014], [0.33, 0.398, 0.462, 0.062, 0.120, 0.112, 0.016]].forEach(([s0, s1, lng, r0, ro, rf, zz], ti) => {
         tier((a, sl, t) => { const k = Math.pow(t, 0.8); return P(sl, a, R(sl, a, lerp(r0, ro, k), lerp(r0, rf, k))); }, AS, () => s0, (a) => s1 + lng * wl(a) + zz * zig(a * 6 + ti), 14, (a, sl) => wSl(a, sl), outS, { uS: 5, fernEvery: ti === 2 ? 5 : 6, mossU: 3 });
       });
       // the gathered band round her upper arm, and the cloth in front of and behind her bare shoulder that joins the sleeve to the body

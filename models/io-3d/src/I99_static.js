@@ -61,6 +61,9 @@
     cloth: std({ color: lin('#1a1518'), roughness: 0.9 })
   };
 
+  MATS.gearGold = MATS.gold; MATS.gearSilver = MATS.silver;       // the same metals as her hat's, kept as their own parts so the page can hide them
+  MATS.leather = std({ color: lin('#2e221d'), roughness: 0.62, envMapIntensity: 0.3 }); MATS.bead = std({ color: lin('#151211'), roughness: 0.28, envMapIntensity: 0.9 }); MATS.wood = std({ color: lin('#5b3320'), roughness: 0.5, envMapIntensity: 0.4 });
+  MATS.crystal = phys({ color: lin('#eef4fb'), roughness: 0.06, transparent: true, opacity: 0.66, envMapIntensity: 1.6, emissive: lin('#cfe0f5'), emissiveIntensity: 0.20 });
   // ---------- bind: one skinned mesh per material ----------
   const root = new THREE.Group(); root.name = 'io';
   root.add(SK.hips); root.updateMatrixWorld(true);

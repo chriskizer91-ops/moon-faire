@@ -40,9 +40,9 @@ canvas#stage{display:block;width:100%;height:100%;touch-action:none;cursor:grab}
 <body>
 <div class="wrap">
   <header>
-    <p class="eyebrow">Moon Faire · stage four of her build</p>
+    <p class="eyebrow">Moon Faire · stage five of her build</p>
     <h1><em>Io</em>, the Herbal Witch</h1>
-    <p class="sub">She wears her cloak now, with the mossy green frill from your new picture, and her hands are painted. Pick a move under Moves to see the cloak swing; the short ones end by themselves. She stays in view while you scroll the buttons. Drag to turn her, pinch or scroll to zoom.</p>
+    <p class="sub">New: her belt, pouch and crystal, both necklaces and her bracelets, on top of the cloak with its mossy frill. Pick a move under Moves; the pouch and crystal swing. She stays in view while you scroll the buttons. Drag to turn her, pinch or scroll to zoom.</p>
   </header>
   <div class="play">
   <div class="stagebox" id="box">
@@ -60,15 +60,16 @@ canvas#stage{display:block;width:100%;height:100%;touch-action:none;cursor:grab}
   <div class="notes">
     <h2>New in this stage</h2>
     <ul>
-      <li>Her cloak, from F4, F5 and F6: open down the front, bare shoulders, sleeves in three tiers that end in a long point, a body in two layers with pointed hems, gold trim on every hem.</li>
-      <li>The moss from your new picture: patches of moss and small ferns along the cloak's hems. Nothing else about her changed.</li>
-      <li>The cloak moves: its body rides with her skirt, and each sleeve hangs from her arm on 24 soft points, so it drops below her arm when she lifts it and flies out when she twirls.</li>
-      <li>Her hands are painted from D1 (left) and D2 (right): backs, palms, every finger and her nails.</li>
-      <li>"Cloak" under Show takes it off, to see her as she was.</li>
+      <li>Belt: dark leather round her waist with the gold ring buckle (F3).</li>
+      <li>Pouch: on her right hip, hanging from the belt, with two gold pieces on its front and the gold ball under it. It swings.</li>
+      <li>Crystal: a clear point with a gold cap, on a gold chain from the belt at the front of her left hip. It swings.</li>
+      <li>Necklaces (F1, F2): the fine silver chain with its clear drop, and the dark cord with the two gold moons and the cross.</li>
+      <li>Bracelets (F1, D4): on each wrist, black beads, wood beads and small gold beads. The cloak's sleeves now stop short of her wrists on the outside so they show.</li>
+      <li>"Belt and jewellery" under Show takes them off.</li>
     </ul>
     <h2 style="margin-top:12px">From the earlier stages</h2>
     <ul>
-      <li>Her arms, her moving hair and skirt, and her first moves (stage three). Her face, glasses, hair and hat (stage two). Her body, bodice and skirt (stage one).</li>
+      <li>Her cloak with the moss, and her painted hands (stage four). Her arms, her moving hair and skirt, and her first moves (stage three). Her face, glasses, hair and hat (stage two). Her body, bodice and skirt (stage one).</li>
     </ul>
     <h2 style="margin-top:12px">What is rough, and what is not here yet</h2>
     <ul class="m">
@@ -77,7 +78,8 @@ canvas#stage{display:block;width:100%;height:100%;touch-action:none;cursor:grab}
       <li>Hair and sleeves can pass through each other at her shoulders. A forearm can show through a sleeve when her elbow bends.</li>
       <li>I tuned the moves from still pictures and cannot watch them play.</li>
       <li>The thin edge of each hand (thumb side, little-finger side) is soft paint with no detail: the paintings do not show it.</li>
-      <li>Not here yet: her own boots, belt, pouch, crystal, necklaces, bracelets, book, blades, and her spells.</li>
+      <li>The new pieces are plain shapes: the belt has no gold vine or holes yet, the pouch has no flap, studs or filigree, and the necklace pendant does not swing.</li>
+      <li>Not here yet: her own boots, book, blades, and her spells.</li>
     </ul>
   </div>
 </div>
@@ -133,6 +135,7 @@ canvas#stage{display:block;width:100%;height:100%;touch-action:none;cursor:grab}
   toggle($('shows'), 'hairB', 'Hair', true, show(['tress', 'tressIn', 'wisp', 'lock', 'hairmass']));
   toggle($('shows'), 'skirtB', 'Skirt', true, show(['skirt', 'tulle', 'band']));
   toggle($('shows'), 'robeB', 'Cloak', true, show(['robe', 'moss', 'fern']));
+  toggle($('shows'), 'gearB', 'Belt and jewellery', true, show(['leather', 'bead', 'wood', 'crystal', 'gearGold', 'gearSilver']));
   setRef();
   // drag to turn, pinch or wheel to zoom
   const pts = new Map(); let pinch0 = 0, dist0 = 0;
@@ -154,7 +157,7 @@ canvas#stage{display:block;width:100%;height:100%;touch-action:none;cursor:grab}
     if (easing) { let d = want.az - orbit.az; d = Math.atan2(Math.sin(d), Math.cos(d)); const k = Math.min(1, dt * 5); orbit.az += d * k; orbit.el += (want.el - orbit.el) * k; orbit.dist += (want.dist - orbit.dist) * k; orbit.target.y += (want.ty - orbit.target.y) * k; }
     stage.render();
   }
-  $('hud').textContent = 'Stage four · ' + Math.round(R.triangles / 1000) + 'k triangles';
+  $('hud').textContent = 'Stage five · ' + Math.round(R.triangles / 1000) + 'k triangles';
   window.IO = { stage, R, step() { fit(); stage.render(); } };
   requestAnimationFrame(frame);
 })();

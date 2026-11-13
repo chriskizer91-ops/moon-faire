@@ -4,7 +4,17 @@ Started November 13, 2026. Built the way the HD Jester was (`claude/HOW-TO-3d-wi
 the Ranger's stage-one recipe: this folder began as a copy of the Ranger's stage-one code (`claude/ranger-3d-model`, commit
 `1d4c9d6`), with the Jester's platform boot builder (`claude/jester-3d-model`, pass 20) in place of the Ranger's boots.
 
-## Where she stands: stage four (November 13, 2026)
+## Where she stands: stage five (November 13, 2026)
+
+Belt, pouch, crystal, both necklaces and her bracelets are on her, over the cloak with its moss.
+
+- **Chris (November 13), after stage four:** "Yes overcloak was correct and it looks good the moss on it It looks good. Let's
+  move on to the belt pouch and Crystal the necklace and bracelets". So the cloak reading is confirmed and the moss is approved.
+- **Page:** the same link as every stage. One offline file: `deliver/Io_3D_stage5.html` (2.8 MB).
+  `deliver/Io_stage5_belt_jewellery.jpg` shows the new pieces beside F1, F2 and F3.
+- Details are under "Stage five" below.
+
+## Stage four (November 13, 2026)
 
 She wears her cloak, with the mossy frill Chris asked for, and her hands are painted.
 
@@ -162,7 +172,7 @@ python3 -I bake_head_io.py         # adds her face, profile, skin tones, hat swa
 python3 -I bake_arms_io.py         # adds her arm skin from D3
 python3 -I bake_hands_io.py        # adds her hands from D1 and D2 (landmarks in hand_marks.json)
 ./build_io.sh                      # tools/tables.py, then out/io.js
-python3 -I build_single_io.py      # deliver/Io_3D_stage4.html, one offline file
+python3 -I build_single_io.py      # deliver/Io_3D_stage5.html, one offline file
 python3 tools/prof_io.py 8 shots/prof.png             # her profile against the model's, by height
 python3 tools/cmp_head_io.py shots/cmp_head.jpg       # head, hat and hair beside C4 and C5
 python3 tools/cmp_io.py shots/cmp_front.jpg front     # also back, sideR, sideL
@@ -346,6 +356,27 @@ Limits: the body is rounder and fuller than M1 because it rides the skirt; the s
 and sleeves pass through each other at her shoulders; a forearm can show through a sleeve when the elbow bends; the cloth is
 not cut from the F10 and F12 swatches yet.
 
+## Stage five: belt, pouch, crystal, necklaces, bracelets (`src/I46_gear.js`)
+
+- **Necklaces (F1, F2):** a fine silver chain on her collarbones with a clear drop; a dark cord to mid-chest with a small gold
+  loop, a large crescent moon, a small crescent and a cross. Both lie on her torso (`frontZ` finds its front surface) and follow
+  her chest; the pendant does not swing.
+- **Belt (F3):** a dark leather strap at 1.056 m, 8.5 mm outside the skirt's waistband and under the cloak, with a gold ring
+  buckle and prong at the middle of her front. It goes with her hips, as the waistband does.
+- **Pouch (F3, placed by M1 and G8):** on her right hip (38 degrees round from the front), from the belt to 0.925 m, with two gold
+  lozenges for the filigree, a gold ball under it and two belt loops. One soft bone (`pouch_0`) hangs it from the belt.
+- **Crystal (F3):** a six-sided clear point with a gold cap and four small gold balls, on a gold chain from a ring on the belt,
+  at the front of her left hip. One soft bone (`cryst_0`).
+- **Bracelets (F1, D4):** on each wrist, from her hand up: 19 black beads, 17 wood beads, 36 small gold beads. They follow the
+  outline of her arm and go with her forearm.
+- The cloak's two lower sleeve tiers now end short of her wrist on the outside (`src/I45_robe.js`), so the bracelets show.
+- New parts: `leather`, `bead`, `wood`, `crystal`, and `gearGold` / `gearSilver` (the hat's metals under their own names, so
+  the page can hide them). `opts.noGear` builds her without them; "Belt and jewellery" under Show hides them.
+- 232 bones, 593,000 triangles.
+
+Limits: plain shapes. The belt has no gold vine, holes or pointed tip; the pouch has no flap, studs or real filigree; the leather
+is one flat colour (F9 has leather swatches); the crescents are simple; hair can lie through the cord.
+
 ## Round 2 paintings (arrived November 13, 2026, after stage one was built)
 
 All 21 arrived and match their index. Nothing is built from them yet.
@@ -393,9 +424,9 @@ They also show her whole look from many sides, with the robe: useful when the ro
 
 ## Next stages
 
-1. **Chris's notes on the cloak:** its shape against M1 (wider sleeve wings, a narrower pointed back), how much moss, how it moves.
-2. The cloak's cloth cut from F10 and F12, and made sheer; hair and sleeves kept apart at her shoulders.
-3. Belt, pouch, crystal (F3, placed by G8); necklaces and bracelets (F1, F2, D4).
+1. **Chris's notes** on the belt, pouch, crystal, necklaces and bracelets.
+2. Detail on them if he wants it: belt vine and holes, the pouch's flap, studs and filigree, leather from F9, a swinging pendant.
+3. The cloak nearer to M1: wider sleeve wings, a narrower pointed back, sheer cloth cut from F10 and F12.
 4. Her own boots (E1 to E8); legs from B5; the emotions in C10; hair on top of her head.
 5. Book and blades (G1 to G6, held as in G9).
 6. Her spells and attacks (H1 to H18, I1 to I8, and round 4).
