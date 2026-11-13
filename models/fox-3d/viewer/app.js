@@ -6,20 +6,23 @@
   // What she can do. States are how she holds herself and stay until changed; moves and spells play once over whatever state she is in.
   // Each: [id, label, half-width in meters the camera must show, half-height (optional), camera by time (optional): t -> [half-width, shift toward the target]]
   const STATES = [['idle', 'Stand', 0.7], ['walk', 'Walk', 0.7], ['run', 'Run', 0.8], ['kneel', 'Kneel', 0.7], ['squat', 'Squat', 0.7], ['sit_chair', 'Sit on a stool', 0.7], ['sit_ground', 'Sit on the ground', 0.7], ['hover', 'Hover', 0.75]];
-  const ACTS = [['jump', 'Jump', 0.9, 1.42], ['talk', 'Talk', 0.8], ['wave', 'Wave', 0.8], ['bow', 'Bow', 0.95], ['twirl', 'Twirl', 1.15], ['laugh', 'Laugh', 0.8], ['dance', 'Dance', 0.95]];
+  // Her own moves (13 Nov): her talk, laugh and dance, a curtsey where the Jester bows and a pounce where the Jester twirls. Names are working names.
+  const ACTS = [['jump', 'Jump', 0.9, 1.42], ['talk', 'Talk', 0.8], ['laugh', 'Laugh', 0.8], ['dance', 'Dance', 1.0], ['curtsey', 'Curtsey', 0.9], ['pounce', 'Pounce', 1.0, 1.32], ['wave', 'Wave', 0.8]];
+  // The Jester's versions she was forked with, kept one row down to compare against until Chris says to drop them.
+  const OLD = [['jester_talk', 'Talk', 0.8], ['jester_laugh', 'Laugh', 0.8], ['jester_dance', 'Dance', 0.95], ['jester_bow', 'Bow', 0.95], ['jester_twirl', 'Twirl', 1.15]];
   const QUIET = [['look_around', 'Stand', 0.7], ['settle', 'Stand', 0.7]];      // small things she does by herself when left standing
   const SPELLS = [];      // the Fox has no spells yet (pass 1): the row and the cast buttons stay hidden until she does
-  const ALL = STATES.concat(ACTS, SPELLS, QUIET), find = (id) => ALL.find((x) => x[0] === id);
+  const ALL = STATES.concat(ACTS, OLD, SPELLS, QUIET), find = (id) => ALL.find((x) => x[0] === id);
   const VIEWS = [['Front', 0, 0.10, 1], ['Three-quarter', -0.62, 0.14, 1], ['Side', -1.5708, 0.08, 1], ['Back', 3.1416, 0.12, 1], ['Face', 0.22, 0.02, 0.27]];
   const touchPhone = (navigator.maxTouchPoints > 0 || /Mobi|Android|iPhone/i.test(navigator.userAgent)) && Math.min(screen.width, screen.height) < 820;
-  // The address after # says which build to show: lite or full (phones get the lighter model unless told otherwise), depth for the head with its
-  // depth-only reshaping, head105 / head110 / head115 for a larger head. The switches below write it and reload. Example: #lite-depth-head110
-  const HASH = location.hash, small = /lite/.test(HASH) ? true : /full/.test(HASH) ? false : touchPhone, depthOn = /depth/.test(HASH), headPc = +((/head(\d+)/.exec(HASH) || [])[1] || 100);
-  const goHash = (o) => { const v = Object.assign({ small, depthOn, headPc }, o); location.hash = '#' + [v.small ? 'lite' : 'full', v.depthOn ? 'depth' : '', v.headPc !== 100 ? 'head' + v.headPc : ''].filter(Boolean).join('-'); location.reload(); };
+  // The address after # says which build to show: lite or full (phones get the lighter model unless told otherwise). The switch below writes it and
+  // reloads. Her head size and face reshaping were switches here while Chris chose (13 Nov); what he chose is now built into the model.
+  const HASH = location.hash, small = /lite/.test(HASH) ? true : /full/.test(HASH) ? false : touchPhone;
+  const goHash = (o) => { const v = Object.assign({ small }, o); location.hash = '#' + (v.small ? 'lite' : 'full'); location.reload(); };
   let stage, J, JO = null;
   try {
     if (!window.THREE) throw new Error('three.js did not load');
-    JO = { detail: small ? 0.75 : 1, textureScale: small ? 0.75 : 1, faceDepth: depthOn ? 1 : 0, headScale: 0.85 * headPc / 100 };
+    JO = { detail: small ? 0.75 : 1, textureScale: small ? 0.75 : 1 };
     stage = makeStage(canvas, { shadow: small ? 1024 : 2048 });
     J = makeFox(JO);
     stage.scene.add(J.root, J.fx);
@@ -38,6 +41,7 @@
   const moveChips = {};
   for (const [id, label] of STATES) moveChips[id] = chip($('states'), label, () => setState(id), id === 'idle');
   for (const [id, label] of ACTS) moveChips[id] = chip($('acts'), label, () => setMove(id), false);
+  for (const [id, label] of OLD) moveChips[id] = chip($('olds'), label, () => setMove(id), false);
   for (const [id, label] of SPELLS) moveChips[id] = chip($('spells'), label, () => setMove(id), false);
   const press = () => { for (const k in moveChips) moveChips[k].setAttribute('aria-pressed', k === state || k === move ? 'true' : 'false'); };
   function setState(id) {
@@ -55,7 +59,7 @@
   }
   for (const [label, az, el, face] of VIEWS) chip(viewRow, label, () => { viewAz = az; viewEl = el; faceTo = face < 1 ? 1 : 0; spin = false; spinChip.setAttribute('aria-pressed', 'false'); });
   // ---- walking her around: a pad on the stage (or W A S D / arrows, Shift to run, Space to jump); she moves the way the pad points, as the camera sees it ----
-  const ROAM_R = 2.85, WALKS = { talk: 1, jump: 1, wave: 1, laugh: 1 };            // moves she can make while walking
+  const ROAM_R = 2.85, WALKS = { talk: 1, jump: 1, wave: 1, laugh: 1, jester_talk: 1, jester_laugh: 1 };            // moves she can make while walking
   const roam = { on: false, x: 0, z: 0, face: 0, vx: 0, vz: 0, jx: 0, jy: 0, keys: {}, idleT: 0, idleNext: 7 };
   const joy = $('joy'), knob = $('knob'); let joyId = null;
   const joySet = (e) => { const r = joy.getBoundingClientRect(), R = r.width / 2; let x = (e.clientX - r.left - R) / (R * 0.72), y = (e.clientY - r.top - R) / (R * 0.72); const m = Math.hypot(x, y); if (m > 1) { x /= m; y /= m; } roam.jx = x; roam.jy = -y; knob.style.transform = 'translate(' + (x * R * 0.72) + 'px,' + (y * R * 0.72) + 'px)'; };
@@ -107,8 +111,6 @@
   let outerOn = true;
   chip(toggleRow, 'Full detail', () => goHash({ small: !small }), !small);
   // two things Chris is choosing between by eye (13 Nov): the head's depth-only reshaping, and a larger head
-  chip(toggleRow, 'Reshaped head', () => goHash({ depthOn: !depthOn }), depthOn);
-  chip(toggleRow, 'Head +' + (headPc - 100) + '%', () => goHash({ headPc: headPc >= 115 ? 100 : headPc + 5 }), headPc !== 100);
   chip(toggleRow, 'Half speed', (b) => { slow = !slow; b.setAttribute('aria-pressed', slow); }, false);
 
   // ---- orbit: drag to turn, pinch or wheel to zoom ----
@@ -148,7 +150,7 @@
   }
 
   // ---- quick buttons on the stage: cast the chosen spell, step through the spells, jump, and a flourish; keys: 1 to 0 cast, Q and E choose, F casts, R flourish, Space jumps ----
-  const FLOUR = ['wave', 'bow', 'twirl', 'laugh', 'dance', 'talk']; let qi = 1, fi = 0;
+  const FLOUR = ['curtsey', 'pounce', 'laugh', 'dance', 'talk', 'wave']; let qi = 1, fi = 0;
   const qName = $('qName'), qShow = () => { qName.textContent = SPELLS.length ? SPELLS[qi][1] : ''; };
   const qStep = (d) => { if (!SPELLS.length) return; qi = (qi + d + SPELLS.length) % SPELLS.length; qShow(); };
   const qCast = () => { if (SPELLS.length) setMove(SPELLS[qi][0]); }, qFlour = () => { setMove(FLOUR[fi]); fi = (fi + 1) % FLOUR.length; };
@@ -258,6 +260,6 @@
   }
   loadClip('idle');
   requestAnimationFrame((t) => { last = t; frame(t); });
-  window.FOX = { J, stage, setMove, setState, STATES, ACTS, SPELLS };
+  window.FOX = { J, stage, setMove, setState, STATES, ACTS, OLD, SPELLS };
   if (!SPELLS.length) { for (const id of ['qPrev', 'qNext', 'qName', 'qCast']) { const el = $(id); if (el) el.hidden = true; } const sp = $('spells'); if (sp && sp.parentElement) sp.parentElement.hidden = true; }
 })();

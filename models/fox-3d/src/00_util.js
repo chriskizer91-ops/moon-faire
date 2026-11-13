@@ -10,6 +10,10 @@ function makeFox(opts) {
   opts = opts || {};
   // detail 0.5 to 1 scales segment counts and cloth resolution for slower phones
   const DET = Math.max(0.5, Math.min(1, opts.detail == null || !Number.isFinite(+opts.detail) ? 1 : +opts.detail));
+  // Chris, 13 Nov: her head is 10% larger than the size measured off the standing painting (0.85), and the depth reshaping of her face is on.
+  // Both can still be passed in (headScale; faceDepth 0 to 1) for comparing, but these are what she is.
+  const HEAD_K = +opts.headScale > 0 ? +opts.headScale : 0.935;
+  const FACE_DEPTH = opts.faceDepth === undefined || opts.faceDepth === null || opts.faceDepth === true ? 1 : Math.max(0, +opts.faceDepth || 0);
   const Q = (n, min) => (DET >= 1 ? n : Math.max(min || 3, Math.round(n * DET)));
   const TAU = Math.PI * 2, PI = Math.PI, DEG = Math.PI / 180;
   let seed = 4242;

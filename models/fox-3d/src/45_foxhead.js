@@ -158,7 +158,7 @@
       addPart('frame', loft(tubeRings(rim, rim.map(() => wire), 6)), wHead, { out: V3(sx * ex, ey, zf) });
       const hinge = V3(sx * (ex + R + 0.001), ey + 0.004, zf - 0.006), back = V3(sx * 0.0745, ey + 0.001, 0.012), tip = V3(sx * 0.0735, ey - 0.014, -0.014);
       addPart('frame', loft(tubeRings(curvePts([V3(sx * (ex + R), ey + 0.003, zf - 0.004), hinge, V3(sx * 0.0725, ey + 0.004, 0.060), back, tip], 16), new Array(16).fill(wire), 6)), wHead, { out: V3(sx * 0.07, ey, 0.05) });
-      { const zp = zf - 0.0115 - 0.0043 * (opts.faceDepth === true ? 1 : +opts.faceDepth || 0); addPart('frame', spherePart(V3(sx * 0.0118, ey - 0.011, zp), 0.0022, 0.0034, 0.0012, 8, 6), wHead, { out: V3(sx * 0.0118, ey - 0.011, zp) }); }      // nose pad, resting on the side of her nose wherever that is
+      { const zp = zf - 0.0115 - 0.0043 * FACE_DEPTH; addPart('frame', spherePart(V3(sx * 0.0118, ey - 0.011, zp), 0.0022, 0.0034, 0.0012, 8, 6), wHead, { out: V3(sx * 0.0118, ey - 0.011, zp) }); }      // nose pad, resting on the side of her nose wherever that is
       const disc = [[], []]; for (let i = 0; i < NS; i++) { const a = (i / NS) * TAU; disc[0].push([sx * ex, ey, zf - 0.0012]); disc[1].push([sx * ex + (R - wire) * Math.cos(a), ey + (R - wire) * Math.sin(a), zf - 0.0012 - 0.004 * Math.pow(Math.abs(sx * ex + R * Math.cos(a)) / 0.06, 2)]); }
       addPart('lens', loft(disc), wHead, { out: V3(sx * ex, ey, 0) });
     }

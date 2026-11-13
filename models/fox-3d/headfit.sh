@@ -1,0 +1,5 @@
+#!/bin/bash
+# usage: headfit.sh prefix query    her head, neck and shoulders from eight angles as worn, then four with the hair off. For checking the fit of neck, choker, hair and glasses after a head-size change.
+cd /home/claude/fox3d && Q="$2" python3 shoot2.py shots/$1 'new Promise(r => setTimeout(() => { T.step(90, 1/60); r(1); }, 1500))' \
+ "a:(T.stage.orbit.target.set(0,0,0.0), T.view(0,0,1.05,1.46,22,360,440))" "b:(T.view(0.6,0,1.05,1.46,22,360,440))" "c:(T.view(1.5708,0,1.05,1.46,22,360,440))" "d:(T.view(2.4,0,1.05,1.46,22,360,440))" "e:(T.view(3.1416,0,1.05,1.46,22,360,440))" "f:(T.view(-0.9,0.1,1.05,1.46,22,360,440))" "g:(T.view(0.4,0.5,1.05,1.46,22,360,440))" "h:(T.view(0.4,-0.45,1.05,1.46,22,360,440))" \
+ "i:(T.clean('color'), T.only(['face','skin','neck','torso','choker','bell','brass','gold','frame','lens','arm','emerald']), T.view(0,0,0.8,1.47,22,360,440))" "j:(T.view(0.7,0,0.8,1.47,22,360,440))" "k:(T.view(1.5708,0,0.8,1.47,22,360,440))" "l:(T.view(0.5,-0.5,0.8,1.47,22,360,440))" 2>&1 | tail -1

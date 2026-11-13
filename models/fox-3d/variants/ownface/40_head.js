@@ -66,9 +66,9 @@
     // shape under it shows, and it was too smooth: no eye sockets, a wide flat bridge to her nose, lips and chin that barely stood out, a flat shelf
     // under her jaw. Here each point of her face may move straight back or straight forward and nowhere else, so seen from in front nothing shifts and
     // the painting lands exactly where it did. (Under her jaw, which cannot be seen from in front, points also rise toward her neck.)
-    // opts.faceDepth: 0 or absent leaves her as she was, 1 is the full reshaping.
-    if (opts.faceDepth) {
-      const K = opts.faceDepth === true ? 1 : +opts.faceDepth, nor = computeNormals(part.pos, part.idx), EY = FC.eyeY, EX = FC.eyeX, NY = FC.noseY, MY = FC.mouthY, BY = FC.browY;
+    // FACE_DEPTH (00_util.js): 1 is the full reshaping and what she wears since 13 Nov; 0 leaves her as she was before it.
+    if (FACE_DEPTH) {
+      const K = FACE_DEPTH, nor = computeNormals(part.pos, part.idx), EY = FC.eyeY, EX = FC.eyeX, NY = FC.noseY, MY = FC.mouthY, BY = FC.browY;
       const g = (a, b) => Math.exp(-a * a - b * b);
       for (let i = 0; i < part.pos.length / 3; i++) {
         const x = part.pos[i * 3], y = part.pos[i * 3 + 1], z = part.pos[i * 3 + 2], ax = Math.abs(x), nz = nor[i * 3 + 2], ny = nor[i * 3 + 1];
