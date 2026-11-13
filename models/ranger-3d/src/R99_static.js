@@ -118,11 +118,13 @@
       U.getWorldQuaternion(slq); const g = sl1.copy(DOWN0).applyQuaternion(slq.invert()); g.addScaledVector(d, -g.dot(d)).sub(it.g0);
       const fl = sl2.copy(d).applyQuaternion(F.quaternion), c = fl.dot(d), fold = sm(0.35, -0.6, c); fl.addScaledVector(d, -c); const sl = fl.length();
       // A folded elbow gathers the cloth small and close round her upper arm, well short of her forearm; the smaller the loop, the less it may slide.
-      const kH = 1 - 0.45 * fold, kM = 1 - 0.25 * fold, cap = Math.max(0.004, 0.085 * kH - 0.044);
+      // As soon as her elbow bends past a quarter of the way, the cloth is pushed up her arm: shorter (to 35%) and closer (to 55%), so its hem
+      // always ends well above her elbow and her forearm has nothing to pass through.
+      const up = sm(0.9, -0.3, c), kR = 1 - 0.45 * up, kL = 1 - 0.65 * up, cap = Math.max(0.003, 0.085 * kR - 0.044);
       const tgt = sl3.copy(g).multiplyScalar(0.017); if (sl > 1e-4) tgt.addScaledVector(fl, -0.040 * fold / sl); if (tgt.length() > cap) tgt.setLength(cap);
       if (!it.off || settle) { it.off = tgt.clone(); it.vel = V3(); }
       else { const n = Math.max(1, Math.ceil(dt / 0.012)), st = dt / n; for (let k = 0; k < n; k++) { it.vel.x += ((tgt.x - it.off.x) * 110 - it.vel.x * 7) * st; it.vel.y += ((tgt.y - it.off.y) * 110 - it.vel.y * 7) * st; it.vel.z += ((tgt.z - it.off.z) * 110 - it.vel.z * 7) * st; it.off.addScaledVector(it.vel, st); } if (it.off.length() > cap + 0.003) it.off.setLength(cap + 0.003); }
-      H.position.copy(H.userData.home).add(it.off); M.position.copy(M.userData.home).addScaledVector(it.off, 0.5); H.scale.setScalar(kH); M.scale.setScalar(kM); }
+      H.position.copy(H.userData.home).add(it.off); M.position.copy(M.userData.home).addScaledVector(it.off, 0.5); H.scale.set(kR, kL, kR); M.scale.set(kR, kL, kR); }
   }
   function softTick(dt, settle) {
     sleeveTick(dt, settle);
@@ -189,7 +191,7 @@
     let squint = 0;
     // taking aim: bow arm out to her left, head turned to it, the other hand drawn back to her jaw, a held breath, the release
     if (N === 'aim') { const k1 = sm(0, 0.5, T), k2 = sm(0.5, 1.3, T), rel = sm(1.95, 2.02, T), out = 1 - sm(2.4, 3.0, T), hold = k2 * (1 - rel);
-      add('uarmL', 0, 0, (86 - 9) * DEG * k1 * out); add('uarmR', 0, 0, -(92 - 9) * DEG * k1 * out); add('farmR', -(1.7 * k1 + 1.1 * k2 - 1.0 * rel) * out, 0, 0); add('uarmR', 0, -0.35 * rel * out, 0);
+      add('uarmL', 0, 0, (86 - 9) * DEG * k1 * out); add('uarmR', 0, 0, -(92 - 9) * DEG * k1 * out); add('farmR', -(1.6 * k1 + 0.9 * k2 - 0.9 * rel) * out, 0, 0); add('uarmR', 0, -0.35 * rel * out, 0);
       add('neck', 0, 0.5 * k1 * out, 0); add('head', 0, 0.62 * k1 * out, 0.04 * hold); add('spine2', 0, 0.12 * k1 * out, -0.05 * k2 * out);
       for (const [S, s] of SIDES) { add('thigh' + S, 0, 0, s * 0.10 * k1 * out); add('foot' + S, 0, 0, -s * 0.10 * k1 * out); }
       add('farmL', 0, 0, 0.012 * Math.sin(T * 31) * hold); squint = hold > 0.6 ? 0.5 : 0; }

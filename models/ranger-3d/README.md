@@ -146,6 +146,11 @@ four strap hooks as real objects, standing still. About 355,000 triangles.
   - Sleeves: a folded elbow gathers the hem to 55% of its size, close round her upper arm and short of her forearm, and the slide
     allowed shrinks with it so her upper arm stays inside. The slide toward the ground is 1.7 cm (was 2.6), so the loop rides a
     little above her raised arm instead of lying on it, where its ragged folds dipped into her skin.
+- **Stage 8b.** Chris: no greys needed for her hair in the Flipbook look (leave it as it lands). Her arm still passed through the
+  lace: "if you can make that not happen somehow." Sleeves now work a third way (`sleeveTick`): as soon as her elbow bends past
+  about 25 degrees the cloth is pushed up her arm, to 35% of its length and 55% of its width by about 107 degrees, so the hem
+  ends well above her elbow and her forearm has nothing to pass through. Straight arm: full length, as painted. The elbow in
+  "aim" folds to 143 degrees at most. Next, by his word: "the rest of her animations and spells and attacks."
 - Waiting for his notes: the moves again; stage two (head), stage three (hands and arms) and stage five.
 
 Rough or not built yet: her face does not move (no blink, no expressions); the hair has a smooth edge with none of the painted
@@ -369,7 +374,7 @@ python3 -I bake_hands_r.py            # adds her hands and arms from D1 and D2
 python3 -I bake_gear_r.py             # adds the leather of her bags and belts from F6
 python3 -I bake_looks_r.py            # adds the two trial faces (younger, the Fox's)
 ./build_r.sh                          # tools/tables.py, then out/ranger.js
-python3 -I build_single_r.py          # deliver/Ranger_3D_stage8.html, one offline file
+python3 -I build_single_r.py          # deliver/Ranger_3D_stage8b.html, one offline file
 python3 tools/shoot_hand.py shots/hand_L.jpg L hand   # one hand from four sides beside D1 or D2; also R, and arm
 python3 tools/wrist_sections.py                       # forearm and hand, slice by slice through the wrist
 python3 tools/page_test.py                            # the page at phone size: belt, bag, hook, boot, hand and body buttons, a drag
