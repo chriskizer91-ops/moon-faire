@@ -41,7 +41,7 @@ canvas#stage{display:block;width:100%;height:100%;touch-action:none;cursor:grab}
   <header>
     <p class="eyebrow">Moon Faire · Stage two of her build</p>
     <h1>The <em>Ranger</em></h1>
-    <p class="sub">Her boots are rebuilt to your eight boot paintings. Drag to turn her, pinch or scroll to zoom. The Boots buttons bring you in close; "Painting beside her" shows your painting for that view, and "Boots only" hides the rest of her.</p>
+    <p class="sub">Her hair is lower over her forehead: it now climbs from the band back to the crown, as in your side painting. Drag to turn her, pinch or scroll to zoom. "Painting beside her" shows your painting for the view you pick.</p>
   </header>
   <div class="stagebox" id="box">
     <canvas id="stage"></canvas>
@@ -57,7 +57,11 @@ canvas#stage{display:block;width:100%;height:100%;touch-action:none;cursor:grab}
   <div><p class="label">Arms and legs</p><div class="chips" id="poses"></div></div>
   <div><p class="label">Show</p><div class="chips" id="shows"></div></div>
   <div class="notes">
-    <h2>Her boots now</h2>
+    <h2>Her hair</h2>
+    <ul>
+      <li>The swell over her forehead stood 2.5 to 4.6 cm too high just behind the band. It is lowered to the slope in your side painting (within 3 mm). Her crown, bun, band and face are untouched.</li>
+    </ul>
+    <h2 style="margin-top:12px">Her boots</h2>
     <ul>
       <li>Laid over your side, front, back and sole paintings at one scale and corrected until the outlines agreed to within a few millimetres.</li>
       <li>Slimmer: the sole is 9.6 cm across at the ball, where it was 12 cm, and the shaft and toe are narrower to match.</li>
@@ -97,18 +101,18 @@ canvas#stage{display:block;width:100%;height:100%;touch-action:none;cursor:grab}
     R = makeRanger({});
     stage.scene.add(R.root);
   } catch (e) { $('err').hidden = false; $('err').textContent = 'She could not be drawn on this device: ' + (e && e.message ? e.message : e); return; }
-  const orbit = stage.orbit; orbit.az = -0.72; orbit.el = 0.36; orbit.dist = 1.5; orbit.fov = 20; orbit.target.set(-0.081, 0.16, 0.05);
-  let want = { az: orbit.az, el: orbit.el, dist: orbit.dist, ty: 0.16, tx: -0.081, tz: 0.05 }, easing = true, spin = false;
+  const orbit = stage.orbit; orbit.az = -Math.PI / 2; orbit.el = 0.06; orbit.dist = 1.7; orbit.fov = 20; orbit.target.set(0, 1.56, 0);
+  let want = { az: orbit.az, el: orbit.el, dist: orbit.dist, ty: 1.56, tx: 0, tz: 0 }, easing = true, spin = false;
   const VIEWS = [['Front', 0, 0.05, 5.6, 0.86, 'front'], ['Three-quarter', 0.7, 0.08, 5.6, 0.86, 'front'], ['Side', Math.PI / 2, 0.05, 5.6, 0.86, 'side'], ['Back', Math.PI, 0.05, 5.6, 0.86, 'back'],
     ['Corset', 0.25, 0.05, 2.6, 1.16, 'front'], ['Legs', 0.3, 0.05, 3.6, 0.48, 'legs'], ['Boots', 0.6, 0.18, 1.9, 0.17, 'boot']];
-  const HVIEWS = [['Face', 0, 0.02, 1.5, 1.512, 'face'], ['Three-quarter', 0.7, 0.03, 1.5, 1.512, 'faceq'], ['Profile', -Math.PI / 2, 0.02, 1.6, 1.53, 'prof'], ['Back of head', Math.PI, 0.05, 1.6, 1.53, 'hback'], ['From above', 0.25, 0.78, 1.7, 1.56, 'top'], ['From below', 0.2, -0.28, 1.5, 1.49, 'below'], ['Head and shoulders', 0.5, 0.04, 2.1, 1.47, 'faceq']];
+  const HVIEWS = [['Face', 0, 0.02, 1.5, 1.512, 'face'], ['Three-quarter', 0.7, 0.03, 1.5, 1.512, 'faceq'], ['Profile', -Math.PI / 2, 0.02, 1.6, 1.53, 'prof'], ['Back of head', Math.PI, 0.05, 1.6, 1.53, 'hback'], ['From above', 0.25, 0.78, 1.7, 1.56, 'top'], ['From below', 0.2, -0.28, 1.5, 1.49, 'below'], ['Head and shoulders', 0.5, 0.04, 2.1, 1.47, 'faceq'], ['Hair from the side', -Math.PI / 2, 0.06, 1.7, 1.56, 'hairS']];
   // hands: seen with her arms out, the back from above and the palm from below, so the fingers point up the screen as in the paintings
   const HANDS = [['Left hand', -Math.PI / 2, 1.2, 0.95, 1.30, 'handLb', 0.705, 2], ['Left palm', Math.PI / 2, -1.2, 0.95, 1.30, 'handLp', 0.705, 2], ['Right hand', Math.PI / 2, 1.2, 0.95, 1.30, 'handRb', -0.705, 2], ['Right palm', -Math.PI / 2, -1.2, 0.95, 1.30, 'handRp', -0.705, 2],
     ['Left arm', 1.25, 0.10, 2.7, 1.02, 'armL', 0.27, 1], ['Right arm', -1.25, 0.10, 2.7, 1.02, 'armR', -0.27, 1]];
   // boots: name, azimuth, elevation, distance, target height, painting, target x, pose, target z
   const BOOTS = [['Three-quarter', -0.72, 0.36, 1.5, 0.16, 'bootQ', -0.081, 1, 0.05], ['Outer side', -Math.PI / 2, 0.05, 1.6, 0.16, 'bootS', -0.081, 1, 0.05], ['Front', 0, 0.10, 1.6, 0.17, 'bootF', 0, 1, 0.05], ['Back', Math.PI, 0.10, 1.6, 0.17, 'bootB', 0, 1, 0.0], ['From above', -0.35, 1.05, 1.5, 0.14, 'bootT', -0.081, 1, 0.05]];
   const POSES = [['At rest', { arm: 15, leg: 0 }], ['As painted', { arm: 24, leg: 3 }], ['Arms out', { arm: 90, leg: 0 }]];
-  let refKey = 'bootQ', showRef = true;
+  let refKey = 'hairS', showRef = true;
   function chips(host, items, onPick, first) {
     items.forEach((it, i) => { const b = document.createElement('button'); b.className = 'chip'; b.type = 'button'; b.textContent = it[0]; b.setAttribute('aria-pressed', i === first ? 'true' : 'false');
       b.addEventListener('click', () => { [...host.children].forEach((c) => c.setAttribute('aria-pressed', 'false')); b.setAttribute('aria-pressed', 'true'); onPick(it); }); host.appendChild(b); });
@@ -118,10 +122,10 @@ canvas#stage{display:block;width:100%;height:100%;touch-action:none;cursor:grab}
   const pickView = (v, host) => { want = { az: v[1], el: v[2], dist: v[3], ty: v[4], tx: v[6] || 0, tz: v[8] != null ? v[8] : (v[6] ? -0.014 : 0), low: host === 'hands' && v[7] === 2 }; easing = true; spin = false; refKey = v[5]; setRef(); $('spinB').setAttribute('aria-pressed', 'false');
     for (const id of ['hviews', 'views', 'hands', 'boots']) if (id !== host) [...$(id).children].forEach((c) => c.setAttribute('aria-pressed', 'false'));
     if (v[7] != null) setPose(v[7]); };
-  chips($('hviews'), HVIEWS, (v) => pickView(v, 'hviews'), -1);
+  chips($('hviews'), HVIEWS, (v) => pickView(v, 'hviews'), 7);
   chips($('views'), VIEWS, (v) => pickView(v, 'views'), -1);
   chips($('hands'), HANDS, (v) => pickView(v, 'hands'), -1);
-  chips($('boots'), BOOTS, (v) => pickView(v, 'boots'), 0);
+  chips($('boots'), BOOTS, (v) => pickView(v, 'boots'), -1);
   chips($('faces'), [['At rest', 0, 'rest'], ['Blink', 1, 'rest'], ['Half shut', 0.5, 'rest'], ['Talking', 0, 'open'], ['Oo', 0, 'oo'], ['Smile', 0, 'smile']], (v) => R.setFace(v[1], v[2]), 0);
   chips($('poses'), POSES, (p) => R.pose(p[1]), 1);
   R.pose(POSES[1][1]);
@@ -153,7 +157,7 @@ canvas#stage{display:block;width:100%;height:100%;touch-action:none;cursor:grab}
     if (easing) { let d = want.az - orbit.az; d = Math.atan2(Math.sin(d), Math.cos(d)); const k = Math.min(1, dt * 5); orbit.az += d * k; orbit.el += (want.el - orbit.el) * k; orbit.dist += (want.dist - orbit.dist) * k; orbit.target.y += (want.ty - orbit.target.y) * k; orbit.target.x += ((want.tx || 0) - orbit.target.x) * k; orbit.target.z += ((want.tz || 0) - orbit.target.z) * k; }
     stage.render();
   }
-  $('hud').textContent = 'Stage four, boots · ' + Math.round(R.triangles / 1000) + 'k triangles';
+  $('hud').textContent = 'Hair lowered over her forehead · ' + Math.round(R.triangles / 1000) + 'k triangles';
   window.RANGER = { stage, R, step() { fit(); stage.render(); } };
   requestAnimationFrame(frame);
 })();

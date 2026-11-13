@@ -91,5 +91,5 @@
     for (const [S, s] of SIDES) { SK['uarm' + S].rotation.set(0, 0, s * arm); SK['thigh' + S].rotation.set(0, 0, s * leg); SK['foot' + S].rotation.set(0, 0, -s * leg); }
     root.updateMatrixWorld(true);
   }
-  return { root, skeleton, bones, SK, animate, pose, meshes, spin: 0, time: 0, stanceProgress: 1, setStance() {}, play() {}, setFace: (eyes, mouth) => paintFace(eyes || 0, mouth || 'rest'), debug: { SK, meshes, cloths: [], headPoint, JH }, get triangles() { return triCount; } };
+  return { root, skeleton, bones, SK, animate, pose, meshes, spin: 0, time: 0, stanceProgress: 1, setStance() {}, play() {}, setFace: (eyes, mouth) => paintFace(eyes || 0, mouth || 'rest'), debug: { SK, meshes, cloths: [], headPoint, JH, hairPt, phOfY }, get triangles() { return triCount; } };
 }

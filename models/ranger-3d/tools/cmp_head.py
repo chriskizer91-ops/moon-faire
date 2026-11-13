@@ -30,4 +30,10 @@ mc = Image.open('/tmp/_hc.png').convert('RGB')
 d = np.asarray(pa).astype(np.float32) * 0.45; d[pm & ~mm] = d[pm & ~mm] * 0.4 + np.array([235, 70, 70]) * 0.6; d[mm & ~pm] = d[mm & ~pm] * 0.4 + np.array([70, 140, 245]) * 0.6
 edge = mm ^ ndi.binary_erosion(mm, iterations=2); d[edge] = (255, 255, 255)
 sheet = Image.new('RGB', (W * 3, H)); sheet.paste(pa, (0, 0)); sheet.paste(mc, (W, 0)); sheet.paste(Image.fromarray(d.astype(np.uint8)), (W * 2, 0)); sheet.save(out, quality=88)
+# how high the outline stands, column by column: painting and model, in metres
+print('top of the outline by ' + ('z (forward of the body line)' if view == 'side' else 'x (from the middle)') + ': painting, model, model - painting (mm)')
+for v in ([-0.12, -0.10, -0.08, -0.06, -0.04, -0.02, 0.0, 0.02, 0.04, 0.06, 0.08] if view == 'side' else [-0.08, -0.06, -0.04, -0.02, 0.0, 0.02, 0.04, 0.06, 0.08]):
+    c = int(round(W / 2 + v * PXM)); pa_ = np.nonzero(pm[:, c])[0]; ma_ = np.nonzero(mm[:, c])[0]
+    f = lambda r: TY + (H / 2 - r) / PXM
+    if len(pa_) and len(ma_): print('  %+.2f   %.3f  %.3f  %+4.0f' % (v, f(pa_.min()), f(ma_.min()), (f(ma_.min()) - f(pa_.min())) * 1000))
 print(out, 'px/m', round(PXM))
