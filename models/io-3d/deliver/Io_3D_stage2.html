@@ -60,6 +60,7 @@ canvas#stage{display:block;width:100%;height:100%;touch-action:none;cursor:grab}
       <li>She blinks, and she talks: her eyes and mouths are the ones you painted in C9.</li>
       <li>Glasses: round lenses in dark bronze wire.</li>
       <li>Hair: about 120 wavy tresses in her own browns, from under the hat to below her hips. Her fringe is real hair too: 24 locks that sweep out from her parting across the top of her forehead and down the sides of her face, so it frames her face and joins the rest of her hair.</li>
+      <li>Flipbook look: a switch under Show that draws her at her sprites' pixel size in the flipbook's 56 colours with an inked outline. It is off when the page opens.</li>
       <li>Hat: the wide floppy brim, the lace band with its chain, three crosses, the ringed cross and two horns, and the crown slumping to her right. Measured off C4 and C5; the felt, lace and horn are your swatches in F9.</li>
     </ul>
     <h2 style="margin-top:12px">From stage one</h2>
@@ -1891,6 +1892,8 @@ function makeIo(opts) {
     b.addEventListener('click', () => { const v = b.getAttribute('aria-pressed') !== 'true'; b.setAttribute('aria-pressed', v ? 'true' : 'false'); fn(v); }); host.appendChild(b); };
   toggle($('shows'), 'refB', 'Painting beside her', true, (v) => { showRef = v; setRef(); });
   toggle($('shows'), 'spinB', 'Turn slowly', false, (v) => { spin = v; easing = false; });
+  // Chris, November 13: the Flipbook look is a switch on every witch's page, and the page opens in the smooth look (claude/HOW-TO-flipbook-look.md)
+  toggle($('shows'), 'flipB', 'Flipbook look', false, (v) => { stage.look = v ? 'flipbook' : 'smooth'; });
   const show = (keys) => (v) => { for (const k of keys) if (R.meshes[k]) R.meshes[k].visible = v; };
   toggle($('shows'), 'hatB', 'Hat', true, show(['felt', 'brim', 'hatband', 'silver', 'gold', 'horn']));
   toggle($('shows'), 'glassB', 'Glasses', true, show(['wire', 'lens', 'pad']));

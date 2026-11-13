@@ -22,6 +22,10 @@ Body and base outfit (stage one), and now her head, face, glasses, hair and hat.
 - **Stage two, third pass (Chris, November 13):** "her bangs should frame her face, not obscure her face ... slide them back so
   that there's no gap between her bangs and the rest of her hair. And her face is more open, because you did a good job on the
   face. And then bring the hat down. Another 30%." Done: see "Third pass" below.
+- **The Flipbook look (Chris, November 13):** "there's a flipbook-like filter that I want to add. It's just going to be a button."
+  It is the switch "Flipbook look" under Show, off when the page opens. "Other than that, she looks fantastic."
+- **The order from here, in his words:** "I believe her arms need to be worked on, and then we need to get her like body moving
+  around before we add more of her outfit."
 - **Stage one, approved by Chris** ("round one is fantastic", "The body looks fantastic as it is"): torso with the bodice painted
   on (B3 front and back, B2 at the sides), bare arms and legs, the skirt as eight stiff tiers with the slit over her left leg,
   boots, hands. Do not reshape these without asking. Stage two only cleaned the tops of her shoulders in the body picture (a dark
@@ -190,6 +194,18 @@ The paintings are data: run Python that reads them with `-I`.
   fringe. The foot is now squarer at its corners and sits 11 mm further forward (`crown.pt` in `I43_hat.js`). When the hat
   moves again, look at the band from the three-quarter views and from above.
 
+### The Flipbook look
+
+The method is the project doc `claude/HOW-TO-flipbook-look.md`. Her `viewer/stage.js` already had the look and `out/palette.js`
+already had the 56 colours, so the switch is one line in `viewer_io/index.tpl.html` that sets `stage.look`. Checked as that
+doc's section 7 asks:
+
+- Her face reads up close and at whole-figure distance; glasses, the hat's chain, crosses and horns stay visible.
+- Colours: `tools/far.py` on a smooth still finds one skin tone (0.2% of her) further than 40 from the 56. No extra colours added.
+  Her browns land on browns and oranges, the felt on the wine reds, her skin on one family of tones from face to legs.
+- One clean dark outline. The smooth look is the same with the switch off. Her floor shadow stays smooth, as the place does.
+- Not checked: her blink and talking mouth in motion with the look on (stills only); and she has no spells yet.
+
 ## Round 2 paintings (arrived November 13, 2026, after stage one was built)
 
 All 21 arrived and match their index. Nothing is built from them yet.
@@ -237,9 +253,10 @@ They also show her whole look from many sides, with the robe: useful when the ro
 
 ## Next stages, in the how-to's order
 
-1. The emotions in C10 and moving brows; hair on top of her head.
-2. Hands and painted arms (D1 to D4), and her legs painted from B5; her neck and chest painted from C18.
-3. Her own boots (E1 to E8).
+1. **Her arms and hands** (D1 to D4): painted skin, the join at her shoulder, her hands. Her legs from B5 can ride along.
+2. **Her body moving**, before any more of her outfit: the skeleton's moves, her hair on spring chains (as the Fox's is) so it
+   moves with her and parts round her arms, the skirt giving way to her legs.
+3. Then the rest: the emotions in C10, hair on top of her head, her own boots (E1 to E8).
 4. Robe as cloth (A1 to A5, F4 to F6, F10, F12), skirt as cloth with see-through lace (F8, F11).
 5. Belt, pouch, crystal, necklaces, bracelets (F1 to F3).
 6. Book and blades (G1 to G6, placed by G8, held as in G9).
