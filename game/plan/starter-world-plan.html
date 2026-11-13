@@ -1,0 +1,441 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Moon Faire starter world plan</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible:ital,wght@0,400;0,700;1,400&family=Jacquard+24&display=swap" rel="stylesheet">
+<style>
+/* Layout idea: one reading column, a map first, then zone cards, tables, and a numbered list of calls for Chris.
+   Colours come from the witches' own light rig: warm key, lilac moon, plum-brown earth. */
+:root {
+  --bg: #f4f1f6;
+  --panel: #ffffff;
+  --ink: #2a1f2e;
+  --muted: #6a5c70;
+  --line: #ddd4e3;
+  --amber: #9a5200;
+  --amber-soft: #fbe9d2;
+  --lilac: #6447a6;
+  --lilac-soft: #ebe4f7;
+  --earth: #4a3438;
+  --l1: #e7ddf3; --l2: #cdbbe9; --l3: #f3d9b4; --l4: #eebb78; --l5: #dc8f2f;
+  --display: "Jacquard 24", "Palatino Linotype", Palatino, Georgia, serif;
+  --body: "Atkinson Hyperlegible", "Segoe UI", system-ui, -apple-system, Arial, sans-serif;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    color-scheme: dark;
+    --bg: #1c151f; --panel: #271d2b; --ink: #f2e9ee; --muted: #b6a7ba; --line: #40323f;
+    --amber: #ffb964; --amber-soft: #43301c; --lilac: #cdb4ff; --lilac-soft: #342a48; --earth: #c9a9ae;
+    --l1: #3a2f4c; --l2: #54427a; --l3: #6b4c22; --l4: #9a6820; --l5: #d98f2e;
+  }
+}
+:root[data-theme="dark"] {
+  color-scheme: dark;
+  --bg: #1c151f; --panel: #271d2b; --ink: #f2e9ee; --muted: #b6a7ba; --line: #40323f;
+  --amber: #ffb964; --amber-soft: #43301c; --lilac: #cdb4ff; --lilac-soft: #342a48; --earth: #c9a9ae;
+  --l1: #3a2f4c; --l2: #54427a; --l3: #6b4c22; --l4: #9a6820; --l5: #d98f2e;
+}
+* { box-sizing: border-box; }
+html { -webkit-text-size-adjust: 100%; }
+body { margin: 0; background: var(--bg); color: var(--ink); font-family: var(--body); font-size: 17px; line-height: 1.5; }
+main { max-width: 760px; margin: 0 auto; padding: 24px 16px 64px; display: flex; flex-direction: column; gap: 36px; }
+header { display: flex; flex-direction: column; gap: 10px; }
+h1 { font-family: var(--display); font-weight: 400; font-size: clamp(38px, 9vw, 58px); line-height: 1; margin: 0; text-wrap: balance; letter-spacing: 0.01em; }
+h2 { font-family: var(--display); font-weight: 400; font-size: 32px; line-height: 1.1; margin: 0 0 12px; text-wrap: balance; }
+h3 { font-size: 18px; margin: 0; line-height: 1.3; }
+p { margin: 0; }
+section { display: flex; flex-direction: column; gap: 14px; }
+section > h2 { margin-bottom: 0; }
+.lede { font-size: 19px; }
+.status { display: inline-flex; align-self: flex-start; gap: 8px; align-items: center; background: var(--amber-soft); color: var(--amber); border-radius: 999px; padding: 4px 12px; font-size: 14px; font-weight: 700; }
+.muted { color: var(--muted); }
+.small { font-size: 15px; }
+.facts { display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap: 10px; margin: 0; padding: 0; list-style: none; }
+.facts li { background: var(--panel); border: 1px solid var(--line); border-radius: 10px; padding: 10px 12px; display: flex; flex-direction: column; }
+.facts b { font-size: 24px; line-height: 1.2; font-variant-numeric: tabular-nums; }
+.facts span { color: var(--muted); font-size: 14px; }
+figure { margin: 0; display: flex; flex-direction: column; gap: 8px; }
+figcaption { color: var(--muted); font-size: 15px; }
+.map { background: var(--panel); border: 1px solid var(--line); border-radius: 12px; padding: 8px; }
+.map svg { display: block; width: 100%; height: auto; max-width: 560px; margin: 0 auto; color: var(--ink); }
+.map .band { fill: var(--bg); }
+.map .node { fill: var(--panel); stroke: var(--ink); stroke-width: 1.2; }
+.map .node.hid { stroke-dasharray: 4 3; }
+.map .node.boss { fill: var(--amber-soft); stroke: var(--amber); stroke-width: 1.6; }
+.map .zt { font: 700 11px var(--body); fill: var(--lilac); letter-spacing: 0.08em; }
+.map .code { font: 700 11px var(--body); fill: var(--amber); }
+.map .nm { font: 700 11.5px var(--body); fill: currentColor; }
+.map .mk { font: 11px var(--body); fill: var(--muted); }
+.map .lbl { font: italic 11px var(--body); fill: var(--muted); }
+.map .way { fill: none; stroke: currentColor; stroke-width: 1.4; }
+.map .air { fill: none; stroke: var(--amber); stroke-width: 1.6; stroke-dasharray: 5 4; }
+.legend { display: flex; flex-wrap: wrap; gap: 6px 18px; font-size: 14px; color: var(--muted); padding: 0; margin: 0; list-style: none; }
+.zone { background: var(--panel); border: 1px solid var(--line); border-radius: 12px; padding: 16px; display: flex; flex-direction: column; gap: 12px; }
+.zone > header { flex-direction: row; flex-wrap: wrap; align-items: baseline; gap: 6px 12px; }
+.zone h3 { font-family: var(--display); font-weight: 400; font-size: 27px; }
+.tag { font-size: 13px; font-weight: 700; border-radius: 999px; padding: 2px 10px; background: var(--lilac-soft); color: var(--lilac); white-space: nowrap; }
+.scenes { display: flex; flex-direction: column; gap: 10px; margin: 0; padding: 0; list-style: none; }
+.scenes li { border-left: 3px solid var(--line); padding-left: 12px; display: flex; flex-direction: column; gap: 2px; }
+.scenes b.c { color: var(--amber); font-variant-numeric: tabular-nums; margin-right: 6px; }
+.scroll { overflow-x: auto; border: 1px solid var(--line); border-radius: 12px; background: var(--panel); }
+table { border-collapse: collapse; width: 100%; font-size: 15px; font-variant-numeric: tabular-nums; }
+th, td { text-align: left; padding: 8px 10px; border-bottom: 1px solid var(--line); vertical-align: top; }
+th { font-size: 13px; color: var(--muted); font-weight: 700; }
+tr:last-child td { border-bottom: 0; }
+td.n, th.n { text-align: right; white-space: nowrap; }
+tr.boss td { background: var(--amber-soft); }
+.pace { display: flex; border-radius: 10px; overflow: hidden; border: 1px solid var(--line); }
+.pace div { padding: 8px 4px; text-align: center; font-size: 13px; font-weight: 700; line-height: 1.25; min-width: 0; color: var(--ink); }
+.pace small { display: block; font-weight: 400; font-size: 12px; }
+.pace .p1 { background: var(--l1); flex: 3; } .pace .p2 { background: var(--l2); flex: 5; } .pace .p3 { background: var(--l3); flex: 6; }
+.pace .p4 { background: var(--l4); flex: 8; } .pace .p5 { background: var(--l5); flex: 2; }
+ul.plain { margin: 0; padding-left: 20px; display: flex; flex-direction: column; gap: 6px; }
+.who { display: flex; flex-direction: column; gap: 8px; margin: 0; padding: 0; list-style: none; }
+.who li { display: grid; grid-template-columns: 92px 1fr; gap: 10px; align-items: start; }
+.who b { color: var(--lilac); }
+ol.calls { margin: 0; padding: 0; list-style: none; display: flex; flex-direction: column; gap: 12px; counter-reset: call; }
+ol.calls > li { counter-increment: call; background: var(--panel); border: 1px solid var(--line); border-radius: 12px; padding: 14px 16px 14px 52px; position: relative; display: flex; flex-direction: column; gap: 6px; }
+ol.calls > li::before { content: counter(call); position: absolute; left: 14px; top: 12px; width: 28px; height: 28px; border-radius: 50%; background: var(--lilac-soft); color: var(--lilac); font-weight: 700; display: flex; align-items: center; justify-content: center; font-size: 15px; }
+.pick { border-left: 3px solid var(--amber); padding-left: 10px; }
+.pick b:first-child, .alt b:first-child { display: inline-block; min-width: 1.3em; }
+.alt { color: var(--muted); padding-left: 13px; }
+.note { background: var(--lilac-soft); border-radius: 12px; padding: 14px 16px; }
+footer { color: var(--muted); font-size: 14px; border-top: 1px solid var(--line); padding-top: 16px; }
+@media (max-width: 420px) { body { font-size: 16px; } th, td { padding: 7px 8px; } }
+</style>
+</head>
+<body>
+<main>
+
+<header>
+  <span class="status">For your approval. Nothing is painted yet.</span>
+  <h1>The starter world, whole game on one page</h1>
+  <p class="lede">A small, complete Moon Faire game: three zones, the four witches and the airship captain, levels 1 to 5, painted scenes with the 3D models on top.</p>
+  <p class="muted small">Every name, place and story beat below is a placeholder for you to change. The fight numbers are measured with your approved combat engine, unchanged.</p>
+</header>
+
+<ul class="facts">
+  <li><b>3</b><span>zones</span></li>
+  <li><b>9</b><span>walking scenes</span></li>
+  <li><b>5</b><span>fight backdrops</span></li>
+  <li><b>about 24</b><span>fights, start to end</span></li>
+  <li><b>1 to 5</b><span>levels</span></li>
+  <li><b>45 to 55 min</b><span>first play (estimate)</span></li>
+</ul>
+
+<section>
+  <h2>The map</h2>
+  <figure>
+    <div class="map">
+      <svg viewBox="0 0 360 540" role="img" aria-label="Map of the three zones. The fair has three scenes, the wilds have three scenes in a row and one hidden scene, and the beacon has two scenes and the boss room. The fair gate leads on foot to the wilds. The airship leads from the mooring field to the beacon once twelve lamps are back.">
+        <defs>
+          <marker id="ah" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 0 L10 5 L0 10 z" fill="currentColor"/></marker>
+          <marker id="ahA" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 0 L10 5 L0 10 z" style="fill:var(--amber)"/></marker>
+        </defs>
+
+        <rect class="band" x="24" y="8" width="332" height="108" rx="10"/>
+        <rect class="band" x="24" y="176" width="332" height="186" rx="10"/>
+        <rect class="band" x="24" y="414" width="332" height="108" rx="10"/>
+
+        <text class="zt" x="346" y="27" text-anchor="end">ZONE 1 · THE MOON FAIRE · LEVELS 1 TO 2</text>
+        <text class="zt" x="346" y="195" text-anchor="end">ZONE 2 · THE WILDS · LEVELS 2 TO 4</text>
+        <text class="zt" x="346" y="433" text-anchor="end">ZONE 3 · THE DARK BEACON · LEVELS 4 TO 5</text>
+
+        <!-- zone 1 -->
+        <rect class="node" x="34" y="40" width="96" height="62" rx="8"/>
+        <text class="code" x="42" y="57">W3</text><text class="nm" x="42" y="73">Mooring field</text><text class="mk" x="42" y="91">◆ ○ captain</text>
+        <rect class="node" x="142" y="40" width="96" height="62" rx="8"/>
+        <text class="code" x="150" y="57">W1 · START</text><text class="nm" x="150" y="73">Fair square</text><text class="mk" x="150" y="91">◆ ○</text>
+        <rect class="node" x="250" y="40" width="96" height="62" rx="8"/>
+        <text class="code" x="258" y="57">W2</text><text class="nm" x="258" y="73">Stall row, ring</text><text class="mk" x="258" y="91">◆ ring bouts</text>
+        <line class="way" x1="142" y1="71" x2="131" y2="71" marker-end="url(#ah)" marker-start="url(#ah)"/>
+        <line class="way" x1="238" y1="71" x2="249" y2="71" marker-end="url(#ah)" marker-start="url(#ah)"/>
+
+        <!-- gate on foot -->
+        <path class="way" d="M298 102 V146 H82 V207" marker-end="url(#ah)"/>
+        <text class="lbl" x="190" y="140" text-anchor="middle">on foot, through the fair gate</text>
+
+        <!-- zone 2 -->
+        <rect class="node" x="34" y="208" width="96" height="62" rx="8"/>
+        <text class="code" x="42" y="225">W4</text><text class="nm" x="42" y="241">Last Lantern</text><text class="mk" x="42" y="259">◆ 3 lamps</text>
+        <rect class="node" x="142" y="208" width="96" height="62" rx="8"/>
+        <text class="code" x="150" y="225">W5</text><text class="nm" x="150" y="241">The stones</text><text class="mk" x="150" y="259">◆ 4 lamps</text>
+        <rect class="node" x="250" y="208" width="96" height="62" rx="8"/>
+        <text class="code" x="258" y="225">W6</text><text class="nm" x="258" y="241">Still pool</text><text class="mk" x="258" y="259">◆ ○ 5 lamps</text>
+        <line class="way" x1="130" y1="239" x2="141" y2="239" marker-end="url(#ah)" marker-start="url(#ah)"/>
+        <line class="way" x1="238" y1="239" x2="249" y2="239" marker-end="url(#ah)" marker-start="url(#ah)"/>
+        <rect class="node hid" x="142" y="292" width="96" height="58" rx="8"/>
+        <text class="code" x="150" y="309">W7 · HIDDEN</text><text class="nm" x="150" y="325">The hollow</text><text class="mk" x="150" y="341">◆ ✦ amulet</text>
+        <line class="way" x1="190" y1="270" x2="190" y2="291" stroke-dasharray="3 3" marker-end="url(#ah)"/>
+        <text class="lbl" x="250" y="300">the Jester joins</text>
+        <text class="lbl" x="250" y="314">at the stones (W5)</text>
+
+        <!-- airship -->
+        <path class="air" d="M34 71 H12 V470 H33" marker-end="url(#ahA)"/>
+        <text class="lbl" x="34" y="394" style="fill:var(--amber)">by airship, once all 12 lamps are back on the ship</text>
+
+        <!-- zone 3 -->
+        <rect class="node" x="34" y="446" width="96" height="62" rx="8"/>
+        <text class="code" x="42" y="463">W8</text><text class="nm" x="42" y="479">Landing ledge</text><text class="mk" x="42" y="497">○ captain</text>
+        <rect class="node" x="142" y="446" width="96" height="62" rx="8"/>
+        <text class="code" x="150" y="463">W9</text><text class="nm" x="150" y="479">Beacon stair</text><text class="mk" x="150" y="497">✦ charm</text>
+        <rect class="node boss" x="250" y="446" width="96" height="62" rx="8"/>
+        <text class="code" x="258" y="463">F5 · BOSS</text><text class="nm" x="258" y="479">Lamp room</text><text class="mk" x="258" y="497">opens at level 5</text>
+        <line class="way" x1="130" y1="477" x2="141" y2="477" marker-end="url(#ah)" marker-start="url(#ah)"/>
+        <line class="way" x1="238" y1="477" x2="249" y2="477" marker-end="url(#ah)"/>
+      </svg>
+    </div>
+    <ul class="legend">
+      <li>◆ a set fight</li>
+      <li>○ rest and save</li>
+      <li>✦ a find</li>
+      <li>dashed box: hidden scene</li>
+    </ul>
+    <figcaption>The journey always runs left to right, the way the witches cast. Walking fights happen in W4, W5, W6, W7 and W9 only.</figcaption>
+  </figure>
+</section>
+
+<section>
+  <h2>The game in six lines</h2>
+  <p class="muted small">A thin story to hang the game on. It is yours to replace.</p>
+  <ul class="plain">
+    <li>The Ranger, the Fox and Io are at the fair at dusk. Wisps drift in among the tents.</li>
+    <li>The wisps make off with the twelve lamps of the captain's airship. He cannot fly it dark.</li>
+    <li>The three go out onto the moor to win the lamps back, one fight at a time.</li>
+    <li>At the standing stones they find the Jester holding off a Shadow Wraith alone. She joins.</li>
+    <li>With all twelve lamps lit, the captain flies them to where the wisps were carrying the light: a dead airship beacon on a crag.</li>
+    <li>At the top, a great wraith sits on a hoard of stolen light. The Jester ends it, and the curtain falls.</li>
+  </ul>
+</section>
+
+<section>
+  <h2>Zone by zone</h2>
+
+  <div class="zone">
+    <header><h3>1. The Moon Faire</h3><span class="tag">party level 1 to 2</span><span class="tag">foes level 1 to 2</span></header>
+    <p>The tent town at dusk. Safe to walk: no walking fights here, only three set fights and the ring.</p>
+    <ul class="scenes">
+      <li><span><b class="c">W1</b><b>The fair square.</b> The game starts here. Lantern posts, bunting, tents all round.</span>
+        <span class="muted">First fight, the teaching one: two wisps drift in. Rest and save at the well.</span></li>
+      <li><span><b class="c">W2</b><b>The stall row and the sparring ring.</b> A lane of stalls ending at a roped ring and the fair gate.</span>
+        <span class="muted">Second fight: three wisps among the stalls. Three or four stalls can be talked to. The ring gives a practice bout whenever you like (two wisps at your level), so nobody can ever get stuck short of a level.</span></li>
+      <li><span><b class="c">W3</b><b>The mooring field.</b> The captain under his moored airship.</span>
+        <span class="muted">Third fight: three wisps at level 2, while the rest carry off the ship's lamps. The party reaches level 2 here. Talk to the captain: he asks for the lamps. Each lamp won back lights up on the ship, so the painting itself shows how close you are.</span></li>
+    </ul>
+  </div>
+
+  <div class="zone">
+    <header><h3>2. The wilds</h3><span class="tag">party level 2 to 4</span><span class="tag">foes level 2 to 6</span></header>
+    <p>A moonlit moor along an old road, the fair glowing behind. Walking fights come evenly, about one every 14 metres walked. Each scene holds a fixed number of lamps: its first few walking fights each carry one, and one sits with a set fight at the landmark.</p>
+    <ul class="scenes">
+      <li><span><b class="c">W4</b><b>The Last Lantern.</b> The fair's last lamp post, then open moor. 3 lamps.</span>
+        <span class="muted">Walking: three or four wisps, level 2 to 3. Set fight at the post: four wisps, level 3.</span></li>
+      <li><span><b class="c">W5</b><b>The standing stones.</b> A ring of old stones across the road. 4 lamps.</span>
+        <span class="muted">Walking: wisps, or a Shadow Wraith with two wisps, level 3 to 4. Set fight: the Jester is already fighting a Shadow Wraith and two wisps (level 4). She is in your party from the first turn of it. This is where the player learns the taunt and Sealed Fate.</span></li>
+      <li><span><b class="c">W6</b><b>The still pool and the broken arch.</b> The end of the road. 5 lamps. A camp to rest and save.</span>
+        <span class="muted">Walking: a Shadow Wraith with two or four wisps, or five wisps, level 4 to 5. Set fight under the arch: two Shadow Wraiths and two wisps, level 5.</span></li>
+      <li><span><b class="c">W7</b><b>The hollow.</b> Hidden, down a gap behind the stones, open once the Jester has joined.</span>
+        <span class="muted">Five wisps at level 6 guard a healing amulet (all healing 5% stronger). Foes this far above you are always the weak kind, as you ruled.</span></li>
+    </ul>
+    <p class="small muted">The shortest way to all twelve lamps is out to the pool and back, with a little wandering at the pool and the stones: about 14 wild fights. The party is level 4 when the last lamp goes on the ship.</p>
+  </div>
+
+  <div class="zone">
+    <header><h3>3. The Dark Beacon</h3><span class="tag">party level 4 to 5</span><span class="tag">foes level 5 to 6</span></header>
+    <p>A dead beacon for airships, on a crag that can only be reached by air. Deep night.</p>
+    <ul class="scenes">
+      <li><span><b class="c">W8</b><b>The landing ledge.</b> The airship moored against the rock, all twelve lamps lit. The captain waits here.</span>
+        <span class="muted">No fights. Rest and save. He will fly you back to the fair if you ask.</span></li>
+      <li><span><b class="c">W9</b><b>The beacon stair.</b> A long climb round the crag.</span>
+        <span class="muted">Walking: Shadow Wraiths with wisps, level 5 to 6. Off the path, a charm (every witch's HP 2% higher). Level 5 arrives after about one and a half climbs.</span></li>
+      <li><span><b class="c">F5</b><b>The lamp room.</b> The door at the top opens at level 5, the boss's level.</span>
+        <span class="muted">The great wraith, two Shadow Wraiths and two wisps, level 5. No walking here: the fight begins at the door.</span></li>
+    </ul>
+  </div>
+</section>
+
+<section>
+  <h2>The set fights, measured</h2>
+  <p>Wins in every 100 fights (1,000 played each) for three kinds of player, in this order: careless (random moves) / attentive / expert. Each fight is measured at the level the party will have when it gets there.</p>
+  <div class="scroll">
+    <table>
+      <thead><tr><th>Where, and the party</th><th>Foes</th><th class="n">Wins, %</th></tr></thead>
+      <tbody>
+        <tr><td>W1 square<br><span class="muted small">three witches, level 1</span></td><td>2 wisps, level 1</td><td class="n">100 / 100 / 100</td></tr>
+        <tr><td>W2 stall row<br><span class="muted small">three, level 1</span></td><td>3 wisps, level 1</td><td class="n">100 / 100 / 100</td></tr>
+        <tr><td>W3 mooring field<br><span class="muted small">three, level 1</span></td><td>3 wisps, level 2</td><td class="n">100 / 100 / 100</td></tr>
+        <tr><td>W4 Last Lantern<br><span class="muted small">three, level 2</span></td><td>4 wisps, level 3</td><td class="n">100 / 100 / 100</td></tr>
+        <tr><td>W5 stones<br><span class="muted small">four, level 2 or 3</span></td><td>Shadow Wraith and 2 wisps, level 4</td><td class="n">100 / 100 / 100</td></tr>
+        <tr><td>W6 arch<br><span class="muted small">four, level 3</span></td><td>2 Shadow Wraiths and 2 wisps, level 5</td><td class="n">100 / 100 / 100</td></tr>
+        <tr><td>W7 hollow<br><span class="muted small">four, level 3</span></td><td>5 wisps, level 6</td><td class="n">100 / 100 / 100</td></tr>
+        <tr class="boss"><td><b>F5 lamp room</b><br><span class="muted small">four, level 5</span></td><td>great wraith, 2 Shadow Wraiths and 2 wisps, level 5</td><td class="n"><b>6 / 81 / 100</b></td></tr>
+        <tr class="boss"><td><span class="muted">the same, a level short</span><br><span class="muted small">four, level 4</span></td><td>the same line-up</td><td class="n">0 / 3 / 92</td></tr>
+      </tbody>
+    </table>
+  </div>
+  <ul class="plain">
+    <li>Every walking fight in the plan was measured the same way. All of them are won 100% of the time by all three kinds of player.</li>
+    <li>So the boss is the one real test, and it follows your rule: at the boss's level an attentive player wins about four times in five, and a level short almost never.</li>
+    <li>With both finds in hand (the amulet and the charm) the boss goes to 7 / 87 / 100.</li>
+    <li>The Shadow Wraith uses the balance sheet's knight numbers. The great wraith uses the boss numbers.</li>
+  </ul>
+</section>
+
+<section>
+  <h2>Levels and pace</h2>
+  <figure>
+    <div class="pace" role="img" aria-label="Level 1 for fights 1 to 3, level 2 for fights 4 to 8, level 3 for fights 9 to 14, level 4 for fights 15 to 22, level 5 for the last two.">
+      <div class="p1">L1<small>1–3</small></div>
+      <div class="p2">Level 2<small>fights 4–8</small></div>
+      <div class="p3">Level 3<small>fights 9–14</small></div>
+      <div class="p4">Level 4<small>fights 15–22</small></div>
+      <div class="p5">L5<small>23–24</small></div>
+    </div>
+    <figcaption>Which fight each level arrives on, from 2,000 simulated playthroughs on the shortest sensible route. Nine in ten land within one fight of this.</figcaption>
+  </figure>
+  <div class="scroll">
+    <table>
+      <thead><tr><th>Moment</th><th class="n">Fights so far</th><th class="n">Level</th></tr></thead>
+      <tbody>
+        <tr><td>Leaving the fair</td><td class="n">3</td><td class="n">2</td></tr>
+        <tr><td>The Jester has joined<br><span class="muted small">one player in seven is still level 2 here</span></td><td class="n">8 to 9</td><td class="n">3</td></tr>
+        <tr><td>All 12 lamps on the ship</td><td class="n">17 to 18</td><td class="n">4</td></tr>
+        <tr><td>The lamp room door opens</td><td class="n">22 to 24</td><td class="n">5</td></tr>
+      </tbody>
+    </table>
+  </div>
+  <ul class="plain">
+    <li><b>What a foe gives:</b> a wisp 10, a Shadow Wraith 40, the great wraith 400, each growing 20% for every level of the foe. The whole party shares it and levels together.</li>
+    <li><b>Total to reach each level:</b> 80, then 400, then 1,150, then 2,000.</li>
+    <li><b>Each level</b> adds 20% to everything for the witches, as you approved: the Jester goes from 1,000 HP at level 1 to about 2,070 at level 5.</li>
+    <li><b>Losing a fight</b> costs nothing: you wake at the last place you rested.</li>
+  </ul>
+</section>
+
+<section>
+  <h2>The gate</h2>
+  <p><b>The twelve lamps.</b> The captain will not fly until every lamp is back on his ship. A lamp only comes from winning a fight in the wilds, and each of the three wild scenes holds its own share (3, 4 and 5), so the party has to go all the way out, at rising levels, and come back.</p>
+  <ul class="plain">
+    <li>It uses the airship and the captain, and it needs no level number on a door.</li>
+    <li>The lamps light up one by one on the moored ship in the mooring field, and a small row of lamps on screen keeps count.</li>
+    <li>Measured: the party is level 4 when the twelfth lamp comes home, in all 2,000 playthroughs.</li>
+  </ul>
+</section>
+
+<section>
+  <h2>Who is in the party, and when</h2>
+  <ul class="who">
+    <li><b>Fights 1 to 7</b><span>The Ranger, the Fox and Io. Your engine says these three win every small fight on their own.</span></li>
+    <li><b>Fight 8 or 9</b><span>The Jester joins at the standing stones, at the party's level. From here it is all four.</span></li>
+    <li><b>The captain</b><span>Not in the party. He stands at the mooring field, then at the landing ledge. He talks, he keeps the lamp count, and he flies the ship.</span></li>
+    <li><b>Walking</b><span>One witch leads and the others follow her path. Any of them can lead.</span></li>
+    <li><b>Outside fights</b><span>No spells. They walk, run, talk, wave, bow, laugh and do their other body moves.</span></li>
+  </ul>
+</section>
+
+<section>
+  <h2>How long it plays</h2>
+  <ul class="plain">
+    <li><b>Fights: 25 to 45 minutes.</b> About 24 fights holding about 240 witch turns and 85 foe turns. That is an estimate at 4 to 9 seconds a witch turn. It cannot be measured until the real spell animations play in a fight.</li>
+    <li><b>Walking, talking and the flight: 12 to 15 minutes.</b></li>
+    <li><b>First play: about 45 to 55 minutes,</b> inside your 40 to 60.</li>
+  </ul>
+</section>
+
+<section>
+  <h2>How the witches keep their look</h2>
+  <ul class="plain">
+    <li>Their light rig and their models are used exactly as they are. The paintings are made to suit them.</li>
+    <li>Every painting is lit the same way the witches are: warm light from the viewer's side and the right, the moon behind and to the upper left, cool sky low on the left, warm earth underfoot.</li>
+    <li>Auros hangs in the same place in every sky, because it barely moves. That is also where the witches' lilac edge light comes from, so they will always match it.</li>
+    <li>The first check, before anything else is painted: the Jester standing in the pilot painting beside herself in her own theatre, at the same size.</li>
+    <li>Speed is for your laptop to judge. No Claude session can measure it: the test browser runs at under two frames a second.</li>
+  </ul>
+</section>
+
+<section>
+  <h2>What you would paint</h2>
+  <p>Fourteen paintings, each from one prompt with a grey-box camera guide attached. The two pilots come first and get fitted and judged before the other twelve are asked for.</p>
+  <div class="scroll">
+    <table>
+      <thead><tr><th>Code</th><th>Painting</th><th>Used for</th></tr></thead>
+      <tbody>
+        <tr class="boss"><td><b>W1</b></td><td>The fair square <b>(pilot)</b></td><td>walking</td></tr>
+        <tr class="boss"><td><b>F1</b></td><td>The moor clearing <b>(pilot)</b></td><td>fights in W4 and W6</td></tr>
+        <tr><td>W2</td><td>The stall row and the ring</td><td>walking</td></tr>
+        <tr><td>W3</td><td>The mooring field and the airship</td><td>walking</td></tr>
+        <tr><td>W4</td><td>The Last Lantern</td><td>walking</td></tr>
+        <tr><td>W5</td><td>The standing stones</td><td>walking</td></tr>
+        <tr><td>W6</td><td>The still pool and the broken arch</td><td>walking</td></tr>
+        <tr><td>W7</td><td>The hollow</td><td>walking</td></tr>
+        <tr><td>W8</td><td>The landing ledge and the airship</td><td>walking</td></tr>
+        <tr><td>W9</td><td>The beacon stair</td><td>walking</td></tr>
+        <tr><td>F2</td><td>The fair, seen from the ring</td><td>town fights and ring bouts</td></tr>
+        <tr><td>F3</td><td>Among the standing stones</td><td>fights in W5 and W7</td></tr>
+        <tr><td>F4</td><td>The crag</td><td>fights in W9</td></tr>
+        <tr><td>F5</td><td>The lamp room</td><td>the boss</td></tr>
+      </tbody>
+    </table>
+  </div>
+  <p class="small muted">Optional fifteenth: one still of the airship crossing under Auros, shown during the flight. The airship is in two or three paintings and must look the same in each, so the W3 keeper gets attached to the later prompts.</p>
+</section>
+
+<section>
+  <h2>Your calls</h2>
+  <p>Ten choices. <b>A</b> is my pick each time and is what the plan above uses. Reply with only the ones you want changed, for example "3B, 8C". Anything you do not mention stays A.</p>
+  <ol class="calls">
+    <li><h3>Dusk or night?</h3>
+      <p class="pick"><b>A</b> One evening that darkens as they go: dusk at the fair, night on the moor, deep night at the beacon.</p>
+      <p class="alt"><b>B</b> Dusk everywhere. <b>C</b> Night everywhere.</p></li>
+    <li><h3>Does Auros show in the paintings?</h3>
+      <p class="pick"><b>A</b> Yes, in every sky, always in the same spot, upper left behind the scene.</p>
+      <p class="alt"><b>B</b> Only in the wilds and at the beacon. <b>C</b> Never shown, only its light.</p></li>
+    <li><h3>When does each witch join?</h3>
+      <p class="pick"><b>A</b> The Ranger, the Fox and Io from the start. The Jester at the standing stones.</p>
+      <p class="alt"><b>B</b> All four from the start. <b>C</b> One at a time, starting with one witch alone (this needs new measuring).</p></li>
+    <li><h3>The gate to zone 3</h3>
+      <p class="pick"><b>A</b> The airship's twelve lamps, won back in the wilds.</p>
+      <p class="alt"><b>B</b> A plain rule: the captain flies at level 4. <b>C</b> The Jester joining opens it.</p></li>
+    <li><h3>Fights in town</h3>
+      <p class="pick"><b>A</b> Both: three set fights as wisps come into the fair, and the ring for practice bouts.</p>
+      <p class="alt"><b>B</b> Only the wisps. <b>C</b> Only the ring.</p></li>
+    <li><h3>The foes</h3>
+      <p class="pick"><b>A</b> Envoi's wraith family only: the wisp, the Shadow Wraith, the great wraith. A wisp carrying a ship's lamp is the same wisp with a lamp.</p>
+      <p class="alt"><b>B</b> Add one new simple foe for the moor, such as a ragflag (a torn fair banner come alive). <b>C</b> Add Envoi's Gloamwing as well.</p></li>
+    <li><h3>Names</h3>
+      <p class="pick"><b>A</b> Placeholders for now, all kept in one data file so you can rename anything in a minute.</p>
+      <p class="alt"><b>B</b> You name the game, the zones and the places before the paintings are asked for.</p></li>
+    <li><h3>The last fight</h3>
+      <p class="pick"><b>A</b> The great wraith, two Shadow Wraiths and two wisps. Wins at level 5: 6 / 81 / 100%. A level short: 0 / 3 / 92%.</p>
+      <p class="alt"><b>B</b> The great wraith and two Shadow Wraiths: 11 / 100 / 100%, and 1 / 66 / 97% a level short. <b>C</b> The great wraith, one Shadow Wraith and two wisps: 17 / 100 / 100%, and 1 / 86 / 100% a level short.</p></li>
+    <li><h3>Between fights</h3>
+      <p class="pick"><b>A</b> Every fight starts with full HP and MP, as in the blob battle, so the balance you approved holds exactly.</p>
+      <p class="alt"><b>B</b> Hurts carry over and the rest spots heal. This changes the balance and would need measuring again.</p></li>
+    <li><h3>The fair folk</h3>
+      <p class="pick"><b>A</b> Voices from inside the stalls and tents, with no new models. The only people you see are the five that exist.</p>
+      <p class="alt"><b>B</b> Leave talking to the captain alone until more models exist.</p></li>
+  </ol>
+</section>
+
+<section>
+  <div class="note">
+    <h3>What happens after you approve</h3>
+    <p>Step 2, the pilot: grey-box layouts and camera guides for the fair square (W1) and the moor clearing (F1), the standing rules, and the two pilot prompts on a page you can use on your phone. While you paint those, I build walking and a fight screen on placeholder pictures with the Jester.</p>
+  </div>
+  <ul class="plain small muted">
+    <li>Checked: my copy of the engine gives the same wins as your combat doc for all seven of its fights and all seven level tests.</li>
+    <li>Checked: every fight in the plan, 1,000 fights for each kind of player, and 2,000 whole playthroughs for each.</li>
+    <li>Not checked, because it cannot be yet: real speed on your laptop, how long a fight takes with the spell animations, and how the walking feels.</li>
+    <li>The Ranger, the Fox, Io and the captain are still being built. The game starts with the Jester and takes newer copies of the others as they come. All four on screen at once will need the lighter versions you are testing.</li>
+  </ul>
+</section>
+
+<footer>Moon Faire starter world, step 1 of the brief. November 13, 2026. Scripts and numbers: branch claude/moon-faire-starter-world, folder game/plan.</footer>
+
+</main>
+</body>
+</html>
