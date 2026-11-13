@@ -144,12 +144,23 @@ Pass 8 (13 Nov 2026): painted neck, chest shading back, purple off her shoulders
 Pass 9 (13 Nov 2026): head 10% larger and the depth reshaping built in; her own talk, laugh, dance, curtsey and pounce (see `claude/fox-3d-pass9-head-locked-own-moves.md`).
 Pass 10 (13 Nov 2026): Chris approved the five moves and keeps the Jester's bow, twirl, wave and jump; how her arms and hands move (see `claude/fox-3d-pass10-arms-hands-motion.md`).
 Pass 11 (13 Nov 2026): the lowest bracelet no longer sinks into the root of her thumb; her fingers are 5% shorter, which is their length in her own painting (see `claude/fox-3d-pass11-bracelet-fingers.md`).
+Pass 12 (13 Nov 2026): fingers 12% thicker (D1's width); her shears come out of the sheath into her hands; her first spell, Hemline Fangs (see `claude/fox-3d-pass12-shears-hemline-fangs.md`).
 Still to do: rounds 3 and 4 (her tools in her hands, her spells, her three flipbook moves): the paintings are in `references/round3` and `round4`, none used yet. Ruffles at the neckline and peplum are flat paint; her choker is plain where A1's has studs and a larger bell; under her jaw and the sides of her head are plain skin tone.
+
+## Her shears in her hands, and her spells (pass 12, round 3)
+
+- **Channels** (in `REST`, `src/70_anim.js`), keyed like any other: `shr` 0 sheathed to 1 in her right hand; `shs` 1 when the back half is in her left hand (two daggers); `sho` how far they are open, in radians; `shl` how the blades lean in her fists (0.44 back toward her wrists for carrying, below 0 forward for a cut).
+- **How a half follows a hand** (`TOOL`, `heldAt`, `poseTools` in `src/75_pose.js`): the half's ring is put in her fist, its blade out of the thumb side, flat to her palm. Bone `shears` is the front half (the bigger ring, her right hand); `shearB` the back half.
+- **They grow.** On her belt the shears are 26 cm (G1, G3). In H3 and H4 each dagger is about 45 cm. They grow 1.7 times as they leave the sheath (`GROW`; `makeFox({ shearsGrow: 1 })` keeps them belt-sized). Lore: "her scissors become daggers".
+- **Aiming a blade.** `bench/blades.js` searches, pose by pose, the forearm turn, wrist bend and lean that point a blade where it should go, and prints them. Use it before keying any move with a blade in it.
+- **Moves** (`src/89_foxspells.js`): `shears_out` (5.5 s; draw, two snips, part into two daggers, show, rejoin, sheath: for looking at the tools) and `hemline_fangs` (2.4 s; the flipbook's twelve frames at 1.22 times their length; the blow on frame 7, 1.22 s; `hits` and `cues` set). Effects: foxfire strewn over the strip each blade swept since the last frame, sparks and a small ring where the cuts cross, a flat ring round her as the halves come back together (H4). Colours `COL.fox`, `COL.foxPale`.
+- Anchors `bladeA`, `bladeB` (the points), `bladeAm`, `bladeBm` (the middles).
+- Not done: the hand takes the ring through the sheath's mouth without the fingers going through the ring; nothing is cut (no target reacts beyond the hit count); the other two flipbook moves (Blue Mischief, Borrowed Face) and the rest of rounds 3 and 4.
 
 ## Her fingers and bracelets (pass 11)
 
 - **Fingers.** `FINGER_K = 0.95` in `src/10_geom.js` scales the four fingers and the thumb's two free bones. The lengths in `FINGERS` are the Jester's; her painting D1 had been scaled to them by its middle finger, so her palm was never checked. In D1 her middle finger (web to tip) is 0.88 to 0.91 of her palm (web to wrist); the model was 0.94 and is now 0.89. Picture: `deliver/Fox_fingers_vs_painting.jpg`. `makeFox({ fingerLen: 1 })` gives the old length. The fingertip anchors (`tipR`, `tipL`) follow the table, and the seven touch keys were worked out again.
-- **Not changed:** her fingers are also about 12% thinner than in D1 (measured across all four at two heights). Chris asked only for the length.
+- **Width.** Her fingers were also about 12% thinner than in D1 (all four, at two heights). Chris, the same day: thicken them. `FINGER_W = 1.12` (fingers and thumb); they are now within 3 pixels of D1's at three heights. `makeFox({ fingerWide: 1 })` gives the old width.
 - **Bracelets.** The beads are strung in `src/33_bracelets.js`, after her hands exist, so each strand lies on whatever is under it: the wrist's oval, or her hand where her hand is wider (the root of her thumb). The lowest strand, on the line where arm meets hand, rides the bone `wrm`, which turns half as far as her hand, so a bent wrist does not push her hand through it. Check: `./wristset.sh w1` (ten views at rest).
 
 ## How her arms and hands move (pass 10)

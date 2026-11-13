@@ -8,6 +8,36 @@
   //   SHOULDER   her collar bone goes with her arm: it lifts as the hand rises above the shoulder and comes forward as she reaches ahead or across.
   //   SOFT_FROM  past this share of the arm's full length the hand eases toward straight instead of locking: a locked arm snaps when it lets go.
   const SHOULDER = opts.shoulderFollow === undefined ? 1 : +opts.shoulderFollow, SOFT_FROM = opts.softReach === undefined ? 0.962 : +opts.softReach;
+  // ---------- her shears in her hands (round 3) ----------
+  // Each half is a rigid piece on its own bone, at rest in the sheath. Held, a half goes wherever a hand goes: its ring in her fist, its blade out of
+  // the thumb side of the fist, leaning back toward her wrist the way a blade sits when the ring is held, flat to her palm. The front half (the bigger
+  // ring) is her right hand's; split, the back half is her left hand's, and the two are her daggers. Pose channels: shr, shs, sho (see REST).
+  const TOOL = (function () {
+    if (!SK.shears || !SK.shearB || !FOXGEAR.shears) return null;
+    const GS = FOXGEAR.shears, M4 = () => new THREE.Matrix4(), inv = (n) => skeleton.boneInverses[BI[n]], bind = (n) => M4().copy(inv(n)).invert(), g = (x, y, z) => V3(...GS.G(x, y, z));
+    const o = g(0, 0, 0), bS = g(0, GS.tipY, 0).sub(o).normalize(), nS = g(0, 0, 1).sub(o); nS.addScaledVector(bS, -nS.dot(bS)).normalize();
+    // a held half = the hand's own movement x where the ring sits in the fist (pre) x how the blade leans there (set each frame) x the half's own shape (post)
+    const grip = (s, bow, hand, bone) => {
+      const e3 = V3().crossVectors(bS, nS), h = g(bow[0], bow[1], 0), p = handPt(s, 0.020, -0.062, 0.006);
+      return { s, pre: M4().copy(inv(hand)).multiply(M4().makeTranslation(p.x, p.y, p.z)), post: M4().makeBasis(bS, nS, e3).transpose().multiply(M4().makeTranslation(-h.x, -h.y, -h.z)).multiply(bind(bone)), t2: handDir(s, 1, 0, 0).normalize() };
+    };
+    return { A: grip(-1, GS.bowA, 'handR', 'shears'), B: grip(1, GS.bowB, 'handL', 'shearB'), axis: nS.clone(), a0: SK.shears.position.clone(), b0: SK.shearB.position.clone(), tip: g(0, GS.tipY, 0), mid: g(0, GS.tipY * 0.45, 0) };
+  })();
+  const _tmA = new THREE.Matrix4(), _tmB = new THREE.Matrix4(), _tmC = new THREE.Matrix4(), _tp1 = V3(), _tq1 = Qt(), _tsc = V3(), _t1 = V3(), _t3 = V3();
+  // In her hands they are bigger than on her belt: in paintings H3 and H4 each dagger is about 45 cm, and the shears in the sheath (G1, G3) are 26.
+  // "Her scissors become daggers" (lore): they grow as they leave the sheath and shrink as they go back. The ring stays in her fist as they do.
+  const GROW = opts.shearsGrow === undefined ? 1.7 : +opts.shearsGrow, _tmS = new THREE.Matrix4(), _one = V3(1, 1, 1);
+  const heldAt = (G, handBone, lean, k, out) => { handDir(G.s, 0, Math.sin(lean), Math.cos(lean), _t1).normalize(); _t3.crossVectors(_t1, G.t2); return out.multiplyMatrices(handBone.matrixWorld, G.pre).multiply(_tmC.makeBasis(_t1, G.t2, _t3)).multiply(_tmS.makeScale(k, k, k)).multiply(G.post); };
+  function poseTools(P) {
+    if (!TOOL) return;
+    const A = SK.shears, B = SK.shearB, held = cl(P.shr || 0, 0, 1), split = cl(P.shs || 0, 0, 1), lean = P.shl === undefined ? 0.44 : P.shl, k = lerp(1, GROW, sm(0.25, 1, held));
+    A.position.copy(TOOL.a0); A.quaternion.set(0, 0, 0, 1); A.scale.set(1, 1, 1);
+    if (held > 0.001) { _tmA.copy(A.parent.matrixWorld).invert().multiply(heldAt(TOOL.A, SK.handR, lean, k, _tmB)); _tmA.decompose(_tp1, _tq1, _tsc); A.position.lerp(_tp1, held); A.quaternion.slerp(_tq1, held); A.scale.lerp(_tsc, held); }
+    A.updateMatrixWorld(true);
+    B.position.copy(TOOL.b0); B.quaternion.setFromAxisAngle(TOOL.axis, P.sho || 0); B.scale.set(1, 1, 1);
+    if (split > 0.001) { _tmA.copy(A.matrixWorld).invert().multiply(heldAt(TOOL.B, SK.handL, lean, k, _tmB)); _tmA.decompose(_tp1, _tq1, _tsc); B.position.lerp(_tp1, split); B.quaternion.slerp(_tq1, split); B.scale.lerp(_tsc, split); }
+    B.updateMatrixWorld(true);
+  }
   // Two of the arm rules need to know how much time has passed, so they can change over time and not over distance. animate() sets poseDt for
   // its own call; a pose applied directly (the workbench, a still) has poseDt 0 and gets the plain, instant rule.
   //   - The elbow tuck and forearm turn of a hanging arm fade as the hand leaves her side. Tied to the hand's height alone, a quick hand crossed
@@ -63,6 +93,7 @@
     }
     if (SK.sheath) SK.sheath.quaternion.set(0, 0, 0, 1).slerp(SK.thighR.quaternion, 0.85);      // her sheath hangs from the belt but lies along her right thigh, and goes where it goes
     root.updateMatrixWorld(true);
+    poseTools(P);
     paintFace(P.eyes, MOUTHS[Math.round(cl(P.mouth, 0, 2))], P.glow);
   }
   // ---------- base layer: the breathing stance and the walk ----------

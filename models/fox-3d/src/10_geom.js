@@ -56,11 +56,13 @@
   // middle finger, so her palm was never checked. In D1 her middle finger, web to tip, is 0.88 to 0.91 of her palm (web to wrist); on the model it
   // was 0.94. At 0.95 of their length her fingers are 0.89 of her palm. The thumb's two free bones take the same.
   const FINGER_K = opts.fingerLen === undefined ? 0.95 : +opts.fingerLen;
-  for (const f of FINGERS) f[3] *= FINGER_K;
+  // The same day: with the length right, her fingers were still thinner than in D1 (about 12%, across all four at two heights), and thin reads as long.
+  const FINGER_W = opts.fingerWide === undefined ? 1.12 : +opts.fingerWide;
+  for (const f of FINGERS) { f[3] *= FINGER_K; f[4] *= FINGER_W; }
   const PHAL = [0.50, 0.255, 0.245];
   const fingerDir = (a) => [0, -Math.cos(a), Math.sin(a)];
   // the thumb's first bone lies inside the heel of the hand, from the wrist to where the thumb comes free
-  const THUMB = { base: [0.008, -0.0062, 0.0286], dir: [0.12, -0.92, 0.37], len: [0.0432, 0.0310 * FINGER_K, 0.0256 * FINGER_K], r: 0.0077, roll: 60 * DEG };
+  const THUMB = { base: [0.008, -0.0062, 0.0286], dir: [0.12, -0.92, 0.37], len: [0.0432, 0.0310 * FINGER_K, 0.0256 * FINGER_K], r: 0.0077 * FINGER_W, roll: 60 * DEG };
   for (const [S, s] of SIDES) {
     for (const [fn, fz, fy, fl, fr, fa] of FINGERS) {
       let par = 'hand' + S, t = 0; const fd = fingerDir(fa);

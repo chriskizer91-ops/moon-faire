@@ -8,9 +8,9 @@
   const STATES = [['idle', 'Stand', 0.7], ['walk', 'Walk', 0.7], ['run', 'Run', 0.8], ['kneel', 'Kneel', 0.7], ['squat', 'Squat', 0.7], ['sit_chair', 'Sit on a stool', 0.7], ['sit_ground', 'Sit on the ground', 0.7], ['hover', 'Hover', 0.75]];
   // Her moves (Chris, 13 Nov): her own talk, laugh, dance, curtsey and pounce, and the Jester's bow, twirl, wave and jump, which she keeps.
   // Names are working names.
-  const ACTS = [['talk', 'Talk', 0.8], ['laugh', 'Laugh', 0.8], ['dance', 'Dance', 1.0], ['curtsey', 'Curtsey', 0.9], ['pounce', 'Pounce', 1.0, 1.32], ['bow', 'Bow', 0.95], ['twirl', 'Twirl', 1.15], ['wave', 'Wave', 0.8], ['jump', 'Jump', 0.9, 1.42]];
+  const ACTS = [['talk', 'Talk', 0.8], ['laugh', 'Laugh', 0.8], ['dance', 'Dance', 1.0], ['curtsey', 'Curtsey', 0.9], ['pounce', 'Pounce', 1.0, 1.32], ['bow', 'Bow', 0.95], ['twirl', 'Twirl', 1.15], ['wave', 'Wave', 0.8], ['jump', 'Jump', 0.9, 1.42], ['shears_out', 'Shears', 0.85]];
   const QUIET = [['look_around', 'Stand', 0.7], ['settle', 'Stand', 0.7]];      // small things she does by herself when left standing
-  const SPELLS = [];      // the Fox has no spells yet (pass 1): the row and the cast buttons stay hidden until she does
+  const SPELLS = [['hemline_fangs', 'Hemline Fangs', 1.2, 1.2]];      // her first spell (round 3); names are working names
   const ALL = STATES.concat(ACTS, SPELLS, QUIET), find = (id) => ALL.find((x) => x[0] === id);
   const VIEWS = [['Front', 0, 0.10, 1], ['Three-quarter', -0.62, 0.14, 1], ['Side', -1.5708, 0.08, 1], ['Back', 3.1416, 0.12, 1], ['Face', 0.22, 0.02, 0.27]];
   const touchPhone = (navigator.maxTouchPoints > 0 || /Mobi|Android|iPhone/i.test(navigator.userAgent)) && Math.min(screen.width, screen.height) < 820;
@@ -148,7 +148,7 @@
   }
 
   // ---- quick buttons on the stage: cast the chosen spell, step through the spells, jump, and a flourish; keys: 1 to 0 cast, Q and E choose, F casts, R flourish, Space jumps ----
-  const FLOUR = ['curtsey', 'pounce', 'laugh', 'dance', 'bow', 'twirl', 'talk', 'wave']; let qi = 1, fi = 0;
+  const FLOUR = ['curtsey', 'pounce', 'laugh', 'dance', 'bow', 'twirl', 'talk', 'wave']; let qi = SPELLS.length > 1 ? 1 : 0, fi = 0;
   const qName = $('qName'), qShow = () => { qName.textContent = SPELLS.length ? SPELLS[qi][1] : ''; };
   const qStep = (d) => { if (!SPELLS.length) return; qi = (qi + d + SPELLS.length) % SPELLS.length; qShow(); };
   const qCast = () => { if (SPELLS.length) setMove(SPELLS[qi][0]); }, qFlour = () => { setMove(FLOUR[fi]); fi = (fi + 1) % FLOUR.length; };
@@ -163,7 +163,7 @@
   }
   qShow();
   // ---- a practice dummy to cast at (with Walk around): she turns to put it on her casting side, the spell goes to where it stands, and it rocks when struck ----
-  const AIMED = { sealed_fate: 1, gilded_rebuke: 1, hush: 1, gravity: 1, ill_omen: 1, stop: 1, last_toll: 1 };
+  const AIMED = { hemline_fangs: 1, sealed_fate: 1, gilded_rebuke: 1, hush: 1, gravity: 1, ill_omen: 1, stop: 1, last_toll: 1 };
   const lin = (h) => new THREE.Color(h).convertSRGBToLinear(), dummy = new THREE.Group(), dBody = new THREE.Group(), dState = { rx: 0, rz: 0, vx: 0, vz: 0, flash: 0 }; let dummyOn = true;
   dummy.add(dBody); dummy.position.set(1.9, 0, -0.25); dummy.visible = false; stage.scene.add(dummy);
   const sackM = new THREE.MeshStandardMaterial({ color: lin(0x9a7d55), roughness: 0.95, emissive: lin(0xb070ff), emissiveIntensity: 0 });

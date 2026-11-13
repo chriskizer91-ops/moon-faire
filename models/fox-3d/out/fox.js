@@ -138,11 +138,13 @@ function makeFox(opts) {
   // middle finger, so her palm was never checked. In D1 her middle finger, web to tip, is 0.88 to 0.91 of her palm (web to wrist); on the model it
   // was 0.94. At 0.95 of their length her fingers are 0.89 of her palm. The thumb's two free bones take the same.
   const FINGER_K = opts.fingerLen === undefined ? 0.95 : +opts.fingerLen;
-  for (const f of FINGERS) f[3] *= FINGER_K;
+  // The same day: with the length right, her fingers were still thinner than in D1 (about 12%, across all four at two heights), and thin reads as long.
+  const FINGER_W = opts.fingerWide === undefined ? 1.12 : +opts.fingerWide;
+  for (const f of FINGERS) { f[3] *= FINGER_K; f[4] *= FINGER_W; }
   const PHAL = [0.50, 0.255, 0.245];
   const fingerDir = (a) => [0, -Math.cos(a), Math.sin(a)];
   // the thumb's first bone lies inside the heel of the hand, from the wrist to where the thumb comes free
-  const THUMB = { base: [0.008, -0.0062, 0.0286], dir: [0.12, -0.92, 0.37], len: [0.0432, 0.0310 * FINGER_K, 0.0256 * FINGER_K], r: 0.0077, roll: 60 * DEG };
+  const THUMB = { base: [0.008, -0.0062, 0.0286], dir: [0.12, -0.92, 0.37], len: [0.0432, 0.0310 * FINGER_K, 0.0256 * FINGER_K], r: 0.0077 * FINGER_W, roll: 60 * DEG };
   for (const [S, s] of SIDES) {
     for (const [fn, fz, fy, fl, fr, fa] of FINGERS) {
       let par = 'hand' + S, t = 0; const fd = fingerDir(fa);
@@ -1804,6 +1806,7 @@ function makeFox(opts) {
       const zMid = (yl) => 0.5 * (DS * (1 + yl / L) + 0.0030);       // half way through the sheath at that height: the blades lie down the middle of it, leaning back as it thins
       const G = (x, y, z) => F(PV[0] + x, PV[1] + y, zMid(PV[1] + y) + z);      // the shears' own space: the screw at the middle, blades pointing down, flat to the front
       const TIPY = -729 * KG, PLY = 111 * KG, PW = 37.5 * KG, TH = 0.0016;
+      FOXGEAR.shears = { G, tipY: TIPY, bowA: [-58 * KG, 406 * KG], bowB: [87 * KG, 395 * KG] };      // for putting them in her hands (75_pose.js)
       for (const [nm, sgn, bow, wb] of [['A', -1, { c: [-58 * KG, 406 * KG], rx: 80 * KG - 0.0021, ry: 175 * KG - 0.0021 }, [BI.shears, 1]], ['B', 1, { c: [87 * KG, 395 * KG], rx: 60 * KG - 0.0021, ry: 94 * KG - 0.0021 }, [BI.shearB, 1]]]) {
         const wf = () => wb, z0 = sgn < 0 ? 0 : -TH;                          // half A lies in front, half B behind
         // the blade and the plate round the screw: spine on its own side, edge toward the other half
@@ -1826,7 +1829,7 @@ function makeFox(opts) {
         for (let i = 0; i < part.pos.length; i += 3) { const d = (part.pos[i] - c.x) * P.Z.x + (part.pos[i + 1] - c.y) * P.Z.y + (part.pos[i + 2] - c.z) * P.Z.z, sq = d * (0.30 - 1); part.pos[i] += P.Z.x * sq; part.pos[i + 1] += P.Z.y * sq; part.pos[i + 2] += P.Z.z * sq; }
         addPart('brass', part, () => [BI.shears, 1], { out: c });
         if (sg > 0) for (const rot of [PI / 4, -PI / 4]) { const cs = Math.cos(rot), sn = Math.sin(rot); put('gearIn', slab((x, y, z) => G(x * cs - y * sn, x * sn + y * cs, TH + 0.0003 + 0.0019 + z), 1, 1, (u, v) => [0.0048 * (2 * u - 1), 0.00055 * (2 * v - 1), 0, 0.5, 0.5], 0.0004), () => [BI.shears, 1], V3(...G(0, 0, TH))); } }
-      FOXGEAR.shears = { pivot: pv, KG };
+      Object.assign(FOXGEAR.shears, { pivot: pv, KG });
     }
   })();
 
@@ -2577,7 +2580,9 @@ function makeFox(opts) {
     hR: [-REST_HX, REST_HY, 0.055], hL: [REST_HX, REST_HY, 0.055], eR: [-0.55, -0.1, -1], eL: [0.55, -0.1, -1], twR: 0, twL: 0, wrR: [0.1, 0], wrL: [0.1, 0],
     fR: FP.relax.slice(), fL: FP.relax.slice(),
     ftR: [0, 0, 0, -0.10, 0, 0, 0], ftL: [0, 0, 0, 0.10, 0, 0, 0], knR: [-0.12, 0, 1], knL: [0.12, 0, 1],
-    eyes: 0, mouth: 0, glow: 0
+    eyes: 0, mouth: 0, glow: 0,
+    shr: 0, shs: 0, sho: 0, shl: 0.44     // her shears: in her right hand (0 sheathed .. 1 held), split (1: the back half in her left hand), open (radians),
+                                          // and how the blades lean in her fists (radians: 0.44 back toward her wrists, for carrying; below 0 forward, for a cut)
   };
   const CHANS = Object.keys(REST);
   const clonePose = (p) => { const o = {}; for (const k of CHANS) o[k] = typeof p[k] === 'number' ? p[k] : p[k].slice(); return o; };
@@ -2707,6 +2712,36 @@ function makeFox(opts) {
   //   SHOULDER   her collar bone goes with her arm: it lifts as the hand rises above the shoulder and comes forward as she reaches ahead or across.
   //   SOFT_FROM  past this share of the arm's full length the hand eases toward straight instead of locking: a locked arm snaps when it lets go.
   const SHOULDER = opts.shoulderFollow === undefined ? 1 : +opts.shoulderFollow, SOFT_FROM = opts.softReach === undefined ? 0.962 : +opts.softReach;
+  // ---------- her shears in her hands (round 3) ----------
+  // Each half is a rigid piece on its own bone, at rest in the sheath. Held, a half goes wherever a hand goes: its ring in her fist, its blade out of
+  // the thumb side of the fist, leaning back toward her wrist the way a blade sits when the ring is held, flat to her palm. The front half (the bigger
+  // ring) is her right hand's; split, the back half is her left hand's, and the two are her daggers. Pose channels: shr, shs, sho (see REST).
+  const TOOL = (function () {
+    if (!SK.shears || !SK.shearB || !FOXGEAR.shears) return null;
+    const GS = FOXGEAR.shears, M4 = () => new THREE.Matrix4(), inv = (n) => skeleton.boneInverses[BI[n]], bind = (n) => M4().copy(inv(n)).invert(), g = (x, y, z) => V3(...GS.G(x, y, z));
+    const o = g(0, 0, 0), bS = g(0, GS.tipY, 0).sub(o).normalize(), nS = g(0, 0, 1).sub(o); nS.addScaledVector(bS, -nS.dot(bS)).normalize();
+    // a held half = the hand's own movement x where the ring sits in the fist (pre) x how the blade leans there (set each frame) x the half's own shape (post)
+    const grip = (s, bow, hand, bone) => {
+      const e3 = V3().crossVectors(bS, nS), h = g(bow[0], bow[1], 0), p = handPt(s, 0.020, -0.062, 0.006);
+      return { s, pre: M4().copy(inv(hand)).multiply(M4().makeTranslation(p.x, p.y, p.z)), post: M4().makeBasis(bS, nS, e3).transpose().multiply(M4().makeTranslation(-h.x, -h.y, -h.z)).multiply(bind(bone)), t2: handDir(s, 1, 0, 0).normalize() };
+    };
+    return { A: grip(-1, GS.bowA, 'handR', 'shears'), B: grip(1, GS.bowB, 'handL', 'shearB'), axis: nS.clone(), a0: SK.shears.position.clone(), b0: SK.shearB.position.clone(), tip: g(0, GS.tipY, 0), mid: g(0, GS.tipY * 0.45, 0) };
+  })();
+  const _tmA = new THREE.Matrix4(), _tmB = new THREE.Matrix4(), _tmC = new THREE.Matrix4(), _tp1 = V3(), _tq1 = Qt(), _tsc = V3(), _t1 = V3(), _t3 = V3();
+  // In her hands they are bigger than on her belt: in paintings H3 and H4 each dagger is about 45 cm, and the shears in the sheath (G1, G3) are 26.
+  // "Her scissors become daggers" (lore): they grow as they leave the sheath and shrink as they go back. The ring stays in her fist as they do.
+  const GROW = opts.shearsGrow === undefined ? 1.7 : +opts.shearsGrow, _tmS = new THREE.Matrix4(), _one = V3(1, 1, 1);
+  const heldAt = (G, handBone, lean, k, out) => { handDir(G.s, 0, Math.sin(lean), Math.cos(lean), _t1).normalize(); _t3.crossVectors(_t1, G.t2); return out.multiplyMatrices(handBone.matrixWorld, G.pre).multiply(_tmC.makeBasis(_t1, G.t2, _t3)).multiply(_tmS.makeScale(k, k, k)).multiply(G.post); };
+  function poseTools(P) {
+    if (!TOOL) return;
+    const A = SK.shears, B = SK.shearB, held = cl(P.shr || 0, 0, 1), split = cl(P.shs || 0, 0, 1), lean = P.shl === undefined ? 0.44 : P.shl, k = lerp(1, GROW, sm(0.25, 1, held));
+    A.position.copy(TOOL.a0); A.quaternion.set(0, 0, 0, 1); A.scale.set(1, 1, 1);
+    if (held > 0.001) { _tmA.copy(A.parent.matrixWorld).invert().multiply(heldAt(TOOL.A, SK.handR, lean, k, _tmB)); _tmA.decompose(_tp1, _tq1, _tsc); A.position.lerp(_tp1, held); A.quaternion.slerp(_tq1, held); A.scale.lerp(_tsc, held); }
+    A.updateMatrixWorld(true);
+    B.position.copy(TOOL.b0); B.quaternion.setFromAxisAngle(TOOL.axis, P.sho || 0); B.scale.set(1, 1, 1);
+    if (split > 0.001) { _tmA.copy(A.matrixWorld).invert().multiply(heldAt(TOOL.B, SK.handL, lean, k, _tmB)); _tmA.decompose(_tp1, _tq1, _tsc); B.position.lerp(_tp1, split); B.quaternion.slerp(_tq1, split); B.scale.lerp(_tsc, split); }
+    B.updateMatrixWorld(true);
+  }
   // Two of the arm rules need to know how much time has passed, so they can change over time and not over distance. animate() sets poseDt for
   // its own call; a pose applied directly (the workbench, a still) has poseDt 0 and gets the plain, instant rule.
   //   - The elbow tuck and forearm turn of a hanging arm fade as the hand leaves her side. Tied to the hand's height alone, a quick hand crossed
@@ -2762,6 +2797,7 @@ function makeFox(opts) {
     }
     if (SK.sheath) SK.sheath.quaternion.set(0, 0, 0, 1).slerp(SK.thighR.quaternion, 0.85);      // her sheath hangs from the belt but lies along her right thigh, and goes where it goes
     root.updateMatrixWorld(true);
+    poseTools(P);
     paintFace(P.eyes, MOUTHS[Math.round(cl(P.mouth, 0, 2))], P.glow);
   }
   // ---------- base layer: the breathing stance and the walk ----------
@@ -3778,6 +3814,95 @@ function makeFox(opts) {
     })();
   })();
 
+  // ---------- the Fox's spells (round 3). First: her shears in her hands, and Hemline Fangs ----------
+  // References: references/round3/H3.webp (the draw and the split), H4.webp (the two cuts), and the flipbook clip hemline_fangs (12 frames at 6 a
+  // second, the blow on frame 7). Her magic is cold blue foxfire (lore/discussion-notes.md, "The Fox").
+  COL.fox = [0.36, 0.78, 1.0]; COL.foxPale = [0.84, 0.95, 1.0]; COL.thread = [1.0, 0.82, 0.42];
+  (function foxSpells() {
+    const arm = (S, h, e, f, tw, wr) => ({ ['h' + S]: h, ['e' + S]: e, ['f' + S]: f, ['tw' + S]: tw, ['wr' + S]: wr });
+    // Hand keys for her shears. GRIP: her right palm on the ring of the sheathed shears (bench: T.reach of 'handR' onto the ring). The turns of her
+    // forearms and wrists that point a blade where it should go were searched for on the model (bench/blades.js), pose by pose.
+    const GRIP = arm('R', [-0.216, 1.015, 0.123], [-1, 0.2, -0.6], FP.grip, 0.2, [0.3, 0]);
+    const upR = (y) => arm('R', [-0.13, y, 0.27], [-0.7, -1, -0.2], FP.grip, 0.2, [0.4, 0.3]), upL = (y) => arm('L', [-0.045, y - 0.01, 0.275], [0.7, -1, -0.2], FP.grip, 0.2, [0.4, -0.3]);      // held up in front of her right shoulder, clear of her face, blades up (H3)
+    const outR = arm('R', [-0.40, 1.02, 0.08], [-0.2, -0.5, -1], FP.grip, 1.0, [0, 0.3]), outL = arm('L', [0.40, 1.02, 0.08], [0.2, -0.5, -1], FP.grip, 1.0, [0, -0.3]);                          // a dagger out at each side, blades up (H3)
+    const restL = arm('L', [0.29, 0.882, 0.055], [0.55, -0.1, -1], FP.relax, 0, [0.1, 0]), restR = arm('R', [-0.29, 0.882, 0.055], [-0.55, -0.1, -1], FP.relax, 0, [0.1, 0]);
+    const _f1 = V3(), _f2 = V3(), _f3 = V3(), _f4 = V3(), prev = { A: { tip: V3(), mid: V3(), on: false }, B: { tip: V3(), mid: V3(), on: false } };
+    // foxfire off a moving blade: sparks strewn over the strip the blade swept since the last frame, so a fast cut leaves an unbroken arc
+    function bladeTrail(W, k, dt) {
+      const tip = anchor('blade' + W, _f1), mid = anchor('blade' + W + 'm', _f2), p = prev[W];
+      if (p.on && k > 0.01) { const sp = tip.distanceTo(p.tip) / Math.max(dt, 1e-3), n = Math.min(40, (10 + sp * 14) * k * dt * 60 / 2.2);
+        for (let i = 0; i < n || (i === 0 && Math.random() < n); i++) { const u = Math.random(), v = Math.pow(Math.random(), 0.6); _f3.copy(p.mid).lerp(p.tip, v); _f4.copy(mid).lerp(tip, v); _f3.lerp(_f4, u);
+          emit(_f3.x, _f3.y, _f3.z, rs() * 0.05, 0.03 + rs() * 0.05, rs() * 0.05, 0.16 + Math.random() * 0.22, 0.022 + 0.034 * v, Math.random() < 0.3 ? COL.foxPale : COL.fox, 0.1, 0.6); } }
+      p.tip.copy(tip); p.mid.copy(mid); p.on = true; return tip;
+    }
+    const glint = (W, dt, rate) => { if (Math.random() < rate * dt) { const t = anchor('blade' + W, _f1); emit(t.x, t.y, t.z, rs() * 0.08, 0.05 + Math.random() * 0.1, rs() * 0.08, 0.35 + Math.random() * 0.3, 0.03, COL.foxPale, 0.2, 0.8); } };
+
+    // Shears: she takes them out to look at them. Draws them, holds them up, two snips, parts them into her two daggers and shows them, puts them
+    // back together and away. For looking at the tools in her hands; not a spell.
+    defAction('shears_out', 5.5, [
+      Object.assign({ t: 0.32, hd: [-0.25, 0.18, 0], sp: [-0.08, 0.05, 0], shr: 0 }, GRIP),
+      Object.assign({ t: 0.42, shr: 0 }, GRIP),
+      Object.assign({ t: 0.80, shr: 1, hd: [0, 0.07, 0.05], sp: [0, 0, 0], sho: 0, mouth: 2 }, upR(1.17)),
+      { t: 1.05, sho: 0 }, { t: 1.20, sho: 0.55 }, { t: 1.36, sho: 0.04 }, { t: 1.52, sho: 0.55 }, { t: 1.68, sho: 0 },                                        // snip, snip
+      Object.assign({ t: 1.80, shs: 0 }, upR(1.17), restL),
+      Object.assign({ t: 2.15, shs: 0, sho: 0 }, upL(1.17)),                                                                                                   // her left hand takes the back half
+      { t: 2.30, shs: 1 },
+      Object.assign({ t: 2.70, hd: [0, -0.03, 0.08], shl: 0.44 }, outR, outL),                                                                                 // two daggers
+      { t: 3.10, twR: 0.7, twL: 1.3, hd: [0.2, -0.03, 0.08] }, { t: 3.50, twR: 1.3, twL: 0.7, hd: [-0.2, -0.03, 0.08] }, Object.assign({ t: 3.85, hd: [0, 0, 0.05], shs: 1 }, outR, outL),      // she turns them in the light
+      Object.assign({ t: 4.25, shs: 1, hd: [0, 0.07, 0] }, upR(1.10), upL(1.10)),
+      { t: 4.40, shs: 0 },
+      Object.assign({ t: 4.60, shr: 1 }, upR(1.10), restL),
+      Object.assign({ t: 4.95, shr: 1, hd: [-0.22, 0.16, 0], sp: [-0.06, 0.04, 0] }, GRIP),
+      Object.assign({ t: 5.10, shr: 0, mouth: 2 }, GRIP),
+      Object.assign({ t: 5.20, shr: 0, hd: [0, 0, 0], sp: [0, 0, 0] }, GRIP)
+    ], { outro: 0.3, cues: [1.36 / 5.5, 1.68 / 5.5], fx(a, t, dt) { const T = a.t; if (T > 0.8 && T < 4.9) { glint('A', dt, 2.5); if (T > 2.3 && T < 4.4) glint('B', dt, 2.5); } } });
+
+    // Hemline Fangs. Keyed on the flipbook's twelve frames, a little slower so no hand has to whip: time = (frame - 1) / 6 x TS.
+    (function () {
+      const TS = 1.22, K = (f, o) => Object.assign({ t: (f - 1) / 6 * TS }, o), keys = [], stand = { hip: [0, 0, 0], hipR: [0, 0, 0], ftR: 'rest', ftL: 'rest', knR: 'rest', knL: 'rest' };
+      const lunge = (dz, dy) => ({ hip: [0.03, dy, dz], ftL: [0.12, 0, 0.30, 0.25, 0], ftR: [-0.10, 0.02, -0.16, -0.5, 0.25], knL: [0.30, 0, 1], knR: [-0.4, 0, 1] });
+      const cutR = (h, wr) => arm('R', h, [-1, -0.6, -0.2], FP.grip, 0.8, wr), cutL = (h, wr) => arm('L', h, [1, -0.6, -0.2], FP.grip, 0.8, wr);
+      keys.push(K(1.85, Object.assign({ hd: [-0.25, 0.18, 0], sp: [-0.08, 0.05, 0], shr: 0 }, GRIP, arm('L', [0.10, 1.04, 0.24], [0.7, -1, -0.2], FP.soft, 0.2, [0.2, 0]))));       // her hand on the ring
+      keys.push(K(2.00, { shr: 0 }));
+      keys.push(K(2.30, Object.assign({ shr: 1, shs: 0, sho: 0.3, shl: 0.44, hd: [0, 0.08, 0], sp: [0, 0, 0], mouth: 2 }, upR(1.10), upL(1.10))));                                   // out and up, and her left hand has the back half
+      keys.push(K(2.50, { shs: 0 }));
+      keys.push(K(3.20, Object.assign({ shs: 1, sho: 0, shl: 0.44, hd: [0, -0.03, 0.06] }, outR, outL, stand)));                                                                     // frame 3: a dagger at each side
+      keys.push(K(3.70, Object.assign({ shl: 0.44 }, outR, outL, stand)));
+      keys.push(K(4.65, Object.assign({ shl: -0.35, sp: [-0.35, 0.10, 0], hd: [0.25, 0, 0] }, lunge(0.10, -0.15),                                                                    // frames 4 and 5: the step, and she winds up to her right
+        arm('R', [-0.40, 1.28, -0.03], [-1, -0.3, -0.6], FP.grip, 1.6, [-0.4, -0.3]), cutL([0.12, 1.08, 0.30], [0, 0]))));
+      keys.push(K(5.30, Object.assign({ shl: -0.45, sp: [-0.37, 0.10, 0] }, lunge(0.10, -0.15), arm('R', [-0.41, 1.29, -0.05], [-1, -0.3, -0.6], FP.grip, 1.6, [-0.4, -0.3]))));
+      keys.push(K(6.15, Object.assign({ shl: -0.7, sp: [0, 0.12, 0], hd: [0, 0.03, 0] }, lunge(0.14, -0.17), cutR([-0.05, 1.16, 0.43], [0, 0.3]), cutL([0.30, 1.28, 0.12], [-0.2, 0.2]))));   // the first cut, her right hand, high right to low left
+      keys.push(K(7.00, Object.assign({ shl: -0.7, sp: [0.25, 0.14, 0], hd: [-0.2, 0.05, 0] }, lunge(0.15, -0.17), cutR([0.18, 0.93, 0.36], [0, 0.3]),                               // frame 7: it lands
+        arm('L', [0.34, 1.40, 0.06], [1, -0.2, -0.6], FP.grip, 1.6, [-0.4, 0.3]))));
+      keys.push(K(7.75, Object.assign({ sp: [0.05, 0.13, 0], hd: [0, 0.04, 0] }, lunge(0.15, -0.17), cutL([0.05, 1.14, 0.44], [0, 0]), cutR([0.21, 0.90, 0.28], [0, 0.3]))));        // the second, her left hand, down across the first
+      keys.push(K(8.45, Object.assign({ shl: -0.7, sp: [-0.15, 0.12, 0], hd: [0.12, 0.05, 0] }, lunge(0.14, -0.16), cutL([-0.16, 0.91, 0.36], [0, -0.3]), cutR([0.20, 0.92, 0.25], [0, 0.3]))));
+      keys.push(K(9.40, Object.assign({ shl: 0.1, shs: 1, sp: [0, 0.02, 0], hd: [0, 0, 0.05], mouth: 2 }, stand, arm('R', [-0.34, 0.98, 0.20], [-0.4, -0.6, -0.8], FP.grip, 1.0, [0, 0.3]),   // she comes up out of it, blades wide
+        arm('L', [0.34, 0.98, 0.20], [0.4, -0.6, -0.8], FP.grip, 1.0, [0, -0.3]))));
+      keys.push(K(10.30, Object.assign({ shl: 0.44, shs: 1, sho: 0.3, hd: [0, 0.07, 0] }, upR(1.10), upL(1.10))));                                                                 // and together again in front of her
+      keys.push(K(10.65, { shs: 0, sho: 0.3 })); keys.push(K(10.90, { sho: 0 }));                                                                                                  // snip
+      keys.push(K(11.00, Object.assign({ shr: 1 }, upR(1.10), restL)));
+      keys.push(K(11.70, Object.assign({ shr: 1, hd: [-0.22, 0.16, 0], sp: [-0.06, 0.04, 0] }, GRIP)));                                                                           // and away
+      keys.push(K(11.95, Object.assign({ shr: 0 }, GRIP)));
+      keys.push(K(12.10, Object.assign({ shr: 0, hd: [0, 0, 0], sp: [0, 0, 0], mouth: 2 }, GRIP)));
+      const dur = (12.9 - 1) / 6 * TS, tt = (f) => (f - 1) / 6 * TS, T_HIT = tt(7.0), T_HIT2 = tt(8.3), T_RING = tt(9.4);
+      defAction('hemline_fangs', dur, keys, { outro: 0.28, stand: true, hits: [T_HIT / dur], cues: [tt(3) / dur, T_HIT2 / dur], impact: 0.6,
+        start() { prev.A.on = prev.B.on = false; },
+        fx(a, t, dt) {
+          const T = a.t, out = T > tt(2.4) && T < tt(11.7), split = T > tt(2.8) && T < tt(10.6);
+          const k1 = win(T, tt(5.5), tt(7.3), 0.08), k2 = win(T, tt(6.9), tt(8.7), 0.08), kr = win(T, tt(8.9), tt(10.0), 0.08);
+          if (out) { const tip = bladeTrail('A', Math.max(k1, 0.5 * kr), dt); if (k1 > 0.2) light(tip, 0.9 * k1, 0x66c8ff); glint('A', dt, 3); } else prev.A.on = false;
+          if (split) { const tip = bladeTrail('B', Math.max(k2, 0.5 * kr), dt); if (k2 > 0.2) light(tip, 0.9 * k2, 0x66c8ff); glint('B', dt, 3); } else prev.B.on = false;
+          if (cue(a, 'split', tt(2.75))) { const p = anchor('bladeAm', _f1); burst(p, 26, 0.9, 0.5, 0.03, COL.foxPale, 0.3, 1.2, 0.2); }
+          const X = anchor('chest', _f1); X.addScaledVector(_f2.set(0, 0, 1).applyQuaternion(root.getWorldQuaternion(_qa)), 0.62 * FOX_K); X.y -= 0.12 * FOX_K;      // where the two cuts cross, in front of her
+          if (cue(a, 'hit1', T_HIT)) { burst(X, 60, 2.2, 0.55, 0.04, COL.fox, 0.5, 1.4, 0.3); shock(X, 0.05, 0.42, 0.30, COL.foxPale); }
+          if (cue(a, 'hit2', T_HIT2)) { burst(X, 46, 1.8, 0.5, 0.04, COL.foxPale, 0.5, 1.4, 0.3); shock(X, 0.04, 0.34, 0.26, COL.fox); }
+          const fl = win(T, T_HIT - 0.03, T_HIT2 + 0.2, 0.06); if (fl > 0.01) light(X, 1.4 * fl, 0x8fd8ff);
+          if (cue(a, 'ring', T_RING)) { const c = anchor('hips', _f1); c.y += 0.16 * FOX_K; shock(c, 0.22, 1.05, 0.55, COL.fox, true); }                              // the ring as she spins them back (H4)
+          if (cue(a, 'snip', tt(10.9))) { const p = anchor('bladeAm', _f1); burst(p, 14, 0.6, 0.4, 0.025, COL.foxPale, 0.3, 1.2, 0.2); }
+        } });
+    })();
+  })();
+
   // ---------- per-frame update ----------
   const st = { init: false, px: 0, py: 0, pz: 0, time: 0 };
   let fade = 1, userWind = V3(0, 0, 0);
@@ -3891,6 +4016,10 @@ function makeFox(opts) {
       case 'handL': { const p = handPt(1, 0.018, -0.06, 0.004); return at('handL', p.x, p.y, p.z); }
       case 'tipR': { const p = handPt(-1, 0, FINGERS[0][2] - FINGERS[0][3], 0.0315); return at('idx2R', p.x, p.y, p.z); }      // the tip of her first finger, whatever its length
       case 'tipL': { const p = handPt(1, 0, FINGERS[0][2] - FINGERS[0][3] - 0.001, 0.027); return at('idx2L', p.x, p.y, p.z); }
+      case 'bladeA': return TOOL ? at('shears', TOOL.tip.x, TOOL.tip.y, TOOL.tip.z) : at('handR', 0, 0, 0);          // the points and middles of her two blades
+      case 'bladeB': return TOOL ? at('shearB', TOOL.tip.x, TOOL.tip.y, TOOL.tip.z) : at('handL', 0, 0, 0);
+      case 'bladeAm': return TOOL ? at('shears', TOOL.mid.x, TOOL.mid.y, TOOL.mid.z) : at('handR', 0, 0, 0);
+      case 'bladeBm': return TOOL ? at('shearB', TOOL.mid.x, TOOL.mid.y, TOOL.mid.z) : at('handL', 0, 0, 0);
       case 'bells': return at('bell3', bellRest[3].x, bellRest[3].y - 0.035, bellRest[3].z);
       case 'feet': return out.set(0, 0, 0).applyMatrix4(root.matrixWorld);
       case 'pendant': { const tp = prof(TORSO, 1.306, true); return at('spine3', 0, 1.306, tp[3] + tp[1] + 0.012); }

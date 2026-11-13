@@ -112,6 +112,10 @@
       case 'handL': { const p = handPt(1, 0.018, -0.06, 0.004); return at('handL', p.x, p.y, p.z); }
       case 'tipR': { const p = handPt(-1, 0, FINGERS[0][2] - FINGERS[0][3], 0.0315); return at('idx2R', p.x, p.y, p.z); }      // the tip of her first finger, whatever its length
       case 'tipL': { const p = handPt(1, 0, FINGERS[0][2] - FINGERS[0][3] - 0.001, 0.027); return at('idx2L', p.x, p.y, p.z); }
+      case 'bladeA': return TOOL ? at('shears', TOOL.tip.x, TOOL.tip.y, TOOL.tip.z) : at('handR', 0, 0, 0);          // the points and middles of her two blades
+      case 'bladeB': return TOOL ? at('shearB', TOOL.tip.x, TOOL.tip.y, TOOL.tip.z) : at('handL', 0, 0, 0);
+      case 'bladeAm': return TOOL ? at('shears', TOOL.mid.x, TOOL.mid.y, TOOL.mid.z) : at('handR', 0, 0, 0);
+      case 'bladeBm': return TOOL ? at('shearB', TOOL.mid.x, TOOL.mid.y, TOOL.mid.z) : at('handL', 0, 0, 0);
       case 'bells': return at('bell3', bellRest[3].x, bellRest[3].y - 0.035, bellRest[3].z);
       case 'feet': return out.set(0, 0, 0).applyMatrix4(root.matrixWorld);
       case 'pendant': { const tp = prof(TORSO, 1.306, true); return at('spine3', 0, 1.306, tp[3] + tp[1] + 0.012); }

@@ -154,6 +154,7 @@
       const zMid = (yl) => 0.5 * (DS * (1 + yl / L) + 0.0030);       // half way through the sheath at that height: the blades lie down the middle of it, leaning back as it thins
       const G = (x, y, z) => F(PV[0] + x, PV[1] + y, zMid(PV[1] + y) + z);      // the shears' own space: the screw at the middle, blades pointing down, flat to the front
       const TIPY = -729 * KG, PLY = 111 * KG, PW = 37.5 * KG, TH = 0.0016;
+      FOXGEAR.shears = { G, tipY: TIPY, bowA: [-58 * KG, 406 * KG], bowB: [87 * KG, 395 * KG] };      // for putting them in her hands (75_pose.js)
       for (const [nm, sgn, bow, wb] of [['A', -1, { c: [-58 * KG, 406 * KG], rx: 80 * KG - 0.0021, ry: 175 * KG - 0.0021 }, [BI.shears, 1]], ['B', 1, { c: [87 * KG, 395 * KG], rx: 60 * KG - 0.0021, ry: 94 * KG - 0.0021 }, [BI.shearB, 1]]]) {
         const wf = () => wb, z0 = sgn < 0 ? 0 : -TH;                          // half A lies in front, half B behind
         // the blade and the plate round the screw: spine on its own side, edge toward the other half
@@ -176,6 +177,6 @@
         for (let i = 0; i < part.pos.length; i += 3) { const d = (part.pos[i] - c.x) * P.Z.x + (part.pos[i + 1] - c.y) * P.Z.y + (part.pos[i + 2] - c.z) * P.Z.z, sq = d * (0.30 - 1); part.pos[i] += P.Z.x * sq; part.pos[i + 1] += P.Z.y * sq; part.pos[i + 2] += P.Z.z * sq; }
         addPart('brass', part, () => [BI.shears, 1], { out: c });
         if (sg > 0) for (const rot of [PI / 4, -PI / 4]) { const cs = Math.cos(rot), sn = Math.sin(rot); put('gearIn', slab((x, y, z) => G(x * cs - y * sn, x * sn + y * cs, TH + 0.0003 + 0.0019 + z), 1, 1, (u, v) => [0.0048 * (2 * u - 1), 0.00055 * (2 * v - 1), 0, 0.5, 0.5], 0.0004), () => [BI.shears, 1], V3(...G(0, 0, TH))); } }
-      FOXGEAR.shears = { pivot: pv, KG };
+      Object.assign(FOXGEAR.shears, { pivot: pv, KG });
     }
   })();

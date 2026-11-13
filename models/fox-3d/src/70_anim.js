@@ -219,7 +219,9 @@
     hR: [-REST_HX, REST_HY, 0.055], hL: [REST_HX, REST_HY, 0.055], eR: [-0.55, -0.1, -1], eL: [0.55, -0.1, -1], twR: 0, twL: 0, wrR: [0.1, 0], wrL: [0.1, 0],
     fR: FP.relax.slice(), fL: FP.relax.slice(),
     ftR: [0, 0, 0, -0.10, 0, 0, 0], ftL: [0, 0, 0, 0.10, 0, 0, 0], knR: [-0.12, 0, 1], knL: [0.12, 0, 1],
-    eyes: 0, mouth: 0, glow: 0
+    eyes: 0, mouth: 0, glow: 0,
+    shr: 0, shs: 0, sho: 0, shl: 0.44     // her shears: in her right hand (0 sheathed .. 1 held), split (1: the back half in her left hand), open (radians),
+                                          // and how the blades lean in her fists (radians: 0.44 back toward her wrists, for carrying; below 0 forward, for a cut)
   };
   const CHANS = Object.keys(REST);
   const clonePose = (p) => { const o = {}; for (const k of CHANS) o[k] = typeof p[k] === 'number' ? p[k] : p[k].slice(); return o; };
