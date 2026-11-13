@@ -1,0 +1,6 @@
+walk0.png
+__pycache__/
+*.pyc
+checks/*.png
+checks/*.jpg
+checks/*.log
