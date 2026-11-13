@@ -657,7 +657,8 @@ function makeFox(opts) {
   for (const [S, s] of SIDES) {
     const rings = [], vs = [], NR = Q(56, 24), NU = Q(36, 18);
     for (let i = 0; i <= NR; i++) {
-      const y = lerp(0.875, 0.247, i / NR), [rx, rzF, rzB, cx, cz] = spline(LEG_UP, y), ring = [];
+      const y = lerp(0.875, 0.247, i / NR), [rx0, rzF0, rzB0, cx, cz] = spline(LEG_UP, y), ring = [];
+      const slim = lerp(1, 0.60, sm(0.27, 0.34, y)), rx = rx0 * slim, rzF = rzF0 * slim, rzB = rzB0 * slim;      // thinner inside the trousers, so a lifted thigh can't poke out through them (it did, in a jump)
       for (let j = 0; j < NU; j++) { const a = PI + (j / NU) * TAU; ring.push([s * cx + rx * Math.sin(a), y, cz + (Math.cos(a) >= 0 ? rzF : rzB) * Math.cos(a)]); }
       rings.push(ring); vs.push(1 - (0.875 - y) / (0.875 - 0.247));
     }
@@ -1491,6 +1492,7 @@ function makeFox(opts) {
   // ---------- her patchwork trousers (shape: F6 and the round 4 paintings; sizes: A1; cloth: the swatch sheets F9 and F10) ----------
   // First build. They are sewn shapes carried by her hips, thighs and shins; they do not yet fall and swing as cloth of their own.
   // In A1 each leg is about 33 cm across from the knee to mid-calf, the two meet at the middle, and the cloth is gathered in at the top of each boot.
+  const FLOUNCE = [];                               // the shapes of her flounces at rest; they are made into cloth in 67_foxcloth.js, once the cloth code exists
   (function foxTrousers() {
     const NU = Q(56, 30), ZC = 0.012;
     const ell = (cx, y, cz, rx, rz, wob) => { const r = []; for (let j = 0; j < NU; j++) { const a = (j / NU) * TAU, k = 1 + (wob ? wob(a) : 0); r.push([cx + rx * k * Math.sin(a), y, cz + rz * k * Math.cos(a)]); } return r; };
@@ -1521,7 +1523,7 @@ function makeFox(opts) {
           }
           tr.push(ring);
         }
-        addPart(key, loft(tr, { uS: 2, vS: 0.8, u0: ph * 0.13 }), wLeg, { out: V3(s * 0.15, (yTop + yHem) / 2, ZC) });
+        FLOUNCE.push({ key, tr, wLeg, ph });
       }
       // the magenta frill where each leg is gathered onto her boot
       const fr = [];
@@ -1567,6 +1569,9 @@ function makeFox(opts) {
     collider('shin' + S, [s * 0.083, 0.47, 0.006], 'foot' + S, [s * 0.081, 0.13, -0.01], 0.066, 0.074, 4);
     collider('foot' + S, [s * 0.081, 0.06, -0.05], 'toe' + S, [s * 0.081, 0.055, 0.12], 0.058, 0.05, 4);
   }
+  // the Fox's trouser legs and hips, for her flounces to lie on and swing against (mask 32)
+  for (const [S, s] of SIDES) { collider('thigh' + S, [s * 0.106, 0.800, 0.012], 'thigh' + S, [s * 0.111, 0.520, 0.012], 0.104, 0.104, 32); collider('shin' + S, [s * 0.112, 0.460, 0.012], 'shin' + S, [s * 0.110, 0.330, 0.012], 0.103, 0.098, 32); }
+  collider('hips', [-0.070, 0.865, 0.020], 'hips', [0.070, 0.865, 0.020], 0.146, 0.146, 32);
   const NCOLL = COLL.length, cW = new Float32Array(NCOLL * 6), cW0 = new Float32Array(NCOLL * 6), cS = new Float32Array(NCOLL * 8);
   const _v = V3(), _v2 = V3();
   function updateColliders(first) {
@@ -2344,6 +2349,21 @@ function makeFox(opts) {
     if (q < 1 && _va.z > zc) { const k = 1 / Math.sqrt(q); _va.x *= k; _va.z = zc + (_va.z - zc) * k; p.copy(_va).applyMatrix4(SK.hips.matrixWorld); }
   } });
   chains.push(bellChain);
+
+  // ---------- the Fox's own cloth: the flounces of her trousers ----------
+  // Each flounce is a sheet sewn to the trouser leg along its top edge and free below. It falls under its own weight, lies on the leg,
+  // swings when she moves and trails when she turns. The shapes come from 47_foxtrousers.js.
+  // Cloth sheets are plain meshes, not skinned ones, so they need materials of their own: the body's materials are built for skinned meshes,
+  // and drawing a sheet with one threw a stray strip of patchwork onto the floor.
+  const clothMat = (key, W) => { const t = bakedTex(key, W, W, '#a03c5c'); t.wrapS = t.wrapT = THREE.RepeatWrapping; return sheen(new THREE.MeshStandardMaterial({ map: t, color: lin('#d2c8c2'), side: THREE.DoubleSide, roughness: 0.86 }), '#ffd0a0', 3, 0.12); };
+  const CLM = { patch: clothMat('patch', 1024), patch2: clothMat('patch2', 768) };
+  for (const f of FLOUNCE) {
+    const NR = f.tr.length, NC = f.tr[0].length;
+    const cloth = makeCloth({ pleat: { n: 9, amp: 0.006, hem: 0.012, ph: f.ph }, cols: NC, rows: NR, wrap: true, mask: 32, margin: 0.007, bend: 0.3, grav: 0.8, drag: 0.02, flutter: 0.6,
+      rest: (c, r) => f.tr[r][c], pin: (c, r) => (r === 0 ? 1 : r === 1 ? 0.55 : 0.04), weights: (c, r, p) => f.wLeg(p[0], p[1], p[2]),
+      uv: (c, r) => [f.ph * 0.13 + (c / NC) * 2, 1 - (r / (NR - 1)) * 0.8] });
+    addCut(cloth, CLM[f.key], 1);
+  }
   const _J = new THREE.Vector3();                  // the waist joint: hand targets shrink toward it with the upper body
 
   // ---------- applying a pose: spine by angles, arms and legs onto their targets, then springs and cloth ----------

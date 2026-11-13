@@ -124,7 +124,8 @@
   for (const [S, s] of SIDES) {
     const rings = [], vs = [], NR = Q(56, 24), NU = Q(36, 18);
     for (let i = 0; i <= NR; i++) {
-      const y = lerp(0.875, 0.247, i / NR), [rx, rzF, rzB, cx, cz] = spline(LEG_UP, y), ring = [];
+      const y = lerp(0.875, 0.247, i / NR), [rx0, rzF0, rzB0, cx, cz] = spline(LEG_UP, y), ring = [];
+      const slim = lerp(1, 0.60, sm(0.27, 0.34, y)), rx = rx0 * slim, rzF = rzF0 * slim, rzB = rzB0 * slim;      // thinner inside the trousers, so a lifted thigh can't poke out through them (it did, in a jump)
       for (let j = 0; j < NU; j++) { const a = PI + (j / NU) * TAU; ring.push([s * cx + rx * Math.sin(a), y, cz + (Math.cos(a) >= 0 ? rzF : rzB) * Math.cos(a)]); }
       rings.push(ring); vs.push(1 - (0.875 - y) / (0.875 - 0.247));
     }

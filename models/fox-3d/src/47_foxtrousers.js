@@ -1,6 +1,7 @@
   // ---------- her patchwork trousers (shape: F6 and the round 4 paintings; sizes: A1; cloth: the swatch sheets F9 and F10) ----------
   // First build. They are sewn shapes carried by her hips, thighs and shins; they do not yet fall and swing as cloth of their own.
   // In A1 each leg is about 33 cm across from the knee to mid-calf, the two meet at the middle, and the cloth is gathered in at the top of each boot.
+  const FLOUNCE = [];                               // the shapes of her flounces at rest; they are made into cloth in 67_foxcloth.js, once the cloth code exists
   (function foxTrousers() {
     const NU = Q(56, 30), ZC = 0.012;
     const ell = (cx, y, cz, rx, rz, wob) => { const r = []; for (let j = 0; j < NU; j++) { const a = (j / NU) * TAU, k = 1 + (wob ? wob(a) : 0); r.push([cx + rx * k * Math.sin(a), y, cz + rz * k * Math.cos(a)]); } return r; };
@@ -31,7 +32,7 @@
           }
           tr.push(ring);
         }
-        addPart(key, loft(tr, { uS: 2, vS: 0.8, u0: ph * 0.13 }), wLeg, { out: V3(s * 0.15, (yTop + yHem) / 2, ZC) });
+        FLOUNCE.push({ key, tr, wLeg, ph });
       }
       // the magenta frill where each leg is gathered onto her boot
       const fr = [];

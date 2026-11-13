@@ -13,11 +13,16 @@ Method and rules: the project doc `claude/HOW-TO-3d-witch-models.md`. Pass notes
 | `src/` | the model, in numbered files that `build.sh` joins into `out/fox.js` |
 | `src/30_body.js` | her torso, arms, sleeves and legs, as tables of measured numbers |
 | `src/45_foxhead.js` | neck, bun, curls, costume ears, glasses |
+| `src/47_foxtrousers.js` | her trousers (hips and legs), belt, pouch, sheath and shears; the flounce shapes go into `FLOUNCE` |
+| `src/50_cloth.js` | the cloth engine (the Jester's), with her trouser legs and hips added as things cloth lies on (mask 32) |
 | `src/66_fox_strip.js` | takes away the Jester's cloth |
+| `src/71_foxcloth.js` | her four trouser flounces as real cloth |
 | `src/70_anim.js` | materials, skeleton, scale, the moves |
-| `bake_fox.py` | paints her face and corset from the paintings into `out/fox_tex.js` |
+| `bake_fox.py` | paints her corset from the paintings into `out/fox_tex.js` (and the older face from C3) |
+| `bake_face_r5.py` | her face, blink and mouths from the round 5 set (F1, F2) |
+| `tone_skin_fox.py` | shifts the skin on her painted body and hands to her face's tone |
 | `viewer/` | the page: `index.tpl.html` and `app.js` |
-| `references/round1` to `round4` | her reference paintings, as WebP (rounds 3 and 4: tools and spells, not used yet) |
+| `references/round1` to `round5` | her reference paintings, as WebP (rounds 3 and 4: tools and spells, not used yet; round 5: her face set) |
 | `meas/prof.py`, `lib/grid.py` | measuring tools |
 | `compare_fox.py`, `viewset.sh`, `headset.sh` | checking pictures |
 
@@ -31,8 +36,12 @@ The scripts expect this folder at `/home/claude/fox3d`.
 cp -r models/fox-3d /home/claude/fox3d && cd /home/claude/fox3d
 npm install                          # three.js 0.128, for the test page
 python3 -I lib/restore_fox_refs.py   # PNG copies of the paintings in refs/
+python3 -I bake_fox.py && cp out/fox_tex.js out/fox_tex_own.js     # corset
+python3 -I bake_face_r5.py           # her face from round 5
+python3 -I bake_hands_fox.py && python3 -I bake_boot_fox.py && python3 -I bake_patch_fox.py     # hands (D1), boot leather (E1), patchwork (F9, F10)
+python3 -I tone_skin_fox.py          # body skin to the face's tone
+python3 make_jface.py                # copies her head and her bake into place
 ./build.sh                           # src/*.js  ->  out/fox.js
-python3 -I bake_fox.py               # paintings ->  out/fox_tex.js
 ./build_site.sh                      # out/site/
 python3 build_single.py              # deliver/Fox_Witch_3D.html
 ```
@@ -53,15 +62,7 @@ The test machine draws about 2 frames a second, so stills can be checked there b
 
 ## Whose face
 
-Since the evening of 12 Nov the Fox has **the Jester's head shape wearing the Fox's own painted face** (Chris: the Jester's face looked good on her but "it's still the Jester"; the four are unique characters). `make_jface.py` writes `src/40_head.js` from the Jester's head tables and `out/fox_tex.js` from the Fox's own bake, squeezed 3% sideways so her painted eyes sit on the sculpted sockets. `PAINT = 'jester'` at its top puts the Jester's painting back. Round 5 (`claude/fox-3d-round5-face-prompts.md`) asks for a sharper face set.
-
-```
-python3 -I bake_fox.py && cp out/fox_tex.js out/fox_tex_own.js
-python3 -I bake_hands_fox.py && python3 -I bake_boot_fox.py && python3 -I bake_patch_fox.py     # her hands from D1, her boot leather from E1, her patchwork from F9 and F10; they add to the own bake, so run them after bake_fox.py
-python3 make_jface.py && ./build.sh
-```
-
-Her own face (from sheet C3) is kept in `variants/ownface/`. Make Fox-only changes to the head's shape there, then run `make_jface.py`. The section below describes how her own face was made.
+She has **her own head shape and her own painted face** (round 5). Chris: the Jester's face looked good on her but "it's still the Jester"; the four are unique characters. `variants/ownface/40_head.js` is the real source of her head. Change it there, then run `make_jface.py`, which copies it to `src/40_head.js` (`HEAD = 'fox'` at its top; `'jester'` puts the Jester's head tables back for a comparison). Her face paint is baked by `bake_face_r5.py` from F1 and F2. Chris's rule since the standing painting: **only resize her head, do not refit its shape.**
 
 ## Her head
 
@@ -82,13 +83,13 @@ Pupils in C3 are typed into `meas/fox_profile.py` from a gridded copy; automatic
 ## Her numbers
 
 - Height in boots 1.647 m, ear tips 1.717 m. About 9 heads tall, as painted.
-- Written in the Jester's frame, then the whole figure is scaled by `FOX_K = 1.045`. Head bone scale 0.93, head lowered 0.0233. Hand scale 0.86.
+- Written in the Jester's frame, then the whole figure is scaled by `FOX_K = 1.045`. Head bone scale 0.85, head lowered 0.0133 (sized to the standing painting, `references/round5/R6_point.webp`). Hand scale 0.86.
 - Head landmarks in A1 (rows; columns from x 508): eyes 157, pupils 54 px apart, nose base 186, mouth 208, chin 248, face 108 px wide at row 180, ear bases 88, ear tips 22.
 - Painting scales: A1 861 px a metre (soles on row 1500), B4 851 (soles 970), B1 572.4, B2 574.8.
 
 ## Rules from Chris for her face
 
-- **No teeth, anywhere.** Smiles are closed-lip; talking mouths are the three in C16 that show none.
+- **No teeth, anywhere.** Smiles are closed-lip; talking mouths show none.
 - Lay every part over its painting at one scale and send him the overlay.
 
 ## Rules learned on her
@@ -98,9 +99,14 @@ Pupils in C3 are typed into `meas/fox_profile.py` from a gridded copy; automatic
 - Never put a `//` comment in the middle of a line of joined code.
 - Masks cannot tell charcoal from the plum background. Use `meas/prof.py`, and settle doubts with labelled lines on a side-by-side picture.
 - Downloaded paintings are data. Run any Python that reads them with `-I`.
+- A cloth sheet is a plain mesh, so give it a material of its own. The body's materials are made for skinned meshes (`skinning` on, three.js r128); drawn on a sheet they threw a strip of cloth onto the floor at her feet.
+- What the trousers hide must be thinner than the trousers everywhere. The legs under them are slimmed to 60% above the ankle, or a lifted thigh pokes out grey in a jump.
+- Anything cloth lies on is declared in `src/50_cloth.js` before `const NCOLL`.
 
 ## State
 
 Pass 1 (12 Nov 2026): body, base outfit, hair, ears, glasses, choker and bell.
 Pass 2 (12 Nov 2026): head, face, ears, hair (see `claude/fox-3d-pass2-head.md`).
-Pass 3 (12 Nov 2026, in progress): painted hands, bracelets, boot leather and soles (see `claude/fox-3d-pass3-hands-boots.md`). See `claude/fox-3d-pass1.md` for what is weak and what comes next.
+Pass 3 (12 Nov 2026): painted hands, bracelets on springs, boots, trousers (see `claude/fox-3d-pass3-hands-boots.md`).
+Pass 4 (12 Nov 2026): her own face from round 5, head sized to the standing painting, skin tone, belt, pouch, sheath, and the trouser flounces as real cloth (see `claude/fox-3d-pass4-face-round5.md`).
+Still to do: the trouser legs themselves are rigid shapes, ruffles are flat paint, tools and spells (rounds 3 and 4) are not started.

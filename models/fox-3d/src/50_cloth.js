@@ -23,6 +23,9 @@
     collider('shin' + S, [s * 0.083, 0.47, 0.006], 'foot' + S, [s * 0.081, 0.13, -0.01], 0.066, 0.074, 4);
     collider('foot' + S, [s * 0.081, 0.06, -0.05], 'toe' + S, [s * 0.081, 0.055, 0.12], 0.058, 0.05, 4);
   }
+  // the Fox's trouser legs and hips, for her flounces to lie on and swing against (mask 32)
+  for (const [S, s] of SIDES) { collider('thigh' + S, [s * 0.106, 0.800, 0.012], 'thigh' + S, [s * 0.111, 0.520, 0.012], 0.104, 0.104, 32); collider('shin' + S, [s * 0.112, 0.460, 0.012], 'shin' + S, [s * 0.110, 0.330, 0.012], 0.103, 0.098, 32); }
+  collider('hips', [-0.070, 0.865, 0.020], 'hips', [0.070, 0.865, 0.020], 0.146, 0.146, 32);
   const NCOLL = COLL.length, cW = new Float32Array(NCOLL * 6), cW0 = new Float32Array(NCOLL * 6), cS = new Float32Array(NCOLL * 8);
   const _v = V3(), _v2 = V3();
   function updateColliders(first) {
