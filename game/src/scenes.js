@@ -8,7 +8,8 @@
     W1: {
       id: 'W1', kind: 'walk', name: 'The fair square', art: 'W1', frame: [1774, 887],
       camera: P.W1.camera, layout: P.W1,
-      show: 0.62,                                         // the screen shows this share of the painting's width
+      show: 0.62, close: 1.4,                             // and Chris asked for her 30 to 50% larger than that (November 13), so the window is drawn in by this much
+                                              // the screen shows this share of the painting's width
       start: { x: -1.6, z: 3.4, face: 0.5 },
       // open ground: the round square and the mouths of the two lanes. Further along, each lane runs behind a stall roof or a
       // tent top (my layout's fault, not the painting's), so the scene changes at the mouth, where she can still be seen.

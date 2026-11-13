@@ -144,8 +144,19 @@ python3 checks/fight.py             # a fight by hand
 python3 checks/auto.py              # the engine's styles through the real page (slow: about 8 minutes)
 ```
 
+### Chris's answers (November 13)
+
+- Walking: she should be 30 to 50% larger. Done: the walking view is drawn in by 40% (`close` in `src/scenes.js`), with a
+  menu on the page for 30, 40 and 50%. She keeps her true size against the tents; the screen shows less of the painting.
+- Fighting: the size is good. The closer shots are sharp enough. The bunting and moths stay.
+- His laptop: 144 pictures a second walking (Trim, 106k triangles, 94 draws, 2.3 ms moving her) and in the fight (Light,
+  71k triangles, 56 draws, 1.3 ms).
+- For the other walking paintings (Claude's plan, to confirm): guides from a closer camera, about 10.7 m of view across the
+  painting's height in place of 15 m, so she is this size at the painting's own sharpness.
+- Fair folk: Claude's answer and a test are in the project doc `claude/moon-faire-fair-folk-npcs-plan.md`.
+
 ## Next
 
-Chris judges the look. Then step 5: the remaining twelve prompts (with the lane lesson built in), every scene traced, the
+Step 5, and the two-person fair-folk test if Chris wants it: the remaining twelve prompts (with the lane lesson built in), every scene traced, the
 other witches and the captain as their models are finished, the foes, town fights, levels, the gate, the boss, talking,
 saving.

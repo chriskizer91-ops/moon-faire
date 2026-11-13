@@ -107,7 +107,7 @@ function makeMFField(stage, S, H) {
       stage.near.forEach((l, i) => { const p = by[i]; l.position.set(p.x, S.lampLight.h, p.z); l.intensity = H.liveOn() ? S.lampLight.k * (p.f || 1) : 0; });
       live.visible = H.liveOn(); if (live.visible) liveStep(t);
       // the screen shows a window of the painting that follows her
-      const FW = S.frame[0], FH = S.frame[1], asp = H.aspect(); let w = FW * S.show, h = w / asp; if (h > FH) { h = FH; w = h * asp; if (w > FW) { w = FW; h = FH; } }
+      const FW = S.frame[0], FH = S.frame[1], asp = H.aspect(); let w = FW * S.show / (H.close() || S.close || 1), h = w / asp; if (h > FH) { h = FH; w = h * asp; if (w > FW) { w = FW; h = FH; } }
       const p = stage.toFrame(_v.set(me.x + me.vx * 0.6, 0.9, me.z + me.vz * 0.6)), tx = p[0] - w / 2, ty = p[1] - h * 0.52;
       if (viewX == null) { viewX = tx; viewY = ty; } else { viewX += (tx - viewX) * Math.min(1, dt * 2.6); viewY += (ty - viewY) * Math.min(1, dt * 2.6); }
       viewX = Math.max(0, Math.min(FW - w, viewX)); viewY = Math.max(0, Math.min(FH - h, viewY));

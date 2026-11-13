@@ -121,6 +121,7 @@ kbd { font: 700 13px var(--body); border: 1px solid var(--line); border-radius: 
   <div class="row">
     <b>Switches</b>
     <button type="button" id="livesw" aria-pressed="true">Lamps, moths and bunting</button>
+    <label class="row" id="sizelab"><span class="muted">Her size</span> <select id="size"><option value="1">As first shown</option><option value="1.3">30% larger</option><option value="1.4" selected>40% larger</option><option value="1.5">50% larger</option></select></label>
     <button type="button" id="closesw" aria-pressed="true" hidden>Closer shots</button>
     <button type="button" id="paintsw" aria-pressed="true">The painting</button>
     <label class="row"><span class="muted">Her detail</span> <select id="detail"><option value="plan">As planned</option><option value="lightest">Lightest</option><option value="light">Light</option><option value="trim">Trim</option><option value="full">Full</option></select></label>
@@ -150,7 +151,7 @@ kbd { font: 700 13px var(--body); border: 1px solid var(--line); border-radius: 
       <h2>What to judge</h2>
       <ul>
         <li>Does she look as she does in her own theatre? Turn The painting off to see her against plain plum at the same size.</li>
-        <li>Does she stand on the ground: her size, her shadow, the light on her?</li>
+        <li>Does she stand on the ground: her size, her shadow, the light on her? Her size is a menu when walking: larger means the screen shows less of the painting.</li>
         <li>The line under the picture gives pictures a second on this machine. Your laptop is the one that counts.</li>
       </ul>
     </div>
@@ -6871,7 +6872,8 @@ window.MF_PILOT = {
     W1: {
       id: 'W1', kind: 'walk', name: 'The fair square', art: 'W1', frame: [1774, 887],
       camera: P.W1.camera, layout: P.W1,
-      show: 0.62,                                         // the screen shows this share of the painting's width
+      show: 0.62, close: 1.4,                             // and Chris asked for her 30 to 50% larger than that (November 13), so the window is drawn in by this much
+                                              // the screen shows this share of the painting's width
       start: { x: -1.6, z: 3.4, face: 0.5 },
       // open ground: the round square and the mouths of the two lanes. Further along, each lane runs behind a stall roof or a
       // tent top (my layout's fault, not the painting's), so the scene changes at the mouth, where she can still be seen.
@@ -7132,7 +7134,7 @@ function makeMFField(stage, S, H) {
       stage.near.forEach((l, i) => { const p = by[i]; l.position.set(p.x, S.lampLight.h, p.z); l.intensity = H.liveOn() ? S.lampLight.k * (p.f || 1) : 0; });
       live.visible = H.liveOn(); if (live.visible) liveStep(t);
       // the screen shows a window of the painting that follows her
-      const FW = S.frame[0], FH = S.frame[1], asp = H.aspect(); let w = FW * S.show, h = w / asp; if (h > FH) { h = FH; w = h * asp; if (w > FW) { w = FW; h = FH; } }
+      const FW = S.frame[0], FH = S.frame[1], asp = H.aspect(); let w = FW * S.show / (H.close() || S.close || 1), h = w / asp; if (h > FH) { h = FH; w = h * asp; if (w > FW) { w = FW; h = FH; } }
       const p = stage.toFrame(_v.set(me.x + me.vx * 0.6, 0.9, me.z + me.vz * 0.6)), tx = p[0] - w / 2, ty = p[1] - h * 0.52;
       if (viewX == null) { viewX = tx; viewY = ty; } else { viewX += (tx - viewX) * Math.min(1, dt * 2.6); viewY += (ty - viewY) * Math.min(1, dt * 2.6); }
       viewX = Math.max(0, Math.min(FW - w, viewX)); viewY = Math.max(0, Math.min(FH - h, viewY));
@@ -7338,7 +7340,7 @@ function makeMFFight(stage, S, H) {
   const H = {
     ui: $('fightui'), panel: $('fightpanel'),
     aspect: () => canvas.clientWidth / Math.max(1, canvas.clientHeight), width: () => canvas.clientWidth,
-    liveOn: () => sw.live, closeOn: () => sw.close,
+    liveOn: () => sw.live, closeOn: () => sw.close, close: () => +$('size').value || 0,
     toast(t) { const e = $('toast'); e.textContent = t; e.hidden = false; clearTimeout(H._t); H._t = setTimeout(() => { e.hidden = true; }, 4200); },
     prompt(t) { const e = $('prompt'); if (e._t !== t) { e._t = t; e.hidden = !t; e.querySelector('span').textContent = t; } },
   };
@@ -7361,7 +7363,7 @@ function makeMFFight(stage, S, H) {
         mode = m; witch(pick()); free([PLAN.walk, PLAN.fight, level]);
         if (m === 'walk') field.enter(J); else fight.enter(J, +$('count').value || 1);
         for (const b of document.querySelectorAll('[data-mode]')) b.setAttribute('aria-pressed', b.dataset.mode === m);
-        $('walkrow').hidden = m !== 'walk'; $('fightrow').hidden = m !== 'fight'; $('closesw').hidden = m !== 'fight'; $('livesw').hidden = m !== 'walk';
+        $('walkrow').hidden = m !== 'walk'; $('sizelab').hidden = m !== 'walk'; $('fightrow').hidden = m !== 'fight'; $('closesw').hidden = m !== 'fight'; $('livesw').hidden = m !== 'walk';
         H.prompt(''); stage.painting = sw.painting; advance(0, true);
       } catch (e) { fail(e); }
       busy = false; fadeEl.classList.remove('on');

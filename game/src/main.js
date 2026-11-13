@@ -10,7 +10,7 @@
   const H = {
     ui: $('fightui'), panel: $('fightpanel'),
     aspect: () => canvas.clientWidth / Math.max(1, canvas.clientHeight), width: () => canvas.clientWidth,
-    liveOn: () => sw.live, closeOn: () => sw.close,
+    liveOn: () => sw.live, closeOn: () => sw.close, close: () => +$('size').value || 0,
     toast(t) { const e = $('toast'); e.textContent = t; e.hidden = false; clearTimeout(H._t); H._t = setTimeout(() => { e.hidden = true; }, 4200); },
     prompt(t) { const e = $('prompt'); if (e._t !== t) { e._t = t; e.hidden = !t; e.querySelector('span').textContent = t; } },
   };
@@ -33,7 +33,7 @@
         mode = m; witch(pick()); free([PLAN.walk, PLAN.fight, level]);
         if (m === 'walk') field.enter(J); else fight.enter(J, +$('count').value || 1);
         for (const b of document.querySelectorAll('[data-mode]')) b.setAttribute('aria-pressed', b.dataset.mode === m);
-        $('walkrow').hidden = m !== 'walk'; $('fightrow').hidden = m !== 'fight'; $('closesw').hidden = m !== 'fight'; $('livesw').hidden = m !== 'walk';
+        $('walkrow').hidden = m !== 'walk'; $('sizelab').hidden = m !== 'walk'; $('fightrow').hidden = m !== 'fight'; $('closesw').hidden = m !== 'fight'; $('livesw').hidden = m !== 'walk';
         H.prompt(''); stage.painting = sw.painting; advance(0, true);
       } catch (e) { fail(e); }
       busy = false; fadeEl.classList.remove('on');
