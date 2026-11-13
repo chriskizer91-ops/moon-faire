@@ -11,6 +11,7 @@
     }
     return [BI.spine3, 1];
   }
+  const SOFT = [];       // soft things that hang from a bone and swing: sleeves, headband tails, loose locks
   function wTorso(x, y, z) {
     const w = wSpine(y), ax = Math.abs(x), S = x < 0 ? 'R' : 'L';
     const k = 0.75 * sm(0.085, 0.15, ax) * sm(1.19, 1.27, y);       // the shoulder girdle follows the collarbone
@@ -112,7 +113,10 @@
       }
       rings.push(ring); vs.push(1 - t);
     }
-    addPart('lacesl', loft(rings, { v: vs, uS: 4 }), () => [BI['uarm' + S], 0.86, BI['clav' + S], 0.14], { out: centroidOf(rings) });
+    // The sleeve is soft: a bone at its band lets the cloth below hang and swing (SOFT, moved in R99_static.js). The top stays on the band.
+    { const bc = sh.clone().addScaledVector(d, 0.052), ax = d.clone().multiplyScalar(0.62).addScaledVector(down, 0.38).normalize(); addBone('slv' + S, 'uarm' + S, bc.x, bc.y, bc.z);
+      SOFT.push({ bone: 'slv' + S, parent: 'uarm' + S, root: bc.clone(), dir: ax.clone(), L: 0.17, grav: 0.45, maxA: 0.30, w2: 90, c: 6, flex: 'farm' + S });
+      addPart('lacesl', loft(rings, { v: vs, uS: 4 }), (x, y, z) => { const t = cl(((x - bc.x) * ax.x + (y - bc.y) * ax.y + (z - bc.z) * ax.z) / 0.19, 0, 1), wb = sm(0.05, 0.7, t); return [BI['slv' + S], wb, BI['uarm' + S], (1 - wb) * 0.86, BI['clav' + S], (1 - wb) * 0.14]; }, { out: centroidOf(rings) }); }
     // the band it hangs from
     const bp = [], br = []; for (let k = 0; k <= 2; k++) { const sl = 0.046 + k * 0.006; bp.push(sh.clone().addScaledVector(d, sl)); br.push(prof(ARM_R, sl, true) + 0.0045 - Math.abs(k - 1) * 0.0015); }
     const band = tubeRings(bp, br, Q(24, 12), V3(0, 0, 1));

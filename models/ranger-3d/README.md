@@ -121,6 +121,14 @@ four strap hooks as real objects, standing still. About 355,000 triangles.
   about the joint, like a ball in a socket; only its hidden tip inside her body stays behind. Under the joint the body's skin goes
   30% with the arm so the armpit opens (`wTorso`). Weights only: her shape standing still, which he approved, is unchanged.
   A first try that let the top of the shoulder follow the arm made a lump there and was dropped.
+- **Stage seven, soft sleeves, headband tails and loose locks.** Chris: in "Take aim" her sleeves meshed into her arm; "her
+  sleeves, headband tails and loose hair moving. Let's do those." Each soft thing gets a bone at its root (`slvL`, `slvR` on the
+  upper arms at the sleeve band; `tail0`, `tail1` and `lock1` to `lock16` on the head) and is listed in `SOFT` (declared in
+  `src/R30_body.js`). Its skin goes over from the parent bone to its own bone along its length, so it bends near the root.
+  `softTick` in `src/R99_static.js` moves them: the tip is a weight on a spring, pulled to where it would rest (its built
+  direction bent toward straight down), lagging when its root moves, held inside a largest angle. A sleeve's pull down and its
+  largest angle grow with the fold of that elbow, so a folded forearm no longer passes through it. `pose()` settles them at once.
+  Not real cloth: each swings as one piece; no folds, and no collision with her neck or shoulders.
 - Waiting for his notes: the moves again; stage two (head), stage three (hands and arms) and stage five.
 
 Rough or not built yet: her face does not move (no blink, no expressions); the hair has a smooth edge with none of the painted
@@ -344,7 +352,7 @@ python3 -I bake_hands_r.py            # adds her hands and arms from D1 and D2
 python3 -I bake_gear_r.py             # adds the leather of her bags and belts from F6
 python3 -I bake_looks_r.py            # adds the two trial faces (younger, the Fox's)
 ./build_r.sh                          # tools/tables.py, then out/ranger.js
-python3 -I build_single_r.py          # deliver/Ranger_3D_stage6d.html, one offline file
+python3 -I build_single_r.py          # deliver/Ranger_3D_stage7.html, one offline file
 python3 tools/shoot_hand.py shots/hand_L.jpg L hand   # one hand from four sides beside D1 or D2; also R, and arm
 python3 tools/wrist_sections.py                       # forearm and hand, slice by slice through the wrist
 python3 tools/page_test.py                            # the page at phone size: belt, bag, hook, boot, hand and body buttons, a drag

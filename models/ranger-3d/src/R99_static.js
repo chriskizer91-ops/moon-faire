@@ -104,18 +104,34 @@
   let lastPose = { arm: 15, leg: 0 }, mv = { name: 'pose', t: 0 }, wk = 0, jg = 0, gph = 0, clock = 0, blinkAt = 2.4, blinkT = -1, mouthAt = 0, mouthNow = 'rest', facePainted = '';
   const SHOTS = { aim: 4.65, cheer: 1.5, limber: 3.9 }, SLOW = { aim: 1.55, limber: 1.5 }, MOVES = ['pose', 'idle', 'walk', 'jog', 'talk', 'aim', 'cheer', 'limber'];
   const add = (b, x, y, z) => { const r = SK[b].rotation; r.x += x; r.y += y; r.z += z; };
-  function restAll() { for (const k in SK) if (!/^(bag|charm)/.test(k)) SK[k].rotation.set(0, 0, 0); SK.hips.position.copy(SK.hips.userData.home); }
+  function restAll() { for (const k in SK) if (!/^(bag|charm|slv|tail|lock)/.test(k)) SK[k].rotation.set(0, 0, 0); SK.hips.position.copy(SK.hips.userData.home); }
+  // Soft things (SOFT): each hangs from its root and its tip is a weight on a spring. It is pulled to where it would rest (its built
+  // direction, bent toward straight down), it lags when its root moves, and it cannot swing past a set angle. A sleeve may hang
+  // further the more her elbow folds, so her forearm does not pass through it.
+  const sv = { a: V3(), b: V3(), c: V3(), q: new THREE.Quaternion() };
+  function softTick(dt, settle) {
+    for (const it of SOFT) { const P = SK[it.parent], B = SK[it.bone], fx = it.flex ? cl(-SK[it.flex].rotation.x / 2.2, 0, 1) : 0, maxA = it.maxA + 1.15 * fx;
+      const root = sv.a.copy(it.root).sub(P.userData.rest).applyMatrix4(P.matrixWorld), rest = sv.b.copy(it.dir).transformDirection(P.matrixWorld);
+      const tgt = sv.c.copy(rest); tgt.y -= it.grav + 2.4 * fx; tgt.normalize().multiplyScalar(it.L).add(root);
+      if (!it.tip || settle) { it.tip = tgt.clone(); it.vel = V3(); }
+      else { const n = Math.max(1, Math.ceil(dt / 0.012)), st = dt / n; for (let k = 0; k < n; k++) { it.vel.x += ((tgt.x - it.tip.x) * it.w2 - it.vel.x * it.c) * st; it.vel.y += ((tgt.y - it.tip.y) * it.w2 - it.vel.y * it.c) * st; it.vel.z += ((tgt.z - it.tip.z) * it.w2 - it.vel.z * it.c) * st; it.tip.addScaledVector(it.vel, st); } }
+      const dir = tgt.copy(it.tip).sub(root).normalize(), dt2 = cl(dir.dot(rest), -1, 1), ang = Math.acos(dt2);
+      if (ang > maxA) { dir.addScaledVector(rest, -dt2).normalize().multiplyScalar(Math.sin(maxA)).addScaledVector(rest, Math.cos(maxA)); it.vel.multiplyScalar(0.6); }
+      it.tip.copy(dir).multiplyScalar(it.L).add(root);
+      P.getWorldQuaternion(sv.q); B.quaternion.setFromUnitVectors(it.dir, dir.applyQuaternion(sv.q.invert())); }
+  }
   function pose(o) {
     o = o || {}; mv = { name: 'pose', t: 0 }; wk = 0; jg = 0; lastPose = { arm: o.arm == null ? 15 : o.arm, leg: o.leg || 0 }; const arm = lastPose.arm * DEG - A_POSE, leg = lastPose.leg * DEG;
     restAll(); for (const [S, s] of SIDES) { SK['uarm' + S].rotation.z = s * arm; SK['thigh' + S].rotation.z = s * leg; SK['foot' + S].rotation.z = -s * leg; }
     root.updateMatrixWorld(true);
     if (gearSettle) { gearSettle(); root.updateMatrixWorld(true); }       // the bags come to rest against her in the new pose
+    softTick(0, true); root.updateMatrixWorld(true);
   }
   function play(name) { if (!MOVES.includes(name) || name === 'pose') { pose(lastPose); return 'pose'; } mv = { name, t: 0 }; return name; }
   function walk(on) { return play(on ? 'walk' : 'pose') === 'walk'; }
   function animate(dt) {
     dt = dt > 0 ? Math.min(dt, 0.05) : 0; clock += dt;
-    if (mv.name === 'pose') { if (gearTick) gearTick(dt); return; }
+    if (mv.name === 'pose') { if (gearTick) gearTick(dt); softTick(dt); return; }
     mv.t += dt; if (SHOTS[mv.name] && mv.t >= SHOTS[mv.name] + 1.2) mv.t = 0;       // a short move plays again after a pause, for as long as it is the one chosen
     const N = SHOTS[mv.name] && mv.t >= SHOTS[mv.name] ? 'idle' : mv.name, T = mv.t / (SLOW[N] || 1); restAll();
     wk += ((N === 'walk' ? 1 : 0) - wk) * Math.min(1, dt * 4.5); jg += ((N === 'jog' ? 1 : 0) - jg) * Math.min(1, dt * 4.5);
@@ -175,6 +191,7 @@
     const bt = clock - blinkT, eyes = Math.max(squint, bt < 0.05 ? 0.5 : bt < 0.10 ? 1 : bt < 0.15 ? 0.5 : 0), key = eyes + '|' + mouthNow;
     if (key !== facePainted) { paintFace(eyes, mouthNow); facePainted = key; }
     if (gearTick) gearTick(dt);       // the bags and charms swing with her
+    softTick(dt);       // and her sleeves, the tails of her headband and her loose locks
   }
   return { root, skeleton, bones, SK, animate, pose, play, moves: MOVES, walk, swing: () => { if (gearKick) gearKick(); }, setLook, meshes, spin: 0, time: 0, stanceProgress: 1, setStance() {}, setFace: (eyes, mouth) => paintFace(eyes || 0, mouth || 'rest'), debug: { SK, meshes, cloths: [], headPoint, JH, hairPt, phOfY }, get triangles() { return triCount; } };
 }

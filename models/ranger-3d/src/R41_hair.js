@@ -80,7 +80,9 @@
       }
       const tp = loft(tr, { capB: true });
       for (let i = 0; i <= NT; i++) for (let j = 0; j < 5; j++) { const q = i * 5 + j, jj = j % 4; tp.uv[q * 2] = u0 + vs[i] * len / 0.45; tp.uv[q * 2 + 1] = jj === 0 || jj === 3 ? 0.04 : 0.96; }
-      addPart('band', tp, (x, y) => { const v = sm(1.40, 1.47, y); return [BI.head, v, BI.neck, 1 - v]; }, { out: V3(O[0] + dx * 0.5, O[1] - len / 2, O[2] + 0.05) });
+      { const nm = 'tail' + (dx < 0 ? 0 : 1), root = V3(O[0], O[1] - 0.004, O[2] + 0.004), tip = V3(O[0] + dx, O[1] - 0.004 - len, O[2] + 0.004 + dz); addBone(nm, 'head', root.x, root.y, root.z);
+        SOFT.push({ bone: nm, parent: 'head', root, dir: tip.clone().sub(root).normalize(), L: len, grav: 0.8, maxA: 1.3, w2: 70, c: 3.5 });
+        addPart('band', tp, (x, y) => { const wb = sm(0.05, 0.6, (root.y - y) / len); return [BI[nm], wb, BI.head, 1 - wb]; }, { out: V3(O[0] + dx * 0.5, O[1] - len / 2, O[2] + 0.05) }); }
     }
   })();
   (function buildGem() {                            // the turquoise in its gold setting, at the middle of the band on her forehead
@@ -112,6 +114,8 @@
       for (let i = 0; i <= NS; i++) { const t = i / NS, k = cr * Math.pow(t, 0.6), w = ph0 + t * turns * TAU; pts.push(V3(sg * (x + ox * t + k * 0.5 * Math.cos(w * 0.93)), y - L * t, z + oz * t + k * Math.sin(w))); rad.push([lerp(0.0050, 0.0022, t), lerp(0.0010, 0.0005, t)]); }
       const lp = loft(tubeRings(pts, rad, 8, V3(sg, 0, 0.3), 1.6 + 0.5 * Math.sin(n)), { uS: 1, vS: 1 });
       for (let i = 0; i < lp.uv.length; i += 2) lp.uv[i] = lp.uv[i] * 0.5 + 0.137 * n;
-      addPart('lock', lp, (px, py) => { const v = sm(1.40, 1.47, py); return [BI.head, v, BI.neck, 1 - v]; }, { out: V3(sg * x, y - L / 2, z) });
+      { const nm = 'lock' + n, root = V3(sg * x, y, z), tip = V3(sg * (x + ox), y - L, z + oz); addBone(nm, 'head', root.x, root.y, root.z);
+        SOFT.push({ bone: nm, parent: 'head', root, dir: tip.clone().sub(root).normalize(), L, grav: 0.5, maxA: 1.0, w2: 110, c: 5 });
+        addPart('lock', lp, (px, py) => { const wb = sm(0.05, 0.6, (y - py) / L); return [BI[nm], wb, BI.head, 1 - wb]; }, { out: V3(sg * x, y - L / 2, z) }); }
     }
   })();
