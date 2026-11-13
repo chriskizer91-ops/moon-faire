@@ -1,0 +1,165 @@
+{
+ "model": "claude-opus-5-5",
+ "effort": "xhigh",
+ "id": "farmhand",
+ "desc": "A farm lad with freckles and sandy hair under a wide straw hat: a mustard shirt with bare forearms, a green waistcoat, brown trousers and muddy boots.",
+ "rounds": [
+  {
+   "n": 1,
+   "seconds": 463.5,
+   "usage": {
+    "input_tokens": 67,
+    "output_tokens": 48000,
+    "cache_creation_input_tokens": 0,
+    "cache_read_input_tokens": 5077
+   },
+   "cost": 0.9612834,
+   "thought": true,
+   "thinking_tokens": 46116,
+   "stop": "max_tokens",
+   "facts": {
+    "errors": [
+     "the file did not run: Page.evaluate: SyntaxError: Unexpected end of input"
+    ]
+   },
+   "said": "file"
+  },
+  {
+   "n": 2,
+   "seconds": 15.7,
+   "usage": {
+    "input_tokens": 48141,
+    "output_tokens": 2360,
+    "cache_creation_input_tokens": 0,
+    "cache_read_input_tokens": 5077
+   },
+   "cost": 0.2407794,
+   "thought": true,
+   "thinking_tokens": 24,
+   "stop": "end_turn",
+   "facts": {
+    "errors": [],
+    "prepareMs": 246,
+    "buildMs": 604,
+    "triangles": 14337,
+    "parts": 29,
+    "own": {
+     "hair": 120,
+     "straw": 564,
+     "band": 56,
+     "wheat": 80,
+     "shirt": 632,
+     "trousers": 280,
+     "vest": 336,
+     "kerchief": 396,
+     "brass": 384,
+     "patch": 192
+    },
+    "draws": 20,
+    "drawn_triangles": 11797
+   },
+   "said": "file"
+  },
+  {
+   "n": 3,
+   "seconds": 100.3,
+   "usage": {
+    "input_tokens": 51836,
+    "output_tokens": 10827,
+    "cache_creation_input_tokens": 0,
+    "cache_read_input_tokens": 5077
+   },
+   "cost": 0.42489940000000004,
+   "thought": true,
+   "thinking_tokens": 8593,
+   "stop": "end_turn",
+   "facts": {
+    "errors": [],
+    "prepareMs": 213,
+    "buildMs": 410,
+    "triangles": 13977,
+    "parts": 29,
+    "own": {
+     "hair": 120,
+     "straw": 564,
+     "band": 56,
+     "wheat": 80,
+     "shirt": 632,
+     "vest": 336,
+     "belt": 112,
+     "brass": 192,
+     "kerchief": 396,
+     "patch": 192
+    },
+    "draws": 20,
+    "drawn_triangles": 11437
+   },
+   "said": "file"
+  },
+  {
+   "n": 4,
+   "seconds": 51.0,
+   "usage": {
+    "input_tokens": 63997,
+    "output_tokens": 5458,
+    "cache_creation_input_tokens": 0,
+    "cache_read_input_tokens": 5077
+   },
+   "cost": 0.3661634,
+   "thought": true,
+   "thinking_tokens": 3224,
+   "stop": "end_turn",
+   "facts": {
+    "errors": [],
+    "prepareMs": 194,
+    "buildMs": 329,
+    "triangles": 14001,
+    "parts": 29,
+    "own": {
+     "hair": 120,
+     "straw": 564,
+     "band": 56,
+     "wheat": 80,
+     "shirt": 632,
+     "vest": 360,
+     "belt": 112,
+     "brass": 192,
+     "kerchief": 396,
+     "patch": 192
+    },
+    "draws": 20,
+    "drawn_triangles": 11461
+   },
+   "said": "file"
+  }
+ ],
+ "kit_chars": 11171,
+ "final": 4,
+ "cost": 1.9931256000000002,
+ "seconds": 630.5,
+ "input_tokens": 164041,
+ "output_tokens": 66645,
+ "cache_creation_input_tokens": 0,
+ "cache_read_input_tokens": 20308,
+ "final_facts": {
+  "errors": [],
+  "prepareMs": 160,
+  "buildMs": 201,
+  "triangles": 14001,
+  "parts": 29,
+  "own": {
+   "hair": 120,
+   "straw": 564,
+   "band": 56,
+   "wheat": 80,
+   "shirt": 632,
+   "vest": 360,
+   "belt": 112,
+   "brass": 192,
+   "kerchief": 396,
+   "patch": 192
+  },
+  "draws": 20,
+  "drawn_triangles": 11461
+ }
+}

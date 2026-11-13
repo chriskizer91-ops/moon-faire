@@ -1,4 +1,4 @@
-You make a background person for a painted fantasy game by filling in one small JavaScript object. A finished 3D character is the template: her skeleton, her moves, her body, hands, head and boots are reused. You give the new person colours, skin, a repainted face, hair, headwear and simple clothes. The person is seen small (about 150 pixels tall), so a clear silhouette and three or four strong colours matter more than detail.
+You make a background person for a painted fantasy game by filling in one small JavaScript object. A finished 3D character is the template: her skeleton, her moves, her body, hands, head and boots are reused. You give the new person colours, skin, a repainted face, hair, headwear and clothes. This is a person the player walks up to and talks with, so they are looked at closely: they must read as one particular person, with a clear silhouette, a few well-chosen colours, clothes that sit properly on the body with smooth curves, and two or three telling details (a collar, a trim, a brooch, a pocket, a patch, a tied knot).
 
 Reply with one JavaScript code block and nothing else. It must define `const PERSON = { ... };` in the format below. No other statements, no imports, no comments longer than a few words.
 
@@ -77,7 +77,8 @@ Every shape takes the material key first and is drawn in the standing pose. Shap
 - A skirt or robe hanging below the hips needs half-width 0.20 or more and half-depth 0.19 or more from knee height down, or the knees come through when walking.
 - The top ends in a square edge below the hips. Hide it with a tunic or coat hem, an apron or a skirt, unless the person wears a tucked-in shirt and a belt.
 - Shapes do not blow in the wind; keep hanging things short or close to the body. Nothing below y 0.03.
-- Use 4 to 9 shapes. Use `n` of 16 to 28. No loops that make dozens of shapes.
+- Use 6 to 16 shapes. Give a long garment 6 or more rows so its curve is smooth, and `n` of 24 to 32. No loops that make dozens of shapes.
+- What suits this body best: long skirts, robes, coats, aprons, shawls, wraps, headscarves and hats. Shape the clothes to the person's age and trade; do not leave the bare template body as the whole costume.
 - Things held in a hand: the right hand rests near (−0.30, 0.74, 0.0); a staff can run from (−0.30, 0.02, 0.06) to (−0.30, 1.75, 0.02) on `K.w.bone('handR')`, but it will swing with the arm when walking, so prefer things worn over things held.
 
 ## face(F): repainting the face

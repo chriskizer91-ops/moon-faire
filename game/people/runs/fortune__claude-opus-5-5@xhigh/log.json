@@ -1,0 +1,148 @@
+{
+ "model": "claude-opus-5-5",
+ "effort": "xhigh",
+ "id": "fortune",
+ "desc": "A tall, thin fortune-teller: pale, with dark eye make-up and long black hair, a deep blue robe to the ankles with a gold-striped sash, and a plum headscarf.",
+ "rounds": [
+  {
+   "n": 1,
+   "seconds": 311.3,
+   "usage": {
+    "input_tokens": 70,
+    "output_tokens": 31515,
+    "cache_creation_input_tokens": 0,
+    "cache_read_input_tokens": 5077
+   },
+   "cost": 0.6315954,
+   "thought": true,
+   "thinking_tokens": 29201,
+   "stop": "end_turn",
+   "facts": {
+    "errors": [],
+    "prepareMs": 340,
+    "buildMs": 425,
+    "triangles": 13773,
+    "parts": 26,
+    "own": {
+     "robe": 660,
+     "trim": 60,
+     "sash": 444,
+     "hair": 256,
+     "scarf": 764,
+     "gold": 100,
+     "gem": 192
+    },
+    "draws": 17,
+    "drawn_triangles": 11233
+   },
+   "said": "file"
+  },
+  {
+   "n": 2,
+   "seconds": 23.6,
+   "usage": {
+    "input_tokens": 32896,
+    "output_tokens": 2920,
+    "cache_creation_input_tokens": 0,
+    "cache_read_input_tokens": 5077
+   },
+   "cost": 0.19099939999999999,
+   "thought": true,
+   "thinking_tokens": 527,
+   "stop": "end_turn",
+   "facts": {
+    "errors": [],
+    "prepareMs": 274,
+    "buildMs": 401,
+    "triangles": 13773,
+    "parts": 26,
+    "own": {
+     "robe": 660,
+     "trim": 60,
+     "sash": 444,
+     "hair": 256,
+     "scarf": 764,
+     "gold": 100,
+     "gem": 192
+    },
+    "draws": 17,
+    "drawn_triangles": 11233
+   },
+   "said": "file"
+  },
+  {
+   "n": 3,
+   "seconds": 25.9,
+   "usage": {
+    "input_tokens": 37127,
+    "output_tokens": 3251,
+    "cache_creation_input_tokens": 0,
+    "cache_read_input_tokens": 5077
+   },
+   "cost": 0.2145434,
+   "thought": true,
+   "thinking_tokens": 786,
+   "stop": "end_turn",
+   "facts": {
+    "errors": [],
+    "prepareMs": 275,
+    "buildMs": 345,
+    "triangles": 13773,
+    "parts": 26,
+    "own": {
+     "robe": 660,
+     "trim": 60,
+     "sash": 444,
+     "hair": 256,
+     "scarf": 764,
+     "gold": 100,
+     "gem": 192
+    },
+    "draws": 17,
+    "drawn_triangles": 11233
+   },
+   "said": "file"
+  },
+  {
+   "n": 4,
+   "seconds": 2.3,
+   "usage": {
+    "input_tokens": 41689,
+    "output_tokens": 62,
+    "cache_creation_input_tokens": 0,
+    "cache_read_input_tokens": 5077
+   },
+   "cost": 0.1690114,
+   "thought": true,
+   "thinking_tokens": 57,
+   "stop": "end_turn",
+   "said": "DONE"
+  }
+ ],
+ "kit_chars": 11171,
+ "final": 3,
+ "cost": 1.2061496,
+ "seconds": 363.1,
+ "input_tokens": 111782,
+ "output_tokens": 37748,
+ "cache_creation_input_tokens": 0,
+ "cache_read_input_tokens": 20308,
+ "final_facts": {
+  "errors": [],
+  "prepareMs": 245,
+  "buildMs": 216,
+  "triangles": 13773,
+  "parts": 26,
+  "own": {
+   "robe": 660,
+   "trim": 60,
+   "sash": 444,
+   "hair": 256,
+   "scarf": 764,
+   "gold": 100,
+   "gem": 192
+  },
+  "draws": 17,
+  "drawn_triangles": 11233
+ }
+}

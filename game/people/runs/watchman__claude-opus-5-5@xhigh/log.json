@@ -1,0 +1,160 @@
+{
+ "model": "claude-opus-5-5",
+ "effort": "xhigh",
+ "id": "watchman",
+ "desc": "An old night-watchman with dark brown skin and a short white beard: a long grey coat to the knees, a red scarf, a tall dark felt hat and heavy black boots.",
+ "rounds": [
+  {
+   "n": 1,
+   "seconds": 260.3,
+   "usage": {
+    "input_tokens": 64,
+    "output_tokens": 26746,
+    "cache_creation_input_tokens": 0,
+    "cache_read_input_tokens": 5077
+   },
+   "cost": 0.5361914,
+   "thought": true,
+   "thinking_tokens": 24673,
+   "stop": "end_turn",
+   "facts": {
+    "errors": [],
+    "prepareMs": 269,
+    "buildMs": 430,
+    "triangles": 13697,
+    "parts": 29,
+    "own": {
+     "coat": 752,
+     "belt": 56,
+     "brass": 576,
+     "scarf": 256,
+     "hair": 120,
+     "beard": 48,
+     "hat": 380,
+     "band": 56,
+     "lamp": 56,
+     "iron": 100
+    },
+    "draws": 20,
+    "drawn_triangles": 11157
+   },
+   "said": "file"
+  },
+  {
+   "n": 2,
+   "seconds": 53.5,
+   "usage": {
+    "input_tokens": 28142,
+    "output_tokens": 5570,
+    "cache_creation_input_tokens": 0,
+    "cache_read_input_tokens": 5077
+   },
+   "cost": 0.2249834,
+   "thought": true,
+   "thinking_tokens": 3328,
+   "stop": "end_turn",
+   "facts": {
+    "errors": [],
+    "prepareMs": 262,
+    "buildMs": 429,
+    "triangles": 13717,
+    "parts": 29,
+    "own": {
+     "coat": 752,
+     "belt": 56,
+     "brass": 576,
+     "scarf": 268,
+     "hair": 128,
+     "beard": 48,
+     "hat": 380,
+     "band": 56,
+     "lamp": 56,
+     "iron": 100
+    },
+    "draws": 20,
+    "drawn_triangles": 11177
+   },
+   "said": "file"
+  },
+  {
+   "n": 3,
+   "seconds": 25.1,
+   "usage": {
+    "input_tokens": 35044,
+    "output_tokens": 3105,
+    "cache_creation_input_tokens": 0,
+    "cache_read_input_tokens": 5077
+   },
+   "cost": 0.20329139999999998,
+   "thought": true,
+   "thinking_tokens": 864,
+   "stop": "end_turn",
+   "facts": {
+    "errors": [],
+    "prepareMs": 252,
+    "buildMs": 334,
+    "triangles": 13701,
+    "parts": 29,
+    "own": {
+     "coat": 752,
+     "belt": 56,
+     "brass": 576,
+     "scarf": 268,
+     "hair": 112,
+     "beard": 48,
+     "hat": 380,
+     "band": 56,
+     "lamp": 56,
+     "iron": 100
+    },
+    "draws": 20,
+    "drawn_triangles": 11161
+   },
+   "said": "file"
+  },
+  {
+   "n": 4,
+   "seconds": 2.4,
+   "usage": {
+    "input_tokens": 39481,
+    "output_tokens": 63,
+    "cache_creation_input_tokens": 0,
+    "cache_read_input_tokens": 5077
+   },
+   "cost": 0.1601994,
+   "thought": true,
+   "thinking_tokens": 58,
+   "stop": "end_turn",
+   "said": "DONE"
+  }
+ ],
+ "kit_chars": 11171,
+ "final": 3,
+ "cost": 1.1246656,
+ "seconds": 341.3,
+ "input_tokens": 102731,
+ "output_tokens": 35484,
+ "cache_creation_input_tokens": 0,
+ "cache_read_input_tokens": 20308,
+ "final_facts": {
+  "errors": [],
+  "prepareMs": 257,
+  "buildMs": 269,
+  "triangles": 13701,
+  "parts": 29,
+  "own": {
+   "coat": 752,
+   "belt": 56,
+   "brass": 576,
+   "scarf": 268,
+   "hair": 112,
+   "beard": 48,
+   "hat": 380,
+   "band": 56,
+   "lamp": 56,
+   "iron": 100
+  },
+  "draws": 20,
+  "drawn_triangles": 11161
+ }
+}
