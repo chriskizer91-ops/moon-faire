@@ -129,6 +129,13 @@ four strap hooks as real objects, standing still. About 355,000 triangles.
   direction bent toward straight down), lagging when its root moves, held inside a largest angle. A sleeve's pull down and its
   largest angle grow with the fold of that elbow, so a folded forearm no longer passes through it. `pose()` settles them at once.
   Not real cloth: each swings as one piece; no folds, and no collision with her neck or shoulders.
+- **Stage 7b, sleeves again.** Chris, with a photo of "Take aim": the sleeves must not mesh with her arms; "her arms moving move
+  it out of the way but it still acts like fabric." The one-bone swing let the arm pass through the cloth. Each sleeve is now a
+  loop of cloth round her upper arm with two bones at its band (`slmL/R` for its middle, `slvL/R` for its hem; `SLEEVES`).
+  `sleeveTick` in `src/R99_static.js` slides them across the arm: toward the ground until the top of the loop rests on the top of
+  her arm (2.6 cm at the hem, on top of the 1.9 cm built in), and away from her forearm as her elbow folds (up to 4 cm), which
+  also gathers the cloth toward her shoulder (hem scaled to 72%). The slide is capped at 4.4 cm, short of the loop's slack, so
+  her arm stays inside. It follows on a spring. Tails and locks keep the stage-seven swing.
 - Waiting for his notes: the moves again; stage two (head), stage three (hands and arms) and stage five.
 
 Rough or not built yet: her face does not move (no blink, no expressions); the hair has a smooth edge with none of the painted
@@ -352,7 +359,7 @@ python3 -I bake_hands_r.py            # adds her hands and arms from D1 and D2
 python3 -I bake_gear_r.py             # adds the leather of her bags and belts from F6
 python3 -I bake_looks_r.py            # adds the two trial faces (younger, the Fox's)
 ./build_r.sh                          # tools/tables.py, then out/ranger.js
-python3 -I build_single_r.py          # deliver/Ranger_3D_stage7.html, one offline file
+python3 -I build_single_r.py          # deliver/Ranger_3D_stage7b.html, one offline file
 python3 tools/shoot_hand.py shots/hand_L.jpg L hand   # one hand from four sides beside D1 or D2; also R, and arm
 python3 tools/wrist_sections.py                       # forearm and hand, slice by slice through the wrist
 python3 tools/page_test.py                            # the page at phone size: belt, bag, hook, boot, hand and body buttons, a drag
