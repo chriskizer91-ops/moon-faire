@@ -76,7 +76,76 @@ Copy the four files from `out/` into `references/` after re-drawing (the keys as
 Checked: both guides draw with no errors; the page at phone and laptop size. Not checked, because it cannot be yet: whether
 ChatGPT keeps to the guides closely enough to fit, and what size it returns (it gave 1448 and 1536 wide for Envoi).
 
-## Next: step 3
+## Steps 3 and 4: the pilot paintings in, the Jester walking and fighting (November 13, 2026) — waiting for Chris to judge the look
 
-Walking on the W1 grey-box picture with the Jester (fitted camera, walk area, cut-outs, the live layer), and a fight screen
-on the blob engine with the Jester and a wisp on the F1 grey-box picture. Then step 4: the paintings in.
+Chris sent both paintings back the same afternoon, so steps 3 and 4 were done as one.
+
+- **The page:** `out/moon-faire-pilot.html`, one offline file (3.8 MB), published at
+  https://claude.ai/artifact/PkUTHyHVp9ZQDwvNgtUFqh. Build it with `python3 build_pilot.py`.
+- **The paintings:** `art/pilot/W1.png` (1774 x 887) and `art/pilot/F1.png` (1448 x 1086), as they came.
+- **They fit the guides without refitting.** `stills/W1-guide-over-painting.jpg` and `F1-guide-over-painting.jpg` lay each
+  guide's outlines over its painting: tents, posts, well and floor cloth within a few pixels; Auros exactly placed; the
+  horizon at 61%. The game uses the cameras in `pilot/scenes-pilot.js` as they are.
+
+### What is in
+
+| File | What it does |
+|---|---|
+| `src/stage.js` | Draws the painting as one flat picture, then the cast over it through the hidden fitted camera. A pan or a closer shot is a window of the painting's frame (`setViewOffset`); the camera never moves. The witches' rig and studio reflections are copied from her own `stage.js`, numbers unchanged. Four fixed lights for nearby things. Her shadow on an unseen plane, and a soft patch at her feet. |
+| `src/scenes.js` | The two scenes as data: painting, walk area, blockers, exits, spots, fight places. Words and names are here. |
+| `src/field.js` | Walking: keys or click-to-walk, walk and run with her own stride numbers, sliding round blockers, exits, spots, the window that follows her, lamp lights on the four nearest painted lamps, and the live layer (lamp glow, footlights, moths, fireflies, bunting). The grey-box shapes are drawn into depth only as the things she walks behind. |
+| `src/fight.js` | A fight on the approved engine, unchanged: turn bar, her four buttons, Life and Fate bars, her game moves (`g_rebuke`, `taunt_attack`, `taunt_heal`, `g_seal`, `g_curtain`) driven through `J.game`, the wisp's own moves, closer shots as crops, the place darkening and shaking with her spells. |
+| `src/main.js`, `src/pilot.tpl.html` | The page: two modes, switches, her detail, the speed line. |
+| `models/jester/` | Copied from branch `claude/jester-3d-model` (pass 21, commit `31b6351`): `jester.js` is her `src/` joined as her `build.sh` does; `jester_tex.js` as it is. `jester_lod.js` is `jester.js` with the fifteen light-level switches from the project doc `claude/jester-3d-light-levels-and-fight-test.md` (`models/tools/patch_jester_lod.py`); `lod.js` is that doc's file; `meshopt_simplifier.js` is meshoptimizer 1.3.0. Her branch is not touched. |
+| `models/foes/wisp.js` | Envoi's wisp, unchanged (`src/models/wisp.js`, branch `claude/send-note-gigdew`). |
+| `sim/blob-battle-engine.js` | The approved engine, unchanged; the page wraps it so its names stay its own. |
+
+- **Her weight follows Chris's plan:** Trim for walking, Light in fights. A menu on the page tries any of the four.
+- **One spell light for everyone:** her own spell light is taken out of her effects and one of the four fixed lights follows it,
+  so no light is ever added or removed while playing.
+- **The pilot's party is the Jester alone,** because she is the only finished model. The engine's party is cut down to her
+  after `newBattle`; no rule or number changes.
+
+### Checked (in the test browser, `checks/*.py`)
+
+- Walking: every blocker, both exits by key, click-to-walk round the well, both spots, a bow on the cloth. No errors.
+- She goes behind the well and the lantern posts (`stills/walk-behind-things.jpg`).
+- One wisp, played by the engine's careless, attentive and expert styles: won each time, in 2 turns, on Curtain Call.
+- Three wisps, played by the attentive style with one added rule (alone, she ends each sealed foe herself): won in 4 turns.
+  The engine's brains on their own lose this one, because they leave small foes for her three friends, who are not here yet.
+- Her in the painting against her in her plain theatre, same window (`stills/check-painting-and-theatre.jpg`): her pixels
+  average 76.5 in the painting and 75.2 in the theatre, out of 255. The difference is the wisp's glow.
+- The page on its own clock, both modes, at laptop and phone size. No errors.
+
+### Not checked, and not built
+
+- **Real speed.** The test browser has no graphics chip and draws one to three pictures a second. The line under the
+  picture gives the count on whatever machine opens it.
+- How anything moves or feels: timing is Chris's to judge.
+- Not built yet: the Flipbook look and glow switches; Envoi's live ground for fights (moving grass); haze on far
+  characters; the other three witches and the captain; talking; saving; sound; cut-outs traced to the painting (they are
+  the grey-box shapes, a few pixels off in places).
+
+### Found on the way
+
+- **ChatGPT returned 1774 and 1448 pixels wide,** not the 2048 asked for. Wide shots are fine; closer shots in a fight are
+  soft, because a closer shot is a crop.
+- **My W1 layout hides the far ends of both lanes** behind a stall roof (left) and a tent top (right). The painting is
+  right; the layout is at fault. The scene now changes at the mouth of each lane. In later guides, nothing tall stands on
+  the near side of a path.
+- **The painting has moon-phase motifs** on one stall's awning and a crescent on the wagon. Moon phases are out of the
+  witches' magic; as fairground decoration it is Chris's call.
+
+```
+cd game
+python3 build_pilot.py              # builds out/moon-faire-pilot.html
+python3 checks/walk.py              # from game/checks: walks the square and writes stills
+python3 checks/fight.py             # a fight by hand
+python3 checks/auto.py              # the engine's styles through the real page (slow: about 8 minutes)
+```
+
+## Next
+
+Chris judges the look. Then step 5: the remaining twelve prompts (with the lane lesson built in), every scene traced, the
+other witches and the captain as their models are finished, the foes, town fights, levels, the gate, the boss, talking,
+saving.

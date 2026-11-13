@@ -48,6 +48,24 @@
     g.position.set(t.x, 0, t.z); return g;
   }
 
+  // everything that stands up in the walking scene: the well, the lantern posts, the tents, the stalls and the props.
+  // The game uses the same shapes, drawn into depth only, as the things a witch walks behind.
+  function solids(S, zNear) {
+    const scene = new THREE.Group();
+    const W = S.well, st = lam(GREY.stone), wd = lam(GREY.wood);
+    scene.add(mesh(new THREE.CylinderGeometry(W.r, W.r, 0.8, 24), st, W.x, 0.4, W.z), mesh(new THREE.CylinderGeometry(0.06, 0.06, 2.2, 8), wd, W.x - W.r + 0.1, 1.1, W.z), mesh(new THREE.CylinderGeometry(0.06, 0.06, 2.2, 8), wd, W.x + W.r - 0.1, 1.1, W.z), mesh(new THREE.BoxGeometry(W.r * 2 + 0.5, 0.1, 1.1), wd, W.x, 2.25, W.z));
+    for (const a of S.posts.at) {
+      const x = Math.cos(a * RAD) * S.posts.r, z = -Math.sin(a * RAD) * S.posts.r;
+      scene.add(mesh(new THREE.CylinderGeometry(0.05, 0.07, S.posts.h, 8), lam(GREY.dark), x, S.posts.h / 2, z));
+      const l = new THREE.Mesh(new THREE.BoxGeometry(0.24, 0.3, 0.24), new THREE.MeshBasicMaterial({ color: 0xffd9a0 })); l.position.set(x, S.posts.h - 0.25, z); scene.add(l);
+    }
+    for (const t of S.tents) scene.add(tent(t));
+    for (const sx of [-1, 1]) scene.add(tent({ kind: 'round', x: sx * 13.6, z: zNear + 1.6, r: 2.6, wall: 2.1, top: 4.6 }));    // tent tops that frame the bottom corners
+    for (const p of S.props) { const b = mesh(new THREE.BoxGeometry(p.w, p.h, p.d), lam(GREY.wood), p.x, p.h / 2 + (p.name === 'wagon' ? 0.45 : 0), p.z); b.rotation.y = (p.turn || 0) * RAD; scene.add(b);
+      if (p.name === 'wagon') for (const sx of [-1, 1]) for (const sz of [-1, 1]) { const w = mesh(new THREE.CylinderGeometry(0.5, 0.5, 0.12, 16), lam(GREY.dark), 0, 0, 0); w.rotation.x = Math.PI / 2; w.position.set(p.x + sx * (p.w / 2 - 0.5), 0.5, p.z + sz * (p.d / 2 + 0.08)); scene.add(w); } }
+    return scene;
+  }
+
   // ---------- the walking scene ----------
   function buildWalk(S, mode) {
     const scene = new THREE.Scene(), C = S.camera, [FW, FH] = S.frame;
@@ -63,17 +81,7 @@
     scene.add(flat(new THREE.CircleGeometry(S.square.r, 64), GREY.square, 0, 0.02, 0), flat(new THREE.RingGeometry(S.square.r - 0.7, S.square.r, 64), GREY.stone, 0, 0.03, 0));
     scene.add(flat(new THREE.PlaneGeometry(S.cloth.w, S.cloth.d), GREY.cloth, S.cloth.x, 0.04, S.cloth.z));
     for (const sx of [-1, 1]) for (let i = 0; i < 4; i++) { const m = new THREE.Mesh(new THREE.SphereGeometry(0.07, 8, 6), new THREE.MeshBasicMaterial({ color: 0xffe2b0 })); m.position.set(S.cloth.x + sx * (S.cloth.w / 2 - 0.2 - i * 0.02) * (1 - i * 0.0), 0.08, S.cloth.z + S.cloth.d / 2 - i * (S.cloth.d / 3)); scene.add(m); }
-    const W = S.well, st = lam(GREY.stone), wd = lam(GREY.wood);
-    scene.add(mesh(new THREE.CylinderGeometry(W.r, W.r, 0.8, 24), st, W.x, 0.4, W.z), mesh(new THREE.CylinderGeometry(0.06, 0.06, 2.2, 8), wd, W.x - W.r + 0.1, 1.1, W.z), mesh(new THREE.CylinderGeometry(0.06, 0.06, 2.2, 8), wd, W.x + W.r - 0.1, 1.1, W.z), mesh(new THREE.BoxGeometry(W.r * 2 + 0.5, 0.1, 1.1), wd, W.x, 2.25, W.z));
-    for (const a of S.posts.at) {
-      const x = Math.cos(a * RAD) * S.posts.r, z = -Math.sin(a * RAD) * S.posts.r;
-      scene.add(mesh(new THREE.CylinderGeometry(0.05, 0.07, S.posts.h, 8), lam(GREY.dark), x, S.posts.h / 2, z));
-      const l = new THREE.Mesh(new THREE.BoxGeometry(0.24, 0.3, 0.24), new THREE.MeshBasicMaterial({ color: 0xffd9a0 })); l.position.set(x, S.posts.h - 0.25, z); scene.add(l);
-    }
-    for (const t of S.tents) scene.add(tent(t));
-    for (const sx of [-1, 1]) scene.add(tent({ kind: 'round', x: sx * 13.6, z: zNear + 1.6, r: 2.6, wall: 2.1, top: 4.6 }));    // tent tops that frame the bottom corners
-    for (const p of S.props) { const b = mesh(new THREE.BoxGeometry(p.w, p.h, p.d), lam(GREY.wood), p.x, p.h / 2 + (p.name === 'wagon' ? 0.45 : 0), p.z); b.rotation.y = (p.turn || 0) * RAD; scene.add(b);
-      if (p.name === 'wagon') for (const sx of [-1, 1]) for (const sz of [-1, 1]) { const w = mesh(new THREE.CylinderGeometry(0.5, 0.5, 0.12, 16), lam(GREY.dark), 0, 0, 0); w.rotation.x = Math.PI / 2; w.position.set(p.x + sx * (p.w / 2 - 0.5), 0.5, p.z + sz * (p.d / 2 + 0.08)); scene.add(w); } }
+    scene.add(solids(S, zNear));
     scene.add(marker(S.figure[0], S.figure[1]));
     return { scene, cam, zFar, zNear, d };
   }
@@ -153,5 +161,5 @@
     r.dispose();
     return { canvas: out, info };
   }
-  window.MF_GREYBOX = { render };
+  window.MF_GREYBOX = { render, solids };
 })();

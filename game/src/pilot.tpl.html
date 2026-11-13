@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Moon Faire pilot: the Jester in the paintings</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible:wght@400;700&family=Jacquard+24&display=swap" rel="stylesheet">
+<style>
+/* Layout idea: the picture first and as large as the window allows, its controls right under it, notes below.
+   One night-time world on purpose: the page is a game screen, so it stays dark in either theme. */
+:root {
+  color-scheme: dark;
+  --bg: #171119; --panel: #241a28; --ink: #f2e9ee; --muted: #b6a7ba; --line: #40323f;
+  --amber: #ffb964; --lilac: #cdb4ff; --lilac-soft: #342a48; --red: #d8576a; --green: #8fdca8;
+  --display: "Jacquard 24", "Palatino Linotype", Palatino, Georgia, serif;
+  --body: "Atkinson Hyperlegible", "Segoe UI", system-ui, -apple-system, Arial, sans-serif;
+}
+* { box-sizing: border-box; }
+[hidden] { display: none !important; }
+html { -webkit-text-size-adjust: 100%; }
+body { margin: 0; background: var(--bg); color: var(--ink); font-family: var(--body); font-size: 16px; line-height: 1.45; }
+main { max-width: 1280px; margin: 0 auto; padding: 14px 16px 56px; display: flex; flex-direction: column; gap: 12px; }
+header { display: flex; flex-wrap: wrap; align-items: center; gap: 8px 16px; }
+h1 { font-family: var(--display); font-weight: 400; font-size: clamp(28px, 6vw, 40px); line-height: 1; margin: 0; flex: 1 1 240px; }
+h2 { font-family: var(--display); font-weight: 400; font-size: 26px; margin: 0; }
+p { margin: 0; }
+.row { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; }
+.row > b { color: var(--muted); font-size: 13px; font-weight: 700; margin-right: 2px; }
+button, select { font: 700 15px var(--body); color: var(--ink); background: var(--panel); border: 1px solid var(--line); border-radius: 999px; padding: 8px 14px; cursor: pointer; }
+select { padding-right: 10px; }
+button:hover:not(:disabled) { border-color: var(--lilac); }
+button:disabled { opacity: 0.45; cursor: default; }
+button[aria-pressed="true"] { background: var(--lilac); color: #1c1326; border-color: var(--lilac); }
+button:focus-visible, select:focus-visible { outline: 3px solid var(--amber); outline-offset: 2px; }
+#stagebox { position: relative; width: min(100%, calc(84vh * 16 / 9)); margin: 0 auto; aspect-ratio: 16 / 9; background: #383043; border-radius: 12px; overflow: hidden; border: 1px solid var(--line); }
+#stagebox:fullscreen { width: 100%; aspect-ratio: auto; border-radius: 0; border: 0; }
+#stage { display: block; width: 100%; height: 100%; touch-action: none; }
+#fade { position: absolute; inset: 0; background: #0c080e; opacity: 0; pointer-events: none; transition: opacity 0.24s; }
+#fade.on { opacity: 1; }
+#loading, #err { position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; text-align: center; padding: 20px; background: #1c151f; }
+#err { color: var(--amber); }
+#meter { font-size: 13px; min-height: 1.45em; text-align: center; font-variant-numeric: tabular-nums; }
+#toast, #prompt { position: absolute; left: 50%; transform: translateX(-50%); background: #1c1326e6; border: 1px solid var(--line); border-radius: 10px; padding: 8px 14px; max-width: min(92%, 560px); text-align: center; }
+#toast { top: 10px; }
+#prompt { bottom: 12px; display: flex; gap: 10px; align-items: center; padding: 6px 8px 6px 14px; }
+#prompt[hidden] { display: none; }
+#fightui { position: absolute; inset: 0; pointer-events: none; }
+#fightui .turnbar { position: absolute; top: 8px; left: 8px; right: 8px; display: flex; gap: 4px; flex-wrap: nowrap; overflow: hidden; }
+#fightui .chip { font-size: 12px; font-weight: 700; padding: 3px 9px; border-radius: 999px; background: #1c1326cc; border: 1px solid var(--line); white-space: nowrap; }
+#fightui .chip.hero { color: var(--lilac); } #fightui .chip.foe { color: var(--green); }
+#fightui .chip.now { background: var(--ink); color: #1c1326; border-color: var(--ink); }
+#fightui .foebar { position: absolute; transform: translate(-50%, -100%); width: 96px; padding: 3px 5px 5px; background: #1c1326cc; border: 1px solid var(--line); border-radius: 8px; pointer-events: none; font-size: 11px; text-align: center; color: var(--ink); cursor: default; }
+#fightui.picking .foebar { pointer-events: auto; cursor: pointer; }
+#fightui .foebar.tgt { border-color: var(--amber); }
+#fightui .foebar.sealed span { color: var(--amber); }
+#fightui .foebar div { position: relative; height: 7px; border-radius: 4px; background: #00000080; overflow: hidden; margin-top: 2px; }
+#fightui .foebar i { position: absolute; top: 0; bottom: 0; }
+#fightui .foebar i.life { left: 0; background: var(--red); } #fightui .foebar i.fate { right: 0; background: #17101c; border-left: 2px solid var(--amber); }
+#fightui .foebar[hidden] { display: none; }
+#fightui .float { position: absolute; transform: translate(-50%, -50%); font-weight: 700; font-size: clamp(15px, 2.4vw, 26px); text-shadow: 0 2px 4px #000, 0 0 2px #000; animation: rise 1.5s ease-out forwards; white-space: nowrap; }
+#fightui .float.dmg { color: #fff; } #fightui .float.heal { color: var(--green); } #fightui .float.fate { color: var(--amber); font-size: clamp(12px, 1.7vw, 18px); } #fightui .float.end { color: var(--lilac); }
+@keyframes rise { from { opacity: 0; margin-top: 8px; } 15% { opacity: 1; } to { opacity: 0; margin-top: -46px; } }
+#fightui .banner { position: absolute; left: 50%; top: 38%; transform: translate(-50%, -50%); display: flex; flex-direction: column; align-items: center; gap: 8px; background: #1c1326e6; border: 1px solid var(--amber); border-radius: 14px; padding: 16px 26px; pointer-events: auto; text-align: center; }
+#fightui .banner[hidden] { display: none; }
+#fightui .banner b { font-family: var(--display); font-weight: 400; font-size: clamp(24px, 4.4vw, 40px); line-height: 1; }
+#fightpanel { display: grid; grid-template-columns: minmax(170px, 240px) 1fr; gap: 6px 16px; align-items: start; background: var(--panel); border: 1px solid var(--line); border-radius: 12px; padding: 10px 14px; }
+#fightpanel[hidden] { display: none; }
+#fightpanel .log { grid-column: 1 / -1; color: var(--amber); min-height: 1.45em; }
+#fightpanel .who { display: grid; grid-template-columns: auto 1fr; gap: 2px 10px; align-items: baseline; font-variant-numeric: tabular-nums; }
+#fightpanel .who .hp { grid-column: 1 / -1; height: 8px; border-radius: 4px; background: #00000080; overflow: hidden; }
+#fightpanel .who .hp i { display: block; height: 100%; background: var(--green); }
+#fightpanel .who .mpn { grid-column: 1 / -1; color: var(--muted); font-size: 14px; }
+#fightpanel .moves { display: flex; flex-wrap: wrap; gap: 8px; min-height: 40px; }
+#fightpanel .help { grid-column: 1 / -1; color: var(--muted); font-size: 14px; min-height: 1.45em; }
+.notes { display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 12px; margin-top: 8px; }
+.notes > div { background: var(--panel); border: 1px solid var(--line); border-radius: 12px; padding: 14px 16px; display: flex; flex-direction: column; gap: 8px; }
+.notes ul { margin: 0; padding-left: 18px; display: flex; flex-direction: column; gap: 5px; }
+.muted { color: var(--muted); }
+kbd { font: 700 13px var(--body); border: 1px solid var(--line); border-radius: 5px; padding: 1px 6px; background: #00000040; }
+@media (max-width: 560px) { #fightpanel { grid-template-columns: 1fr; } }
+@media (prefers-reduced-motion: reduce) { #fade { transition: none; } }
+</style>
+</head>
+<body>
+<main>
+  <header>
+    <h1>The Jester in the paintings</h1>
+    <div class="row">
+      <button type="button" data-mode="walk" aria-pressed="false">Walk the fair square</button>
+      <button type="button" data-mode="fight" aria-pressed="false">Fight on the moor</button>
+    </div>
+  </header>
+
+  <div id="stagebox">
+    <canvas id="stage" aria-label="The game picture"></canvas>
+    <div id="fightui" hidden></div>
+    <div id="prompt" hidden><span></span><button type="button" id="use">Do it</button></div>
+    <div id="toast" role="status" hidden></div>
+    <div id="fade"></div>
+    <div id="loading">Building the Jester…</div>
+    <div id="err" hidden></div>
+  </div>
+
+  <p id="meter" class="muted"></p>
+
+  <div id="fightpanel" hidden></div>
+
+  <div class="row" id="walkrow" hidden>
+    <b>She can</b>
+    <button type="button" data-act="wave">Wave</button><button type="button" data-act="bow">Bow</button><button type="button" data-act="laugh">Laugh</button>
+    <button type="button" data-act="talk">Talk</button><button type="button" data-act="twirl">Twirl</button><button type="button" data-act="dance">Dance</button><button type="button" data-act="jump">Jump</button>
+  </div>
+  <div class="row" id="fightrow" hidden>
+    <b>The fight</b>
+    <button type="button" id="again">Start again</button>
+    <label class="row"><span class="muted">Foes</span> <select id="count"><option value="1">One wisp</option><option value="3">Three wisps</option></select></label>
+    <label class="row"><span class="muted">Who plays</span> <select id="auto"><option value="">You</option><option value="attentive">It plays itself</option></select></label>
+  </div>
+  <div class="row">
+    <b>Switches</b>
+    <button type="button" id="livesw" aria-pressed="true">Lamps, moths and bunting</button>
+    <button type="button" id="closesw" aria-pressed="true" hidden>Closer shots</button>
+    <button type="button" id="paintsw" aria-pressed="true">The painting</button>
+    <label class="row"><span class="muted">Her detail</span> <select id="detail"><option value="plan">As planned</option><option value="lightest">Lightest</option><option value="light">Light</option><option value="trim">Trim</option><option value="full">Full</option></select></label>
+    <button type="button" id="full">Full screen</button>
+  </div>
+
+  <div class="notes">
+    <div>
+      <h2>Walking</h2>
+      <ul>
+        <li><kbd>W</kbd> <kbd>A</kbd> <kbd>S</kbd> <kbd>D</kbd> or the arrow keys to walk. Hold <kbd>Shift</kbd> to run.</li>
+        <li>Or click or tap the ground and she walks there.</li>
+        <li><kbd>E</kbd> at the well or on the floor cloth.</li>
+        <li>She goes behind the well, the lantern posts and the stalls. The two lanes end where the next paintings will begin.</li>
+      </ul>
+    </div>
+    <div>
+      <h2>Fighting</h2>
+      <ul>
+        <li>Nothing is timed. On her turn, pick a move with the buttons or <kbd>1</kbd> to <kbd>4</kbd>.</li>
+        <li>With three wisps, click a wisp's bar or press <kbd>Tab</kbd> to choose her target.</li>
+        <li>A wisp's bar shows its Life in red. Fate grows in from the other end each time it hits her. When they meet it is sealed, and Sealed Fate ends it.</li>
+        <li>The rules and numbers are your approved combat engine, unchanged.</li>
+      </ul>
+    </div>
+    <div>
+      <h2>What to judge</h2>
+      <ul>
+        <li>Does she look as she does in her own theatre? Turn The painting off to see her against plain plum at the same size.</li>
+        <li>Does she stand on the ground: her size, her shadow, the light on her?</li>
+        <li>The line under the picture gives pictures a second on this machine. Your laptop is the one that counts.</li>
+      </ul>
+    </div>
+  </div>
+</main>
+/*SCRIPTS*/
+</body>
+</html>
