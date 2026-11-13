@@ -17,6 +17,12 @@ Body, base outfit, head, face, hair, headband and glasses, standing still. 324,6
 - **Stage 2c, the same evening.** The three face pictures arrived (J1, J2, J3; `references/chatgpt/`). Her face is now J1, her
   blink, half-shut eyes, two talking mouths and smile come from J2 (buttons on the page, `setFace(eyes, mouth)` on the model), and
   her cheeks, jaw and ears at the sides are painted from the profile in J3. About 325,000 triangles.
+- **Stage 2d, a fidelity pass on her head.** Chris: "Her hair band is floating above her forehead and I think she needs another head
+  and face fidelity pass." The band now lies on her skin below the hairline and on her hair above it (`bandPt` in `src/R41_hair.js`).
+  Her head was laid over J3's front and side views at one scale (`tools/cmp_j3.py`) and corrected: the neck leans forward as it
+  rises, front and back; neck and the top of the chest take her painted neck tone (`skinNeck`), darker and warmer than her chest;
+  the sides of the neck wear J3's profile; the hair is rounder on top and fuller at the back of the head and the nape; the painted
+  shadows of loose hair and band tails are cleared from the back of her neck; the lenses are fainter.
 - Stage two, waiting for his notes: face, ears, hair with the bun, headband with knot, tails, gem and drop, glasses, loose locks,
   and a wrist that joins the hand.
 
@@ -123,7 +129,8 @@ take the lean out. Her arms keep the Jester's bone lengths (0.63 m; the painting
   at once, each laid on from its own side (C3 profile, C3 front, C5 from behind, C8 from above) and mixed in the hair material by
   which way the hair faces. In each, the band is painted out with the hair next to it folded over, and everything outside the
   hair is filled from well inside it.
-- **Headband.** A strip wrapped round the hair in a tilted plane, from high on the forehead down behind the ears to the knot at
+- **Headband.** A strip of even width that lies on her skin where there is no hair under it and on her hair elsewhere, pressing
+  it flat (`bandPt`), wrapped in a tilted plane, from high on the forehead down behind the ears to the knot at
   the nape (`BAND`). Its picture is the flat strip in F2, mirrored each way from the gem. Knot and two stiff tails at the back.
 - **Gem.** Turquoise dome, gold rim, ring of beads, leaves, and the drop that rests on her forehead.
 - **Loose locks.** Eight on each side: flat twisting ribbons wearing fine strands with gaps, drawn in code.
@@ -138,6 +145,11 @@ take the lean out. Her arms keep the Jester's bone lengths (0.63 m; the painting
   knee 0.131 against 0.134, calf 0.123 against 0.130.
 - Profile: the main build now has the Jester's profile, by Chris's choice, so it is not held to C3. (The own-head variant was
   within 0.4 mm of C3 from brow to chin, `tools/prof_cmp_r.py`.)
+- Head against J3 (`tools/cmp_j3.py`, stage 2d), model against painting. Front: jaw 0.094 m wide against 0.096; below the ears 0.112
+  against 0.117; across the ears 0.166 against 0.161. Side, forward of the body's middle line: brow 0.092 against 0.090, cheek 0.092
+  against 0.094, chin 0.084 against 0.089 (the Jester's chin); back of the hair at 1.54 m -0.127 against -0.124; nape at 1.43 m -0.066
+  against -0.061. Where they still differ by more than a centimetre, the body paintings rule: J3's shoulders sit about 3 cm lower
+  than B1's (a longer neck), its neck is 1 cm narrower just under the chin, and its bun is smaller and lower than C3's.
 - Stage 2b was looked at from the front, three-quarter both ways, side, above, below and a low three-quarter, and the single file
   was loaded at phone size: no errors, and a drag turns her.
 - Head outlines (`tools/cmp_head.py`): from the side the face, the top of the hair and the bun follow C3. From the front the
@@ -147,7 +159,7 @@ take the lean out. Her arms keep the Jester's bone lengths (0.63 m; the painting
 
 Known rough spots: the sides of the torso under the arms are filled in from thin evidence; the painted strap hooks are flat;
 the shins are straight where the front painting has them angled a little outward; the hair pictures still come from C3, C5 and C8 with the band painted out, so just behind
-the band the hair is folded-over texture, which can read as crimped (J3 shows her hair without the band and is the source for the hair pass); a faint line remains where forearm skin meets hand skin until both are painted; a pale smudge shows at the base of the back of her neck, left from stage one.
+the band the hair is folded-over texture, which can read as crimped (J3 shows her hair without the band and is the source for the hair pass); a faint line remains where forearm skin meets hand skin until both are painted.
 
 ## Building
 
@@ -161,7 +173,8 @@ python3 -I lib/restore_refs.py        # PNG copies of the paintings into refs/
 python3 -I bake_ranger.py             # out/ranger_tex.js: body (needs Pillow, numpy, scipy)
 python3 -I bake_head.py               # adds the head, hair and band pictures to it (also needs opencv)
 ./build_r.sh                          # tools/tables.py, then out/ranger.js
-python3 -I build_single_r.py          # deliver/Ranger_3D_stage2c.html, one offline file
+python3 -I build_single_r.py          # deliver/Ranger_3D_stage2d.html, one offline file
+python3 tools/cmp_j3.py shots/cj3.jpg                 # head beside J3's three views, with widths and depths by height
 python3 tools/cmp_head.py shots/ch_side.jpg side      # head beside C3 with outlines; also front
 python3 tools/cmp_r.py shots/cmp_front.jpg front      # body beside B1 with outlines; also back, sideR, sideL
 python3 shoot.py shots/x 'T.j.pose({arm:24,leg:3})' face:0,0,1.25,1.53,22,520,600   # a still; angles are in radians

@@ -1,4 +1,4 @@
-# one offline file: deliver/Ranger_3D_stage2c.html (three.js, the stage, her textures, her model and the page, all inline)
+# one offline file: deliver/Ranger_3D_stage2d.html (three.js, the stage, her textures, her model and the page, all inline)
 import base64, io, sys
 sys.path.insert(0, '/home/claude/ranger/tools')
 from PIL import Image
@@ -18,4 +18,4 @@ t = open(R + 'viewer_r/index.tpl.html').read()
 rd = lambda p: open(R + p).read()
 t = t.replace('/*THREE*/', rd('node_modules/three/build/three.min.js').replace('</script>', '<\\/script>')).replace('/*PAL*/', rd('out/palette.js')).replace('/*STAGE*/', rd('viewer/stage.js'))
 t = t.replace('/*TEX*/', rd('out/ranger_tex.js')).replace('/*MODEL*/', rd('out/ranger.js')).replace('/*REFS*/{}', json.dumps(refs))
-open(R + 'deliver/Ranger_3D_stage2c.html', 'w').write(t); print('deliver/Ranger_3D_stage2c.html', round(len(t) / 1e6, 2), 'MB')
+open(R + 'deliver/Ranger_3D_stage2d.html', 'w').write(t); print('deliver/Ranger_3D_stage2d.html', round(len(t) / 1e6, 2), 'MB')

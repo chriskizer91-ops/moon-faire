@@ -8,8 +8,8 @@
   const BUN_D = V3(0, 0.575, -0.818), BUN = { amp: 0.061, sig: 37 * DEG };
   const BAND = { yF: 1.589, zF: 0.080, slope: 0.514, w: 0.032 }, bandY = (z) => BAND.yF - (BAND.zF - z) * BAND.slope;
   function hairPt(a, ph, u, phB, add, plain) {      // u: 0 at the crown .. 1 at the hairline; phB: where the band presses the hair; add: extra metres out
-    const rise = phB == null ? 1 : sm(phB - 0.02, phB - 0.30, ph);       // the band holds the hair flat; behind it the hair lifts as it is swept back to the bun
-    let g = 0.0070 + (0.027 * sm(1.50, 0.50, ph) * (0.72 + 0.28 * sm(-0.6, 0.4, Math.cos(a))) + 0.006 * sm(0.9, 1.5, ph) * sm(2.1, 1.5, ph)) * rise;
+    const rise = phB == null ? 1 : sm(phB - 0.02, phB - 0.46, ph);       // the band holds the hair flat; behind it the hair lifts as it is swept back to the bun
+    let g = (0.0070 + 0.011 * sm(0.1, -0.6, Math.cos(a)) * sm(1.88, 2.08, ph)) * (phB == null ? 1 : 1 - 0.45 * Math.exp(-Math.pow((ph - phB) / 0.16, 2))) + (0.027 * sm(1.50, 0.50, ph) * (0.55 + 0.45 * Math.cos(a) * Math.cos(a)) + 0.009 * sm(0.9, 1.5, ph) * sm(2.1, 1.5, ph) + 0.016 * sm(1.15, 1.6, ph) * sm(2.25, 1.75, ph) * sm(0.2, -0.5, Math.cos(a))) * rise;      // rounder on top, fuller at the back of the head (J3's side view)
     g *= 0.30 + 0.70 * sm(1.0, 0.72, u);
     const p = headPoint(a, ph, g + (add || 0)), dx = p[0] - HC.x, dy = p[1] - HC.y, dz = p[2] - HC.z, L = Math.hypot(dx, dy, dz) || 1;
     const Lv = Math.hypot(dy, dz) || 1, av = Math.acos(cl((dy * BUN_D.y + dz * BUN_D.z) / Lv, -1, 1)), al = Math.asin(cl(Math.abs(dx) / L, 0, 1)), ang = Math.hypot(av, 1.32 * al);      // the bun is narrower from side to side than it is tall
@@ -21,7 +21,11 @@
     const s = 1 + b / L;
     return [HC.x + dx * s, HC.y + dy * s, HC.z + dz * s];
   }
-  function bandPh(a) { let ph = 1.4; for (let k = 0; k < 12; k++) { const p = hairPt(a, ph, 0, ph, 0, true); ph = lerp(ph, phOfY(bandY(p[2])), 0.8); } return ph; }
+  // The band lies on her skin where there is no hair under it (her forehead, below the hairline) and on her hair everywhere else,
+  // pressing it flat. add: metres out from that surface.
+  const phEdgeOf = (a) => phOfY(spline(HAIR_EDGE, Math.abs(a)));
+  function bandPt(a, ph, add) { const e = phEdgeOf(a), cover = sm(e + 0.015, e - 0.05, ph); return headPoint(a, ph, 0.0042 * cover + add + (add > 0.001 ? 0.0012 * cover : 0)); }
+  function bandPh(a) { let ph = 1.4; for (let k = 0; k < 12; k++) { const p = bandPt(a, ph, 0.002); ph = lerp(ph, phOfY(bandY(p[2])), 0.8); } return ph; }
   (function buildHair() {
     const NU = Q(168, 64), NV = Q(76, 28), rings = [], phE = [], phB = [], aOf = (j) => -PI + (j / NU) * TAU;
     for (let j = 0; j < NU; j++) { const a = aOf(j); phE.push(phOfY(spline(HAIR_EDGE, Math.abs(a)))); phB.push(bandPh(a)); }
@@ -41,12 +45,12 @@
   (function buildBand() {
     const NU = Q(132, 52), rings = [], K = [-1, -0.55, 0, 0.55, 1], cs = []; let s = 0, prev = null, knot = null;
     for (let j = 0; j <= NU; j++) {                 // from the knot at the nape, round her right side to the forehead and back by her left
-      const a = -PI + (j / NU) * TAU, pb = bandPh(a), pc = hairPt(a, pb, 0, pb, 0.003, true);
+      const a = -PI + (j / NU) * TAU, pb = bandPh(a), pc = bandPt(a, pb, 0.003);
       // the band is a strip of even width: how far to step up and down the head for half its width is worked out on each side separately
-      const step = (sgn) => { let lo = 0, hi = 0.6; for (let it = 0; it < 18; it++) { const m = (lo + hi) / 2, q = hairPt(a, pb + sgn * m, 0, pb, 0, true); if (Math.hypot(q[0] - pc0[0], q[1] - pc0[1], q[2] - pc0[2]) < BAND.w / 2) lo = m; else hi = m; } return (lo + hi) / 2; };
-      const pc0 = hairPt(a, pb, 0, pb, 0, true), dUp = step(-1), dDn = step(1), ring = [];
-      for (const k of K) ring.push(hairPt(a, pb + k * (k < 0 ? dUp : dDn), 0, pb, 0.0030 + 0.0012 * (1 - k * k), true));
-      for (const k of [0.8, 0, -0.8]) ring.push(hairPt(a, pb + k * (k < 0 ? dUp : dDn), 0, pb, 0.0005, true));
+      const step = (sgn) => { let lo = 0, hi = 0.6; for (let it = 0; it < 18; it++) { const m = (lo + hi) / 2, q = bandPt(a, pb + sgn * m, 0); if (Math.hypot(q[0] - pc0[0], q[1] - pc0[1], q[2] - pc0[2]) < BAND.w / 2) lo = m; else hi = m; } return (lo + hi) / 2; };
+      const pc0 = bandPt(a, pb, 0), dUp = step(-1), dDn = step(1), ring = [];
+      for (const k of K) ring.push(bandPt(a, pb + k * (k < 0 ? dUp : dDn), 0.0018 + 0.0012 * (1 - k * k)));
+      for (const k of [0.8, 0, -0.8]) ring.push(bandPt(a, pb + k * (k < 0 ? dUp : dDn), 0.0003));
       rings.push(ring);
       if (prev) s += Math.hypot(pc[0] - prev[0], pc[1] - prev[1], pc[2] - prev[2]);
       prev = pc; cs.push(s); if (j === 0) knot = pc;
@@ -76,7 +80,7 @@
     }
   })();
   (function buildGem() {                            // the turquoise in its gold setting, at the middle of the band on her forehead
-    const pb = bandPh(0), O = hairPt(0, pb, 0, pb, 0.0048, true), u1 = hairPt(0, pb - 0.02, 0, pb, 0.0048, true), u2 = hairPt(0, pb + 0.02, 0, pb, 0.0048, true);
+    const pb = bandPh(0), O = bandPt(0, pb, 0.0036), u1 = bandPt(0, pb - 0.02, 0.0036), u2 = bandPt(0, pb + 0.02, 0.0036);
     const U = V3(u1[0] - u2[0], u1[1] - u2[1], u1[2] - u2[2]).normalize(), R = V3(1, 0, 0), N = V3().crossVectors(R, U).normalize();
     const at = (r, u, n) => V3(O[0] + R.x * r + U.x * u + N.x * n, O[1] + R.y * r + U.y * u + N.y * n, O[2] + R.z * r + U.z * u + N.z * n);
     blob('gem', O, R, U, N, [0, 0, 0.0012], [0.0086, 0.0119, 0.0046], Q(28, 14), Q(14, 8));
@@ -89,7 +93,7 @@
     blob('gold', O, R, U, N, [0, -0.0176, 0.0012], [0.0023, 0.0023, 0.0021], 8, 5); blob('gold', O, R, U, N, [0, -0.0208, 0.0008], [0.0012, 0.0012, 0.0012], 6, 4);
     // the drop hangs straight down from under the gem and rests on her forehead
     const top = at(0, -0.0222, 0.0008), dr = [];
-    for (const [t, r] of [[0, 0.0005], [0.18, 0.0011], [0.42, 0.0024], [0.66, 0.0035], [0.84, 0.0033], [0.95, 0.0021], [1, 0.0006]]) dr.push(ringXZ(top.x, top.y - 0.0105 * t, top.z + 0.0012 * t, r, r, r, Q(12, 8)));
+    for (const [t, r] of [[0, 0.0005], [0.18, 0.0011], [0.42, 0.0024], [0.66, 0.0035], [0.84, 0.0033], [0.95, 0.0021], [1, 0.0006]]) dr.push(ringXZ(top.x, top.y - 0.0105 * t, top.z + 0.0042 * t, r, r, r, Q(12, 8)));
     addPart('gold', loft(dr, { capA: true, capB: true }), wHead, { out: V3(top.x, top.y - 0.006, top.z) });
   })();
   // loose hair: soft wavy locks that have slipped the bun, at her temples, round her ears and at the nape. Each is a flat, twisting

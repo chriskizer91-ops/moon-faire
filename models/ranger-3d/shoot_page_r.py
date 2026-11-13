@@ -10,7 +10,7 @@ with sync_playwright() as p:
             bb = pg.locator('#box').bounding_box(); pg.screenshot(path=path, clip={'x': bb['x'], 'y': max(0, bb['y']), 'width': bb['width'], 'height': min(bb['height'], vp['height'] - max(0, bb['y']))})
         pg.on('console', lambda m: logs.append(m.type + ': ' + m.text[:300]) if m.type == 'error' else None)
         pg.on('pageerror', lambda e: logs.append('PAGEERR: ' + str(e)[:500]))
-        pg.goto('file:///home/claude/ranger/deliver/Ranger_3D_stage2c.html'); pg.wait_for_function('window.RANGER || !document.getElementById("err").hidden', timeout=120000)
+        pg.goto('file:///home/claude/ranger/deliver/Ranger_3D_stage2d.html'); pg.wait_for_function('window.RANGER || !document.getElementById("err").hidden', timeout=120000)
         pg.wait_for_timeout(2500)
         print(tag, 'hud:', pg.inner_text('#hud'), '| err hidden:', pg.evaluate('document.getElementById("err").hidden'), '| scrollW', pg.evaluate('document.documentElement.scrollWidth'), 'clientW', pg.evaluate('document.documentElement.clientWidth'))
         def settle(n=40):

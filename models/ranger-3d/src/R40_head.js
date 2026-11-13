@@ -12,7 +12,7 @@
     const FC = { eyeY: LAY.eyeY || 1.5246, eyeX: LAY.eyeX || 0.0304, browY: LAY.browY || 1.5368, noseY: LAY.noseY || 1.4877, mouthY: LAY.mouthY || 1.4586 };
     // TUCK is the one thing added to her head. The Jester's cap and ruff hide what lies behind her jaw; the Ranger's hair is up, so
     // below the ears the back of each ring is drawn in to the neck: [from height, to height, neck half-width, neck middle, neck half-depth] in the head's frame
-    const TUCK = [1.4927, 1.4523, 0.0468, -0.0298, 0.0495];
+    const TUCK = [1.4927, 1.4523, 0.0468, -0.0115, 0.0535];
     const FACE_MID = [[1.4174, 0.0825], [1.4200, 0.0861], [1.4240, 0.0887], [1.4300, 0.0884], [1.4380, 0.0891], [1.4454, 0.0908], [1.4520, 0.0921], [1.4586, 0.0941], [1.4630, 0.0952], [1.4680, 0.0954],
     [1.4747, 0.0956], [1.4800, 0.0956], [1.4900, 0.0947], [1.5000, 0.0943], [1.5100, 0.0948], [1.5220, 0.0946], [1.5300, 0.0964], [1.5387, 0.1000], [1.5500, 0.0989], [1.5550, 0.0985]];
   const NOSE = [[1.4680, 0], [1.4700, 0.0019], [1.4720, 0.0031], [1.4747, 0.0035], [1.4760, 0.0040], [1.4774, 0.0052], [1.4787, 0.0104], [1.4800, 0.0135], [1.4840, 0.0172], [1.4880, 0.0189], [1.4920, 0.0171], [1.4980, 0.0125], [1.5040, 0.0092], [1.5100, 0.0059], [1.5160, 0.0023], [1.5220, 0.0004], [1.5260, 0]];
@@ -89,7 +89,7 @@
       const nx = FB.nor[i * 3], ny = FB.nor[i * 3 + 1], px = FB.pos[i * 3], py = FB.pos[i * 3 + 1], pz = FB.pos[i * 3 + 2], pyJ = toJy(py), pzJ = toJz(pz), pxJ = Math.abs(px) / HS;
       const under = sm(-0.22, -0.66, ny) * sm(1.444, 1.428, pyJ), plain = Math.max(under, sm(0.010, -0.006, pzJ - JH.HC.z), pxJ > 0.03 ? sm(1.12, 0.92, earR(pz, py)) : 0);
       const side = sm(0.70, 0.93, Math.abs(nx)) * sm(0.034, 0.050, pxJ) * sm(Wn[2] + 0.002, Wn[2] + 0.014, py) * sm(Wn[3] - 0.002, Wn[3] - 0.014, py) * (1 - plain);
-      faceMix.push(side, plain, 1 - 0.40 * under); faceUvS.push((pz - Wn[0]) / (Wn[1] - Wn[0]), (py - Wn[2]) / (Wn[3] - Wn[2]));
+      faceMix.push(side, plain, 1 - 0.17 * under, 1); faceUvS.push((pz - Wn[0]) / (Wn[1] - Wn[0]), (py - Wn[2]) / (Wn[3] - Wn[2]));
     }
   })();
   // Her painted face is kept on a canvas, so the painted eyes or mouth of another state can be set into it: her blink, her talking
@@ -137,17 +137,21 @@
       const part = loft(rings, { capA: true }), cols = NT + 1, info = addPart('face', part, wHead, { out: V3(sg * 0.05, EAR.y, EAR.z) }), FB = buckets.face, Wn = SIDE_WIN;
       for (let i = info.start; i < info.start + info.count; i++) {
         const k = kind[Math.min(kind.length - 1, Math.floor((i - info.start) / cols))] || 0, py = FB.pos[i * 3 + 1], pz = FB.pos[i * 3 + 2];
-        if ((i - info.start) >= rings.length * cols || k === 0) faceMix.push(1, 0, 1); else if (k === 1) faceMix.push(0.5, 0.5, 0.95); else faceMix.push(0, 1, 0.82);
+        if ((i - info.start) >= rings.length * cols || k === 0) faceMix.push(1, 0, 1, 1); else if (k === 1) faceMix.push(0.5, 0.5, 0.97, 1); else faceMix.push(0, 1, 0.92, 1);
         faceUvS.push((EAR.z + (pz - EAR.z) * EAR.texK - Wn[0]) / (Wn[1] - Wn[0]), (EAR.y + (py - EAR.y) * EAR.texK - Wn[2]) / (Wn[3] - Wn[2]));
       }
     }
   })();
-  // neck: from the top of the torso up inside the jaw. Its front leans forward as it rises, so the throat meets the underside of the
-  // jaw about 4 cm behind the chin, and it darkens toward the jaw, so the jaw reads as a jaw (the Jester's ruff hid all of this)
+  // neck: from the top of the torso up inside the jaw. It leans forward as it rises, front and back, as in the side view in J3,
+  // so the throat meets the underside of the jaw about 4 cm behind the chin. Its sides wear the profile in J3; its front and back
+  // are her neck's own tone (darker and warmer than her chest, as painted), darker again under the jaw.
   (function buildNeck() {
-    const NU = Q(48, 22), wNeck = (x, y) => { const u = sm(1.40, 1.47, y); return [BI.neck, 1 - u, BI.head, u]; }, nr = [];
-    for (const [y, rx, zf, zb] of [[1.396, 0.0505, 0.0245, -0.0785], [1.410, 0.0495, 0.0290, -0.0775], [1.424, 0.0482, 0.0345, -0.0770], [1.440, 0.0470, 0.0385, -0.0772], [1.460, 0.0468, 0.0380, -0.0785], [1.490, 0.0460, 0.0300, -0.0795]])
+    const NU = Q(56, 24), wNeck = (x, y) => { const u = sm(1.40, 1.47, y); return [BI.neck, 1 - u, BI.head, u]; }, nr = [];
+    for (const [y, rx, zf, zb] of [[1.396, 0.0505, 0.0245, -0.0785], [1.410, 0.0492, 0.0305, -0.0735], [1.424, 0.0480, 0.0355, -0.0675], [1.440, 0.0470, 0.0390, -0.0625], [1.460, 0.0468, 0.0395, -0.0600], [1.490, 0.0460, 0.0320, -0.0600]])
       nr.push(ringXZ(0, y, (zf + zb) / 2, rx, (zf - zb) / 2, (zf - zb) / 2, NU));
-    const info = addPart('face', loft(nr), wNeck, { out: V3(0, 1.44, -0.025) }), FB = buckets.face;
-    for (let i = info.start; i < info.start + info.count; i++) { const py = FB.pos[i * 3 + 1], pz = FB.pos[i * 3 + 2]; faceMix.push(0, 1, 1 - 0.36 * sm(1.403, 1.432, py) * sm(-0.030, 0.015, pz)); faceUvS.push(0, 0); }
+    const info = addPart('face', loft(nr), wNeck, { out: V3(0, 1.44, -0.012) }), FB = buckets.face, Wn = SIDE_WIN;
+    for (let i = info.start; i < info.start + info.count; i++) {
+      const nx = FB.nor[i * 3], py = FB.pos[i * 3 + 1], pz = FB.pos[i * 3 + 2], sd = sm(0.50, 0.85, Math.abs(nx)) * sm(1.398, 1.422, py);
+      faceMix.push(sd, 1 - sd, 1 - 0.17 * sm(1.403, 1.432, py) * sm(-0.030, 0.015, pz), 1); faceUvS.push((pz - Wn[0]) / (Wn[1] - Wn[0]), (py - Wn[2]) / (Wn[3] - Wn[2]));
+    }
   })();

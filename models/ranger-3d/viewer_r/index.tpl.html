@@ -41,7 +41,7 @@ canvas#stage{display:block;width:100%;height:100%;touch-action:none;cursor:grab}
   <header>
     <p class="eyebrow">Moon Faire · Stage two of her build</p>
     <h1>The <em>Ranger</em></h1>
-    <p class="sub">Her new face is on: your J1 on the Jester's face model, with her blink, talking mouths and smile from J2 under "Her face". Drag to turn her, pinch or scroll to zoom. The Head buttons bring you in close; "Painting beside her" shows your painting for that view.</p>
+    <p class="sub">A fidelity pass on her head, checked against J1 and J3 at one scale. Her headband now lies on her forehead. Drag to turn her, pinch or scroll to zoom. The Head buttons bring you in close; "Painting beside her" shows your painting for that view.</p>
   </header>
   <div class="stagebox" id="box">
     <canvas id="stage"></canvas>
@@ -61,12 +61,13 @@ canvas#stage{display:block;width:100%;height:100%;touch-action:none;cursor:grab}
       <li>The buttons under "Her face" set J2's eyes or mouth into it: blink, half shut, talking, "oo", smile. Only the eyes or the mouth change; the rest of her face stays put.</li>
       <li>Her cheeks, jaw and ears at the sides are painted from the side view in J3.</li>
       <li>The shape is still the Jester's face model at 94% of its size, drawn in to her neck behind the jaw.</li>
-      <li>Hair, headband, gem, glasses and loose locks are as before.</li>
+      <li>New in this pass: the headband lies on her forehead and on her hair, instead of standing off them.</li>
+      <li>Her neck leans forward as in J3's side view, has her painted neck tone, and wears J3's paint at the sides, so jaw and neck join as one.</li>
+      <li>Her hair is rounder on top and fuller at the back of her head and at the nape. The lenses of her glasses are fainter.</li>
     </ul>
     <h2 style="margin-top:12px">Rough, or not here yet</h2>
     <ul class="m">
       <li>Her face changes only when you press a button. Blinking and talking on their own come with movement.</li>
-      <li>The join of jaw and neck is plain.</li>
       <li>Her hair is still painted from the old pictures, with the band painted out of them.</li>
       <li>The fine flyaway wisps round her hair are missing, and the loose locks are simple.</li>
       <li>Earrings and necklaces, with the rest of her jewellery.</li>
@@ -138,7 +139,7 @@ canvas#stage{display:block;width:100%;height:100%;touch-action:none;cursor:grab}
     if (easing) { let d = want.az - orbit.az; d = Math.atan2(Math.sin(d), Math.cos(d)); const k = Math.min(1, dt * 5); orbit.az += d * k; orbit.el += (want.el - orbit.el) * k; orbit.dist += (want.dist - orbit.dist) * k; orbit.target.y += (want.ty - orbit.target.y) * k; }
     stage.render();
   }
-  $('hud').textContent = 'Stage two, her new face · ' + Math.round(R.triangles / 1000) + 'k triangles';
+  $('hud').textContent = 'Stage two, fidelity pass · ' + Math.round(R.triangles / 1000) + 'k triangles';
   window.RANGER = { stage, R, step() { fit(); stage.render(); } };
   requestAnimationFrame(frame);
 })();

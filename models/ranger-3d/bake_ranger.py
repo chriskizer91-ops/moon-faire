@@ -95,7 +95,9 @@ atlas = col * conf[..., None] + fl * (1 - conf[..., None])
 # the neck: above her collarbones the paintings bring hair, ears and their shadows; plain skin takes over there
 jj0, jj1 = int((AY1 - 1.345) / (AY1 - AY0) * H), int((AY1 - 1.300) / (AY1 - AY0) * H); cu = (np.abs(us - 0.5) < 0.045)
 chest = np.median(atlas[jj0:jj1][:, cu].reshape(-1, 3), 0); T['skinChest'] = '#%02x%02x%02x' % tuple(int(round(v)) for v in chest); print('chest skin', T['skinChest'])
-fade = smooth(1.352, 1.392, Y)[..., None]; atlas = atlas * (1 - fade) + chest[None, None] * fade
+NECK = np.array([190.0, 127.0, 98.0]); T['skinNeck'] = '#be7f62'      # her neck in J3, between collarbones and chin: darker and warmer than her chest
+ub = np.minimum(us, 1 - us)[None, :]; lower = 0.030 * smooth(0.30, 0.18, ub)       # at her back the band's tails, loose hair and their shadows hang lower in the painting, so plain skin starts lower there
+nk = smooth(1.350, 1.398, Y)[..., None]; fade = smooth(1.352 - lower, 1.392 - lower, Y)[..., None]; atlas = atlas * (1 - fade) + (chest[None, None] * (1 - nk) + NECK[None, None] * nk) * fade
 T['body'] = uri(atlas, 90); Image.fromarray(np.clip(atlas, 0, 255).astype(np.uint8)).save('/home/claude/ranger/shots/bake_body.jpg', quality=90)
 print('body atlas', atlas.shape, 'low-confidence share %.3f' % float((conf < 0.5).mean()))
 
