@@ -10,7 +10,7 @@
   // Names are working names.
   const ACTS = [['talk', 'Talk', 0.8], ['laugh', 'Laugh', 0.8], ['dance', 'Dance', 1.0], ['curtsey', 'Curtsey', 0.9], ['pounce', 'Pounce', 1.0, 1.32], ['bow', 'Bow', 0.95], ['twirl', 'Twirl', 1.15], ['wave', 'Wave', 0.8], ['jump', 'Jump', 0.9, 1.42], ['shears_out', 'Shears', 0.85]];
   const QUIET = [['look_around', 'Stand', 0.7], ['settle', 'Stand', 0.7]];      // small things she does by herself when left standing
-  const SPELLS = [['hemline_fangs', 'Hemline Fangs', 1.2, 1.2]];      // her first spell (round 3); names are working names
+  const SPELLS = [['hemline_fangs', 'Hemline Fangs', 1.2, 1.2], ['blue_mischief', 'Blue Mischief', 1.2, 1.2], ['borrowed_face', 'Borrowed Face', 1.3, 1.2]];      // her first spell (round 3); names are working names
   const ALL = STATES.concat(ACTS, SPELLS, QUIET), find = (id) => ALL.find((x) => x[0] === id);
   const VIEWS = [['Front', 0, 0.10, 1], ['Three-quarter', -0.62, 0.14, 1], ['Side', -1.5708, 0.08, 1], ['Back', 3.1416, 0.12, 1], ['Face', 0.22, 0.02, 0.27]];
   const touchPhone = (navigator.maxTouchPoints > 0 || /Mobi|Android|iPhone/i.test(navigator.userAgent)) && Math.min(screen.width, screen.height) < 820;
@@ -22,7 +22,11 @@
   try {
     if (!window.THREE) throw new Error('three.js did not load');
     JO = { detail: small ? 0.75 : 1, textureScale: small ? 0.75 : 1 };
-    stage = makeStage(canvas, { shadow: small ? 1024 : 2048 });
+    // The Flipbook look's colours: the 56 every witch shares, then hers. The 56 have no green, and her blouse snapped to blue; these three are the
+    // blouse colours of her own flipbook frames (light, middle, dark). Three of the eight spare places. (A fourth, the pale of her foxfire, was
+    // tried and taken out: it pulled the white of her costume ears to ice blue.)
+    const FOX_COLOURS = [[84, 122, 116], [51, 82, 82], [22, 45, 47]];
+    stage = makeStage(canvas, { shadow: small ? 1024 : 2048, palette: (window.JESTER_PALETTE || []).concat(FOX_COLOURS) });
     J = makeFox(JO);
     stage.scene.add(J.root, J.fx);
   } catch (e) { err.hidden = false; err.textContent = 'This page needs WebGL to draw her. ' + (e && e.message ? e.message : ''); return; }
@@ -108,6 +112,8 @@
   // the layers worn over the base outfit (veils, ribbon strands, shawl, shoulder kerchiefs) can be taken off, to work on the outfit beneath
   let outerOn = true;
   chip(toggleRow, 'Full detail', () => goHash({ small: !small }), !small);
+  // The Flipbook look (claude/HOW-TO-flipbook-look.md): she is redrawn at her sprites' pixel size, in the flipbook's colours, with an inked outline. Starts off.
+  chip(toggleRow, 'Flipbook look', (b) => { stage.look = stage.look === 'flipbook' ? 'smooth' : 'flipbook'; b.setAttribute('aria-pressed', stage.look === 'flipbook'); }, false);
   // two things Chris is choosing between by eye (13 Nov): the head's depth-only reshaping, and a larger head
   chip(toggleRow, 'Half speed', (b) => { slow = !slow; b.setAttribute('aria-pressed', slow); }, false);
 
@@ -163,7 +169,7 @@
   }
   qShow();
   // ---- a practice dummy to cast at (with Walk around): she turns to put it on her casting side, the spell goes to where it stands, and it rocks when struck ----
-  const AIMED = { hemline_fangs: 1, sealed_fate: 1, gilded_rebuke: 1, hush: 1, gravity: 1, ill_omen: 1, stop: 1, last_toll: 1 };
+  const AIMED = { hemline_fangs: 1, blue_mischief: 1, borrowed_face: 1, sealed_fate: 1, gilded_rebuke: 1, hush: 1, gravity: 1, ill_omen: 1, stop: 1, last_toll: 1 };
   const lin = (h) => new THREE.Color(h).convertSRGBToLinear(), dummy = new THREE.Group(), dBody = new THREE.Group(), dState = { rx: 0, rz: 0, vx: 0, vz: 0, flash: 0 }; let dummyOn = true;
   dummy.add(dBody); dummy.position.set(1.9, 0, -0.25); dummy.visible = false; stage.scene.add(dummy);
   const sackM = new THREE.MeshStandardMaterial({ color: lin(0x9a7d55), roughness: 0.95, emissive: lin(0xb070ff), emissiveIntensity: 0 });
@@ -185,7 +191,7 @@
   function dummyHit(k) { const dx = dummy.position.x - roam.x, dz = dummy.position.z - roam.z, L = Math.hypot(dx, dz) || 1, p = 2.2 + 4.2 * k; dState.vx += dz / L * p; dState.vz += -dx / L * p; dState.flash = Math.min(1, 0.4 + k); }
   // ---- what a spell does to the room: the picture jolts or sways, light flashes from where it lands, and motes cross the whole stage ----
   const sfx = $('sfx'), sg = sfx.getContext('2d'), MOTES = [], calm = matchMedia('(prefers-reduced-motion: reduce)').matches, _hp = new THREE.Vector3();
-  const LOOK = { last_toll: ['214,222,255', 'rain', 1], gravity: ['176,116,255', 'fall', 1], stop: ['208,182,255', 'hold', 1], gilded_rebuke: ['255,206,112', 'burst', 0], curtain_call: ['255,206,112', 'confetti', 0], sealed_fate: ['192,124,255', 'burst', 0],
+  const LOOK = { hemline_fangs: ['150,215,255', 'burst', 0], blue_mischief: ['150,215,255', 'burst', 0], borrowed_face: ['150,215,255', 'rise', 0], last_toll: ['214,222,255', 'rain', 1], gravity: ['176,116,255', 'fall', 1], stop: ['208,182,255', 'hold', 1], gilded_rebuke: ['255,206,112', 'burst', 0], curtain_call: ['255,206,112', 'confetti', 0], sealed_fate: ['192,124,255', 'burst', 0],
     hush: ['206,188,255', 'inward', 1], ill_omen: ['156,84,236', 'burst', 0], royal_reversal: ['216,222,255', 'rise', 0], against_all_odds: ['255,216,132', 'rise', 0], jump: ['226,210,255', 'dust', 0] };
   let shakeK = 0, swayK = 0, swayT = 9, flashK = 0, flashC = '200,150,255', flashX = 0.5, flashY = 0.5, hitSeen = 0;
   const R = Math.random, mote = (x, y, vx, vy, life, size, c, o) => { if (MOTES.length < 420) MOTES.push(Object.assign({ x, y, vx, vy, life, max: life, size, c, g: 0, drag: 0, kind: 0, a: R() * 6.28, w: 0 }, o || {})); };

@@ -145,7 +145,20 @@ Pass 9 (13 Nov 2026): head 10% larger and the depth reshaping built in; her own 
 Pass 10 (13 Nov 2026): Chris approved the five moves and keeps the Jester's bow, twirl, wave and jump; how her arms and hands move (see `claude/fox-3d-pass10-arms-hands-motion.md`).
 Pass 11 (13 Nov 2026): the lowest bracelet no longer sinks into the root of her thumb; her fingers are 5% shorter, which is their length in her own painting (see `claude/fox-3d-pass11-bracelet-fingers.md`).
 Pass 12 (13 Nov 2026): fingers 12% thicker (D1's width); her shears come out of the sheath into her hands; her first spell, Hemline Fangs (see `claude/fox-3d-pass12-shears-hemline-fangs.md`).
+Pass 13 (13 Nov 2026): the Flipbook look switch (with her three blouse greens added to the 56 colours); Blue Mischief and Borrowed Face, so all three flipbook moves are in; a ghost double and a foxfire fox (see `claude/fox-3d-pass13-flipbook-look-blue-mischief-borrowed-face.md`).
 Still to do: rounds 3 and 4 (her tools in her hands, her spells, her three flipbook moves): the paintings are in `references/round3` and `round4`, none used yet. Ruffles at the neckline and peplum are flat paint; her choker is plain where A1's has studs and a larger bell; under her jaw and the sides of her head are plain skin tone.
+
+## The Flipbook look, and two more spells (pass 13)
+
+- **Flipbook look** (`claude/HOW-TO-flipbook-look.md`): a switch on her page, off to start. `out/palette.js` (the 56 colours all four witches share) is now in her branch. The 56 have no green and her blouse snapped to blue, so `viewer/app.js` passes three more, the blouse colours of her own flipbook frames: `[84,122,116]`, `[51,82,82]`, `[22,45,47]`. Three of the eight spare places. A fourth (the pale of her foxfire) was tried and removed: it turned the white of her costume ears ice blue.
+- For the look, sparks (`pPoints` in `src/80_fx.js`) are sized by the height of the picture being drawn into. The page's own hit flash has her foxfire colour (`LOOK` in `viewer/app.js`) and each spell sets `fxHitP` so it lands where the spell does.
+- Check: `python3 flip_shots.py shots/fl` (the real page, look off and on: standing, talking, each spell).
+- **Her spells act toward her left** (+x in her space: screen right when she faces you), as on the sprite sheet, and the page turns her so that is the dummy. A move that strikes forward turns her with its `spin` track (Hemline Fangs a quarter turn, Blue Mischief 1.25 radians for the throw). `tdir()` in `src/89b_foxspells2.js` gives the true direction of her target whatever turn the move has given her.
+- **`GHOST`** (`src/89b_foxspells2.js`): a ghost double. Her own skinned meshes are drawn a second time on a second set of bones in one see-through blue material: no new geometry, no textures. A spell sets `GHOST.P` (any pose), calls `GHOST.show(opacity, x, y, z, turn)` each frame it should be seen, and it is gone the frame nothing asks for it. Its pose is worked out on her bones and copied across before her own pose is laid over them (`animate`, `poseQuiet`). The cloth flounces of her trousers are not in it. This is the piece Same Cloth (a ghost copy of an enemy) will need.
+- **`FOXFIRE`**: a fox of light built from a dozen simple shapes in one glowing material; `place(point, direction, length, stretch, opacity, time)`. It is plain: it reads as a four-legged thing with ears and a brush, not as the fox of painting H6.
+- **`blue_mischief`** (3.67 s, the flipbook's own length; the throw on frame 16, the hit 0.42 s later): bell, spark on her fingertip, the little fox on her palm, turn and wind-up, throw, the leap (it grows from 17 cm to 95 cm), burst.
+- **`borrowed_face`** (3.67 s; the double is in place on frame 10): palm over her right eye, the double steps out of her left side and makes the Jester's bow she keeps (H8), she leans away behind it with a finger to her lips, the double fades at the end.
+- Not as the paintings: in H5 the fox sits on her left hand, here her right; in H8 she tiptoes away, here she stays and leans; the double has no lace or flounces.
 
 ## Her shears in her hands, and her spells (pass 12, round 3)
 

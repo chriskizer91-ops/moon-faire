@@ -14,7 +14,7 @@ with sync_playwright() as p:
     print('triangles', pg.evaluate('FOX.J.triangles'), 'head', pg.evaluate('FOX.J.bones ? 1 : 0'))
     rows = pg.evaluate("[...document.querySelectorAll('section')].map((s) => s.querySelector('.label').textContent + ': ' + [...s.querySelectorAll('button')].map((b) => b.textContent).join(', '))")
     for r in rows: print(' ', r)
-    for i, (mv, wait) in enumerate([('talk', 2.2), ('laugh', 1.2), ('dance', 2.0), ('curtsey', 1.4), ('pounce', 1.9), ('bow', 1.5), ('twirl', 1.5), ('shears_out', 1.5), ('hemline_fangs', 1.5)]):
+    for i, (mv, wait) in enumerate([('talk', 2.2), ('laugh', 1.2), ('dance', 2.0), ('curtsey', 1.4), ('pounce', 1.9), ('bow', 1.5), ('twirl', 1.5), ('shears_out', 1.5), ('hemline_fangs', 1.5), ('blue_mischief', 1.5), ('borrowed_face', 2.5)]):
         pg.evaluate(f"FOX.setMove('{mv}')"); pg.wait_for_timeout(int(wait * 1000))
         pg.screenshot(path=f'/home/claude/fox3d/shots/single_{h}_{i}.png')
         print(mv, 'action now:', pg.evaluate('FOX.J.action'), 'pressed:', pg.evaluate("[...document.querySelectorAll('button[aria-pressed=true]')].map((b) => b.textContent).join('|')"))

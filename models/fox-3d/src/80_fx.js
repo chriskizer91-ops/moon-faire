@@ -12,7 +12,8 @@
     fragmentShader: 'varying vec3 vC; varying float vA; varying float vK;\nvoid main(){ vec2 p = gl_PointCoord * 2.0 - 1.0; float a = 1.0 - (sqrt(abs(p.x)) + sqrt(abs(p.y))); float star = pow(max(a, 0.0), 1.3) * 1.9 + exp(-dot(p, p) * 6.0) * 0.5; float mote = exp(-dot(p, p) * 3.2) * 0.9; gl_FragColor = vec4(vC * mix(star, mote, vK) * vA, 1.0); }' });
   glowOnly(pMat, true); const pPoints = new THREE.Points(pGeo, pMat); pPoints.frustumCulled = false; pPoints.renderOrder = 30;
   const _dbs = new THREE.Vector2();
-  pPoints.onBeforeRender = (r) => { r.getDrawingBufferSize(_dbs); pMat.uniforms.uVH.value = _dbs.y; };
+  // sparks are sized by the height of the picture being drawn into: the screen, or the small picture of the Flipbook look, where a spark is a pixel or two
+  pPoints.onBeforeRender = (r) => { const rt = r.getRenderTarget(); if (rt) pMat.uniforms.uVH.value = rt.height; else { r.getDrawingBufferSize(_dbs); pMat.uniforms.uVH.value = _dbs.y; } pMat.uniformsNeedUpdate = true; };
   fx.add(pPoints);
   function emit(x, y, z, vx, vy, vz, life, size, col, grav, drag) {
     const i = pNext; pNext = (pNext + 1) % NPART;

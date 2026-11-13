@@ -83,6 +83,7 @@
         P = cur;
       }
     }
+    if (typeof GHOST !== 'undefined' && GHOST && GHOST.live) GHOST.pose();      // her ghost double takes its pose first; her own pose is then laid over the same bones
     poseDt = dt; applyPose(armLife(P, dt)); poseDt = 0;
     // a jump of the root (a teleport) lays the cloth and springs afresh instead of whipping them
     root.getWorldPosition(_va);
@@ -95,7 +96,9 @@
     _vb.set(0, 0, -1).applyQuaternion(_rq).multiplyScalar((2.6 * wb + 3.2 * rb) * (1 - sk) * (opts.treadmill === false ? 0 : 1)); WIND.copy(userWind).add(_vb);
     if (typeof bodyTick === 'function') bodyTick(t, dt);
     stepCloth(dt, t);
+    if (typeof GHOST !== 'undefined' && GHOST) GHOST.asked = false;
     if (typeof updateFx === 'function') updateFx(t, dt, P);
+    if (typeof GHOST !== 'undefined' && GHOST && !GHOST.asked && GHOST.group.visible) GHOST.hide();
   }
   const ACTIONS = {};
   for (const n in ACTS) ACTIONS[n] = Object.freeze({ dur: ACTS[n].dur, hits: Object.freeze((ACTS[n].hits || []).slice()), cues: Object.freeze((ACTS[n].cues || []).slice()), hold: !!ACTS[n].hold });

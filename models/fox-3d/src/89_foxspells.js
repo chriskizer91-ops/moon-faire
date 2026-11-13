@@ -70,7 +70,9 @@
       keys.push(K(11.95, Object.assign({ shr: 0 }, GRIP)));
       keys.push(K(12.10, Object.assign({ shr: 0, hd: [0, 0, 0], sp: [0, 0, 0], mouth: 2 }, GRIP)));
       const dur = (12.9 - 1) / 6 * TS, tt = (f) => (f - 1) / 6 * TS, T_HIT = tt(7.0), T_HIT2 = tt(8.3), T_RING = tt(9.4);
-      defAction('hemline_fangs', dur, keys, { outro: 0.28, stand: true, hits: [T_HIT / dur], cues: [tt(3) / dur, T_HIT2 / dur], impact: 0.6,
+      // Her spells act toward her left (screen right when she faces you, as on the sprite sheet), so for a blow struck forward she turns to face it.
+      const spin = [[0, 0], [tt(2.2), 0], [tt(4.4), PI / 2], [tt(9.0), PI / 2], [tt(11.4), 0], [dur, 0]];
+      defAction('hemline_fangs', dur, keys, { outro: 0.28, stand: true, spin, hits: [T_HIT / dur], cues: [tt(3) / dur, T_HIT2 / dur], impact: 0.6,
         start() { prev.A.on = prev.B.on = false; },
         fx(a, t, dt) {
           const T = a.t, out = T > tt(2.4) && T < tt(11.7), split = T > tt(2.8) && T < tt(10.6);
@@ -78,7 +80,7 @@
           if (out) { const tip = bladeTrail('A', Math.max(k1, 0.5 * kr), dt); if (k1 > 0.2) light(tip, 0.9 * k1, 0x66c8ff); glint('A', dt, 3); } else prev.A.on = false;
           if (split) { const tip = bladeTrail('B', Math.max(k2, 0.5 * kr), dt); if (k2 > 0.2) light(tip, 0.9 * k2, 0x66c8ff); glint('B', dt, 3); } else prev.B.on = false;
           if (cue(a, 'split', tt(2.75))) { const p = anchor('bladeAm', _f1); burst(p, 26, 0.9, 0.5, 0.03, COL.foxPale, 0.3, 1.2, 0.2); }
-          const X = anchor('chest', _f1); X.addScaledVector(_f2.set(0, 0, 1).applyQuaternion(root.getWorldQuaternion(_qa)), 0.62 * FOX_K); X.y -= 0.12 * FOX_K;      // where the two cuts cross, in front of her
+          const X = anchor('chest', _f1); X.addScaledVector(_f2.set(0, 0, 1).applyQuaternion(root.getWorldQuaternion(_qa)), 0.62 * FOX_K); X.y -= 0.12 * FOX_K; fxHitP.copy(X);      // where the two cuts cross, in front of her (and where the page puts its own flash)
           if (cue(a, 'hit1', T_HIT)) { burst(X, 60, 2.2, 0.55, 0.04, COL.fox, 0.5, 1.4, 0.3); shock(X, 0.05, 0.42, 0.30, COL.foxPale); }
           if (cue(a, 'hit2', T_HIT2)) { burst(X, 46, 1.8, 0.5, 0.04, COL.foxPale, 0.5, 1.4, 0.3); shock(X, 0.04, 0.34, 0.26, COL.fox); }
           const fl = win(T, T_HIT - 0.03, T_HIT2 + 0.2, 0.06); if (fl > 0.01) light(X, 1.4 * fl, 0x8fd8ff);
