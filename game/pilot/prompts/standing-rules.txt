@@ -1,0 +1,10 @@
+STYLE. A realistic, richly detailed, hand-painted scene with believable scale and painterly but detailed surfaces: real canvas, rope, wood, stone, earth and grass. It has to sit behind realistic 3D characters, so paint it as real as Image 3. Not pixel art, not a cartoon, not anime, no drawn outlines, not game tiles.
+
+LIGHT. The game's characters are always lit the same way, so every painting in this set is lit the same way:
+- The main light is warm and soft. It comes from behind the viewer and from the right, a little under 45 degrees up. The sides of things that face the viewer and the right are the lit sides. Soft shadows fall away from the viewer and to the left, toward the upper left of the picture, about as long as the thing is tall. Image 1 shows this.
+- The moon, Auros, is behind the scene in the upper left of the sky. It edges the upper-left outlines of things with cool, pale lilac light. It does not cast the main shadows.
+- A cool blue-violet sky light fills the shadows from low on the left. Shadows are soft and never black.
+- The ground is warm in colour: earth, dry grass and warm stone.
+- Only lit lanterns, the moon and the sky are bright. Everything else is calm enough that a brightly dressed character stands out against it.
+
+LEAVE OUT, because the game draws them live on top: people, animals and creatures of any kind; the magenta marker; fireflies, moths, drifting smoke, sparks, glows of magic, rain and lightning. No lettering anywhere: signs and banners are blank or patterned. No captions, labels, borders, UI, grid lines or vignette.

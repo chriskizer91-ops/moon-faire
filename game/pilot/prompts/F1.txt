@@ -1,0 +1,22 @@
+One production background painting for my fantasy role-playing game, Moon Faire: the backdrop of a battle. The game draws realistic 3D characters, creatures and spell effects on top of it, standing on the open ground across the bottom.
+
+Output exactly ONE landscape 4:3 image, 2048 x 1536 pixels or larger. Not a collage or a contact sheet.
+
+I am attaching three images.
+- Image 1 is the CAMERA AND LAYOUT GUIDE: a grey-box model of this exact scene, drawn from the exact camera the game uses. Keep its camera, its horizon, its moon and its layout. Take only layout, scale and the direction of the light from it. Do not copy its grey colours or its blocky shapes: paint real things in their places. The bright magenta figure is a measuring marker 1.70 m tall, standing where a character will stand. Use it for scale, then leave it out and paint the bare ground where it stands.
+- Image 2 is a finished battle background from another game of mine, painted for the same camera. Match its craft, its finish, its believable scale and the way haze separates its layers. Do not copy its place, its mountains or its cold colours.
+- Image 3 is one of the characters who will stand in this scene, shown from the front and the back. It is there to show how realistic the characters are. Never paint her, or anyone, into the scene.
+
+VIEW. As in Image 1: a camera near eye level, tilted very slightly up, with a 38-degree lens feel. The horizon is level and sits 61% of the way down the picture. A flat, wide, open clearing fills the bottom third.
+
+{RULES}
+
+THE OPEN GROUND. The bottom third of the picture is entirely level, unobstructed ground, calm and low in contrast, lit softly and evenly, with its detail getting smaller toward the horizon. The game stands its characters here and adds its own moving grass. Nothing stands on it: no rocks, water, paths, roots, walls, posts, props or steps, and no trees or branches framing the foreground. Everything with a shape of its own is in the middle distance or far away, behind the clearing.
+
+THE SCENE: THE MOOR CLEARING AT NIGHT.
+A moonlit moor a short walk beyond the Moon Faire, a travelling fair of tents, in a dark-ages fantasy land.
+- The clearing: short moor grass with low heather and dry bracken, in warm, muted greens, tans and dusty purples. It is night, but the clearing reads clearly.
+- Far off on the left of the horizon, small, as in the guide: the warm glow of the fair's lanterns and the dark double peak of its big top, with a few smaller tent tops beside it. It is tiny and distant.
+- In the middle distance, beyond the clearing: an old road of worn flagstones that runs behind the clearing and curves away to the right toward the horizon; a low dry-stone wall on the left; clumps of gorse and heather; one wind-bent thorn tree right of the middle; and a leaning waymark stone beside the road on the right. None of them comes forward into the clearing.
+- Far away: low rolling moor hills in two or three hazy bands, as in the guide. No mountains. Thin silver-lavender haze lies between the layers.
+- The sky: a broad, calm night sky in deep plum and indigo, with a few faint stars and thin wisps of cloud. Auros, the moon, is large, bright, detailed and nearly full, with a soft glow round it, exactly where the guide puts it: 31% of the way across and 17% of the way down, about 13% of the picture's height across.

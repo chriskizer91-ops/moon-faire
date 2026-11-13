@@ -1,0 +1,18 @@
+<!DOCTYPE html>
+<html lang="en"><head><meta charset="utf-8"><title>Pilot grey-box guides</title>
+<style>body{margin:0;background:#1c151f;color:#f2e9ee;font:15px system-ui,sans-serif;padding:12px}canvas{max-width:100%;height:auto;display:block;margin:8px 0 20px;border:1px solid #40323f}</style></head>
+<body>
+<p>Grey-box guides for the two pilot paintings, drawn from the game's cameras. Open with a web server or from disk.</p>
+<div id="out"></div>
+<script src="../lib/three.r128.min.js"></script>
+<script src="scenes-pilot.js"></script>
+<script src="greybox.js"></script>
+<script>
+window.MF_SHOTS = {};
+for (const id of ['W1', 'F1']) for (const mode of ['guide', 'key']) {
+  const r = MF_GREYBOX.render(id, mode); window.MF_SHOTS[id + '_' + mode] = { info: r.info, canvas: r.canvas };
+  const h = document.createElement('p'); h.textContent = id + ' ' + mode; document.getElementById('out').append(h, r.canvas);
+}
+window.MF_DONE = true;
+</script>
+</body></html>

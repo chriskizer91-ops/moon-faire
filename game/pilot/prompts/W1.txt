@@ -1,0 +1,25 @@
+One production background painting for my fantasy role-playing game, Moon Faire. The game draws realistic 3D characters on top of this painting, walking on its ground.
+
+Output exactly ONE landscape image, 2:1 (twice as wide as it is tall), 2048 x 1024 pixels or larger. Not a collage or a contact sheet.
+
+I am attaching three images.
+- Image 1 is the CAMERA AND LAYOUT GUIDE: a grey-box model of this exact scene, drawn from the exact camera the game uses. Keep its camera, its perspective and its layout. Every tent, stall, lantern post, the well, the round square and the two lanes stay where the guide puts them and the size the guide makes them. Take only layout, scale and the direction of the light from it. Do not copy its grey colours or its blocky shapes: paint real things in their places. The bright magenta figure is a measuring marker 1.70 m tall, the height of a person here. Use it for scale, then leave it out and paint the bare ground where it stands.
+- Image 2 is a finished background painting from another game of mine. Match its craft and finish. Take nothing else from it: not its place, not its camera, not its night colours.
+- Image 3 is one of the characters who will stand in this scene, shown from the front and the back. It is there to show how realistic the characters are. Never paint her, or anyone, into the scene.
+
+VIEW. As in Image 1: a high three-quarter view, looking down at about 24 degrees through a long lens, like the painted backgrounds of classic role-playing games. The perspective is flattened: things at the back are only a little smaller than things at the front, and upright things stay upright. Not isometric, not straight down.
+
+{RULES}
+
+GROUND THE CHARACTERS WALK ON. The round square, both lanes and the open ground between the tents are level, clear and easy to read. Nothing hangs over them or hides them: no roof, awning, banner, rope, branch or string of flags crosses walkable ground. Do not string bunting or flags across the square: the game adds its own. Every tent door and every stall front that faces the square is fully visible. Keep the middle of the square empty except for what the guide shows.
+
+THE SCENE: THE FAIR SQUARE AT DUSK.
+The middle of the Moon Faire, a travelling fair of tents that follows the moon across the world, in a dark-ages fantasy land. People of many lands travel with it, so its tents and stalls are a mix of cloths, patterns and crafts from many cultures. It is dusk and the lanterns have just been lit.
+- The ground: a round square about 14 m across of pale, trodden earth, edged by a ring of worn flat stones. A trodden earth lane, about 4 m wide, leaves the square to the left edge of the picture, and another to the right edge.
+- In the square, toward the back: a performer's floor cloth lying flat on the ground, a rug about 4.5 m by 3 m in deep red with a gold border, with four small brass footlights along each short side. It is completely flat: no stage and no platform.
+- In the square, front right of the middle: a small round stone well with a low wall, two wooden posts, a little shingled roof and a bucket.
+- Eight lantern posts round the square, exactly where the guide puts them: dark wooden posts 3.3 m tall, each with one lit lantern of warm amber glass that throws a small warm pool of light on the ground.
+- Tents and stalls where the guide's boxes stand. Back left, a round tent in broad wine-red and cream stripes with a pointed roof. Back middle, two open market stalls with cloth awnings and wooden counters. Back right, a square tent of indigo cloth with a pale star pattern. On the left, above the lane, a square tent of ochre and rust cloth; below the lane, an open stall. On the right, above the lane, an open stall; below the lane, a round tent of green and gold cloth. Each tent has its door flap toward the square, and each stall its counter. Their colours are rich but softened by the dusk.
+- At the bottom corners of the picture, the tops of two more tents frame the scene, as in the guide.
+- Along the front: a painted wooden wagon on the left, and a stack of crates and barrels on the right, as in the guide.
+- The top of the picture is a narrow band, as in the guide. Beyond the tents stands the fair's big top with its two peaks, dark against the sky, with more tent tops and a far line of low hills. The sky is deep blue-violet above, with a last low band of rose and amber. Auros, the moon, is large, pale and nearly full, exactly where the guide puts it in the upper left.

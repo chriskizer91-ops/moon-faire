@@ -4,7 +4,7 @@ const rng = seed => { let s = seed >>> 0 || 1; return () => { s ^= s << 13; s >>
 const xpOf = (code, lvl) => { let x = 0; code.replace(/^t/, '').replace(/(\d*)([wKB])/g, (_, n, k) => { x += (+n || 1) * P.xp[k]; }); return Math.round(x * Math.pow(P.xp.slope, lvl - 1)); };
 const levelOf = xp => { let L = 1; for (const k of [2, 3, 4, 5]) if (xp >= P.toReach[k]) L = k; return L; };
 function play(seed, style) {
-  const r = rng(seed); const S = { xp: 0, lamps: 0, jester: false, fights: 0, hero: 0, foe: 0, losses: 0, log: [], lampsLeft: {}, walked: 0, next: 0 };
+  const r = rng(seed); const S = { xp: 0, lamps: 0, jester: true, fights: 0, hero: 0, foe: 0, losses: 0, log: [], lampsLeft: {}, walked: 0, next: 0 };
   for (const k in P.scenes) S.lampsLeft[k] = P.scenes[k].lamps;
   const mark = name => S.log.push({ name, level: levelOf(S.xp), xp: S.xp, fights: S.fights, lamps: S.lamps });
   function fight(code, lvl, lamp) {
@@ -34,7 +34,7 @@ function play(seed, style) {
   const set = id => { const f = P.sets[id]; if (f.jesterJoins) S.jester = true; fight(f.code, f.level, f.lamp); };
   set('T1'); set('T2'); set('T3'); mark('Leaving the fair');
   cross('W4'); set('S1'); mark('The Last Lantern done');
-  cross('W5'); set('S2'); mark('The Jester has joined');
+  cross('W5'); set('S2'); mark('Past the standing stones');
   cross('W6'); set('S3'); mark('The pool reached');
   let guard = 0;
   while (S.lampsLeft.W6 > 0 && guard++ < 20) cross('W6');
