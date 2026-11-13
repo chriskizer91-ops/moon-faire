@@ -1,5 +1,5 @@
 # Stills of the real page, stepped by hand so a move can be seen at a chosen moment (the headless browser is far too slow to watch it run).
-# usage: shoot_page.py out_prefix WIDTHxHEIGHT [query] step ...
+# usage: shoot_page.py out_prefix WIDTHxHEIGHT [query] step ...      (PAGE=out/game/test_local.html for the game moves page)
 #   step:  name=JS            run JS, then take a still called out_prefix_name.png   (JS can use P = window.JESTER; P.step(n, dt) advances the page)
 #          =JS                run JS without a still
 import sys, os
@@ -14,7 +14,7 @@ with sync_playwright() as p:
     logs = []
     pg.on('console', lambda m: logs.append(m.type + ': ' + m.text[:500]) if m.type in ('error', 'warning') and 'GPU stall' not in m.text else None)
     pg.on('pageerror', lambda e: logs.append('PAGEERR: ' + str(e)[:800]))
-    pg.goto('file:///home/claude/work/out/site/test_local.html' + (q or '?shot=1') + ('&' if q else '&') + 'shot=1' + os.environ.get('HASH', '#lite'))
+    pg.goto('file:///home/claude/work/' + os.environ.get('PAGE', 'out/site/test_local.html') + (q or '?shot=1') + ('&' if q else '&') + 'shot=1' + os.environ.get('HASH', '#lite'))
     try: pg.wait_for_function('window.JESTER', timeout=180000)
     except Exception as e:
         print('NO PAGE', e); [print(l) for l in logs[:20]]; sys.exit(1)

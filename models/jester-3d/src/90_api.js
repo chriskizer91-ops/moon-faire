@@ -104,6 +104,8 @@
     // for the lore's moves: dark is how far the place round her should go black (she and her spell stay lit), shake a rumble to add to the picture,
     // charge how full her big spell is (0 to 1: the host adds up the blows aimed at her; it shows as dust round her), camera what the effects turn to face, arena how far the open ground runs
     get dark() { return darkNow; }, get shake() { return shakeNow; }, get charge() { return chargeK; }, set charge(v) { setCharge(v); }, set camera(c) { vCam = c || null; }, get camera() { return vCam; }, set arena(r) { arenaR = +r > 0 ? +r : 0; }, spellLight,
+    // for her moves in the game (89b_game.js): Fate on each foe, where the other foes and her fainted friends are, and how many blows she will still catch
+    game,
     get triangles() { return triCount; }, get dim() { return dimNow; }, set wind(v) { userWind.copy(v); }, get wind() { return userWind; },
     debug: { SK, cloths, cur, base, REST, FP, meshes, MATS, chains, applyPose, clonePose }
   };

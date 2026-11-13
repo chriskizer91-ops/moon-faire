@@ -266,6 +266,56 @@ uses it", and then it "manifests out of the air as those rings". He likes the mo
 Checked: the lore's moves and the two flipbook spells they are built from over every stance; stills of the dust at each
 charge, in the cast, walking, in the theatre and in the Flipbook look. Not checked: at real speed, or on a real phone.
 
+## Her moves in the game (pass 21, November 13, 2026)
+
+The moves each witch uses in the game were settled on November 13, in the claude.ai Project "Flip Book Art", doc
+`lore/combat-balance.md`. Chris asked for a new page of the Jester with only the spells she uses in the game, every Move and
+every Body state, adding to her moves where the new rules ask for it and removing nothing. The night square page
+(https://claude.ai/artifact/8733piMPdu8AMzQbmPQTjh) stays exactly as it is. He also wants the **Flipbook look kept as a switch
+on every model**: a model has to look right without it first, and then the look can be laid over it. It must not be used to
+hide a model that does not look good without it.
+
+Published as its own page, "Jester Witch 3D: her game moves": https://claude.ai/artifact/MnovyvRW8qZj9DnUMwUP4n
+
+**Her five moves in the game, and what each is here:**
+
+| In the game | In the model | What the rule adds |
+|---|---|---|
+| Gilded Rebuke: 40 to one foe | `g_rebuke`: `gilded_rebuke` played whole | The chain draws a thin gold ring, and the blow is thrown from the bells to the foe as a thread of gold |
+| Attack taunt: 50, and she catches the next 3 blows | `taunt_attack`, as it was | Three small new moons circle her, one for each blow she will still catch (`J.game.catches`) |
+| Heal taunt: 10 MP, heals her 120, and taunts | `taunt_heal`, as it was | The same three moons |
+| Sealed Fate: ends a sealed foe; every other foe loses 20% of its full Life | `g_seal`: `doom` played whole | The foe is drawn into the seal and goes out as the rings shut; a streak runs along the ground to each other foe |
+| Curtain Call: the same cast when it leaves no foe standing; fainted friends stand at 25% | `g_curtain`: `doom_end` played whole | The splash, the other foes taken with the first, and a light standing up where each fainted friend lay |
+
+- **Model** (`src/89b_game.js`, and one line in `src/90_api.js`). Nothing older is changed: `doom`, `doom_end`, `gilded_rebuke` and
+  the rest play as before, and the three new moves call the old moves' own keys and effects, then add theirs. The rules belong
+  to the game, so the host tells the model what it needs through `J.game`:
+  - `fates`: one entry for each foe, kept in the same place in the list (`null` for a foe that is gone):
+    `{ x, y, z, r, h, k, sealed }`. `k` is the foe's Fate as a share of the Life it has left. It shows as dust falling round
+    the foe like sand (one `THREE.Points` for each foe, moved in the vertex shader). Sealed, the fall stops, the dust locks
+    into a tilted ring, and a small eclipse hangs over the foe.
+  - `others`: where the foes she is not casting at stand. The splash goes to each.
+  - `friends`: where her fainted friends lie. With none given, three places behind her are used.
+  - `catches`: 0 to 3.
+  - `J.charge` (pass 20) is still there. This page sets it to the Fate share of the foe nearest its seal, so the dust round
+    her still thickens and still becomes the rings when she casts.
+- **Fate replaces the charge of pass 20 in the rules.** Fate is on each foe, not on her: a blow a foe lands on her gives that
+  foe 500, a heavy one 1,000, and a friend dropping below half gives every foe 5% of its Life. A foe is sealed when its Fate
+  covers all the Life it has left.
+- **Page** (`viewer/game.js`, `viewer/game.tpl.html`, `build_game.sh`). The same stage, square and model as the night square
+  page; `viewer/app.js` and its template are untouched, so that page still builds as it was. All words and numbers are data
+  at the top of `game.js`: `GAME` (the five moves), `RULES`, `FOES` (two sacks with a knight's and a wisp's numbers),
+  `FRIENDS`, `WORDS`. Each foe has a bar over it (its Life, with Fate growing over it) and numbers rise from each blow.
+  The buttons always work, so any move can be watched at any time: Sealed Fate seals its foe first if it was not sealed,
+  and switches to Curtain Call by itself when it would leave no foe standing. The camera takes in the foes while she casts
+  at them and for a moment after a blow. The flipbook inset is on the left here and only carries the 20 frames this page
+  can show.
+- **Not built:** the three friends themselves (the lights stand in for them), her fainting (on this page her HP stops at 1),
+  the turn bar, and the Fox's and Io's moves that feed Fate (Same Cloth, healing). The swing of up to 25% on damage and
+  heals is left out so the numbers can be read.
+
+Checked: every move over every stance (186 pairs, no errors or broken numbers), and the three new moves again on the final build; stills of a whole fight at phone size (blows, both taunts, Gilded Rebuke, Sealed Fate with its splash, the cast that runs on into Curtain Call, new foes standing up), in the little theatre, in the Flipbook look and at laptop size; the single file run on its own clock with its buttons pressed, with no errors. Not checked: at real speed, or on a real phone.
+
 ## What is kept here
 
 Everything needed to rebuild her is in this folder: the model source (`src/`), the viewer (`viewer/`), the bake and build scripts,
@@ -287,8 +337,13 @@ python3 -I bake.py                    # out/jester_tex.js (needs Pillow, numpy, 
 ./build.sh                            # out/jester.js
 ./build_site.sh                       # out/site/: index.html, jester.js, jester_tex.js
 python3 build_single.py               # deliver/Jester_Witch_3D.html, one offline file
+./build_game.sh                       # out/game/: the page for her moves in the game (pass 21)
+python3 build_single.py game          # deliver/Jester_Witch_3D_game_moves.html
+python3 fight_shots.py                # stills of a whole fight on that page, as sheets in shots/
+python3 smoke.py /home/claude/work/deliver/Jester_Witch_3D_game_moves.html "A foe hits her" "Sealed Fate"   # run a built file on its own clock and press buttons
 python3 check_moves.py                # every move over every stance: errors and broken numbers (about half an hour; name moves to run a few)
 python3 seq.py doom doom "1.3 3.2 4.0"  # stills of one move at chosen seconds on the real page, joined into shots/doom_sheet.png
+PAGE=out/game/test_local.html python3 seq.py seal g_seal "3.4 4.0 4.3"   # the same on the game moves page
 python3 shoot.py shots/x 'new Promise(r => setTimeout(() => { T.step(200, 1/60); r(1); }, 2500))' front:0,0.04,7.6,0.86,18,560,820
 ```
 
