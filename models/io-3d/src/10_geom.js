@@ -8,6 +8,32 @@
     b.userData.home = b.position.clone();
     SK[name] = b; BI[name] = bones.length; bones.push(b); return b;
   }
+  // ---------- soft chains: her hair and her skirt hang from short chains of bones that swing after her (stepped in I99_static.js) ----------
+  // A chain is a row of points from its root down to its tip. Each stretch between two points is a bone; the first hangs from a body bone.
+  const CHAINS = [];
+  function addChain(grp, id, parent, pts, o) {
+    const names = []; let par = parent;
+    for (let k = 0; k < pts.length - 1; k++) { const nm = id + '_' + k; addBone(nm, par, pts[k].x, pts[k].y, pts[k].z); names.push(nm); par = nm; }
+    const ch = Object.assign({ grp, id, parent, names, pts }, o || {}); CHAINS.push(ch); return ch;
+  }
+  // the bones that carry a point at height y on a chain: the stretch it lies on, shared with the next stretch near each joint so the bend is round
+  function chainW(ch, y) {
+    const P = ch.pts, n = ch.names.length, par = BI[ch.parent];
+    if (y >= P[0].y) return [par, 1];
+    let k = 0; while (k < n - 1 && y < P[k + 1].y) k++;
+    const t = (P[k].y - y) / (P[k].y - P[k + 1].y);
+    if (t < 0.5) return [k > 0 ? BI[ch.names[k - 1]] : par, 0.5 - t, BI[ch.names[k]], 0.5 + t];
+    if (k === n - 1) return [BI[ch.names[k]], 1];
+    return [BI[ch.names[k]], 1.5 - t, BI[ch.names[k + 1]], t - 0.5];
+  }
+  // two lists of [bone, weight, ...] mixed: (1 - f) of a and f of b; at most four bones are kept
+  function mixW(a, b, f) {
+    const m = new Map();
+    for (let i = 0; i < a.length; i += 2) m.set(a[i], (m.get(a[i]) || 0) + a[i + 1] * (1 - f));
+    for (let i = 0; i < b.length; i += 2) m.set(b[i], (m.get(b[i]) || 0) + b[i + 1] * f);
+    const l = []; m.forEach((w, bi) => { if (w > 1e-4) l.push([bi, w]); }); l.sort((p, q) => q[1] - p[1]);
+    const out = []; for (const [bi, w] of l.slice(0, 4)) out.push(bi, w); return out;
+  }
   const A_POSE = 15 * DEG;                       // arms rest this far out from straight down
   const L_UARM = 0.232, L_FARM = 0.212;          // Io's painted arms are about 2.5 cm shorter than the Jester's
   const L_THIGH = IO_HIP_Y - IO_KNEE_Y, L_SHIN = IO_KNEE_Y - 0.105;      // Io: hip joint 0.935, knee 0.57 (the Jester's are 0.835 and 0.47)

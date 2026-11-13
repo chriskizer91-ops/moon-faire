@@ -4,9 +4,21 @@ Started November 13, 2026. Built the way the HD Jester was (`claude/HOW-TO-3d-wi
 the Ranger's stage-one recipe: this folder began as a copy of the Ranger's stage-one code (`claude/ranger-3d-model`, commit
 `1d4c9d6`), with the Jester's platform boot builder (`claude/jester-3d-model`, pass 20) in place of the Ranger's boots.
 
-## Where she stands: stage two (November 13, 2026)
+## Where she stands: stage three (November 13, 2026)
 
-Body and base outfit (stage one), and now her head, face, glasses, hair and hat. She blinks and can talk; her body does not move yet.
+She moves. Her arms are shaped and painted from D3, her hair and skirt hang from chains of bones that swing with her, and she
+has her first eleven moves (poses and emotes, not attacks).
+
+- **Chris asked (November 13):** "let's make the fabric. That's on her move with her as she moves and let's do her posturing
+  posing and moves. Not her attacks but her like animations her emotes and these are to test that the clothes work good and
+  also work on her arms Because I do think her arms are still just tubes".
+- **Page:** the same link as every stage. One offline file: `deliver/Io_3D_stage3.html` (2.5 MB). It opens with her standing
+  and breathing. `deliver/Io_stage3_arms_and_moves.jpg` is her arm beside D3 and a still from each move.
+- Everything about this stage is under "Stage three" below. Stage two's notes follow unchanged.
+
+## Stage two (November 13, 2026)
+
+Body and base outfit (stage one), and her head, face, glasses, hair and hat. She blinks and can talk.
 
 - **Page:** https://claude.ai/artifact/Uvz35Hj97w5yjyA5j2Z6Ep (republish each stage's page to that link). The same page as one
   offline file is `deliver/Io_3D_stage2.html` (2.4 MB). Twelve views, six faces (blinking, talking, four held), three poses, the
@@ -134,13 +146,16 @@ mkdir -p shots deliver
 python3 -I lib/restore_refs.py     # PNG copies of the paintings into refs/
 python3 -I bake_io.py              # out/io_tex.js (needs Pillow, numpy, scipy)
 python3 -I bake_head_io.py         # adds her face, profile, skin tones, hat swatches and hair colours to it
+python3 -I bake_arms_io.py         # adds her arm skin from D3
 ./build_io.sh                      # tools/tables.py, then out/io.js
-python3 -I build_single_io.py      # deliver/Io_3D_stage2.html, one offline file
+python3 -I build_single_io.py      # deliver/Io_3D_stage3.html, one offline file
 python3 tools/prof_io.py 8 shots/prof.png             # her profile against the model's, by height
 python3 tools/cmp_head_io.py shots/cmp_head.jpg       # head, hat and hair beside C4 and C5
 python3 tools/cmp_io.py shots/cmp_front.jpg front     # also back, sideR, sideL
 python3 shoot.py shots/x 'T.j.pose({arm:28,leg:5.5})' front:0,0.03,6.6,0.9,22     # a still; angles are in radians
 python3 tools/page_test_io.py      # the page at phone size (slow: software rendering)
+tools/allmoves.sh                  # shots/m/mv_<move>.jpg: stills through each move (tools/strip.py does one)
+tools/armclose.sh x; tools/shoulder.sh x      # her arm and her shoulder close, hair hidden
 ```
 
 The paintings are data: run Python that reads them with `-I`.
@@ -206,6 +221,81 @@ doc's section 7 asks:
 - One clean dark outline. The smooth look is the same with the switch off. Her floor shadow stays smooth, as the place does.
 - Not checked: her blink and talking mouth in motion with the look on (stills only); and she has no spells yet.
 
+## Stage three: arms, soft hair and skirt, first moves
+
+### Arms (`src/I30_body.js`, `bake_arms_io.py`)
+
+- **Shape.** `ARM_X` gives, every 2 cm down the arm, how far the skin is from the bone on four sides: outer, inner, front, back.
+  Outer and inner are measured off D3 (`tools/arm_d3.py` finds the arm's top and bottom edge in both halves of the painting;
+  `tools/arm_fit.py` turns them into distances). Her arm held out is her hanging arm turned up, so D3's top line is her outer
+  side. Front and back are not painted anywhere; they follow a slim arm (biceps, triceps, the point of the elbow, the crease).
+  The painted centre line is moved only 60% of the way from the old round tube, so the arm does not lean toward her body when
+  it hangs. D3's forearm is longer than its upper arm; her bones were not changed, so each half is fitted on its own.
+- **Scale.** 2016 pixels to a metre in D3 (shoulder joint to wrist, 0.444 m). Mid upper arm 6.6 cm across, elbow 6.3,
+  forearm 6.7 at its widest, wrist 3.5 thick.
+- **Wrist.** The hand model's wrist is 2.9 cm thick and sits 5.5 mm toward the thumb side of the forearm's line
+  (`tools`: measure with the snippet in the stage-three project note). The arm narrows to that, squares off (flat on the
+  back and the palm side) so it covers the hand's own cuff, and ends hidden 1.4 cm inside the hand.
+- **Shoulder.** Above the joint the arm ends in a ball that sits on the joint itself (`ARM_CAP`), and the whole arm is carried
+  by the upper-arm bone alone. So however it turns, the ball stays in place inside her shoulder and nothing is pulled two ways.
+  Under the joint her body's skin goes 30% of the way with the arm, only in the middle of the armpit (`ku` in `wTorso`).
+  The same idea as the Ranger's stage 6d. The elbow's skin goes over to the forearm a little above the joint at the back
+  (the point of the elbow belongs to the forearm) and folds at the crease in front (`wArm`).
+- **Paint.** `arms` in `out/io_tex.js`, 512 x 1024, one arm unrolled: across, once round the arm from the outer side through
+  the front; down, wrist at the top row. The front half of the arm is D3's front view, the back half its back view, mixed at the
+  top and bottom lines. Half of the painting's own light is kept; the tone drift along the arm is taken out; the whole is
+  brought to the plain arm colour so it meets her shoulder and her plain hand. Both arms wear the same picture.
+- Not done: her hands are still plain skin. D1 and D2 can be painted onto them the way the Ranger's were
+  (`bake_hands_r.py` and `hand_marks.json` on `claude/ranger-3d-model`); the marks have to be measured again for Io's paintings.
+
+### Soft chains: hair and skirt (`CHAINS` in `src/10_geom.js`, stepped in `src/I99_static.js`)
+
+- A chain is a row of points from a root down to a tip; each stretch between two points is a bone. `addChain` makes one;
+  `chainW` says which bones carry a point at a given height (the stretch it lies on, shared with the next near each joint);
+  `mixW` blends two chains.
+- **Hair:** 5 chains down her back (`hb0` to `hb4`, joints at 1.40, 1.28, 1.16, 1.04, 0.92, 0.80, 0.68 m) and 2 down the front
+  of each shoulder (`hfR0`, `hfR1`, `hfL0`, `hfL1`, to 0.92 m), all hanging from her chest (spine3). Above 1.46 m her hair goes
+  with her head, as before, and blends to the chains between 1.46 and 1.36 m. Each tress follows the two chains nearest it.
+  The fringe goes with her head.
+- **Skirt:** 12 chains round her hips (`sk0` to `sk11`, joints every 12 cm from 1.02 to 0.18 m). All layers of the skirt use them.
+- **How a point moves (`softStep`).** It is pulled toward where it would rest: the way it was built, carried by its body bone,
+  leaning toward plain hanging the further down the chain it is (`g`). It keeps most of its speed (`d`), so it lags behind her
+  and swings in after. Then it is put back at its fixed length from the point above, pushed out of the balls (`COL`: her neck,
+  chest, waist, hips, arms and hands for hair; thighs, knees, shins, feet, arms and hands for the skirt) and lifted onto the
+  floor (`FLOOR`). Sixty steps a second whatever the frame rate.
+- **Her standing look is unchanged.** At rest every point sits where stage two built it: a ball never pushes a point out of
+  its place at rest (each pair's reach is cut to the distance they have at rest).
+- `pose()` settles everything at once (`softSettle`). `lift` on a skirt chain spreads it outward (the curtsey holds the skirt
+  out; the twirl flares it).
+- Plain black shorts above mid-thigh (0.845 m) so a moving thigh cannot show through the lace. My choice; Chris has been told.
+- 182 bones in all now. One frame of walking costs 0.13 ms of script on the build machine (the drawing is the cost, not this).
+
+### Moves (`body()` in `src/I99_static.js`)
+
+`play(name)` starts one; `pose()` holds her still. Short moves end by themselves and she goes back to `idle`.
+
+| Button | Name | What she does | Seconds |
+|---|---|---|---|
+| Standing | `idle` | Breathes, shifts her weight slowly, her head drifts a little. Feet planted. | loop |
+| Walk | `walk` | An unhurried step on the spot; hips turn a little; small arm swing. | 1.12 a cycle |
+| Talk | `talk` | Her left hand opens palm-up at her waist and moves with her words; small nods and tilts; her painted mouths. | loop |
+| Push up glasses | `glasses` | Right index finger to the bridge of her glasses, a small push, her head dips and lifts. | 2.4 |
+| Tip her hat | `hat` | Left hand to the brim, a nod, a smile. | 2.6 |
+| Curtsey | `curtsey` | Holds her skirt out at both sides, right foot behind, dips and bows her head. | 3.0 |
+| Twirl | `twirl` | One full turn on her toes, arms out; hair and skirt fly. | 2.6 |
+| Pick a herb | `herb` | Kneels on her right knee, picks at the ground with her right hand, brings it to her nose, shuts her eyes, smiles, stands. | 5.0 |
+| Wave | `wave` | Right hand up beside her hat, palm out, waving; head tilted; smiling. | 2.6 |
+| Look round | `look` | Over her right shoulder, then her left. | 3.6 |
+
+How they are written: every frame all body bones go back to rest (`restAll`), the move is laid on top (`add`), then her feet
+are planted and her hands brought to their points by a two-bone reach (`ik2`; `reach` for an arm), hands are turned to face
+the right way (`aimHand`), feet set level (`flatFoot`), fingers curled (`fingers`), and the soft chains are stepped. A hand
+travels from where it hangs to its point along a line that bows forward, so its elbow bends on the way. Points on her head
+(her glasses, her hat brim, her nose) are followed with `carried('head', ...)`, so the hand stays on them when she nods.
+
+Limits: tuned from stills (`tools/strip.py`, `tools/allmoves.sh`), never watched playing. Hair and skirt bend in 12 cm
+stretches. A hand can pass through a lock of hair. When she stands up from kneeling her left thigh shows at the slit for a moment.
+
 ## Round 2 paintings (arrived November 13, 2026, after stage one was built)
 
 All 21 arrived and match their index. Nothing is built from them yet.
@@ -251,13 +341,15 @@ All 26 arrived and match their index. Nothing is built from them yet.
 
 They also show her whole look from many sides, with the robe: useful when the robe and the cloth are built.
 
-## Next stages, in the how-to's order
+## Next stages
 
-1. **Her arms and hands** (D1 to D4): painted skin, the join at her shoulder, her hands. Her legs from B5 can ride along.
-2. **Her body moving**, before any more of her outfit: the skeleton's moves, her hair on spring chains (as the Fox's is) so it
-   moves with her and parts round her arms, the skirt giving way to her legs.
-3. Then the rest: the emotions in C10, hair on top of her head, her own boots (E1 to E8).
-4. Robe as cloth (A1 to A5, F4 to F6, F10, F12), skirt as cloth with see-through lace (F8, F11).
-5. Belt, pouch, crystal, necklaces, bracelets (F1 to F3).
-6. Book and blades (G1 to G6, placed by G8, held as in G9).
-7. The body moves, with her hair on spring chains as the Fox's is; then her own moves and spells (H1 to H18, I1 to I8, and round 4).
+Chris's order (November 13): arms, then her body moving, then more of her outfit. The first two have a first draft now.
+
+1. **His notes on this stage:** the feel and timing of each move, the hair and skirt in motion, the arms.
+2. **Hands** painted from D1 and D2 (and bracelets from D4 later); legs from B5.
+3. More of her own moves if he wants them; the emotions in C10; hair on top of her head.
+4. Her own boots (E1 to E8).
+5. Robe as cloth (A1 to A5, F4 to F6, F10, F12), on the same soft chains; skirt lace see-through (F8, F11).
+6. Belt, pouch, crystal, necklaces, bracelets (F1 to F3).
+7. Book and blades (G1 to G6, placed by G8, held as in G9).
+8. Her spells and attacks (H1 to H18, I1 to I8, and round 4).
