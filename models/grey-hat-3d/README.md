@@ -10,14 +10,58 @@ something or just talks to them", and he gets his own folder because he is a cha
   Project docs `claude/HOW-TO-3d-witch-models.md` and `claude/HOW-TO-3d-witch-faces.md`. Read both before writing any code.
 - Project note for this folder: `claude/grey-hat-3d-reference-prompts.md`.
 
-## Where he stands: before stage one (November 13, 2026)
+## Where he stands: first build, paused part-way (November 13, 2026)
 
-- There is one picture of him, from the front, a cartoon in sunset light: `references/source/grey_hat_picture.png`.
-- The list of reference paintings Chris will make in ChatGPT is written: 62 prompts in three rounds
-  (`references/grey-hat-3d-reference-prompts.md`). Round 1 (sets A to E, 37 paintings) is enough to start building.
-- The page Chris runs it from, with the images to attach and a copy button on every prompt:
-  https://claude.ai/artifact/C5AQhCfSatL1PAZoLVPP2x (republish every change to that link).
-- No paintings have come back yet, and there is no model code yet.
+Page: https://claude.ai/artifact/L25hB8DWnPBxJm44MAfiJe (republish every change to that link). About 330,000 triangles.
+Project note: `claude/grey-hat-3d-first-build.md`.
+
+What Chris said this session:
+
+- His name is maybe **Noiz** ("the name maybe noiz"). Kept in data (`api.name`, the page title); the folder stays `grey-hat-3d`.
+- "his boots do have gold flecks so you'll have to add those in as a code animation of pixel or floating around his feet. When he
+  walks like gold glitter dust follows his boots". So the paintings keep plain black boots and the gold is code (`src/N80_dust.js`).
+- Seeing the first pictures: "can you make it look more like the 3D models that the witches are? ... every other instance has
+  made a blank doll that looked good and then printed the image on top of that." **This is the rule for him from here on.**
+- Then: "Can you show me what you've got so far? Without building anymore." So the build stopped where it was.
+
+What exists:
+
+- **All 53 paintings of rounds 1 and 2** are checked and saved in `references/chatgpt/` (A1 to G3). None needs redoing. F8 is a
+  flat cloth sample, because the image maker refused the torn hole over skin twice.
+- **Head:** the Jester's face model (the head every witch wears), copied from the Ranger's `R40_head.js` into `src/N40_head.js`,
+  at 1.06 times its size, eye line at 1.660 m, nose tip 0.096 m forward. Two changes to its shape: a man's jaw (the lower face
+  keeps its width further down) and a crown 3 cm lower, so the skull ends under his hair. His face is C1, placed by his pupils and
+  lip line; his profile is C3's right figure (`bake_face.py`, landmarks read off gridded copies). Ears from the Ranger's ear code.
+- **Glasses** as a real object (`src/N42_glasses.js`). **Hair** as one smooth shell (`src/N41_hair.js`).
+- **Body, legs, boots, arms:** forms measured from B1 (front, back) and B2 (sides) by `tools/tables.py`, wearing those paintings
+  laid on from four sides by rest position and mixed by which way the surface faces (material `proj`, `bake_proj.py`). The
+  sleeves take their sides from A3. Outline against the paintings (`tools/cmp.py`): 94.5% overlap from the front, 94.7% from the side.
+- **Hands:** the witches' hand model at 1.10 size, turned as painted (backs forward), in two plain colours (glove, skin).
+- **Gold dust:** flecks on the boots, motes round his feet, a trail shed by a moving boot. 1,340 single points.
+- **Moves:** `pose`, `idle`, `walk`, `talk`: first drafts from the Ranger's stride. `setBlank(true)` shows the blank doll.
+
+Rough, and why Chris stopped it:
+
+- **The body is not a doll yet.** It is his clothes as one smooth skin, built outline-first and painted by projection. The
+  witches were built as a good blank doll first, then painted. Redo him that way: a man's body under the clothes (B3 and B5
+  show it), then shirt, corset and trousers as their own layers.
+- His neck is a plain panel with streaked paint at its sides. His hair reads as a hood, with wrong-coloured patches where it
+  turns in beside his neck. Up close the body paint is soft (it comes from whole-figure paintings).
+- Not used yet: C2 (blink and talking mouths), C4 to C14 (hair, hat, glasses), D (hands), E (boots), all of round 2.
+- Not built: hat, belt and ring, pouch, scroll, charms, dagger, pearls, feather earring.
+- He stands 1.78 m in his boots. That is Claude's number; Chris has not confirmed it.
+
+Build and check:
+
+```
+python3 -I lib/restore_refs.py                 # refs/*.png from references/chatgpt/*.webp
+npm install                                    # three.js r128
+python3 -I tools/tables.py && python3 -I bake_proj.py && python3 -I bake_face.py
+./build.sh                                     # out/noiz.js and out/noiz_tex.js
+python3 shoot.py /tmp/s "T.clean('nodust')" front:0,0.03,7.2,0.92,16,700,900     # angles in radians
+python3 tools/cmp.py /tmp/cmp_front.jpg front  # outline against the painting
+python3 -I build_single.py                     # deliver/Noiz_3D_stage1.html: publish this one (three.js inline, tested)
+```
 
 ## What is in this folder
 
@@ -27,7 +71,8 @@ something or just talks to them", and he gets his own folder because he is a cha
 | `references/starters/` | The seven images Chris attaches in ChatGPT. N1 to N3 are his picture and two enlarged cuts of it. S1 to S4 are the Jester style guides the Ranger's and the Fox's pages also use (from branch `claude/jester-3d-model`, `models/jester-3d/references/`). |
 | `references/grey-hat-3d-reference-prompts.md` | Every prompt, the standing rules, the checklist, and what was guessed from the picture. |
 | `references/build_prompts.py`, `page.tpl.html` | Build the prompt list, the page, the starters and the zip. All the words live in `build_prompts.py`. |
-| `references/chatgpt/` | Where the kept paintings go, as webp, named by code (`A1.webp`, `C3.webp`). |
+| `references/chatgpt/` | The kept paintings, as webp, named by code: rounds 1 and 2 (A1 to G3). |
+| `src/`, `tools/`, `bake_*.py`, `build.sh`, `shoot.py`, `viewer_n/`, `viewer/stage.js` | The model, its measuring and baking tools, and his page. `00_util`, `10_geom`, `N20_tex`, `32_hands` and `stage.js` come from the Ranger's folder. |
 
 Rebuild the page and the list after changing any wording (the page and the zip are not committed):
 
