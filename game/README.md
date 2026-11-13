@@ -157,7 +157,7 @@ python3 checks/auto.py              # the engine's styles through the real page 
 
 ## People from a template (November 13)
 
-**Chris's verdict (November 13): not for the game.** The only NPCs are people the party talks to, and by that measure none of these people are good enough. This folder is a finished cost test; the game does not load it. Do not put template people in a scene.
+**Chris's ruling (November 13):** the only NPCs are people the party talks to, and by that measure none of the first twelve people are good enough for the game. He then called the hand-made lamp-seller "pretty fantastic" and asked for Opus 5.5 at high or extra-high effort and no other model. Whether the second test's people pass is his to say. The game does not load this folder yet.
 
 A test Chris asked for: with the Jester's model as the template, how little does it cost to have a Claude model make a new background person through the API?
 
@@ -176,7 +176,14 @@ Measured on four one-line test descriptions (`people/kit/test-people.json`, stan
 | Sonnet 5.5 | 11 cents | 5.4 cents | 58 s |
 | Opus 5.5 | 18 cents | 7.5 cents | 55 s |
 
-The whole test cost $1.19. Limits found: every person has the Jester's body and face shape (men and stout people only pass under a coat or apron, at a distance); shapes are stiff, so nothing sways; the painted beard only reaches round the mouth. Not measured: speed on Chris's laptop with several people in a scene.
+A second test followed Chris's ruling and his word to use Opus 5.5 only, at high or extra-high effort. The instruction was rewritten for a person seen up close (more shapes, smoother clothes, telling details) and the model could fix the file three times (`--effort high|xhigh --rounds 4`; runs are in `people/runs/<person>__claude-opus-5-5@<effort>/`).
+
+| Opus 5.5 | Each person | Time |
+|---|---|---|
+| high effort | 38 cents | 123 s |
+| extra-high effort | $1.33 | 423 s |
+
+High effort is the setting to use; extra-high adds little for three to five times the price. The fortune-teller at high effort stands beside the hand-made lamp-seller. The men do not, because of the template body and face. Both tests together cost $8.02. Limits found: every person has the Jester's body and face shape (men and stout people only pass under a coat or apron, at a distance); shapes are stiff, so nothing sways; the painted beard only reaches round the mouth. Not measured: speed on Chris's laptop with several people in a scene.
 
 ## Next
 
