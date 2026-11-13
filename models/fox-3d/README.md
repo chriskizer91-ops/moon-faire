@@ -21,6 +21,9 @@ Method and rules: the project doc `claude/HOW-TO-3d-witch-models.md`. Pass notes
 | `src/71_foxcloth.js` | her four trouser flounces as real cloth |
 | `src/70_anim.js` | materials, skeleton, scale, the moves |
 | `src/88_foxmoves.js` | her own everyday moves: talk, laugh, dance, curtsey, pounce. She keeps the Jester's bow, twirl, wave and jump. The Jester's talk, laugh and dance are renamed `jester_...` there and are off her page |
+| `src/89_foxspells.js`, `89b_foxspells2.js`, `89c_foxspells3.js` | her spells: Hemline Fangs; Blue Mischief and Borrowed Face (with her ghost double and foxfire fox); Same Cloth, Slip Stitch and Crazy Quilt (with her thread, the cut in the air, the quilt, and a ghost copy of an enemy) |
+| `bake_places_fox.py` | cuts the six patches of other places out of painting I7 into one small picture, `places` (Slip Stitch and Crazy Quilt) |
+| `poses.py`, `stills.py`, `strip2.py`, `tile.py`, `page_shots.py`, `spellcmp.py` | looking at spells: standing poses side by side (with a solver that puts her shears' point on a spot); big stills of a move; a strip folded into rows; pictures in a row; stills of the real page at chosen seconds of a move; the stills beside the paintings |
 | `bench/armdiag.js` | how her arms and hands move, in numbers: reach, elbow and wrist speeds, fingertip speed, for every move at 60 frames a second |
 | `bench.py`, `bench/*.js`, `strip.py`, `sheet.py` | the move workbench: pose her, land a fingertip on a point of her (`T.reach`), take stills of a move at chosen seconds |
 | `bake_fox.py` | paints her corset from the paintings into `out/fox_tex.js` (and the older face from C3) |
@@ -46,6 +49,7 @@ python3 -I bake_fox.py && cp out/fox_tex.js out/fox_tex_own.js     # corset
 python3 -I bake_face_r5.py           # her face from round 5
 python3 -I bake_hands_fox.py && python3 -I bake_boot_fox.py && python3 -I bake_patch_fox.py     # hands (D1), boot leather (E1), patchwork (F9, F10)
 python3 -I bake_gear_fox.py          # belt, pouch and sheath leather (F7, G3)
+python3 -I bake_places_fox.py        # the six patches of other places (I7), for Slip Stitch and Crazy Quilt
 python3 -I match_skin_fox.py         # one skin: chest, hands and arms to her face's tone and finish. Always last, and only once per fresh bake
 python3 make_jface.py                # copies her head and her bake into place
 ./build.sh                           # src/*.js  ->  out/fox.js
@@ -64,6 +68,10 @@ python3 strip.py laugh '0,0.03;-0.9,0.05' 2.6 1.22 0.6 1.25 1.75   # shots/strip
 python3 bench.py bench/contacts.js shots/ct                        # prints the hand keys that put a fingertip on her glasses, bell and lips
 ./headfit.sh f1 ''                   # shots/f1_a..l.png  head, neck and shoulders from twelve angles, for checking the fit after a head change
 python3 test_single.py lite          # opens deliver/Fox_Witch_3D.html at phone size with the network cut off and plays her moves
+PRE=bench/dummy.js python3 stills.py same_cloth shots/sc '0.06,0.06,7.6,1.02,1.15,1200,800' 1.95 3.5 4.21   # big stills of a move at those seconds; PRE stands a practice dummy to her left
+python3 page_shots.py shots/pg same_cloth smooth 1 '' 2.6 4.22       # the real page at phone size, Walk around on, at those seconds of the move (slow: about a minute a still)
+python3 poses.py name '<js returning { label: pose }>'               # standing poses side by side, with reach and where her shears' point is
+python3 bench.py bench/armdiag3.js   # reach and speeds through her spells
 ./facecmp.sh f1 '?o=%7B%22faceDepth%22%3A1%7D'   # shots/f1_a..p.png  her head from six angles, worn, bare and shape only, for one build (here: reshaped)
 ./handcmp.sh h1                      # shots/h1_handcmp.jpg  her hanging arm and hand beside A1 (front) and A2 (back) at A1's scale
 ./armcmp.sh a1                       # shots/a1_armcmp.jpg  her left arm and sleeve beside A1's at A1's own scale, one numbered grid
@@ -146,7 +154,39 @@ Pass 10 (13 Nov 2026): Chris approved the five moves and keeps the Jester's bow,
 Pass 11 (13 Nov 2026): the lowest bracelet no longer sinks into the root of her thumb; her fingers are 5% shorter, which is their length in her own painting (see `claude/fox-3d-pass11-bracelet-fingers.md`).
 Pass 12 (13 Nov 2026): fingers 12% thicker (D1's width); her shears come out of the sheath into her hands; her first spell, Hemline Fangs (see `claude/fox-3d-pass12-shears-hemline-fangs.md`).
 Pass 13 (13 Nov 2026): the Flipbook look switch (with her three blouse greens added to the 56 colours); Blue Mischief and Borrowed Face, so all three flipbook moves are in; a ghost double and a foxfire fox (see `claude/fox-3d-pass13-flipbook-look-blue-mischief-borrowed-face.md`).
-Still to do: rounds 3 and 4 (her tools in her hands, her spells, her three flipbook moves): the paintings are in `references/round3` and `round4`, none used yet. Ruffles at the neckline and peplum are flat paint; her choker is plain where A1's has studs and a larger bell; under her jaw and the sides of her head are plain skin tone.
+Pass 14 (13 Nov 2026): Same Cloth, Slip Stitch and Crazy Quilt, which finishes round 3 (see `claude/fox-3d-pass14-same-cloth-slip-stitch-crazy-quilt.md`).
+Still to do: round 4 (J1 to J11, K1 to K4: the older moves and three new ones); the paintings are in `references/round4`, none used yet. Ruffles at the neckline and peplum are flat paint; her choker is plain where A1's has studs and a larger bell; under her jaw and the sides of her head are plain skin tone.
+
+## Same Cloth, Slip Stitch, Crazy Quilt (pass 14)
+
+New spells from her lore: no flipbook clips, so the timing is ours. Paintings H9 to H13 and her magic set I4, I6, I7, I8. All in `src/89c_foxspells3.js`.
+
+Pieces any spell can use:
+
+- **`RIB`**: her thread (I4). Ribbons of light that face the eye, coloured blue, teal, violet, rose, gold along their length; all the threads of a frame are one mesh. A spell calls `RIB.begin()` once a frame, then `RIB.path(fn, width, alpha, hue, span, ends)` for each thread. It also remembers where the picture was last taken from (`RIB.eye`), so a spell can turn a flat thing to face whoever is looking.
+- **`PLACES`**: the six patches of other places (I7), baked by `bake_places_fox.py` into `places` in `out/fox_tex.js` (86 KB). `placeCol` in its shader picks a place and a quarter turn for each square of a grid and draws the stitched seams. Without the picture each place is a plain colour.
+- **`SLIT`**: the cut in the air (I6). `place(foot, across, facing)`, then `show(cut, open, flap, sew, opacity, time)`: a line of light while it is cut from the top down, a pointed opening with the patches behind it, big even stitches where it is sewn shut from the top down. `flapFor(point)` says how far the near edge must be lifted to pass through a hand; `needle(point, direction, opacity)` draws the needle. **The patches are a solid surface.** Whoever steps in behind the lifted edge is hidden by it, as behind a tent flap; nothing is clipped.
+- **`EGHOST`**: a ghost copy of an enemy (I8, and the lore's "ghost 3D copy of any character"). The host says what she is aiming at: `fox.target = anObject3D` (the page gives the practice dummy). `from(object)` draws its plain meshes a second time in see-through blue with seams of light; with nothing given, a cloth doll on a post stands in. It measures how wide the thing is at each height, and `edge(u)` gives the line a hand's breadth outside it: the cut-out's edge. `show(opacity, foot, turn, tiltX, tiltZ, top, time)`; everything above `top` has unravelled. Skinned meshes are not copied yet (a 3D enemy with bones would need the same second-skeleton trick as her own double).
+- **`QUILT`**: a quilt of light (H13). Cloth worked out afresh each frame: it leaves her two hands far end first, billows, banks so the audience sees its face, and settles into a dome over the target.
+- **`tipOf(S, i, out)`**: any fingertip (0 thumb to 4 little finger).
+- **`foxAwayAsk`**: a spell sets it each frame she is not to be drawn (she has gone through the cut). `fox.state.away` tells the host. If the spell is cut short she is back the next frame.
+
+The moves:
+
+- **`same_cloth`** (6.7 s; the blow at 4.2 s). Shears out and pointed at her target, four snips while the outline is drawn round it (it faces whoever is looking, since an outline is what the eye sees); the copy peels away toward her; shears away; both hands up with a thread from each fingertip (H10); she draws it back and throws it, and it whirls into the thing it was cut from; she laughs; shears out again, snip, the threads fall and the copy unravels from the top.
+- **`slip_stitch`** (6.6 s on her page). She turns to her left, reaches high on her toes and drags the point of her shears straight down a line (keys solved so the point stays on it: `poses.py` with `bench/stroke.poses.js`); shears away; she steps in, takes the cut and draws its edge back like a curtain (the edge follows her fingers); waves; sidesteps in behind it; she is gone at 4.0 s; the needle sews it shut by 5.05 s. On her page she then pops back where she began at 5.8 s. **In the game the move should end at about 5.4 s with her gone.** She is not turned toward the dummy for this one.
+- **`crazy_quilt`** (4.6 s; it lands at 3.0 s). She gathers it at her hip, swings it over her head, shakes it out, a second flick, lets go; it settles over the target, its squares keep changing places and stars circle where a head would be.
+
+Numbers (`bench/armdiag3.js`): reach never past 0.96 of her arm; fingertips at most 2.5 m/s in Same Cloth, 3.2 in Slip Stitch, 3.5 in Crazy Quilt. Every stance with every move: 126 pairs, no broken numbers. Her hair is unchanged (same vertex sums as the last build).
+
+Where they differ from the paintings:
+
+- H10: the copy swings one arm. Here the copy is rigid, so it whirls round its post and its arm comes round with it.
+- H9: the cut-away copy trails a veil of cloth back to the outline. Here there is no veil.
+- H12: she steps through with her back to us and looks over her shoulder. Here she faces us, waves, and steps in sideways behind the lifted edge. From the side or behind you can see her standing behind the patches until she is gone: the trick is made for the audience's side.
+- H11: the slit is taller than her raised hand can reach. Here it starts where her shears can reach (1.96 m) and runs on down to the ground by itself after her stroke ends at knee height.
+- H13: one quilt with seven or so big pictures and wild frayed edges. Here six square pictures in a neat three-by-two, each place once (a longer throw repeats them), with a plain bright rim.
+- None of the paintings' teeth: she smiles with her mouth shut, as everywhere.
 
 ## The Flipbook look, and two more spells (pass 13)
 

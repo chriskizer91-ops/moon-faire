@@ -97,7 +97,9 @@
     if (typeof bodyTick === 'function') bodyTick(t, dt);
     stepCloth(dt, t);
     if (typeof GHOST !== 'undefined' && GHOST) GHOST.asked = false;
+    if (typeof foxAway !== 'undefined') foxAwayAsk = false;
     if (typeof updateFx === 'function') updateFx(t, dt, P);
+    if (typeof foxAway !== 'undefined' && foxAway !== foxAwayAsk) { foxAway = foxAwayAsk; root.visible = fade > 0.001 && !foxAway; clothGroup.visible = !foxAway; state.away = foxAway; }      // she has stepped through a cut (Slip Stitch): gone only while a spell keeps asking
     if (typeof GHOST !== 'undefined' && GHOST && !GHOST.asked && GHOST.group.visible) GHOST.hide();
   }
   const ACTIONS = {};
@@ -129,16 +131,17 @@
     }
   }
   const state = {};
-  function setFade(f) { const was = fade > 0.001; fade = cl(Number.isFinite(+f) ? +f : 1, 0, 1); const now = fade > 0.001; if (now !== was) { root.visible = now; fx.visible = now; } }
+  function setFade(f) { const was = fade > 0.001; fade = cl(Number.isFinite(+f) ? +f : 1, 0, 1); const now = fade > 0.001; if (now !== was) { root.visible = now && !(typeof foxAway !== 'undefined' && foxAway); fx.visible = now; } }
   return {
     root, fx, skeleton, bones, animate, play, ACTIONS, anchor, setFade, state, setStance, STANCES: STANCE_LIST,
     stop() { act = null; pending = ''; },
     reset() { act = null; pending = ''; stance = null; stanceTo = ''; for (const S in ARML) { ARML[S].init = false; armSt[S].hang = -1; armSt[S].has = false; } resetCloth(); for (const c of chains) c.reset(); },
-    get stance() { return stanceTo; }, set targetDist(v) { tgtK = v > 0 ? cl(v / 2.6, 0.4, 2.6) : 1; }, get spin() { return spinNow; },      // spin: the host adds this to the root's turn (a twirl)
+    get stance() { return stanceTo; }, set targetDist(v) { tgtK = v > 0 ? cl(v / 2.6, 0.4, 2.6) : 1; }, set target(o) { if (typeof tgtObj !== 'undefined') tgtObj = o || null; }, get target() { return typeof tgtObj !== 'undefined' ? tgtObj : null; },      // target: the Object3D she is aiming at, for spells that copy it (Same Cloth)
+    get spin() { return spinNow; },      // spin: the host adds this to the root's turn (a twirl)
     get stanceNow() { return stance ? stance.name : ''; }, get stanceProgress() { return stance ? stance.t / stance.def.dur : 0; }, get pending() { return pending; },
     get fade() { return fade; }, get busy() { return !!act && !(act.def.hold && act.t >= act.dur); }, get action() { return act ? act.type : ''; },
     get progress() { return act ? Math.min(1, act.t / act.dur) : -1; }, get time() { return act ? act.t : -1; },
     get triangles() { return triCount; }, get dim() { return dimNow; }, set wind(v) { userWind.copy(v); }, get wind() { return userWind; },
-    debug: { SK, cloths, cur, base, REST, FP, meshes, MATS, chains, applyPose, clonePose }
+    debug: { SK, cloths, cur, base, REST, FP, meshes, MATS, chains, applyPose, clonePose, fx3: typeof SLIT !== 'undefined' ? { RIB, SLIT, EGHOST, QUILT, tipOf } : null }
   };
 }

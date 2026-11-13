@@ -12,5 +12,5 @@ with sync_playwright() as p:
     def step(mv, secs): pg.evaluate(f"(() => {{ FOX.J.stop(); FOX.setMove('{mv}'); }})()"); pg.wait_for_timeout(int(secs * 1000))
     for look in ('smooth', 'flipbook'):
         pg.evaluate(f"FOX.stage.look = '{look}'"); pg.evaluate("FOX.J.stop()"); shot(look + '_stand')
-        for mv, secs in (('talk', 3.0), ('hemline_fangs', 5.0), ('blue_mischief', 9.0), ('borrowed_face', 8.0)): step(mv, secs); cv.screenshot(path=f'{out}_{look}_{mv}.png')
+        for mv, secs in (('talk', 3.0), ('hemline_fangs', 5.0), ('blue_mischief', 9.0), ('borrowed_face', 8.0), ('same_cloth', 14.0), ('slip_stitch', 11.0), ('crazy_quilt', 8.0)): step(mv, secs); cv.screenshot(path=f'{out}_{look}_{mv}.png')
     print('times', pg.evaluate("FOX.J.action"), 'errors', logs[:3]); b.close()

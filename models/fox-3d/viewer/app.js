@@ -10,7 +10,8 @@
   // Names are working names.
   const ACTS = [['talk', 'Talk', 0.8], ['laugh', 'Laugh', 0.8], ['dance', 'Dance', 1.0], ['curtsey', 'Curtsey', 0.9], ['pounce', 'Pounce', 1.0, 1.32], ['bow', 'Bow', 0.95], ['twirl', 'Twirl', 1.15], ['wave', 'Wave', 0.8], ['jump', 'Jump', 0.9, 1.42], ['shears_out', 'Shears', 0.85]];
   const QUIET = [['look_around', 'Stand', 0.7], ['settle', 'Stand', 0.7]];      // small things she does by herself when left standing
-  const SPELLS = [['hemline_fangs', 'Hemline Fangs', 1.2, 1.2], ['blue_mischief', 'Blue Mischief', 1.2, 1.2], ['borrowed_face', 'Borrowed Face', 1.3, 1.2]];      // her first spell (round 3); names are working names
+  const SPELLS = [['hemline_fangs', 'Hemline Fangs', 1.2, 1.2], ['blue_mischief', 'Blue Mischief', 1.2, 1.2], ['borrowed_face', 'Borrowed Face', 1.3, 1.2],
+    ['same_cloth', 'Same Cloth', 1.9, 1.2, () => [1.9, 1.3], 1], ['slip_stitch', 'Slip Stitch', 1.3, 1.25, () => [1.35, 0.4], 1], ['crazy_quilt', 'Crazy Quilt', 2.6, 1.2, () => [2.6, 1.9], 1]];      // the fifth entry: how wide a view the spell needs and where its middle is (metres to her left), when she is not walking about      // her first spell (round 3); names are working names
   const ALL = STATES.concat(ACTS, SPELLS, QUIET), find = (id) => ALL.find((x) => x[0] === id);
   const VIEWS = [['Front', 0, 0.10, 1], ['Three-quarter', -0.62, 0.14, 1], ['Side', -1.5708, 0.08, 1], ['Back', 3.1416, 0.12, 1], ['Face', 0.22, 0.02, 0.27]];
   const touchPhone = (navigator.maxTouchPoints > 0 || /Mobi|Android|iPhone/i.test(navigator.userAgent)) && Math.min(screen.width, screen.height) < 820;
@@ -54,7 +55,7 @@
   }
   function setMove(id) {
     if (id === 'idle' || id === 'walk') { J.stop(); move = ''; return setState(id); }      // kept for older callers
-    if (roam.on && dummy.visible && AIMED[id]) { const dx = dummy.position.x - roam.x, dz = dummy.position.z - roam.z; roam.aim = Math.atan2(-dz, dx); J.targetDist = Math.hypot(dx, dz); } else { roam.aim = null; J.targetDist = 0; }
+    if (roam.on && dummy.visible && AIMED[id]) { const dx = dummy.position.x - roam.x, dz = dummy.position.z - roam.z; roam.aim = Math.atan2(-dz, dx); J.targetDist = Math.hypot(dx, dz); J.target = dummy; } else { roam.aim = null; J.targetDist = 0; J.target = null; }      // target: what she is aiming at, for a spell that copies it (Same Cloth)
     move = id; faceTo = 0; J.play(id, true);
     if (J.stance === '' && J.STANCES.indexOf(state) >= 0) state = 'idle';             // a jump stands her up first
     press(); bookT0 = time;
@@ -104,7 +105,8 @@
     wb += (wbTo - wb) * Math.min(1, dt * 8); rb += (rbTo - rb) * Math.min(1, dt * 5);
     if (wb > 0.001) phase += dt * Math.max(2.0, v * (7.66 * (1 - rb) + 4.2 * rb));       // her feet keep pace with the ground she covers
     J.root.position.set(roam.x, 0, roam.z); J.root.rotation.y = roam.face + J.spin;
-    const share = dummy.visible && J.action && AIMED[J.action] ? 0.42 : 0, cx = roam.x + (dummy.position.x - roam.x) * share, cz = roam.z + (dummy.position.z - roam.z) * share; roam.wide = share ? Math.hypot(dummy.position.x - roam.x, dummy.position.z - roam.z) * 0.62 + 0.7 : 0;
+    const share = dummy.visible && J.action && AIMED[J.action] ? 0.42 : 0; let cx = roam.x + (dummy.position.x - roam.x) * share, cz = roam.z + (dummy.position.z - roam.z) * share; if (!share && camX) { cx += camX * Math.cos(roam.face); cz -= camX * Math.sin(roam.face); }      // a spell that is not aimed at the dummy but happens to her left (Slip Stitch): look there
+    roam.wide = share ? Math.hypot(dummy.position.x - roam.x, dummy.position.z - roam.z) * 0.62 + 0.7 : 0;
     orbit.target.x += (cx - orbit.target.x) * Math.min(1, dt * 5); orbit.target.z += (cz - orbit.target.z) * Math.min(1, dt * 5); stage.follow(roam.x, roam.z);
     return v;
   }
@@ -169,7 +171,7 @@
   }
   qShow();
   // ---- a practice dummy to cast at (with Walk around): she turns to put it on her casting side, the spell goes to where it stands, and it rocks when struck ----
-  const AIMED = { hemline_fangs: 1, blue_mischief: 1, borrowed_face: 1, sealed_fate: 1, gilded_rebuke: 1, hush: 1, gravity: 1, ill_omen: 1, stop: 1, last_toll: 1 };
+  const AIMED = { hemline_fangs: 1, blue_mischief: 1, borrowed_face: 1, same_cloth: 1, crazy_quilt: 1, sealed_fate: 1, gilded_rebuke: 1, hush: 1, gravity: 1, ill_omen: 1, stop: 1, last_toll: 1 };
   const lin = (h) => new THREE.Color(h).convertSRGBToLinear(), dummy = new THREE.Group(), dBody = new THREE.Group(), dState = { rx: 0, rz: 0, vx: 0, vz: 0, flash: 0 }; let dummyOn = true;
   dummy.add(dBody); dummy.position.set(1.9, 0, -0.25); dummy.visible = false; stage.scene.add(dummy);
   const sackM = new THREE.MeshStandardMaterial({ color: lin(0x9a7d55), roughness: 0.95, emissive: lin(0xb070ff), emissiveIntensity: 0 });
@@ -191,7 +193,7 @@
   function dummyHit(k) { const dx = dummy.position.x - roam.x, dz = dummy.position.z - roam.z, L = Math.hypot(dx, dz) || 1, p = 2.2 + 4.2 * k; dState.vx += dz / L * p; dState.vz += -dx / L * p; dState.flash = Math.min(1, 0.4 + k); }
   // ---- what a spell does to the room: the picture jolts or sways, light flashes from where it lands, and motes cross the whole stage ----
   const sfx = $('sfx'), sg = sfx.getContext('2d'), MOTES = [], calm = matchMedia('(prefers-reduced-motion: reduce)').matches, _hp = new THREE.Vector3();
-  const LOOK = { hemline_fangs: ['150,215,255', 'burst', 0], blue_mischief: ['150,215,255', 'burst', 0], borrowed_face: ['150,215,255', 'rise', 0], last_toll: ['214,222,255', 'rain', 1], gravity: ['176,116,255', 'fall', 1], stop: ['208,182,255', 'hold', 1], gilded_rebuke: ['255,206,112', 'burst', 0], curtain_call: ['255,206,112', 'confetti', 0], sealed_fate: ['192,124,255', 'burst', 0],
+  const LOOK = { hemline_fangs: ['150,215,255', 'burst', 0], blue_mischief: ['150,215,255', 'burst', 0], borrowed_face: ['150,215,255', 'rise', 0], same_cloth: ['150,215,255', 'burst', 0], crazy_quilt: ['214,196,255', 'rise', 0], last_toll: ['214,222,255', 'rain', 1], gravity: ['176,116,255', 'fall', 1], stop: ['208,182,255', 'hold', 1], gilded_rebuke: ['255,206,112', 'burst', 0], curtain_call: ['255,206,112', 'confetti', 0], sealed_fate: ['192,124,255', 'burst', 0],
     hush: ['206,188,255', 'inward', 1], ill_omen: ['156,84,236', 'burst', 0], royal_reversal: ['216,222,255', 'rise', 0], against_all_odds: ['255,216,132', 'rise', 0], jump: ['226,210,255', 'dust', 0] };
   let shakeK = 0, swayK = 0, swayT = 9, flashK = 0, flashC = '200,150,255', flashX = 0.5, flashY = 0.5, hitSeen = 0;
   const R = Math.random, mote = (x, y, vx, vy, life, size, c, o) => { if (MOTES.length < 420) MOTES.push(Object.assign({ x, y, vx, vy, life, max: life, size, c, g: 0, drag: 0, kind: 0, a: R() * 6.28, w: 0 }, o || {})); };
@@ -247,7 +249,7 @@
     // left standing, she looks about or settles her weight now and then
     if (state === 'idle' && !move && !J.action && going < 0.05 && wbTo === 0) { roam.idleT += dt; if (roam.idleT > roam.idleNext) { roam.idleT = 0; roam.idleNext = 6 + Math.random() * 7; J.play(Math.random() < 0.5 ? 'look_around' : 'settle', false); } } else roam.idleT = 0;
     J.animate(phase, wb, time, dt, rb);
-    { const m = find(move || state), cam = m[4] && J.action === m[0] ? m[4](J.time) : null; needHalf = cam ? cam[0] : m[2]; needV = m[3] || 1.12; camX += ((cam ? cam[1] : 0) - camX) * Math.min(1, dt * 3); if (roam.on) needHalf = Math.max(roam.wide || 0, cam ? 1.05 : needHalf, 1.05); else orbit.target.x = camX; }
+    { const m = find(move || state), cam = m[4] && J.action === m[0] ? m[4](J.time) : null; needHalf = cam ? cam[0] : m[2]; needV = m[3] || 1.12; camX += ((cam ? cam[1] : 0) - camX) * Math.min(1, dt * 3); if (roam.on) needHalf = Math.max(roam.wide || 0, cam ? (m[5] ? (AIMED[m[0]] ? Math.min(cam[0], (roam.wide || 1.05) + 0.5) : cam[0]) : 1.05) : needHalf, 1.05); else orbit.target.x = camX; }      // m[5]: this spell's width counts while she walks about too
     // camera: fit the move, ease to a chosen view, or turn slowly
     if (spin) orbit.az += dt * 0.5;
     if (viewAz != null) { let d = viewAz - orbit.az; d = Math.atan2(Math.sin(d), Math.cos(d)); orbit.az += d * Math.min(1, dt * 5); orbit.el += (viewEl - orbit.el) * Math.min(1, dt * 5); if (Math.abs(d) < 0.003) viewAz = null; }
