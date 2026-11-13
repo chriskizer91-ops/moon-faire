@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Io 3D: stage one</title>
+<title>Io 3D</title>
 <style>
 :root{--velvet:#15121c;--curtain:#211b2b;--stage:#383043;--blue:#d0567c;--blued:#7a2443;--silver:#f0dfc0;--teal:#49c9bc;--gold:#d9ad55;--ink:#f0ebf5;--muted:#a99db9;--line:#3a3049;
   --serif:"Iowan Old Style","Palatino Linotype",Palatino,Georgia,serif;--body:system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;--mono:ui-monospace,Menlo,Consolas,monospace;color-scheme:dark}
@@ -39,9 +39,9 @@ canvas#stage{display:block;width:100%;height:100%;touch-action:none;cursor:grab}
 <body>
 <div class="wrap">
   <header>
-    <p class="eyebrow">Moon Faire · stage one of her build</p>
+    <p class="eyebrow">Moon Faire · stage two of her build</p>
     <h1><em>Io</em>, the Herbal Witch</h1>
-    <p class="sub">Her body and base outfit, built from your round 1 paintings B2, B3, B4 and B5. Drag to turn her, pinch or scroll to zoom. Her head is a plain form for now: her face, hair, glasses and hat are the next stage, and the robe comes after that.</p>
+    <p class="sub">Her head, face, glasses, hair and hat, on the body from stage one. Drag to turn her, pinch or scroll to zoom. Nothing moves yet, and the robe, belt and jewellery come later.</p>
   </header>
   <div class="stagebox" id="box">
     <canvas id="stage"></canvas>
@@ -53,19 +53,25 @@ canvas#stage{display:block;width:100%;height:100%;touch-action:none;cursor:grab}
   <div><p class="label">Arms and legs</p><div class="chips" id="poses"></div></div>
   <div><p class="label">Show</p><div class="chips" id="shows"></div></div>
   <div class="notes">
-    <h2>What is here</h2>
+    <h2>New in this stage</h2>
     <ul>
-      <li>Body proportions measured off the paintings. Waist, hips, bust, shoulders, arms and the skirt's outline are within about a centimetre of B3 from the front and B2 from the side.</li>
-      <li>Bodice: your paintings wrapped right round her (B3 front and back, B2 at the sides).</li>
-      <li>Skirt: eight tiers with the slit over her left leg, cut to the outline in B3 and B2. Its lace is a piece of B4.</li>
-      <li>Bare arms and legs in her skin colour. Her knee, hip and boot heights come from B5.</li>
+      <li>Her face: painting C1 on a head shaped to her profile in C3 (within a millimetre from chin to forehead), with her ears and neck.</li>
+      <li>Glasses: round lenses in thin bronze wire, sized from C2 and C14.</li>
+      <li>Hair: about 110 wavy tresses in her own browns, from under the hat to below her hips, with curtain bangs. Laid out from C11, C4 and C5.</li>
+      <li>Hat: the wide floppy brim, the lace band with its chain, three crosses, the ringed cross and two horns, and the crown slumping to her right. Measured off C4 and C5; the felt, lace and horn are your swatches in F9.</li>
     </ul>
-    <h2 style="margin-top:12px">What is a stand-in, and what is not here yet</h2>
+    <h2 style="margin-top:12px">From stage one</h2>
+    <ul>
+      <li>Body, bodice, skirt, bare arms and legs, as you approved them. The dark patch and purple streaks on her shoulders are gone, and the bodice straps now run over them.</li>
+    </ul>
+    <h2 style="margin-top:12px">What is rough, and what is not here yet</h2>
     <ul class="m">
-      <li>The skirt is stiff and its lace is solid. It becomes hanging, see-through cloth later, and wants the lace square from round 2.</li>
-      <li>The boots are the Jester's boot made taller. Her own (the strap and buckle, gold stitching) come in the boots stage, from E1 to E8.</li>
-      <li>Arms, legs and hands are plain skin, with no painted detail yet.</li>
-      <li>Not here yet: face, hair, glasses, hat, robe, belt, pouch, crystal, necklaces, bracelets, book, blades, and all movement.</li>
+      <li>Her hair is stiff: it does not move or part round her arms yet. Up close a tress reads as a ribbon, and the ends are blunt.</li>
+      <li>Her fringe is thinner than painted, and the top of her head under the hat is bare.</li>
+      <li>Her face does not blink or change yet. The states in C9 are ready for that.</li>
+      <li>The crown of the hat has soft creases only, not the deep folds of the paintings.</li>
+      <li>Still stand-ins: the stiff skirt, the boots, plain skin on arms, legs and hands.</li>
+      <li>Not here yet: robe, belt, pouch, crystal, necklaces, bracelets, book, blades, and all movement.</li>
     </ul>
   </div>
 </div>
@@ -87,10 +93,11 @@ canvas#stage{display:block;width:100%;height:100%;touch-action:none;cursor:grab}
     R = makeIo({});
     stage.scene.add(R.root);
   } catch (e) { $('err').hidden = false; $('err').textContent = 'She could not be drawn on this device: ' + (e && e.message ? e.message : e); return; }
-  const orbit = stage.orbit; orbit.az = 0.35; orbit.el = 0.08; orbit.dist = 5.6; orbit.fov = 20; orbit.target.set(0, 0.86, 0);
-  let want = { az: orbit.az, el: orbit.el, dist: orbit.dist, ty: 0.86 }, easing = true, spin = false;
-  const VIEWS = [['Front', 0, 0.05, 5.6, 0.86, 'front'], ['Three-quarter', 0.7, 0.08, 5.6, 0.86, 'front'], ['Side', Math.PI / 2, 0.05, 5.6, 0.86, 'side'], ['Back', Math.PI, 0.05, 5.6, 0.86, 'back'],
-    ['Bodice', 0.25, 0.05, 2.6, 1.2, 'front'], ['Skirt and leg', 0.42, 0.05, 3.9, 0.58, 'skirt'], ['Legs', 0.3, 0.05, 3.9, 0.55, 'legs'], ['Boots', 0.6, 0.18, 1.9, 0.2, 'boot']];
+  const orbit = stage.orbit; orbit.az = 0.35; orbit.el = 0.08; orbit.dist = 6.3; orbit.fov = 20; orbit.target.set(0, 0.92, 0);
+  let want = { az: orbit.az, el: orbit.el, dist: orbit.dist, ty: 0.92 }, easing = true, spin = false;
+  const VIEWS = [['Front', 0, 0.05, 6.3, 0.92, 'front'], ['Three-quarter', 0.7, 0.08, 6.3, 0.92, 'front'], ['Side', -Math.PI / 2, 0.05, 6.3, 0.92, 'side'], ['Back', Math.PI, 0.05, 6.3, 0.92, 'back'],
+    ['Face', 0, 0, 1.9, 1.50, 'face'], ['Face, turned', -0.75, 0, 1.9, 1.50, 'face34'], ['Profile', -Math.PI / 2, 0, 2.3, 1.50, 'profile'], ['Hat', 0.3, 0.42, 2.7, 1.60, 'hat'], ['Hair from behind', Math.PI, 0.05, 4.2, 1.16, 'hairback'],
+    ['Bodice', 0.25, 0.05, 2.6, 1.2, 'bodice'], ['Skirt and leg', 0.42, 0.05, 3.9, 0.58, 'skirt'], ['Boots', 0.6, 0.18, 1.9, 0.2, 'boot']];
   const POSES = [['At rest', { arm: 15, leg: 0 }], ['As painted', { arm: 28, leg: 5.5 }], ['Arms out', { arm: 90, leg: 0 }]];
   let refKey = 'front', showRef = true;
   function chips(host, items, onPick, first) {
@@ -99,20 +106,24 @@ canvas#stage{display:block;width:100%;height:100%;touch-action:none;cursor:grab}
   }
   function setRef() { const im = $('ref'), src = REFS[refKey]; im.hidden = !(showRef && src); if (src && im.getAttribute('src') !== src) im.src = src; }
   chips($('views'), VIEWS, (v) => { want = { az: v[1], el: v[2], dist: v[3], ty: v[4] }; easing = true; spin = false; refKey = v[5]; setRef(); $('spinB').setAttribute('aria-pressed', 'false'); }, -1);
-  chips($('poses'), POSES, (p) => R.pose(p[1]), 1);
-  R.pose(POSES[1][1]);
+  chips($('poses'), POSES, (p) => R.pose(p[1]), 0);
+  R.pose(POSES[0][1]);
   const toggle = (host, id, label, on, fn) => { const b = document.createElement('button'); b.className = 'chip'; b.type = 'button'; b.id = id; b.textContent = label; b.setAttribute('aria-pressed', on ? 'true' : 'false');
     b.addEventListener('click', () => { const v = b.getAttribute('aria-pressed') !== 'true'; b.setAttribute('aria-pressed', v ? 'true' : 'false'); fn(v); }); host.appendChild(b); };
   toggle($('shows'), 'refB', 'Painting beside her', true, (v) => { showRef = v; setRef(); });
   toggle($('shows'), 'spinB', 'Turn slowly', false, (v) => { spin = v; easing = false; });
-  toggle($('shows'), 'skirtB', 'Skirt', true, (v) => { for (const k of ['skirt', 'tulle', 'band']) if (R.meshes[k]) R.meshes[k].visible = v; });
+  const show = (keys) => (v) => { for (const k of keys) if (R.meshes[k]) R.meshes[k].visible = v; };
+  toggle($('shows'), 'hatB', 'Hat', true, show(['felt', 'brim', 'hatband', 'silver', 'gold', 'horn']));
+  toggle($('shows'), 'glassB', 'Glasses', true, show(['wire', 'lens', 'pad']));
+  toggle($('shows'), 'hairB', 'Hair', true, show(['tress', 'tressIn', 'wisp', 'lock', 'hairmass']));
+  toggle($('shows'), 'skirtB', 'Skirt', true, show(['skirt', 'tulle', 'band']));
   setRef();
   // drag to turn, pinch or wheel to zoom
   const pts = new Map(); let pinch0 = 0, dist0 = 0;
   canvas.addEventListener('pointerdown', (e) => { canvas.setPointerCapture(e.pointerId); pts.set(e.pointerId, [e.clientX, e.clientY]); easing = false; if (pts.size === 2) { const a = [...pts.values()]; pinch0 = Math.hypot(a[0][0] - a[1][0], a[0][1] - a[1][1]); dist0 = orbit.dist; } });
   canvas.addEventListener('pointermove', (e) => { const p = pts.get(e.pointerId); if (!p) return; const dx = e.clientX - p[0], dy = e.clientY - p[1]; pts.set(e.pointerId, [e.clientX, e.clientY]);
     if (pts.size === 1) { orbit.az -= dx * 0.008; orbit.el = Math.max(-0.3, Math.min(1.3, orbit.el + dy * 0.006)); }
-    else if (pts.size === 2 && pinch0 > 0) { const a = [...pts.values()], d = Math.hypot(a[0][0] - a[1][0], a[0][1] - a[1][1]); orbit.dist = Math.max(1.2, Math.min(9, dist0 * pinch0 / d)); orbit.target.y = Math.max(0.1, Math.min(1.5, orbit.target.y + dy * 0.0012)); } });
+    else if (pts.size === 2 && pinch0 > 0) { const a = [...pts.values()], d = Math.hypot(a[0][0] - a[1][0], a[0][1] - a[1][1]); orbit.dist = Math.max(1.2, Math.min(9, dist0 * pinch0 / d)); orbit.target.y = Math.max(0.1, Math.min(1.7, orbit.target.y + dy * 0.0012)); } });
   const up = (e) => { pts.delete(e.pointerId); pinch0 = 0; };
   canvas.addEventListener('pointerup', up); canvas.addEventListener('pointercancel', up);
   canvas.addEventListener('wheel', (e) => { e.preventDefault(); easing = false; orbit.dist = Math.max(1.2, Math.min(9, orbit.dist * Math.exp(e.deltaY * 0.001))); }, { passive: false });
@@ -125,7 +136,7 @@ canvas#stage{display:block;width:100%;height:100%;touch-action:none;cursor:grab}
     if (easing) { let d = want.az - orbit.az; d = Math.atan2(Math.sin(d), Math.cos(d)); const k = Math.min(1, dt * 5); orbit.az += d * k; orbit.el += (want.el - orbit.el) * k; orbit.dist += (want.dist - orbit.dist) * k; orbit.target.y += (want.ty - orbit.target.y) * k; }
     stage.render();
   }
-  $('hud').textContent = 'Stage one · ' + Math.round(R.triangles / 1000) + 'k triangles';
+  $('hud').textContent = 'Stage two · ' + Math.round(R.triangles / 1000) + 'k triangles';
   window.IO = { stage, R, step() { fit(); stage.render(); } };
   requestAnimationFrame(frame);
 })();

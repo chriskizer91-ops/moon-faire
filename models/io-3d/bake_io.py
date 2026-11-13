@@ -89,6 +89,31 @@ conf = np.clip(wsum / 0.12, 0, 1)
 f1, _ = fill(col, conf, 6.0); f2, d2 = fill(col, conf, 28.0); fl = np.where((d2 > 1e-3)[..., None], f2, col)
 fl = np.where((ndi.gaussian_filter(conf, 6.0, mode='wrap') > 0.02)[..., None], f1, fl)
 atlas = col * conf[..., None] + fl * (1 - conf[..., None])
+# The tops of her shoulders and the sides of her neck: the front and back paintings see these edge-on, so they bring the backdrop
+# (purple streaks) and the shadow under her hair (a dark patch). Anything there that is neither skin nor bodice strap is repainted
+# from the skin beside it, and each strap is carried over the top of the shoulder to meet its other half.
+r_, g_, b_ = atlas[..., 0], atlas[..., 1], atlas[..., 2]
+zone = Y > 1.318
+skinlike = (r_ > 125) & (r_ - b_ > 48) & (r_ - g_ > 14)
+strap = (np.maximum(np.maximum(r_, g_), b_) < 82) & (Y < 1.353) & (np.abs(np.abs(us[None, :] - 0.5) - 0.25) > 0.004)
+strap = ndi.binary_opening(strap, iterations=2)
+badsk = ndi.binary_dilation(zone & ~skinlike & ~strap, iterations=3) & zone & ~ndi.binary_dilation(strap, iterations=2)
+good = skinlike & ~badsk
+idx = ndi.distance_transform_edt(~good, return_distances=False, return_indices=True); near = atlas[idx[0], idx[1]]
+near = np.stack([ndi.gaussian_filter(near[..., c], 5.0, mode='wrap') for c in range(3)], -1)
+wb = ndi.gaussian_filter(badsk.astype(np.float32), 2.0, mode='wrap')[..., None]; atlas = atlas * (1 - wb) + near * wb
+jtop, jbot = int((AY1 - 1.353) / (AY1 - AY0) * H), int((AY1 - 1.322) / (AY1 - AY0) * H)
+for uc in (0.25, 0.75):
+    ends = []
+    for lo, hi in ((uc - 0.060, uc - 0.010), (uc + 0.010, uc + 0.060)):
+        c0, c1 = int(lo * W), int(hi * W); ys, xs = np.nonzero(strap[jtop:jbot, c0:c1])
+        if len(ys) < 20: continue
+        near_side = np.abs((xs + c0) / W - uc); sel = near_side < np.percentile(near_side, 30)          # the end of the strap nearest the top of the shoulder
+        ends.append((float(xs[sel].mean() + c0), float(ys[sel].mean() + jtop)))
+    if len(ends) == 2:
+        (x0, y0), (x1, y1) = ends; n = int(abs(x1 - x0)) + 1; scol = np.median(atlas[strap], 0); hw = 0.0026 * H / (AY1 - AY0)          # a strap 5 mm wide, as painted
+        yy, xx = np.mgrid[0:H, 0:W]; t = np.clip((xx - x0) / (x1 - x0), 0, 1); d = np.abs(yy - (y0 + (y1 - y0) * t)); k = np.clip((hw - d) / 2.5 + 0.5, 0, 1) * np.clip((xx - x0 + 8) / 6.0, 0, 1) * np.clip((x1 + 8 - xx) / 6.0, 0, 1)
+        atlas = atlas * (1 - k[..., None]) + scol[None, None] * k[..., None]; print('strap carried over the shoulder at u %.2f: %s' % (uc, [(round(a), round(b)) for a, b in ends]))
 # the neck: above her collarbones the paintings bring hair, ears and their shadows; plain skin takes over there
 jj0, jj1 = int((AY1 - 1.345) / (AY1 - AY0) * H), int((AY1 - 1.300) / (AY1 - AY0) * H); cu = (np.abs(us - 0.5) < 0.045)
 chest = np.median(atlas[jj0:jj1][:, cu].reshape(-1, 3), 0); T['skinChest'] = '#%02x%02x%02x' % tuple(int(round(v)) for v in chest); print('chest skin', T['skinChest'])

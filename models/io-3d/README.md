@@ -4,36 +4,46 @@ Started November 13, 2026. Built the way the HD Jester was (`claude/HOW-TO-3d-wi
 the Ranger's stage-one recipe: this folder began as a copy of the Ranger's stage-one code (`claude/ranger-3d-model`, commit
 `1d4c9d6`), with the Jester's platform boot builder (`claude/jester-3d-model`, pass 20) in place of the Ranger's boots.
 
-## Where she stands: stage one (November 13, 2026)
+## Where she stands: stage two (November 13, 2026)
 
-Body and base outfit, checked against her round 1 paintings. Nothing moves yet.
+Body and base outfit (stage one), and now her head, face, glasses, hair and hat. Nothing moves yet.
 
-- **Built:** torso with the bodice painted on (B3 front and back, B2 at the sides), bare arms and legs, the skirt as eight
-  stiff tiers with the slit over her left leg, boots, hands, a plain head form. 232,000 triangles.
-- **Page:** `deliver/Io_3D_stage1.html` (one offline file, 1.4 MB), published at
-  https://claude.ai/artifact/Uvz35Hj97w5yjyA5j2Z6Ep. Republish each stage's page to that link. Views, three poses, the painting beside her, the skirt on
-  or off. `deliver/Io_stage1_vs_paintings.jpg` is the model beside B3 and B2 at one scale with the outlines laid over.
-- **Stand-ins:** the skirt is stiff and its lace is solid (one tier cut from B4, with a drawn scalloped hem); the boots are
-  the Jester's boot made 5.5 cm taller and a little wider (no strap, buckle or gold stitching yet); arms, legs and hands are
-  plain skin; the head is a form with no face.
-- **Not built:** face, hair, glasses, hat, robe, belt, pouch, crystal, necklaces, bracelets, book, sickle, dagger, cloth
-  that hangs, movement, spells.
+- **Page:** https://claude.ai/artifact/Uvz35Hj97w5yjyA5j2Z6Ep (republish each stage's page to that link). The same page as one
+  offline file is `deliver/Io_3D_stage2.html` (2.3 MB). Twelve views, three poses, the painting beside her, and buttons to take
+  off her hat, glasses, hair and skirt. `deliver/Io_stage2_vs_paintings.jpg` is her head, hat and hair beside C4 and C5 at one scale.
+- **Stage two built:** her face (C1) on a head shaped to her profile (C3), ears, neck; round glasses; about 110 wavy tresses of
+  hair with curtain bangs; the hat with its brim, lace band, chain, three crosses, ringed cross, two horns and slumping crown.
+  548,000 triangles.
+- **Stage one, approved by Chris** ("round one is fantastic", "The body looks fantastic as it is"): torso with the bodice painted
+  on (B3 front and back, B2 at the sides), bare arms and legs, the skirt as eight stiff tiers with the slit over her left leg,
+  boots, hands. Do not reshape these without asking. Stage two only cleaned the tops of her shoulders in the body picture (a dark
+  patch and purple streaks) and carried the bodice straps over them.
+- **Stand-ins and rough spots:** her hair is stiff (no movement, does not part round raised arms), a tress reads as a ribbon up
+  close and its end is blunt; her fringe is thinner than painted; the top of her head under the hat is bare; her face has no
+  blink or expressions yet; the hat's crown has soft creases, not the deep folds of the paintings; the skirt is stiff with solid
+  lace; the boots are the Jester's boot made taller; arms, legs and hands are plain skin.
+- **Not built:** robe, belt, pouch, crystal, necklaces, bracelets, book, sickle, dagger, cloth that hangs, movement, spells.
 
 ## What is here
 
 - `references/starters/`: the 14 images Chris attaches in ChatGPT. `references/prompts/`: the 104 prompts and the scripts
   that build `Io_Reference_Prompts.html` (see the README text below and `claude/io-3d-reference-prompts.md` in the project).
 - `references/round1/`: the 43 round 1 paintings (A1 to E8) as WebP, with the index Chris's zips came with.
-- `references/round2/`: the 21 round 2 paintings (F1 to F12, G1 to G9) as WebP, with their index. Not used yet; see "Round 2" below.
+- `references/round2/`: the 21 round 2 paintings (F1 to F12, G1 to G9) as WebP, with their index. Only F9's swatches are used so far; see "Round 2" below.
+- `references/round3/`: the 26 round 3 paintings (H1 to H18, I1 to I8) as WebP, with their index. Not used yet; see "Round 3" below.
 - `src/`: the model, joined in this order by `build_io.sh` into `out/io.js` (one function, `makeIo(opts)`):
   `00_util`, `I05_tables` (written by `tools/tables.py`), `10_geom` (skeleton and part builders), `20_tex`, `I21_tex`,
-  `I30_body` (torso, arms, legs, skirt), `I31_boots`, `32_hands`, `I40_head` (the plain form), `I99_static` (materials, and
-  `pose({arm, leg})` in degrees for checking her against the paintings).
+  `I30_body` (torso, arms, legs, skirt), `I31_boots`, `32_hands`, `I40_head` (head, face, ears, neck), `I42_glasses`,
+  `I43_hat`, `I41_hair` (after the hat, because the hair starts under it), `I99_static` (materials, and `pose({arm, leg})`
+  in degrees for checking her against the paintings).
 - `tools/tables.py`: every measurement, in one place, for both the model and the bake. Edit numbers there.
 - `bake_io.py`: cuts the paintings into `out/io_tex.js` (`window.IO_TEX`: the wrapped body picture, the skirt's lace, two
-  skin colours).
+  skin colours). `bake_head_io.py`, run after it, adds her face (C1), her profile (C3), her neck's tone (C18), the hat's felt,
+  lace and horn (F9) and her hair colours (C13).
 - `tools/`: `sil.py` (figure outlines off the plum background), `measure.py` (outline tables in metres), `cmp_io.py` (model
-  beside a painting with both outlines), `page_test_io.py` (the page at phone size). `lib/grid.py` puts a labelled grid on a
+  beside a painting with both outlines), `page_test_io.py` (the page at phone size), `zoomgrid.py` (a zoomed, gridded crop for reading landmarks),
+  `prof_io.py` (her painted profile against the model's middle line), `fit_prof_io.py` (moves the model's middle line onto it),
+  `cmp_head_io.py` (her head, hat and hair beside C4 and C5 at one scale). `lib/grid.py` puts a labelled grid on a
   painting; `lib/restore_refs.py` turns the WebP paintings back into the `refs/*.png` the tools read.
 
 ## Her measurements
@@ -60,13 +70,44 @@ The skirt is 0.54 m across and 0.43 m deep at its widest (0.30 to 0.35 m up) and
 - B5 (in shorts) has a wider waist than B3 (in the bodice). The model follows B3 from the waist up and B5 at the hips and legs.
 - B3's feet are 32 cm apart and B5's 19 cm. `pose({arm: 28, leg: 5.5})` is the stance in B3.
 
+### Her head (stage two)
+
+The head is the Jester's face model (as the Ranger's is), worn at 0.95 of its size and 0.95 as wide above the nose. Her chin
+stays where her whole-figure paintings put it (1.408 m), so her **eye line is 1.511 m**, not 1.50; the tip of her nose is
+0.107 m forward of the body's middle line.
+
+| Painting | Pixels per metre of the model | Fixed points |
+|---|---|---|
+| C1 (front face) | 4689 | pupils (487, 533) and (767, 533), middle of nose and mouth x 630, brows y 462, under the nose 745, lip line 828, under the chin 1006 |
+| C2 (with glasses) | 4689, same framing as C1 | each ring 44 mm across, its middle 2.6 mm outside the pupil and 7 mm below the eye line |
+| C3 profile (right figure) | 2169 | eye y 420, tip of the nose x 1513, lip line 556, under the chin 644, ear x 1195 to 1262, y 405 to 522 |
+| C4 front (left figure) | 1370 | middle x 287, eyes y 453.5 |
+| C4 profile (right figure) | 1290 | tip of the nose x 1432, eye y 462 |
+| C5 from behind (middle figure) | 1235 | middle x 742, back edge of the brim y 372 = 1.44 m |
+
+- Heights: chin 1.408, lip line 1.448, under the nose 1.466, eyes 1.511, brows 1.526, hairline 1.58. Eyes 59 mm apart.
+- The whole-figure paintings (A1, B3) draw a shorter face than the close-ups: 8.4 to 9.1 cm from eye to chin against 10.3 cm in
+  C1 and C3, with the eyes as far apart. The close-ups are the master for her face, as on the Ranger.
+- A1's eyes are at y 198, not 186.5 as first read (that was the top of her glasses). A1 is 878 px a metre by its eye line.
+  Nothing was measured off A1 in stage one, so nothing built is affected.
+- Hat: the opening is 17 by 25 cm on a plane rising to the front (1.578 m in front, 1.518 m behind); the brim 33 by 39 cm,
+  level in front, 4.5 cm lower at the sides and 9 cm lower behind; the band 4.6 cm; the top of the crown 1.72 m; its tip
+  hangs behind her right shoulder at 1.40 m.
+- Hair: the curtain down her back is 33 cm wide at her shoulder blades and ends about 0.72 m up; the bunches in front end
+  between her waist and hips; waves are 11 to 15 cm long.
+- Glasses: C2 and C14 show thin 44 mm rings; every whole-figure painting shows them bigger and darker. Built at 50 mm, dark bronze.
+
 ## Checking
 
-`tools/cmp_io.py` lays the model's outline over the painting's. Stage one: front (B3) overlap 0.82, back 0.82, right side (B2)
-0.84, left side 0.85; the rest is mostly her head, hat and hair, which are not built. By height, waist, hips, bust, shoulders,
-arms, boots and the skirt's outline are within about a centimetre from the front; from the side the upper back sits about
-1.5 cm further forward than painted, which is the lean taken out. The page ran at phone size in a headless browser: no
-errors, nothing off the side, buttons and a drag work. Not checked on a real phone.
+- **Stage one:** `tools/cmp_io.py` lays the model's outline over the painting's: front (B3) overlap 0.82, back 0.82, right side
+  (B2) 0.84, left side 0.85. Waist, hips, bust, shoulders, arms, boots and the skirt's outline are within about a centimetre
+  from the front; from the side the upper back sits about 1.5 cm further forward than painted, which is the lean taken out.
+  (These were measured before she had hair and a hat; run with her hair and hat hidden to repeat them.)
+- **Stage two:** `tools/prof_io.py`: the model's middle line is within 1.0 mm of her painted profile from chin to forehead.
+  `tools/cmp_head_io.py`: her head, hat and hair beside C4 (front and profile) and C5 (from behind) at one scale, judged by eye.
+  Stills from the front, both three-quarters, both sides, behind, above and below.
+- The page ran at phone size in a headless browser: no errors, nothing off the side, every button, and a drag. Not checked on a
+  real phone.
 
 ## Building
 
@@ -78,8 +119,11 @@ npm install three@0.128.0          # playwright and Chrome are needed for the pi
 mkdir -p shots deliver
 python3 -I lib/restore_refs.py     # PNG copies of the paintings into refs/
 python3 -I bake_io.py              # out/io_tex.js (needs Pillow, numpy, scipy)
+python3 -I bake_head_io.py         # adds her face, profile, skin tones, hat swatches and hair colours to it
 ./build_io.sh                      # tools/tables.py, then out/io.js
-python3 -I build_single_io.py      # deliver/Io_3D_stage1.html, one offline file
+python3 -I build_single_io.py      # deliver/Io_3D_stage2.html, one offline file
+python3 tools/prof_io.py 8 shots/prof.png             # her profile against the model's, by height
+python3 tools/cmp_head_io.py shots/cmp_head.jpg       # head, hat and hair beside C4 and C5
 python3 tools/cmp_io.py shots/cmp_front.jpg front     # also back, sideR, sideL
 python3 shoot.py shots/x 'T.j.pose({arm:28,leg:5.5})' front:0,0.03,6.6,0.9,22     # a still; angles are in radians
 python3 tools/page_test_io.py      # the page at phone size (slow: software rendering)
@@ -87,13 +131,26 @@ python3 tools/page_test_io.py      # the page at phone size (slow: software rend
 
 The paintings are data: run Python that reads them with `-I`.
 
-## Rules learned this stage
+## Rules learned in stage one
 
 - `spline()` in `00_util.js` reads its keys from low to high. Tables written from the top down (legs, skirt) must be reversed
   first, or use `prof()`.
 - When patching a line, never leave a `//` comment in the middle of a statement (it swallowed a `const`).
 - The legs must start inside the hips, and the hips must be narrower than the skirt that covers them, or skin shows through.
 - Check the scale of a part painting (B5) against a full figure by something both show (the boot), not by its own height.
+
+## Rules learned in stage two
+
+- Hair that hangs is placed by height: its x is given, and its depth is whatever keeps it clear of her (`zBack`, `zFront` in
+  `I41_hair.js`). That rule cannot put hair on the **side** of her head: it pushed the side hair round to the front of her face.
+  Hair beside her head is placed by its own rule (`bunchPts`): on the side of the head, as wide as the head has been on the way down.
+- Do not let hair follow the jaw: below the cheekbones the head narrows, and hair that follows it meets under her chin.
+- Each layer of hair must start close to the head under the hat and stand off only below it, or its roots poke out through the band.
+- A tress takes a narrow strip of a wide strand picture. A wide strip makes each tress two-toned.
+- The sheet of plain hair under the tresses must be narrower than the tresses, or its edge shows as a black band.
+- Take the hat's shape from both views at once and check both at one scale (`cmp_head_io.py`): the first crown matched the
+  measurements along its middle line and was still 5 cm too tall and far too thin.
+- Where a strand rule needs a surface that is not there, give it a fallback: three points went nine metres away.
 
 ## Round 2 paintings (arrived November 13, 2026, after stage one was built)
 
@@ -121,12 +178,31 @@ All 21 arrived and match their index. Nothing is built from them yet.
   it. Chris to choose.
 - F3's pouch carries a gold filigree and a hanging gold ball; G8 shows the pouch on her right hip and the dagger on her left.
 
+## Round 3 paintings (arrived November 13, 2026, while stage two was being built)
+
+All 26 arrived and match their index. Nothing is built from them yet.
+
+| Painting | Shows |
+|---|---|
+| H1, H2 | walking and running; sitting reading and kneeling |
+| H3, H4 | the pendant becoming the sickle; the sickle's sweep and low cut |
+| H5, H6 | a leaf lifting from the book; the healing ribbon of leaves reaching a friend |
+| H7 to H10 | the seed raised and planted; the sapling and the fawn; the grown stag of wood; the stag leaping |
+| H11, H12 | Moonflowers: the book floating, motes rising; the ring of white flowers with two friends inside |
+| H13 | kneeling to raise a fallen friend |
+| H14, H15 | the dagger drawn and driven into the ground; thorns and roses binding a foe in violet fire |
+| H16 | a guard of woven thorn round her |
+| H17, H18 | hit, and fallen with her hat off; victory |
+| I1 to I8 | on black, for effects: leaves, sparks and moons, gold arcs, the seed growing, vines, moonflowers, violet fire, thorns rising |
+
+They also show her whole look from many sides, with the robe: useful when the robe and the cloth are built.
+
 ## Next stages, in the how-to's order
 
-1. Head from her profile (C3), face baked from C1 with the states in C9, then glasses (C14), hair (C11 to C13) and hat (C15 to C17).
-2. Hands and painted arms (D1 to D4), and her legs painted from B5.
+1. Her face moving: blink, talking mouths and smile from C9, the emotions in C10; a fuller fringe; hair on top of her head.
+2. Hands and painted arms (D1 to D4), and her legs painted from B5; her neck and chest painted from C18.
 3. Her own boots (E1 to E8).
-4. Robe as cloth (A1 to A5; wants F4 to F6 and F10 from round 2), skirt as cloth with see-through lace (wants F8 and F11).
-5. Belt, pouch, crystal, necklaces, bracelets (wants F1 to F3).
-6. Book and blades (round 2, set G).
-7. The body moves, then her own moves and spells (rounds 3 and 4).
+4. Robe as cloth (A1 to A5, F4 to F6, F10, F12), skirt as cloth with see-through lace (F8, F11).
+5. Belt, pouch, crystal, necklaces, bracelets (F1 to F3).
+6. Book and blades (G1 to G6, placed by G8, held as in G9).
+7. The body moves, with her hair on spring chains as the Fox's is; then her own moves and spells (H1 to H18, I1 to I8, and round 4).
