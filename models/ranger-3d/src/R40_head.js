@@ -154,4 +154,14 @@
       const nx = FB.nor[i * 3], py = FB.pos[i * 3 + 1], pz = FB.pos[i * 3 + 2], sd = sm(0.50, 0.85, Math.abs(nx)) * sm(1.398, 1.422, py);
       faceMix.push(sd, 1 - sd, 1 - 0.17 * sm(1.403, 1.432, py) * sm(-0.030, 0.015, pz), 1); faceUvS.push((pz - Wn[0]) / (Wn[1] - Wn[0]), (py - Wn[2]) / (Wn[3] - Wn[2]));
     }
+    // the foot of the neck takes the chest's surface direction where the two meet, so the light does not break along the join
+    const TB = buckets.torso, rim = [];
+    for (let i = 0; i < TB.n; i++) { const y = TB.pos[i * 3 + 1]; if (y > 1.386 && y < 1.4055 && Math.abs(TB.pos[i * 3]) < 0.08 && Math.abs(TB.nor[i * 3 + 1]) < 0.85) rim.push(i); }
+    for (let i = info.start; i < info.start + info.count && rim.length; i++) {
+      const px = FB.pos[i * 3], py = FB.pos[i * 3 + 1], pz = FB.pos[i * 3 + 2], k = sm(1.432, 1.404, py); if (k <= 0) continue;
+      let best = rim[0], bd = 1e9;
+      for (const j of rim) { const d = Math.hypot(TB.pos[j * 3] - px, TB.pos[j * 3 + 2] - pz) + 0.5 * Math.abs(TB.pos[j * 3 + 1] - 1.400); if (d < bd) { bd = d; best = j; } }
+      const nx = lerp(FB.nor[i * 3], TB.nor[best * 3], k), ny = lerp(FB.nor[i * 3 + 1], TB.nor[best * 3 + 1], k), nz = lerp(FB.nor[i * 3 + 2], TB.nor[best * 3 + 2], k), l = Math.hypot(nx, ny, nz) || 1;
+      FB.nor[i * 3] = nx / l; FB.nor[i * 3 + 1] = ny / l; FB.nor[i * 3 + 2] = nz / l;
+    }
   })();

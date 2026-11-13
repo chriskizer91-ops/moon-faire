@@ -23,6 +23,8 @@ Body, base outfit, head, face, hair, headband and glasses, standing still. 324,6
   rises, front and back; neck and the top of the chest take her painted neck tone (`skinNeck`), darker and warmer than her chest;
   the sides of the neck wear J3's profile; the hair is rounder on top and fuller at the back of the head and the nape; the painted
   shadows of loose hair and band tails are cleared from the back of her neck; the lenses are fainter.
+  The foot of the neck takes the chest's surface direction where the two meet (`buildNeck` in `src/R40_head.js`), so the light
+  no longer breaks in a line across her neck.
 - Stage two, waiting for his notes: face, ears, hair with the bun, headband with knot, tails, gem and drop, glasses, loose locks,
   and a wrist that joins the hand.
 
