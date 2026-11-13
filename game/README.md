@@ -157,6 +157,8 @@ python3 checks/auto.py              # the engine's styles through the real page 
 
 ## People from a template (November 13)
 
+**Chris's verdict (November 13): not for the game.** The only NPCs are people the party talks to, and by that measure none of these people are good enough. This folder is a finished cost test; the game does not load it. Do not put template people in a scene.
+
 A test Chris asked for: with the Jester's model as the template, how little does it cost to have a Claude model make a new background person through the API?
 
 - Page: https://claude.ai/artifact/S2zzMgXm1qwoGEF2Nk491T (file: `people/out/moon-faire-people.html`). It shows the people in 3D, the costs, and a box that makes a new person straight from the browser with an API key (that box works in the file copy only).
