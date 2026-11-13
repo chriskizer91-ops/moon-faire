@@ -1,6 +1,6 @@
 
   // ---------- head: a sculpted oval with soft features; the face itself is painted (and repainted to blink) ----------
-  const HC = V3(0, 1.555, 0.002), HR = { x: 0.070, yT: 0.092, yB: 0.140, zF: 0.0985, zB: 0.083 };     // skull: lower crown and shallower back, as in her profile
+  const HC = V3(0, 1.555, 0.002), HR = { x: 0.0700, yT: 0.092, yB: 0.1414, zF: 0.0985, zB: 0.083 };     // skull: lower crown and shallower back, as in her profile
   const LAY = (BAKED && BAKED.layout) || {};          // where the features sit in the painted face
   const FC = { eyeY: LAY.eyeY || 1.5246, eyeX: LAY.eyeX || 0.0304, ew: 0.0135, eh: 0.0056, browY: LAY.browY || 1.5368, noseY: LAY.noseY || 1.4877, mouthY: LAY.mouthY || 1.4586 };
   const FACE = { x0: -0.1, x1: 0.1, y0: 1.385, y1: 1.585 };          // the face canvas covers this window, seen from the front
@@ -9,14 +9,13 @@
   // FACE_MID is the middle line with the nose and lips taken away [height, metres forward of the ear line], NOSE is how far the
   // nose stands out from it, and FACE_V says how the face turns back toward the ears at each height (0: round like an egg;
   // more: straighter from chin to jaw, the way a jaw is; less than 0: flat across, the way a brow is).
-  const FACE_MID = [[1.4174, 0.0825], [1.4200, 0.0861], [1.4240, 0.0887], [1.4300, 0.0884], [1.4380, 0.0891], [1.4454, 0.0908], [1.4520, 0.0921], [1.4586, 0.0941], [1.4630, 0.0952], [1.4680, 0.0954],
-    [1.4747, 0.0956], [1.4800, 0.0956], [1.4900, 0.0947], [1.5000, 0.0943], [1.5100, 0.0948], [1.5220, 0.0946], [1.5300, 0.0964], [1.5387, 0.1000], [1.5500, 0.0989], [1.5550, 0.0985]];
-  const NOSE = [[1.4680, 0], [1.4700, 0.0019], [1.4720, 0.0031], [1.4747, 0.0035], [1.4760, 0.0040], [1.4774, 0.0052], [1.4787, 0.0104], [1.4800, 0.0135], [1.4840, 0.0172], [1.4880, 0.0189], [1.4920, 0.0171], [1.4980, 0.0125], [1.5040, 0.0092], [1.5100, 0.0059], [1.5160, 0.0023], [1.5220, 0.0004], [1.5260, 0]];
-  const NOSE_W = [[1.4680, 0.0050], [1.4760, 0.0050], [1.4800, 0.0064], [1.4880, 0.0094], [1.4960, 0.0078], [1.5080, 0.0060], [1.5260, 0.0056]];
-  const LIPS = {uy: 1.4644, ua: 0.0056, ly: 1.4512, la: 0.0044, chinY: 1.4300, cheekY: 1.4975, hollowY: 1.4670};
-  const FACE_V = [[1.4150, 0.30], [1.4300, 0.40], [1.4450, 0.44], [1.4586, 0.40], [1.4760, 0.22], [1.4975, 0.02], [1.5246, -0.12], [1.5400, -0.10], [1.5550, 0]];      // her face is rounder than the Jester's: fuller cheeks and jaw as it turns (C3 at 34 degrees)
+  const FACE_MID = [[1.4211, 0.0977], [1.4265, 0.0989], [1.4304, 0.0992], [1.4318, 0.0992], [1.4372, 0.0987], [1.4409, 0.0987], [1.4425, 0.0992], [1.4479, 0.1008], [1.4525, 0.1015], [1.4532, 0.1015], [1.4586, 0.1025], [1.4639, 0.1038], [1.4679, 0.1041], [1.4693, 0.1043], [1.4747, 0.1051], [1.4785, 0.1049], [1.4800, 0.1046], [1.4854, 0.1039], [1.4907, 0.1032], [1.4961, 0.1026], [1.5014, 0.1019], [1.5068, 0.1013], [1.5122, 0.1007], [1.5175, 0.1001], [1.5229, 0.0995], [1.5282, 0.0988], [1.5310, 0.0984], [1.5336, 0.0983], [1.5389, 0.0988], [1.5443, 0.0991], [1.5496, 0.0990], [1.5550, 0.0986]];
+  const NOSE = [[1.4785, 0.0000], [1.4818, 0.0019], [1.4851, 0.0099], [1.4883, 0.0145], [1.4916, 0.0169], [1.4936, 0.0176], [1.4949, 0.0176], [1.4982, 0.0163], [1.5015, 0.0135], [1.5048, 0.0102], [1.5080, 0.0080], [1.5113, 0.0061], [1.5146, 0.0043], [1.5179, 0.0026], [1.5212, 0.0010], [1.5244, 0.0000], [1.5277, 0.0000], [1.5310, 0.0000]];
+  const NOSE_W = [[1.4785, 0.0052], [1.4857, 0.0054], [1.4894, 0.0070], [1.4966, 0.0100], [1.5038, 0.0082], [1.5147, 0.0062], [1.5310, 0.0058]];
+  const LIPS = {uy: 1.4679, ua: 0.003, ly: 1.4525, la: 0.0033, chinY: 1.4304, cheekY: 1.4975, hollowY: 1.4669999999999999};
+  const FACE_V = [[1.4150, 0.20], [1.4300, 0.26], [1.4450, 0.26], [1.4586, 0.20], [1.4760, 0.06], [1.4975, -0.08], [1.5246, -0.14], [1.5400, -0.10], [1.5550, 0]];      // her face is rounder than the Jester's: fuller cheeks and jaw as it turns (C3 at 34 degrees)
   // how wide a ring of the lower head is, from 1 at the cheeks to 0 under the chin: the last tenth closes quickly, so the jaw has an edge and a flat underside
-  const SIN9 = Math.sqrt(1 - 0.81), SN9 = Math.pow(SIN9, 0.60), snLow = (sp, t) => (t > 0.9 ? SN9 * Math.pow(sp / SIN9, 0.40) : Math.pow(sp, 0.60));
+  const SIN9 = Math.sqrt(1 - 0.81), SN9 = Math.pow(SIN9, 0.42), snLow = (sp, t) => (t > 0.9 ? SN9 * Math.pow(sp / SIN9, 0.40) : Math.pow(sp, 0.42));
   const T_CHIN = (HC.y - FACE_MID[0][0]) / HR.yB, SN_CHIN = snLow(Math.sqrt(1 - T_CHIN * T_CHIN), T_CHIN), RZ_CHIN = FACE_MID[0][1] - 0.050 * T_CHIN * T_CHIN * T_CHIN;
   // Chris, 12 Nov: her forehead was a little tall. The top of the head comes down half an inch (12.7 mm on her, 13.1 here before the head is scaled):
   // everything above the brow slides down, the brow and all below it stay where they were. The hairline, hair and costume ears come down with it.
@@ -26,7 +25,7 @@
   function headPoint(a, ph, grow) {                 // a: angle from the front toward her left; ph: 0 at the crown, PI at the chin
     const yn = Math.cos(ph), s = Math.sin(a), c = Math.cos(a), g = grow || 0, t = Math.max(0, -yn), sn = yn < 0 ? snLow(Math.sin(ph), t) : Math.sin(ph);
     let y = (yn >= 0 ? HR.yT : HR.yB) * yn + g * yn; const Y = HC.y + (yn >= 0 ? HR.yT : HR.yB) * yn;
-    const x = ((HR.x * sn) * (1 - 0.16 * sm(0.5, 1.0, t)) + g * Math.min(1, sn * 3)) * s;      // the outline from the front, narrowing to the jaw
+    const x = ((HR.x * sn) * (1 - 0.08 * sm(0.5, 1.0, t)) + g * Math.min(1, sn * 3)) * s;      // the outline from the front, narrowing to the jaw
     const zc = 0.050 * t * t * t;                   // the lower head sits forward, so the chin hangs under the mouth; the corners of the jaw stay back near the ears
     let z;
     if (c < 0) z = zc * (1 - 0.95 * sm(0, -0.9, c)) + (HR.zB + g) * sn * c;      // only the face comes forward: the back of the head runs straight down into the nape
@@ -42,7 +41,7 @@
         d -= 0.0064 * G(ax - FC.eyeX, Y - FC.eyeY, 0.017, 0.0105) + 0.0028 * G(ax - 0.014, Y - (FC.eyeY - 0.002), 0.007, 0.010);   // eye sockets, deepest beside the bridge
         d += 0.0034 * G(ax - 0.028, Y - (FC.browY + 0.002), 0.027, 0.0075);                        // brow
         d += 0.0036 * G(ax - FC.eyeX, Y - FC.eyeY, 0.0112, 0.0064) - 0.0012 * G(ax - FC.eyeX, Y - (FC.eyeY + 0.0088), 0.014, 0.0024) - 0.0008 * G(ax - FC.eyeX, Y - (FC.eyeY - 0.0090), 0.013, 0.0024);   // the eyeball rounding out of its socket, and the crease of the lid above it
-        d += 0.0040 * G(ax - 0.043, Y - LIPS.cheekY, 0.020, 0.016) - 0.0022 * G(ax - 0.047, Y - LIPS.hollowY, 0.016, 0.014);   // cheekbones, and the hollow under them
+        d += 0.0040 * G(ax - 0.046, Y - LIPS.cheekY, 0.020, 0.016) - 0.0022 * G(ax - 0.050, Y - LIPS.hollowY, 0.016, 0.014);   // cheekbones, and the hollow under them
         d -= 0.0010 * G(x, Y - (FC.mouthY + 0.0135), 0.0034, 0.0055);                             // the groove under the nose
         d += LIPS.ua * G(x, Y - LIPS.uy, 0.020, 0.0054) + LIPS.la * G(x, Y - LIPS.ly, 0.016, 0.0054);  // lips
         d -= 0.0016 * G(ax - 0.024, Y - FC.mouthY, 0.006, 0.008);                                 // corners of the mouth

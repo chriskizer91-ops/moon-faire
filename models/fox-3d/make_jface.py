@@ -7,6 +7,10 @@
 import re, json, io, base64, glob, subprocess, numpy as np
 from PIL import Image
 W = '/home/claude/fox3d/'; J = '/home/claude/work/build/models/jester-3d/'
+HEAD = 'fox'          # whose HEAD SHAPE: 'fox' = her own tables (fitted to her profile), with her own painting; 'jester' = the Jester's tables (then PAINT below chooses the painting)
+if HEAD == 'fox':
+    # Round 5 (12 Nov, evening): her new face set arrived, and Chris wants her to be her own character, not the Jester.
+    import shutil; shutil.copy(W + 'variants/ownface/40_head.js', W + 'src/40_head.js'); shutil.copy(W + 'out/fox_tex_own.js', W + 'out/fox_tex.js'); print('her own head shape and her own painting'); raise SystemExit
 fx = open(W + 'variants/ownface/40_head.js').read(); js = open(J + 'src/40_head.js').read()
 def take(pat, flags=re.S):
     m = re.search(pat, js, flags); assert m, pat; return m.group(0)

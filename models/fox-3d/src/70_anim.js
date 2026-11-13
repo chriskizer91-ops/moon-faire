@@ -92,7 +92,7 @@
     curl: sheen(std({ map: curlTex, roughness: 0.52 }), '#ffe0a8', 2.6, 0.34),
     ear: sheen(std({ map: earTex, roughness: 0.95 }), '#ffd2a8', 2.2, 0.45),
     frame: std({ color: lin(0x3b2b20), roughness: 0.34, metalness: 0.9, envMapIntensity: 1.3 }),
-    lens: phys({ color: lin(0xffffff), roughness: 0.05, transparent: true, opacity: 0.09, depthWrite: false, envMapIntensity: 1.2 })
+    lens: Object.assign(phys({ color: lin(0xffffff), roughness: 0.05, transparent: true, opacity: 0.02, depthWrite: false, envMapIntensity: 0.2 }), { visible: false })     // clear glass: any tint clouded her eyes, so the lenses are not drawn
   });
   const root = new THREE.Group(); root.name = 'fox';
   root.add(SK.hips); root.updateMatrixWorld(true);
