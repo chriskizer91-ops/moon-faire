@@ -25,7 +25,10 @@
     addBone('clav' + S, 'spine3', s * 0.035, 1.295, 0);
     addBone('uarm' + S, 'clav' + S, sh.x, sh.y, sh.z);
     addBone('farm' + S, 'uarm' + S, el.x, el.y, el.z);
-    addBone('hand' + S, 'farm' + S, wr.x, wr.y, wr.z);
+    // Three bones along the forearm that only ever turn about its length: a third, two thirds and all of the wrist's turn. The skin between elbow and
+    // wrist is shared out among them, so a turned hand twists the forearm along its whole length, as a real one does, instead of wringing it at the elbow.
+    for (const [nm, f] of [['ftwA', 0.44], ['ftwB', 0.67], ['ftwC', 0.90]]) { const q = el.clone().addScaledVector(d, L_FARM * f); addBone(nm + S, 'farm' + S, q.x, q.y, q.z); }
+    addBone('hand' + S, 'ftwC' + S, wr.x, wr.y, wr.z);
     addBone('thigh' + S, 'hips', s * 0.085, 0.835, 0);
     addBone('shin' + S, 'thigh' + S, s * 0.083, 0.47, 0.006);
     addBone('foot' + S, 'shin' + S, s * 0.081, 0.105, -0.012);

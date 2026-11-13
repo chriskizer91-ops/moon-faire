@@ -13,6 +13,7 @@ Method and rules: the project doc `claude/HOW-TO-3d-witch-models.md`. Pass notes
 | `src/` | the model, in numbered files that `build.sh` joins into `out/fox.js` |
 | `src/30_body.js` | her torso, arms, sleeves and legs, as tables of measured numbers |
 | `src/45_foxhead.js` | neck, bun, curls, costume ears, glasses |
+| `src/30_body.js` (arms) | her arms, sleeves, the beads on the sleeve band and her bracelets, built as her left arm and mirrored |
 | `src/47_foxtrousers.js` | her trousers (hips and legs), belt, pouch, sheath and shears; the flounce shapes go into `FLOUNCE` |
 | `src/50_cloth.js` | the cloth engine (the Jester's), with her trouser legs and hips added as things cloth lies on (mask 32) |
 | `src/66_fox_strip.js` | takes away the Jester's cloth |
@@ -53,6 +54,9 @@ Checks (Playwright with Chrome, software drawing):
 ./headset.sh f1                      # shots/f1_heads.png  four head views
 ./headcmp.sh f1                      # shots/f1_headcmp.png  her head beside A1's on one numbered grid
 ./check_moves.sh                     # every stance with every move, looking for broken numbers
+./armcmp.sh a1                       # shots/a1_armcmp.jpg  her left arm and sleeve beside A1's at A1's own scale, one numbered grid
+./poseset.sh p1                      # shots/p1_poses.jpg  eight poses in a strip, for a before-and-after look when the pose solver changes
+python3 -I meas/arm_width.py refs/A1.png 600 900 490 720     # the arm's edges row by row, in a painting or a render
 python3 shoot2.py shots/cmp 'new Promise(r => setTimeout(() => { T.step(40, 1/60); r(1); }, 1500))' 'front:T.view(0,0,60,0.90,1.9,700,900)' 'side:T.view(Math.PI/2,0,60,0.90,1.9,700,900)'
 python3 -I compare_fox.py            # deliver/Fox_pass1_compare.png  model beside A1 and B4, one scale
 python3 shoot_site.py shots/site.png 390 844 "Wave:2" "Kneel:2"     # the page at phone size; each step is "Label:seconds"
@@ -102,6 +106,11 @@ Pupils in C3 are typed into `meas/fox_profile.py` from a gridded copy; automatic
 - A cloth sheet is a plain mesh, so give it a material of its own. The body's materials are made for skinned meshes (`skinning` on, three.js r128); drawn on a sheet they threw a strip of cloth onto the floor at her feet.
 - What the trousers hide must be thinner than the trousers everywhere. The legs under them are slimmed to 60% above the ankle, or a lifted thigh pokes out grey in a jump.
 - Anything cloth lies on is declared in `src/50_cloth.js` before `const NCOLL`.
+- New code that needs random numbers makes its own generator (see the `arm` and `emerald` materials). The shared `rnd` feeds her hair, so one extra call anywhere before the hair is built reshuffles the hair Chris approved.
+- Phones get the lighter build by default (`#lite`: detail 0.75, 283k triangles). The test machine is not a phone, so it shows the full build unless the address ends in `#lite`. Check both.
+- The limb solver's lengths are multiplied by `FOX_K` (`src/70_anim.js`). Without that every hand and foot target looked 4.5% too far, so her arms hung dead straight.
+- The stage camera sees 60 m and no further. `T.view` in `test.html` now moves the near and far planes with the distance. Before 13 Nov, views from 60 m away (most of the side-by-side pictures) cut off whatever lay behind her middle: back hair, elbows.
+- The forearm has three twist bones (`ftwA`, `ftwB`, `ftwC`); the hand hangs from the last. A wrist turn goes to them, not to the forearm bone, so the skin twists along the forearm and does not wring at the elbow.
 
 ## State
 
@@ -109,4 +118,5 @@ Pass 1 (12 Nov 2026): body, base outfit, hair, ears, glasses, choker and bell.
 Pass 2 (12 Nov 2026): head, face, ears, hair (see `claude/fox-3d-pass2-head.md`).
 Pass 3 (12 Nov 2026): painted hands, bracelets on springs, boots, trousers (see `claude/fox-3d-pass3-hands-boots.md`).
 Pass 4 (12 Nov 2026): her own face from round 5, head sized to the standing painting, skin tone, belt, pouch, sheath, and the trouser flounces as real cloth (see `claude/fox-3d-pass4-face-round5.md`).
-Still to do: the trouser legs themselves are rigid shapes, ruffles are flat paint, tools and spells (rounds 3 and 4) are not started.
+Pass 5 (13 Nov 2026): sleeves and arms against A1, A2 and F5 (see `claude/fox-3d-pass5-sleeves-arms.md`).
+Still to do: belt, pouch and shears in more detail; her face; ruffles at the neckline and peplum are flat paint; tools and spells (rounds 3 and 4) are not started.

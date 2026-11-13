@@ -71,6 +71,34 @@
     patch: (() => { const t = bakedTex('patch', 1024, 1024, '#a03c5c'); t.wrapS = t.wrapT = THREE.RepeatWrapping; return sheen(std({ map: t, color: lin('#d2c8c2'), roughness: 0.86, side: THREE.DoubleSide }), '#ffd0a0', 3, 0.12); })(),      // her patchwork (F9)
     patch2: (() => { const t = bakedTex('patch2', 768, 768, '#a03c5c'); t.wrapS = t.wrapT = THREE.RepeatWrapping; return sheen(std({ map: t, color: lin('#d2c8c2'), roughness: 0.86, side: THREE.DoubleSide }), '#ffd0a0', 3, 0.12); })(),     // the second sheet (F10), for the upper flounce
     frill: sheen(std({ color: lin('#a02f6c'), roughness: 0.80, side: THREE.DoubleSide }), '#ff9ad0', 3, 0.2),
+    arm: (() => {                                    // the skin of her arms: her face's tone, a little paler down the inside, flushed at the elbow, freckled as in A1 and A5.
+      // Across the picture: outside of the arm, front, inside, back. Down it: shoulder to wrist.
+      const W = 512, H = 1024, c = cvs(W, H), g = c.getContext('2d'), base = SKIN || '#d89780'; g.fillStyle = base; g.fillRect(0, 0, W, H); let sd = 4177;
+      const rn = () => { sd = (sd * 16807) % 2147483647; return sd / 2147483647; }, yOf = (sl) => H * (sl + 0.022) / 0.500;
+      const soft = (x, y, rx, ry, col, al) => { for (const dx of [-W, 0, W]) { g.save(); g.translate(x + dx, y); g.scale(rx, ry); const gr = g.createRadialGradient(0, 0, 0, 0, 0, 1); gr.addColorStop(0, col.replace('A', String(al))); gr.addColorStop(1, col.replace('A', '0')); g.fillStyle = gr; g.beginPath(); g.arc(0, 0, 1, 0, 6.2832); g.fill(); g.restore(); } };
+      for (let i = 0; i < 46; i++) soft(rn() * W, rn() * H, 30 + rn() * 60, 40 + rn() * 90, rn() < 0.5 ? 'rgba(236,150,128,A)' : 'rgba(246,208,186,A)', 0.05 + rn() * 0.05);      // skin is never one flat tone
+      soft(W * 0.40, yOf(0.36), W * 0.20, H * 0.24, 'rgba(250,222,204,A)', 0.20);                 // the paler inside of the forearm
+      soft(W * 0.75, yOf(0.244), W * 0.13, H * 0.036, 'rgba(206,104,92,A)', 0.30);                // the elbow
+      soft(W * 0.25, yOf(0.249), W * 0.12, H * 0.006, 'rgba(160,84,66,A)', 0.30);                 // the crease inside it
+      soft(W * 0.80, yOf(0.455), W * 0.08, H * 0.016, 'rgba(214,120,104,A)', 0.18);               // the wrist bone
+      for (let i = 0; i < 300; i++) {                                                             // freckles: most on the outside and back of the forearm
+        const u = (0.88 + (rn() + rn() + rn() - 1.5) * 0.42 + 1) % 1, sl = 0.18 + 0.27 * Math.pow(rn(), 0.8), r = 1.1 + rn() * rn() * 3.0;
+        soft(u * W, yOf(sl), r, r * 1.15, 'rgba(150,80,52,A)', 0.34 + rn() * 0.42);
+      }
+      const t = ctex(c); t.wrapS = THREE.RepeatWrapping;
+      return sheen(std({ map: t, color: lin('#d8ccc6'), roughness: 0.64, envMapIntensity: 0.2, emissive: lin('#ffffff'), emissiveMap: t, emissiveIntensity: 0.44 }), '#ffb49a', 3.2, 0.1);
+    })(),
+    emerald: (() => {                                // the blouse's dark green linen (A1, F5): a plain weave with slubs, uneven threads and a soft mottle
+      const S = 256, c = cvs(S, S), g = c.getContext('2d'); g.fillStyle = '#283b39'; g.fillRect(0, 0, S, S); let sd = 9241;
+      const rn = () => { sd = (sd * 16807) % 2147483647; return sd / 2147483647; };
+      for (let i = 0; i < 60; i++) { const x = rn() * S, y = rn() * S, r = 14 + rn() * 34, gr = g.createRadialGradient(x, y, 0, x, y, r), col = rn() < 0.5 ? '70,98,92' : '18,28,28'; gr.addColorStop(0, 'rgba(' + col + ',' + (0.10 + rn() * 0.12) + ')'); gr.addColorStop(1, 'rgba(' + col + ',0)');
+        for (const dx of [-S, 0, S]) for (const dy of [-S, 0, S]) { g.save(); g.translate(dx, dy); g.fillStyle = gr; g.fillRect(x - r, y - r, 2 * r, 2 * r); g.restore(); } }
+      for (let y = 0; y < S; y += 2) { g.fillStyle = 'rgba(' + (rn() < 0.5 ? '96,128,118' : '12,20,20') + ',' + (0.03 + rn() * 0.07) + ')'; g.fillRect(0, y, S, 1); }      // weft
+      for (let x = 0; x < S; x += 2) { g.fillStyle = 'rgba(' + (rn() < 0.5 ? '96,128,118' : '12,20,20') + ',' + (0.03 + rn() * 0.07) + ')'; g.fillRect(x, 0, 1, S); }      // warp
+      for (let i = 0; i < 70; i++) { const hz = rn() < 0.6, x = rn() * S, y = Math.floor(rn() * S), L = 6 + rn() * 30; g.fillStyle = 'rgba(128,160,146,' + (0.08 + rn() * 0.14) + ')'; if (hz) { g.fillRect(x, y, L, 1); g.fillRect(x - S, y, L, 1); } else { g.fillRect(y, x, 1, L); g.fillRect(y, x - S, 1, L); } }      // slubs
+      const t = ctex(c, 1, 1);
+      return sheen(std({ map: t, roughness: 0.94, side: THREE.DoubleSide }), '#9fc8b8', 2.8, 0.20);
+    })(),
     neck: (() => {                                   // her neck: the chest's tone where it leaves the collar, her face's tone above the choker, darkening into the shade under her jaw
       const c = cvs(8, 128), g = c.getContext('2d'), CH = (BAKED && BAKED.skinChest) || SKIN || '#e0a890', J = (BAKED && BAKED.skinJaw) || SKIN || '#c08068', F = SKIN || '#d89780';
       const ratio = (hex, k) => { const a = new THREE.Color(hex), b = new THREE.Color(CH); return 'rgb(' + [a.r / b.r, a.g / b.g, a.b / b.b].map((v) => Math.round(255 * Math.min(1, v * k))).join(',') + ')'; };
@@ -124,11 +152,13 @@
   const LIMB = {};
   for (const [S, s] of SIDES) {
     const ax = armDir[S].clone(), az = V3(0, 0, -1).cross(ax).normalize();
-    LIMB['arm' + S] = { inv: basisQ(ax, az, Qt()).invert(), l1: L_UARM * UPK, l2: L_FARM * UPK };
+    // Limb lengths as the solver meets them, in the world: the whole figure is FOX_K times the frame its tables are written in. Without FOX_K here
+    // every hand and foot target looked 4.5% too far away, so her arms hung dead straight and bent limbs overshot their marks.
+    LIMB['arm' + S] = { inv: basisQ(ax, az, Qt()).invert(), l1: L_UARM * UPK * FOX_K, l2: L_FARM * UPK * FOX_K };
     const hip = SK['thigh' + S].userData.rest, kn = SK['shin' + S].userData.rest, an = SK['foot' + S].userData.rest;
     const lx = kn.clone().sub(hip).normalize(), lz = V3(0, 0, 1).cross(lx).normalize();
     const lx2 = an.clone().sub(kn).normalize(), lz2 = V3(0, 0, 1).cross(lx2).normalize();
-    LIMB['leg' + S] = { inv: basisQ(lx, lz, Qt()).invert(), inv2: basisQ(lx2, lz2, Qt()).invert(), l1: hip.distanceTo(kn), l2: kn.distanceTo(an) };
+    LIMB['leg' + S] = { inv: basisQ(lx, lz, Qt()).invert(), inv2: basisQ(lx2, lz2, Qt()).invert(), l1: hip.distanceTo(kn) * FOX_K, l2: kn.distanceTo(an) * FOX_K };
   }
   // two-bone IK: from joint a at world A to target T with the middle joint leaning toward pole; sets both bones' rotations
   function solveLimb(bA, bB, A, T, pole, L, twist, parentQ, outMidQ) {
@@ -174,9 +204,10 @@
     SK['thb1' + S].quaternion.setFromAxisAngle(A.thumbFlex, t * 0.7); SK['thb2' + S].quaternion.setFromAxisAngle(A.thumbFlex, t * 0.9);
   }
   // the resting pose: every channel a spell can move
+  const REST_HX = opts.restHX === undefined ? 0.290 : opts.restHX, REST_HY = opts.restHY === undefined ? 0.882 : opts.restHY;      // her resting wrist, read off A1: 31 cm out from her middle, 92 cm up
   const REST = {
     hip: [0, 0, 0], hipR: [0, 0, 0], sp: [0, 0, 0], hd: [0, 0, 0], sh: [0, 0],
-    hR: [-0.300, 0.868, 0.055], hL: [0.300, 0.868, 0.055], eR: [-0.55, -0.1, -1], eL: [0.55, -0.1, -1], twR: 0, twL: 0, wrR: [0.1, 0], wrL: [0.1, 0],
+    hR: [-REST_HX, REST_HY, 0.055], hL: [REST_HX, REST_HY, 0.055], eR: [-0.55, -0.1, -1], eL: [0.55, -0.1, -1], twR: 0, twL: 0, wrR: [0.1, 0], wrL: [0.1, 0],
     fR: FP.relax.slice(), fL: FP.relax.slice(),
     ftR: [0, 0, 0, -0.10, 0, 0, 0], ftL: [0, 0, 0, 0.10, 0, 0, 0], knR: [-0.12, 0, 1], knL: [0.12, 0, 1],
     eyes: 0, mouth: 0, glow: 0

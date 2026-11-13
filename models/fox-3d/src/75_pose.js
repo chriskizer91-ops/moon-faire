@@ -3,6 +3,7 @@
   // ---------- applying a pose: spine by angles, arms and legs onto their targets, then springs and cloth ----------
   const SPF = [0.25, 0.35, 0.40], MOUTHS = ['rest', 'open', 'smile'];
   const _T = V3(), _A = V3(), _P = V3(), _pq = Qt(), _mq = Qt(), _rq = Qt(), _fq = Qt();
+  const HANG_IN = opts.hangIn === undefined ? 1.0 : opts.hangIn, HANG_TW = opts.hangTw === undefined ? -1.35 : opts.hangTw;
   function applyPose(P) {
     const hips = SK.hips, hh = hips.userData.home;
     hips.position.set(hh.x + P.hip[0], hh.y + P.hip[1], hh.z + P.hip[2]); hips.rotation.set(P.hipR[1], P.hipR[0], P.hipR[2], 'YXZ');
@@ -15,8 +16,12 @@
       // arm
       SK['clav' + S].getWorldQuaternion(_pq); SK['uarm' + S].getWorldPosition(_A);
       const h = P['h' + S], e = P['e' + S];
-      _T.set(h[0], h[1], h[2]).applyMatrix4(root.matrixWorld); SK.spine1.getWorldPosition(_J); _T.sub(_J).multiplyScalar(UPK).add(_J); _P.set(e[0], e[1], e[2]).applyQuaternion(_rq);
-      solveLimb(SK['uarm' + S], SK['farm' + S], _A, _T, _P, LIMB['arm' + S], -s * P['tw' + S], _pq, _mq);
+      // An arm hanging at her side carries its elbow in toward her waist and its forearm out and away, as in painting A1 (and as a real arm does).
+      // The further a hand is lifted or swung from her side, the less of this there is, so every move keeps the elbow it was given.
+      const hang = HANG_IN * sm(1.02, 0.90, h[1]) * sm(0.34, 0.10, Math.abs(h[2] - 0.055)) * sm(0.50, 0.36, Math.abs(h[0]));
+      _T.set(h[0], h[1], h[2]).applyMatrix4(root.matrixWorld); SK.spine1.getWorldPosition(_J); _T.sub(_J).multiplyScalar(UPK).add(_J); _P.set(e[0] - s * hang, e[1], e[2]).applyQuaternion(_rq);
+      solveLimb(SK['uarm' + S], SK['farm' + S], _A, _T, _P, LIMB['arm' + S], 0, _pq, _mq);
+      { const tw = -s * (P['tw' + S] + hang * HANG_TW), ad = armDir[S]; SK['ftwA' + S].quaternion.setFromAxisAngle(ad, tw / 3); SK['ftwB' + S].quaternion.setFromAxisAngle(ad, tw * 2 / 3); SK['ftwC' + S].quaternion.setFromAxisAngle(ad, tw); }
       const HA = handAxes[S], w = P['wr' + S];
       _qa.setFromAxisAngle(HA.curl, w[0]); _qb.setFromAxisAngle(HA.palm, w[1]); SK['hand' + S].quaternion.copy(_qb).multiply(_qa);
       poseFingers(S, P['f' + S]);

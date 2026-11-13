@@ -103,7 +103,10 @@ function makeFox(opts) {
     addBone('clav' + S, 'spine3', s * 0.035, 1.295, 0);
     addBone('uarm' + S, 'clav' + S, sh.x, sh.y, sh.z);
     addBone('farm' + S, 'uarm' + S, el.x, el.y, el.z);
-    addBone('hand' + S, 'farm' + S, wr.x, wr.y, wr.z);
+    // Three bones along the forearm that only ever turn about its length: a third, two thirds and all of the wrist's turn. The skin between elbow and
+    // wrist is shared out among them, so a turned hand twists the forearm along its whole length, as a real one does, instead of wringing it at the elbow.
+    for (const [nm, f] of [['ftwA', 0.44], ['ftwB', 0.67], ['ftwC', 0.90]]) { const q = el.clone().addScaledVector(d, L_FARM * f); addBone(nm + S, 'farm' + S, q.x, q.y, q.z); }
+    addBone('hand' + S, 'ftwC' + S, wr.x, wr.y, wr.z);
     addBone('thigh' + S, 'hips', s * 0.085, 0.835, 0);
     addBone('shin' + S, 'thigh' + S, s * 0.083, 0.47, 0.006);
     addBone('foot' + S, 'shin' + S, s * 0.081, 0.105, -0.012);
@@ -592,53 +595,95 @@ function makeFox(opts) {
     addPart('torso', part, wTorso, { out: V3(0, 1.1, 0) });
   })();
 
-  // ---------- arms: bare, with a short puffed emerald sleeve gathered above the elbow ----------
-  // radius along the arm, from the shoulder joint (0) to the wrist (0.47), read off B1 and A5
-  const ARM_R = [[-0.035, 0.028], [0, 0.043], [0.04, 0.046], [0.11, 0.042], [0.19, 0.0365], [0.245, 0.0345], [0.30, 0.0355], [0.39, 0.030], [0.455, 0.0245], [0.475, 0.0235]];
-  // the sleeve: [distance along the arm, radius, how deep the gathers are]
-  const PUFF = [[-0.060, 0.030, 0], [-0.046, 0.056, 0.02], [-0.022, 0.072, 0.03], [0.012, 0.082, 0.025], [0.052, 0.086, 0.02], [0.092, 0.081, 0.03], [0.122, 0.067, 0.05], [0.140, 0.050, 0.07], [0.150, 0.0445, 0.07], [0.158, 0.0445, 0.07], [0.166, 0.051, 0.10], [0.180, 0.060, 0.15], [0.194, 0.066, 0.18]];
-  const PUFF_K = PUFF.map((p) => [p[0], [p[1], p[2]]]);
+  // ---------- arms: bare, with a short puffed linen sleeve gathered into a beaded band above the elbow ----------
+  // The arm's shape along its length, from the shoulder joint (0) to the wrist (0.47): [distance, [half its width across, half its depth front to back]].
+  // Read off A1 (arms hanging, 861 px a metre) and A5 (arms out): 7 cm at the elbow, 7.5 across the swell just below it, 4.8 two thirds of the way
+  // down, then flattening into the wrist of her hand (4.4 by 2.8 cm). Above the sleeve's hem it is hidden, and sized to fit inside the band.
+  const ARM_S = [[-0.022, [0.030, 0.030]], [0, [0.038, 0.040]], [0.04, [0.040, 0.042]], [0.11, [0.0345, 0.0360]], [0.17, [0.0332, 0.0352]], [0.205, [0.0325, 0.0340]], [0.232, [0.0322, 0.0322]], [0.245, [0.0335, 0.0316]],
+    [0.2785, [0.0372, 0.0360]], [0.309, [0.0349, 0.0347]], [0.334, [0.0310, 0.0318]], [0.358, [0.0270, 0.0284]], [0.383, [0.0230, 0.0254]], [0.408, [0.0194, 0.0233]], [0.436, [0.0163, 0.0219]], [0.460, [0.0146, 0.0216]], [0.478, [0.0140, 0.0218]]];
+  // The sleeve, read off A1, A3 and the blouse sheet F5: [distance along the arm, radius, fine gathers, broad folds, how far into the ruffle].
+  // A ball of linen from the shoulder seam (it stands 5 cm above the joint) to a shirred band 14 cm down, which it overhangs a little; then a 5 cm ruffle.
+  const SLEEVE = [[-0.050, 0.006, 0, 0, 0], [-0.044, 0.016, 0.08, 0, 0], [-0.037, 0.024, 0.10, 0, 0], [-0.022, 0.040, 0.08, 0.010, 0], [-0.0085, 0.0517, 0.05, 0.020, 0], [0.012, 0.0610, 0.025, 0.030, 0],
+    [0.035, 0.0672, 0.014, 0.045, 0], [0.062, 0.0690, 0.016, 0.050, 0], [0.090, 0.0668, 0.032, 0.045, 0], [0.110, 0.0638, 0.055, 0.035, 0], [0.124, 0.0600, 0.08, 0.025, 0], [0.133, 0.0535, 0.10, 0.010, 0],
+    [0.1385, 0.0465, 0.10, 0, 0], [0.1392, 0.0410, 0.10, 0, 0], [0.1365, 0.0380, 0.08, 0, 0], [0.1340, 0.0372, 0.03, 0, 0], [0.1380, 0.0377, 0.03, 0, 0], [0.1420, 0.0372, 0.03, 0, 0], [0.1460, 0.0375, 0.03, 0, 0],
+    [0.1490, 0.0398, 0.02, 0, 0.25], [0.1580, 0.0448, 0, 0, 0.55], [0.1720, 0.0505, 0, 0, 0.85], [0.1880, 0.0560, 0, 0, 1]];
+  const SLEEVE_K = SLEEVE.map((p, i) => [i, p]), BAND_S = 0.1400, BAND_R = 0.0372, SLEEVE_IN = 0.122;      // SLEEVE_IN: the puff stops at the corset strap's outer edge
+  const armAt = (sl) => spline(ARM_S, sl);
   function wArm(S, sLen) {
     if (sLen < 0.05) { const u = sm(-0.035, 0.05, sLen); return [BI['clav' + S], (1 - u) * 0.6, BI.spine3, (1 - u) * 0.4, BI['uarm' + S], u]; }
-    if (sLen < L_UARM + 0.05) { const u = sm(L_UARM - 0.05, L_UARM + 0.05, sLen); return [BI['uarm' + S], 1 - u, BI['farm' + S], u]; }
-    const u = sm(L_UARM + L_FARM - 0.02, L_UARM + L_FARM + 0.012, sLen); return [BI['farm' + S], 1 - u, BI['hand' + S], u];
+    const E1 = L_UARM + 0.05, W0 = L_UARM + L_FARM - 0.02;
+    if (sLen < E1) { const u = sm(L_UARM - 0.05, E1, sLen); return [BI['uarm' + S], 1 - u, BI['farm' + S], u]; }
+    if (sLen < W0) {                               // down the forearm the skin passes from one twist bone to the next
+      const f = 3 * (sLen - E1) / (W0 - E1), k = Math.min(2, Math.floor(f)), u = f - k, nm = ['farm', 'ftwA', 'ftwB', 'ftwC'];
+      return [BI[nm[k] + S], 1 - u, BI[nm[k + 1] + S], u];
+    }
+    const u = sm(W0, L_UARM + L_FARM + 0.012, sLen); return [BI['ftwC' + S], 1 - u, BI['hand' + S], u];
   }
   const braceletChains = [];                       // each strand of beads hangs on its own little spring, so the three knock about out of step
-  for (const [S, s] of SIDES) {
-    const d = armDir[S], sh = restPts['sh' + S], NS = Q(40, 18), NU = Q(28, 14);
-    {                                              // the arm
-      const pts = [], rad = [], ss = [];
-      for (let i = 0; i <= NS; i++) { const sl = lerp(-0.035, 0.475, i / NS); pts.push(sh.clone().addScaledVector(d, sl)); const r = spline(ARM_R, sl); rad.push([r, r * 0.94]); ss.push(sl); }
-      const rings = tubeRings(pts, rad, NU, V3(0, 0, 1)), cols = NU + 1;
-      addPart('skin', loft(rings, { capA: true }), (x, y, z, i) => wArm(S, i < ss.length * cols ? ss[Math.floor(i / cols)] : ss[0]), { out: centroidOf(rings) });
+  // Both arms are built as her left one and mirrored, with each ring's points taken in the opposite order so the skin still faces out;
+  // the picture's left-to-right is flipped to match (u), so front, back, inside and outside mean the same on both arms.
+  const gsA = (x, w) => Math.exp(-x * x / (w * w));
+  const mirrorRings = (rings) => rings.map((ring) => ring.map((p, j) => { const q = ring[(ring.length - j) % ring.length]; return [-q[0], q[1], q[2]]; }));
+  const flipU = (part, uS) => { for (let k = 0; k < part.uv.length; k += 2) part.uv[k] = (uS || 1) - part.uv[k]; return part; };
+  {
+    const d = armDir.L, sh = restPts.shL, o = V3(Math.cos(A_POSE), Math.sin(A_POSE), 0), bz = V3(0, 0, 1);      // along the arm, out to her side, to her front
+    const at = (sl, lat, fr) => [sh.x + d.x * sl + o.x * lat, sh.y + d.y * sl + o.y * lat, sh.z + fr];
+    // --- the arm ---
+    const NS = Q(72, 30), NU = Q(40, 18), aRings = [], aS = [];
+    for (let i = 0; i <= NS; i++) {
+      const sl = lerp(-0.022, 0.478, Math.pow(i / NS, 0.92)), [hx, hz] = armAt(sl), ring = [];
+      const cLat = 0.0020 * gsA(sl - 0.285, 0.040), cFr = 0.0040 * sm(0.40, 0.47, sl);        // the swell below the elbow sits to the outside; the wrist meets the middle of her hand
+      for (let j = 0; j < NU; j++) {
+        const a = (j / NU) * TAU, ca = Math.cos(a), sa = Math.sin(a);
+        const back = Math.max(0, -sa), front = Math.max(0, sa);
+        let k = 1 + (0.0042 / hz) * gsA(sl - 0.2440, 0.0130) * Math.pow(back, 5)                // the point of the elbow
+          - (0.0020 / hz) * gsA(sl - 0.2480, 0.0100) * Math.pow(front, 4)                      // the hollow of the inner elbow
+          + (0.0016 / hz) * gsA(sl - 0.4560, 0.0080) * Math.pow(back, 6);                      // the wrist bone
+        k -= (0.0012 / hz) * gsA(sl - 0.2440, 0.0090) * (gsA(a - 4.19, 0.30) + gsA(a - 5.24, 0.30));     // the two dimples beside the point of the elbow
+        ring.push(at(sl, cLat + ca * hx * k, cFr + sa * hz * k));
+      }
+      aRings.push(ring); aS.push(sl);
     }
-    {                                              // her bracelets (F2), three strands stacked above each wrist: large dark wood beads, small gold ones, medium wood ones
-      const bz = V3(0, 0, 1), by = V3().crossVectors(bz, d).normalize(), bx = V3().crossVectors(d, by).normalize();
+    // --- the sleeve ---
+    const NP = Q(84, 34), NV = Q(108, 44), sRings = [], sS = [], COARSE = NV < 100;     // the phone build has fewer points round the sleeve (81), too few to carry the finest gathers, so it gets fewer, broader ones
+    for (let i = 0; i <= NP; i++) {
+      const [sl0, r, fine, broad, ruf] = spline(SLEEVE_K, (i / NP) * (SLEEVE.length - 1)), ring = [];
+      for (let j = 0; j < NV; j++) {
+        const a = (j / NV) * TAU;
+        // gathers are never even: each fold has its own width and depth, and the broad folds of the puff run a little aslant
+        const wob = 0.9 * Math.sin(a * 3 + 0.8) + 0.6 * Math.sin(a * 5 + 2.9), amp = 0.62 + 0.38 * Math.sin(a * 2 + 1.1 + sl0 * 9);
+        const pl = COARSE ? 0.8 * amp * (0.7 * Math.sin(a * 12 + wob + 0.4) + 0.3 * Math.sin(a * 17 - wob + 2.2)) : amp * (0.55 * Math.sin(a * 21 + wob + 0.4) + 0.30 * Math.sin(a * 33 - 1.4 * wob + 2.2 + sl0 * 30) + 0.15 * Math.sin(a * 47 + 0.5 * wob));
+        const bf = 0.9 * Math.sin(a * 5 + sl0 * 13 + 0.7 + 0.5 * wob) + 0.6 * Math.sin(a * 8 - sl0 * 17 + 2.1) + 0.35 * Math.sin(a * 13 + sl0 * 9 + 4.0 - wob);
+        const flute = COARSE ? 0.64 * Math.sin(a * 8 + 0.5 + 0.7 * wob) + 0.30 * Math.sin(a * 13 + 1.9 - wob) : 0.60 * Math.sin(a * 8 + 0.5 + 0.7 * wob) + 0.30 * Math.sin(a * 13 + 1.9 - wob) + 0.16 * Math.sin(a * 21 + 3.3);
+        const wave = ruf * ruf * 0.0165 * flute * (0.75 + 0.25 * Math.sin(a * 3 + 2)), sl = sl0 + ruf * (0.0030 * Math.sin(a * 8 + 2.1 + 0.7 * wob) + 0.0020 * Math.sin(a * 3 + 0.4));
+        const rr2 = r * (1 + fine * pl + broad * bf) + wave, p = at(sl, Math.cos(a) * rr2, Math.sin(a) * rr2);
+        if (ruf === 0 && sl0 < 0.133 && p[0] < SLEEVE_IN) p[0] = SLEEVE_IN + 0.30 * (p[0] - SLEEVE_IN);      // where the puff would cover the corset strap it is pressed flat against her side instead
+        ring.push(p);
+      }
+      sRings.push(ring); sS.push(Math.max(0.02, sl0));
+    }
+    for (const [S, s] of SIDES) {
+      const ar = s > 0 ? aRings : mirrorRings(aRings), sr = s > 0 ? sRings : mirrorRings(sRings), ac = NU + 1, sc = NV + 1;
+      const arm = loft(ar, { capA: true }), slv = loft(sr, { capA: true, uS: 9, vS: 5 });
+      if (s < 0) { flipU(arm, 1); flipU(slv, 9); }
+      addPart('arm', arm, (x, y, z, i) => wArm(S, i < aS.length * ac ? aS[Math.floor(i / ac)] : aS[0]), { out: centroidOf(ar) });
+      addPart('emerald', slv, (x, y, z, i) => wArm(S, i < sS.length * sc ? sS[Math.floor(i / sc)] : 0.02), { out: centroidOf(sr) });
+      // the gold beads sewn round the band
+      const NB = 21, wB = [BI['uarm' + S], 1];
+      for (let k = 0; k < NB; k++) { const a = ((k + 0.5) / NB) * TAU, p = at(BAND_S, Math.cos(a) * (BAND_R + 0.0024), Math.sin(a) * (BAND_R + 0.0024)), q = V3(s * p[0], p[1], p[2]); addPart('bellm', spherePart(q, 0.0034, 0.0034, 0.0034, 9, 7), () => wB, { out: q }); }
+      // her bracelets (F2), three strands stacked above each wrist: large dark wood beads, small gold ones, medium wood ones. Each lies on the wrist's own flattened shape.
       for (const [sl, br, nb, key, ph] of [[0.4130, 0.0056, 13, 'woodbead', 0.0], [0.4285, 0.0031, 27, 'bellm', 0.3], [0.4420, 0.0040, 20, 'woodbead', 0.7]]) {
-        const c = sh.clone().addScaledVector(d, sl), R = spline(ARM_R, sl) + br * 0.80, c2 = c.clone().addScaledVector(d, 0.035), bn = 'br' + S + Math.round(sl * 1000);
-        addBone(bn + 'a', 'farm' + S, c.x, c.y, c.z); addBone(bn + 'b', bn + 'a', c2.x, c2.y, c2.z); braceletChains.push({ names: [bn + 'a', bn + 'b'], anchor: 'farm' + S, k: 0.14 + 0.5 * br * 20 });
+        const [hx, hz] = armAt(sl), cFr = 0.0040 * sm(0.40, 0.47, sl), ex = hx + br * 0.80, ez = hz + br * 0.80, c0 = at(sl, 0, cFr), c1 = at(sl + 0.035, 0, cFr), bn = 'br' + S + Math.round(sl * 1000);
+        addBone(bn + 'a', 'ftwC' + S, s * c0[0], c0[1], c0[2]); addBone(bn + 'b', bn + 'a', s * c1[0], c1[1], c1[2]); braceletChains.push({ names: [bn + 'a', bn + 'b'], anchor: 'ftwC' + S, k: 0.14 + 0.5 * br * 20 });
         const wf = (() => { const w = [BI[bn + 'a'], 1]; return () => w; })();
-        for (let k = 0; k < nb; k++) {
-          const a = ph + (k / nb) * TAU, q = c.clone().addScaledVector(bx, Math.cos(a) * R).addScaledVector(by, Math.sin(a) * R * 0.94);
+        const M = 360, cum = [0]; let px = ex, pz = 0;                                             // equal steps round the oval, not equal angles
+        for (let m = 1; m <= M; m++) { const a = (m / M) * TAU, x = Math.cos(a) * ex, z = Math.sin(a) * ez; cum.push(cum[m - 1] + Math.hypot(x - px, z - pz)); px = x; pz = z; }
+        for (let k = 0, m = 0; k < nb; k++) {
+          const want = ((k / nb + ph / TAU) % 1) * cum[M]; while (m < M && cum[m + 1] < want) m++; if (cum[m] > want) { m = 0; while (m < M && cum[m + 1] < want) m++; }
+          const a = ((m + (want - cum[m]) / Math.max(1e-9, cum[m + 1] - cum[m])) / M) * TAU, p = at(sl, Math.cos(a) * ex, cFr + Math.sin(a) * ez), q = V3(s * p[0], p[1], p[2]);
           addPart(key, spherePart(q, br, br, br, 8, 6), wf, { out: q });
         }
       }
-    }
-    {                                              // the sleeve: one gathered sheet, open at the ruffle
-      const NP = Q(34, 16), NV = Q(72, 36), rings = [], ss = [], GATH = 15;
-      const ax = d.clone(), bz = V3(0, 0, 1), by = V3().crossVectors(bz, ax).normalize();
-      for (let i = 0; i <= NP; i++) {
-        const sl = lerp(PUFF[0][0], PUFF[PUFF.length - 1][0], i / NP), [r, gd] = spline(PUFF_K, sl), c = sh.clone().addScaledVector(ax, sl), ring = [];
-        for (let j = 0; j < NV; j++) {
-          const a = (j / NV) * TAU, rr2 = r * (1 + gd * Math.sin(a * GATH + sl * 40) + 0.5 * gd * Math.sin(a * 7 + 1.3));
-          // the puff sits a little above and outside the arm's line, as cloth held up by its own gathers does
-          const lift = 0.010 * Math.exp(-Math.pow((sl - 0.05) / 0.06, 2));
-          ring.push([c.x + (bz.x * Math.cos(a) + by.x * Math.sin(a)) * rr2 + s * lift * 0.6, c.y + (bz.y * Math.cos(a) + by.y * Math.sin(a)) * rr2 + lift, c.z + (bz.z * Math.cos(a) + by.z * Math.sin(a)) * rr2]);
-        }
-        rings.push(ring); ss.push(sl);
-      }
-      const cols = NV + 1;
-      addPart('emerald', loft(rings, { capA: true, uS: 6, vS: 2 }), (x, y, z, i) => wArm(S, i < ss.length * cols ? Math.max(0.02, ss[Math.floor(i / cols)]) : 0.02), { out: centroidOf(rings) });
     }
   }
 
@@ -1000,7 +1045,7 @@ function makeFox(opts) {
     for (let i = 0; i < n; i++) {
       const v = G.src[i]; handPt(s, G.pos[v * 3], G.pos[v * 3 + 1], G.pos[v * 3 + 2], p); handDir(s, G.nor[v * 3], G.nor[v * 3 + 1], G.nor[v * 3 + 2], d);
       pos[i * 3] = p.x; pos[i * 3 + 1] = p.y; pos[i * 3 + 2] = p.z; nor[i * 3] = d.x; nor[i * 3 + 1] = d.y; nor[i * 3 + 2] = d.z;
-      const nb = G.wB[v], nw = G.wW[v], w = []; for (let k = 0; k < nb.length; k++) w.push(BI[nb[k] + S], nw[k]); wts[i] = w;
+      const nb = G.wB[v], nw = G.wW[v], w = []; for (let k = 0; k < nb.length; k++) w.push(BI[(nb[k] === 'farm' ? 'ftwC' : nb[k]) + S], nw[k]); wts[i] = w;      // above the wrist the hand's skin belongs to the last twist bone, which turns with it
     }
     let idx = G.idx;
     if (s > 0) { idx = idx.slice(); for (let i = 0; i < idx.length; i += 3) { const t = idx[i + 1]; idx[i + 1] = idx[i + 2]; idx[i + 2] = t; } }      // the mirrored hand winds the other way
@@ -2144,6 +2189,34 @@ function makeFox(opts) {
     patch: (() => { const t = bakedTex('patch', 1024, 1024, '#a03c5c'); t.wrapS = t.wrapT = THREE.RepeatWrapping; return sheen(std({ map: t, color: lin('#d2c8c2'), roughness: 0.86, side: THREE.DoubleSide }), '#ffd0a0', 3, 0.12); })(),      // her patchwork (F9)
     patch2: (() => { const t = bakedTex('patch2', 768, 768, '#a03c5c'); t.wrapS = t.wrapT = THREE.RepeatWrapping; return sheen(std({ map: t, color: lin('#d2c8c2'), roughness: 0.86, side: THREE.DoubleSide }), '#ffd0a0', 3, 0.12); })(),     // the second sheet (F10), for the upper flounce
     frill: sheen(std({ color: lin('#a02f6c'), roughness: 0.80, side: THREE.DoubleSide }), '#ff9ad0', 3, 0.2),
+    arm: (() => {                                    // the skin of her arms: her face's tone, a little paler down the inside, flushed at the elbow, freckled as in A1 and A5.
+      // Across the picture: outside of the arm, front, inside, back. Down it: shoulder to wrist.
+      const W = 512, H = 1024, c = cvs(W, H), g = c.getContext('2d'), base = SKIN || '#d89780'; g.fillStyle = base; g.fillRect(0, 0, W, H); let sd = 4177;
+      const rn = () => { sd = (sd * 16807) % 2147483647; return sd / 2147483647; }, yOf = (sl) => H * (sl + 0.022) / 0.500;
+      const soft = (x, y, rx, ry, col, al) => { for (const dx of [-W, 0, W]) { g.save(); g.translate(x + dx, y); g.scale(rx, ry); const gr = g.createRadialGradient(0, 0, 0, 0, 0, 1); gr.addColorStop(0, col.replace('A', String(al))); gr.addColorStop(1, col.replace('A', '0')); g.fillStyle = gr; g.beginPath(); g.arc(0, 0, 1, 0, 6.2832); g.fill(); g.restore(); } };
+      for (let i = 0; i < 46; i++) soft(rn() * W, rn() * H, 30 + rn() * 60, 40 + rn() * 90, rn() < 0.5 ? 'rgba(236,150,128,A)' : 'rgba(246,208,186,A)', 0.05 + rn() * 0.05);      // skin is never one flat tone
+      soft(W * 0.40, yOf(0.36), W * 0.20, H * 0.24, 'rgba(250,222,204,A)', 0.20);                 // the paler inside of the forearm
+      soft(W * 0.75, yOf(0.244), W * 0.13, H * 0.036, 'rgba(206,104,92,A)', 0.30);                // the elbow
+      soft(W * 0.25, yOf(0.249), W * 0.12, H * 0.006, 'rgba(160,84,66,A)', 0.30);                 // the crease inside it
+      soft(W * 0.80, yOf(0.455), W * 0.08, H * 0.016, 'rgba(214,120,104,A)', 0.18);               // the wrist bone
+      for (let i = 0; i < 300; i++) {                                                             // freckles: most on the outside and back of the forearm
+        const u = (0.88 + (rn() + rn() + rn() - 1.5) * 0.42 + 1) % 1, sl = 0.18 + 0.27 * Math.pow(rn(), 0.8), r = 1.1 + rn() * rn() * 3.0;
+        soft(u * W, yOf(sl), r, r * 1.15, 'rgba(150,80,52,A)', 0.34 + rn() * 0.42);
+      }
+      const t = ctex(c); t.wrapS = THREE.RepeatWrapping;
+      return sheen(std({ map: t, color: lin('#d8ccc6'), roughness: 0.64, envMapIntensity: 0.2, emissive: lin('#ffffff'), emissiveMap: t, emissiveIntensity: 0.44 }), '#ffb49a', 3.2, 0.1);
+    })(),
+    emerald: (() => {                                // the blouse's dark green linen (A1, F5): a plain weave with slubs, uneven threads and a soft mottle
+      const S = 256, c = cvs(S, S), g = c.getContext('2d'); g.fillStyle = '#283b39'; g.fillRect(0, 0, S, S); let sd = 9241;
+      const rn = () => { sd = (sd * 16807) % 2147483647; return sd / 2147483647; };
+      for (let i = 0; i < 60; i++) { const x = rn() * S, y = rn() * S, r = 14 + rn() * 34, gr = g.createRadialGradient(x, y, 0, x, y, r), col = rn() < 0.5 ? '70,98,92' : '18,28,28'; gr.addColorStop(0, 'rgba(' + col + ',' + (0.10 + rn() * 0.12) + ')'); gr.addColorStop(1, 'rgba(' + col + ',0)');
+        for (const dx of [-S, 0, S]) for (const dy of [-S, 0, S]) { g.save(); g.translate(dx, dy); g.fillStyle = gr; g.fillRect(x - r, y - r, 2 * r, 2 * r); g.restore(); } }
+      for (let y = 0; y < S; y += 2) { g.fillStyle = 'rgba(' + (rn() < 0.5 ? '96,128,118' : '12,20,20') + ',' + (0.03 + rn() * 0.07) + ')'; g.fillRect(0, y, S, 1); }      // weft
+      for (let x = 0; x < S; x += 2) { g.fillStyle = 'rgba(' + (rn() < 0.5 ? '96,128,118' : '12,20,20') + ',' + (0.03 + rn() * 0.07) + ')'; g.fillRect(x, 0, 1, S); }      // warp
+      for (let i = 0; i < 70; i++) { const hz = rn() < 0.6, x = rn() * S, y = Math.floor(rn() * S), L = 6 + rn() * 30; g.fillStyle = 'rgba(128,160,146,' + (0.08 + rn() * 0.14) + ')'; if (hz) { g.fillRect(x, y, L, 1); g.fillRect(x - S, y, L, 1); } else { g.fillRect(y, x, 1, L); g.fillRect(y, x - S, 1, L); } }      // slubs
+      const t = ctex(c, 1, 1);
+      return sheen(std({ map: t, roughness: 0.94, side: THREE.DoubleSide }), '#9fc8b8', 2.8, 0.20);
+    })(),
     neck: (() => {                                   // her neck: the chest's tone where it leaves the collar, her face's tone above the choker, darkening into the shade under her jaw
       const c = cvs(8, 128), g = c.getContext('2d'), CH = (BAKED && BAKED.skinChest) || SKIN || '#e0a890', J = (BAKED && BAKED.skinJaw) || SKIN || '#c08068', F = SKIN || '#d89780';
       const ratio = (hex, k) => { const a = new THREE.Color(hex), b = new THREE.Color(CH); return 'rgb(' + [a.r / b.r, a.g / b.g, a.b / b.b].map((v) => Math.round(255 * Math.min(1, v * k))).join(',') + ')'; };
@@ -2197,11 +2270,13 @@ function makeFox(opts) {
   const LIMB = {};
   for (const [S, s] of SIDES) {
     const ax = armDir[S].clone(), az = V3(0, 0, -1).cross(ax).normalize();
-    LIMB['arm' + S] = { inv: basisQ(ax, az, Qt()).invert(), l1: L_UARM * UPK, l2: L_FARM * UPK };
+    // Limb lengths as the solver meets them, in the world: the whole figure is FOX_K times the frame its tables are written in. Without FOX_K here
+    // every hand and foot target looked 4.5% too far away, so her arms hung dead straight and bent limbs overshot their marks.
+    LIMB['arm' + S] = { inv: basisQ(ax, az, Qt()).invert(), l1: L_UARM * UPK * FOX_K, l2: L_FARM * UPK * FOX_K };
     const hip = SK['thigh' + S].userData.rest, kn = SK['shin' + S].userData.rest, an = SK['foot' + S].userData.rest;
     const lx = kn.clone().sub(hip).normalize(), lz = V3(0, 0, 1).cross(lx).normalize();
     const lx2 = an.clone().sub(kn).normalize(), lz2 = V3(0, 0, 1).cross(lx2).normalize();
-    LIMB['leg' + S] = { inv: basisQ(lx, lz, Qt()).invert(), inv2: basisQ(lx2, lz2, Qt()).invert(), l1: hip.distanceTo(kn), l2: kn.distanceTo(an) };
+    LIMB['leg' + S] = { inv: basisQ(lx, lz, Qt()).invert(), inv2: basisQ(lx2, lz2, Qt()).invert(), l1: hip.distanceTo(kn) * FOX_K, l2: kn.distanceTo(an) * FOX_K };
   }
   // two-bone IK: from joint a at world A to target T with the middle joint leaning toward pole; sets both bones' rotations
   function solveLimb(bA, bB, A, T, pole, L, twist, parentQ, outMidQ) {
@@ -2247,9 +2322,10 @@ function makeFox(opts) {
     SK['thb1' + S].quaternion.setFromAxisAngle(A.thumbFlex, t * 0.7); SK['thb2' + S].quaternion.setFromAxisAngle(A.thumbFlex, t * 0.9);
   }
   // the resting pose: every channel a spell can move
+  const REST_HX = opts.restHX === undefined ? 0.290 : opts.restHX, REST_HY = opts.restHY === undefined ? 0.882 : opts.restHY;      // her resting wrist, read off A1: 31 cm out from her middle, 92 cm up
   const REST = {
     hip: [0, 0, 0], hipR: [0, 0, 0], sp: [0, 0, 0], hd: [0, 0, 0], sh: [0, 0],
-    hR: [-0.300, 0.868, 0.055], hL: [0.300, 0.868, 0.055], eR: [-0.55, -0.1, -1], eL: [0.55, -0.1, -1], twR: 0, twL: 0, wrR: [0.1, 0], wrL: [0.1, 0],
+    hR: [-REST_HX, REST_HY, 0.055], hL: [REST_HX, REST_HY, 0.055], eR: [-0.55, -0.1, -1], eL: [0.55, -0.1, -1], twR: 0, twL: 0, wrR: [0.1, 0], wrL: [0.1, 0],
     fR: FP.relax.slice(), fL: FP.relax.slice(),
     ftR: [0, 0, 0, -0.10, 0, 0, 0], ftL: [0, 0, 0, 0.10, 0, 0, 0], knR: [-0.12, 0, 1], knL: [0.12, 0, 1],
     eyes: 0, mouth: 0, glow: 0
@@ -2369,6 +2445,7 @@ function makeFox(opts) {
   // ---------- applying a pose: spine by angles, arms and legs onto their targets, then springs and cloth ----------
   const SPF = [0.25, 0.35, 0.40], MOUTHS = ['rest', 'open', 'smile'];
   const _T = V3(), _A = V3(), _P = V3(), _pq = Qt(), _mq = Qt(), _rq = Qt(), _fq = Qt();
+  const HANG_IN = opts.hangIn === undefined ? 1.0 : opts.hangIn, HANG_TW = opts.hangTw === undefined ? -1.35 : opts.hangTw;
   function applyPose(P) {
     const hips = SK.hips, hh = hips.userData.home;
     hips.position.set(hh.x + P.hip[0], hh.y + P.hip[1], hh.z + P.hip[2]); hips.rotation.set(P.hipR[1], P.hipR[0], P.hipR[2], 'YXZ');
@@ -2381,8 +2458,12 @@ function makeFox(opts) {
       // arm
       SK['clav' + S].getWorldQuaternion(_pq); SK['uarm' + S].getWorldPosition(_A);
       const h = P['h' + S], e = P['e' + S];
-      _T.set(h[0], h[1], h[2]).applyMatrix4(root.matrixWorld); SK.spine1.getWorldPosition(_J); _T.sub(_J).multiplyScalar(UPK).add(_J); _P.set(e[0], e[1], e[2]).applyQuaternion(_rq);
-      solveLimb(SK['uarm' + S], SK['farm' + S], _A, _T, _P, LIMB['arm' + S], -s * P['tw' + S], _pq, _mq);
+      // An arm hanging at her side carries its elbow in toward her waist and its forearm out and away, as in painting A1 (and as a real arm does).
+      // The further a hand is lifted or swung from her side, the less of this there is, so every move keeps the elbow it was given.
+      const hang = HANG_IN * sm(1.02, 0.90, h[1]) * sm(0.34, 0.10, Math.abs(h[2] - 0.055)) * sm(0.50, 0.36, Math.abs(h[0]));
+      _T.set(h[0], h[1], h[2]).applyMatrix4(root.matrixWorld); SK.spine1.getWorldPosition(_J); _T.sub(_J).multiplyScalar(UPK).add(_J); _P.set(e[0] - s * hang, e[1], e[2]).applyQuaternion(_rq);
+      solveLimb(SK['uarm' + S], SK['farm' + S], _A, _T, _P, LIMB['arm' + S], 0, _pq, _mq);
+      { const tw = -s * (P['tw' + S] + hang * HANG_TW), ad = armDir[S]; SK['ftwA' + S].quaternion.setFromAxisAngle(ad, tw / 3); SK['ftwB' + S].quaternion.setFromAxisAngle(ad, tw * 2 / 3); SK['ftwC' + S].quaternion.setFromAxisAngle(ad, tw); }
       const HA = handAxes[S], w = P['wr' + S];
       _qa.setFromAxisAngle(HA.curl, w[0]); _qb.setFromAxisAngle(HA.palm, w[1]); SK['hand' + S].quaternion.copy(_qb).multiply(_qa);
       poseFingers(S, P['f' + S]);
