@@ -21,12 +21,12 @@
       }
       addPart('patch', loft(rings, { uS: 2, vS: 1.8 }), wLeg, { out: V3(s * 0.15, 0.5, ZC) });
       // two flounces over each leg, the upper one shorter, each with a dipping hem and its own waves
-      for (const [yTop, yHem, g0, g1, key, ph, dip] of [[0.700, 0.435, 0.005, 0.020, 'patch', 1.3, 0.050], [0.815, 0.585, 0.010, 0.028, 'patch2', 0.4, 0.060]]) {
+      for (const [yTop, yHem, g0, g1, key, ph, dip] of [[0.660, 0.375, 0.006, 0.046, 'patch', 1.3, 0.085], [0.815, 0.520, 0.012, 0.058, 'patch2', 0.4, 0.100]]) {
         const NT = Q(12, 7), tr = [];
         for (let i = 0; i <= NT; i++) {
           const t = i / NT, ring = [];
           for (let j = 0; j < NU; j++) {
-            const a = (j / NU) * TAU, y = lerp(yTop, yHem - dip * (0.5 + 0.5 * Math.sin(a * 4 + ph)), t), [cxo, rx, rz] = legAt(y), g = lerp(g0, g1, t) + 0.014 * t * Math.sin(a * 13 + ph * 3 + t * 5);
+            const a = (j / NU) * TAU, y = lerp(yTop, yHem - dip * Math.pow(0.5 + 0.5 * Math.sin(a * 3 + ph), 1.6), t), [cxo, rx, rz] = legAt(y), g = lerp(g0, g1, t) + 0.014 * t * Math.sin(a * 13 + ph * 3 + t * 5);
             ring.push([s * cxo + (rx + g) * Math.sin(a), y, ZC + (rz + g) * Math.cos(a)]);
           }
           tr.push(ring);
@@ -38,4 +38,17 @@
       for (let i = 0; i <= 4; i++) { const t = i / 4, ring = []; for (let j = 0; j < NU; j++) { const a = (j / NU) * TAU, r = lerp(0.056, 0.086, t) + 0.011 * t * Math.sin(a * 15); ring.push([s * 0.089 + r * Math.sin(a), lerp(0.262, 0.212, t) + 0.004 * t * Math.sin(a * 15 + 1), -0.004 + r * 1.22 * Math.cos(a)]); } fr.push(ring); }
       addPart('frill', loft(fr), () => [SHN, 1], { out: V3(s * 0.089, 0.24, -0.004) });
     }
+    // ---- her belt, slung lower on her left hip, with its buckle, the pouch on her left and the sheath for her shears on her right (F7, G4, and the standing painting) ----
+    const YA = YOKE.map((r) => [r[0], [r[1], r[2], r[3]]]).reverse(), beltY = (a) => 0.958 - 0.020 * Math.sin(a);
+    const onHip = (a, y, out) => { const [rx, rz, cz] = spline(YA, cl(y, 0.745, 0.992)); return V3((rx + out) * Math.sin(a), y, cz + (rz + out) * Math.cos(a)); };
+    const wH = () => [BI.hips, 1], NB = Q(64, 36), band = (dy, out) => { const r = []; for (let j = 0; j < NB; j++) { const a = (j / NB) * TAU, q = onHip(a, beltY(a) + dy, out); r.push([q.x, q.y, q.z]); } return r; };
+    addPart('belt', loft([band(-0.016, 0.001), band(-0.014, 0.0085), band(0, 0.0095), band(0.014, 0.0085), band(0.016, 0.001)]), wH, { out: V3(0, 0.955, 0.03) });
+    for (let k = 0; k < 14; k++) { const a = 0.9 + k * 0.38, q = onHip(a, beltY(a), 0.0105); addPart('bellm', spherePart(q, 0.0030, 0.0030, 0.0022, 6, 5), wH, { out: q }); }      // studs
+    { const a = 0.42, q = onHip(a, beltY(a), 0.0115); addPart('bellm', spherePart(q, 0.022, 0.019, 0.0050, 14, 8), wH, { out: q }); const q2 = onHip(a, beltY(a), 0.0150); addPart('belt', spherePart(q2, 0.013, 0.011, 0.0030, 10, 6), wH, { out: q2 }); }      // buckle
+    { const a = 1.30, yb = beltY(a), c = onHip(a, yb - 0.070, 0.030), f = onHip(a, yb - 0.046, 0.034), st = onHip(a, yb - 0.066, 0.060);      // pouch, flap, stud
+      addPart('pouch', spherePart(c, 0.050, 0.056, 0.030, 16, 10), wH, { out: c }); addPart('belt', spherePart(f, 0.052, 0.034, 0.031, 16, 10), wH, { out: f }); addPart('bellm', spherePart(st, 0.006, 0.006, 0.004, 8, 6), wH, { out: st });
+      const lp = onHip(a, yb - 0.012, 0.014); addPart('belt', spherePart(lp, 0.016, 0.022, 0.008, 10, 6), wH, { out: lp }); }
+    { const a = -0.95, yb = beltY(a), c = onHip(a, yb - 0.105, 0.020), lp = onHip(a, yb - 0.012, 0.014);      // sheath, and the two bows of her shears standing out of it
+      addPart('pouch', spherePart(c, 0.024, 0.100, 0.013, 14, 12), wH, { out: c }); addPart('belt', spherePart(lp, 0.022, 0.024, 0.008, 10, 6), wH, { out: lp });
+      for (const dx of [-0.013, 0.013]) { const q = onHip(a + dx / 0.17, yb + 0.012, 0.024); addPart('steel', spherePart(q, 0.0105, 0.0125, 0.0035, 10, 6), wH, { out: q }); } }
   })();

@@ -65,6 +65,9 @@
     return ctex(c);
   })();
   Object.assign(MATS, {
+    belt: sheen(std({ color: lin('#4b2a18'), roughness: 0.58 }), '#ffc890', 3, 0.12),
+    pouch: sheen(std({ color: lin('#5c3520'), roughness: 0.62 }), '#ffc890', 3, 0.12),
+    steel: std({ color: lin('#c9ced6'), roughness: 0.26, metalness: 0.95 }),
     patch: (() => { const t = bakedTex('patch', 1024, 1024, '#a03c5c'); t.wrapS = t.wrapT = THREE.RepeatWrapping; return sheen(std({ map: t, color: lin('#d2c8c2'), roughness: 0.86, side: THREE.DoubleSide }), '#ffd0a0', 3, 0.12); })(),      // her patchwork (F9)
     patch2: (() => { const t = bakedTex('patch2', 768, 768, '#a03c5c'); t.wrapS = t.wrapT = THREE.RepeatWrapping; return sheen(std({ map: t, color: lin('#d2c8c2'), roughness: 0.86, side: THREE.DoubleSide }), '#ffd0a0', 3, 0.12); })(),     // the second sheet (F10), for the upper flounce
     frill: sheen(std({ color: lin('#a02f6c'), roughness: 0.80, side: THREE.DoubleSide }), '#ff9ad0', 3, 0.2),
@@ -99,7 +102,7 @@
   const skeleton = new THREE.Skeleton(bones), meshes = {};
   const FOX_K = opts.scale || 1.045;                 // the whole figure, against the Jester's frame: her legs, shoulders and chin all land on her paintings at this one number
   root.scale.setScalar(FOX_K);                       // set here, after the skeleton has taken its rest pose: set any earlier, the bones would grow and the skin would not
-  SK.spine1.scale.setScalar(UPK); SK.head.scale.setScalar(opts.headScale || 0.93); SK.head.position.y -= (opts.headDrop === undefined ? 0.0233 : opts.headDrop); root.updateMatrixWorld(true);   // horns keep their size as the head shrinks       // after the bind, so head, cap, horns and their veils all shrink about the neck
+  SK.spine1.scale.setScalar(UPK); SK.head.scale.setScalar(opts.headScale || 0.85); SK.head.position.y -= (opts.headDrop === undefined ? 0.0133 : opts.headDrop);      // Chris, 12 Nov: size her head to the standing painting with the raised finger (refs/R6_point.png): there, eye to lip is 50 px and eye to chin 83 px of 1344 px from soles to eyes, 8 to 9% smaller than A1's root.updateMatrixWorld(true);   // horns keep their size as the head shrinks       // after the bind, so head, cap, horns and their veils all shrink about the neck
   let triCount = 0;
   for (const key in buckets) {
     const B = buckets[key], g = new THREE.BufferGeometry();

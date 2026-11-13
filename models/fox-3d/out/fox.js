@@ -1511,12 +1511,12 @@ function makeFox(opts) {
       }
       addPart('patch', loft(rings, { uS: 2, vS: 1.8 }), wLeg, { out: V3(s * 0.15, 0.5, ZC) });
       // two flounces over each leg, the upper one shorter, each with a dipping hem and its own waves
-      for (const [yTop, yHem, g0, g1, key, ph, dip] of [[0.700, 0.435, 0.005, 0.020, 'patch', 1.3, 0.050], [0.815, 0.585, 0.010, 0.028, 'patch2', 0.4, 0.060]]) {
+      for (const [yTop, yHem, g0, g1, key, ph, dip] of [[0.660, 0.375, 0.006, 0.046, 'patch', 1.3, 0.085], [0.815, 0.520, 0.012, 0.058, 'patch2', 0.4, 0.100]]) {
         const NT = Q(12, 7), tr = [];
         for (let i = 0; i <= NT; i++) {
           const t = i / NT, ring = [];
           for (let j = 0; j < NU; j++) {
-            const a = (j / NU) * TAU, y = lerp(yTop, yHem - dip * (0.5 + 0.5 * Math.sin(a * 4 + ph)), t), [cxo, rx, rz] = legAt(y), g = lerp(g0, g1, t) + 0.014 * t * Math.sin(a * 13 + ph * 3 + t * 5);
+            const a = (j / NU) * TAU, y = lerp(yTop, yHem - dip * Math.pow(0.5 + 0.5 * Math.sin(a * 3 + ph), 1.6), t), [cxo, rx, rz] = legAt(y), g = lerp(g0, g1, t) + 0.014 * t * Math.sin(a * 13 + ph * 3 + t * 5);
             ring.push([s * cxo + (rx + g) * Math.sin(a), y, ZC + (rz + g) * Math.cos(a)]);
           }
           tr.push(ring);
@@ -1528,6 +1528,19 @@ function makeFox(opts) {
       for (let i = 0; i <= 4; i++) { const t = i / 4, ring = []; for (let j = 0; j < NU; j++) { const a = (j / NU) * TAU, r = lerp(0.056, 0.086, t) + 0.011 * t * Math.sin(a * 15); ring.push([s * 0.089 + r * Math.sin(a), lerp(0.262, 0.212, t) + 0.004 * t * Math.sin(a * 15 + 1), -0.004 + r * 1.22 * Math.cos(a)]); } fr.push(ring); }
       addPart('frill', loft(fr), () => [SHN, 1], { out: V3(s * 0.089, 0.24, -0.004) });
     }
+    // ---- her belt, slung lower on her left hip, with its buckle, the pouch on her left and the sheath for her shears on her right (F7, G4, and the standing painting) ----
+    const YA = YOKE.map((r) => [r[0], [r[1], r[2], r[3]]]).reverse(), beltY = (a) => 0.958 - 0.020 * Math.sin(a);
+    const onHip = (a, y, out) => { const [rx, rz, cz] = spline(YA, cl(y, 0.745, 0.992)); return V3((rx + out) * Math.sin(a), y, cz + (rz + out) * Math.cos(a)); };
+    const wH = () => [BI.hips, 1], NB = Q(64, 36), band = (dy, out) => { const r = []; for (let j = 0; j < NB; j++) { const a = (j / NB) * TAU, q = onHip(a, beltY(a) + dy, out); r.push([q.x, q.y, q.z]); } return r; };
+    addPart('belt', loft([band(-0.016, 0.001), band(-0.014, 0.0085), band(0, 0.0095), band(0.014, 0.0085), band(0.016, 0.001)]), wH, { out: V3(0, 0.955, 0.03) });
+    for (let k = 0; k < 14; k++) { const a = 0.9 + k * 0.38, q = onHip(a, beltY(a), 0.0105); addPart('bellm', spherePart(q, 0.0030, 0.0030, 0.0022, 6, 5), wH, { out: q }); }      // studs
+    { const a = 0.42, q = onHip(a, beltY(a), 0.0115); addPart('bellm', spherePart(q, 0.022, 0.019, 0.0050, 14, 8), wH, { out: q }); const q2 = onHip(a, beltY(a), 0.0150); addPart('belt', spherePart(q2, 0.013, 0.011, 0.0030, 10, 6), wH, { out: q2 }); }      // buckle
+    { const a = 1.30, yb = beltY(a), c = onHip(a, yb - 0.070, 0.030), f = onHip(a, yb - 0.046, 0.034), st = onHip(a, yb - 0.066, 0.060);      // pouch, flap, stud
+      addPart('pouch', spherePart(c, 0.050, 0.056, 0.030, 16, 10), wH, { out: c }); addPart('belt', spherePart(f, 0.052, 0.034, 0.031, 16, 10), wH, { out: f }); addPart('bellm', spherePart(st, 0.006, 0.006, 0.004, 8, 6), wH, { out: st });
+      const lp = onHip(a, yb - 0.012, 0.014); addPart('belt', spherePart(lp, 0.016, 0.022, 0.008, 10, 6), wH, { out: lp }); }
+    { const a = -0.95, yb = beltY(a), c = onHip(a, yb - 0.105, 0.020), lp = onHip(a, yb - 0.012, 0.014);      // sheath, and the two bows of her shears standing out of it
+      addPart('pouch', spherePart(c, 0.024, 0.100, 0.013, 14, 12), wH, { out: c }); addPart('belt', spherePart(lp, 0.022, 0.024, 0.008, 10, 6), wH, { out: lp });
+      for (const dx of [-0.013, 0.013]) { const q = onHip(a + dx / 0.17, yb + 0.012, 0.024); addPart('steel', spherePart(q, 0.0105, 0.0125, 0.0035, 10, 6), wH, { out: q }); } }
   })();
 
   // ---------- cloth: veils and skirts are sheets of particles, pinned to the skeleton and draped over body colliders ----------
@@ -2120,6 +2133,9 @@ function makeFox(opts) {
     return ctex(c);
   })();
   Object.assign(MATS, {
+    belt: sheen(std({ color: lin('#4b2a18'), roughness: 0.58 }), '#ffc890', 3, 0.12),
+    pouch: sheen(std({ color: lin('#5c3520'), roughness: 0.62 }), '#ffc890', 3, 0.12),
+    steel: std({ color: lin('#c9ced6'), roughness: 0.26, metalness: 0.95 }),
     patch: (() => { const t = bakedTex('patch', 1024, 1024, '#a03c5c'); t.wrapS = t.wrapT = THREE.RepeatWrapping; return sheen(std({ map: t, color: lin('#d2c8c2'), roughness: 0.86, side: THREE.DoubleSide }), '#ffd0a0', 3, 0.12); })(),      // her patchwork (F9)
     patch2: (() => { const t = bakedTex('patch2', 768, 768, '#a03c5c'); t.wrapS = t.wrapT = THREE.RepeatWrapping; return sheen(std({ map: t, color: lin('#d2c8c2'), roughness: 0.86, side: THREE.DoubleSide }), '#ffd0a0', 3, 0.12); })(),     // the second sheet (F10), for the upper flounce
     frill: sheen(std({ color: lin('#a02f6c'), roughness: 0.80, side: THREE.DoubleSide }), '#ff9ad0', 3, 0.2),
@@ -2154,7 +2170,7 @@ function makeFox(opts) {
   const skeleton = new THREE.Skeleton(bones), meshes = {};
   const FOX_K = opts.scale || 1.045;                 // the whole figure, against the Jester's frame: her legs, shoulders and chin all land on her paintings at this one number
   root.scale.setScalar(FOX_K);                       // set here, after the skeleton has taken its rest pose: set any earlier, the bones would grow and the skin would not
-  SK.spine1.scale.setScalar(UPK); SK.head.scale.setScalar(opts.headScale || 0.93); SK.head.position.y -= (opts.headDrop === undefined ? 0.0233 : opts.headDrop); root.updateMatrixWorld(true);   // horns keep their size as the head shrinks       // after the bind, so head, cap, horns and their veils all shrink about the neck
+  SK.spine1.scale.setScalar(UPK); SK.head.scale.setScalar(opts.headScale || 0.85); SK.head.position.y -= (opts.headDrop === undefined ? 0.0133 : opts.headDrop);      // Chris, 12 Nov: size her head to the standing painting with the raised finger (refs/R6_point.png): there, eye to lip is 50 px and eye to chin 83 px of 1344 px from soles to eyes, 8 to 9% smaller than A1's root.updateMatrixWorld(true);   // horns keep their size as the head shrinks       // after the bind, so head, cap, horns and their veils all shrink about the neck
   let triCount = 0;
   for (const key in buckets) {
     const B = buckets[key], g = new THREE.BufferGeometry();
