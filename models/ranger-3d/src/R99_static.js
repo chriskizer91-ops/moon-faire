@@ -57,11 +57,11 @@
     leggings: sheen(std({ map: tLegs, color: lin('#cfc6c6'), roughness: 0.78, envMapIntensity: 0.2, emissive: lin('#ffffff'), emissiveMap: tLegs, emissiveIntensity: 0.30 }), '#7a6470', 3, 0.10),
     lacesl: std({ map: tLaceC, alphaMap: tLaceA, alphaTest: 0.30, transparent: false, side: THREE.DoubleSide, roughness: 0.9, color: lin('#8d868c') }),
     laceband: std({ color: lin('#17131a'), roughness: 0.95 }),
-    boot: (() => { const n = crinkleTex(), k = new THREE.Vector2(0.9, 0.9); return std({ map: leatherTexR(), color: lin('#b4a69c'), roughness: 0.62, envMapIntensity: 0.45, normalMap: n, normalScale: k }); })(),
-    sole: std({ map: soleTexR(), color: lin('#b0a6a0'), roughness: 0.86 }),
-    stitch: std({ color: lin('#b9a47c'), roughness: 0.8 }), eyelet: std({ color: lin('#b08a4e'), roughness: 0.36, metalness: 1, envMapIntensity: 1.4 }), aglet: std({ color: lin('#a8823e'), roughness: 0.35, metalness: 1 }),
-    lace: std({ color: lin('#8f7350'), roughness: 0.88 }),
-    sock: std({ map: sockTexR(), color: lin('#d9d2d0'), roughness: 0.96 }),
+    boot: (() => { const n = crinkleTex(), k = new THREE.Vector2(0.36, 0.36); return std({ map: leatherTexR(), color: lin('#c4b8ac'), roughness: 0.58, envMapIntensity: 0.55, normalMap: n, normalScale: k }); })(),
+    sole: std({ map: soleTexR(), color: lin('#aaa29c'), roughness: 0.86 }),
+    stitch: std({ color: lin('#a98459'), roughness: 0.8 }), eyelet: std({ color: lin('#b08a4e'), roughness: 0.36, metalness: 1, envMapIntensity: 1.4 }), aglet: std({ color: lin('#a8823e'), roughness: 0.35, metalness: 1 }),
+    lace: std({ color: lin('#7d5a38'), roughness: 0.92 }), hole: std({ color: lin('#0c0a0a'), roughness: 1 }),
+    sock: std({ map: sockTexR(), color: lin('#d2cbc8'), roughness: 0.97 }),
     cloth: std({ color: lin('#1a1518'), roughness: 0.9 })
   };
 

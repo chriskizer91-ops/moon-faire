@@ -6,7 +6,7 @@ Published at https://claude.ai/artifact/NqGHWjWfKvmjcprckzUN7v (republish every 
 `claude/ranger-3d-stage1-body.md`, `claude/ranger-3d-stage2-head.md`, `claude/ranger-3d-stage2b-jester-face.md`,
 `claude/ranger-3d-round4-face-prompts.md` and `claude/ranger-3d-stage2c-new-face.md`.
 
-## Where she stands: stage three (November 12, 2026)
+## Where she stands: stage four (November 13, 2026)
 
 Body, base outfit, head, face, hair, headband and glasses, standing still. 324,628 triangles.
 
@@ -30,6 +30,11 @@ Body, base outfit, head, face, hair, headband and glasses, standing still. 324,6
   gloss. The paint runs from fingertips to about 15 cm above the wrist; above that the arm carries the forearm's tone and grain to
   the shoulder. The wrist was slimmed from 5.3 to 4.7 cm to match D1, D2 and A1 and moved in line with the hand; the arm's hidden
   end was thinned so it stays under the skin of the palm (it showed as a patch once it was painted). The hands' shape is unchanged.
+- **Stage four, boots.** Chris: "Yes let's continue she is looking good." Next in the how-to's order was her boots. They were laid
+  over E1 to E8 at one scale (`tools/cmp_boot.py`) and rebuilt until the outlines agreed to within about 3 mm: sole 9.6 cm across
+  at the ball (it was 12), shaft and toe narrower, shaft shallower front to back with the eyelets set back from the front edge, sock
+  lower and smaller (top 29.1 cm up, it was 32). Lacing, seams, heel counter, back strap with a pull loop, welt stitching, lugs and
+  the leather, sole and sock pictures all follow the paintings now (`src/R31_boots.js`, `src/R21_tex.js`).
 - Stage two, waiting for his notes: face, ears, hair with the bun, headband with knot, tails, gem and drop, glasses, loose locks,
   and a wrist that joins the hand.
 
@@ -109,7 +114,21 @@ take the lean out. Her arms keep the Jester's bone lengths (0.63 m; the painting
 - **Shorts.** Their legs are short cuffs that sit just outside the leg and wear the same picture as the torso.
 - **Leggings.** One tube per leg from `LEG`. The picture is her sleeve lace (F11) over toned-down skin, following B3.
 - **Sleeves.** Lace cylinders that follow the upper arm, see-through where the lace has holes. Stiff until the cloth stage.
-- **Boots and socks.** The Jester's boot, made lower and a little shorter, with a thicker lugged sole and nine eyelets.
+- **Boots and socks (rebuilt in stage four).** The builder began as the Jester's; every table in `src/R31_boots.js` is now read off
+  her own boot paintings.
+  - *Scale.* E1 (outer side) is scaled so its sole is as long as the model's: 1 painting pixel = 0.27 mm. The others are scaled to
+    E1's height (ground to sock top), or to its length for the views from above and below. E6 (from above) has strong perspective
+    and gives a boot about 2 cm too narrow, so widths come from E3, E4 and E7.
+  - *Outline.* `B_SH` is the shaft by height (half-width, front, back, centre), `B_FT` the foot by length, `B_YT` the welt line,
+    `B_HW` the sole's plan, `bBot` the arch. Seen from above, the back half of the shaft is a rounded box and the front half comes
+    to a rounded nose (`B_EF`), which is what puts the eyelets well back from the front edge in the side view.
+  - *Places on the side* are given as [z, y] in metres, read straight off E1, and laid on whichever of shaft and foot is outside
+    there (`sideX`, `onSide`): the nine eyelets (`B_EYE`), the edge of the piece they sit in (`STAY`), the seam from the last
+    eyelet down to the welt (`VAMP`). The back is given by angle from the back seam (`COUNTER`, the strap, the stitched box).
+  - *Laces* run from eyelet to eyelet over the front of the boot (`over` finds the leather under them). The bow has two drooping
+    loops and two tails with brass tips.
+  - *Sock.* Three soft rolls from the collar (23.2 cm) to 29.1 cm, 9 cm across and 11.4 deep.
+  - *Paintings disagree* about the heel: E7 gives a heel 7.3 cm across, E4 about 8.6. The model's is 8.6 at the welt.
 
 ## How the head is made (stage two)
 
@@ -198,7 +217,12 @@ take the lean out. Her arms keep the Jester's bone lengths (0.63 m; the painting
 Stage three was looked at with `tools/shoot_hand.py` (each hand and forearm from four sides beside its painting) and
 `tools/page_test.py` (the page at phone size: every hand and arm button, a drag, no errors).
 
-Known rough spots: the thin edge of the hand (little-finger side, round the base of the thumb) is soft paint with no detail, because
+Stage four was looked at with `tools/cmp_boot.py` (each view beside its painting with the model's outline drawn over it, and
+tables of both outlines in millimetres) and `tools/page_test.py`. Side view: back edge within 3 mm from sole to collar; front view:
+widths within 3 mm from sole to collar, sock within 6; whole boot 257 mm long and 295 mm tall against 257 and 296 painted.
+
+Known rough spots: the boot leather is one worn texture all over (the paintings rub paler on toe cap and heel), the shaft has no
+ankle creases, and the tread under the sole is plain bars, not the crosses in E7; the thin edge of the hand (little-finger side, round the base of the thumb) is soft paint with no detail, because
 neither painting shows it; the paint on the fingers is drawn out; the arm meets the shoulder with a step; the sides of the torso under the arms are filled in from thin evidence; the painted strap hooks are flat;
 the shins are straight where the front painting has them angled a little outward; the hair pictures still come from C3, C5 and C8 with the band painted out, so just behind
 the band the hair is folded-over texture, which can read as crimped (J3 shows her hair without the band and is the source for the hair pass); a faint line remains where forearm skin meets hand skin until both are painted.
@@ -216,10 +240,11 @@ python3 -I bake_ranger.py             # out/ranger_tex.js: body (needs Pillow, n
 python3 -I bake_head.py               # adds the head, hair and band pictures to it (also needs opencv)
 python3 -I bake_hands_r.py            # adds her hands and arms from D1 and D2
 ./build_r.sh                          # tools/tables.py, then out/ranger.js
-python3 -I build_single_r.py          # deliver/Ranger_3D_stage3.html, one offline file
+python3 -I build_single_r.py          # deliver/Ranger_3D_stage4.html, one offline file
 python3 tools/shoot_hand.py shots/hand_L.jpg L hand   # one hand from four sides beside D1 or D2; also R, and arm
 python3 tools/wrist_sections.py                       # forearm and hand, slice by slice through the wrist
-python3 tools/page_test.py                            # the page at phone size: hand and arm buttons, a drag
+python3 tools/page_test.py                            # the page at phone size: boot, hand and body buttons, a drag
+python3 tools/cmp_boot.py shots/boot                  # her boot beside E1 to E7 at one scale, with outline tables in mm
 python3 tools/cmp_j3.py shots/cj3.jpg                 # head beside J3's three views, with widths and depths by height
 python3 tools/cmp_head.py shots/ch_side.jpg side      # head beside C3 with outlines; also front
 python3 tools/cmp_r.py shots/cmp_front.jpg front      # body beside B1 with outlines; also back, sideR, sideL
@@ -233,7 +258,7 @@ Python that reads them with `-I`.
 
 ## Next stages
 
-In the order of the how-to: boots against E1 to E8 once more; strap hooks, belts, satchel and
+In the order of the how-to: strap hooks, belts, satchel and
 pouch as solid things; sleeves and headband tails as cloth; necklaces, earrings, charms and bracelets; bow, sword and knives
 (G1 to G7); then the Jester's body moves in her clothes; a face that blinks and changes expression (C10, C11); then her own moves
 and spells with their effects (I1 to I6); then the full page.

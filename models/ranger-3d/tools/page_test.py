@@ -2,19 +2,19 @@
 import sys
 from playwright.sync_api import sync_playwright
 from PIL import Image
-PAGE = sys.argv[1] if len(sys.argv) > 1 else '/home/claude/ranger/deliver/Ranger_3D_stage3.html'
+PAGE = sys.argv[1] if len(sys.argv) > 1 else '/home/claude/ranger/deliver/Ranger_3D_stage4.html'
 ARGS = ['--use-angle=swiftshader', '--enable-unsafe-swiftshader', '--ignore-gpu-blocklist', '--allow-file-access-from-files']
 with sync_playwright() as p:
     b = p.chromium.launch(executable_path='/usr/bin/google-chrome', args=ARGS)
     pg = b.new_page(viewport={'width': 412, 'height': 915}); pg.set_default_timeout(240000); logs = []
     pg.on('pageerror', lambda e: logs.append('PAGEERR: ' + str(e)[:300])); pg.on('console', lambda m: logs.append('console: ' + m.text[:200]) if m.type == 'error' else None)
     pg.goto('file://' + PAGE); pg.wait_for_function('window.RANGER', timeout=240000); pg.wait_for_timeout(7000)
-    print('hud:', pg.inner_text('#hud'), '| chips:', {k: pg.evaluate('(k) => document.querySelectorAll("#" + k + " .chip").length', k) for k in ('hviews', 'faces', 'hands', 'views', 'poses', 'shows')})
+    print('hud:', pg.inner_text('#hud'), '| chips:', {k: pg.evaluate('(k) => document.querySelectorAll("#" + k + " .chip").length', k) for k in ('hviews', 'faces', 'boots', 'hands', 'views', 'poses', 'shows')})
     bx = pg.locator('#stage').bounding_box(); clip = {'x': bx['x'], 'y': bx['y'], 'width': bx['width'], 'height': bx['height']}; shots = []
     def shot(name): pg.evaluate('window.scrollTo(0,0)'); pg.wait_for_timeout(300); f = '/tmp/pt_%s.png' % name; pg.screenshot(path=f, clip=clip); shots.append(f)
     shot('open')
-    for host, label in (('hands', 'Left palm'), ('hands', 'Right hand'), ('hands', 'Right palm'), ('hands', 'Left arm'), ('views', 'Front'), ('hviews', 'Face')):
-        pg.evaluate('window.scrollTo(0,0)'); pg.click('#%s >> text="%s"' % (host, label)); pg.wait_for_timeout(6500); shot(label.replace(' ', '_'))
+    for host, label in (('boots', 'Outer side'), ('boots', 'Front'), ('boots', 'Back'), ('boots', 'From above'), ('hands', 'Left hand'), ('views', 'Front'), ('hviews', 'Face')):
+        pg.evaluate('window.scrollTo(0,0)'); pg.click('#%s >> text="%s"' % (host, label)); pg.wait_for_timeout(6500); shot(host + '_' + label.replace(' ', '_'))
     print('after Face: target', pg.evaluate('RANGER.stage.orbit.target.toArray().map((v) => +v.toFixed(3))'), 'pressed pose:', pg.evaluate('[...document.querySelectorAll("#poses .chip")].filter((c) => c.getAttribute("aria-pressed") === "true").map((c) => c.textContent)'))
     az0 = pg.evaluate('RANGER.stage.orbit.az'); cx, cy = bx['x'] + bx['width'] / 2, bx['y'] + bx['height'] / 2
     pg.mouse.move(cx, cy); pg.mouse.down(); pg.wait_for_timeout(300)
