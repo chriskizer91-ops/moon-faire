@@ -59,11 +59,21 @@ four strap hooks as real objects, standing still. About 355,000 triangles.
     the buckles.
   - A choice made here, told to Chris: the paintings draw each bag face-on in every view. The satchel is on the side of her hip
     turned a little forward and the pouch behind her left hip, so each shows from the front, the side and the back.
+- **Stage 5b, the rough spots of stage five.** Chris: "Continue on with fixing what's still rough: the bags, the charms, her shoulders."
+  - Charms (F7), in `src/R45_gear.js`: three turquoise crystals under the satchel, the bead string from the ring buckle, the
+    cluster of gold balls from the square buckle, the amber string under the pouch. Each is a list of parts (clasp, ring, links,
+    beads, cap, cut stone) drawn down a line, at the lengths in A1 (bead string and cluster about 18.5 cm). Stones are flat-faced.
+  - Things that hang have bones now: `bagsat`, `bagpouch` (children of the hips, at the belt hinge) and `charm1` to `charm6`
+    (children of the hips or of a bag). `animate(dt)` swings them: gravity pulls each in against her, her thigh pushes a bag out
+    (the bag's lean is worked out from the thigh's place each frame), a push (`swing()`) or the movement of its hinge sets it
+    swinging. `pose()` lets them come to rest at once. The page has "Give them a swing" and a "Legs apart" pose.
+  - Strap hooks take the skin's own weights (the six nearest skin points, `wNear`), so the outer curls ride her shoulder when her
+    arm lifts. The strap is redrawn over the top of each shoulder in the body picture (`strap_over` in `bake_ranger.py`).
 - Waiting for his notes: stage two (head), stage three (hands and arms), stage 4b (hair) and stage five.
 
 Rough or not built yet: her face does not move (no blink, no expressions); the hair has a smooth edge with none of the painted
-flyaway wisps, and the loose locks are simple; earrings and necklaces; fingers that bend; the charms on her belts and the rings they hang from; bracelets; the bags are stiff (no
-swing, and a moving thigh can pass through one); with her arms raised the outer iron curls stay put instead of riding her shoulder;
+flyaway wisps, and the loose locks are simple; earrings and necklaces; fingers that bend; bracelets; each charm is one stiff piece on a hinge (its chain does not bend, charms can
+pass through each other); the caps on the stones are plain cones; with her arms straight out the iron curls bend with her skin;
 sleeves and headband tails as hanging cloth; bow, sword, knives; all movement and spells.
 
 ## What is here
@@ -263,7 +273,7 @@ paintings draw about 12 (F6's shape was kept).
 
 Known rough spots: the boot leather is one worn texture all over (the paintings rub paler on toe cap and heel), the shaft has no
 ankle creases, and the tread under the sole is plain bars, not the crosses in E7; the thin edge of the hand (little-finger side, round the base of the thumb) is soft paint with no detail, because
-neither painting shows it; the paint on the fingers is drawn out; the arm meets the shoulder with a step; the sides of the torso under the arms are filled in from thin evidence; at her back the straps blur just above the buckles; the satchel's loops sit 2 cm nearer its middle than F6 paints them, to hang clear of the ring buckle;
+neither painting shows it; the paint on the fingers is drawn out; the arm meets the shoulder with a step; the sides of the torso under the arms are filled in from thin evidence; the satchel's loops sit 2 cm nearer its middle than F6 paints them, to hang clear of the ring buckle;
 the shins are straight where the front painting has them angled a little outward; the hair pictures still come from C3, C5 and C8 with the band painted out, so just behind
 the band the hair is folded-over texture, which can read as crimped (J3 shows her hair without the band and is the source for the hair pass); a faint line remains where forearm skin meets hand skin until both are painted.
 
@@ -281,7 +291,7 @@ python3 -I bake_head.py               # adds the head, hair and band pictures to
 python3 -I bake_hands_r.py            # adds her hands and arms from D1 and D2
 python3 -I bake_gear_r.py             # adds the leather of her bags and belts from F6
 ./build_r.sh                          # tools/tables.py, then out/ranger.js
-python3 -I build_single_r.py          # deliver/Ranger_3D_stage5.html, one offline file
+python3 -I build_single_r.py          # deliver/Ranger_3D_stage5b.html, one offline file
 python3 tools/shoot_hand.py shots/hand_L.jpg L hand   # one hand from four sides beside D1 or D2; also R, and arm
 python3 tools/wrist_sections.py                       # forearm and hand, slice by slice through the wrist
 python3 tools/page_test.py                            # the page at phone size: belt, bag, hook, boot, hand and body buttons, a drag
@@ -299,7 +309,7 @@ Python that reads them with `-I`.
 
 ## Next stages
 
-In the order of the how-to: sleeves and headband tails as cloth; necklaces, earrings, bracelets, and the charms on her belts (F7); bow, sword and knives
+In the order of the how-to: sleeves and headband tails as cloth; necklaces, earrings and bracelets; bow, sword and knives
 (G1 to G7); then the Jester's body moves in her clothes; a face that blinks and changes expression (C10, C11); then her own moves
 and spells with their effects (I1 to I6); then the full page.
 

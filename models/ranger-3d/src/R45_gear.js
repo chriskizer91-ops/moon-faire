@@ -7,8 +7,10 @@
   //   Pouch: 9.3 cm across, 14 tall. It hangs from belt B behind her left hip.
   //   Strap hooks: where each shoulder strap comes over, front and back (133 and 134 cm up, 11.5 cm out): a brass buckle and two black
   //   iron curls, each curl 2.6 cm across and 3.9 tall, in rod 6 mm thick.
+  let gearTick = null, gearKick = null, gearSettle = null;       // set below: swing the bags and charms, give them a push, let them come to rest
   (function buildGear() {
     if (!BAKED || !BAKED.gearLayout) return;
+    const HANG = [];
     const GL = BAKED.gearLayout, P3 = (a) => V3(a[0], a[1], a[2]), wHip = () => [BI.hips, 1];
     const gUV = (name, px, py) => { const L = GL[name]; return [(L[0] + (px - L[4]) / (L[6] - L[4]) * L[2]) / 1024, 1 - (L[1] + (py - L[5]) / (L[7] - L[5]) * L[3]) / 1024]; };
     // the surface of her body and the way it faces
@@ -91,6 +93,11 @@
         hinge.addScaledVector(ez0, push); }
       const ey = UP.clone().multiplyScalar(Math.cos(th)).addScaledVector(ez0, -Math.sin(th)), ez = ez0.clone().multiplyScalar(Math.cos(th)).addScaledVector(UP, Math.sin(th));
       const O = hinge.clone().addScaledVector(ey, -drop);
+      const bn = 'bag' + S.name; addBone(bn, 'hips', hinge.x, hinge.y, hinge.z); const wB = () => [BI[bn], 1];       // its own bone, at the hinge, so it can swing and be pushed out by her thigh
+      { const sd = hinge.x < 0 ? 'R' : 'L', inFoot = (p) => { const d = p.clone().sub(hinge); return Math.abs(d.dot(ex)) < hw0 * 0.94 && d.y < -drop - 0.004 && d.y > -drop - H - 0.01; }, ang = (p) => Math.atan2(p.clone().sub(hinge).dot(ez0), hinge.y - p.y);
+        let needT = -1; for (const p of body) if (inFoot(p)) needT = Math.max(needT, ang(p));
+        const pts = []; for (let j = 0; j <= 18; j++) { const y = lerp(0.87, 0.69, j / 18); for (const q of legRing(sd === 'R' ? -1 : 1, y, 1.04, 30)) { const p = P3(q); if (inFoot(p)) pts.push({ p, w: 1 - sm(0.78, 0.87, y) }); } }
+        HANG.push({ kind: 'bag', bone: bn, side: sd, hinge: hinge.clone(), ex: ex.clone(), ez: ez0.clone(), th0: th, clear: 0, needT, need0: pts.reduce((m, q) => Math.max(m, ang(q.p)), needT), pts, L: drop + H * 0.55, damp: 3.0, bMax: 0.05, lean: true, a: 0, b: 0, va: 0, vb: 0 }); }
       if (typeof window !== 'undefined') (window.__gear = window.__gear || {})[S.name] = { yaw: best.yaw, lean: th, O: O.toArray(), ex: ex.toArray(), ez: ez.toArray(), box: [[-hw0, 0, 0], [hw0, 0, 0], [-hw0, -H, 0], [hw0, -H, 0], [-hw0, 0, S.D[1]], [hw0, 0, S.D[1]], [-hw0, -H, S.D[0]], [hw0, -H, S.D[0]]].map(([X, Y, Z]) => O.clone().addScaledVector(ex, X).addScaledVector(ey, Y).addScaledVector(ez, Z).toArray()) };
       const W3 = (X, Y, Z) => O.clone().addScaledVector(ex, X).addScaledVector(ey, Y).addScaledVector(ez, Z), A = (X, Y, Z) => W3(X, Y, Z).toArray();
       const halfW = (Y) => { const h = Y + H; return h < rc ? hw0 - rc + Math.sqrt(Math.max(0, rc * rc - (rc - h) * (rc - h))) : hw0; };
@@ -98,7 +105,7 @@
       const zF = (X, Y) => depth(Y) * (1 - 0.10 * Math.pow(X / hw0, 2)) * (1 - 0.30 * sm(0.80, 1.0, Math.abs(X) / Math.max(1e-6, halfW(Y))));
       // the painted bag has round shoulders: near its top the picture is read a little narrower, so no background comes in at the corners
       const uvF = (X, Y) => { const py = S.f[2] - Y / m; return gUV(S.name + 'Front', cxF + (X / m) * 0.975 * lerp(S.topK, 1, sm(S.f[2] - 5, S.f[2] + S.topR, py)), py); }, inside = W3(0, -H / 2, S.D[0] / 2);
-      const sheet = (rows, uvs, key) => { const part = loft(rows, { open: true }); for (let i = 0; i < uvs.length; i++) { part.uv[i * 2] = uvs[i][0]; part.uv[i * 2 + 1] = uvs[i][1]; } addPart(key || 'gear', part, wHip, { out: inside }); };
+      const sheet = (rows, uvs, key) => { const part = loft(rows, { open: true }); for (let i = 0; i < uvs.length; i++) { part.uv[i * 2] = uvs[i][0]; part.uv[i * 2 + 1] = uvs[i][1]; } addPart(key || 'gear', part, wB, { out: inside }); };
       const NX = Q(14, 8), NY = Q(16, 9);
       // back and front
       { const rb = [], ub = [], rf = [], uf = [], cxB = (S.b[0] + S.b[1]) / 2, mB = S.W / (S.b[1] - S.b[0]);
@@ -135,9 +142,9 @@
       for (const tb of S.tabs) slab(tb, 0.0048 + 0.0032);
       // buckles on the straps: a steel frame and its prong
       for (const [px, py, hwp, hhp] of S.buckles) { const X = (px - cxF) * m, Y = -(py - S.f[2]) * m, c = W3(X, Y, zF(X, Y) + S.bz);
-        tube('steel', roundRect(c, ex, ey, hwp * m, hhp * m, 0.0034, 3), 0.0021, wHip, true);
-        tube('steel', [c.clone().addScaledVector(ey, hhp * m).addScaledVector(ez, 0.0008), c.clone().addScaledVector(ez, 0.0018), c.clone().addScaledVector(ey, -hhp * m).addScaledVector(ez, 0.0010)], 0.0014, wHip); }
-      for (const [px, py, lift] of S.studs) { const X = (px - cxF) * m, Y = -(py - S.f[2]) * m; dome('gearBrass', W3(X, Y, zF(X, Y) + lift), ez, 0.0027, 0.0018, wHip); }
+        tube('steel', roundRect(c, ex, ey, hwp * m, hhp * m, 0.0034, 3), 0.0021, wB, true);
+        tube('steel', [c.clone().addScaledVector(ey, hhp * m).addScaledVector(ez, 0.0008), c.clone().addScaledVector(ez, 0.0018), c.clone().addScaledVector(ey, -hhp * m).addScaledVector(ez, 0.0010)], 0.0014, wB); }
+      for (const [px, py, lift] of S.studs) { const X = (px - cxF) * m, Y = -(py - S.f[2]) * m; dome('gearBrass', W3(X, Y, zF(X, Y) + lift), ez, 0.0027, 0.0018, wB); }
       // the loops it hangs by: up the back, out over the belt and down behind it
       for (const [lx0, lx1, bx0, bx1] of S.loops) { const X0 = (lx0 - cxF) * m, X1 = (lx1 - cxF) * m, span = S.loopPy[1] - S.loopPy[0], colsL = [], hw = BELT.hw, th = BELT.th;
         for (const q of [0, 0.5, 1]) { const X = lerp(X0, X1, q), b = B.above(O, ex, X, sAnchor), c = b.p.clone().addScaledVector(b.n, b.off), bq = (a, d) => c.clone().addScaledVector(b.w, a).addScaledVector(b.n, d);
@@ -145,9 +152,9 @@
         const rows = [], uvs = []; let acc = 0;
         for (let i = 0; i < colsL[1].length; i++) { if (i) acc += colsL[1][i].distanceTo(colsL[1][i - 1]); rows.push(colsL.map((cp) => cp[i].toArray())); for (const q of [0, 0.5, 1]) uvs.push(gUV('satBack', lerp(bx0, bx1, q), S.loopPy[1] - cl(acc / 0.13, 0, 1) * span)); }
         const part = loft(rows, { open: true }); for (let i = 0; i < uvs.length; i++) { part.uv[i * 2] = uvs[i][0]; part.uv[i * 2 + 1] = uvs[i][1]; }
-        addPart('gear', part, wHip, { out: B.above(O, ex, (X0 + X1) / 2, sAnchor).p.clone().addScaledVector(ey, -0.004) });
+        addPart('gear', part, wB, { out: B.above(O, ex, (X0 + X1) / 2, sAnchor).p.clone().addScaledVector(ey, -0.004) });
         if (typeof window !== 'undefined') (window.__gear[S.name].loops = window.__gear[S.name].loops || []).push([B.above(O, ex, X0, sAnchor).p.x, B.above(O, ex, X1, sAnchor).p.x]); }
-      return { O, ex, ey, ez, H };
+      return { O, ex, ey, ez, ez0, H, W3, bn, D: S.D };
     };
     const SAT = { name: 'sat', W: 0.200, D: [0.065, 0.044], rc: 70, topK: 0.86, topR: 52, f: [60, 482, 512, 910], b: [757, 1203, 542, 909], sd: [546, 692, 530, 915], flap: [686, 648],
       straps: [[164, 218, 690, 690, 874, 902], [340, 392, 690, 690, 874, 902]], tabs: [[245, 308, 604, 634, 834, 864]], buckles: [[190, 779, 36, 36], [366, 779, 36, 36]], bz: 0.0030 + 0.0030,
@@ -157,8 +164,80 @@
       studs: [[1376, 655, 0.0062], [1368, 690, 0.0062], [1385, 690, 0.0062]], loops: [[1347, 1402, 828, 875]], loopPy: [448, 675] };
     if (typeof window !== 'undefined') { window.__gear = window.__gear || {}; window.__gear.belts = { ring: beltA.at(beltA.buckle).p.toArray(), square: beltB.at(beltB.buckle).p.toArray(), lenA: beltA.L, lenB: beltB.L, studsA: beltA.nT, pitch: beltA.pitch, hiA: beltA.at(beltA.sOfU(0.25)).p.toArray(), loA: beltA.at(beltA.sOfU(0.75)).p.toArray(), crossF: beltA.at(beltA.sOfU(0.5)).p.toArray(), crossB: beltA.at(beltA.sOfU(0)).p.toArray() }; }
     const uSat = 0.300, uPou = 0.815, sSat = beltA.sOfU(uSat), sPou = beltB.sOfU(uPou);
-    bag(SAT, beltA, uSat, 0.043); bag(POU, beltB, uPou, 0.045);
+    const sat = bag(SAT, beltA, uSat, 0.043), pou = bag(POU, beltB, uPou, 0.045);
     studs(beltA, [[beltA.buckle + 0.006, 0.050], [beltA.sOfU(0.5), 0.026], [beltA.sOfU(0), 0.026]]);       // none under its buckle and tail, nor where the other belt lies over it studs(beltB, [[beltB.buckle - 0.042, 0.086]]);
+
+    // ---- charms (F7): six strings of beads. Each has its own bone at its clasp, so it can swing. ----
+    // Sizes come from F7 (0.33 mm to a pixel of the sheet as shown, set by the bead string being 19 cm in A1). Three crystals hang under
+    // the satchel, the bead string from the ring buckle, the cluster of gold balls from the square buckle, the amber string under the pouch.
+    const UPV = V3(0, 1, 0);
+    const flat = (key, tris, c0, wf) => { const pos = [], nor = [], idx = [];       // flat faces, so stones look cut
+      for (const [a, b0, c1] of tris) { let b = b0, c = c1; const n = b.clone().sub(a).cross(c.clone().sub(a)).normalize(); if (n.dot(a.clone().add(b).add(c).multiplyScalar(1 / 3).sub(c0)) < 0) { n.negate(); const t = b; b = c; c = t; }
+        for (const p of [a, b, c]) { idx.push(pos.length / 3); pos.push(p.x, p.y, p.z); nor.push(n.x, n.y, n.z); } }
+      addPart(key, { pos, idx }, wf, { nor }); };
+    let nCharm = 0;
+    const charm = (parent, top, nh0, items, free, K) => {
+      const name = 'charm' + (++nCharm), nh = V3(nh0.x, 0, nh0.z).normalize(), exC = V3().crossVectors(UPV, nh), side = top.x < 0 ? 'R' : 'L';
+      const LEN = { clasp: () => 0.0185, ring: () => 0.0042, link: (n) => n * 0.0034 + 0.001, bead: (r) => 1.84 * r, sp: () => 0.0026, facet: (r, h) => h, cap: (r, h) => h * 0.55, crystal: (rx, rz, h) => h, drop: (r, h) => h, cluster: (r, d) => 2 * r + 2 * d };
+      const len = K * items.reduce((m, it) => m + LEN[it[0]](it[1], it[2], it[3]), 0);
+      // one that hangs against her leans out just far enough to clear her
+      let th = 0, needT = -9; const pts = [], ang = (p) => Math.atan2(p.clone().sub(top).dot(nh) + 0.008 * K, top.y - p.y);
+      if (!free) { const u0 = rTorsoU(top.x, top.y, top.z);
+        for (let i = -6; i <= 6; i++) for (let j = 0; j <= 24; j++) { const y = top.y - 0.012 - (len - 0.012) * j / 24; if (y < R_TY0) continue; needT = Math.max(needT, ang(P3(rTorso(u0 + i * 0.004, y)))); }
+        for (let j = 0; j <= 16; j++) { const y = lerp(0.87, top.y - len - 0.01, j / 16); if (y > top.y - 0.012) continue; for (const q of legRing(side === 'R' ? -1 : 1, y, 1.04, 30)) { const p = P3(q); if (Math.abs(p.clone().sub(top).dot(exC)) < 0.016 && p.clone().sub(top).dot(nh) > -0.08) pts.push({ p, w: 1 - sm(0.78, 0.87, y) }); } }
+        th = Math.max(0, pts.reduce((m, q) => Math.max(m, ang(q.p)), needT)); }
+      const ey = UPV.clone().multiplyScalar(Math.cos(th)).addScaledVector(nh, -Math.sin(th)), ez = nh.clone().multiplyScalar(Math.cos(th)).addScaledVector(UPV, Math.sin(th));
+      addBone(name, parent, top.x, top.y, top.z); const wC = () => [BI[name], 1], P = (sd, a, b) => top.clone().addScaledVector(ey, -sd * K).addScaledVector(exC, (a || 0) * K).addScaledVector(ez, (b || 0) * K);
+      const ball = (key, c, r, ry) => addPart(key, spherePart(c, r * K, (ry || r) * K, r * K, 10, 7), wC, { out: c });
+      const hoop = (sc, ra, rs, rod, turned, n) => { const pts2 = []; for (let j = 0; j < n; j++) { const t = (j / n) * TAU; pts2.push(turned ? P(sc - rs * Math.cos(t), 0, ra * Math.sin(t)) : P(sc - rs * Math.cos(t), ra * Math.sin(t), 0)); } tube('charmGold', pts2, rod * K, wC, true); };
+      const prism = (key, s0, rings, n, rx, rz, h) => { const Rg = rings.map(([f, k]) => { const ring = []; for (let j = 0; j < n; j++) { const t = ((j + 0.5) / n) * TAU; ring.push(P(s0 + f * h, rx * k * Math.cos(t), rz * k * Math.sin(t))); } return ring; }), tris = [], A = P(s0), Z = P(s0 + h), last = Rg.length - 1;
+        for (let j = 0; j < n; j++) { const k = (j + 1) % n; tris.push([A, Rg[0][j], Rg[0][k]]); for (let i = 0; i < last; i++) { tris.push([Rg[i][j], Rg[i + 1][j], Rg[i + 1][k]]); tris.push([Rg[i][j], Rg[i + 1][k], Rg[i][k]]); } tris.push([Z, Rg[last][k], Rg[last][j]]); }
+        flat(key, tris, P(s0 + h * 0.4), wC); };
+      let s = 0;
+      for (const it of items) { const k = it[0];
+        if (k === 'clasp') { const pts2 = []; for (let j = 0; j < 14; j++) { const t = (j / 14) * TAU; pts2.push(P(s + 0.0088 - 0.0080 * Math.cos(t), 0.0033 * Math.sin(t) * (1 - 0.22 * Math.cos(t)), 0)); } tube('charmGold', pts2, 0.0009 * K, wC, true); ball('charmGold', P(s + 0.0176), 0.0017); }
+        else if (k === 'ring') hoop(s + 0.0021, 0.0026, 0.0026, 0.0007, false, 10);
+        else if (k === 'link') for (let i = 0; i < it[1]; i++) hoop(s + 0.0022 + i * 0.0034, 0.0013, 0.0024, 0.00045, i % 2 === 0, 8);
+        else if (k === 'bead') ball(it[2], P(s + 0.92 * it[1]), it[1]);
+        else if (k === 'sp') ball('charmGold', P(s + 0.0013), 0.0017, 0.0014);
+        else if (k === 'facet') prism(it[3], s, [[0.07, 0.55], [0.3, 1], [0.7, 1], [0.93, 0.55]], 8, it[1], it[1], it[2]);
+        else if (k === 'cap') { const rings = [[0, 0.22], [0.25, 0.5], [0.6, 0.86], [1, 1.04]].map(([f, q]) => { const ring = []; for (let j = 0; j < 12; j++) { const t = (j / 12) * TAU; ring.push(P(s + f * it[2], it[1] * q * Math.cos(t), it[1] * q * Math.sin(t) * (it[3] || 1)).toArray()); } return ring; }); addPart('charmGold', loft(rings, { capA: true }), wC, { out: P(s + it[2] * 0.6) }); }
+        else if (k === 'crystal') prism('crystal', s, [[0.10, 0.60], [0.30, 1]], 6, it[1], it[2], it[3]);
+        else if (k === 'drop') prism(it[3], s, [[0.05, 0.42], [0.20, 0.86], [0.42, 1], [0.70, 0.60]], 8, it[1], it[1], it[2]);
+        else if (k === 'cluster') { const r = it[1], d = it[2]; ball('charmGold', P(s + r), r); ball('charmGold', P(s + r + d, -d), r); ball('charmGold', P(s + r + d, d), r); ball('charmGold', P(s + r + 2 * d), r); }
+        s += LEN[k](it[1], it[2], it[3]); }
+      HANG.push({ kind: 'charm', bone: name, side, hinge: top.clone(), ex: exC, ez: nh, th0: th, clear: 0.008 * K, needT, need0: th, pts, L: Math.max(0.05, len * 0.62), damp: 2.2, bMax: 0.9, lean: !free, a: 0, b: 0, va: 0, vb: 0 });
+    };
+    const G = 'charmGold';
+    const CRYSTAL = (links, rb, rx, h) => [['clasp'], ['ring'], ['link', links], ['bead', rb, G], ['sp'], ['bead', 0.0038, 'teal'], ['sp'], ['link', 2], ['cap', rx * 0.98, 0.016, 0.62], ['crystal', rx, rx * 0.56, h]];
+    { const bot = (X, Zf) => sat.W3(X, -sat.H + (Math.abs(X) > 0.06 ? 0.006 : 0.001), sat.D[0] * Zf);       // three crystals under the satchel, toward her back as in A1
+      charm(sat.bn, bot(-0.074, 0.55), sat.ez0, CRYSTAL(4, 0.0062, 0.0130, 0.042), true, 1.1);
+      charm(sat.bn, bot(-0.046, 0.62), sat.ez0, CRYSTAL(6, 0.0056, 0.0118, 0.038), true, 1.1);
+      charm(sat.bn, bot(-0.020, 0.52), sat.ez0, CRYSTAL(3, 0.0058, 0.0112, 0.040), true, 1.1); }
+    { const e = beltA.at(beltA.buckle), top = e.p.clone().addScaledVector(e.n, e.off + BELT.th * 2 + 0.0040).addScaledVector(e.w, -0.0170);       // the bead string, from the ring buckle
+      charm('hips', top, e.n, [['clasp'], ['ring'], ['link', 3], ['bead', 0.0024, G], ['facet', 0.0055, 0.018, 'amber'], ['bead', 0.0024, G], ['bead', 0.0040, 'teal'], ['bead', 0.0024, G], ['bead', 0.0024, G], ['bead', 0.0050, 'pearl'], ['bead', 0.0024, G], ['bead', 0.0040, 'teal'], ['bead', 0.0024, G], ['link', 4], ['cap', 0.0072, 0.008], ['drop', 0.0095, 0.030, 'amber'], ['bead', 0.0024, G], ['bead', 0.0024, G], ['bead', 0.0055, 'pearl']], false, 1.1); }
+    { const e = beltB.at(beltB.buckle), top = e.p.clone().addScaledVector(e.n, e.off + BELT.th * 2 + 0.0040).addScaledVector(e.w, -0.0180);       // the cluster of gold balls, from the square buckle
+      charm('hips', top, e.n, [['clasp'], ['ring'], ['link', 9], ['cluster', 0.0088, 0.0095], ['link', 6], ['bead', 0.0040, 'teal'], ['bead', 0.0024, G], ['link', 2], ['cap', 0.0062, 0.007], ['drop', 0.0078, 0.032, 'amber']], false, 1.12); }
+    charm(pou.bn, pou.W3(0.014, -pou.H + 0.001, pou.D[0] * 0.6), pou.ez0, [['clasp'], ['link', 5], ['bead', 0.0036, G], ['bead', 0.0038, 'teal'], ['bead', 0.0024, G], ['facet', 0.0058, 0.020, 'amber'], ['bead', 0.0024, G], ['link', 4], ['cap', 0.0060, 0.007], ['drop', 0.0068, 0.028, 'amber']], true, 1.1);       // the amber string, under the pouch
+
+    // ---- how the hanging things move ----
+    // Each is a weight on a hinge. Gravity pulls it in against her; her thigh can push it out; a push or her own movement sets it swinging.
+    { const qb = new THREE.Quaternion(), Mrel = new THREE.Matrix4(), tv = V3(), tw = V3(), ta = V3();
+      const needNow = (h) => { let a = h.needT; if (!h.pts.length) return a; const tb = SK['thigh' + h.side], hp = SK.hips; Mrel.copy(hp.matrixWorld).invert().multiply(tb.matrixWorld);
+        for (const q of h.pts) { tv.copy(q.p).sub(tb.userData.rest).applyMatrix4(Mrel).add(hp.userData.rest).sub(q.p).multiplyScalar(q.w).add(q.p).sub(h.hinge); if (-tv.y < 0.012) continue; a = Math.max(a, Math.atan2(tv.dot(h.ez) + h.clear, -tv.y)); } return a; };
+      const floor = (h) => (h.lean ? Math.max(0, needNow(h) - h.need0) : -0.7);
+      const apply = (h) => { SK[h.bone].quaternion.setFromAxisAngle(h.ex, -h.a).multiply(qb.setFromAxisAngle(h.ez, h.b)); };
+      gearSettle = () => { for (const h of HANG) { h.a = h.lean ? floor(h) : 0; h.b = 0; h.va = 0; h.vb = 0; h.pw = null; h.pv = null; apply(h); } };
+      gearKick = () => { HANG.forEach((h, i) => { h.va += h.kind === 'bag' ? 4.0 : 2.6; h.vb += h.kind === 'bag' ? 0 : (i % 2 ? 1.9 : -1.9); }); };
+      gearTick = (dt) => { if (!(dt > 0)) return; dt = Math.min(dt, 0.05); const n = Math.ceil(dt / 0.008), st = dt / n;
+        for (const h of HANG) { const bone = SK[h.bone]; bone.getWorldPosition(tw); let ia = 0, ib = 0;
+          if (h.pw) { tv.copy(tw).sub(h.pw).multiplyScalar(1 / dt); if (h.pv) { ta.copy(tv).sub(h.pv).multiplyScalar(1 / dt); const pm = bone.parent.matrixWorld; ia = cl(-ta.dot(tw.copy(h.ez).transformDirection(pm)) / h.L, -80, 80); ib = cl(-ta.dot(tw.copy(h.ex).transformDirection(pm)) / h.L, -80, 80); bone.getWorldPosition(tw); } (h.pv || (h.pv = V3())).copy(tv); }
+          (h.pw || (h.pw = V3())).copy(tw);
+          const lo = floor(h), w2 = 9.8 / h.L;
+          for (let k = 0; k < n; k++) { h.va += (-w2 * Math.sin(h.th0 + h.a) - h.damp * h.va + ia) * st; h.a += h.va * st; if (h.a < lo) { h.a = lo; if (h.va < 0) h.va *= -0.12; h.vb *= Math.max(0, 1 - 8 * st); }
+            h.vb += (-w2 * (h.kind === 'bag' ? 6 : 1) * Math.sin(h.b) - h.damp * h.vb + ib) * st; h.b = cl(h.b + h.vb * st, -h.bMax, h.bMax); }
+          apply(h); } };
+      if (typeof window !== 'undefined') window.__gear.hang = HANG.map((h) => ({ bone: h.bone, th0: +h.th0.toFixed(3), pts: h.pts.length, L: +h.L.toFixed(3) })); }
 
     // ---- strap hooks: a brass buckle on each shoulder strap and a black iron curl either side of it, front and back ----
     // Each sits where the flat painted one was on her body picture (bake_ranger.py paints those out). Shapes are read off A1 (front) and
@@ -177,9 +256,13 @@
     // curls as [out from the middle of the buckle, up], in metres
     const CURLS = { front: { out: [[0.0128, 0.0050], [0.0180, 0.0100], [0.0255, 0.0120], [0.0345, 0.0070], [0.0398, -0.0030], [0.0392, -0.0130], [0.0335, -0.0195], [0.0265, -0.0210]], inn: [[0.0128, 0.0055], [0.0170, 0.0100], [0.0230, 0.0118], [0.0315, 0.0070], [0.0362, -0.0020], [0.0350, -0.0100], [0.0290, -0.0140], [0.0232, -0.0130]] },
       back: { out: [[0.0125, 0.0000], [0.0180, 0.0012], [0.0245, 0.0005], [0.0325, -0.0035], [0.0372, -0.0120], [0.0360, -0.0215], [0.0300, -0.0275], [0.0250, -0.0273]], inn: [[0.0125, 0.0000], [0.0180, 0.0012], [0.0240, 0.0005], [0.0315, -0.0035], [0.0364, -0.0115], [0.0348, -0.0198], [0.0295, -0.0236], [0.0250, -0.0223]] } };
+    const VTX = []; for (const k of ['torso', 'armL', 'armR']) { const Bk = buckets[k]; if (!Bk) continue; for (let i = 0; i < Bk.n; i++) { const x = Math.abs(Bk.pos[i * 3]), y = Bk.pos[i * 3 + 1]; if (y < 1.25 || y > 1.41 || x < 0.05 || x > 0.21) continue; VTX.push([Bk.pos[i * 3], y, Bk.pos[i * 3 + 2], Bk.si.slice(i * 4, i * 4 + 4), Bk.sw.slice(i * 4, i * 4 + 4)]); } }
+    const wNear = (X, Y, Z) => { const best = []; for (const v of VTX) { const d = (v[0] - X) * (v[0] - X) + (v[1] - Y) * (v[1] - Y) + (v[2] - Z) * (v[2] - Z); if (best.length < 6) { best.push([d, v]); best.sort((p, q) => p[0] - q[0]); } else if (d < best[5][0]) { best[5] = [d, v]; best.sort((p, q) => p[0] - q[0]); } }
+      const acc = {}; for (const [d, v] of best) { const k = 1 / (d + 2e-5); for (let j = 0; j < 4; j++) if (v[4][j] > 0) acc[v[3][j]] = (acc[v[3][j]] || 0) + k * v[4][j]; }
+      const out = []; for (const [bi, w] of Object.entries(acc).sort((p, q) => q[1] - p[1]).slice(0, 4)) out.push(+bi, w); return out.length ? out : wTorso(X, Y, Z); };
     const HOOKS = [[0.5 - 0.117, 1.321, true], [0.5 + 0.117, 1.321, true], [0.1115, 1.337, false], [1 - 0.1115, 1.337, false]];
     for (const [u, y, front] of HOOKS) {
-      const cx = rTorso(u, y)[0], sOut = cx < 0 ? -1 : 1, wf = (X, Y, Z) => wTorso(X, Y, Z), at = (a, b, lift) => skin(cx + sOut * a, y + b, front, lift);
+      const cx = rTorso(u, y)[0], sOut = cx < 0 ? -1 : 1, wf = (X, Y, Z) => wNear(X, Y, Z), at = (a, b, lift) => skin(cx + sOut * a, y + b, front, lift);
       const loop = (pts, r, key) => tube(key || 'hookBrass', pts, r, wf, true);
       if (front) { const ring = []; for (let j = 0; j < 26; j++) { const a = (j / 26) * TAU; ring.push(at(0.0135 * Math.cos(a), 0.0110 * Math.sin(a), 0.0030)); } loop(ring, 0.0013);
         tube('hookBrass', [at(0, 0.0125, 0.0036), at(0, 0.004, 0.0046), at(0, -0.005, 0.0046), at(0, -0.0130, 0.0036)], 0.0010, wf);

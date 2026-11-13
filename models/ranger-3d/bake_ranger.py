@@ -130,6 +130,25 @@ def paint_out(atlas):
     band = band * (1 - m) + (num / np.maximum(den, 1e-5)) * m
     atlas[j0:j1] = band; print('painted out: %d px of iron, %d px of brass' % (int(dark.sum()), int(bad.sum()))); return atlas
 atlas = paint_out(atlas)
+# Over the top of each shoulder the paintings see the strap edge-on, so it came out as a blur. It is drawn again there: the strap keeps
+# its place (a band at a fixed distance from her middle) and wears the colours it has just under the front buckles.
+def strap_over(atlas):
+    r, g, b = atlas[..., 0], atlas[..., 1], atlas[..., 2]; blue = b > r + 12; ax = np.abs(X)
+    front = Z > (Z.max(1, keepdims=True) + Z.min(1, keepdims=True)) / 2
+    rows = ((Y[:, 0] > 1.298) & (Y[:, 0] < 1.310))[:, None]; sel = blue & rows & front & (ax > 0.085) & (ax < 0.145)
+    lo, hi = np.percentile(ax[sel], 2), np.percentile(ax[sel], 98); xc = (lo + hi) / 2; hw = (hi - lo) / 2 + 0.0018; t = (ax - xc) / hw
+    ti = np.clip(np.round((t + 1.15) / 2.3 * 36).astype(int), 0, 36); prof = np.zeros((37, 3), np.float32); src = rows & front & (np.abs(t) <= 1.15)
+    for k in range(37):
+        m = src & (ti == k); prof[k] = np.median(atlas[m], 0) if m.sum() > 3 else (prof[k - 1] if k else chest)
+    y0 = np.where(front, 1.321 + 0.017, 1.337 + 0.009); up = smooth(0.0, 0.006, Y - y0)
+    # stray blue beside the band, left from the blur, goes back to skin
+    stray = (up > 0.5) & ndi.binary_dilation(blue, iterations=2) & (np.abs(t) > 1.0) & (ax > 0.05); stray = ndi.binary_dilation(stray, iterations=3) & (np.abs(t) > 1.0)
+    ok = ~stray & ~ndi.binary_dilation(blue, iterations=6) & ((0.3 * r + 0.59 * g + 0.11 * b) > 120); w = ok.astype(np.float32)
+    num = np.stack([ndi.gaussian_filter(atlas[..., k] * w, 14, mode='wrap') for k in range(3)], -1); den = ndi.gaussian_filter(w, 14, mode='wrap')[..., None]
+    m = np.clip(ndi.gaussian_filter(stray.astype(np.float32), 2.0)[..., None] * 1.6, 0, 1); atlas = atlas * (1 - m) + np.where(den > 0.01, num / np.maximum(den, 1e-5), chest[None, None]) * m
+    band = (up * smooth(1.16, 1.02, np.abs(t)))[..., None]; atlas = atlas * (1 - band) + prof[ti] * band
+    print('strap over the shoulder: %.1f cm from her middle, %.1f cm wide; %d px redrawn' % (xc * 100, hw * 200, int((band[..., 0] > 0.5).sum()))); return atlas
+atlas = strap_over(atlas)
 T['body'] = uri(atlas, 90); Image.fromarray(np.clip(atlas, 0, 255).astype(np.uint8)).save('/home/claude/ranger/shots/bake_body.jpg', quality=90)
 print('body atlas', atlas.shape, 'low-confidence share %.3f' % float((conf < 0.5).mean()))
 

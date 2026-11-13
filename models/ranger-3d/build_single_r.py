@@ -1,4 +1,4 @@
-# one offline file: deliver/Ranger_3D_stage5.html (three.js, the stage, her textures, her model and the page, all inline)
+# one offline file: deliver/Ranger_3D_stage5b.html (three.js, the stage, her textures, her model and the page, all inline)
 import base64, io, sys
 sys.path.insert(0, '/home/claude/ranger/tools')
 from PIL import Image
@@ -20,9 +20,10 @@ refs.update({'bootQ': whole('E5.png', (60, 0, 1194, 1254)), 'bootS': whole('E1.p
 def on_her(name, cx, soles, ppm, x0, x1, y0, y1): return whole(name, (round(cx + x0 * ppm), round(soles - y1 * ppm), round(cx + x1 * ppm), round(soles - y0 * ppm)))       # a box given in metres on her
 A1, A2 = ('A1.png', 512.5, 1507, 898), ('A2.png', 507, 1505, 898)
 refs.update({'gearF': on_her(*A1, -0.29, 0.29, 0.70, 1.10), 'gearB': on_her(*A2, -0.29, 0.29, 0.70, 1.10), 'gearBk': on_her(*A1, -0.15, 0.15, 0.90, 1.06), 'hookF': on_her(*A1, -0.185, -0.045, 1.27, 1.375), 'hookB': on_her(*A2, -0.18, -0.04, 1.275, 1.38),
+             'charmF': on_her(*A1, -0.30, 0.30, 0.62, 1.02), 'charmS': whole('F7.png', (60, 50, 620, 840)),
              'gearSat': whole('F6.png', (40, 432, 520, 942)), 'gearPou': whole('F6.png', (1262, 492, 1488, 880))})
 t = open(R + 'viewer_r/index.tpl.html').read()
 rd = lambda p: open(R + p).read()
 t = t.replace('/*THREE*/', rd('node_modules/three/build/three.min.js').replace('</script>', '<\\/script>')).replace('/*PAL*/', rd('out/palette.js')).replace('/*STAGE*/', rd('viewer/stage.js'))
 t = t.replace('/*TEX*/', rd('out/ranger_tex.js')).replace('/*MODEL*/', rd('out/ranger.js')).replace('/*REFS*/{}', json.dumps(refs))
-open(R + 'deliver/Ranger_3D_stage5.html', 'w').write(t); print('deliver/Ranger_3D_stage5.html', round(len(t) / 1e6, 2), 'MB')
+open(R + 'deliver/Ranger_3D_stage5b.html', 'w').write(t); print('deliver/Ranger_3D_stage5b.html', round(len(t) / 1e6, 2), 'MB')
