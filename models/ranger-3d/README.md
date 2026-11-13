@@ -6,7 +6,7 @@ Published at https://claude.ai/artifact/NqGHWjWfKvmjcprckzUN7v (republish every 
 `claude/ranger-3d-stage1-body.md`, `claude/ranger-3d-stage2-head.md`, `claude/ranger-3d-stage2b-jester-face.md`,
 `claude/ranger-3d-round4-face-prompts.md` and `claude/ranger-3d-stage2c-new-face.md`.
 
-## Where she stands: stage two (November 12, 2026)
+## Where she stands: stage three (November 12, 2026)
 
 Body, base outfit, head, face, hair, headband and glasses, standing still. 324,628 triangles.
 
@@ -25,11 +25,16 @@ Body, base outfit, head, face, hair, headband and glasses, standing still. 324,6
   shadows of loose hair and band tails are cleared from the back of her neck; the lenses are fainter.
   The foot of the neck takes the chest's surface direction where the two meet (`buildNeck` in `src/R40_head.js`), so the light
   no longer breaks in a line across her neck.
+- **Stage three, hands and painted arms.** Chris: "Leta move on to her hands and painted arms." Her left hand and forearm wear D1,
+  her right D2, nothing mirrored (`bake_hands_r.py`, landmarks in `hand_marks.json`). Nails are the painted ones under a clear
+  gloss. The paint runs from fingertips to about 15 cm above the wrist; above that the arm carries the forearm's tone and grain to
+  the shoulder. The wrist was slimmed from 5.3 to 4.7 cm to match D1, D2 and A1 and moved in line with the hand; the arm's hidden
+  end was thinned so it stays under the skin of the palm (it showed as a patch once it was painted). The hands' shape is unchanged.
 - Stage two, waiting for his notes: face, ears, hair with the bun, headband with knot, tails, gem and drop, glasses, loose locks,
   and a wrist that joins the hand.
 
 Rough or not built yet: her face does not move (no blink, no expressions); the hair has a smooth edge with none of the painted
-flyaway wisps, and the loose locks are simple; earrings and necklaces; painted arms and hands; the strap hooks as real objects,
+flyaway wisps, and the loose locks are simple; earrings and necklaces; fingers that bend; the strap hooks as real objects,
 belts, satchel, pouch, charms, bracelets; sleeves and headband tails as hanging cloth; bow, sword, knives; all movement and spells.
 
 ## What is here
@@ -53,6 +58,8 @@ belts, satchel, pouch, charms, bracelets; sleeves and headband tails as hanging 
   it is wanted back. `face_prompts/`: the request for three new face pictures and the script that builds its page.
 - For the own-head variant: `tools/prof_r.py` traces her profile off C3 and prints the `MID` table. `tools/prof_cmp_r.py`: the painted profile beside the
   model's, millimetre by millimetre. `tools/cmp_head.py`: her head beside C3 from the side or the front, outlines overlaid.
+- `bake_hands_r.py`: hand and arm textures (`hands`, `handsR`, `armL`, `armR`), added to the same file; `hand_marks.json` holds the
+  finger, web and wrist landmarks of D1 and D2.
 - `bake_ranger.py`: body textures. `bake_head.py`: head textures, added to the same file. Both write `out/ranger_tex.js`
   (`window.RANGER_TEX`).
 - `out/ranger_tex.js`: the baked textures in the published page (made from the original PNGs). `out/palette.js`: stage colours.
@@ -140,6 +147,35 @@ take the lean out. Her arms keep the Jester's bone lengths (0.63 m; the painting
 - **Wrists.** The forearm narrows to 5.3 cm two centimetres above the joint, then widens and flattens into the heel of the hand
   and runs on inside it. The heel's size and place were measured off the hand mesh. The hands themselves were not changed.
 
+## How the hands and arms are painted (stage three)
+
+- **Hands.** The hand model reads one 1024 picture: five strips, one per finger, each wrapped once round it, and two flat panels for
+  the back of the hand and the palm. `bake_hands_r.py` (from the Jester's `bake_hands.py`) fills it from D1 for her left hand. Her
+  right hand is the same mesh mirrored, so D2 is flipped into a left-hand layout, baked the same way into `handsR`, and worn by the
+  right hand (`handR` in `src/32_hands.js`), which mirrors it back.
+- **Landmarks** (`hand_marks.json`): each finger's root and tip and half its width, in the back view (`D`) and the palm view (`P`); the
+  middle finger's line, its web and the wrist in each view. Outlines were measured by `tools/hand_measure.py` (fingertips, webs,
+  finger lines, widths by row) and the result checked by eye with `tools/hand_marks.py`. A finger's root is where it parts from its
+  neighbour; the thumb's is its knuckle, where it comes free of the palm.
+- **Her painted hand is not the hand model's shape.** Painted: middle finger 284 px from web to tip, palm 362 px from web to wrist,
+  207 px from little knuckle to index knuckle. Model (the Jester's hand): 84, 89 and 57.3 mm. So the paint is fitted piece by piece:
+  across the hand 0.2768 mm a pixel (knuckles), along the palm about 0.245 (web to wrist), each finger strip from its own root to
+  its own tip (drawn out about 15%). The hands were approved and were not reshaped.
+- **Arms.** Each arm wears a 512 by 1024 picture of itself unrolled (`armL`, `armR`): once round the arm across the picture, with
+  the back of the forearm in the middle and the thumb side at three quarters; shoulder at the top, wrist at the bottom, the lower
+  forearm on 60% of the rows (`vs` in `src/R30_body.js`). The back view of the painting covers the back half and the palm view the
+  inner half, mixed at the sides. At the wrist the arm reads the painting exactly as the hand's flat panels do, so lines cross the
+  join; further up, the painted outline is wrapped round the arm. Scale along the forearm: 0.30 mm a pixel.
+- **Above the painting** (higher than 0.32 m down the arm): the forearm's own tone carried on, with the painting's fine grain (not
+  its moles) laid over, turning to the tone of the body picture beside the shoulder (`SHOULDER`, from `tools/shoulder_tone.py`).
+- **Wrist.** `ARM_R`, `ARM_T`, `ARM_PALM` and `ARM_Z` in `src/R30_body.js`. D1 and D2 give a wrist 0.86 of the width across the
+  knuckles (4.7 cm on her; A1 gives 4.5) and in line with the middle of the hand, 6 mm to the thumb side of the wrist joint. The
+  arm covers the stub of the hand, meets the heel of the hand at the joint and runs on inside it; `tools/wrist_sections.py` prints
+  both, slice by slice, and was used to keep the hidden end under the skin of the palm and of the back of the hand.
+- **Light at the joins.** Arm and hands use the body's material settings. Where the arm leaves the shoulder its surface direction is
+  blended into the shoulder's. A step remains there: it is the shape of the body, not the paint.
+- **Nails.** Painted on the fingers; the model's nail plates are only a clear gloss over them (`nail`).
+
 ## Checking
 
 - Body outlines, model against painting (`tools/cmp_r.py`): front (B1) hips 0.376 m wide against 0.386, waist 0.204 against 0.202,
@@ -159,7 +195,11 @@ take the lean out. Her arms keep the Jester's bone lengths (0.63 m; the painting
 - The page was run in a headless browser at phone and laptop size (`shoot_page_r.py`): no errors, nothing off the side of the
   screen, every button pressed, and a drag turns her. Not checked: on a real phone.
 
-Known rough spots: the sides of the torso under the arms are filled in from thin evidence; the painted strap hooks are flat;
+Stage three was looked at with `tools/shoot_hand.py` (each hand and forearm from four sides beside its painting) and
+`tools/page_test.py` (the page at phone size: every hand and arm button, a drag, no errors).
+
+Known rough spots: the thin edge of the hand (little-finger side, round the base of the thumb) is soft paint with no detail, because
+neither painting shows it; the paint on the fingers is drawn out; the arm meets the shoulder with a step; the sides of the torso under the arms are filled in from thin evidence; the painted strap hooks are flat;
 the shins are straight where the front painting has them angled a little outward; the hair pictures still come from C3, C5 and C8 with the band painted out, so just behind
 the band the hair is folded-over texture, which can read as crimped (J3 shows her hair without the band and is the source for the hair pass); a faint line remains where forearm skin meets hand skin until both are painted.
 
@@ -174,8 +214,12 @@ mkdir -p shots deliver
 python3 -I lib/restore_refs.py        # PNG copies of the paintings into refs/
 python3 -I bake_ranger.py             # out/ranger_tex.js: body (needs Pillow, numpy, scipy)
 python3 -I bake_head.py               # adds the head, hair and band pictures to it (also needs opencv)
+python3 -I bake_hands_r.py            # adds her hands and arms from D1 and D2
 ./build_r.sh                          # tools/tables.py, then out/ranger.js
-python3 -I build_single_r.py          # deliver/Ranger_3D_stage2d.html, one offline file
+python3 -I build_single_r.py          # deliver/Ranger_3D_stage3.html, one offline file
+python3 tools/shoot_hand.py shots/hand_L.jpg L hand   # one hand from four sides beside D1 or D2; also R, and arm
+python3 tools/wrist_sections.py                       # forearm and hand, slice by slice through the wrist
+python3 tools/page_test.py                            # the page at phone size: hand and arm buttons, a drag
 python3 tools/cmp_j3.py shots/cj3.jpg                 # head beside J3's three views, with widths and depths by height
 python3 tools/cmp_head.py shots/ch_side.jpg side      # head beside C3 with outlines; also front
 python3 tools/cmp_r.py shots/cmp_front.jpg front      # body beside B1 with outlines; also back, sideR, sideL
@@ -183,13 +227,13 @@ python3 shoot.py shots/x 'T.j.pose({arm:24,leg:3})' face:0,0,1.25,1.53,22,520,60
 python3 shoot_page_r.py               # the real page at phone and laptop size (slow: run it in the background)
 ```
 
-Always run `bake_ranger.py` before `bake_head.py`: the second adds to the file the first writes. Baking from the WebP copies
+Always run `bake_ranger.py`, then `bake_head.py`, then `bake_hands_r.py`: each adds to the file the first writes. Baking from the WebP copies
 gives pictures a hair different from the ones kept in `out/` (those came from the original PNGs). The paintings are data: run
 Python that reads them with `-I`.
 
 ## Next stages
 
-In the order of the how-to: hands and painted arms (D1, D2); boots against E1 to E8 once more; strap hooks, belts, satchel and
+In the order of the how-to: boots against E1 to E8 once more; strap hooks, belts, satchel and
 pouch as solid things; sleeves and headband tails as cloth; necklaces, earrings, charms and bracelets; bow, sword and knives
 (G1 to G7); then the Jester's body moves in her clothes; a face that blinks and changes expression (C10, C11); then her own moves
 and spells with their effects (I1 to I6); then the full page.

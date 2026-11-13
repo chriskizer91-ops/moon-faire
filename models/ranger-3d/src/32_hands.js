@@ -216,7 +216,7 @@
     }
     let idx = G.idx;
     if (s > 0) { idx = idx.slice(); for (let i = 0; i < idx.length; i += 3) { const t = idx[i + 1]; idx[i + 1] = idx[i + 2]; idx[i + 2] = t; } }      // the mirrored hand winds the other way
-    addPart(HANDP ? 'hand' : 'skin', { pos, uv: HANDP ? G.uv : null, idx }, (x, y, z, i) => wts[i], { nor });
+    addPart(HANDP ? (S === 'R' && BAKED.handsR ? 'handR' : 'hand') : 'skin', { pos, uv: HANDP ? G.uv : null, idx }, (x, y, z, i) => wts[i], { nor });
     // nails: a thin curved plate on the back of each fingertip, rounded at the cuticle and at the free edge
     for (const D of G.DG) {
       const L = D.name === 'thb' ? 0.0132 : D.name === 'pnk' ? 0.0102 : 0.0120, t0 = D.len - L + 0.0008, tf = D.tc + 0.80 * D.rt, NS = Q(18, 8), NW = Q(10, 5), rings = [];

@@ -41,7 +41,7 @@ canvas#stage{display:block;width:100%;height:100%;touch-action:none;cursor:grab}
   <header>
     <p class="eyebrow">Moon Faire · Stage two of her build</p>
     <h1>The <em>Ranger</em></h1>
-    <p class="sub">A fidelity pass on her head, checked against J1 and J3 at one scale. Her headband now lies on her forehead. Drag to turn her, pinch or scroll to zoom. The Head buttons bring you in close; "Painting beside her" shows your painting for that view.</p>
+    <p class="sub">Her hands and arms now wear your paintings: D1 on her left, D2 on her right. Drag to turn her, pinch or scroll to zoom. The Hands and arms buttons bring you in close; "Painting beside her" shows your painting for that view.</p>
   </header>
   <div class="stagebox" id="box">
     <canvas id="stage"></canvas>
@@ -51,28 +51,28 @@ canvas#stage{display:block;width:100%;height:100%;touch-action:none;cursor:grab}
   </div>
   <div><p class="label">Head</p><div class="chips" id="hviews"></div></div>
   <div><p class="label">Her face</p><div class="chips" id="faces"></div></div>
+  <div><p class="label">Hands and arms</p><div class="chips" id="hands"></div></div>
   <div><p class="label">Body</p><div class="chips" id="views"></div></div>
   <div><p class="label">Arms and legs</p><div class="chips" id="poses"></div></div>
   <div><p class="label">Show</p><div class="chips" id="shows"></div></div>
   <div class="notes">
-    <h2>Her head now</h2>
+    <h2>Her hands and arms now</h2>
     <ul>
-      <li>Her face is J1, the picture you made for this head. It is laid on by her eyes, her nose and the line of her lips. Nothing had to be painted out of it.</li>
-      <li>The buttons under "Her face" set J2's eyes or mouth into it: blink, half shut, talking, "oo", smile. Only the eyes or the mouth change; the rest of her face stays put.</li>
-      <li>Her cheeks, jaw and ears at the sides are painted from the side view in J3.</li>
-      <li>The shape is still the Jester's face model at 94% of its size, drawn in to her neck behind the jaw.</li>
-      <li>New in this pass: the headband lies on her forehead and on her hair, instead of standing off them.</li>
-      <li>Her neck leans forward as in J3's side view, has her painted neck tone, and wears J3's paint at the sides, so jaw and neck join as one.</li>
-      <li>Her hair is rounder on top and fuller at the back of her head and at the nape. The lenses of her glasses are fainter.</li>
+      <li>Her left hand and forearm are painted from D1, her right from D2. Nothing is mirrored, so each has its own lines and moles.</li>
+      <li>Her nails are the ones you painted: short and natural, with a clear gloss over them.</li>
+      <li>The paint runs from her fingertips to about 15 cm above the wrist. Above that her skin carries on in the same tone and grain, up to her shoulder.</li>
+      <li>Her wrist is slimmer: 4.7 cm across, as D1 and D2 show it against her hand. It was 5.3 cm. Say if you want the old wrist back.</li>
+      <li>The shape of her hands was not changed.</li>
     </ul>
     <h2 style="margin-top:12px">Rough, or not here yet</h2>
     <ul class="m">
-      <li>Her face changes only when you press a button. Blinking and talking on their own come with movement.</li>
-      <li>Her hair is still painted from the old pictures, with the band painted out of them.</li>
-      <li>The fine flyaway wisps round her hair are missing, and the loose locks are simple.</li>
-      <li>Earrings and necklaces, with the rest of her jewellery.</li>
-      <li>Painted detail on her arms and hands.</li>
-      <li>Belts, satchel, pouch, charms, bracelets, the strap hooks as real objects.</li>
+      <li>Your painted hand has a longer palm and shorter fingers than the hand shape she wears, which is the Jester's. The paint is fitted to that shape, so the paint on her fingers is drawn out a little.</li>
+      <li>The thin edge of the hand, on the little-finger side and round the base of the thumb, is soft paint with no detail: neither painting shows it.</li>
+      <li>Where her arm meets her shoulder there is still a step. That is the shape of her body, which I have not touched.</li>
+      <li>Her fingers do not bend yet. That comes with movement.</li>
+      <li>Her hair is still painted from the old pictures, and the fine flyaway wisps are missing.</li>
+      <li>Rings, bracelets, earrings and necklaces.</li>
+      <li>Belts, satchel, pouch, charms, the strap hooks as real objects.</li>
       <li>Sleeves and the headband tails as hanging cloth. For now they are stiff.</li>
       <li>Bow, sword, knives, and all movement.</li>
     </ul>
@@ -96,24 +96,31 @@ canvas#stage{display:block;width:100%;height:100%;touch-action:none;cursor:grab}
     R = makeRanger({});
     stage.scene.add(R.root);
   } catch (e) { $('err').hidden = false; $('err').textContent = 'She could not be drawn on this device: ' + (e && e.message ? e.message : e); return; }
-  const orbit = stage.orbit; orbit.az = 0.5; orbit.el = 0.04; orbit.dist = 2.1; orbit.fov = 20; orbit.target.set(0, 1.47, 0);
-  let want = { az: orbit.az, el: orbit.el, dist: orbit.dist, ty: 1.47 }, easing = true, spin = false;
+  const orbit = stage.orbit; orbit.az = -Math.PI / 2; orbit.el = 1.2; orbit.dist = 0.95; orbit.fov = 20; orbit.target.set(0.705, 1.30, -0.014);
+  let want = { az: orbit.az, el: orbit.el, dist: orbit.dist, ty: 1.30, tx: 0.705, tz: -0.014 }, easing = true, spin = false;
   const VIEWS = [['Front', 0, 0.05, 5.6, 0.86, 'front'], ['Three-quarter', 0.7, 0.08, 5.6, 0.86, 'front'], ['Side', Math.PI / 2, 0.05, 5.6, 0.86, 'side'], ['Back', Math.PI, 0.05, 5.6, 0.86, 'back'],
     ['Corset', 0.25, 0.05, 2.6, 1.16, 'front'], ['Legs', 0.3, 0.05, 3.6, 0.48, 'legs'], ['Boots', 0.6, 0.18, 1.9, 0.17, 'boot']];
   const HVIEWS = [['Face', 0, 0.02, 1.5, 1.512, 'face'], ['Three-quarter', 0.7, 0.03, 1.5, 1.512, 'faceq'], ['Profile', -Math.PI / 2, 0.02, 1.6, 1.53, 'prof'], ['Back of head', Math.PI, 0.05, 1.6, 1.53, 'hback'], ['From above', 0.25, 0.78, 1.7, 1.56, 'top'], ['From below', 0.2, -0.28, 1.5, 1.49, 'below'], ['Head and shoulders', 0.5, 0.04, 2.1, 1.47, 'faceq']];
+  // hands: seen with her arms out, the back from above and the palm from below, so the fingers point up the screen as in the paintings
+  const HANDS = [['Left hand', -Math.PI / 2, 1.2, 0.95, 1.30, 'handLb', 0.705, 2], ['Left palm', Math.PI / 2, -1.2, 0.95, 1.30, 'handLp', 0.705, 2], ['Right hand', Math.PI / 2, 1.2, 0.95, 1.30, 'handRb', -0.705, 2], ['Right palm', -Math.PI / 2, -1.2, 0.95, 1.30, 'handRp', -0.705, 2],
+    ['Left arm', 1.25, 0.10, 2.7, 1.02, 'armL', 0.27, 1], ['Right arm', -1.25, 0.10, 2.7, 1.02, 'armR', -0.27, 1]];
   const POSES = [['At rest', { arm: 15, leg: 0 }], ['As painted', { arm: 24, leg: 3 }], ['Arms out', { arm: 90, leg: 0 }]];
-  let refKey = 'faceq', showRef = true;
+  let refKey = 'handLb', showRef = true;
   function chips(host, items, onPick, first) {
     items.forEach((it, i) => { const b = document.createElement('button'); b.className = 'chip'; b.type = 'button'; b.textContent = it[0]; b.setAttribute('aria-pressed', i === first ? 'true' : 'false');
       b.addEventListener('click', () => { [...host.children].forEach((c) => c.setAttribute('aria-pressed', 'false')); b.setAttribute('aria-pressed', 'true'); onPick(it); }); host.appendChild(b); });
   }
   function setRef() { const im = $('ref'), src = REFS[refKey]; im.hidden = !(showRef && src); if (src && im.getAttribute('src') !== src) im.src = src; }
-  const pickView = (v, other) => { want = { az: v[1], el: v[2], dist: v[3], ty: v[4] }; easing = true; spin = false; refKey = v[5]; setRef(); $('spinB').setAttribute('aria-pressed', 'false'); [...$(other).children].forEach((c) => c.setAttribute('aria-pressed', 'false')); };
-  chips($('hviews'), HVIEWS, (v) => pickView(v, 'views'), 6);
-  chips($('views'), VIEWS, (v) => pickView(v, 'hviews'), -1);
+  const setPose = (i) => { R.pose(POSES[i][1]); [...$('poses').children].forEach((c, k) => c.setAttribute('aria-pressed', k === i ? 'true' : 'false')); };
+  const pickView = (v, host) => { want = { az: v[1], el: v[2], dist: v[3], ty: v[4], tx: v[6] || 0, tz: v[6] ? -0.014 : 0 }; easing = true; spin = false; refKey = v[5]; setRef(); $('spinB').setAttribute('aria-pressed', 'false');
+    for (const id of ['hviews', 'views', 'hands']) if (id !== host) [...$(id).children].forEach((c) => c.setAttribute('aria-pressed', 'false'));
+    if (v[7] != null) setPose(v[7]); };
+  chips($('hviews'), HVIEWS, (v) => pickView(v, 'hviews'), -1);
+  chips($('views'), VIEWS, (v) => pickView(v, 'views'), -1);
+  chips($('hands'), HANDS, (v) => pickView(v, 'hands'), 0);
   chips($('faces'), [['At rest', 0, 'rest'], ['Blink', 1, 'rest'], ['Half shut', 0.5, 'rest'], ['Talking', 0, 'open'], ['Oo', 0, 'oo'], ['Smile', 0, 'smile']], (v) => R.setFace(v[1], v[2]), 0);
-  chips($('poses'), POSES, (p) => R.pose(p[1]), 1);
-  R.pose(POSES[1][1]);
+  chips($('poses'), POSES, (p) => R.pose(p[1]), 2);
+  R.pose(POSES[2][1]);
   const toggle = (host, id, label, on, fn) => { const b = document.createElement('button'); b.className = 'chip'; b.type = 'button'; b.id = id; b.textContent = label; b.setAttribute('aria-pressed', on ? 'true' : 'false');
     b.addEventListener('click', () => { const v = b.getAttribute('aria-pressed') !== 'true'; b.setAttribute('aria-pressed', v ? 'true' : 'false'); fn(v); }); host.appendChild(b); };
   toggle($('shows'), 'refB', 'Painting beside her', true, (v) => { showRef = v; setRef(); });
@@ -125,21 +132,21 @@ canvas#stage{display:block;width:100%;height:100%;touch-action:none;cursor:grab}
   const pts = new Map(); let pinch0 = 0, dist0 = 0;
   canvas.addEventListener('pointerdown', (e) => { canvas.setPointerCapture(e.pointerId); pts.set(e.pointerId, [e.clientX, e.clientY]); easing = false; if (pts.size === 2) { const a = [...pts.values()]; pinch0 = Math.hypot(a[0][0] - a[1][0], a[0][1] - a[1][1]); dist0 = orbit.dist; } });
   canvas.addEventListener('pointermove', (e) => { const p = pts.get(e.pointerId); if (!p) return; const dx = e.clientX - p[0], dy = e.clientY - p[1]; pts.set(e.pointerId, [e.clientX, e.clientY]);
-    if (pts.size === 1) { orbit.az -= dx * 0.008; orbit.el = Math.max(-0.45, Math.min(1.35, orbit.el + dy * 0.006)); }
-    else if (pts.size === 2 && pinch0 > 0) { const a = [...pts.values()], d = Math.hypot(a[0][0] - a[1][0], a[0][1] - a[1][1]); orbit.dist = Math.max(1.2, Math.min(9, dist0 * pinch0 / d)); orbit.target.y = Math.max(0.1, Math.min(1.62, orbit.target.y + dy * 0.0012)); } });
+    if (pts.size === 1) { orbit.az -= dx * 0.008; orbit.el = Math.max(want.tx ? -1.35 : -0.45, Math.min(1.35, orbit.el + dy * 0.006)); }
+    else if (pts.size === 2 && pinch0 > 0) { const a = [...pts.values()], d = Math.hypot(a[0][0] - a[1][0], a[0][1] - a[1][1]); orbit.dist = Math.max(0.6, Math.min(9, dist0 * pinch0 / d)); orbit.target.y = Math.max(0.1, Math.min(1.62, orbit.target.y + dy * 0.0012)); } });
   const up = (e) => { pts.delete(e.pointerId); pinch0 = 0; };
   canvas.addEventListener('pointerup', up); canvas.addEventListener('pointercancel', up);
-  canvas.addEventListener('wheel', (e) => { e.preventDefault(); easing = false; orbit.dist = Math.max(1.2, Math.min(9, orbit.dist * Math.exp(e.deltaY * 0.001))); }, { passive: false });
+  canvas.addEventListener('wheel', (e) => { e.preventDefault(); easing = false; orbit.dist = Math.max(0.6, Math.min(9, orbit.dist * Math.exp(e.deltaY * 0.001))); }, { passive: false });
   let sized = '';
   function fit() { const w = box.clientWidth, h = box.clientHeight, pr = Math.min(window.devicePixelRatio || 1, 2), k = w + 'x' + h + 'x' + pr; if (k !== sized && w > 0 && h > 0) { sized = k; stage.resize(w, h, pr); } }
   let last = 0;
   function frame(now) {
     requestAnimationFrame(frame); const dt = Math.min(0.05, (now - last) / 1000 || 0.016); last = now; fit();
     if (spin) orbit.az += dt * 0.5;
-    if (easing) { let d = want.az - orbit.az; d = Math.atan2(Math.sin(d), Math.cos(d)); const k = Math.min(1, dt * 5); orbit.az += d * k; orbit.el += (want.el - orbit.el) * k; orbit.dist += (want.dist - orbit.dist) * k; orbit.target.y += (want.ty - orbit.target.y) * k; }
+    if (easing) { let d = want.az - orbit.az; d = Math.atan2(Math.sin(d), Math.cos(d)); const k = Math.min(1, dt * 5); orbit.az += d * k; orbit.el += (want.el - orbit.el) * k; orbit.dist += (want.dist - orbit.dist) * k; orbit.target.y += (want.ty - orbit.target.y) * k; orbit.target.x += ((want.tx || 0) - orbit.target.x) * k; orbit.target.z += ((want.tz || 0) - orbit.target.z) * k; }
     stage.render();
   }
-  $('hud').textContent = 'Stage two, fidelity pass · ' + Math.round(R.triangles / 1000) + 'k triangles';
+  $('hud').textContent = 'Stage three, hands and arms · ' + Math.round(R.triangles / 1000) + 'k triangles';
   window.RANGER = { stage, R, step() { fit(); stage.render(); } };
   requestAnimationFrame(frame);
 })();

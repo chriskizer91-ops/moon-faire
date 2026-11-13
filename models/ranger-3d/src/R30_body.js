@@ -52,22 +52,42 @@
   })();
 
   // ---------- arms: bare, from the shoulder to the wrist ----------
-  const ARM_R = [[-0.054, 0.003], [-0.050, 0.016], [-0.042, 0.030], [-0.030, 0.0405], [-0.015, 0.0480], [0, 0.0515], [0.04, 0.054], [0.11, 0.050], [0.19, 0.045], [0.245, 0.042], [0.30, 0.040], [0.39, 0.033], [0.425, 0.0290], [0.447, 0.0266], [0.470, 0.0295], [0.482, 0.0305], [0.493, 0.0298]];
-  // The wrist: the forearm narrows to 5.3 cm two centimetres above the joint, then widens and flattens into the heel of the hand and runs
-  // on a little way inside it, so there is no step where they meet. The heel of the hand sits a little toward the thumb and the palm
-  // (measured off the hand itself), and the end of the forearm leans the same way. ARM_T is how thick the arm is as a share of its width.
-  const ARM_T = [[0.28, 1], [0.33, 0.92], [0.39, 0.89], [0.425, 0.80], [0.447, 0.72], [0.470, 0.56], [0.482, 0.51], [0.493, 0.47]];
+  const ARM_R = [[-0.054, 0.003], [-0.050, 0.016], [-0.042, 0.030], [-0.030, 0.0405], [-0.015, 0.0480], [0, 0.0515], [0.04, 0.054], [0.11, 0.050], [0.19, 0.045], [0.245, 0.042], [0.30, 0.040], [0.39, 0.0318], [0.425, 0.0264], [0.447, 0.0235], [0.458, 0.0246], [0.470, 0.0262], [0.482, 0.0285], [0.493, 0.0290]];
+  // The wrist, as her hand paintings D1 and D2 show it: 4.7 cm across (0.86 of the width across her knuckles; A1 gives 4.5 cm), in line with
+  // the middle of her hand, which sits 6 mm to the thumb side of the wrist joint, so the forearm drifts that way from the elbow down (ARM_Z).
+  // It covers the stub of the hand, meets the heel of the hand at the joint and runs on inside it. ARM_T is how thick the arm is as a share of
+  // its width; ARM_PALM moves the end toward the palm. Both were set from slices through the hand (tools/wrist_sections.py), so the end
+  // stays under the skin of the palm and of the back of the hand.
+  const ARM_T = [[0.28, 1], [0.33, 0.92], [0.39, 0.89], [0.425, 0.80], [0.447, 0.740], [0.458, 0.671], [0.464, 0.610], [0.470, 0.519], [0.482, 0.416], [0.493, 0.350]];
+  const ARM_PALM = [[0.43, 0], [0.447, 0.0002], [0.458, 0.0003], [0.464, 0.0003], [0.470, 0.0004], [0.482, 0.00065], [0.493, 0.00035]], ARM_Z = (sl) => 0.0062 * sm(0.25, 0.45, sl);
   function wArm(S, sLen) {
     if (sLen < 0.05) { const u = sm(-0.045, 0.05, sLen); return [BI['clav' + S], (1 - u) * 0.6, BI.spine3, (1 - u) * 0.4, BI['uarm' + S], u]; }
     if (sLen < L_UARM + 0.05) { const u = sm(L_UARM - 0.05, L_UARM + 0.05, sLen); return [BI['uarm' + S], 1 - u, BI['farm' + S], u]; }
     const u = sm(L_UARM + L_FARM - 0.02, L_UARM + L_FARM + 0.012, sLen); return [BI['farm' + S], 1 - u, BI['hand' + S], u];
   }
   for (const [S, s] of SIDES) {
-    const d = armDir[S], sh = restPts['sh' + S], NS = Q(44, 20), NU = Q(28, 14);
-    const pts = [], rad = [], ss = [];
-    for (let i = 0; i <= NS; i++) { const sl = -0.054 + 0.547 * (i < 10 ? 0.07 * (i / 10) : 0.07 + 0.93 * (i - 10) / (NS - 10)); const kw = sm(0.44, 0.482, sl); pts.push(sh.clone().addScaledVector(d, sl).add(V3(s * d.y * 0.0045 * kw, -s * d.x * 0.0045 * kw, 0.0065 * kw))); const r = prof(ARM_R, sl, true); rad.push([r, r * spline(ARM_T, cl(sl, 0.28, 0.493))]); ss.push(sl); }   // the forearm is a little flat toward the wrist
-    const rings = tubeRings(pts, rad, NU, V3(0, 0, 1)), part = loft(rings, { capA: true, capB: true, vS: 3 }), cols = NU + 1;      // the first rings are close together: they round the shoulder
-    addPart('skin', part, (x, y, z, i) => wArm(S, i < ss.length * cols ? ss[Math.floor(i / cols)] : i === ss.length * cols ? ss[0] : ss[ss.length - 1]), { out: centroidOf(rings) });
+    const d = armDir[S], sh = restPts['sh' + S], NU = Q(32, 16);
+    const pts = [], rad = [], ss = [], sls = [], S1 = -0.054 + 0.547 * 0.07, NM = Q(30, 14), NW = Q(18, 9);
+    for (let i = 0; i <= 10; i++) sls.push(-0.054 + 0.547 * 0.07 * (i / 10));           // the first rings are close together: they round the shoulder
+    for (let i = 1; i <= NM; i++) sls.push(S1 + (0.43 - S1) * i / NM);
+    for (let i = 1; i <= NW; i++) sls.push(0.43 + 0.063 * i / NW);                        // and the last are close together: they shape the wrist
+    for (const sl of sls) { const pm = sl > 0.43 ? spline(ARM_PALM, Math.min(sl, 0.493)) : 0; pts.push(sh.clone().addScaledVector(d, sl).add(V3(s * d.y * pm, -s * d.x * pm, ARM_Z(sl)))); const r = prof(ARM_R, sl, true); rad.push([r, r * spline(ARM_T, cl(sl, 0.28, 0.493))]); ss.push(sl); }
+    // Her arm wears its own painting (bake_hands_r.py), unrolled: once round the arm across the picture, with the back of the forearm in the
+    // middle and the thumb side at three quarters; shoulder at the top, wrist at the bottom, the lower forearm on 60% of the rows.
+    const vs = ss.map((sl) => sl <= 0.30 ? 1 - 0.4 * (sl + 0.054) / 0.354 : 0.6 * (1 - (sl - 0.30) / 0.193));
+    const rings = tubeRings(pts, rad, NU, V3(0, 0, 1)), part = loft(rings, { capA: true, capB: true, u0: 0.75, uS: s < 0 ? -1 : 1, v: vs }), cols = NU + 1;
+    const armKey = BAKED && BAKED['arm' + S] ? 'arm' + S : 'skin', info = addPart(armKey, part, (x, y, z, i) => wArm(S, i < ss.length * cols ? ss[Math.floor(i / cols)] : i === ss.length * cols ? ss[0] : ss[ss.length - 1]), { out: centroidOf(rings) });
+    // where the arm leaves the shoulder it takes the shoulder's surface direction, so the light does not break along the join
+    const AB = buckets[armKey], TB = buckets.torso, near = [];
+    for (let k = 0; k < TB.n; k++) if (s * TB.pos[k * 3] > 0.07 && TB.pos[k * 3 + 1] > 1.2) near.push(k);
+    for (let i = info.start; i < info.start + info.count; i++) {
+      const ring = Math.floor((i - info.start) / cols); if (ring >= ss.length || ss[ring] > 0.075) continue;
+      const px = AB.pos[i * 3], py = AB.pos[i * 3 + 1], pz = AB.pos[i * 3 + 2]; let best = -1, bd = 1e9;
+      for (const k of near) { const dq = Math.hypot(TB.pos[k * 3] - px, TB.pos[k * 3 + 1] - py, TB.pos[k * 3 + 2] - pz); if (dq < bd) { bd = dq; best = k; } }
+      const w = sm(0.028, 0.008, bd); if (best < 0 || w <= 0) continue;
+      const nx = lerp(AB.nor[i * 3], TB.nor[best * 3], w), ny = lerp(AB.nor[i * 3 + 1], TB.nor[best * 3 + 1], w), nz = lerp(AB.nor[i * 3 + 2], TB.nor[best * 3 + 2], w), l = Math.hypot(nx, ny, nz) || 1;
+      AB.nor[i * 3] = nx / l; AB.nor[i * 3 + 1] = ny / l; AB.nor[i * 3 + 2] = nz / l;
+    }
   }
 
   // ---------- the lace sleeves: a wide bell of black lace from a band round the upper arm to ragged points near the elbow ----------
