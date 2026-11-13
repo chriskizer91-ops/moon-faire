@@ -32,7 +32,7 @@ const run = (name, dur, setup) => {
   return name.padEnd(9) + ' R ' + f(out.R) + '\n' + ''.padEnd(9) + ' L ' + f(out.L);
 };
 const A = J.ACTIONS, rows = [];
-for (const m of ['hemline_fangs', 'blue_mischief', 'same_cloth', 'slip_stitch', 'crazy_quilt']) rows.push(run(m, A[m].dur));
+for (const m of ['hemline_fangs', 'blue_mischief', 'same_cloth', 'slip_stitch', 'crazy_quilt', 'bell_silent', 'moons_little_lie']) rows.push(run(m, A[m].dur));
 
 T.wb = 0; T.rb = 0; J.stop();
 return rows.join('\n');

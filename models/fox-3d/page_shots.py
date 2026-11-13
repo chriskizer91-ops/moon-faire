@@ -10,6 +10,7 @@ with sync_playwright() as p:
     pg.on('pageerror', lambda e: logs.append(str(e)[:300])); pg.on('console', lambda m: logs.append(m.text[:200]) if m.type == 'error' and 'font' not in m.text.lower() and 'ERR_' not in m.text else None)
     pg.goto('file:///home/claude/fox3d/out/site/test_local.html#lite'); pg.wait_for_function('window.FOX', timeout=180000); pg.wait_for_timeout(2000)
     if walk: pg.click("button:has-text('Walk around')"); pg.wait_for_timeout(1200)
+    pg.evaluate('window.scrollTo(0, 0)'); pg.wait_for_timeout(300)      # the click can scroll the page; the still must be of the whole picture
     pg.evaluate(f"FOX.stage.look = '{look}'")
     if view: az, el, dist = [float(x) for x in view.split(',')]; pg.evaluate(f"(() => {{ const o = FOX.stage.orbit; o.az = {az}; o.el = {el}; if ({dist} > 0) o.dist = {dist}; }})()")
     bb = pg.locator('canvas').first.bounding_box()      # a plain clip of the page: waiting for the canvas to hold still can time out while she walks

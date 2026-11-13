@@ -22,6 +22,8 @@ Method and rules: the project doc `claude/HOW-TO-3d-witch-models.md`. Pass notes
 | `src/70_anim.js` | materials, skeleton, scale, the moves |
 | `src/88_foxmoves.js` | her own everyday moves: talk, laugh, dance, curtsey, pounce. She keeps the Jester's bow, twirl, wave and jump. The Jester's talk, laugh and dance are renamed `jester_...` there and are off her page |
 | `src/89_foxspells.js`, `89b_foxspells2.js`, `89c_foxspells3.js` | her spells: Hemline Fangs; Blue Mischief and Borrowed Face (with her ghost double and foxfire fox); Same Cloth, Slip Stitch and Crazy Quilt (with her thread, the cut in the air, the quilt, and a ghost copy of an enemy) |
+| `src/89d_foxspells4.js` | two of round 4's ten: When the Bell Falls Silent and The Moon's Little Lie (with her nine tails, and the coin that becomes the moon) |
+| `bake_moon_fox.py` | cuts the blue moon out of painting K2 into `moon` (The Moon's Little Lie) |
 | `bake_places_fox.py` | cuts the six patches of other places out of painting I7 into one small picture, `places` (Slip Stitch and Crazy Quilt) |
 | `poses.py`, `stills.py`, `strip2.py`, `tile.py`, `page_shots.py`, `spellcmp.py` | looking at spells: standing poses side by side (with a solver that puts her shears' point on a spot); big stills of a move; a strip folded into rows; pictures in a row; stills of the real page at chosen seconds of a move; the stills beside the paintings |
 | `bench/armdiag.js` | how her arms and hands move, in numbers: reach, elbow and wrist speeds, fingertip speed, for every move at 60 frames a second |
@@ -50,6 +52,7 @@ python3 -I bake_face_r5.py           # her face from round 5
 python3 -I bake_hands_fox.py && python3 -I bake_boot_fox.py && python3 -I bake_patch_fox.py     # hands (D1), boot leather (E1), patchwork (F9, F10)
 python3 -I bake_gear_fox.py          # belt, pouch and sheath leather (F7, G3)
 python3 -I bake_places_fox.py        # the six patches of other places (I7), for Slip Stitch and Crazy Quilt
+python3 -I bake_moon_fox.py          # the blue moon (K2), for The Moon's Little Lie
 python3 -I match_skin_fox.py         # one skin: chest, hands and arms to her face's tone and finish. Always last, and only once per fresh bake
 python3 make_jface.py                # copies her head and her bake into place
 ./build.sh                           # src/*.js  ->  out/fox.js
@@ -155,7 +158,19 @@ Pass 11 (13 Nov 2026): the lowest bracelet no longer sinks into the root of her 
 Pass 12 (13 Nov 2026): fingers 12% thicker (D1's width); her shears come out of the sheath into her hands; her first spell, Hemline Fangs (see `claude/fox-3d-pass12-shears-hemline-fangs.md`).
 Pass 13 (13 Nov 2026): the Flipbook look switch (with her three blouse greens added to the 56 colours); Blue Mischief and Borrowed Face, so all three flipbook moves are in; a ghost double and a foxfire fox (see `claude/fox-3d-pass13-flipbook-look-blue-mischief-borrowed-face.md`).
 Pass 14 (13 Nov 2026): Same Cloth, Slip Stitch and Crazy Quilt, which finishes round 3 (see `claude/fox-3d-pass14-same-cloth-slip-stitch-crazy-quilt.md`).
-Still to do: round 4 (J1 to J11, K1 to K4: the older moves and three new ones); the paintings are in `references/round4`, none used yet. Ruffles at the neckline and peplum are flat paint; her choker is plain where A1's has studs and a larger bell; under her jaw and the sides of her head are plain skin tone.
+Pass 15 (13 Nov 2026): When the Bell Falls Silent and The Moon's Little Lie, two of round 4's ten. Chris: "do your two favorite and let's call it that", so **the Fox is finished here** (see `claude/fox-3d-pass15-bell-falls-silent-moons-little-lie-finished.md`).
+Not built, by his choice: the other eight of round 4 (Switcheroo, Finders Keepers, Loose Thread, Ninefold Lie, Bellbound Bargain, Pins and Needles, Seam Ripper, Thimble). Their paintings are in `references/round4` (J1 to J5, J9 to J11, K3, K4). Ruffles at the neckline and peplum are flat paint; her choker is plain where A1's has studs and a larger bell; under her jaw and the sides of her head are plain skin tone.
+
+## When the Bell Falls Silent, The Moon's Little Lie (pass 15, the last)
+
+Two of round 4's ten moves; paintings J6, J7, J8, K1, K2. In `src/89d_foxspells4.js`.
+
+- **`TAILS`**: her nine tails of foxfire (K1). Nine flat flames in a fan from one point behind her hips, worked out afresh each frame, sapphire with violet, rose and gold only at their curled tips. `shape(base, right, back, open, length, spread, opacity, time)`. The helper `fan(...)` in the same file turns the fan to face whoever is looking (using `RIB.eye`), so it is never seen edge-on.
+- **`MOON`**: the coin and the moon (K2). One disc that is a thin crescent when small (`phase` 0) and the painted blue moon when grown (`phase` 1), with a rim of thirty stitches that can be sewn on and unpicked clockwise from the top. It faces whoever is looking, and spins as a coin. The moon picture is `moon` in `out/fox_tex.js` (38 KB, `bake_moon_fox.py`); without it the moon is plain blue.
+- **`bell_silent`** (6.0 s; no blow, it is a change in her, not an attack). Two fingers on her bell, elbow down (solved with `poses.py`). Her smile goes at 1.5 s, the tails open by 2.8 s, blue flame along her shoulders and at her ears, the stage dims, one slow blink. At 4.9 s she lets the bell go, it rings, and she smiles again.
+- **`moons_little_lie`** (7.0 s; its light lands at 4.35 s). The coin spins on her raised fingertip, left hand on her hip (J7). She flicks it up at 2.2 s; it climbs, grows and fills into the moon (1.6 m across its radius, 3.6 m up, behind her and toward her target). A needle sews it on from 3.25 to 4.15 s while she throws her arms wide and her tails come out (J8). A shaft of light falls on the target. From 5.05 s the stitches come undone, the moon drops back into her open hand as a coin, and she closes her fingers on it at 6.25 s.
+- Numbers: 138 stance and move pairs, no broken numbers; fingertips at most 1.4 m/s in the first and 3.9 in the second; reach never past 0.96.
+- Not as the paintings: J8 has four ghost doubles beside her, here none (each double costs drawing her again); in J8 the moon is straight behind her, here it sits toward her target so its light can fall there; J6's tails are shorter and more S-curved than these.
 
 ## Same Cloth, Slip Stitch, Crazy Quilt (pass 14)
 
