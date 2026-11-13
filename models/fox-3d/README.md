@@ -14,13 +14,15 @@ Method and rules: the project doc `claude/HOW-TO-3d-witch-models.md`. Pass notes
 | `src/30_body.js` | her torso, arms, sleeves and legs, as tables of measured numbers |
 | `src/45_foxhead.js` | neck, bun, curls, costume ears, glasses |
 | `src/30_body.js` (arms) | her arms, sleeves, the beads on the sleeve band and her bracelets, built as her left arm and mirrored |
-| `src/47_foxtrousers.js` | her trousers (hips and legs), belt, pouch, sheath and shears; the flounce shapes go into `FLOUNCE` |
+| `src/47_foxtrousers.js` | her trousers (hips and legs); the flounce shapes go into `FLOUNCE`, the hip and leg shapes into `FOXHIP` |
+| `src/48_foxgear.js` | her belt and buckle, the pouch, the sheath and her shears, each built to its own painting and wearing that painting as its leather |
 | `src/50_cloth.js` | the cloth engine (the Jester's), with her trouser legs and hips added as things cloth lies on (mask 32) |
 | `src/66_fox_strip.js` | takes away the Jester's cloth |
 | `src/71_foxcloth.js` | her four trouser flounces as real cloth |
 | `src/70_anim.js` | materials, skeleton, scale, the moves |
 | `bake_fox.py` | paints her corset from the paintings into `out/fox_tex.js` (and the older face from C3) |
 | `bake_face_r5.py` | her face, blink and mouths from the round 5 set (F1, F2) |
+| `bake_gear_fox.py` | cuts the belt, pouch (F7) and sheath (G3) paintings into one picture, `gear`, with a map of where each piece sits |
 | `tone_skin_fox.py` | shifts the skin on her painted body and hands to her face's tone |
 | `viewer/` | the page: `index.tpl.html` and `app.js` |
 | `references/round1` to `round5` | her reference paintings, as WebP (rounds 3 and 4: tools and spells, not used yet; round 5: her face set) |
@@ -40,6 +42,7 @@ python3 -I lib/restore_fox_refs.py   # PNG copies of the paintings in refs/
 python3 -I bake_fox.py && cp out/fox_tex.js out/fox_tex_own.js     # corset
 python3 -I bake_face_r5.py           # her face from round 5
 python3 -I bake_hands_fox.py && python3 -I bake_boot_fox.py && python3 -I bake_patch_fox.py     # hands (D1), boot leather (E1), patchwork (F9, F10)
+python3 -I bake_gear_fox.py          # belt, pouch and sheath leather (F7, G3)
 python3 -I tone_skin_fox.py          # body skin to the face's tone
 python3 make_jface.py                # copies her head and her bake into place
 ./build.sh                           # src/*.js  ->  out/fox.js
@@ -110,6 +113,9 @@ Pupils in C3 are typed into `meas/fox_profile.py` from a gridded copy; automatic
 - Phones get the lighter build by default (`#lite`: detail 0.75, 283k triangles). The test machine is not a phone, so it shows the full build unless the address ends in `#lite`. Check both.
 - The limb solver's lengths are multiplied by `FOX_K` (`src/70_anim.js`). Without that every hand and foot target looked 4.5% too far, so her arms hung dead straight.
 - The stage camera sees 60 m and no further. `T.view` in `test.html` now moves the near and far planes with the distance. Before 13 Nov, views from 60 m away (most of the side-by-side pictures) cut off whatever lay behind her middle: back hair, elbows.
+- A hard piece that has a painting of each face (pouch, sheath) is built as separate faces, each given the painting of that face looked at straight on. One shared skin would smear the paintings where the faces meet.
+- Brass studs and snaps are real domes placed exactly over the painted ones, so the paint and the metal agree.
+- The sheath is its own bone (`sheath`), turned each frame to follow her right thigh; the flounce under it is held nearly still (`underSheath` in `src/71_foxcloth.js`). Her shears are two halves on two bones (`shears`, `shearB`) inside it, ready to be drawn and opened in the tools round.
 - The forearm has three twist bones (`ftwA`, `ftwB`, `ftwC`); the hand hangs from the last. A wrist turn goes to them, not to the forearm bone, so the skin twists along the forearm and does not wring at the elbow.
 
 ## State
@@ -119,4 +125,5 @@ Pass 2 (12 Nov 2026): head, face, ears, hair (see `claude/fox-3d-pass2-head.md`)
 Pass 3 (12 Nov 2026): painted hands, bracelets on springs, boots, trousers (see `claude/fox-3d-pass3-hands-boots.md`).
 Pass 4 (12 Nov 2026): her own face from round 5, head sized to the standing painting, skin tone, belt, pouch, sheath, and the trouser flounces as real cloth (see `claude/fox-3d-pass4-face-round5.md`).
 Pass 5 (13 Nov 2026): sleeves and arms against A1, A2 and F5 (see `claude/fox-3d-pass5-sleeves-arms.md`).
-Still to do: belt, pouch and shears in more detail; her face; ruffles at the neckline and peplum are flat paint; tools and spells (rounds 3 and 4) are not started.
+Pass 6 (13 Nov 2026): belt, pouch, sheath and shears rebuilt from F7, G1 and G3 (see `claude/fox-3d-pass6-belt-pouch-shears.md`).
+Still to do: her face; ruffles at the neckline and peplum are flat paint; tools and spells (rounds 3 and 4) are not started.

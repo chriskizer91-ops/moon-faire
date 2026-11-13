@@ -67,10 +67,15 @@
   Object.assign(MATS, {
     belt: sheen(std({ color: lin('#4b2a18'), roughness: 0.58 }), '#ffc890', 3, 0.12),
     pouch: sheen(std({ color: lin('#5c3520'), roughness: 0.62 }), '#ffc890', 3, 0.12),
-    steel: std({ color: lin('#c9ced6'), roughness: 0.26, metalness: 0.95 }),
+    steel: std({ color: lin('#c9ced6'), roughness: 0.26, metalness: 0.95, side: THREE.DoubleSide }),
     patch: (() => { const t = bakedTex('patch', 1024, 1024, '#a03c5c'); t.wrapS = t.wrapT = THREE.RepeatWrapping; return sheen(std({ map: t, color: lin('#d2c8c2'), roughness: 0.86, side: THREE.DoubleSide }), '#ffd0a0', 3, 0.12); })(),      // her patchwork (F9)
     patch2: (() => { const t = bakedTex('patch2', 768, 768, '#a03c5c'); t.wrapS = t.wrapT = THREE.RepeatWrapping; return sheen(std({ map: t, color: lin('#d2c8c2'), roughness: 0.86, side: THREE.DoubleSide }), '#ffd0a0', 3, 0.12); })(),     // the second sheet (F10), for the upper flounce
     frill: sheen(std({ color: lin('#a02f6c'), roughness: 0.80, side: THREE.DoubleSide }), '#ff9ad0', 3, 0.2),
+    // her belt, pouch and sheath: the leather is the paintings themselves (F7, G3), baked by bake_gear_fox.py
+    gear: (() => { const t = bakedTex('gear', 1024, 1024, '#4a2c1c'); return sheen(std({ map: t, color: lin('#d6ccc4'), roughness: 0.62, side: THREE.DoubleSide }), '#ffc890', 3, 0.10); })(),
+    beltm: (() => { const t = bakedTex('beltTex', 128, 128, '#4a2c1c'); t.wrapS = t.wrapT = THREE.RepeatWrapping; return sheen(std({ map: t, color: lin('#d6ccc4'), roughness: 0.62 }), '#ffc890', 3, 0.10); })(),
+    gearIn: std({ color: lin('#1a100b'), roughness: 0.9, side: THREE.DoubleSide }),
+    brass: std({ color: lin('#b8893a'), roughness: 0.36, metalness: 0.88 }),
     arm: (() => {                                    // the skin of her arms: her face's tone, a little paler down the inside, flushed at the elbow, freckled as in A1 and A5.
       // Across the picture: outside of the arm, front, inside, back. Down it: shoulder to wrist.
       const W = 512, H = 1024, c = cvs(W, H), g = c.getContext('2d'), base = SKIN || '#d89780'; g.fillStyle = base; g.fillRect(0, 0, W, H); let sd = 4177;

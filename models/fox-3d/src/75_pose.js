@@ -37,6 +37,7 @@
       if (rel > 0.001) { _qc.setFromAxisAngle(Y_AX, f[3]).multiply(_qa.setFromAxisAngle(X_AX, f[4])).multiply(_qb.setFromAxisAngle(Z_AX, f[5])); SK['foot' + S].quaternion.slerp(_qc, Math.min(1, rel)); }
       SK['toe' + S].quaternion.setFromAxisAngle(X_AX, -Math.max(0, f[4]) * 0.92 * (1 - Math.min(1, rel)));
     }
+    if (SK.sheath) SK.sheath.quaternion.set(0, 0, 0, 1).slerp(SK.thighR.quaternion, 0.85);      // her sheath hangs from the belt but lies along her right thigh, and goes where it goes
     root.updateMatrixWorld(true);
     paintFace(P.eyes, MOUTHS[Math.round(cl(P.mouth, 0, 2))], P.glow);
   }
