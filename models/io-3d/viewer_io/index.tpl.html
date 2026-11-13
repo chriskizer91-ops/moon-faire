@@ -40,9 +40,9 @@ canvas#stage{display:block;width:100%;height:100%;touch-action:none;cursor:grab}
 <body>
 <div class="wrap">
   <header>
-    <p class="eyebrow">Moon Faire · stage three of her build</p>
+    <p class="eyebrow">Moon Faire · stage four of her build</p>
     <h1><em>Io</em>, the Herbal Witch</h1>
-    <p class="sub">She moves now. Pick a move under Moves; the short ones end by themselves. She stays in view while you scroll the buttons. Her arms are shaped and painted from your arm painting, and her hair and skirt swing with her. Drag to turn her, pinch or scroll to zoom. The robe, belt and jewellery come later.</p>
+    <p class="sub">She wears her cloak now, with the mossy green frill from your new picture, and her hands are painted. Pick a move under Moves to see the cloak swing; the short ones end by themselves. She stays in view while you scroll the buttons. Drag to turn her, pinch or scroll to zoom.</p>
   </header>
   <div class="play">
   <div class="stagebox" id="box">
@@ -60,26 +60,24 @@ canvas#stage{display:block;width:100%;height:100%;touch-action:none;cursor:grab}
   <div class="notes">
     <h2>New in this stage</h2>
     <ul>
-      <li>Arms: no longer tubes. The outline is measured off your painting D3: the round of her shoulder, the taper to her elbow, the point of the elbow, the swell of her forearm and a flat wrist. Her skin is painted from D3 too.</li>
-      <li>Shoulders: each arm turns in her shoulder like a ball in a socket, so it stays one clean piece when she lifts it.</li>
-      <li>Hair that moves: from the foot of her neck down, her hair hangs from 9 chains of bones (5 down her back, 2 down the front of each shoulder). It lags behind her, swings in after, hangs down when she bends, and keeps out of her body and arms.</li>
-      <li>Skirt that moves: it hangs from 12 chains round her hips. It swings as she walks, is pushed out by her knees, flares when she turns, and lies on the floor when she kneels.</li>
-      <li>Her first moves, under Moves: standing, walk, talk, and seven short ones that end by themselves: push up her glasses, tip her hat, curtsey, twirl, pick a herb, wave, look round. They are poses and emotes, not attacks.</li>
-      <li>Her hands go where they should: a finger to her glasses, fingers on her hat brim, a hand to the ground and to her nose. Her feet stay planted when she bends. Her fingers curl.</li>
+      <li>Her cloak, from F4, F5 and F6: open down the front, bare shoulders, sleeves in three tiers that end in a long point, a body in two layers with pointed hems, gold trim on every hem.</li>
+      <li>The moss from your new picture: patches of moss and small ferns along the cloak's hems. Nothing else about her changed.</li>
+      <li>The cloak moves: its body rides with her skirt, and each sleeve hangs from her arm on 24 soft points, so it drops below her arm when she lifts it and flies out when she twirls.</li>
+      <li>Her hands are painted from D1 (left) and D2 (right): backs, palms, every finger and her nails.</li>
+      <li>"Cloak" under Show takes it off, to see her as she was.</li>
     </ul>
     <h2 style="margin-top:12px">From the earlier stages</h2>
     <ul>
-      <li>Her face, glasses, hair, fringe and hat, as you approved them. She blinks and talks with the eyes and mouths you painted in C9. The Flipbook look is a switch under Show.</li>
-      <li>Body, bodice and skirt as you approved them.</li>
+      <li>Her arms, her moving hair and skirt, and her first moves (stage three). Her face, glasses, hair and hat (stage two). Her body, bodice and skirt (stage one).</li>
     </ul>
     <h2 style="margin-top:12px">What is rough, and what is not here yet</h2>
     <ul class="m">
-      <li>I tuned the moves from still pictures. I cannot watch them play, so timing and feel need your eye.</li>
-      <li>Hair and skirt bend in stretches about 12 cm long, so they swing and fold but do not ripple. A hand can still pass through a lock of hair.</li>
-      <li>Her hands are plain skin: D1 and D2 are not painted onto them yet. Her legs are plain skin too.</li>
-      <li>Under the skirt, above mid-thigh, she now wears plain black shorts. I added them so a moving thigh cannot show through the lace.</li>
-      <li>The top of her head under the hat is bare. The emotions in C10 are not in yet.</li>
-      <li>Not here yet: her own boots, robe, belt, pouch, crystal, necklaces, bracelets, book, blades, and her spells.</li>
+      <li>The cloak is a first build. Its cloth and trim are drawn by code in F6's colours, not cut from your swatches yet. It is not see-through.</li>
+      <li>Its body is fuller and rounder than in your picture, because it rides on the skirt. Its sleeves are narrower than the wide wings in your picture.</li>
+      <li>Hair and sleeves can pass through each other at her shoulders. A forearm can show through a sleeve when her elbow bends.</li>
+      <li>I tuned the moves from still pictures and cannot watch them play.</li>
+      <li>The thin edge of each hand (thumb side, little-finger side) is soft paint with no detail: the paintings do not show it.</li>
+      <li>Not here yet: her own boots, belt, pouch, crystal, necklaces, bracelets, book, blades, and her spells.</li>
     </ul>
   </div>
 </div>
@@ -134,6 +132,7 @@ canvas#stage{display:block;width:100%;height:100%;touch-action:none;cursor:grab}
   toggle($('shows'), 'glassB', 'Glasses', true, show(['wire', 'lens', 'pad']));
   toggle($('shows'), 'hairB', 'Hair', true, show(['tress', 'tressIn', 'wisp', 'lock', 'hairmass']));
   toggle($('shows'), 'skirtB', 'Skirt', true, show(['skirt', 'tulle', 'band']));
+  toggle($('shows'), 'robeB', 'Cloak', true, show(['robe', 'moss', 'fern']));
   setRef();
   // drag to turn, pinch or wheel to zoom
   const pts = new Map(); let pinch0 = 0, dist0 = 0;
@@ -155,7 +154,7 @@ canvas#stage{display:block;width:100%;height:100%;touch-action:none;cursor:grab}
     if (easing) { let d = want.az - orbit.az; d = Math.atan2(Math.sin(d), Math.cos(d)); const k = Math.min(1, dt * 5); orbit.az += d * k; orbit.el += (want.el - orbit.el) * k; orbit.dist += (want.dist - orbit.dist) * k; orbit.target.y += (want.ty - orbit.target.y) * k; }
     stage.render();
   }
-  $('hud').textContent = 'Stage three · ' + Math.round(R.triangles / 1000) + 'k triangles';
+  $('hud').textContent = 'Stage four · ' + Math.round(R.triangles / 1000) + 'k triangles';
   window.IO = { stage, R, step() { fit(); stage.render(); } };
   requestAnimationFrame(frame);
 })();

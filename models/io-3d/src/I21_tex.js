@@ -54,3 +54,35 @@
     for (let i = 0; i < 560; i++) { const x = r() * W, top = H * (1 - (0.50 + 0.50 * Math.pow(r(), 0.7))); g.lineWidth = 2.2 + 4.2 * r(); g.beginPath(); g.moveTo(x, H); g.bezierCurveTo(x + 9 * (r() - 0.5), H * 0.66, x + 9 * (r() - 0.5), H * 0.4, x + 11 * (r() - 0.5), top); g.stroke(); }
     const t = ctex(c); t.wrapS = THREE.RepeatWrapping; t.encoding = THREE.LinearEncoding; return t;
   }
+
+  // ---------- her cloak (stage four): sheer burgundy chiffon with small gold dots; the bottom tenth of the picture is the
+  // gold-embroidered trim that runs along every hem (F6 shows the cloth, the trim and a hem point) ----------
+  function robeTexIo() {
+    const W = 512, H = 512, c = cvs(W, H), g = c.getContext('2d'), own = seed; seed = 5151;
+    g.fillStyle = '#6e1e35'; g.fillRect(0, 0, W, H);
+    for (let x = 0; x < W; x++) { const v = fbm(x * 0.21, 7.3) - 0.47; g.fillStyle = v > 0 ? 'rgba(255,170,160,' + Math.min(0.09, v * 0.3) + ')' : 'rgba(30,0,12,' + Math.min(0.16, -v * 0.5) + ')'; g.fillRect(x, 0, 1, H); }      // the weave runs down the cloth
+    for (let i = 0; i < 7; i++) { const x = (i + 0.5) * W / 7, gr = g.createLinearGradient(x - 30, 0, x + 30, 0); gr.addColorStop(0, 'rgba(30,0,10,0)'); gr.addColorStop(0.5, 'rgba(30,0,10,0.17)'); gr.addColorStop(1, 'rgba(30,0,10,0)'); g.fillStyle = gr; g.fillRect(x - 30, 0, 60, H); }   // soft folds
+    g.fillStyle = '#e6b958'; for (let j = 0; j < 9; j++) for (let i = 0; i < 8; i++) { g.beginPath(); g.arc(((i + (j % 2 ? 0.5 : 0)) * 64 + 16) % W, j * 50 + 22, 2.4, 0, TAU); g.fill(); }
+    const y0 = H - 56; g.fillStyle = '#541426'; g.fillRect(0, y0, W, 56); g.strokeStyle = '#dcaa45'; g.lineWidth = 3.2; g.beginPath(); g.moveTo(0, y0 + 4); g.lineTo(W, y0 + 4); g.moveTo(0, H - 5); g.lineTo(W, H - 5); g.stroke();
+    const vine = (x) => y0 + 28 + 10 * Math.sin((x / W) * TAU * 4);
+    g.lineWidth = 2.6; g.beginPath(); for (let x = 0; x <= W; x += 4) { if (x) g.lineTo(x, vine(x)); else g.moveTo(x, vine(x)); } g.stroke();
+    g.fillStyle = '#ecc468'; for (let k = 0; k < 16; k++) { const x = (k + 0.5) * W / 16; g.beginPath(); g.ellipse(x, vine(x) + (k % 2 ? -8 : 8), 7.5, 3.4, k % 2 ? -0.7 : 0.7, 0, TAU); g.fill(); }
+    seed = own; const t = ctex(c); t.wrapS = THREE.RepeatWrapping; t.wrapT = THREE.ClampToEdgeWrapping; return t;
+  }
+  // The moss Chris asked for (November 13): "a mossy green frill" along the cloak's hems. A strip of tufts with gaps between them.
+  function mossTexIo() {
+    const W = 512, H = 128, c = cvs(W, H), g = c.getContext('2d'), own = seed; seed = 7723;
+    const cols = ['#2f3d16', '#44531a', '#5a6b1f', '#73822a', '#8d9440', '#3a4714'];
+    for (let k = 0; k < 9; k++) { const cx = (k + 0.5 + (rnd() - 0.5) * 0.5) * W / 9, wide = 14 + rnd() * 22, tall = 0.55 + rnd() * 0.45; if (rnd() > 0.60) continue;       // it grows in patches, not all along
+      for (let i = 0; i < 120; i++) { const a = rnd() * TAU, r = Math.sqrt(rnd()), x = cx + Math.cos(a) * r * wide, y = H * 0.56 + Math.sin(a) * r * H * 0.36 * tall, rr = 2.2 + rnd() * 4.2;
+        g.fillStyle = cols[Math.floor(rnd() * cols.length)]; g.beginPath(); g.arc(((x % W) + W) % W, y, rr, 0, TAU); g.fill(); }
+      for (let i = 0; i < 7; i++) { const x = cx + (rnd() - 0.5) * wide * 1.4, y = H * 0.74; g.strokeStyle = cols[1 + Math.floor(rnd() * 3)]; g.lineWidth = 1.6; g.beginPath(); g.moveTo(x, y); g.lineTo(x + (rnd() - 0.5) * 6, y + 10 + rnd() * 20); g.stroke(); } }      // a few threads hang down
+    seed = own; const t = ctex(c); t.wrapS = THREE.RepeatWrapping; return t;
+  }
+  function fernTexIo() {                           // one small fern frond, its stem up the middle of the picture
+    const W = 128, H = 256, c = cvs(W, H), g = c.getContext('2d');
+    g.strokeStyle = '#4c6420'; g.lineWidth = 3; g.beginPath(); g.moveTo(W / 2, H - 2); g.quadraticCurveTo(W / 2 + 6, H * 0.5, W / 2 - 2, 8); g.stroke();
+    for (let i = 0; i < 15; i++) { const t = i / 14, y = H - 22 - t * (H - 40), len = (1 - t * 0.82) * 50, x = W / 2 + 6 * Math.sin(t * 2.4) - 2 * t;
+      for (const sd of [-1, 1]) { g.fillStyle = i % 2 ? '#7d9a2f' : '#647f24'; g.beginPath(); g.ellipse(x + sd * len * 0.5, y - len * 0.16, len * 0.52, 5.2 - t * 2.4, -sd * 0.42, 0, TAU); g.fill(); } }
+    return ctex(c);
+  }

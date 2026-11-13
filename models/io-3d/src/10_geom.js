@@ -18,10 +18,10 @@
   }
   // the bones that carry a point at height y on a chain: the stretch it lies on, shared with the next stretch near each joint so the bend is round
   function chainW(ch, y) {
-    const P = ch.pts, n = ch.names.length, par = BI[ch.parent];
-    if (y >= P[0].y) return [par, 1];
-    let k = 0; while (k < n - 1 && y < P[k + 1].y) k++;
-    const t = (P[k].y - y) / (P[k].y - P[k + 1].y);
+    const Y = ch.ys || (ch.ys = ch.pts.map((p) => p.y)), n = ch.names.length, par = BI[ch.parent];
+    if (y >= Y[0]) return [par, 1];
+    let k = 0; while (k < n - 1 && y < Y[k + 1]) k++;
+    const t = (Y[k] - y) / (Y[k] - Y[k + 1]);
     if (t < 0.5) return [k > 0 ? BI[ch.names[k - 1]] : par, 0.5 - t, BI[ch.names[k]], 0.5 + t];
     if (k === n - 1) return [BI[ch.names[k]], 1];
     return [BI[ch.names[k]], 1.5 - t, BI[ch.names[k + 1]], t - 0.5];

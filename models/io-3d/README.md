@@ -4,7 +4,20 @@ Started November 13, 2026. Built the way the HD Jester was (`claude/HOW-TO-3d-wi
 the Ranger's stage-one recipe: this folder began as a copy of the Ranger's stage-one code (`claude/ranger-3d-model`, commit
 `1d4c9d6`), with the Jester's platform boot builder (`claude/jester-3d-model`, pass 20) in place of the Ranger's boots.
 
-## Where she stands: stage three (November 13, 2026)
+## Where she stands: stage four (November 13, 2026)
+
+She wears her cloak, with the mossy frill Chris asked for, and her hands are painted.
+
+- **Chris (November 13), after stage three:** "Oh my goodness she's fantastic. Very nice. Well done. Let's continue". Then, with
+  a picture of her from three sides (`references/moss/M1.webp`): "This ... is how IO should look adding a little bit of moss to
+  her. Overclock changing. Nothing else. Just giving like a mossy green frill to her outfit". Read as: only her cloak changes;
+  it gets moss and small ferns along its hems. **M1 is the master for her cloak.** He has been told how it was read.
+- **Page:** the same link as every stage. One offline file: `deliver/Io_3D_stage4.html` (2.8 MB).
+  `deliver/Io_stage4_cloak_moss_hands.jpg` is the cloak beside M1, the cloak moving, and her hands.
+- Details are under "Stage four" below.
+
+## Stage three (November 13, 2026)
+
 
 She moves. Her arms are shaped and painted from D3, her hair and skirt hang from chains of bones that swing with her, and she
 has her first eleven moves (poses and emotes, not attacks).
@@ -147,8 +160,9 @@ python3 -I lib/restore_refs.py     # PNG copies of the paintings into refs/
 python3 -I bake_io.py              # out/io_tex.js (needs Pillow, numpy, scipy)
 python3 -I bake_head_io.py         # adds her face, profile, skin tones, hat swatches and hair colours to it
 python3 -I bake_arms_io.py         # adds her arm skin from D3
+python3 -I bake_hands_io.py        # adds her hands from D1 and D2 (landmarks in hand_marks.json)
 ./build_io.sh                      # tools/tables.py, then out/io.js
-python3 -I build_single_io.py      # deliver/Io_3D_stage3.html, one offline file
+python3 -I build_single_io.py      # deliver/Io_3D_stage4.html, one offline file
 python3 tools/prof_io.py 8 shots/prof.png             # her profile against the model's, by height
 python3 tools/cmp_head_io.py shots/cmp_head.jpg       # head, hat and hair beside C4 and C5
 python3 tools/cmp_io.py shots/cmp_front.jpg front     # also back, sideR, sideL
@@ -296,6 +310,42 @@ travels from where it hangs to its point along a line that bows forward, so its 
 Limits: tuned from stills (`tools/strip.py`, `tools/allmoves.sh`), never watched playing. Hair and skirt bend in 12 cm
 stretches. A hand can pass through a lock of hair. When she stands up from kneeling her left thigh shows at the slit for a moment.
 
+## Stage four: painted hands, the cloak, the moss
+
+### Hands (`bake_hands_io.py`, `hand_marks.json`)
+
+- D1 is her left hand, D2 her right (flipped into a left-hand layout for baking, as the Ranger's). Landmarks were measured with
+  `tools/hand_measure.py` and checked by eye with `tools/hand_marks.py`; `tools/flip_hand.py` flips D2 for those two.
+- Each hand has its own scale across (`KX`: little knuckle to index knuckle is the model's 57.3 mm; D1 234.6 px, D2 224.7 px).
+  Her painted middle finger is about 340 px from web to tip; each finger strip is fitted root to tip on its own.
+- `hands` and `handsR` in `out/io_tex.js`, 1024 x 1024 each, in the layout `src/32_hands.js` reads. The nail plates are now only a
+  clear gloss over the painted nails.
+- The hand's tone where it leaves the arm is brought to the plain arm colour, and the arm's paint fades to that colour over its
+  last 7 cm, so they meet without a step in tone. A faint line of shape remains at the wrist.
+- The thin edges of the hand are soft paint: neither painting shows them.
+
+### The cloak (`src/I45_robe.js`, textures in `src/I21_tex.js`)
+
+- Shape from F4 (laid flat), F5 (the sleeve on an arm) and F6 (cloth, trim, shoulder cut-out, hem point); the moss from M1.
+- `tier()` builds one tier of cloth from a point function, a top and a hem, and puts the moss strip and the ferns on the hem.
+- **Body:** two layers with zigzag hems, open 29 degrees each side of the middle of her front. Above her waist it lies on her
+  torso (`wTorso`); below it rides the skirt's twelve chains, 1.2 cm outside the skirt (`robeS`). Under her arms it starts at
+  the armpit; in front and behind it runs up over her shoulders by her neck.
+- **Sleeves:** a gold band round the upper arm, cloth in front of and behind the bare shoulder, then three tiers; the third ends
+  in a long point at the back of her arm on the side toward her body. Toward her body the sleeve stays close to her arm.
+- **How a sleeve moves:** 24 soft points a sleeve (4 round the arm at 6 heights). Each is a one-bone chain hung from a point
+  further up her arm (`SLA`), carried by her upper arm or forearm, and wants to keep the direction it hangs in at rest whatever
+  her arm does (`g` 0.80 to 0.93, measured against her chest's heading, `yaw: 'spine3'`). So the cloth drops below a lifted
+  arm, slides to the elbow when the forearm rises, and flies out in a twirl. A chain can now carry its own settings (`soft`).
+- **Cloth and trim** are drawn by code (`robeTexIo`): burgundy with a fine weave, gold dots, and a gold vine band in the bottom
+  tenth of the picture, which every hem reads. Not sheer.
+- **Moss** (`mossTexIo`, `fernTexIo`): a strip of tufts with gaps on every hem, and a small fern card every few columns.
+- 230 bones in all. `opts.noRobe` builds her without the cloak; "Cloak" under Show hides it.
+
+Limits: the body is rounder and fuller than M1 because it rides the skirt; the sleeves are narrower than M1's wide wings; hair
+and sleeves pass through each other at her shoulders; a forearm can show through a sleeve when the elbow bends; the cloth is
+not cut from the F10 and F12 swatches yet.
+
 ## Round 2 paintings (arrived November 13, 2026, after stage one was built)
 
 All 21 arrived and match their index. Nothing is built from them yet.
@@ -343,13 +393,9 @@ They also show her whole look from many sides, with the robe: useful when the ro
 
 ## Next stages
 
-Chris's order (November 13): arms, then her body moving, then more of her outfit. The first two have a first draft now.
-
-1. **His notes on this stage:** the feel and timing of each move, the hair and skirt in motion, the arms.
-2. **Hands** painted from D1 and D2 (and bracelets from D4 later); legs from B5.
-3. More of her own moves if he wants them; the emotions in C10; hair on top of her head.
-4. Her own boots (E1 to E8).
-5. Robe as cloth (A1 to A5, F4 to F6, F10, F12), on the same soft chains; skirt lace see-through (F8, F11).
-6. Belt, pouch, crystal, necklaces, bracelets (F1 to F3).
-7. Book and blades (G1 to G6, placed by G8, held as in G9).
-8. Her spells and attacks (H1 to H18, I1 to I8, and round 4).
+1. **Chris's notes on the cloak:** its shape against M1 (wider sleeve wings, a narrower pointed back), how much moss, how it moves.
+2. The cloak's cloth cut from F10 and F12, and made sheer; hair and sleeves kept apart at her shoulders.
+3. Belt, pouch, crystal (F3, placed by G8); necklaces and bracelets (F1, F2, D4).
+4. Her own boots (E1 to E8); legs from B5; the emotions in C10; hair on top of her head.
+5. Book and blades (G1 to G6, held as in G9).
+6. Her spells and attacks (H1 to H18, I1 to I8, and round 4).

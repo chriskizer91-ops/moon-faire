@@ -53,7 +53,7 @@ lp = np.stack([ndi.gaussian_filter(tex[..., c], (46, 40), mode=('nearest', 'wrap
 rm = lp.mean(1, keepdims=True)
 flat = tex * (rm / lp) ** 0.5
 flat *= skin / flat[vis].reshape(-1, 3).mean(0)
-k = np.clip((sl - 0.004) / 0.060, 0, 1) * np.clip((0.447 - sl) / 0.045, 0, 1); k = (k * k * (3 - 2 * k))[:, None, None]   # plain at the shoulder and at the wrist
+k = np.clip((sl - 0.004) / 0.060, 0, 1) * np.clip((0.440 - sl) / 0.075, 0, 1); k = (k * k * (3 - 2 * k))[:, None, None]   # plain at the shoulder and at the wrist
 flat = skin * (1 - k) + flat * k
 b_ = io.BytesIO(); Image.fromarray(np.clip(flat, 0, 255).astype(np.uint8)).save(b_, 'JPEG', quality=90, subsampling=0)
 T['arms'] = 'data:image/jpeg;base64,' + base64.b64encode(b_.getvalue()).decode()

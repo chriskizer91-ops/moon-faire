@@ -9,6 +9,9 @@
     torso: sheen(std({ map: tBody, color: lin('#b9b2b6'), roughness: 0.74, envMapIntensity: 0.25, emissive: lin('#ffffff'), emissiveMap: tBody, emissiveIntensity: 0.34 }), '#8fa4d8', 3, 0.06),
     skin: sheen(std(lit({ color: lin('#b9b2b6').multiply(lin(SKIN_L)), emissive: lin(SKIN_L), emissiveIntensity: 0.34 })), '#ffb49a', 3.2, 0.06),
     arm: (() => { const t = bakedTex('arms', 512, 1024, SKIN_L); return sheen(std(lit({ map: t, color: lin('#b9b2b6'), emissive: lin('#ffffff'), emissiveMap: t, emissiveIntensity: 0.34 })), '#ffb49a', 3.2, 0.06); })(),
+    robe: (() => { const t = robeTexIo(); return sheen(std({ map: t, color: lin('#b0a9ab'), roughness: 0.84, envMapIntensity: 0.15, side: THREE.DoubleSide, emissive: lin('#ffffff'), emissiveMap: t, emissiveIntensity: 0.27 }), '#ff9aa8', 3, 0.10); })(),
+    moss: (() => { const t = mossTexIo(); return std({ map: t, alphaTest: 0.5, color: lin('#b8b8b0'), roughness: 0.95, envMapIntensity: 0.1, side: THREE.DoubleSide, emissive: lin('#ffffff'), emissiveMap: t, emissiveIntensity: 0.32, polygonOffset: true, polygonOffsetFactor: -2, polygonOffsetUnits: -2 }); })(),
+    fern: (() => { const t = fernTexIo(); return std({ map: t, alphaTest: 0.5, color: lin('#b8b8b0'), roughness: 0.9, envMapIntensity: 0.1, side: THREE.DoubleSide, emissive: lin('#ffffff'), emissiveMap: t, emissiveIntensity: 0.32 }); })(),
     form: sheen(std(lit({ color: lin('#b9b2b6').multiply(lin(SKIN_C)), emissive: lin(SKIN_C), emissiveIntensity: 0.34 })), '#ffb49a', 3.2, 0.06),
     // the head wears three pictures at once, mixed by which way the skin faces (see buildHead): the front painting, the profile painting, plain skin
     face: (() => {
@@ -43,8 +46,9 @@
     wire: std({ color: lin('#4a3a2a'), metalness: 0.85, roughness: 0.40, envMapIntensity: 1.2 }),
     pad: phys({ color: lin('#d8d2cc'), transparent: true, opacity: 0.55, roughness: 0.2 }),
     lens: phys({ color: lin('#e9e4f2'), transparent: true, opacity: 0.10, roughness: 0.04, metalness: 0, envMapIntensity: 1.6, depthWrite: false, side: THREE.DoubleSide }),
-    hand: (() => { const t = bakedTex('hands', 1024, 1024, SKIN_L), own = !!(BAKED && BAKED.hands); return sheen(std({ map: t, color: lin(own ? '#d8ccc6' : '#b9b2b6'), roughness: own ? 0.62 : 0.70, envMapIntensity: 0.2, emissive: lin('#ffffff'), emissiveMap: t, emissiveIntensity: own ? 0.40 : 0.34 }), '#ffb49a', 3.2, 0.08); })(),
-    nail: phys({ color: lin('#d9a79a'), roughness: 0.28, clearcoat: 1, clearcoatRoughness: 0.2 }),
+    hand: (() => { const t = bakedTex('hands', 1024, 1024, SKIN_L); return sheen(std(lit({ map: t, color: lin('#b9b2b6'), emissive: lin('#ffffff'), emissiveMap: t, emissiveIntensity: 0.34 })), '#ffb49a', 3.2, 0.06); })(),
+    handR: (() => { const t = bakedTex('handsR', 1024, 1024, SKIN_L); return sheen(std(lit({ map: t, color: lin('#b9b2b6'), emissive: lin('#ffffff'), emissiveMap: t, emissiveIntensity: 0.34 })), '#ffb49a', 3.2, 0.06); })(),
+    nail: BAKED && BAKED.hands ? phys({ color: lin('#ecc9c0'), transparent: true, opacity: 0.20, roughness: 0.25, clearcoat: 1, clearcoatRoughness: 0.15, depthWrite: false }) : phys({ color: lin('#d9a79a'), roughness: 0.28, clearcoat: 1, clearcoatRoughness: 0.2 }),      // her nails are painted on her fingers (D1, D2); the plate is only their gloss
     // the skirt's lace is a piece of painting B4, repeated; it is solid for now (the see-through lace needs the round 2 lace square)
     skirt: sheen(std({ map: tLace, color: lin('#a8a0a4'), roughness: 0.86, envMapIntensity: 0.15, side: THREE.DoubleSide, emissive: lin('#ffffff'), emissiveMap: tLace, emissiveIntensity: 0.30 }), '#7a6470', 3, 0.10),
     tulle: std({ color: lin('#0f0c10'), roughness: 0.95, side: THREE.DoubleSide, transparent: true, opacity: 0.62, depthWrite: false }),
@@ -110,21 +114,22 @@
   // swings in after. It stays a fixed length from the point above, outside the balls, and above the floor.
   const FLOOR = 0.018, SOFT_H = 1 / 60;
   const SOFT = CHAINS.map((ch) => {
-    const n = ch.names.length, hair = ch.grp === 'hair', pad = hair ? 0.012 : 0.030;       // the skirt's inner layers lie inside its chains, so its balls are padded more
-    const o = { ch, hair, par: SK[ch.parent], b: ch.names.map((nm) => SK[nm]), dir: [], len: [], cur: [], prev: [], g: [], k: [], d: [], cols: [], lift: 0, out: ch.a != null ? V3(Math.sin(ch.a), 0, Math.cos(ch.a)) : null, P: V3(), Q: new THREE.Quaternion(), Y: new THREE.Quaternion() };
+    const n = ch.names.length, hair = ch.grp === 'hair', own = ch.soft || null, pad = own ? own.pad : hair ? 0.012 : 0.030, grp = own ? own.col : hair ? 'h' : 's';       // the skirt's inner layers lie inside its chains, so its balls are padded more
+    const o = { ch, hair, yb: SK[ch.yaw || ch.parent], par: SK[ch.parent], b: ch.names.map((nm) => SK[nm]), dir: [], len: [], cur: [], prev: [], g: [], k: [], d: [], cols: [], lift: 0, out: ch.a != null ? V3(Math.sin(ch.a), 0, Math.cos(ch.a)) : null, P: V3(), Q: new THREE.Quaternion(), Y: new THREE.Quaternion() };
     for (let i = 0; i < n; i++) {
       const tip = ch.pts[i + 1], v = tip.clone().sub(ch.pts[i]), t = n > 1 ? i / (n - 1) : 0; o.len.push(v.length()); o.dir.push(v.normalize()); o.cur.push(tip.clone()); o.prev.push(tip.clone());
-      if (!hair) { o.k.push(lerp(0.10, 0.05, t)); o.d.push(lerp(0.22, 0.16, t)); o.g.push(lerp(0.05, 0.32, t)); }
+      if (own) { o.k.push(own.k); o.d.push(own.d); o.g.push(own.g); }
+      else if (!hair) { o.k.push(lerp(0.10, 0.05, t)); o.d.push(lerp(0.22, 0.16, t)); o.g.push(lerp(0.05, 0.32, t)); }
       else if (ch.front) { o.k.push(lerp(0.060, 0.026, t)); o.d.push(lerp(0.17, 0.11, t)); o.g.push(lerp(0.30, 0.88, t)); }
       else { o.k.push(lerp(0.060, 0.024, t)); o.d.push(lerp(0.17, 0.11, t)); o.g.push(lerp(0.10, 0.85, t)); }
-      const cs = []; COL.forEach((c, ci) => { if (c.g.indexOf(hair ? 'h' : 's') < 0) return; const r = Math.min(c.r + pad, tip.distanceTo(c.rest) - 0.003); if (r > 0.014) cs.push(ci, r); }); o.cols.push(cs);       // a ball never pushes a point out of its place at rest
+      const cs = []; COL.forEach((c, ci) => { if (c.g.indexOf(grp) < 0) return; const r = Math.min(c.r + pad, tip.distanceTo(c.rest) - 0.003); if (r > 0.014) cs.push(ci, r); }); o.cols.push(cs);       // a ball never pushes a point out of its place at rest
     }
     return o;
   });
   const fitLen = (p, c, L) => { p.sub(c); p.multiplyScalar(L / (p.length() || 1e-6)).add(c); };
   function softFrames() {
     for (const c of COL) c.p.copy(c.off).applyMatrix4(c.bone.matrixWorld).applyMatrix4(_inv);
-    for (const o of SOFT) { _mb.multiplyMatrices(_inv, o.par.matrixWorld); o.Q.setFromRotationMatrix(_mb); o.P.copy(o.b[0].position).applyMatrix4(_mb); _p.set(0, 0, 1).applyQuaternion(o.Q); o.Y.setFromAxisAngle(AY, Math.atan2(_p.x, _p.z)); }
+    for (const o of SOFT) { _mb.multiplyMatrices(_inv, o.par.matrixWorld); o.Q.setFromRotationMatrix(_mb); o.P.copy(o.b[0].position).applyMatrix4(_mb); if (o.yb === o.par) _p.set(0, 0, 1).applyQuaternion(o.Q); else _p.set(0, 0, 1).applyQuaternion(rootQuat(o.yb, _qa)); o.Y.setFromAxisAngle(AY, Math.atan2(_p.x, _p.z)); }
   }
   function softTarget(o, i, c, out) {                 // where point i of a chain would rest, hanging from c
     const g = o.g[i]; out.copy(o.dir[i]).applyQuaternion(o.Q).multiplyScalar(1 - g); _t2.copy(o.dir[i]).applyQuaternion(o.Y).multiplyScalar(g); out.add(_t2);
