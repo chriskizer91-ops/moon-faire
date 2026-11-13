@@ -69,6 +69,14 @@ details.more>div{margin-top:10px}
   <div class="notes">
     <h2>Changed in this pass</h2>
     <ul>
+      <li>Her sword is built from your sword painting: a slim moonsteel blade, a crescent guard with its horns toward the blade, a dark blue grip bound with silver wire, and an oval blue gem in gold with a ring of gold beads for a pommel. 74 cm long.</li>
+      <li>It hangs in a black scabbard with a silver mouth and tip at the front of her left hip, tip down and back, as in your carry painting. The scabbard swings as she moves, and her thigh pushes it aside instead of passing through it.</li>
+      <li>New move, "Sword". Her left hand tips the scabbard, her right hand crosses and draws. She hops round to face screen right and lands on guard, right foot leading. The blade goes back over her shoulder, then comes over the top in one full cut with a long step, leaving a crescent of light. She holds the lunge, comes back to guard, turns to the front and puts the sword away.</li>
+      <li>Her feet are planted in this move: each foot is put on a spot on the ground and her legs are worked out from it, the same way as her arms.</li>
+      <li>New switch: "Sword", under "More views and switches".</li>
+    </ul>
+    <h2 style="margin-top:12px">Earlier: fingers, the bow, Moonsteel Draw</h2>
+    <ul>
       <li>Her fingers curl. Her hands hang relaxed, close round what she holds, open when she talks and make a fist when she cheers.</li>
       <li>Her bow is built from your bow paintings: moonsteel, a dark blue leather grip, a crescent holding a blue gem at each end of the grip, and open limbs of two rails with a vine and leaves between them. It is 96 cm from tip to tip.</li>
       <li>Folded, each limb rolls up toward its tip like a fern, and the bow rides upright on the middle of her back, 37 cm long. It stays there while she walks, jogs, talks and cheers.</li>
@@ -100,6 +108,7 @@ details.more>div{margin-top:10px}
       <li><b>Jog:</b> the same stride made quick: leaning in, heels kicking up, elbows bent and pumping.</li>
       <li><b>Talk:</b> her own. Weight on one hip, one quick hand at chest height, small nods, her mouth moving through her painted mouths.</li>
       <li><b>Moonsteel Draw:</b> the bow from her back, the full draw, the arrow loosed, the bow put away. It replaces "Take aim".</li>
+      <li><b>Sword:</b> drawn from her left hip, a guard, one full cut with a long step, and away.</li>
       <li><b>Cheer:</b> a dip, a jump with one arm thrown up, a soft landing, a smile. <b>Limber up:</b> bouncing on her toes, rolling her shoulders, shaking out her arms.</li>
       <li>Her bags and charms move with all of it.</li>
     </ul>
@@ -155,11 +164,15 @@ details.more>div{margin-top:10px}
       <li>Sleeves, tails and locks swing as single pieces that bend near the root. They do not fold or ripple yet, and a lock can pass through her neck or shoulder when she turns her head far.</li>
       <li>With her arms straight out the iron curls bend a little with her skin, as if soft.</li>
       <li>Moonsteel Draw is tuned from still pictures, like the other moves. Its timing needs your eye.</li>
-      <li>Her feet slide out to the wide stance instead of stepping.</li>
+      <li>In Moonsteel Draw her feet still slide out to the wide stance instead of stepping.</li>
+      <li>The sword move is one cut for now. More cuts and a thrust can follow.</li>
+      <li>The vine engraved along the blade and the leaf work on the guard are not there yet. The scabbard's straps are plain.</li>
+      <li>When she walks or jogs her left arm can swing through the sword's hilt.</li>
+      <li>As the blade leaves the scabbard it turns a little early, so its point passes through the scabbard's side for a moment.</li>
       <li>Nothing holds the folded bow to her back yet: no clip or loop.</li>
       <li>Seen from behind, her fingers go a little way into the bow's curl as she takes hold of it.</li>
       <li>In the Flipbook look the bow's thin silver is mostly ink line, so it reads dark.</li>
-      <li>Still to come: sword, knives, Silverglass, the gem, hit reactions, a dodge, a win and a fall.</li>
+      <li>Still to come: knives, Silverglass, the gem, hit reactions, a dodge, a win and a fall.</li>
     </ul>
   </div>
   </details>
@@ -222,18 +235,19 @@ details.more>div{margin-top:10px}
     b.addEventListener('click', () => { const v = b.getAttribute('aria-pressed') !== 'true'; b.setAttribute('aria-pressed', v ? 'true' : 'false'); fn(v); }); host.appendChild(b); };
   toggle($('shows'), 'refB', 'Painting beside her', false, (v) => { showRef = v; setRef(); });
   toggle($('shows'), 'spinB', 'Turn slowly', false, (v) => { spin = v; easing = false; });
-  const vis = { glasses: true, sleeves: true, boots: false, gear: true, hooks: true, charms: true, bow: true }, BOWKEYS = ['moon', 'bowWrap', 'bowGem'], BOOTK = ['boot', 'sole', 'stitch', 'eyelet', 'lace', 'aglet', 'sock', 'hole'], GEARK = ['belt', 'gear', 'steel', 'keeperB', 'gearBrass', 'beltHole'], HOOKK = ['iron', 'hookBrass'], CHARMK = ['charmGold', 'teal', 'pearl', 'amber', 'crystal'];
-  const applyVis = () => { for (const k in R.meshes) { let v = true; if (['wire', 'lens', 'pad'].includes(k)) v = vis.glasses; if (['lacesl', 'laceband'].includes(k)) v = vis.sleeves; if (GEARK.includes(k)) v = vis.gear; if (HOOKK.includes(k)) v = vis.hooks; if (CHARMK.includes(k)) v = vis.charms; if (BOWKEYS.includes(k)) v = vis.bow; if (vis.boots && !BOOTK.includes(k)) v = false; R.meshes[k].visible = v; } if (R.light) R.light.visible = vis.bow && !vis.boots; };
+  const vis = { glasses: true, sleeves: true, boots: false, gear: true, hooks: true, charms: true, bow: true, sword: true }, BOWKEYS = ['moon', 'bowWrap', 'bowGem'], SWORDKEYS = ['blade', 'swordSteel', 'swordGrip', 'swordGold', 'swordGem', 'scab', 'scabStrap'], BOOTK = ['boot', 'sole', 'stitch', 'eyelet', 'lace', 'aglet', 'sock', 'hole'], GEARK = ['belt', 'gear', 'steel', 'keeperB', 'gearBrass', 'beltHole'], HOOKK = ['iron', 'hookBrass'], CHARMK = ['charmGold', 'teal', 'pearl', 'amber', 'crystal'];
+  const applyVis = () => { for (const k in R.meshes) { let v = true; if (['wire', 'lens', 'pad'].includes(k)) v = vis.glasses; if (['lacesl', 'laceband'].includes(k)) v = vis.sleeves; if (GEARK.includes(k)) v = vis.gear; if (HOOKK.includes(k)) v = vis.hooks; if (CHARMK.includes(k)) v = vis.charms; if (BOWKEYS.includes(k)) v = vis.bow; if (SWORDKEYS.includes(k)) v = vis.sword; if (vis.boots && !BOOTK.includes(k)) v = false; R.meshes[k].visible = v; } if (R.light) R.light.visible = vis.bow && !vis.boots; };
   toggle($('shows'), 'glassB', 'Glasses', true, (v) => { vis.glasses = v; applyVis(); });
   toggle($('shows'), 'sleeveB', 'Lace sleeves', true, (v) => { vis.sleeves = v; applyVis(); });
-  chips($('moves'), [['Stand still', 'pose'], ['Ready', 'idle'], ['Walk', 'walk'], ['Jog', 'jog'], ['Talk', 'talk'], ['Moonsteel Draw', 'draw'], ['Cheer', 'cheer'], ['Limber up', 'limber']], (v) => { if (v[1] === 'pose') setPose(1); else R.play(v[1]);
-    if (v[1] === 'draw') { want = { az: 0.1, el: 0.05, dist: 5.9, ty: 0.98, tx: 0.2, tz: 0 }; easing = true; spin = false; $('spinB').setAttribute('aria-pressed', 'false'); [...$('cam').children].forEach((c) => c.setAttribute('aria-pressed', 'false')); } }, 1);       // the draw is shown from the front, with room for the bow at screen right
+  chips($('moves'), [['Stand still', 'pose'], ['Ready', 'idle'], ['Walk', 'walk'], ['Jog', 'jog'], ['Talk', 'talk'], ['Moonsteel Draw', 'draw'], ['Sword', 'sword'], ['Cheer', 'cheer'], ['Limber up', 'limber']], (v) => { if (v[1] === 'pose') setPose(1); else R.play(v[1]);
+    if (v[1] === 'draw' || v[1] === 'sword') { want = v[1] === 'draw' ? { az: 0.1, el: 0.05, dist: 5.9, ty: 0.98, tx: 0.2, tz: 0 } : { az: 0.1, el: 0.06, dist: 7.4, ty: 0.95, tx: 0.5, tz: 0 }; easing = true; spin = false; $('spinB').setAttribute('aria-pressed', 'false'); [...$('cam').children].forEach((c) => c.setAttribute('aria-pressed', 'false')); } }, 1);       // the draw and the sword are shown from the front, with room at screen right
   toggle($('extra'), 'slowB', 'Half speed', false, (v) => { speed = v ? 0.45 : 1; });
   toggle($('extra'), 'flipB', 'Flipbook look', false, (v) => { stage.look = v ? 'flipbook' : 'smooth'; });       // claude/HOW-TO-flipbook-look.md: a switch, off when the page opens
   toggle($('shows'), 'gearB', 'Belts and bags', true, (v) => { vis.gear = v; applyVis(); });
   toggle($('shows'), 'hooksB', 'Strap hooks', true, (v) => { vis.hooks = v; applyVis(); });
   toggle($('shows'), 'charmsB', 'Charms', true, (v) => { vis.charms = v; applyVis(); });
   toggle($('shows'), 'bowB', 'Bow', true, (v) => { vis.bow = v; applyVis(); });
+  toggle($('shows'), 'swordB', 'Sword', true, (v) => { vis.sword = v; applyVis(); });
   toggle($('shows'), 'bootsB', 'Boots only', false, (v) => { vis.boots = v; applyVis(); });
   setRef();
   // drag to turn, pinch or wheel to zoom

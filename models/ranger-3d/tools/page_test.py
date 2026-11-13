@@ -1,9 +1,9 @@
 # page_test.py : opens the one-file page at phone size, presses the hand and arm buttons, drags, and saves what the stage shows
 import sys, os
-PART = os.environ.get('PART', '')       # the whole test is slow without a graphics card: PART=1 is the bow and the draw, PART=2 the rest
+PART = os.environ.get('PART', '')       # the whole test is slow without a graphics card: PART=1 is the bow, the draw and the sword, PART=2 the rest
 from playwright.sync_api import sync_playwright
 from PIL import Image
-PAGE = sys.argv[1] if len(sys.argv) > 1 else '/home/claude/ranger/deliver/Ranger_3D_stage9.html'
+PAGE = sys.argv[1] if len(sys.argv) > 1 else '/home/claude/ranger/deliver/Ranger_3D_stage10.html'
 ARGS = ['--use-angle=swiftshader', '--enable-unsafe-swiftshader', '--ignore-gpu-blocklist', '--allow-file-access-from-files']
 with sync_playwright() as p:
     b = p.chromium.launch(executable_path='/usr/bin/google-chrome', args=ARGS)
@@ -17,6 +17,7 @@ with sync_playwright() as p:
     if PART != '2':
         pg.click('#moves >> text="Moonsteel Draw"'); pg.wait_for_timeout(3500); shot('draw_1'); pg.wait_for_timeout(2500); shot('draw_2'); pg.wait_for_timeout(2500); shot('draw_3'); print('draw: move', pg.evaluate('RANGER.R.moves.join(",")'), 'bow keys', pg.evaluate('["moon","bowWrap","bowGem"].map((k) => !!RANGER.R.meshes[k])'))
         pg.click('#moves >> text="Ready"'); pg.click('#cam >> text="Back"'); pg.wait_for_timeout(5000); shot('back'); pg.click('#flipB'); pg.click('#moves >> text="Moonsteel Draw"'); pg.wait_for_timeout(5000); shot('draw_flip'); pg.click('#flipB'); pg.click('#bowB'); pg.wait_for_timeout(1500); shot('no_bow'); pg.click('#bowB')
+        pg.click('#moves >> text="Sword"'); pg.wait_for_timeout(2600); shot('sword_1'); pg.wait_for_timeout(1500); shot('sword_2'); pg.wait_for_timeout(1500); shot('sword_3'); pg.wait_for_timeout(2500); shot('sword_4'); print('sword keys', pg.evaluate('["blade","swordSteel","scab"].map((k) => !!RANGER.R.meshes[k])'))
     if PART == '1': print('errors:', logs[:4]); b.close()
     if PART != '1':
         for host, label in (('moves', 'Walk'), ('cam', 'Side'), ('moves', 'Jog'), ('cam', 'Hips'), ('moves', 'Stand still'), ('gear', 'Charms'), ('poses', 'Legs apart'), ('boots', 'Outer side'), ('hands', 'Left hand'), ('views', 'Front'), ('hviews', 'Face')):

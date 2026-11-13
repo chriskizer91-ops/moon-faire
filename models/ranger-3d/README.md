@@ -190,12 +190,37 @@ four strap hooks as real objects, standing still. About 355,000 triangles.
     switch under "More views and switches".
   - Rough: tuned from stills, not watched; her feet slide to the wide stance; nothing holds the bow to her back; from
     behind her fingers go a little into the curl as she takes hold; in the Flipbook look the thin silver is mostly ink.
+- **Stage ten: her sword.** Chris, after stage nine: "Let's continue she's looking good."
+  - **Sword** (`src/R47_sword.js`; materials `blade`, `swordSteel`, `swordGrip`, `swordGold`, `swordGem`). From G4, 74 cm
+    long: a 57.5 cm two-edged blade, flat diamond in section and 2.4 cm wide at the guard; a crescent guard with its horns
+    toward the blade; an 8 cm grip of dark blue leather bound with silver wire; an oval blue gem in gold with a ring of gold
+    beads for a pommel. Built in a place of its own (`SWK.G1`) with one bone, `sword`, a child of `root`: up the blade is +Y,
+    the edges along X.
+  - **Scabbard** (`scab`, `scabStrap`, bone `scab` on `hips`). Black leather, silver mouth and tip, two bands with rings and
+    a strap from each to her belt. It hangs at the front of her left hip (`uS` 0.665), tip down and back by 24 degrees, wide
+    side along her hip so the guard shows from the front (G6). `scabTick` swings it (a weight on a spring), keeps it clear
+    of her left thigh, and tips and turns it for the draw. `SWK.Qsh` and `SWK.Psh` put the sword in it.
+  - **Planted feet** (`plant(S, W, qF, hint, k)`). `reach` became `solve(chain, ...)`, used for arms (`ARM`) and legs
+    (`LEG`: the knee folds backward, the shin does not twist).
+  - **Sword move** (move `sword`; `swordBeats`, `swordHand`, `swordStage`). In the move's own seconds: right hand to the
+    grip while her left tips the scabbard (to 0.26); the blade slides out as she hops round to face screen right, hips
+    turned 62 degrees, right foot leading (to 0.6); guard, blade 50 degrees up; back over her shoulder (1.02 to 1.24); the
+    cut over the top with a 34 cm step (1.27 to 1.40); the lunge held; back to guard (1.9 to 2.3); turned to the front and
+    sheathed (2.56 to 3.4). Once drawn the blade turns in the plane of the picture (`phi`), and her hand is worked out from
+    the sword. The grip lies across her palm by 35 to 50 degrees so her wrist stays within what a wrist can do.
+    `SHOTS.sword` 4.5 s, `SLOW.sword` 1.25.
+  - **Light**: the crescent the cut leaves (I5) is a strip worked out afresh each frame from where the blade was over the
+    last quarter second (`trailM`); the blade shines along its length as she cuts (`LT.swGlow`). Light only, as before.
+  - Page: "Sword" in the moves row (camera to the front and pulled back), "Sword" switch under "More views and switches".
+  - Rough: one cut only; no vine on the blade or leaf work on the guard; plain straps; her left arm can swing through the
+    hilt when she walks or jogs; the blade's point passes through the scabbard's side for a moment as it leaves; in
+    Moonsteel Draw her feet still slide.
 - Waiting for his notes: the moves again; stage two (head), stage three (hands and arms) and stage five.
 
 Rough or not built yet: her face does not move (no blink, no expressions); the hair has a smooth edge with none of the painted
 flyaway wisps, and the loose locks are simple; earrings and necklaces; bracelets; each charm is one stiff piece on a hinge (its chain does not bend, charms can
 pass through each other); the caps on the stones are plain cones; with her arms straight out the iron curls bend with her skin;
-sword and knives; Silverglass and the gem; hit reactions, a dodge, a win and a fall.
+knives; Silverglass and the gem; hit reactions, a dodge, a win and a fall.
 
 ## What is here
 
@@ -211,7 +236,8 @@ sword and knives; Silverglass and the gem; hit reactions, a dodge, a win and a f
   - `R42_glasses.js`: glasses.
   - `R45_gear.js`: belts with buckles, studs and tucked ends; satchel and pouch; the four strap hooks; charms.
   - `R46_bow.js`: her bow, open and rolled up (stage nine).
-  - `R99_static.js`: materials, binding, `pose({arm, leg})`, her moves, her fingers, the reach solver, the bow at work and its light.
+  - `R47_sword.js`: her sword, and its scabbard at her left hip (stage ten).
+  - `R99_static.js`: materials, binding, `pose({arm, leg})`, her moves, her fingers, the solver for arms and legs, the bow and the sword at work, and their light.
 - `tools/tables.py`: the one place her body tables live. The model and the body bake both read them.
 - `tools/sil.py`: lifts a figure off a painting's flat background. `tools/measure.py` and `tools/more.py` print widths and depths
   by height. `tools/cmp_r.py` puts the model beside a painting at one scale with the two outlines laid over each other.
@@ -363,6 +389,11 @@ take the lean out. Her arms keep the Jester's bone lengths (0.63 m; the painting
 
 ## Checking
 
+- Stage ten: stills at 16 moments of the sword move from the front, the lunge from the target's side, from behind and from
+  above, her hand on the grip, the sword at her hip from four sides, in Ready, Walk, Jog and at full draw of the bow, and
+  the cut in the Flipbook look. Hands and feet reached where they were wanted at every still (0 mm short). Page test at
+  phone size, both halves: no errors; a drag turns her (0.64 rad).
+
 - Stage nine: stills at 23 moments of Moonsteel Draw from the front (`tools/seq.sh`), the take from behind, close-ups of
   her face and both hands at full draw, the bow on her back from behind and the side, the Flipbook look at three moments,
   and her hands in Ready, Talk, Cheer and Jog. At every still both hands reached where they were wanted (0 mm short).
@@ -438,8 +469,8 @@ Python that reads them with `-I`.
 
 ## Next stages
 
-Done at stage nine: fingers, the bow, Moonsteel Draw. Next, in the order Chris agreed: the sword with a fencer's guard and a full
-cut (G4, H7); the knives with their throw (G5, H8); Silverglass (H6) and the gem (H9); then hit reactions, a dodge, a win and
+Done at stage nine: fingers, the bow, Moonsteel Draw. Done at stage ten: the sword, its guard and a full cut (G4, H7).
+Next, in the order Chris agreed: the knives with their throw (G5, H8); Silverglass (H6) and the gem (H9); then hit reactions, a dodge, a win and
 a fall. The older list below is kept for what is still open in it.
 
 
