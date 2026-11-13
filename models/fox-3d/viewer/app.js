@@ -12,11 +12,14 @@
   const ALL = STATES.concat(ACTS, SPELLS, QUIET), find = (id) => ALL.find((x) => x[0] === id);
   const VIEWS = [['Front', 0, 0.10, 1], ['Three-quarter', -0.62, 0.14, 1], ['Side', -1.5708, 0.08, 1], ['Back', 3.1416, 0.12, 1], ['Face', 0.22, 0.02, 0.27]];
   const touchPhone = (navigator.maxTouchPoints > 0 || /Mobi|Android|iPhone/i.test(navigator.userAgent)) && Math.min(screen.width, screen.height) < 820;
-  const small = location.hash === '#lite' ? true : location.hash === '#full' ? false : touchPhone;      // phones get the lighter model; the Full detail switch overrides
+  // The address after # says which build to show: lite or full (phones get the lighter model unless told otherwise), depth for the head with its
+  // depth-only reshaping, head105 / head110 / head115 for a larger head. The switches below write it and reload. Example: #lite-depth-head110
+  const HASH = location.hash, small = /lite/.test(HASH) ? true : /full/.test(HASH) ? false : touchPhone, depthOn = /depth/.test(HASH), headPc = +((/head(\d+)/.exec(HASH) || [])[1] || 100);
+  const goHash = (o) => { const v = Object.assign({ small, depthOn, headPc }, o); location.hash = '#' + [v.small ? 'lite' : 'full', v.depthOn ? 'depth' : '', v.headPc !== 100 ? 'head' + v.headPc : ''].filter(Boolean).join('-'); location.reload(); };
   let stage, J, JO = null;
   try {
     if (!window.THREE) throw new Error('three.js did not load');
-    JO = { detail: small ? 0.75 : 1, textureScale: small ? 0.75 : 1 };
+    JO = { detail: small ? 0.75 : 1, textureScale: small ? 0.75 : 1, faceDepth: depthOn ? 1 : 0, headScale: 0.85 * headPc / 100 };
     stage = makeStage(canvas, { shadow: small ? 1024 : 2048 });
     J = makeFox(JO);
     stage.scene.add(J.root, J.fx);
@@ -102,7 +105,10 @@
   const spinChip = chip(toggleRow, 'Turntable', (b) => { spin = !spin; viewAz = null; b.setAttribute('aria-pressed', spin); }, false);
   // the layers worn over the base outfit (veils, ribbon strands, shawl, shoulder kerchiefs) can be taken off, to work on the outfit beneath
   let outerOn = true;
-  chip(toggleRow, 'Full detail', () => { location.hash = small ? '#full' : '#lite'; location.reload(); }, !small);
+  chip(toggleRow, 'Full detail', () => goHash({ small: !small }), !small);
+  // two things Chris is choosing between by eye (13 Nov): the head's depth-only reshaping, and a larger head
+  chip(toggleRow, 'Reshaped head', () => goHash({ depthOn: !depthOn }), depthOn);
+  chip(toggleRow, 'Head +' + (headPc - 100) + '%', () => goHash({ headPc: headPc >= 115 ? 100 : headPc + 5 }), headPc !== 100);
   chip(toggleRow, 'Half speed', (b) => { slow = !slow; b.setAttribute('aria-pressed', slow); }, false);
 
   // ---- orbit: drag to turn, pinch or wheel to zoom ----

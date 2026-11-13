@@ -62,6 +62,44 @@
       rings.push(ring);
     }
     const part = loft(rings, { capA: true, capB: true });
+    // Depth only (Chris, 13 Nov: her face is perfect straight on and wrong from every other angle). Straight on, the painting does the work. Turned, the
+    // shape under it shows, and it was too smooth: no eye sockets, a wide flat bridge to her nose, lips and chin that barely stood out, a flat shelf
+    // under her jaw. Here each point of her face may move straight back or straight forward and nowhere else, so seen from in front nothing shifts and
+    // the painting lands exactly where it did. (Under her jaw, which cannot be seen from in front, points also rise toward her neck.)
+    // opts.faceDepth: 0 or absent leaves her as she was, 1 is the full reshaping.
+    if (opts.faceDepth) {
+      const K = opts.faceDepth === true ? 1 : +opts.faceDepth, nor = computeNormals(part.pos, part.idx), EY = FC.eyeY, EX = FC.eyeX, NY = FC.noseY, MY = FC.mouthY, BY = FC.browY;
+      const g = (a, b) => Math.exp(-a * a - b * b);
+      for (let i = 0; i < part.pos.length / 3; i++) {
+        const x = part.pos[i * 3], y = part.pos[i * 3 + 1], z = part.pos[i * 3 + 2], ax = Math.abs(x), nz = nor[i * 3 + 2], ny = nor[i * 3 + 1];
+        if (z > 0.02 && nz > 0.12) {
+          let d = 0;
+          d -= 0.0055 * g((ax - EX) / 0.0165, (y - EY) / 0.0105);                                                   // the socket her eye sits in
+          d -= 0.0065 * g((ax - 0.0165) / 0.0065, (y - (EY - 0.001)) / 0.0085);                                     // deepest at the inner corner, beside the bridge of her nose
+          d += 0.0026 * g((ax - EX) / 0.0105, (y - EY) / 0.0062);                                                   // the round of the eye itself
+          d -= 0.0018 * g((ax - 0.034) / 0.014, (y - (EY + 0.0095)) / 0.0035);                                      // the hollow under her brow
+          d += 0.0016 * g(0, (y - (BY + 0.001)) / 0.0055) * sm(0.006, 0.018, ax) * (1 - sm(0.046, 0.060, ax));      // her brow
+          d += 0.0030 * g(x / 0.0058, 0) * sm(NY - 0.004, NY + 0.004, y) * (1 - sm(EY - 0.004, EY + 0.008, y));     // the ridge of her nose
+          d -= 0.0058 * g((ax - 0.0170) / 0.0062, 0) * sm(NY - 0.002, NY + 0.010, y) * (1 - sm(EY - 0.012, EY - 0.002, y));     // its sides, which were a wide low mound
+          d += 0.0022 * g((ax - 0.0138) / 0.0042, (y - (NY - 0.0015)) / 0.0050);                                    // the wings of her nostrils
+          d -= 0.0020 * g((ax - 0.0205) / 0.0035, (y - (NY - 0.001)) / 0.0060);                                     // and the crease behind them
+          d += 0.0012 * g((ax - 0.036) / 0.012, (y - (NY + 0.006)) / 0.010);                                        // the apples of her cheeks
+          { const x0 = 0.0200, y0 = NY - 0.002, x1 = 0.0310, y1 = MY - 0.006, t = cl(((ax - x0) * (x1 - x0) + (y - y0) * (y1 - y0)) / ((x1 - x0) * (x1 - x0) + (y1 - y0) * (y1 - y0)), 0, 1), ds = Math.hypot(ax - (x0 + t * (x1 - x0)), y - (y0 + t * (y1 - y0)));
+            d -= 0.0016 * Math.exp(-(ds / 0.0034) * (ds / 0.0034)); }                                                // the fold from her nose to the corner of her mouth, which was only painted
+          d -= 0.0015 * g((ax - 0.046) / 0.010, (y - (MY + 0.004)) / 0.012);                                        // the hollow under them
+          d += 0.0020 * g(x / 0.0135, (y - (MY + 0.0052)) / 0.0042);                                                // her upper lip
+          d += 0.0022 * g(x / 0.0120, (y - (MY - 0.0045)) / 0.0040);                                                // her lower lip
+          d -= 0.0010 * g(x / 0.0200, (y - MY) / 0.0014);                                                           // the line between them
+          d -= 0.0016 * g((ax - 0.0265) / 0.0050, (y - (MY + 0.0005)) / 0.0050);                                    // the corners of her mouth
+          d -= 0.0018 * g(x / 0.0140, (y - (MY - 0.0145)) / 0.0042);                                                // the fold under her lower lip
+          d += 0.0022 * g(x / 0.0130, (y - (MY - 0.0300)) / 0.0075);                                                // her chin
+          part.pos[i * 3 + 2] = z + K * d * sm(0.12, 0.45, nz);
+        }
+        // Under her jaw: the flat shelf slopes up toward her neck. Nothing moves at the jaw's own edge (which is what shows from in front), and the rise
+        // grows smoothly behind it, so there is no step.
+        if (ny < -0.15 && y < 1.475 && z > -0.03) part.pos[i * 3 + 1] = y + K * 0.015 * sm(0, 0.036, (0.092 - 0.9 * ax) - z) * sm(-0.15, -0.65, ny) * (1 - sm(1.440, 1.475, y)) * sm(-0.03, 0.0, z);
+      }
+    }
     for (let i = 0; i < part.pos.length / 3; i++) {   // planar projection from the front
       part.uv[i * 2] = (part.pos[i * 3] - FACE.x0) / (FACE.x1 - FACE.x0); part.uv[i * 2 + 1] = (part.pos[i * 3 + 1] - FACE.y0) / (FACE.y1 - FACE.y0);
     }

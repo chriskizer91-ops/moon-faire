@@ -105,7 +105,10 @@
       const t = ctex(c, 1, 1);
       return sheen(std({ map: t, roughness: 0.94, side: THREE.DoubleSide }), '#9fc8b8', 2.8, 0.20);
     })(),
-    neck: (() => {                                   // her neck: the chest's tone where it leaves the collar, her face's tone above the choker, darkening into the shade under her jaw
+    neck: BAKED && BAKED.neck ? (() => {             // her neck, painted (match_skin_fox.py): round it from the front, to her left, the back, her right; from her collar up to under her jaw
+      const t = bakedTex('neck', 256, 256, SKIN || '#d89780'); t.wrapS = THREE.RepeatWrapping;
+      return sheen(std({ map: t, color: lin('#d8ccc6'), roughness: 0.66, envMapIntensity: 0.2, emissive: lin('#ffffff'), emissiveMap: t, emissiveIntensity: 0.44 }), '#ffb49a', 3.2, 0.08);
+    })() : (() => {                                  // (without the bake) the chest's tone where it leaves the collar, her face's tone above the choker, darkening into the shade under her jaw
       const c = cvs(8, 128), g = c.getContext('2d'), CH = (BAKED && BAKED.skinChest) || SKIN || '#e0a890', J = (BAKED && BAKED.skinJaw) || SKIN || '#c08068', F = SKIN || '#d89780';
       const ratio = (hex, k) => { const a = new THREE.Color(hex), b = new THREE.Color(CH); return 'rgb(' + [a.r / b.r, a.g / b.g, a.b / b.b].map((v) => Math.round(255 * Math.min(1, v * k))).join(',') + ')'; };
       const gr = g.createLinearGradient(0, 128, 0, 0); gr.addColorStop(0, '#ffffff'); gr.addColorStop(0.24, '#ffffff'); gr.addColorStop(0.34, ratio(F, 1.0)); gr.addColorStop(0.50, ratio(F, 0.93)); gr.addColorStop(0.62, ratio(J, 0.92)); gr.addColorStop(1, ratio(J, 0.85));

@@ -57,6 +57,7 @@ Checks (Playwright with Chrome, software drawing):
 ./headset.sh f1                      # shots/f1_heads.png  four head views
 ./headcmp.sh f1                      # shots/f1_headcmp.png  her head beside A1's on one numbered grid
 ./check_moves.sh                     # every stance with every move, looking for broken numbers
+./facecmp.sh f1 '?o=%7B%22faceDepth%22%3A1%7D'   # shots/f1_a..p.png  her head from six angles, worn, bare and shape only, for one build (here: reshaped)
 ./handcmp.sh h1                      # shots/h1_handcmp.jpg  her hanging arm and hand beside A1 (front) and A2 (back) at A1's scale
 ./armcmp.sh a1                       # shots/a1_armcmp.jpg  her left arm and sleeve beside A1's at A1's own scale, one numbered grid
 ./poseset.sh p1                      # shots/p1_poses.jpg  eight poses in a strip, for a before-and-after look when the pose solver changes
@@ -114,6 +115,8 @@ Pupils in C3 are typed into `meas/fox_profile.py` from a gridded copy; automatic
 - Phones get the lighter build by default (`#lite`: detail 0.75, 283k triangles). The test machine is not a phone, so it shows the full build unless the address ends in `#lite`. Check both.
 - The limb solver's lengths are multiplied by `FOX_K` (`src/70_anim.js`). Without that every hand and foot target looked 4.5% too far, so her arms hung dead straight.
 - The stage camera sees 60 m and no further. `T.view` in `test.html` now moves the near and far planes with the distance. Before 13 Nov, views from 60 m away (most of the side-by-side pictures) cut off whatever lay behind her middle: back hair, elbows.
+- **Two things Chris is choosing by eye (13 Nov), both off unless asked for.** `faceDepth: 1` reshapes her face in depth only (`variants/ownface/40_head.js`): points move straight back or forward, so the straight-on view keeps its painting exactly. `headScale` is 0.85; 5, 10 and 15% larger are 0.8925, 0.935 and 0.9775. In the page they are the switches "Reshaped head" and "Head +0%", which write the address (`#lite-depth-head110`) and reload. Do not make either the default until he says which.
+- Her neck is a painting now (`neck` in the bake, from `match_skin_fox.py`): round it from the front, to her left, the back, her right; from her collar up to under her jaw.
 - **One skin.** Every bare part of her (face, neck, chest, arms, hands) uses the same recipe: tint `#d8ccc6`, 44% of its own picture as glow, roughness 0.66, a fifth of the sky's light, the same soft rim. The tone is `skin` in the bake, read off the middle of her painted face, not her forehead. The painted skin on her body is picked out pixel by pixel by `bodySkin` and lit by that recipe inside the torso material.
 - Run the bakes from the top when a skin step changes. `match_skin_fox.py` flattens the chest's painted shine, so running it twice on the same bake flattens it twice.
 - A hard piece that has a painting of each face (pouch, sheath) is built as separate faces, each given the painting of that face looked at straight on. One shared skin would smear the paintings where the faces meet.
@@ -130,4 +133,5 @@ Pass 4 (12 Nov 2026): her own face from round 5, head sized to the standing pain
 Pass 5 (13 Nov 2026): sleeves and arms against A1, A2 and F5 (see `claude/fox-3d-pass5-sleeves-arms.md`).
 Pass 6 (13 Nov 2026): belt, pouch, sheath and shears rebuilt from F7, G1 and G3 (see `claude/fox-3d-pass6-belt-pouch-shears.md`).
 Pass 7 (13 Nov 2026): one skin from face to hands, painted arms, softer hands, palms turned in at rest (see `claude/fox-3d-pass7-one-skin.md`).
-Still to do: her face from off-centre (the shape of her head in depth; waiting on Chris); ruffles at the neckline and peplum are flat paint; tools and spells (rounds 3 and 4) are not started.
+Pass 8 (13 Nov 2026): painted neck, chest shading back, purple off her shoulders, bracelets on the wrist, and the two head options to choose from (see `claude/fox-3d-pass8-neck-chest-head-options.md`).
+Still to do: Chris's choice of head size and of the depth reshaping; ruffles at the neckline and peplum are flat paint; tools and spells (rounds 3 and 4) are not started.

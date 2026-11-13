@@ -672,7 +672,7 @@ function makeFox(opts) {
       const NB = 21, wB = [BI['uarm' + S], 1];
       for (let k = 0; k < NB; k++) { const a = ((k + 0.5) / NB) * TAU, p = at(BAND_S, Math.cos(a) * (BAND_R + 0.0024), Math.sin(a) * (BAND_R + 0.0024)), q = V3(s * p[0], p[1], p[2]); addPart('bellm', spherePart(q, 0.0034, 0.0034, 0.0034, 9, 7), () => wB, { out: q }); }
       // her bracelets (F2), three strands stacked above each wrist: large dark wood beads, small gold ones, medium wood ones. Each lies on the wrist's own flattened shape.
-      for (const [sl, br, nb, key, ph] of [[0.4130, 0.0056, 13, 'woodbead', 0.0], [0.4285, 0.0031, 27, 'bellm', 0.3], [0.4420, 0.0040, 20, 'woodbead', 0.7]]) {
+      for (const [sl, br, nb, key, ph] of [[0.4470, 0.0056, 13, 'woodbead', 0.0], [0.4630, 0.0031, 27, 'bellm', 0.3], [0.4775, 0.0040, 20, 'woodbead', 0.7]]) {      // right at the wrist, as in A1; the last strand sits on the line where arm meets hand
         const [hx, hz] = armAt(sl), cFr = 0.0040 * sm(0.40, 0.47, sl), ex = hx + br * 0.80, ez = hz + br * 0.80, c0 = at(sl, 0, cFr), c1 = at(sl + 0.035, 0, cFr), bn = 'br' + S + Math.round(sl * 1000);
         addBone(bn + 'a', 'ftwC' + S, s * c0[0], c0[1], c0[2]); addBone(bn + 'b', bn + 'a', s * c1[0], c1[1], c1[2]); braceletChains.push({ names: [bn + 'a', bn + 'b'], anchor: 'ftwC' + S, k: 0.14 + 0.5 * br * 20 });
         const wf = (() => { const w = [BI[bn + 'a'], 1]; return () => w; })();
@@ -1132,6 +1132,44 @@ function makeFox(opts) {
       rings.push(ring);
     }
     const part = loft(rings, { capA: true, capB: true });
+    // Depth only (Chris, 13 Nov: her face is perfect straight on and wrong from every other angle). Straight on, the painting does the work. Turned, the
+    // shape under it shows, and it was too smooth: no eye sockets, a wide flat bridge to her nose, lips and chin that barely stood out, a flat shelf
+    // under her jaw. Here each point of her face may move straight back or straight forward and nowhere else, so seen from in front nothing shifts and
+    // the painting lands exactly where it did. (Under her jaw, which cannot be seen from in front, points also rise toward her neck.)
+    // opts.faceDepth: 0 or absent leaves her as she was, 1 is the full reshaping.
+    if (opts.faceDepth) {
+      const K = opts.faceDepth === true ? 1 : +opts.faceDepth, nor = computeNormals(part.pos, part.idx), EY = FC.eyeY, EX = FC.eyeX, NY = FC.noseY, MY = FC.mouthY, BY = FC.browY;
+      const g = (a, b) => Math.exp(-a * a - b * b);
+      for (let i = 0; i < part.pos.length / 3; i++) {
+        const x = part.pos[i * 3], y = part.pos[i * 3 + 1], z = part.pos[i * 3 + 2], ax = Math.abs(x), nz = nor[i * 3 + 2], ny = nor[i * 3 + 1];
+        if (z > 0.02 && nz > 0.12) {
+          let d = 0;
+          d -= 0.0055 * g((ax - EX) / 0.0165, (y - EY) / 0.0105);                                                   // the socket her eye sits in
+          d -= 0.0065 * g((ax - 0.0165) / 0.0065, (y - (EY - 0.001)) / 0.0085);                                     // deepest at the inner corner, beside the bridge of her nose
+          d += 0.0026 * g((ax - EX) / 0.0105, (y - EY) / 0.0062);                                                   // the round of the eye itself
+          d -= 0.0018 * g((ax - 0.034) / 0.014, (y - (EY + 0.0095)) / 0.0035);                                      // the hollow under her brow
+          d += 0.0016 * g(0, (y - (BY + 0.001)) / 0.0055) * sm(0.006, 0.018, ax) * (1 - sm(0.046, 0.060, ax));      // her brow
+          d += 0.0030 * g(x / 0.0058, 0) * sm(NY - 0.004, NY + 0.004, y) * (1 - sm(EY - 0.004, EY + 0.008, y));     // the ridge of her nose
+          d -= 0.0058 * g((ax - 0.0170) / 0.0062, 0) * sm(NY - 0.002, NY + 0.010, y) * (1 - sm(EY - 0.012, EY - 0.002, y));     // its sides, which were a wide low mound
+          d += 0.0022 * g((ax - 0.0138) / 0.0042, (y - (NY - 0.0015)) / 0.0050);                                    // the wings of her nostrils
+          d -= 0.0020 * g((ax - 0.0205) / 0.0035, (y - (NY - 0.001)) / 0.0060);                                     // and the crease behind them
+          d += 0.0012 * g((ax - 0.036) / 0.012, (y - (NY + 0.006)) / 0.010);                                        // the apples of her cheeks
+          { const x0 = 0.0200, y0 = NY - 0.002, x1 = 0.0310, y1 = MY - 0.006, t = cl(((ax - x0) * (x1 - x0) + (y - y0) * (y1 - y0)) / ((x1 - x0) * (x1 - x0) + (y1 - y0) * (y1 - y0)), 0, 1), ds = Math.hypot(ax - (x0 + t * (x1 - x0)), y - (y0 + t * (y1 - y0)));
+            d -= 0.0016 * Math.exp(-(ds / 0.0034) * (ds / 0.0034)); }                                                // the fold from her nose to the corner of her mouth, which was only painted
+          d -= 0.0015 * g((ax - 0.046) / 0.010, (y - (MY + 0.004)) / 0.012);                                        // the hollow under them
+          d += 0.0020 * g(x / 0.0135, (y - (MY + 0.0052)) / 0.0042);                                                // her upper lip
+          d += 0.0022 * g(x / 0.0120, (y - (MY - 0.0045)) / 0.0040);                                                // her lower lip
+          d -= 0.0010 * g(x / 0.0200, (y - MY) / 0.0014);                                                           // the line between them
+          d -= 0.0016 * g((ax - 0.0265) / 0.0050, (y - (MY + 0.0005)) / 0.0050);                                    // the corners of her mouth
+          d -= 0.0018 * g(x / 0.0140, (y - (MY - 0.0145)) / 0.0042);                                                // the fold under her lower lip
+          d += 0.0022 * g(x / 0.0130, (y - (MY - 0.0300)) / 0.0075);                                                // her chin
+          part.pos[i * 3 + 2] = z + K * d * sm(0.12, 0.45, nz);
+        }
+        // Under her jaw: the flat shelf slopes up toward her neck. Nothing moves at the jaw's own edge (which is what shows from in front), and the rise
+        // grows smoothly behind it, so there is no step.
+        if (ny < -0.15 && y < 1.475 && z > -0.03) part.pos[i * 3 + 1] = y + K * 0.015 * sm(0, 0.036, (0.092 - 0.9 * ax) - z) * sm(-0.15, -0.65, ny) * (1 - sm(1.440, 1.475, y)) * sm(-0.03, 0.0, z);
+      }
+    }
     for (let i = 0; i < part.pos.length / 3; i++) {   // planar projection from the front
       part.uv[i * 2] = (part.pos[i * 3] - FACE.x0) / (FACE.x1 - FACE.x0); part.uv[i * 2 + 1] = (part.pos[i * 3 + 1] - FACE.y0) / (FACE.y1 - FACE.y0);
     }
@@ -1527,7 +1565,7 @@ function makeFox(opts) {
       addPart('frame', loft(tubeRings(rim, rim.map(() => wire), 6)), wHead, { out: V3(sx * ex, ey, zf) });
       const hinge = V3(sx * (ex + R + 0.001), ey + 0.004, zf - 0.006), back = V3(sx * 0.0745, ey + 0.001, 0.012), tip = V3(sx * 0.0735, ey - 0.014, -0.014);
       addPart('frame', loft(tubeRings(curvePts([V3(sx * (ex + R), ey + 0.003, zf - 0.004), hinge, V3(sx * 0.0725, ey + 0.004, 0.060), back, tip], 16), new Array(16).fill(wire), 6)), wHead, { out: V3(sx * 0.07, ey, 0.05) });
-      addPart('frame', spherePart(V3(sx * 0.0118, ey - 0.011, zf - 0.0115), 0.0022, 0.0034, 0.0012, 8, 6), wHead, { out: V3(sx * 0.0118, ey - 0.011, zf - 0.0115) });      // nose pad
+      { const zp = zf - 0.0115 - 0.0043 * (opts.faceDepth === true ? 1 : +opts.faceDepth || 0); addPart('frame', spherePart(V3(sx * 0.0118, ey - 0.011, zp), 0.0022, 0.0034, 0.0012, 8, 6), wHead, { out: V3(sx * 0.0118, ey - 0.011, zp) }); }      // nose pad, resting on the side of her nose wherever that is
       const disc = [[], []]; for (let i = 0; i < NS; i++) { const a = (i / NS) * TAU; disc[0].push([sx * ex, ey, zf - 0.0012]); disc[1].push([sx * ex + (R - wire) * Math.cos(a), ey + (R - wire) * Math.sin(a), zf - 0.0012 - 0.004 * Math.pow(Math.abs(sx * ex + R * Math.cos(a)) / 0.06, 2)]); }
       addPart('lens', loft(disc), wHead, { out: V3(sx * ex, ey, 0) });
     }
@@ -2396,7 +2434,10 @@ function makeFox(opts) {
       const t = ctex(c, 1, 1);
       return sheen(std({ map: t, roughness: 0.94, side: THREE.DoubleSide }), '#9fc8b8', 2.8, 0.20);
     })(),
-    neck: (() => {                                   // her neck: the chest's tone where it leaves the collar, her face's tone above the choker, darkening into the shade under her jaw
+    neck: BAKED && BAKED.neck ? (() => {             // her neck, painted (match_skin_fox.py): round it from the front, to her left, the back, her right; from her collar up to under her jaw
+      const t = bakedTex('neck', 256, 256, SKIN || '#d89780'); t.wrapS = THREE.RepeatWrapping;
+      return sheen(std({ map: t, color: lin('#d8ccc6'), roughness: 0.66, envMapIntensity: 0.2, emissive: lin('#ffffff'), emissiveMap: t, emissiveIntensity: 0.44 }), '#ffb49a', 3.2, 0.08);
+    })() : (() => {                                  // (without the bake) the chest's tone where it leaves the collar, her face's tone above the choker, darkening into the shade under her jaw
       const c = cvs(8, 128), g = c.getContext('2d'), CH = (BAKED && BAKED.skinChest) || SKIN || '#e0a890', J = (BAKED && BAKED.skinJaw) || SKIN || '#c08068', F = SKIN || '#d89780';
       const ratio = (hex, k) => { const a = new THREE.Color(hex), b = new THREE.Color(CH); return 'rgb(' + [a.r / b.r, a.g / b.g, a.b / b.b].map((v) => Math.round(255 * Math.min(1, v * k))).join(',') + ')'; };
       const gr = g.createLinearGradient(0, 128, 0, 0); gr.addColorStop(0, '#ffffff'); gr.addColorStop(0.24, '#ffffff'); gr.addColorStop(0.34, ratio(F, 1.0)); gr.addColorStop(0.50, ratio(F, 0.93)); gr.addColorStop(0.62, ratio(J, 0.92)); gr.addColorStop(1, ratio(J, 0.85));

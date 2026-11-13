@@ -20,14 +20,24 @@ SHADE = np.array([0.90, 1.00, 1.10], np.float32)    # skin in shade is a little 
 
 # ---- her chest and back ----
 a = load('body'); H, Wd = a.shape[:2]; R, G, B = a[..., 0], a[..., 1], a[..., 2]
+# The paintings' purple backdrop shows above her shoulders and beside her body, and the bake had carried it onto the tops of her shoulders as a purple
+# smear (Chris, 13 Nov). Backdrop that touches the top or side edge of either half of the picture is painted over with the nearest cloth or skin.
+bg = (R - B < 16) & (R < 120) & (G < R + 6); leak = np.zeros((H, Wd), bool); top = int(H * 0.48)
+for x0, x1 in ((0, Wd // 2), (Wd // 2, Wd)):
+    lab0, _ = ndi.label(bg[:top, x0:x1]); edge = set(np.unique(np.concatenate([lab0[:, 0], lab0[:, 1], lab0[:, -1], lab0[:, -2], lab0[0, :]]))) - {0}
+    leak[:top, x0:x1] = np.isin(lab0, list(edge))
+leak = ndi.binary_dilation(leak, iterations=4); leak[top + 6:] = False
+if leak.any(): ii = ndi.distance_transform_edt(leak, return_distances=False, return_indices=True); a = a[ii[0], ii[1]]; print('backdrop painted over on her shoulders:', int(leak.sum()), 'pixels')
+R, G, B = a[..., 0], a[..., 1], a[..., 2]
 like = (R > 140) & (R >= G - 2) & (G >= B - 6) & (R - B > 6) & (R - B < 150) & (G / np.maximum(R, 1) > 0.52) & (G / np.maximum(R, 1) < 0.975)
 lab, n = ndi.label(like); seeds = [(int(H * 0.07), int(Wd * 0.25)), (int(H * 0.07), int(Wd * 0.75))]       # the bare skin above the neckline, front and back
 sk = np.zeros((H, Wd), bool)
 for sy, sx in seeds:
     if lab[sy, sx]: sk |= lab == lab[sy, sx]
+for k in set(np.unique(lab[:3, :])) - {0}: sk |= lab == k          # and the bare tops of her shoulders, which reach the top edge of the picture
 sk = ndi.binary_fill_holes(sk); sk = ndi.binary_opening(sk, iterations=1); m = sk.astype(np.float32)
 L = lum(a); Lmed = np.median(L[sk]); low = mblur(L, m, 9) / Lmed; fine = np.clip(L / np.maximum(mblur(L, m, 2.2), 1), 0.86, 1.07)
-s = np.where(low < 1, 1 + 0.60 * (low - 1), 1 + 0.18 * (low - 1)); s = np.clip(s, 0.70, 1.045)          # shadows kept at 60%, highlights at 18%: the paint no longer shines
+s = np.where(low < 1, 1 + 0.90 * (low - 1), 1 + 0.45 * (low - 1)); s = np.clip(s, 0.62, 1.10)           # shadows kept at 90%, highlights at 45% (Chris, 13 Nov: 60 and 18 was too flat): shaded and lit, but not shiny
 new = 0.95 * TONE[None, None, :] * (s[..., None] ** SHADE[None, None, :]) * fine[..., None]      # 5% under the tone: her chest faces the light more than her face does, and read brighter at the same paint
 soft = ndi.gaussian_filter(m, 1.3)[..., None]; body = a * (1 - soft) + new * soft; save('body', body, 90)
 print('body: skin pixels', int(sk.sum()), 'was', np.median(a[sk], 0).astype(int), 'now', np.median(body[sk], 0).astype(int))
@@ -94,5 +104,24 @@ for _ in range(190):                                 # freckles, as in A1 and A5
     du = np.minimum(np.abs(xx - u * AW), AW - np.abs(xx - u * AW)); g = np.exp(-(du ** 2 + (yy - jof(sl)) ** 2) / (r * r)); tint *= 1 - (0.10 + 0.16 * rng.rand()) * g[..., None] * np.array([0.55, 1.0, 1.25], np.float32)
 arm = TONE[None, None, :] * arm * tint; save('arm', arm, 90); Image.fromarray(np.clip(arm, 0, 255).astype(np.uint8)).save(W + 'shots/match_arm.jpg', quality=90)
 print('arm: middle tone', np.median(arm.reshape(-1, 3), 0).astype(int))
+# ---- her neck: 256 round (front, her left, back, her right) by 256 up (collar to under her jaw). The same borrowed skin as her arms, with her neck drawn on it. ----
+NW = 256; yy, xx = np.mgrid[0:NW, 0:NW].astype(np.float32); u = xx / NW; v = 1 - yy / NW; du = np.minimum(u, 1 - u)          # du: how far round from the front, 0 to 0.5
+tile = arm[int(AH * 0.56):int(AH * 0.56) + NW, 40:40 + NW] / TONE[None, None, :]; tile = tile / np.maximum(np.stack([ndi.gaussian_filter(tile[..., c], 20) for c in range(3)], -1), 1e-3)
+shade = 1 - 0.16 * np.clip((v - 0.42) / 0.58, 0, 1) ** 1.3                                           # the shade under her jaw
+gb = lambda uu, vv, ru, rv: np.exp(-(np.minimum(np.abs(u - uu), 1 - np.abs(u - uu)) / ru) ** 2 - ((v - vv) / rv) ** 2)
+cord = np.zeros((NW, NW), np.float32)
+for sgn in (1, -1):                                  # the two cords that run from behind each ear down to the pit of her throat
+    uc = (sgn * (0.035 + 0.205 * np.clip((v - 0.22) / 0.70, 0, 1) ** 1.15)) % 1.0
+    dd = np.minimum(np.abs(u - uc), 1 - np.abs(u - uc)); cord += 0.050 * np.exp(-(dd / 0.030) ** 2) - 0.045 * np.exp(-((dd - 0.045) / 0.028) ** 2) * (du < 0.30)
+shade = shade * (1 + cord * np.clip((v - 0.20) / 0.2, 0, 1))
+shade *= 1 - 0.10 * gb(0.0, 0.26, 0.030, 0.050)                                                      # the pit of her throat
+shade *= 1 + 0.035 * gb(0.0, 0.60, 0.050, 0.110)                                                     # her throat itself, catching the light
+for vv, dp in ((0.47, 0.050), (0.585, 0.040)):                                                       # the two faint rings every neck has
+    shade *= 1 - dp * np.exp(-((v - vv - 0.012 * np.cos(u * 2 * np.pi)) / 0.0075) ** 2) * (0.35 + 0.65 * np.exp(-(du / 0.22) ** 2))
+neck = TONE[None, None, :] * tile * (shade[..., None] ** SHADE[None, None, :])
+for _ in range(34):                                  # a few freckles, front and sides
+    fu = (rng.rand() - 0.5) * 0.62; fv = 0.18 + 0.62 * rng.rand(); r = 0.9 + 1.5 * rng.rand(); gg = np.exp(-((np.minimum(np.abs(u - fu % 1.0), 1 - np.abs(u - fu % 1.0)) * NW) ** 2 + ((v - fv) * NW) ** 2) / (r * r))
+    neck *= 1 - (0.10 + 0.14 * rng.rand()) * gg[..., None] * np.array([0.55, 1.0, 1.25], np.float32)
+save('neck', neck, 90); Image.fromarray(np.clip(neck, 0, 255).astype(np.uint8)).save(W + 'shots/match_neck.jpg', quality=90); print('neck: middle tone', np.median(neck.reshape(-1, 3), 0).astype(int))
 T['skinChest'] = T['skin']
 js = 'window.FOX_TEX=' + json.dumps(T, separators=(',', ':')) + ';'; open(OUT, 'w').write(js); open(W + 'variants/ownface/fox_tex_own.js', 'w').write(js)

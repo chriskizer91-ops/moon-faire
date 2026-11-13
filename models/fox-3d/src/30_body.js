@@ -136,7 +136,7 @@
       const NB = 21, wB = [BI['uarm' + S], 1];
       for (let k = 0; k < NB; k++) { const a = ((k + 0.5) / NB) * TAU, p = at(BAND_S, Math.cos(a) * (BAND_R + 0.0024), Math.sin(a) * (BAND_R + 0.0024)), q = V3(s * p[0], p[1], p[2]); addPart('bellm', spherePart(q, 0.0034, 0.0034, 0.0034, 9, 7), () => wB, { out: q }); }
       // her bracelets (F2), three strands stacked above each wrist: large dark wood beads, small gold ones, medium wood ones. Each lies on the wrist's own flattened shape.
-      for (const [sl, br, nb, key, ph] of [[0.4130, 0.0056, 13, 'woodbead', 0.0], [0.4285, 0.0031, 27, 'bellm', 0.3], [0.4420, 0.0040, 20, 'woodbead', 0.7]]) {
+      for (const [sl, br, nb, key, ph] of [[0.4470, 0.0056, 13, 'woodbead', 0.0], [0.4630, 0.0031, 27, 'bellm', 0.3], [0.4775, 0.0040, 20, 'woodbead', 0.7]]) {      // right at the wrist, as in A1; the last strand sits on the line where arm meets hand
         const [hx, hz] = armAt(sl), cFr = 0.0040 * sm(0.40, 0.47, sl), ex = hx + br * 0.80, ez = hz + br * 0.80, c0 = at(sl, 0, cFr), c1 = at(sl + 0.035, 0, cFr), bn = 'br' + S + Math.round(sl * 1000);
         addBone(bn + 'a', 'ftwC' + S, s * c0[0], c0[1], c0[2]); addBone(bn + 'b', bn + 'a', s * c1[0], c1[1], c1[2]); braceletChains.push({ names: [bn + 'a', bn + 'b'], anchor: 'ftwC' + S, k: 0.14 + 0.5 * br * 20 });
         const wf = (() => { const w = [BI[bn + 'a'], 1]; return () => w; })();

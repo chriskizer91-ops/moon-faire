@@ -1,0 +1,6 @@
+#!/bin/bash
+# usage: facecmp.sh prefix query    her head from six angles, twice: as she is worn (hair, glasses) and bare. For comparing two builds of her head.
+cd /home/claude/fox3d && Q="$2" python3 shoot2.py shots/$1 'new Promise(r => setTimeout(() => { T.step(60, 1/60); r(1); }, 1500))' \
+ "a:(T.stage.orbit.target.set(0,0,0.03), T.view(0,0,0.62,1.50,22,340,400))" "b:(T.view(0.50,0,0.62,1.50,22,340,400))" "c:(T.view(0.85,0,0.62,1.50,22,340,400))" "d:(T.view(0.50,0.45,0.62,1.50,22,340,400))" "e:(T.view(0.50,-0.42,0.62,1.50,22,340,400))" "f:(T.view(-0.55,0.1,0.62,1.50,22,340,400))" \
+ "g:(T.clean('color'), T.only(['face','skin','neck']), T.view(0,0,0.62,1.50,22,340,400))" "h:(T.view(0.50,0,0.62,1.50,22,340,400))" "i:(T.view(0.85,0,0.62,1.50,22,340,400))" "j:(T.view(0.50,0.45,0.62,1.50,22,340,400))" "k:(T.view(0.50,-0.42,0.62,1.50,22,340,400))" "l:(T.view(1.5708,0,0.62,1.50,22,340,400))" \
+ "m:(T.j.debug.meshes.face.material = new THREE.MeshStandardMaterial({ color: new THREE.Color(0xcc8262).convertSRGBToLinear(), roughness: 0.66, skinning: true }), T.view(0.50,0,0.62,1.50,22,340,400))" "n:(T.view(0.85,0,0.62,1.50,22,340,400))" "o:(T.view(0.50,-0.42,0.62,1.50,22,340,400))" "p:(T.view(1.5708,0,0.62,1.50,22,340,400))" 2>&1 | tail -1
