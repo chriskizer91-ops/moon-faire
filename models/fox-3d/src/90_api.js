@@ -12,6 +12,38 @@
   }
   const torso0inv = torsoM(REST, new THREE.Matrix4()).invert();
   const LEGS = { hip: 1, hipR: 1, ftR: 1, ftL: 1, knR: 1, knL: 1 }; let spinNow = 0;
+  // ---------- life in her hands (13 Nov) ----------
+  // Keys say where a hand should be. Left at that, a hand is carried like a board, every finger moves at the same instant, and a key can snap the
+  // wrist round faster than a wrist turns. Here, each frame, between the pose and the skeleton:
+  //   - each finger follows its key a little late, and no two by the same amount;
+  //   - wrist turns and bends are eased;
+  //   - the hand drags behind the way it is travelling and swings through a little when it stops (a spring), as a loose wrist does.
+  // A held pose settles to exactly what its key says, so a fingertip set on her lips still lands on her lips. opts.handLife: 0 turns it off.
+  const HAND_LIFE = opts.handLife === undefined ? 1 : +opts.handLife, F_TAU = [0.050, 0.038, 0.052, 0.066, 0.080, 0.055], W_TAU = 0.032, DRAG = 0.11, DRAG_MAX = [0.40, 0.24], D_W = 16, D_Z = 0.60;
+  const ARML = {}, lifePose = clonePose(REST), _lq = Qt(), _lr = Qt(), _ld = V3();
+  for (const [S] of SIDES) ARML[S] = { init: false, hp: V3(), v: V3(), o: [0, 0], ov: [0, 0], f: [0, 0, 0, 0, 0, 0], tw: 0, wr: [0, 0] };
+  function armLife(P, dt) {
+    if (!(HAND_LIFE > 0) || !(dt > 0)) return P;
+    const out = lifePose; for (const k of CHANS) { const x = P[k]; if (typeof x === 'number') out[k] = x; else { const o = out[k]; for (let i = 0; i < x.length; i++) o[i] = x[i]; } }
+    root.getWorldQuaternion(_lr).invert();
+    for (const [S] of SIDES) {
+      const a = ARML[S], h = P['h' + S], f = out['f' + S], w = out['wr' + S];
+      if (!a.init) { a.hp.set(h[0], h[1], h[2]); a.v.set(0, 0, 0); a.o[0] = a.o[1] = a.ov[0] = a.ov[1] = 0; for (let k = 0; k < 6; k++) a.f[k] = f[k]; a.tw = P['tw' + S]; a.wr[0] = w[0]; a.wr[1] = w[1]; a.init = true; }
+      for (let k = 0; k < 6; k++) { a.f[k] += (f[k] - a.f[k]) * (1 - Math.exp(-dt / F_TAU[k])); f[k] = lerp(f[k], a.f[k], HAND_LIFE); }
+      const kw = 1 - Math.exp(-dt / W_TAU); a.tw += (P['tw' + S] - a.tw) * kw; a.wr[0] += (w[0] - a.wr[0]) * kw; a.wr[1] += (w[1] - a.wr[1]) * kw;
+      // how fast the hand is travelling (in her own space, so walking her about the stage does not count), smoothed over a few frames
+      _ld.set(h[0], h[1], h[2]).sub(a.hp).multiplyScalar(1 / dt); a.hp.set(h[0], h[1], h[2]); if (_ld.lengthSq() > 400) _ld.set(0, 0, 0); a.v.lerp(_ld, 1 - Math.exp(-dt / 0.035));
+      // the two ways the wrist can give: bending (fingertips toward the palm side) and tilting (toward the thumb or little-finger side)
+      const HA = handAxes[S]; SK['ftwC' + S].getWorldQuaternion(_lq).premultiply(_lr);
+      for (let i = 0; i < 2; i++) {
+        _ld.crossVectors(i ? HA.palm : HA.curl, HA.along).applyQuaternion(_lq);
+        const want = cl(-DRAG * a.v.dot(_ld), -DRAG_MAX[i], DRAG_MAX[i]);
+        a.ov[i] += (-D_W * D_W * (a.o[i] - want) - 2 * D_Z * D_W * a.ov[i]) * dt; a.o[i] += a.ov[i] * dt; a.o[i] = cl(a.o[i], -0.55, 0.55);
+      }
+      out['tw' + S] = lerp(P['tw' + S], a.tw, HAND_LIFE); w[0] = lerp(w[0], a.wr[0] + a.o[0], HAND_LIFE); w[1] = lerp(w[1], a.wr[1] + a.o[1], HAND_LIFE);
+    }
+    return out;
+  }
   function animate(phase, wb, t, dt, rb) {
     dt = dt > 0 ? Math.min(dt, 0.05) : 0; st.time = t; wb = wb || 0; rb = rb || 0;
     // the stance clock: forward to settle into a stance, backward to stand up out of it
@@ -51,7 +83,7 @@
         P = cur;
       }
     }
-    applyPose(P);
+    poseDt = dt; applyPose(armLife(P, dt)); poseDt = 0;
     // a jump of the root (a teleport) lays the cloth and springs afresh instead of whipping them
     root.getWorldPosition(_va);
     if (!st.init || Math.hypot(_va.x - st.px, _va.y - st.py, _va.z - st.pz) > 1.0) { resetCloth(); for (const c of chains) c.reset(); st.init = true; }
@@ -94,7 +126,7 @@
   return {
     root, fx, skeleton, bones, animate, play, ACTIONS, anchor, setFade, state, setStance, STANCES: STANCE_LIST,
     stop() { act = null; pending = ''; },
-    reset() { act = null; pending = ''; stance = null; stanceTo = ''; resetCloth(); for (const c of chains) c.reset(); },
+    reset() { act = null; pending = ''; stance = null; stanceTo = ''; for (const S in ARML) { ARML[S].init = false; armSt[S].hang = -1; armSt[S].has = false; } resetCloth(); for (const c of chains) c.reset(); },
     get stance() { return stanceTo; }, set targetDist(v) { tgtK = v > 0 ? cl(v / 2.6, 0.4, 2.6) : 1; }, get spin() { return spinNow; },      // spin: the host adds this to the root's turn (a twirl)
     get stanceNow() { return stance ? stance.name : ''; }, get stanceProgress() { return stance ? stance.t / stance.def.dur : 0; }, get pending() { return pending; },
     get fade() { return fade; }, get busy() { return !!act && !(act.def.hold && act.t >= act.dur); }, get action() { return act ? act.type : ''; },

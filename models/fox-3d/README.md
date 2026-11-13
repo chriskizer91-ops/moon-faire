@@ -20,7 +20,8 @@ Method and rules: the project doc `claude/HOW-TO-3d-witch-models.md`. Pass notes
 | `src/66_fox_strip.js` | takes away the Jester's cloth |
 | `src/71_foxcloth.js` | her four trouser flounces as real cloth |
 | `src/70_anim.js` | materials, skeleton, scale, the moves |
-| `src/88_foxmoves.js` | her own everyday moves: talk, laugh, dance, curtsey, pounce. The Jester's talk, bow, twirl, laugh and dance are renamed `jester_...` there and kept to compare |
+| `src/88_foxmoves.js` | her own everyday moves: talk, laugh, dance, curtsey, pounce. She keeps the Jester's bow, twirl, wave and jump. The Jester's talk, laugh and dance are renamed `jester_...` there and are off her page |
+| `bench/armdiag.js` | how her arms and hands move, in numbers: reach, elbow and wrist speeds, fingertip speed, for every move at 60 frames a second |
 | `bench.py`, `bench/*.js`, `strip.py`, `sheet.py` | the move workbench: pose her, land a fingertip on a point of her (`T.reach`), take stills of a move at chosen seconds |
 | `bake_fox.py` | paints her corset from the paintings into `out/fox_tex.js` (and the older face from C3) |
 | `bake_face_r5.py` | her face, blink and mouths from the round 5 set (F1, F2) |
@@ -140,8 +141,28 @@ Pass 5 (13 Nov 2026): sleeves and arms against A1, A2 and F5 (see `claude/fox-3d
 Pass 6 (13 Nov 2026): belt, pouch, sheath and shears rebuilt from F7, G1 and G3 (see `claude/fox-3d-pass6-belt-pouch-shears.md`).
 Pass 7 (13 Nov 2026): one skin from face to hands, painted arms, softer hands, palms turned in at rest (see `claude/fox-3d-pass7-one-skin.md`).
 Pass 8 (13 Nov 2026): painted neck, chest shading back, purple off her shoulders, bracelets on the wrist, and the two head options to choose from (see `claude/fox-3d-pass8-neck-chest-head-options.md`).
-Pass 9 (13 Nov 2026): head 10% larger and the depth reshaping built in; her own talk, laugh, dance, curtsey and pounce, first versions (see `claude/fox-3d-pass9-head-locked-own-moves.md`).
-Still to do: Chris's verdict on the five moves at speed (they have only been seen as stills); ruffles at the neckline and peplum are flat paint; her choker is plain where A1's has studs and a larger bell; under her jaw and the sides of her head are plain skin tone; tools and spells (rounds 3 and 4) are not started.
+Pass 9 (13 Nov 2026): head 10% larger and the depth reshaping built in; her own talk, laugh, dance, curtsey and pounce (see `claude/fox-3d-pass9-head-locked-own-moves.md`).
+Pass 10 (13 Nov 2026): Chris approved the five moves and keeps the Jester's bow, twirl, wave and jump; how her arms and hands move (see `claude/fox-3d-pass10-arms-hands-motion.md`).
+Still to do: rounds 3 and 4 (her tools in her hands, her spells, her three flipbook moves): the paintings are in `references/round3` and `round4`, none used yet. Ruffles at the neckline and peplum are flat paint; her choker is plain where A1's has studs and a larger bell; under her jaw and the sides of her head are plain skin tone.
+
+## How her arms and hands move (pass 10)
+
+Chris, 13 Nov: "her arms and hands could use more work ... it's more of how they're moving. Not changing the way they look." Motion cannot be seen on the test machine, so it was measured: `python3 bench.py bench/armdiag.js` plays every move at 60 frames a second and reports each arm's reach, elbow and wrist speeds and fingertip speed. What it found, and what was changed:
+
+| Found | Why | Change | Where |
+|---|---|---|---|
+| The forearm snapped round 49 degrees in three frames whenever a hand left or came back to her side (wrist turning at 1300 to 1800 deg/s) | the elbow tuck and forearm turn of a hanging arm faded with the hand's height alone | the fade now takes about a fifth of a second however fast the hand goes | `armSt`, `poseDt` in `src/75_pose.js` |
+| Arms locked straight and snapped when they let go (curtsey, pounce, the Jester's bow and jump) | hand keys beyond the arm's length; the solver clamps hard | past 96% of its length the arm eases toward straight (`SOFT_FROM`); her own keys moved within reach | `src/75_pose.js`, `src/88_foxmoves.js` |
+| One frame where the elbow flipped (pounce) | the elbow's given direction lay along the arm | the elbow keeps the direction it had when its key cannot tell | `src/75_pose.js` |
+| Hands flew at 6 to 17 m/s at the start of her moves and in the pounce | first keys at 0.2 s; hands keyed far from where the body was | later first keys; the pounce's hands placed from her shoulder's position at each moment | `src/88_foxmoves.js` |
+| Shoulders did not move with the arms | the collar bone only moved for a shrug | it lifts as the hand rises above the shoulder and comes forward as she reaches ahead or across (`SHOULDER`) | `src/75_pose.js` |
+| Hands carried like boards; every finger moving at the same instant | keys were applied straight to the bones | `armLife` in `src/90_api.js`: fingers follow their keys a little late and each by a different amount, wrist keys are eased, and the hand drags behind its travel and swings through when it stops |
+
+- Her resting pose is unchanged: every rule is zero for an arm hanging at her side.
+- A held pose settles to exactly its key, so a fingertip keyed onto her lips still lands there. The seven touch keys were worked out again with `bench/contacts.js` after the shoulders changed (they moved by up to 8 mm).
+- `makeFox({ shoulderFollow: 0, softReach: 0, handLife: 0 })` gives the arms as they were, for comparing.
+- Numbers for her five moves, before and after: fastest wrist turn 1300 to 1800 deg/s, now 240 to 660. Fastest fingertip: talk 3.9 to 2.6 m/s, laugh 7.8 to 3.8, dance 6.5 to 3.8, pounce 17 to 3.8. Hardest elbow jolt in the pounce: a quarter of what it was. Hand not turning on the forearm while it travels: walk 47% of the time to 24%, run 55% to 0, jump 79% to 15.
+- Left alone: the Jester's jump still throws her arms up in a sixth of a second (9 m/s at the fingertip). Legs have none of these rules yet.
 
 ## Her own moves (`src/88_foxmoves.js`)
 
@@ -149,13 +170,14 @@ Chris, 13 Nov: "so it's like her talk and she's not the jester"; she "would have
 
 | Move | In place of | What she does |
 |---|---|---|
-| `talk` (11.5 s) | the Jester's talk | one finger up; finds a thread in the air and draws it out; holds it up and snips it twice with two fingers; "who, me?" with her shoulders up; pushes her glasses up and goes still; flicks her bell twice; wags a finger; a finger to her lips; both hands flick open, low |
-| `laugh` (3.4 s) | the Jester's laugh | a snicker behind curled fingers, chin down and turned away, the other arm across her middle; she folds over it, peeks, it gets away again, she flicks it off |
-| `dance` (5.4 s) | the Jester's jig | four slow swaying steps, weight on one hip and the far wrist shaking by her ear; a hop that turns her back to you; two bumps of her hips; a hop back round into a pose |
-| `curtsey` (3.5 s) | bow | a foot slips behind, she dips, a fold of her trousers held out, a finger to her lips (the gesture of painting J4), one slow blink, head up throughout |
-| `pounce` (4.6 s) | twirl | crouch, a wiggle of her hips with her head still, a spring up and 40 cm forward, down with cupped hands on her catch, a peek, a look up at you, a hop back |
+| `talk` (11.6 s) | the Jester's talk | one finger up; finds a thread in the air and draws it out; holds it up and snips it twice with two fingers; "who, me?" with her shoulders up; pushes her glasses up and goes still; flicks her bell twice; wags a finger; a finger to her lips; both hands flick open, low |
+| `laugh` (3.6 s) | the Jester's laugh | a snicker behind curled fingers, chin down and turned away, the other arm across her middle; she folds over it, peeks, it gets away again, she flicks it off |
+| `dance` (5.8 s) | the Jester's jig | four slow swaying steps, weight on one hip and the far wrist shaking by her ear; a hop that turns her back to you; two bumps of her hips; a hop back round into a pose |
+| `curtsey` (3.5 s) | her own (she keeps the bow too) | a foot slips behind, she dips, a fold of her trousers held out, a finger to her lips (the gesture of painting J4), one slow blink, head up throughout |
+| `pounce` (4.9 s) | her own (she keeps the twirl too) | crouch, a wiggle of her hips with her head still, a spring up and 40 cm forward, down with cupped hands on her catch, a peek, a look up at you, a hop back |
 
 - Keys are written as **beats** in `talk`: she arrives in a pose and holds it. A channel left out of a key keeps gliding toward its next key, so a pose that should hold needs a second key at the end of the hold.
 - Hand keys that touch her (glasses, bell, lips) come from `bench/contacts.js`, which moves the hand until the fingertip is on the point for the lean and head turn of that moment. Run it again after any change to her head, neck or arms and paste the numbers into `88_foxmoves.js`.
-- Not done: the trouser cloth does not lift in her fingers in the curtsey; the bell does not swing when flicked; she cannot wink (her eyes shut together); `wave`, `jump`, `look_around` and `settle` are still the Jester's.
+- Chris, 13 Nov, after trying them: all five stay. She also keeps the Jester's bow and twirl, and the Jester's wave and jump are fine as they are. He likes that each witch can hover and talk while hovering, and wants the four to hover together one day.
+- Not done: the trouser cloth does not lift in her fingers in the curtsey; the bell does not swing when flicked; she cannot wink (her eyes shut together).
 - Motion has not been seen: the test machine draws about two frames a second. Timing came from arithmetic (a 30 cm jump is 0.5 s in the air) and from the Jester's moves.

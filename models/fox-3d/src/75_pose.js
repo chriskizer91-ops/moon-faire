@@ -4,6 +4,17 @@
   const SPF = [0.25, 0.35, 0.40], MOUTHS = ['rest', 'open', 'smile'];
   const _T = V3(), _A = V3(), _P = V3(), _pq = Qt(), _mq = Qt(), _rq = Qt(), _fq = Qt();
   const HANG_IN = opts.hangIn === undefined ? 1.0 : opts.hangIn, HANG_TW = opts.hangTw === undefined ? -0.85 : opts.hangTw, REST_WR = opts.restWr || [0.16, 0.0];
+  // How her arms move (Chris, 13 Nov: "her arms and hands could use more work ... it's more of how they're moving"). Each can be turned off (0) to compare.
+  //   SHOULDER   her collar bone goes with her arm: it lifts as the hand rises above the shoulder and comes forward as she reaches ahead or across.
+  //   SOFT_FROM  past this share of the arm's full length the hand eases toward straight instead of locking: a locked arm snaps when it lets go.
+  const SHOULDER = opts.shoulderFollow === undefined ? 1 : +opts.shoulderFollow, SOFT_FROM = opts.softReach === undefined ? 0.962 : +opts.softReach;
+  // Two of the arm rules need to know how much time has passed, so they can change over time and not over distance. animate() sets poseDt for
+  // its own call; a pose applied directly (the workbench, a still) has poseDt 0 and gets the plain, instant rule.
+  //   - The elbow tuck and forearm turn of a hanging arm fade as the hand leaves her side. Tied to the hand's height alone, a quick hand crossed
+  //     that fade in three frames and the forearm snapped round 49 degrees. Now the fade takes about a fifth of a second however fast the hand goes.
+  //   - When the elbow's given direction lies almost along the arm, there is no telling which way the elbow should point and it could flip
+  //     in one frame. Then the elbow keeps the direction it had.
+  let poseDt = 0; const armSt = { R: { hang: -1, a: 0, perp: V3(), has: false }, L: { hang: -1, a: 0, perp: V3(), has: false } }, _AR = V3(), _dR = V3(), _pR = V3();
   function applyPose(P) {
     const hips = SK.hips, hh = hips.userData.home;
     hips.position.set(hh.x + P.hip[0], hh.y + P.hip[1], hh.z + P.hip[2]); hips.rotation.set(P.hipR[1], P.hipR[0], P.hipR[2], 'YXZ');
@@ -16,10 +27,22 @@
       // arm
       SK['clav' + S].getWorldQuaternion(_pq); SK['uarm' + S].getWorldPosition(_A);
       const h = P['h' + S], e = P['e' + S];
+      if (SHOULDER > 0) {                             // an arm hanging at her side leaves the shoulder exactly where it was, so her resting pose is unchanged
+        _T.copy(_A); root.worldToLocal(_T); const dx = h[0] - _T.x, dy = h[1] - _T.y, dz = h[2] - _T.z, el = Math.atan2(dy, Math.hypot(dx, dz));
+        const lift = 0.34 * sm(-0.25, 1.15, el) * SHOULDER, fwd = (0.20 * sm(0.14, 0.44, dz) + 0.14 * sm(0.02, 0.26, -s * h[0])) * SHOULDER, C = SK['clav' + S];
+        C.rotation.set(0, -s * fwd, s * (P.sh[s < 0 ? 0 : 1] + lift)); C.updateMatrixWorld(true); C.getWorldQuaternion(_pq); SK['uarm' + S].getWorldPosition(_A);
+      }
       // An arm hanging at her side carries its elbow in toward her waist and its forearm out and away, as in painting A1 (and as a real arm does).
       // The further a hand is lifted or swung from her side, the less of this there is, so every move keeps the elbow it was given.
-      const hang = HANG_IN * sm(1.02, 0.90, h[1]) * sm(0.34, 0.10, Math.abs(h[2] - 0.055)) * sm(0.50, 0.36, Math.abs(h[0]));
-      _T.set(h[0], h[1], h[2]).applyMatrix4(root.matrixWorld); SK.spine1.getWorldPosition(_J); _T.sub(_J).multiplyScalar(UPK).add(_J); _P.set(e[0] - s * hang, e[1], e[2]).applyQuaternion(_rq);
+      const hangT = HANG_IN * sm(1.02, 0.90, h[1]) * sm(0.34, 0.10, Math.abs(h[2] - 0.055)) * sm(0.50, 0.36, Math.abs(h[0])), AS = armSt[S]; let hang = hangT;
+      if (poseDt > 0 && AS.hang >= 0) { const k = 1 - Math.exp(-poseDt / 0.075); AS.a += (hangT - AS.a) * k; AS.hang += (AS.a - AS.hang) * k; hang = AS.hang; } else AS.a = AS.hang = hangT;
+      _T.set(h[0], h[1], h[2]).applyMatrix4(root.matrixWorld); SK.spine1.getWorldPosition(_J); _T.sub(_J).multiplyScalar(UPK).add(_J);
+      _AR.copy(_A); root.worldToLocal(_AR); _dR.set(h[0] - _AR.x, h[1] - _AR.y, h[2] - _AR.z).normalize(); _pR.set(e[0] - s * hang, e[1], e[2]);
+      { const pl = _pR.length() || 1; _pR.addScaledVector(_dR, -_pR.dot(_dR)); const m = _pR.length() / pl; if (m > 1e-4) _pR.multiplyScalar(1 / _pR.length()); else _pR.copy(AS.perp);
+        if (poseDt > 0 && AS.has) { const w = sm(0.08, 0.38, m); if (w < 1) { _pR.lerp(AS.perp, 1 - w); _pR.addScaledVector(_dR, -_pR.dot(_dR)); if (_pR.lengthSq() > 1e-8) _pR.normalize(); else _pR.copy(AS.perp); } }
+        AS.perp.copy(_pR); AS.has = true; }
+      _P.copy(_pR).applyQuaternion(_rq);
+      if (SOFT_FROM > 0) { const LA = LIMB['arm' + S], full = (LA.l1 + LA.l2) * 0.9985, da = (LA.l1 + LA.l2) * SOFT_FROM, z = full - da; _va.subVectors(_T, _A); const d = _va.length(); if (d > da && z > 0) _T.copy(_A).addScaledVector(_va, (da + z * (1 - Math.exp(-(d - da) / z))) / d); }
       solveLimb(SK['uarm' + S], SK['farm' + S], _A, _T, _P, LIMB['arm' + S], 0, _pq, _mq);
       { const tw = -s * (P['tw' + S] + hang * HANG_TW), ad = armDir[S]; SK['ftwA' + S].quaternion.setFromAxisAngle(ad, tw / 3); SK['ftwB' + S].quaternion.setFromAxisAngle(ad, tw * 2 / 3); SK['ftwC' + S].quaternion.setFromAxisAngle(ad, tw); }
       const HA = handAxes[S], w = P['wr' + S];

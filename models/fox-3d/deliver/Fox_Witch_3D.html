@@ -58,7 +58,7 @@ canvas#stage{display:block;width:100%;height:100%;touch-action:none;cursor:grab}
 <div class="wrap">
   <header>
     <h1>Fox Witch 3D</h1>
-    <p class="sub">The Fox of the Moon Faire in 3D. In progress: the Fox in her corset, patchwork trousers, boots and bracelets, with her own face on her own head shape, and her belt, pouch and shears. Her hair and bracelets swing, and the flounces on her trousers are real cloth. Her skin is one tone from face to hands. Her head is 10% larger and her face is reshaped in depth, as chosen on November 13. She has her own talk, laugh and dance, a curtsey and a pounce: first versions. Tools and spells come next.</p>
+    <p class="sub">The Fox of the Moon Faire in 3D. In progress: the Fox in her corset, patchwork trousers, boots and bracelets, with her own face on her own head shape, and her belt, pouch and shears. Her hair and bracelets swing, and the flounces on her trousers are real cloth. Her skin is one tone from face to hands. Her head is 10% larger and her face is reshaped in depth, as chosen on November 13. Her moves are her own talk, laugh, dance, curtsey and pounce, with the Jester&rsquo;s bow, twirl, wave and jump. Her shoulders now go with her arms, and her wrists and fingers trail and settle. Tools and spells come next.</p>
   </header>
   <div class="stagebox" id="stagebox">
     <canvas id="stage" aria-label="3D model of the Fox Witch. Drag to turn her, pinch or scroll to zoom."></canvas>
@@ -71,11 +71,10 @@ canvas#stage{display:block;width:100%;height:100%;touch-action:none;cursor:grab}
   </div>
   <section aria-label="How she holds herself"><p class="label">Body</p><div class="chips slide" id="states"></div></section>
   <section aria-label="Her moves"><p class="label">Her moves</p><div class="chips slide" id="acts"></div></section>
-  <section aria-label="The Jester's moves, to compare"><p class="label">The Jester&rsquo;s, to compare</p><div class="chips slide" id="olds"></div></section>
   <section aria-label="Spells"><p class="label">Spells</p><div class="chips slide" id="spells"></div></section>
   <section aria-label="Views"><p class="label">Views</p><div class="chips" id="views"></div></section>
   <section aria-label="Switches"><p class="label">Switches</p><div class="chips" id="toggles"></div></section>
-  <p class="notes">Drag to turn her; pinch or scroll to zoom. <b>Walk around</b> puts a round pad on the stage: drag it and she walks the way you push; push to the edge and she runs. On a keyboard use W A S D or the arrow keys, Shift to run, Space to jump. <b>Body</b> is how she holds herself: it stays until you pick another. <b>Her moves</b> play once over whatever she is doing; the row under it holds the Jester&rsquo;s versions she started with, to compare. <b>Half speed</b> slows a move down. She has no spells yet. What you see under her bodice is charcoal leggings, as in painting B4: that is her body before the trousers go on.</p>
+  <p class="notes">Drag to turn her; pinch or scroll to zoom. <b>Walk around</b> puts a round pad on the stage: drag it and she walks the way you push; push to the edge and she runs. On a keyboard use W A S D or the arrow keys, Shift to run, Space to jump. <b>Body</b> is how she holds herself: it stays until you pick another. <b>Her moves</b> play once over whatever she is doing, hovering included. <b>Half speed</b> slows a move down. She has no spells yet. What you see under her bodice is charcoal leggings, as in painting B4: that is her body before the trousers go on.</p>
 </div>
 <script>/**
  * @license
@@ -2856,6 +2855,17 @@ function makeFox(opts) {
   const SPF = [0.25, 0.35, 0.40], MOUTHS = ['rest', 'open', 'smile'];
   const _T = V3(), _A = V3(), _P = V3(), _pq = Qt(), _mq = Qt(), _rq = Qt(), _fq = Qt();
   const HANG_IN = opts.hangIn === undefined ? 1.0 : opts.hangIn, HANG_TW = opts.hangTw === undefined ? -0.85 : opts.hangTw, REST_WR = opts.restWr || [0.16, 0.0];
+  // How her arms move (Chris, 13 Nov: "her arms and hands could use more work ... it's more of how they're moving"). Each can be turned off (0) to compare.
+  //   SHOULDER   her collar bone goes with her arm: it lifts as the hand rises above the shoulder and comes forward as she reaches ahead or across.
+  //   SOFT_FROM  past this share of the arm's full length the hand eases toward straight instead of locking: a locked arm snaps when it lets go.
+  const SHOULDER = opts.shoulderFollow === undefined ? 1 : +opts.shoulderFollow, SOFT_FROM = opts.softReach === undefined ? 0.962 : +opts.softReach;
+  // Two of the arm rules need to know how much time has passed, so they can change over time and not over distance. animate() sets poseDt for
+  // its own call; a pose applied directly (the workbench, a still) has poseDt 0 and gets the plain, instant rule.
+  //   - The elbow tuck and forearm turn of a hanging arm fade as the hand leaves her side. Tied to the hand's height alone, a quick hand crossed
+  //     that fade in three frames and the forearm snapped round 49 degrees. Now the fade takes about a fifth of a second however fast the hand goes.
+  //   - When the elbow's given direction lies almost along the arm, there is no telling which way the elbow should point and it could flip
+  //     in one frame. Then the elbow keeps the direction it had.
+  let poseDt = 0; const armSt = { R: { hang: -1, a: 0, perp: V3(), has: false }, L: { hang: -1, a: 0, perp: V3(), has: false } }, _AR = V3(), _dR = V3(), _pR = V3();
   function applyPose(P) {
     const hips = SK.hips, hh = hips.userData.home;
     hips.position.set(hh.x + P.hip[0], hh.y + P.hip[1], hh.z + P.hip[2]); hips.rotation.set(P.hipR[1], P.hipR[0], P.hipR[2], 'YXZ');
@@ -2868,10 +2878,22 @@ function makeFox(opts) {
       // arm
       SK['clav' + S].getWorldQuaternion(_pq); SK['uarm' + S].getWorldPosition(_A);
       const h = P['h' + S], e = P['e' + S];
+      if (SHOULDER > 0) {                             // an arm hanging at her side leaves the shoulder exactly where it was, so her resting pose is unchanged
+        _T.copy(_A); root.worldToLocal(_T); const dx = h[0] - _T.x, dy = h[1] - _T.y, dz = h[2] - _T.z, el = Math.atan2(dy, Math.hypot(dx, dz));
+        const lift = 0.34 * sm(-0.25, 1.15, el) * SHOULDER, fwd = (0.20 * sm(0.14, 0.44, dz) + 0.14 * sm(0.02, 0.26, -s * h[0])) * SHOULDER, C = SK['clav' + S];
+        C.rotation.set(0, -s * fwd, s * (P.sh[s < 0 ? 0 : 1] + lift)); C.updateMatrixWorld(true); C.getWorldQuaternion(_pq); SK['uarm' + S].getWorldPosition(_A);
+      }
       // An arm hanging at her side carries its elbow in toward her waist and its forearm out and away, as in painting A1 (and as a real arm does).
       // The further a hand is lifted or swung from her side, the less of this there is, so every move keeps the elbow it was given.
-      const hang = HANG_IN * sm(1.02, 0.90, h[1]) * sm(0.34, 0.10, Math.abs(h[2] - 0.055)) * sm(0.50, 0.36, Math.abs(h[0]));
-      _T.set(h[0], h[1], h[2]).applyMatrix4(root.matrixWorld); SK.spine1.getWorldPosition(_J); _T.sub(_J).multiplyScalar(UPK).add(_J); _P.set(e[0] - s * hang, e[1], e[2]).applyQuaternion(_rq);
+      const hangT = HANG_IN * sm(1.02, 0.90, h[1]) * sm(0.34, 0.10, Math.abs(h[2] - 0.055)) * sm(0.50, 0.36, Math.abs(h[0])), AS = armSt[S]; let hang = hangT;
+      if (poseDt > 0 && AS.hang >= 0) { const k = 1 - Math.exp(-poseDt / 0.075); AS.a += (hangT - AS.a) * k; AS.hang += (AS.a - AS.hang) * k; hang = AS.hang; } else AS.a = AS.hang = hangT;
+      _T.set(h[0], h[1], h[2]).applyMatrix4(root.matrixWorld); SK.spine1.getWorldPosition(_J); _T.sub(_J).multiplyScalar(UPK).add(_J);
+      _AR.copy(_A); root.worldToLocal(_AR); _dR.set(h[0] - _AR.x, h[1] - _AR.y, h[2] - _AR.z).normalize(); _pR.set(e[0] - s * hang, e[1], e[2]);
+      { const pl = _pR.length() || 1; _pR.addScaledVector(_dR, -_pR.dot(_dR)); const m = _pR.length() / pl; if (m > 1e-4) _pR.multiplyScalar(1 / _pR.length()); else _pR.copy(AS.perp);
+        if (poseDt > 0 && AS.has) { const w = sm(0.08, 0.38, m); if (w < 1) { _pR.lerp(AS.perp, 1 - w); _pR.addScaledVector(_dR, -_pR.dot(_dR)); if (_pR.lengthSq() > 1e-8) _pR.normalize(); else _pR.copy(AS.perp); } }
+        AS.perp.copy(_pR); AS.has = true; }
+      _P.copy(_pR).applyQuaternion(_rq);
+      if (SOFT_FROM > 0) { const LA = LIMB['arm' + S], full = (LA.l1 + LA.l2) * 0.9985, da = (LA.l1 + LA.l2) * SOFT_FROM, z = full - da; _va.subVectors(_T, _A); const d = _va.length(); if (d > da && z > 0) _T.copy(_A).addScaledVector(_va, (da + z * (1 - Math.exp(-(d - da) / z))) / d); }
       solveLimb(SK['uarm' + S], SK['farm' + S], _A, _T, _P, LIMB['arm' + S], 0, _pq, _mq);
       { const tw = -s * (P['tw' + S] + hang * HANG_TW), ad = armDir[S]; SK['ftwA' + S].quaternion.setFromAxisAngle(ad, tw / 3); SK['ftwB' + S].quaternion.setFromAxisAngle(ad, tw * 2 / 3); SK['ftwC' + S].quaternion.setFromAxisAngle(ad, tw); }
       const HA = handAxes[S], w = P['wr' + S];
@@ -3728,8 +3750,10 @@ function makeFox(opts) {
   // The Jester plays to the back row: big, even, both arms wide. The Fox is a trickster who sews. One hand is busy while the other idles on her pouch;
   // her moves are small and quick and close to her face, and then she is still; her head cocks like a fox listening; her fingers pinch a thread or snip it;
   // she never lets go of your eye; and she likes to make her bells ring. (Lore: lore/discussion-notes.md, "The Fox". The curtsey is the gesture of J4.)
-  // The Jester's talk, bow, twirl, laugh and dance are kept under jester_ names, to compare against, until Chris says to drop them.
-  for (const n of ['talk', 'bow', 'twirl', 'laugh', 'dance']) if (ACTS[n]) { ACTS['jester_' + n] = ACTS[n]; delete ACTS[n]; }
+  // Chris, 13 Nov, after trying them: her talk, laugh, dance, curtsey and pounce stay, and she keeps the Jester's bow and twirl as well (and the
+  // Jester's wave and jump: "they're just waving"). The Jester's talk, laugh and dance are no longer on her page; they stay here under jester_
+  // names only so the two can be played side by side while her moves are still being worked on.
+  for (const n of ['talk', 'laugh', 'dance']) if (ACTS[n]) { ACTS['jester_' + n] = ACTS[n]; delete ACTS[n]; }
   (function foxMoves() {
     const SNIP_A = [0.62, 0.02, 0.05, 0.90, 0.93, 1.0], SNIP_B = [0.62, 0.07, 0.02, 0.90, 0.93, 0.0];       // two fingers as shears: open, shut
     const PINCH = [0.85, 0.72, 0.30, 0.16, 0.06, 0.9];                                                         // thumb and first finger closed on a thread, the others fanned
@@ -3737,12 +3761,12 @@ function makeFox(opts) {
     const eD = (s) => [s * 0.7, -1, -0.2], mix3 = (a, b, k) => [lerp(a[0], b[0], k), lerp(a[1], b[1], k), lerp(a[2], b[2], k)];
     // Where a hand has to land on her (a fingertip on her glasses, her bell, her lips): worked out on the model with bench/contacts.js, for the lean and
     // head turn she has at that moment. If her head, neck or arms change size, run that again and paste the new numbers here.
-    const POUCH_L = [0.20, 0.99, 0.19], GLASSES = [0.091, 1.400, 0.173], BELL = [-0.143, 1.381, 0.077], SHH = [0.079, 1.317, 0.172];
-    const HIDE0 = [-0.042, 1.374, 0.221], HIDE1 = [-0.052, 1.327, 0.261], PEEK = [-0.118, 1.286, 0.165], DIP_SHH = [0.085, 1.151, 0.158];
+    const POUCH_L = [0.20, 0.99, 0.19], GLASSES = [0.086, 1.394, 0.170], BELL = [-0.143, 1.380, 0.085], SHH = [0.079, 1.316, 0.170];
+    const HIDE0 = [-0.040, 1.371, 0.222], HIDE1 = [-0.051, 1.326, 0.262], PEEK = [-0.118, 1.286, 0.164], DIP_SHH = [0.084, 1.150, 0.155];
 
     // Talk: she explains something with a thread that is not there. Only her arms, head and face move, so it plays over any stance, or as she walks.
     (function () {
-      const keys = [], idleL = arm('L', POUCH_L, [1, -0.4, -0.3], FP.soft, 0.2, [0.3, 0]), idleR = arm('R', [-0.25, 1.00, 0.15], [-0.55, -0.1, -1], FP.relax, 0.2, [0.1, 0]);
+      const LEAD = 0.10, keys = [], idleL = arm('L', POUCH_L, [1, -0.4, -0.3], FP.soft, 0.2, [0.3, 0]), idleR = arm('R', [-0.25, 1.00, 0.15], [-0.55, -0.1, -1], FP.relax, 0.2, [0.1, 0]);
       // A beat: she arrives in a pose at t and stays in it for len. Every beat names both arms, her head and her lean, so nothing starts drifting
       // toward the next beat early: quick, then still, is how she moves.
       const beat = (t, len, L, R, o) => { const k = Object.assign({ sp: [0, 0, 0], sh: [0, 0], eyes: 0 }, L, R, o); keys.push(Object.assign({ t }, k)); if (len > 0) keys.push(Object.assign({ t: t + len }, k)); };
@@ -3780,7 +3804,8 @@ function makeFox(opts) {
       mk.sort((a, b) => a[0] - b[0]); let last = -1;
       for (const [t, v] of mk) if (t - last >= 0.03) { keys.push({ t, mouth: v }); last = t; }                     // two keys at one moment would stall the curve
       keys.sort((a, b) => a.t - b.t);
-      defAction('talk', 11.5, keys, { outro: 0.6, cues: [2.80 / 11.5, 7.02 / 11.5] });
+      for (const k of keys) k.t += LEAD;                                                                            // her first reach takes 0.45 s, not 0.35
+      defAction('talk', 11.5 + LEAD, keys, { outro: 0.6, cues: [(2.75 + LEAD) / (11.5 + LEAD), (7.09 + LEAD) / (11.5 + LEAD)] });
     })();
 
     // Laugh: a snicker she tries to hide. Chin down and turned away, curled fingers over her mouth, the other arm across her middle; her shoulders
@@ -3799,13 +3824,14 @@ function makeFox(opts) {
       keys.push({ t: 2.52, hR: PEEK, eR: [-0.6, -1, -0.1], fR: FP.soft, twR: 0.9, wrR: [0.3, 0.2] });
       keys.push({ t: 2.74, sh: [0, 0], sp: [0, 0, 0], hd: [0.03, -0.02, 0.08], hR: [-0.30, 1.20, 0.20], eR: [-0.7, -1, -0.3], fR: FP.open, twR: 0.3, wrR: [-0.35, 0.3], eyes: 0, mouth: 2 });   // oh, stop
       keys.push({ t: 2.90, wrR: [0.35, -0.2] }, { t: 3.05, mouth: 2 });
-      defAction('laugh', 3.4, keys, { outro: 0.45 });
+      for (const k of keys) k.t += 0.22;                                                                            // 0.42 s for her hand to reach her mouth: at 0.20 it was a whip (8 m/s)
+      defAction('laugh', 3.62, keys, { outro: 0.45 });
     })();
 
     // Dance: she dances to ring her bells. Four slow swaying steps, her weight dropping onto one hip while the other foot points out and the far wrist
     // shakes up by her ear; a hop that turns her back to you, two bumps of her hips with a look over her shoulder; a hop back round into a pose.
     (function () {
-      const keys = [], B = 0.44, T0 = 0.32, spin = [[0, 0]];
+      const keys = [], B = 0.48, T0 = 0.50, spin = [[0, 0]];
       const mid = (t, y) => keys.push({ t, hip: [0, y, 0], hipR: [0, 0, 0], sp: [0, 0, 0], hd: [0, 0, 0], ftR: 'rest', ftL: 'rest', knR: 'rest', knL: 'rest', hR: [-0.25, 1.30, 0.16], hL: [0.25, 1.30, 0.16], wrR: [0, 0], wrL: [0, 0] });
       // her weight on one hip (sd: −1 is her right), the other foot pointed out; the arm on the free side up, the other low and out
       const sway = (t, sd, deep) => {
@@ -3813,13 +3839,13 @@ function makeFox(opts) {
         k['ft' + Fr] = [-sd * 0.16, 0.035, 0.08, -sd * 0.35, 0.42]; k['kn' + Fr] = [-sd * 0.4, 0, 1]; k['ft' + W] = 'rest'; k['kn' + W] = 'rest';
         Object.assign(k, arm(Fr, [-sd * 0.19, 1.63, 0.05], [-sd * 1, 0.3, -0.3], FP.soft, 0.3, [0.1, 0.45]), arm(W, [sd * 0.36, 0.97, 0.12], [sd * 0.5, -0.4, -1], FP.open, 0.9, [-0.3, 0]));
         keys.push(k);
-        for (let j = -1; j <= 2; j++) if (j) keys.push({ t: t + j * 0.085, ['wr' + Fr]: [0.1, j % 2 ? -0.45 : 0.45] });                         // the shake that rings her wrist
+        for (let j = -1; j <= 2; j++) if (j) keys.push({ t: t + j * 0.10, ['wr' + Fr]: [0.1, j % 2 ? -0.5 : 0.5] });                         // the shake that rings her wrist
       };
-      keys.push({ t: 0.20, hip: [0, -0.03, 0], hR: [-0.25, 1.30, 0.16], hL: [0.25, 1.30, 0.16], eR: [-1, -0.6, -0.3], eL: [1, -0.6, -0.3], fR: FP.soft, fL: FP.soft, twR: 0.4, twL: 0.4, mouth: 2 });
+      keys.push({ t: 0.38, hip: [0, -0.03, 0], hR: [-0.25, 1.30, 0.16], hL: [0.25, 1.30, 0.16], eR: [-1, -0.6, -0.3], eL: [1, -0.6, -0.3], fR: FP.soft, fL: FP.soft, twR: 0.4, twL: 0.4, mouth: 2 });
       for (let i = 0; i < 4; i++) { const t = T0 + i * B; if (i) mid(t, 0.006); sway(t + B * 0.5, i % 2 ? 1 : -1, 1); }
       // a hop that takes her half way round: down, up (she turns in the air), down
       const hop = (t, a0, a1) => {
-        keys.push({ t, hip: [0, -0.085, 0], hipR: [0, 0, 0], sp: [0, 0.10, 0], hd: [0, 0, 0], ftR: 'rest', ftL: 'rest', knR: [-0.2, 0, 1], knL: [0.2, 0, 1], hR: [-0.22, 1.08, 0.16], hL: [0.22, 1.08, 0.16], eR: [-1, -0.6, -0.3], eL: [1, -0.6, -0.3], fR: FP.soft, fL: FP.soft, twR: 0.4, twL: 0.4, wrR: [0, 0], wrL: [0, 0] });
+        keys.push({ t, hip: [0, -0.085, 0], hipR: [0, 0, 0], sp: [0, 0.10, 0], hd: [0, 0, 0], ftR: 'rest', ftL: 'rest', knR: [-0.2, 0, 1], knL: [0.2, 0, 1], hR: [-0.24, 1.20, 0.16], hL: [0.24, 1.20, 0.16], eR: [-1, -0.6, -0.3], eL: [1, -0.6, -0.3], fR: FP.soft, fL: FP.soft, twR: 0.4, twL: 0.4, wrR: [0, 0], wrL: [0, 0] });
         keys.push({ t: t + 0.11, hip: [0, 0.02, 0], sp: [0, -0.03, 0], ftR: [0, 0.045, 0, -0.1, 0.5], ftL: [0, 0.045, 0, 0.1, 0.5], hR: [-0.30, 1.30, 0.12], hL: [0.30, 1.30, 0.12] });
         keys.push({ t: t + 0.23, hip: [0, 0.085, 0], ftR: [0.01, 0.12, 0, -0.1, 0.6], ftL: [-0.01, 0.12, 0, 0.1, 0.6], hR: [-0.33, 1.42, 0.08], hL: [0.33, 1.42, 0.08] });
         keys.push({ t: t + 0.35, hip: [0, 0.02, 0], ftR: [0, 0.04, 0, -0.1, 0.4], ftL: [0, 0.04, 0, 0.1, 0.4] });
@@ -3833,63 +3859,71 @@ function makeFox(opts) {
       keys.push(Object.assign({ t: t + 0.20, hip: [-0.08, -0.04, 0], hipR: [0.06, 0, -0.17], sp: [-0.22, 0, 0.20], hd: [-0.80, -0.02, 0.05], knR: 'rest', knL: [0.3, 0, 1], ftL: [0.03, 0.03, 0.02, 0.2, 0.35] }, onHips));
       keys.push({ t: t + 0.42, hip: [0, 0, 0], hipR: [0, 0, 0], sp: [-0.22, 0, 0], hd: [-0.80, -0.02, 0], ftL: 'rest', knL: 'rest' });
       keys.push({ t: t + 0.64, hip: [0.08, -0.04, 0], hipR: [-0.06, 0, 0.17], sp: [-0.22, 0, -0.20], hd: [-0.80, -0.02, -0.05], knR: [-0.3, 0, 1], ftR: [-0.03, 0.03, 0.02, -0.2, 0.35] });
+      keys.push(Object.assign({ t: t + 0.74 }, onHips));                                                              // her hands stay on her hips through both bumps
       keys.push({ t: t + 0.86, hip: [0, 0, 0], hipR: [0, 0, 0], sp: [-0.10, 0, 0], hd: [-0.4, 0, 0], ftR: 'rest', knR: 'rest' });
-      t = hop(t + 0.92, PI, TAU);
+      t = hop(t + 1.00, PI, TAU);
       // round again and into her pose: weight on her left hip, left hand on it, right wrist ringing by her ear, head cocked
       keys.push({ t: t + 0.22, hip: [0.075, -0.05, 0], hipR: [-0.08, 0, 0.17], sp: [0.08, 0, -0.22], hd: [-0.10, -0.03, 0.15], ftR: [-0.16, 0.035, 0.08, -0.35, 0.42], knR: [-0.4, 0, 1], ftL: 'rest', knL: 'rest',
         hL: [0.215, 1.035, -0.02], eL: [1, -0.1, -0.6], fL: FP.loose, twL: 0.2, wrL: [0.5, 0], hR: [-0.19, 1.63, 0.05], eR: [-1, 0.3, -0.3], fR: FP.soft, twR: 0.3, wrR: [0.1, -0.45], mouth: 2 });
-      for (let j = 1; j <= 4; j++) keys.push({ t: t + 0.22 + j * 0.085, wrR: [0.1, j % 2 ? 0.45 : -0.45] });
+      for (let j = 1; j <= 4; j++) keys.push({ t: t + 0.22 + j * 0.10, wrR: [0.1, j % 2 ? 0.5 : -0.5] });
       keys.push({ t: t + 0.95, hip: [0.075, -0.045, 0], hd: [-0.10, -0.03, 0.16], mouth: 2 });
       const dur = t + 1.45; spin.push([dur, TAU]);
       keys.sort((a, b) => a.t - b.t);
       defAction('dance', dur, keys, { outro: 0.45, stand: true, spin });
     })();
 
-    // Curtsey (in place of the Jester's bow): one foot slips behind, she dips, holds a fold of her trousers out at her side and puts a finger to her
+    // Curtsey (her own; she also keeps the Jester's bow): one foot slips behind, she dips, holds a fold of her trousers out at her side and puts a finger to her
     // lips. She does not lower her head: she watches you through it, with one slow blink. More cheek than respect.
     defAction('curtsey', 3.5, [
-      { t: 0.42, ftR: [0.05, 0.03, -0.20, -0.40, 0.40], hip: [0.005, -0.02, 0], hR: [-0.285, 0.80, 0.04], eR: [-1, -0.2, -0.6], fR: PINCH, twR: 0.2, wrR: [0.2, 0], hL: [0.14, 1.12, 0.22], eL: [0.8, -1, -0.2], fL: FP.point, twL: 0.4, wrL: [0.1, 0], hd: [0.03, -0.02, 0.08], mouth: 2 },
-      { t: 1.00, ftR: [0.05, 0.04, -0.24, -0.45, 0.50], hip: [0.01, -0.17, -0.02], knL: [0.40, 0, 1], knR: [-0.5, 0, 1], sp: [0, 0.12, 0], hd: [0.05, -0.08, 0.14], hR: [-0.30, 0.68, 0.05], hL: DIP_SHH },
+      { t: 0.42, ftR: [0.05, 0.03, -0.20, -0.40, 0.40], hip: [0.005, -0.02, 0], hR: [-0.275, 0.85, 0.04], eR: [-1, -0.2, -0.6], fR: PINCH, twR: 0.2, wrR: [0.2, 0], hL: [0.14, 1.12, 0.22], eL: [0.8, -1, -0.2], fL: FP.point, twL: 0.4, wrL: [0.1, 0], hd: [0.03, -0.02, 0.08], mouth: 2 },
+      { t: 1.00, ftR: [0.05, 0.04, -0.24, -0.45, 0.50], hip: [0.01, -0.17, -0.02], knL: [0.40, 0, 1], knR: [-0.5, 0, 1], sp: [0, 0.12, 0], hd: [0.05, -0.08, 0.14], hR: [-0.30, 0.705, 0.05], hL: DIP_SHH },
       { t: 1.30, eyes: 0 }, { t: 1.48, eyes: 1 }, { t: 1.62, eyes: 1 }, { t: 1.80, eyes: 0 },
-      { t: 2.05, hip: [0.01, -0.165, -0.02], sp: [0, 0.12, 0], hd: [0.05, -0.08, 0.15], hR: [-0.30, 0.685, 0.05], hL: [DIP_SHH[0], DIP_SHH[1] + 0.005, DIP_SHH[2]] },
+      { t: 2.05, hip: [0.01, -0.165, -0.02], sp: [0, 0.12, 0], hd: [0.05, -0.08, 0.15], hR: [-0.30, 0.71, 0.05], hL: [DIP_SHH[0], DIP_SHH[1] + 0.005, DIP_SHH[2]] },
       { t: 2.60, ftR: [0.02, 0.02, -0.08, -0.2, 0.2], hip: [0, 0, 0], knL: 'rest', knR: 'rest', sp: [0, -0.02, 0], hd: [0, -0.03, -0.10], hR: [-0.37, 0.93, 0.12], fR: FP.open, twR: 0.9, wrR: [-0.3, 0.2], hL: [0.20, 1.20, 0.22], fL: FP.soft, twL: 0.8 },
       { t: 3.00, ftR: 'rest', hR: [-0.32, 0.90, 0.08], hL: [0.27, 1.02, 0.14], mouth: 2 }
     ], { outro: 0.45, stand: true });
 
-    // Pounce (in place of the Jester's twirl): the way a fox takes a mouse. She sinks, her hips wind up with a wiggle while her head stays dead still,
-    // she springs up and over and comes down with both hands cupped on her catch; a peek between her thumbs, a look up at you, and she hops back.
+    // Pounce (her own; she also keeps the Jester's twirl): the way a fox takes a mouse. She sinks, her hips wind up with a wiggle while her head
+    // stays dead still, she springs up and over and comes down with both hands cupped on her catch; a peek between her thumbs, a look up at you,
+    // and she hops back. Her hands are always placed where her arms can reach (within nine tenths of their length from the shoulder at that
+    // moment: bench/armdiag.js), because an arm pulled straight locks, and snaps when it lets go.
     (function () {
-      const keys = [], crouch = { hip: [0, -0.36, -0.10], sp: [0, 0.50, 0], hd: [0, -0.34, 0], hR: [-0.13, 0.50, 0.30], hL: [0.13, 0.50, 0.30], eR: [-1, -0.1, -0.2], eL: [1, -0.1, -0.2], fR: FP.cup, fL: FP.cup, wrR: [0.3, 0], wrL: [0.3, 0],
-        knR: [-0.40, 0, 1], knL: [0.40, 0, 1], ftR: [-0.03, 0.035, 0, -0.30, 0.45], ftL: [0.03, 0.035, 0, 0.30, 0.45] };
+      const keys = [], both = (x, y, z, o) => Object.assign({ hR: [-x, y, z], hL: [x, y, z] }, o);
+      const crouch = both(0.12, 0.58, 0.22, { hip: [0, -0.36, -0.10], sp: [0, 0.50, 0], hd: [0, -0.34, 0], eR: [-1, -0.1, -0.2], eL: [1, -0.1, -0.2], fR: FP.cup, fL: FP.cup, wrR: [0.3, 0], wrL: [0.3, 0],
+        knR: [-0.40, 0, 1], knL: [0.40, 0, 1], ftR: [-0.03, 0.035, 0, -0.30, 0.45], ftL: [0.03, 0.035, 0, 0.30, 0.45] });
       keys.push(Object.assign({ t: 0.45, eyes: 0.3 }, crouch));
-      for (let i = 0; i < 5; i++) { const s = i % 2 ? 1 : -1, a = i === 4 ? 0 : 1; keys.push({ t: 0.58 + i * 0.13, hip: [s * 0.02 * a, -0.36 - 0.012 * i, -0.10 - 0.008 * i], hipR: [s * 0.16 * a, 0, s * 0.05 * a], sp: [-s * 0.14 * a, 0.50, -s * 0.03 * a], hd: [0, -0.34, 0] }); }   // the wiggle
-      // the spring: hands whip back, then she is up and over. 0.50 s in the air, 30 cm up, 40 cm forward, tipped forward with her knees drawn up
-      const T0 = 1.24, AIR = 0.50, H = 0.30, FW = 0.40, g = 8 * H / (AIR * AIR), v0 = g * AIR / 2;
-      keys.push({ t: 1.04, hR: crouch.hR, hL: crouch.hL, eR: crouch.eR, eL: crouch.eL, fR: FP.cup, fL: FP.cup });
-      keys.push({ t: 1.14, hip: [0, -0.40, -0.12], sp: [0, 0.56, 0], hR: [-0.27, 0.62, -0.14], hL: [0.27, 0.62, -0.14], eR: [-0.5, 0.3, -1], eL: [0.5, 0.3, -1], fR: FP.soft, fL: FP.soft, eyes: 0 });
-      keys.push({ t: T0, hip: [0, 0.03, 0.02], hipR: [0, 0, 0], sp: [0, 0.10, 0], hd: [0, -0.10, 0], hR: [-0.22, 1.20, 0.30], hL: [0.22, 1.20, 0.30], eR: [-0.6, -1, -0.3], eL: [0.6, -1, -0.3], ftR: [-0.02, 0.07, 0, -0.10, 0.75], ftL: [0.02, 0.07, 0, 0.10, 0.75], knR: [-0.2, 0, 1], knL: [0.2, 0, 1], mouth: 1 });
+      for (let i = 0; i < 5; i++) { const s = i % 2 ? 1 : -1, a = i === 4 ? 0 : 1; keys.push({ t: 0.54 + i * 0.10, hip: [s * 0.02 * a, -0.36 - 0.012 * i, -0.10 - 0.008 * i], hipR: [s * 0.16 * a, 0, s * 0.05 * a], sp: [-s * 0.14 * a, 0.50, -s * 0.03 * a], hd: [0, -0.34, 0] }); }   // the wiggle
+      // the spring: her arms swing back and then through as she pushes off, then she is up and over. 0.50 s in the air, 30 cm up, 40 cm forward,
+      // tipped forward with her knees drawn up.
+      const T0 = 1.34, AIR = 0.50, H = 0.30, FW = 0.40, g = 8 * H / (AIR * AIR), v0 = g * AIR / 2;
+      keys.push(both(0.12, 0.58, 0.22, { t: 0.80, eR: crouch.eR, eL: crouch.eL, fR: FP.cup, fL: FP.cup }));
+      keys.push(both(0.27, 0.64, -0.14, { t: 1.06, hip: [0, -0.40, -0.12], sp: [0, 0.56, 0], eR: [-0.5, 0.3, -1], eL: [0.5, 0.3, -1], fR: FP.soft, fL: FP.soft, eyes: 0 }));
+      keys.push({ t: 1.14, hip: [0, -0.41, -0.12], sp: [0, 0.56, 0] });
+      keys.push(both(0.20, 1.02, 0.30, { t: T0, hip: [0, 0.03, 0.02], hipR: [0, 0, 0], sp: [0, 0.10, 0], hd: [0, -0.10, 0], eR: [-0.6, -1, -0.3], eL: [0.6, -1, -0.3], ftR: [-0.02, 0.07, 0, -0.10, 0.75], ftL: [0.02, 0.07, 0, 0.10, 0.75], knR: [-0.2, 0, 1], knL: [0.2, 0, 1], mouth: 1 }));
+      const HX = [0.20, 0.19, 0.16, 0.12, 0.08, 0.05, 0.034], HY = [1.02, 1.13, 1.22, 1.20, 1.10, 0.93, 0.74], HZ = [0.30, 0.36, 0.42, 0.50, 0.58, 0.61, 0.62];      // her hands through the leap: up with her, then down to the catch
       for (let i = 1; i <= 5; i++) {
         const u = i / 6, ta = u * AIR, y = v0 * ta - 0.5 * g * ta * ta, z = FW * u, tuck = Math.sin(PI * u), dn = sm(0.45, 1, u);
-        keys.push({ t: T0 + ta, hip: [0, 0.03 * (1 - u) - 0.10 * dn + y, 0.02 + z - 0.05 * dn], hipR: [0, 0.28 * tuck, 0], sp: [0, 0.10 + 0.50 * tuck * (1 - dn) + 0.50 * dn, 0], hd: [0, -0.10 + 0.34 * tuck, 0],
-          hR: [-lerp(0.22, 0.05, dn), 1.20 + 0.06 * tuck * (1 - dn) + y - 0.80 * dn, 0.30 + z + 0.17 * tuck], hL: [lerp(0.22, 0.05, dn), 1.20 + 0.06 * tuck * (1 - dn) + y - 0.80 * dn, 0.30 + z + 0.17 * tuck], fR: FP.open, fL: FP.open,
-          ftR: [-0.02 - 0.02 * tuck, 0.07 * (1 - u) + y + 0.22 * tuck, z - 0.12 * tuck * (1 - dn) + 0.03 * dn, -0.15, 0.75 - 0.4 * dn], ftL: [0.02 + 0.02 * tuck, 0.07 * (1 - u) + y + 0.18 * tuck, z - 0.07 * tuck * (1 - dn) + 0.03 * dn, 0.15, 0.75 - 0.4 * dn] });
+        keys.push(both(HX[i], HY[i], HZ[i], { t: T0 + ta, hip: [0, 0.03 * (1 - u) - 0.10 * dn + y, 0.02 + z - 0.05 * dn], hipR: [0, 0.28 * tuck, 0], sp: [0, 0.10 + 0.50 * tuck * (1 - dn) + 0.50 * dn, 0], hd: [0, -0.10 + 0.34 * tuck, 0],
+          eR: [-1, lerp(-1, 0.1, u), -0.2], eL: [1, lerp(-1, 0.1, u), -0.2], fR: FP.open, fL: FP.open,
+          ftR: [-0.02 - 0.02 * tuck, 0.07 * (1 - u) + y + 0.22 * tuck, z - 0.12 * tuck * (1 - dn) + 0.03 * dn, -0.15, 0.75 - 0.4 * dn], ftL: [0.02 + 0.02 * tuck, 0.07 * (1 - u) + y + 0.18 * tuck, z - 0.07 * tuck * (1 - dn) + 0.03 * dn, 0.15, 0.75 - 0.4 * dn] }));
       }
-      const TL = T0 + AIR, GOT = { hR: [-0.034, 0.31, FW + 0.25], hL: [0.034, 0.31, FW + 0.25], eR: [-1, 0.1, -0.1], eL: [1, 0.1, -0.1], fR: FP.cup, fL: FP.cup, twR: 0.75, twL: 0.75, wrR: [0.2, 0], wrL: [0.2, 0] };
-      keys.push(Object.assign({ t: TL, hip: [0, -0.20, FW - 0.06], hipR: [0, 0, 0], sp: [0, 0.52, 0], hd: [0, 0.10, 0], ftR: [-0.04, 0, FW, -0.30, 0.10], ftL: [0.04, 0, FW, 0.30, 0.10], knR: [-0.40, 0, 1], knL: [0.40, 0, 1], mouth: 0 }, GOT));     // got it
-      keys.push({ t: TL + 0.16, hip: [0, -0.47, FW - 0.11], sp: [0, 0.60, 0], hd: [0, 0.12, 0], ftR: [-0.04, 0.035, FW, -0.36, 0.5], ftL: [0.04, 0.035, FW, 0.36, 0.5], knR: [-0.5, 0, 1], knL: [0.5, 0, 1] });
-      keys.push({ t: TL + 0.34, hip: [0, -0.43, FW - 0.11], sp: [0, 0.56, 0] });
+      const TL = T0 + AIR, cup = { eR: [-1, 0.1, -0.1], eL: [1, 0.1, -0.1], fR: FP.cup, fL: FP.cup, twR: 0.75, twL: 0.75, wrR: [0.2, 0], wrL: [0.2, 0] };
+      keys.push(both(HX[6], HY[6], HZ[6], Object.assign({ t: TL, hip: [0, -0.20, FW - 0.06], hipR: [0, 0, 0], sp: [0, 0.52, 0], hd: [0, 0.10, 0], ftR: [-0.04, 0, FW, -0.30, 0.10], ftL: [0.04, 0, FW, 0.30, 0.10], knR: [-0.40, 0, 1], knL: [0.40, 0, 1], mouth: 0 }, cup)));     // got it
+      keys.push(both(0.034, 0.47, 0.60, { t: TL + 0.16, hip: [0, -0.47, FW - 0.11], sp: [0, 0.60, 0], hd: [0, 0.12, 0], ftR: [-0.04, 0.035, FW, -0.36, 0.5], ftL: [0.04, 0.035, FW, 0.36, 0.5], knR: [-0.5, 0, 1], knL: [0.5, 0, 1] }));
+      keys.push(both(0.034, 0.49, 0.60, { t: TL + 0.34, hip: [0, -0.43, FW - 0.11], sp: [0, 0.56, 0] }));
       // she lifts her cupped hands and peeks in between her thumbs
-      keys.push({ t: TL + 0.70, hR: [-0.036, 0.52, FW + 0.21], hL: [0.036, 0.52, FW + 0.21], sp: [0, 0.50, 0], hd: [0.05, 0.22, 0.12], eyes: 0.4, mouth: 0 });
-      keys.push({ t: TL + 0.95, hR: [-0.046, 0.53, FW + 0.21], hL: [0.046, 0.53, FW + 0.21], hd: [0.05, 0.24, 0.13], eyes: 0.4, mouth: 2 });
+      keys.push(both(0.036, 0.56, 0.60, { t: TL + 0.70, sp: [0, 0.50, 0], hd: [0.05, 0.22, 0.12], eyes: 0.4, mouth: 0 }));
+      keys.push(both(0.046, 0.57, 0.60, { t: TL + 0.95, hd: [0.05, 0.24, 0.13], eyes: 0.4, mouth: 2 }));
       // looks up at you, pleased with herself
-      keys.push({ t: TL + 1.25, hd: [0, -0.36, -0.10], eyes: 0, mouth: 2, hR: [-0.036, 0.50, FW + 0.21], hL: [0.036, 0.50, FW + 0.21] });
-      keys.push({ t: TL + 1.50, hd: [0, -0.36, -0.12], hip: [0, -0.45, FW - 0.12], sp: [0, 0.52, 0] });
-      // and hops back to where she started: 0.34 s in the air, 14 cm up
-      const T1 = TL + 1.64, AIR2 = 0.34, H2 = 0.14, g2 = 8 * H2 / (AIR2 * AIR2), w0 = g2 * AIR2 / 2;
-      keys.push({ t: T1, hip: [0, -0.02, FW - 0.02], sp: [0, 0.10, 0], hd: [0, -0.06, 0], ftR: [-0.02, 0.06, FW, -0.10, 0.7], ftL: [0.02, 0.06, FW, 0.10, 0.7], knR: [-0.2, 0, 1], knL: [0.2, 0, 1], hR: [-0.30, 1.00, 0.24], hL: [0.30, 1.00, 0.24], eR: [-0.6, -1, -0.3], eL: [0.6, -1, -0.3], fR: FP.open, fL: FP.open, twR: 0.9, twL: 0.9 });
-      for (let i = 1; i <= 3; i++) { const u = i / 4, ta = u * AIR2, y = w0 * ta - 0.5 * g2 * ta * ta, z = FW * (1 - u); keys.push({ t: T1 + ta, hip: [0, -0.02 + y, z - 0.02 * (1 - u)], ftR: [-0.02, 0.06 * (1 - u) + y + 0.05, z, -0.10, 0.6], ftL: [0.02, 0.06 * (1 - u) + y + 0.05, z, 0.10, 0.6], hR: [-0.36, 1.06 + y, 0.16 + z * 0.3], hL: [0.36, 1.06 + y, 0.16 + z * 0.3] }); }
-      keys.push({ t: T1 + AIR2, hip: [0, -0.07, 0], sp: [0, 0.06, 0], hd: [0.04, -0.03, 0.12], ftR: 'rest', ftL: 'rest', knR: [-0.2, 0, 1], knL: [0.2, 0, 1], hR: [-0.38, 1.00, 0.14], hL: [0.38, 1.00, 0.14], mouth: 2 });
-      keys.push({ t: T1 + AIR2 + 0.30, hip: [0, 0, 0], sp: [0, 0, 0], knR: 'rest', knL: 'rest', hR: [-0.36, 0.98, 0.12], hL: [0.36, 0.98, 0.12], hd: [0.04, -0.03, 0.13], mouth: 2 });
+      keys.push(both(0.036, 0.55, 0.60, { t: TL + 1.25, hd: [0, -0.36, -0.10], eyes: 0, mouth: 2 }));
+      keys.push(Object.assign(both(0.045, 0.55, 0.60, { t: TL + 1.50, hd: [0, -0.36, -0.12], hip: [0, -0.45, FW - 0.12], sp: [0, 0.52, 0] }), cup));
+      // and hops back to where she started: up out of the crouch in 0.3 s, 0.34 s in the air, 14 cm up. Her hands part and open on the way
+      const T1 = TL + 1.80, AIR2 = 0.34, H2 = 0.14, g2 = 8 * H2 / (AIR2 * AIR2), w0 = g2 * AIR2 / 2, wide = { eR: [-0.6, -1, -0.3], eL: [0.6, -1, -0.3], fR: FP.open, fL: FP.open, twR: 0.9, twL: 0.9 };
+      keys.push(both(0.20, 0.98, FW + 0.16, Object.assign({ t: T1, hip: [0, -0.02, FW - 0.02], sp: [0, 0.10, 0], hd: [0, -0.06, 0], ftR: [-0.02, 0.06, FW, -0.10, 0.7], ftL: [0.02, 0.06, FW, 0.10, 0.7], knR: [-0.2, 0, 1], knL: [0.2, 0, 1] }, wide)));
+      for (let i = 1; i <= 3; i++) { const u = i / 4, ta = u * AIR2, y = w0 * ta - 0.5 * g2 * ta * ta, z = FW * (1 - u), k = { t: T1 + ta, hip: [0, -0.02 + y, z - 0.02 * (1 - u)], ftR: [-0.02, 0.06 * (1 - u) + y + 0.05, z, -0.10, 0.6], ftL: [0.02, 0.06 * (1 - u) + y + 0.05, z, 0.10, 0.6] };
+        if (i === 2) Object.assign(k, both(0.30, 1.10, 0.30)); keys.push(k); }
+      keys.push(both(0.38, 1.00, 0.14, { t: T1 + AIR2, hip: [0, -0.07, 0], sp: [0, 0.06, 0], hd: [0.04, -0.03, 0.12], ftR: 'rest', ftL: 'rest', knR: [-0.2, 0, 1], knL: [0.2, 0, 1], mouth: 2 }));
+      keys.push(both(0.36, 0.98, 0.12, { t: T1 + AIR2 + 0.30, hip: [0, 0, 0], sp: [0, 0, 0], knR: 'rest', knL: 'rest', hd: [0.04, -0.03, 0.13], mouth: 2 }));
       const dur = T1 + AIR2 + 0.95;
       defAction('pounce', dur, keys, { outro: 0.4, stand: true, hits: [TL / dur], cues: [T0 / dur] });
     })();
@@ -3908,6 +3942,38 @@ function makeFox(opts) {
   }
   const torso0inv = torsoM(REST, new THREE.Matrix4()).invert();
   const LEGS = { hip: 1, hipR: 1, ftR: 1, ftL: 1, knR: 1, knL: 1 }; let spinNow = 0;
+  // ---------- life in her hands (13 Nov) ----------
+  // Keys say where a hand should be. Left at that, a hand is carried like a board, every finger moves at the same instant, and a key can snap the
+  // wrist round faster than a wrist turns. Here, each frame, between the pose and the skeleton:
+  //   - each finger follows its key a little late, and no two by the same amount;
+  //   - wrist turns and bends are eased;
+  //   - the hand drags behind the way it is travelling and swings through a little when it stops (a spring), as a loose wrist does.
+  // A held pose settles to exactly what its key says, so a fingertip set on her lips still lands on her lips. opts.handLife: 0 turns it off.
+  const HAND_LIFE = opts.handLife === undefined ? 1 : +opts.handLife, F_TAU = [0.050, 0.038, 0.052, 0.066, 0.080, 0.055], W_TAU = 0.032, DRAG = 0.11, DRAG_MAX = [0.40, 0.24], D_W = 16, D_Z = 0.60;
+  const ARML = {}, lifePose = clonePose(REST), _lq = Qt(), _lr = Qt(), _ld = V3();
+  for (const [S] of SIDES) ARML[S] = { init: false, hp: V3(), v: V3(), o: [0, 0], ov: [0, 0], f: [0, 0, 0, 0, 0, 0], tw: 0, wr: [0, 0] };
+  function armLife(P, dt) {
+    if (!(HAND_LIFE > 0) || !(dt > 0)) return P;
+    const out = lifePose; for (const k of CHANS) { const x = P[k]; if (typeof x === 'number') out[k] = x; else { const o = out[k]; for (let i = 0; i < x.length; i++) o[i] = x[i]; } }
+    root.getWorldQuaternion(_lr).invert();
+    for (const [S] of SIDES) {
+      const a = ARML[S], h = P['h' + S], f = out['f' + S], w = out['wr' + S];
+      if (!a.init) { a.hp.set(h[0], h[1], h[2]); a.v.set(0, 0, 0); a.o[0] = a.o[1] = a.ov[0] = a.ov[1] = 0; for (let k = 0; k < 6; k++) a.f[k] = f[k]; a.tw = P['tw' + S]; a.wr[0] = w[0]; a.wr[1] = w[1]; a.init = true; }
+      for (let k = 0; k < 6; k++) { a.f[k] += (f[k] - a.f[k]) * (1 - Math.exp(-dt / F_TAU[k])); f[k] = lerp(f[k], a.f[k], HAND_LIFE); }
+      const kw = 1 - Math.exp(-dt / W_TAU); a.tw += (P['tw' + S] - a.tw) * kw; a.wr[0] += (w[0] - a.wr[0]) * kw; a.wr[1] += (w[1] - a.wr[1]) * kw;
+      // how fast the hand is travelling (in her own space, so walking her about the stage does not count), smoothed over a few frames
+      _ld.set(h[0], h[1], h[2]).sub(a.hp).multiplyScalar(1 / dt); a.hp.set(h[0], h[1], h[2]); if (_ld.lengthSq() > 400) _ld.set(0, 0, 0); a.v.lerp(_ld, 1 - Math.exp(-dt / 0.035));
+      // the two ways the wrist can give: bending (fingertips toward the palm side) and tilting (toward the thumb or little-finger side)
+      const HA = handAxes[S]; SK['ftwC' + S].getWorldQuaternion(_lq).premultiply(_lr);
+      for (let i = 0; i < 2; i++) {
+        _ld.crossVectors(i ? HA.palm : HA.curl, HA.along).applyQuaternion(_lq);
+        const want = cl(-DRAG * a.v.dot(_ld), -DRAG_MAX[i], DRAG_MAX[i]);
+        a.ov[i] += (-D_W * D_W * (a.o[i] - want) - 2 * D_Z * D_W * a.ov[i]) * dt; a.o[i] += a.ov[i] * dt; a.o[i] = cl(a.o[i], -0.55, 0.55);
+      }
+      out['tw' + S] = lerp(P['tw' + S], a.tw, HAND_LIFE); w[0] = lerp(w[0], a.wr[0] + a.o[0], HAND_LIFE); w[1] = lerp(w[1], a.wr[1] + a.o[1], HAND_LIFE);
+    }
+    return out;
+  }
   function animate(phase, wb, t, dt, rb) {
     dt = dt > 0 ? Math.min(dt, 0.05) : 0; st.time = t; wb = wb || 0; rb = rb || 0;
     // the stance clock: forward to settle into a stance, backward to stand up out of it
@@ -3947,7 +4013,7 @@ function makeFox(opts) {
         P = cur;
       }
     }
-    applyPose(P);
+    poseDt = dt; applyPose(armLife(P, dt)); poseDt = 0;
     // a jump of the root (a teleport) lays the cloth and springs afresh instead of whipping them
     root.getWorldPosition(_va);
     if (!st.init || Math.hypot(_va.x - st.px, _va.y - st.py, _va.z - st.pz) > 1.0) { resetCloth(); for (const c of chains) c.reset(); st.init = true; }
@@ -3990,7 +4056,7 @@ function makeFox(opts) {
   return {
     root, fx, skeleton, bones, animate, play, ACTIONS, anchor, setFade, state, setStance, STANCES: STANCE_LIST,
     stop() { act = null; pending = ''; },
-    reset() { act = null; pending = ''; stance = null; stanceTo = ''; resetCloth(); for (const c of chains) c.reset(); },
+    reset() { act = null; pending = ''; stance = null; stanceTo = ''; for (const S in ARML) { ARML[S].init = false; armSt[S].hang = -1; armSt[S].has = false; } resetCloth(); for (const c of chains) c.reset(); },
     get stance() { return stanceTo; }, set targetDist(v) { tgtK = v > 0 ? cl(v / 2.6, 0.4, 2.6) : 1; }, get spin() { return spinNow; },      // spin: the host adds this to the root's turn (a twirl)
     get stanceNow() { return stance ? stance.name : ''; }, get stanceProgress() { return stance ? stance.t / stance.def.dur : 0; }, get pending() { return pending; },
     get fade() { return fade; }, get busy() { return !!act && !(act.def.hold && act.t >= act.dur); }, get action() { return act ? act.type : ''; },
@@ -4008,13 +4074,12 @@ function makeFox(opts) {
   // What she can do. States are how she holds herself and stay until changed; moves and spells play once over whatever state she is in.
   // Each: [id, label, half-width in meters the camera must show, half-height (optional), camera by time (optional): t -> [half-width, shift toward the target]]
   const STATES = [['idle', 'Stand', 0.7], ['walk', 'Walk', 0.7], ['run', 'Run', 0.8], ['kneel', 'Kneel', 0.7], ['squat', 'Squat', 0.7], ['sit_chair', 'Sit on a stool', 0.7], ['sit_ground', 'Sit on the ground', 0.7], ['hover', 'Hover', 0.75]];
-  // Her own moves (13 Nov): her talk, laugh and dance, a curtsey where the Jester bows and a pounce where the Jester twirls. Names are working names.
-  const ACTS = [['jump', 'Jump', 0.9, 1.42], ['talk', 'Talk', 0.8], ['laugh', 'Laugh', 0.8], ['dance', 'Dance', 1.0], ['curtsey', 'Curtsey', 0.9], ['pounce', 'Pounce', 1.0, 1.32], ['wave', 'Wave', 0.8]];
-  // The Jester's versions she was forked with, kept one row down to compare against until Chris says to drop them.
-  const OLD = [['jester_talk', 'Talk', 0.8], ['jester_laugh', 'Laugh', 0.8], ['jester_dance', 'Dance', 0.95], ['jester_bow', 'Bow', 0.95], ['jester_twirl', 'Twirl', 1.15]];
+  // Her moves (Chris, 13 Nov): her own talk, laugh, dance, curtsey and pounce, and the Jester's bow, twirl, wave and jump, which she keeps.
+  // Names are working names.
+  const ACTS = [['talk', 'Talk', 0.8], ['laugh', 'Laugh', 0.8], ['dance', 'Dance', 1.0], ['curtsey', 'Curtsey', 0.9], ['pounce', 'Pounce', 1.0, 1.32], ['bow', 'Bow', 0.95], ['twirl', 'Twirl', 1.15], ['wave', 'Wave', 0.8], ['jump', 'Jump', 0.9, 1.42]];
   const QUIET = [['look_around', 'Stand', 0.7], ['settle', 'Stand', 0.7]];      // small things she does by herself when left standing
   const SPELLS = [];      // the Fox has no spells yet (pass 1): the row and the cast buttons stay hidden until she does
-  const ALL = STATES.concat(ACTS, OLD, SPELLS, QUIET), find = (id) => ALL.find((x) => x[0] === id);
+  const ALL = STATES.concat(ACTS, SPELLS, QUIET), find = (id) => ALL.find((x) => x[0] === id);
   const VIEWS = [['Front', 0, 0.10, 1], ['Three-quarter', -0.62, 0.14, 1], ['Side', -1.5708, 0.08, 1], ['Back', 3.1416, 0.12, 1], ['Face', 0.22, 0.02, 0.27]];
   const touchPhone = (navigator.maxTouchPoints > 0 || /Mobi|Android|iPhone/i.test(navigator.userAgent)) && Math.min(screen.width, screen.height) < 820;
   // The address after # says which build to show: lite or full (phones get the lighter model unless told otherwise). The switch below writes it and
@@ -4043,7 +4108,6 @@ function makeFox(opts) {
   const moveChips = {};
   for (const [id, label] of STATES) moveChips[id] = chip($('states'), label, () => setState(id), id === 'idle');
   for (const [id, label] of ACTS) moveChips[id] = chip($('acts'), label, () => setMove(id), false);
-  for (const [id, label] of OLD) moveChips[id] = chip($('olds'), label, () => setMove(id), false);
   for (const [id, label] of SPELLS) moveChips[id] = chip($('spells'), label, () => setMove(id), false);
   const press = () => { for (const k in moveChips) moveChips[k].setAttribute('aria-pressed', k === state || k === move ? 'true' : 'false'); };
   function setState(id) {
@@ -4061,7 +4125,7 @@ function makeFox(opts) {
   }
   for (const [label, az, el, face] of VIEWS) chip(viewRow, label, () => { viewAz = az; viewEl = el; faceTo = face < 1 ? 1 : 0; spin = false; spinChip.setAttribute('aria-pressed', 'false'); });
   // ---- walking her around: a pad on the stage (or W A S D / arrows, Shift to run, Space to jump); she moves the way the pad points, as the camera sees it ----
-  const ROAM_R = 2.85, WALKS = { talk: 1, jump: 1, wave: 1, laugh: 1, jester_talk: 1, jester_laugh: 1 };            // moves she can make while walking
+  const ROAM_R = 2.85, WALKS = { talk: 1, jump: 1, wave: 1, laugh: 1 };            // moves she can make while walking
   const roam = { on: false, x: 0, z: 0, face: 0, vx: 0, vz: 0, jx: 0, jy: 0, keys: {}, idleT: 0, idleNext: 7 };
   const joy = $('joy'), knob = $('knob'); let joyId = null;
   const joySet = (e) => { const r = joy.getBoundingClientRect(), R = r.width / 2; let x = (e.clientX - r.left - R) / (R * 0.72), y = (e.clientY - r.top - R) / (R * 0.72); const m = Math.hypot(x, y); if (m > 1) { x /= m; y /= m; } roam.jx = x; roam.jy = -y; knob.style.transform = 'translate(' + (x * R * 0.72) + 'px,' + (y * R * 0.72) + 'px)'; };
@@ -4152,7 +4216,7 @@ function makeFox(opts) {
   }
 
   // ---- quick buttons on the stage: cast the chosen spell, step through the spells, jump, and a flourish; keys: 1 to 0 cast, Q and E choose, F casts, R flourish, Space jumps ----
-  const FLOUR = ['curtsey', 'pounce', 'laugh', 'dance', 'talk', 'wave']; let qi = 1, fi = 0;
+  const FLOUR = ['curtsey', 'pounce', 'laugh', 'dance', 'bow', 'twirl', 'talk', 'wave']; let qi = 1, fi = 0;
   const qName = $('qName'), qShow = () => { qName.textContent = SPELLS.length ? SPELLS[qi][1] : ''; };
   const qStep = (d) => { if (!SPELLS.length) return; qi = (qi + d + SPELLS.length) % SPELLS.length; qShow(); };
   const qCast = () => { if (SPELLS.length) setMove(SPELLS[qi][0]); }, qFlour = () => { setMove(FLOUR[fi]); fi = (fi + 1) % FLOUR.length; };
@@ -4262,7 +4326,7 @@ function makeFox(opts) {
   }
   loadClip('idle');
   requestAnimationFrame((t) => { last = t; frame(t); });
-  window.FOX = { J, stage, setMove, setState, STATES, ACTS, OLD, SPELLS };
+  window.FOX = { J, stage, setMove, setState, STATES, ACTS, SPELLS };
   if (!SPELLS.length) { for (const id of ['qPrev', 'qNext', 'qName', 'qCast']) { const el = $(id); if (el) el.hidden = true; } const sp = $('spells'); if (sp && sp.parentElement) sp.parentElement.hidden = true; }
 })();
 </script>
