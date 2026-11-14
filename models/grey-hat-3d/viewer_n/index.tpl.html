@@ -43,7 +43,7 @@ canvas#stage{display:block;width:100%;height:100%;touch-action:none;cursor:grab}
   <header>
     <p class="eyebrow">Moon Faire · the man they meet · first build</p>
     <h1>Noiz, <em>the Grey Hat</em></h1>
-    <p class="sub">Where he stands right now, part-way through his first build: no hat, belt or jewellery yet. Drag to turn him, pinch or scroll to zoom. New: he stands at rest instead of with his arms out, and his walk and his boots' ankles are rebuilt. Press "Walk" and "Talk". "A-pose" puts the arms-out pose back. His hair is real locks over real ears, and it moves. His shirt is real cloth that moves, over a painted body. His trousers are real cloth with real holes. "Doll" shows the body under his clothes. "Blank doll" shows his shape without paint. "Walk" shows the gold dust following his boots.</p>
+    <p class="sub">Where he stands right now, part-way through his first build. Drag to turn him, pinch or scroll to zoom. New: he has his grey hat, his pearls and feather earring, and his belt with its ring, pouch, scroll, charms and dagger. Press "Hat" and "Belt" under the views to look closely, and "Walk" to see the hanging things swing. "Hat" and "Belt and jewellery" under Show take them off. He stands at rest; "A-pose" puts the arms-out pose back. His hair is real locks, his shirt and trousers are real cloth. "Doll" shows the body under his clothes. "Blank doll" shows his shape without paint.</p>
   </header>
   <div class="stagebox" id="box">
     <canvas id="stage"></canvas>
@@ -57,17 +57,24 @@ canvas#stage{display:block;width:100%;height:100%;touch-action:none;cursor:grab}
   <div><p class="label">Show</p><div class="chips" id="shows"></div></div>
   <div class="notes">
     <div>
-      <h2>New: he stands and walks like a man</h2>
+      <h2>New: his hat, belt, pouch, scroll and jewellery</h2>
       <ul>
-        <li>You said his boots and ankles need to move as real ones do when he walks, and that his whole posture could be better.</li>
-        <li><b>He no longer stands with his arms out.</b> His weight is on his right leg, his left foot a little forward and turned out, chest open, head up. His arms hang by his sides with the palms turned in. He breathes and shifts a little.</li>
-        <li><b>Press "Walk".</b> His heel lands first with the toes up, the foot rolls flat, then the heel lifts and the boot bends at the ball as the toe pushes off. The other foot swings through low. His feet do not slide on the ground while they are down.</li>
-        <li><b>The walk has weight.</b> His hips move over the leg he is standing on, his shoulders turn a little against his hips, his arms swing from the shoulder with soft elbows, and his head stays steady. It is an unhurried walk, about one step every 0.6 seconds.</li>
-        <li><b>Press "Talk".</b> He offers something with his right hand, opens both hands, then marks a point with a finger of his left. His head goes with his hands.</li>
-        <li><b>"A-pose"</b> (under Show) puts back the old arms-out pose, which matches your paintings. The three "Arms" buttons belong to it.</li>
-        <li>The boot's shaft now follows his shin and the foot follows the ground, with a crease at the ankle. His shirt sleeves, trousers and hair were checked in the new poses.</li>
-        <li><b>Rough for now:</b> he walks on the spot. When he starts or stops walking his feet glide into place for about half a second. The boots are still the old painted leather, not rebuilt yet, and the underside of the soles is plain black: you can see it from behind when a heel lifts.</li>
-        <li><b>I cannot watch him move from here,</b> only look at stills one after another. The timing and the feel of the walk need your eye: tell me if it is too slow, too stiff or too much.</li>
+        <li>You said he looks good as he is, and to give him his hat, his belt and pouch and scroll and jewellery.</li>
+        <li><b>The hat.</b> Grey wool felt with a wide drooping brim, a dark band, and a slumped crown whose point falls to his left, as your paintings have it. His hair comes out from under it. Press <b>"Hat"</b> under the views. The point leans a little when his head moves.</li>
+        <li><b>Pearls</b> at the base of his throat, inside the open collar, and <b>the feather earring</b> in his left ear only: a short chain, two small pearls and a black feather. It swings.</li>
+        <li><b>The belt.</b> Black leather over the bottom of the corset, fastened in front by one large steel ring, with a buckle at his left and a second strap dropping to his right hip. Press <b>"Belt"</b>.</li>
+        <li><b>On his right hip:</b> the brown pouch with its flap and brass stud, the rolled scroll in its leather loop under it, and the skull and leaf charms. <b>On his left hip:</b> the dagger in its sheath.</li>
+        <li><b>Press "Walk".</b> The pouch, scroll, charms and dagger hang from the belt and swing and settle as the Ranger's bags do. His thigh pushes them out as it comes forward, so they do not pass through his trousers.</li>
+        <li>Under Show, <b>"Hat"</b> and <b>"Belt and jewellery"</b> take them off and put them back.</li>
+        <li><b>Rough for now:</b> the hat's folds are simpler than the painted ones. The pearls go under the collar at the sides instead of lying over it. The scroll is plain parchment with no writing. The ring is a little bigger than painted. The scroll hangs a few centimetres nearer his middle than painted, and the dagger hangs straight down where the painting slants it. In "Walk" and "Talk" his right hand passes close to the pouch.</li>
+        <li><b>I cannot watch him move from here,</b> only look at stills. Tell me if the hanging things swing too much or too little.</li>
+      </ul>
+    </div>
+    <div>
+      <h2>Before that: he stands and walks like a man</h2>
+      <ul class="m">
+        <li>He stands with his weight on his right leg and his arms by his sides. In "Walk" his heel lands first, the foot rolls and the toe pushes off. In "Talk" he gestures with both hands.</li>
+        <li>Rough: he walks on the spot, and the boots are still the old painted leather.</li>
       </ul>
     </div>
     <div>
@@ -156,7 +163,7 @@ canvas#stage{display:block;width:100%;height:100%;touch-action:none;cursor:grab}
   let want = { az: 0.5, el: 0.06, dist: 6.2, ty: 0.90, tx: 0, tz: 0 }, easing = true, spin = false;
   // name, azimuth, elevation, distance, target height, painting, target x, target z
   const VIEWS = [['Three-quarter', 0.5, 0.06, 6.2, 0.90, 'front'], ['Front', 0, 0.05, 6.2, 0.90, 'front'], ['Side', Math.PI / 2, 0.05, 6.2, 0.90, 'side'], ['Back', Math.PI, 0.05, 6.2, 0.90, 'back'],
-    ['Face', 0, 0.03, 2.0, 1.63, 'face'], ['Head, turned', 0.6, 0.05, 2.3, 1.61, 'faceq'], ['Profile', -Math.PI / 2, 0.03, 2.3, 1.61, 'prof'], ['Shirt and corset', 0.3, 0.05, 2.9, 1.24, 'chest'], ['Trousers', 0.3, 0.05, 3.3, 0.70, 'legs'], ['Close on the holes', 0.55, 0.02, 1.5, 0.66, 'legs', 0.13, 0], ['Boots', 0.6, 0.16, 2.3, 0.20, 'boot', 0, 0.03], ['Hands', 0.9, 0.10, 2.0, 0.92, 'hand', 0.44, -0.06, 'handL']];
+    ['Hat', 0.45, 0.10, 2.7, 1.70, 'hat'], ['Belt', -0.30, 0.04, 2.9, 0.93, 'belt'], ['Face', 0, 0.03, 2.0, 1.63, 'face'], ['Head, turned', 0.6, 0.05, 2.3, 1.61, 'faceq'], ['Profile', -Math.PI / 2, 0.03, 2.3, 1.61, 'prof'], ['Shirt and corset', 0.3, 0.05, 2.9, 1.24, 'chest'], ['Trousers', 0.3, 0.05, 3.3, 0.70, 'legs'], ['Close on the holes', 0.55, 0.02, 1.5, 0.66, 'legs', 0.13, 0], ['Boots', 0.6, 0.16, 2.3, 0.20, 'boot', 0, 0.03], ['Hands', 0.9, 0.10, 2.0, 0.92, 'hand', 0.44, -0.06, 'handL']];
   const POSES = [['As painted', {}], ['Arms down', { arm: 17 }], ['Arms out', { arm: 90 }]];
   let refKey = 'front', showRef = true;
   function chips(host, items, onPick, first) {
@@ -182,6 +189,9 @@ canvas#stage{display:block;width:100%;height:100%;touch-action:none;cursor:grab}
   toggle($('shows'), 'aposeB', 'A-pose', false, (v) => { if (v) { R.pose(POSES[aPose][1]); press('poses', aPose); press('moves', -1); } else { R.play(move); press('poses', -1); press('moves', MOVES.findIndex((m) => m[1] === move)); } });
   toggle($('shows'), 'spinB', 'Turn slowly', false, (v) => { spin = v; easing = false; });
   toggle($('shows'), 'dustB', 'Gold dust', true, (v) => { R.dust.amount = v ? 1 : 0; });
+  // "Hat" and "Belt and jewellery": his hat, and his pearls, feather earring, belt, pouch, scroll, charms and dagger (stage 6)
+  toggle($('shows'), 'hatB', 'Hat', true, (v) => { R.setHat(v); });
+  toggle($('shows'), 'propsB', 'Belt and jewellery', true, (v) => { R.setProps(v); });
   toggle($('shows'), 'blankB', 'Blank doll', false, (v) => { R.setBlank(v); });
   // "Doll": his clothes come off and the body built to go under them shows, with his own head, hair, glasses and hands
   toggle($('shows'), 'dollB', 'Doll', false, (v) => { R.setDoll(v); });

@@ -15,7 +15,7 @@ def whole(name, box, h=520): return uri(Image.open(R + 'refs/' + name).convert('
 reg = json.load(open(R + 'out/registration.json'))['front']
 def on_him(x0, x1, y0, y1, h=460):          # a box given in metres on him, cut from the front painting
     return whole(reg['name'], (round(reg['c'] + x0 * reg['pxm']), round(reg['y1'] - y1 * reg['pxm']), round(reg['c'] + x1 * reg['pxm']), round(reg['y1'] - y0 * reg['pxm'])), h)
-refs = {'front': crop('B1.png', 0), 'back': crop('B1.png', 1), 'side': crop('B2.png', 1), 'chest': on_him(-0.36, 0.36, 0.98, 1.56), 'legs': crop('B4.png', 0, h=480),
+refs = {'front': whole('A1.png', (40, 0, 984, 1536)), 'back': whole('A2.png', (40, 0, 984, 1536)), 'hat': whole('C5.png', (0, 150, 540, 680), 440), 'belt': whole('A1.png', (230, 560, 800, 960), 400), 'side': crop('B2.png', 1), 'chest': on_him(-0.36, 0.36, 0.98, 1.56), 'legs': crop('B4.png', 0, h=480),
         'boot': whole('E5.png', (60, 0, 1194, 1254), 380), 'hand': whole('D1.png', (40, 0, 640, 1254), 460),
         'face': whole('C1.png', (60, 0, 1194, 1254), 460), 'faceq': whole('C3.png', (524, 60, 1010, 760), 460), 'prof': whole('C3.png', (1012, 60, 1536, 760), 460)}
 rd = lambda p: open(R + p).read()

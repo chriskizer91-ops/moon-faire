@@ -57,6 +57,7 @@
   // The corset's top edge (stage 3). With the new shirt on (N47_shirt.js) the old skin's trunk is drawn only up to the corset's top edge
   // (uShirtCut 1) and thrown away above it: what is left of the old skin is the corset and nothing else. The edge is measured off the
   // same paintings (tools/shirt_measure.py): 1.29 m across the front with a small notch at the middle, 1.287 across the back, 1.28 at the sides.
+  const hatPressLater = (m) => hatPress(m);      // hatPress is written out further down, with the hair's own materials
   const CORSET_CUT = { value: 1 }, SHIRT_CUT = { value: 1 }, CUFF_CUT = { value: 1 }, UNDER_CUFF = { value: 1 };
   const CUT_GLSL = [
     'float topF = 1.289 - 0.040 * ( 1.0 - smoothstep( 0.0, 0.034, abs( vRest.x ) ) ), topB = 1.287, topS = 1.281;',
@@ -64,7 +65,7 @@
     'float cutF = 0.997 + 0.051 * pow( min( abs( vRest.x ) / 0.17, 1.0 ), 0.70 ), cutB = 1.027 + 0.020 * min( abs( vRest.x ) / 0.17, 1.0 ), cutS = 1.082 - 1.71 * ( vRest.z + 0.03 ) * ( vRest.z + 0.03 );',
     'if ( uCorsetCut > 0.5 && vRest.y < ( cutF * wf + cutB * wb + cutS * ( wr + wl ) ) / ( wf + wb + wr + wl ) ) discard;'].join('\n');
   // the trunk, legs and boots take their sides from B2 (arms held out of the way); the arms take theirs from A3 (arms hanging)
-  MATS.proj = mkProj('sideR', 'sideL'); MATS.projArm = mkProj('armR', 'armL'); MATS.projHair = mkProj('sideR', 'sideL'); MATS.projHair.side = THREE.DoubleSide; MATS.projRuffle = mkProj('armR', 'armL'); MATS.projRuffle.side = THREE.DoubleSide; MATS.projCuff = mkProj('armR', 'armL', false, true);
+  MATS.proj = mkProj('sideR', 'sideL'); MATS.projArm = mkProj('armR', 'armL'); MATS.projHair = mkProj('sideR', 'sideL'); MATS.projHair.side = THREE.DoubleSide; MATS.projHair = hatPressLater(MATS.projHair); MATS.projRuffle = mkProj('armR', 'armL'); MATS.projRuffle.side = THREE.DoubleSide; MATS.projCuff = mkProj('armR', 'armL', false, true);
   MATS.projLegs = MATS.projBoots = MATS.proj; MATS.projTrunk = mkProj('sideR', 'sideL', true);      // one material, three meshes: each region of the old skin can be hidden by itself
   const tHairN = hairTexN(HAIR.COLS, false), tHairBumpN = hairTexN(HAIR.COLS, true), tHairAlphaN = hairAlphaN();
   function hairMat(k, cut, rep) {
@@ -75,6 +76,35 @@
       sh.vertexShader = sh.vertexShader.replace('#include <common>', '#include <common>\nattribute float hshade; varying float vHs;').replace('#include <begin_vertex>', '#include <begin_vertex>\n vHs = hshade;');
       sh.fragmentShader = sh.fragmentShader.replace('#include <common>', '#include <common>\nvarying float vHs;').replace('#include <color_fragment>', '#include <color_fragment>\n diffuseColor.rgb *= vHs;').replace('#include <emissivemap_fragment>', '#include <emissivemap_fragment>\n totalEmissiveRadiance *= vHs;');
     };
+    return m;
+  }
+  // His hair under his hat. With the hat on, every point of his hair is kept inside the room the hat leaves it: inside the crown above the
+  // opening, and under a cone that lies below the brim outside it. A point outside that room is pulled straight in toward the hat's middle
+  // line, the way a hat presses hair to the head. It is done on the graphics card after the hair's own bones and chains have moved it, so
+  // the hair still hangs and swings as before and nothing about its design changes; with the hat off it is untouched.
+  const HAT_U = { m: { value: new THREE.Matrix4() }, mi: { value: new THREE.Matrix4() }, on: { value: 1 } };
+  function hatPress(m) {
+    const first = m.onBeforeCompile;
+    m.onBeforeCompile = (sh) => {
+      if (first) first(sh);
+      sh.uniforms.uHatM = HAT_U.m; sh.uniforms.uHatMi = HAT_U.mi; sh.uniforms.uHatOn = HAT_U.on;
+      const f = (v) => v.toFixed(5), K = HAT.KC;
+      sh.vertexShader = sh.vertexShader.replace('#include <common>', ['#include <common>', 'uniform mat4 uHatM; uniform mat4 uHatMi; uniform float uHatOn;',
+        'vec3 hatPress( vec3 p ) {',
+        '  vec3 q = ( uHatMi * vec4( p, 1.0 ) ).xyz - vec3( ' + f(HAT.O.x) + ', ' + f(HAT.O.y) + ', ' + f(HAT.O.z) + ' );',
+        '  float sT = ' + f(Math.sin(HAT.TILT)) + ', cT = ' + f(Math.cos(HAT.TILT)) + ';',
+        '  float hu = q.x, hw = q.y * sT + q.z * cT, hn = q.y * cT - q.z * sT;',
+        '  float r = length( vec2( hu, hw ) ); if ( r < 0.0001 ) return p;',
+        '  float redge = r / length( vec2( hu / ' + f(HAT.A) + ', hw / ' + f(HAT.B) + ' ) );',
+        '  float kc = hn < ' + f(K[1][0]) + ' ? mix( 1.0, ' + f(K[1][1]) + ', clamp( hn / ' + f(K[1][0]) + ', 0.0, 1.0 ) ) : hn < ' + f(K[2][0]) + ' ? mix( ' + f(K[1][1]) + ', ' + f(K[2][1]) + ', ( hn - ' + f(K[1][0]) + ' ) / ' + f(K[2][0] - K[1][0]) + ' ) : mix( ' + f(K[2][1]) + ', ' + f(K[3][1]) + ', clamp( ( hn - ' + f(K[2][0]) + ' ) / ' + f(K[3][0] - K[2][0]) + ', 0.0, 1.0 ) );',
+        '  float rmax = redge * kc - ' + f(HAT.INSET) + ' - 0.25 * max( 0.0, hn - 0.05 ) + max( 0.0, - hn - ' + f(HAT.GAP) + ' ) / ' + f(HAT.CONE) + ';',
+        '  if ( r <= rmax ) return p;',
+        '  float k = max( rmax, 0.0 ) / r; hu *= k; hw *= k;',
+        '  q = vec3( hu, hw * sT + hn * cT, hw * cT - hn * sT ) + vec3( ' + f(HAT.O.x) + ', ' + f(HAT.O.y) + ', ' + f(HAT.O.z) + ' );',
+        '  return ( uHatM * vec4( q, 1.0 ) ).xyz;',
+        '}'].join('\n')).replace('#include <skinning_vertex>', '#include <skinning_vertex>\n if ( uHatOn > 0.5 ) transformed = hatPress( transformed );');
+    };
+    m.customProgramCacheKey = () => 'hatPress|' + (first ? first.toString() : '');
     return m;
   }
   Object.assign(MATS, {
@@ -97,7 +127,7 @@
     frame: std({ color: lin('#0d0d10'), roughness: 0.28, envMapIntensity: 1.1 }),
     // his hair (N45b_hair.js): pictures of strands and nothing else. Each point carries its own shade ('hshade': darker at the edges and the
     // underside of a lock, at its root, and in the layers underneath). Tips are a hard cut-out; nothing is blended.
-    hair: hairMat(1.0, true), hairIn: hairMat(0.86, true), hairCap: hairMat(0.80, true), hairMass: hairMat(0.48, true),
+    hair: hatPress(hairMat(1.0, true)), hairIn: hatPress(hairMat(0.86, true)), hairCap: hatPress(hairMat(0.80, true)), hairMass: hatPress(hairMat(0.48, true)),
     steel: std({ color: lin('#b9bcc2'), roughness: 0.30, metalness: 0.9, envMapIntensity: 1.2 }),      // the rims of the plugs in his ears
     lens: phys({ color: lin('#dfe6ee'), transparent: true, opacity: 0.10, roughness: 0.04, metalness: 0, envMapIntensity: 1.6, depthWrite: false, side: THREE.DoubleSide }),
     // the hand model in two plain colours until his hand paintings are baked on: uv.x 1 is glove leather, 0 is skin
@@ -257,6 +287,28 @@
     return m;
   })();
 
+  // His hat, belt and jewellery (N48_gear.js). Felt and leathers and parchment wear small repeating squares cut from F13 (bake_gear.py);
+  // like the trousers they are lit partly as painted, so they sit beside his painted corset and boots. Metals and pearls are plain.
+  { const sq = (key, fill) => { const t = bakedTex(key, 256, 256, fill); t.wrapS = t.wrapT = THREE.RepeatWrapping; t.anisotropy = 8; return t; };
+    const tf = sq('felt', '#665c5c'), tb = sq('beltL', '#322d2d'), tp = sq('pouchL', '#4d2f26'), tq = sq('parch', '#dab690');
+    const worn = (t, k, rough, em, o) => std(Object.assign({ map: t, color: lin('#b9b2b6').multiplyScalar(k), roughness: rough, envMapIntensity: 0.15, emissive: lin('#ffffff').multiplyScalar(k), emissiveMap: t, emissiveIntensity: em }, o || {}));
+    // the brightness each point carries (darker down in a fold or under the brim) dims the picture's own glow too, not only the lamps' light
+    const shadeGlow = (m) => { const first = m.onBeforeCompile; m.onBeforeCompile = (sh) => { if (first) first(sh); sh.fragmentShader = sh.fragmentShader.replace('#include <emissivemap_fragment>', '#include <emissivemap_fragment>\n totalEmissiveRadiance *= vColor.rgb;'); }; m.customProgramCacheKey = () => 'shadeGlow|' + (first ? first.toString() : ''); return m; };
+    Object.assign(MATS, {
+      hatFelt: shadeGlow(sheen(worn(tf, 1.0, 0.96, 0.34, { bumpMap: tf, bumpScale: 0.0012, side: THREE.DoubleSide, envMapIntensity: 0.05, color: lin('#b6b8c0'), vertexColors: true }), '#c4c4cc', 2.6, 0.07)),      // wool felt: no shine, a soft pale edge where it turns away
+      hatBand: worn(tb, 1.15, 0.70, 0.30, { bumpMap: tb, bumpScale: 0.0006, color: lin('#c4b4ae') }),                              // the band: dark worn leather, a little warmer than his belt
+      gBelt: worn(tb, 1.0, 0.62, 0.30, { bumpMap: tb, bumpScale: 0.0008 }),
+      gPouch: worn(tp, 1.0, 0.66, 0.32, { bumpMap: tp, bumpScale: 0.0010 }),
+      gParch: worn(tq, 1.0, 0.88, 0.36, { bumpMap: tq, bumpScale: 0.0004, side: THREE.DoubleSide }),
+      gBrass: std({ color: lin('#b08a4a'), roughness: 0.42, metalness: 0.85, envMapIntensity: 1.1, emissive: lin('#5a4320'), emissiveIntensity: 0.25 }),      // worn brass: rings, buckle, skull, dagger guard
+      gSteel: std({ color: lin('#b9bcc2'), roughness: 0.32, metalness: 0.9, envMapIntensity: 1.2 }),                                // the earring's chain and the dagger's fittings
+      gPearl: phys({ color: lin('#efe3d6'), roughness: 0.28, metalness: 0, clearcoat: 0.8, clearcoatRoughness: 0.25, envMapIntensity: 0.55, emissive: lin('#e8d6c8'), emissiveIntensity: 0.22 }),
+      gFeather: std({ color: lin('#20262b'), roughness: 0.62, envMapIntensity: 0.25, side: THREE.DoubleSide, emissive: lin('#1c2428'), emissiveIntensity: 0.3 }),      // a black feather with a blue-green cast
+      gDark: std({ color: lin('#1c1a1c'), roughness: 0.6, envMapIntensity: 0.2 }),                                                 // cords, the dagger's grip and sheath
+      gLeaf: std({ color: lin('#c79a3c'), roughness: 0.4, metalness: 0.8, envMapIntensity: 1.1, side: THREE.DoubleSide, emissive: lin('#6a4a16'), emissiveIntensity: 0.35 }),      // the gold leaf charm
+    });
+  }
+
   // His shirt (N47_shirt.js). The cloth is the cream linen square of F13, repeated; each point also carries a brightness (darker down in a
   // fold, lighter on its crest) and, on the pieces edged with lace, where it sits in the lace band of F13: there the lace picture is drawn
   // instead of the linen and its holes are cut out (a hard cut: nothing is see-through, so nothing has to be sorted). Both faces are drawn;
@@ -301,6 +353,7 @@
     g.setAttribute('skinWeight', new THREE.Float32BufferAttribute(B.sw, 4));
     if (key === 'doll') { g.setAttribute('color', new THREE.Float32BufferAttribute(dollCol, 3)); g.setAttribute('dollLeg', new THREE.Float32BufferAttribute(dollLeg, 3)); g.setAttribute('dollArm', new THREE.Float32BufferAttribute(dollArm, 3)); }
     if (HAIR.SHADE[key]) { if (HAIR.SHADE[key].length !== B.n) throw new Error('hair shade list for ' + key + ' has ' + HAIR.SHADE[key].length + ' entries for ' + B.n + ' points'); g.setAttribute('hshade', new THREE.Float32BufferAttribute(HAIR.SHADE[key], 1)); }
+    if (GEAR.SHADE[key]) { if (GEAR.SHADE[key].length !== B.n) throw new Error('shade list for ' + key + ' has ' + GEAR.SHADE[key].length + ' entries for ' + B.n + ' points'); const c = new Float32Array(B.n * 3); for (let i = 0; i < B.n; i++) c[i * 3] = c[i * 3 + 1] = c[i * 3 + 2] = GEAR.SHADE[key][i]; g.setAttribute('color', new THREE.Float32BufferAttribute(c, 3)); }
     if (key === 'face') { g.setAttribute('faceMix', new THREE.Float32BufferAttribute(faceMix, 4)); g.setAttribute('uvSide', new THREE.Float32BufferAttribute(faceUvS, 2)); }
     g.setIndex(B.n > 65535 ? new THREE.Uint32BufferAttribute(B.idx, 1) : new THREE.Uint16BufferAttribute(B.idx, 1));
     const m = new THREE.SkinnedMesh(g, MATS[key] || MATS.cloth);
@@ -347,13 +400,16 @@
   const A_REST = N_APOSE, MOVES = ['pose', 'stand', 'idle', 'walk', 'talk'];
   let lastPose = { arm: A_REST, leg: 0 }, mv = { name: 'pose', t: 0 }, wk = 0, tk = 0, live = 0, gph = 0, clock = 0;
   const add = (b, x, y, z) => { const r = SK[b].rotation; r.x += x; r.y += y; r.z += z; };
+  // where the hat is now, for keeping his hair under it (hatPress, above): from the hat's resting place to where its bone has carried it, in his own space
+  const _hr = new THREE.Matrix4(), _ht = new THREE.Matrix4();
+  function hatRoom() { const b = SK.hat, r = b.userData.rest; _hr.copy(root.matrixWorld).invert().multiply(b.matrixWorld).multiply(_ht.makeTranslation(-r.x, -r.y, -r.z)); HAT_U.m.value.copy(_hr); HAT_U.mi.value.copy(_hr).invert(); }
   function restAll() { for (const k in SK) SK[k].rotation.set(0, 0, 0); SK.hips.position.copy(SK.hips.userData.home); }
   function pose(o) {
     o = o || {}; mv = { name: 'pose', t: 0 }; wk = 0; tk = 0; live = 0; lastPose = { arm: o.arm == null ? A_REST : o.arm, leg: o.leg || 0 };
     const arm = lastPose.arm * DEG - A_POSE, leg = lastPose.leg * DEG;
     restAll(); for (const [S, s] of SIDES) { SK['uarm' + S].rotation.z = s * arm; SK['thigh' + S].rotation.z = s * leg; SK['foot' + S].rotation.z = -s * leg; }
     root.updateMatrixWorld(true);
-    HAIRSIM.step(0, true); CLOTH.step(0, true); TR_SWAY.step(0, true);     // the cloth is laid on him in the new pose and left to settle, so a still picture is right at once
+    GEAR.step(0, true); hatRoom(); HAIRSIM.step(0, true); CLOTH.step(0, true); TR_SWAY.step(0, true);     // the cloth is laid on him in the new pose and left to settle, so a still picture is right at once
   }
   const AX = V3(1, 0, 0), AY = V3(0, 1, 0), AZ = V3(0, 0, 1), Qt = () => new THREE.Quaternion();
   const _q1 = Qt(), _q2 = Qt(), _q3 = Qt(), _q4 = Qt(), _v1 = V3(), _v2 = V3(), _v3 = V3();
@@ -468,7 +524,7 @@
   function play(name, now) {
     if (!MOVES.includes(name) || name === 'pose') { pose(lastPose); return 'pose'; }
     const from = mv.name; mv = { name, t: 0 };
-    if (now || from === 'pose') { snapTo(name); body(0); root.updateMatrixWorld(true); HAIRSIM.step(0, true); CLOTH.step(0, true); TR_SWAY.step(0, true); }      // from the measuring pose there is nothing sensible to ease through
+    if (now || from === 'pose') { snapTo(name); body(0); root.updateMatrixWorld(true); GEAR.step(0, true); hatRoom(); HAIRSIM.step(0, true); CLOTH.step(0, true); TR_SWAY.step(0, true); }      // from the measuring pose there is nothing sensible to ease through
     return name;
   }
   // one frame of standing, walking or talking
@@ -544,12 +600,12 @@
   function animate(dt) {
     dt = dt > 0 ? Math.min(dt, 0.05) : 0; clock += dt;
     if (mv.name !== 'pose') { mv.t += dt; body(dt); root.updateMatrixWorld(true); }
-    HAIRSIM.step(dt, false); root.updateMatrixWorld(true); CLOTH.step(dt, false); TR_SWAY.step(dt, false);
+    GEAR.step(dt, mv.name === 'pose'); hatRoom(); HAIRSIM.step(dt, false); root.updateMatrixWorld(true); CLOTH.step(dt, false); TR_SWAY.step(dt, false);
     DUST.ground.set(-Math.sin(root.rotation.y), 0, -Math.cos(root.rotation.y)).multiplyScalar(api.walkOnSpot ? WALK_SPEED * wk : 0);
     DUST.update(dt);
   }
   // the blank doll: every part in one plain clay colour, so his shape can be judged without his paintings on it
-  const CLAY = std({ color: lin('#b7a797'), roughness: 0.92, envMapIntensity: 0.15 }), CLAY2 = std({ color: lin('#b7a797'), roughness: 0.92, envMapIntensity: 0.15, side: THREE.DoubleSide });
+  const CLAY = std({ color: lin('#b7a797'), roughness: 0.92, envMapIntensity: 0.15 }), CLAY2 = std({ color: lin('#b7a797'), roughness: 0.92, envMapIntensity: 0.15, side: THREE.DoubleSide }), CLAY_H = hatPress(std({ color: lin('#b7a797'), roughness: 0.92, envMapIntensity: 0.15, side: THREE.DoubleSide }));      // CLAY_H: clay hair, kept under his hat like the painted hair
   // the blank doll's clay for the old skin's trunk: the same clay, ending at the corset's edge as the painted one does
   const CLAY_CUT = std({ color: lin('#b7a797'), roughness: 0.92, envMapIntensity: 0.15 });
   CLAY_CUT.onBeforeCompile = (sh) => {
@@ -562,7 +618,7 @@
   const CLAY_T = std({ color: lin('#b7a797'), roughness: 0.92, envMapIntensity: 0.15, side: THREE.DoubleSide, alphaMap: TR_MASK_G, alphaTest: 0.5 });
   const CLAY_S = new THREE.MeshStandardMaterial({ color: lin('#b7a797'), roughness: 0.92, envMapIntensity: 0.15, side: THREE.DoubleSide });      // and for the shirt's cloth, which is not moved by bones
   let blank = false;
-  function setBlank(on) { blank = !!on; for (const k in meshes) { const m = meshes[k]; m.material = !blank ? m.userData.painted : k === 'trousers' ? CLAY_T : /^(projHair|projRuffle|hair|hairIn|hairCap|hairMass)$/.test(k) ? CLAY2 : /^(lens|nail)$/.test(k) ? m.userData.painted : /^(projTrunk|projHips)$/.test(k) ? CLAY_CUT : CLAY; if (k === 'lens' || k === 'nail') m.visible = !blank; } for (const k in shirtMeshes) shirtMeshes[k].material = blank ? CLAY_S : shirtMeshes[k].userData.painted; return blank; }
+  function setBlank(on) { blank = !!on; for (const k in meshes) { const m = meshes[k]; m.material = !blank ? m.userData.painted : k === 'trousers' ? CLAY_T : /^(projHair|hair|hairIn|hairCap|hairMass)$/.test(k) ? CLAY_H : k === 'projRuffle' ? CLAY2 : /^(lens|nail)$/.test(k) ? m.userData.painted : /^(projTrunk|projHips)$/.test(k) ? CLAY_CUT : CLAY; if (k === 'lens' || k === 'nail') m.visible = !blank; } for (const k in shirtMeshes) shirtMeshes[k].material = blank ? CLAY_S : shirtMeshes[k].userData.painted; return blank; }
   // ---------- the doll and the old skin ----------
   // The old skin is his clothes as one smooth shape with the paintings laid on. It is being replaced, a region at a time, by real garments
   // over the doll (N45_doll.js). Both are cut into the same regions here, so that a region of the old skin can be switched off and the same
@@ -615,7 +671,13 @@
     for (const k in shirtMeshes) shirtMeshes[k].visible = newS; meshes.lacing.visible = newS; meshes.projCuff.visible = !doll; UNDER_CUFF.value = doll ? 0 : 1;
     if (newS) meshes.dollTrunk.visible = true;
   }
-  function setDoll(on) { doll = !!on; showSkins(); return doll; }
+  // Stage 6: his hat, and his belt and jewellery (N48_gear.js). Each can be switched off by itself ("Hat" and "Belt and jewellery" on the
+  // page); both are hidden with the clothes when he is stripped to the doll. With the hat off his hair is no longer pressed under it.
+  const HAT_KEYS = ['hatFelt', 'hatBand'], PROP_KEYS = ['gPearl', 'gSteel', 'gFeather', 'gBelt', 'gPouch', 'gParch', 'gBrass', 'gDark', 'gLeaf']; let hatOn = true, propsOn = true;
+  function showGear() { for (const k of HAT_KEYS) if (meshes[k]) meshes[k].visible = hatOn && !doll; HAT_U.on.value = hatOn && !doll ? 1 : 0; for (const k of PROP_KEYS) if (meshes[k]) meshes[k].visible = propsOn && !doll; }
+  function setHat(on) { hatOn = !!on; showGear(); return hatOn; }
+  function setProps(on) { propsOn = !!on; showGear(); return propsOn; }
+  function setDoll(on) { doll = !!on; showSkins(); showGear(); return doll; }
   function setOldSkin(o) { for (const k in (o || {})) if (k in OLD) oldOn[k] = !!o[k]; showSkins(); return Object.assign({}, oldOn); }
   function setOldTrousers(on) { setOldSkin({ legs: !!on, hips: !!on }); return oldOn.legs; }
   function setOldShirt(on) { setOldSkin({ arms: !!on, ruffles: !!on }); return oldOn.arms; }      // "Old shirt" on the page: the old painted shirt skin goes back on in place of the new shirt, for comparing
@@ -626,14 +688,14 @@
   function showHair() { for (const k of HAIR_KEYS) if (meshes[k]) meshes[k].visible = hairOn && !oldHair; meshes.projHair.visible = hairOn && oldHair; }
   function setOldHair(on) { oldHair = !!on; showHair(); return oldHair; }
   function setHair(on) { hairOn = !!on; showHair(); return hairOn; }
-  showHair();
+  showHair(); showGear();
   setOldSkin({ legs: false, hips: false, arms: false, ruffles: false });
   // Every list a mesh carries must be as long as its list of points. A real graphics chip refuses to draw a mesh with a short list, so the
   // whole mesh vanishes (his face did, November 13), while the software renderer the tools here use draws it anyway. So it is caught here.
   for (const M of [meshes, shirtMeshes]) for (const k in M) { const g = M[k].geometry, n = g.attributes.position.count; for (const a in g.attributes) if (g.attributes[a].count !== n) throw new Error('mesh "' + k + '": ' + a + ' has ' + g.attributes[a].count + ' entries for ' + n + ' points'); }
   // and no triangle may name a point that is not there (the cut meshes above share their lists of points, so this is checked too)
   for (const M of [meshes, shirtMeshes]) for (const k in M) { const g = M[k].geometry, n = g.attributes.position.count, ix = g.index.array; if (ix.length % 3) throw new Error('mesh "' + k + '": its list of triangles is not a multiple of three'); for (let i = 0; i < ix.length; i++) if (ix[i] >= n) throw new Error('mesh "' + k + '": a triangle names point ' + ix[i] + ' of ' + n); }
-  const api = { root, fx, skeleton, bones, SK, animate, pose, play, moves: MOVES, meshes, dust: DUST, setBlank, get blank() { return blank; }, setDoll, get doll() { return doll; }, setOldSkin, get oldSkin() { return Object.assign({}, oldOn); }, setOldTrousers, get oldTrousers() { return oldOn.legs; }, setOldShirt, get oldShirt() { return oldOn.arms; }, setCloth, get cloth() { return CLOTH.on; }, setOldHair, get oldHair() { return oldHair; }, setHair, get hair() { return hairOn; }, shirtMeshes, walkOnSpot: true, walkSpeed: WALK_SPEED, stride: W_L, strideTime: W_T, name: 'Noiz', debug: { SK, meshes, trunkPt, legPt, bootPt, headPoint, hairPt, armAt, doll: DOLL, trousers: TROUSERS, holes: TR_HOLES, cloth: CLOTH, shirt: SHIRT, sway: TR_SWAY, hair: HAIR, hairSim: HAIRSIM, gait, FOOT, LEG, soleLow, TUNE }, get triangles() { return triCount; } };
+  const api = { root, fx, skeleton, bones, SK, animate, pose, play, moves: MOVES, meshes, dust: DUST, setBlank, get blank() { return blank; }, setDoll, get doll() { return doll; }, setOldSkin, get oldSkin() { return Object.assign({}, oldOn); }, setOldTrousers, get oldTrousers() { return oldOn.legs; }, setOldShirt, get oldShirt() { return oldOn.arms; }, setCloth, get cloth() { return CLOTH.on; }, setOldHair, get oldHair() { return oldHair; }, setHair, get hair() { return hairOn; }, setHat, get hat() { return hatOn; }, setProps, get props() { return propsOn; }, gearKick: GEAR.kick, shirtMeshes, walkOnSpot: true, walkSpeed: WALK_SPEED, stride: W_L, strideTime: W_T, name: 'Noiz', debug: { SK, meshes, trunkPt, legPt, bootPt, headPoint, hairPt, armAt, doll: DOLL, trousers: TROUSERS, holes: TR_HOLES, cloth: CLOTH, shirt: SHIRT, sway: TR_SWAY, hair: HAIR, hairSim: HAIRSIM, gear: GEAR, hat: HAT, gait, FOOT, LEG, soleLow, TUNE }, get triangles() { return triCount; } };
   pose(lastPose);
   return api;
 }

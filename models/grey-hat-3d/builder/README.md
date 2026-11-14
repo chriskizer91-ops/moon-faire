@@ -22,3 +22,4 @@ Things learned running it:
 - The finished witches' folders were fetched from their branches into `/home/claude/witches/` (read-only) so the builder can take their methods. `common_brief.md` is the part every stage brief shares.
 - Stage 4 (hair over real ears): 166 turns, about 202,000 output tokens, 20.0 million cached-read tokens, 0.7 million cache-write tokens.
 - Stage 5 (ankles, walk, posture): 115 turns, about 129,000 output tokens, 12.3 million cached-read tokens, 0.4 million cache-write tokens.
+- Stage 6 (hat, belt, pouch, scroll, jewellery): 181 turns, about 294,000 output tokens, 23.8 million cached-read tokens, 1.2 million cache-write tokens.

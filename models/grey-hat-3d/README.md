@@ -10,6 +10,55 @@ something or just talks to them", and he gets his own folder because he is a cha
   Project docs `claude/HOW-TO-3d-witch-models.md` and `claude/HOW-TO-3d-witch-faces.md`. Read both before writing any code.
 - Project note for this folder: `claude/grey-hat-3d-reference-prompts.md`.
 
+## Stage 6 of the rebuild: his hat, pearls, feather earring, belt, pouch, scroll, charms and dagger (November 14, 2026)
+
+Chris: "he looks good as he is. Let's just go ahead and give him his hat, his belt and pouch and scroll and jewelry". All of it is in
+`src/N48_gear.js` (built after the shirt, before the dust), its materials are in `src/N99_static.js` ("His hat, belt and jewellery"),
+its surfaces come from `bake_gear.py`. Report: `builder/stage6_report.md`. The source before this stage: `src_before_gear/`.
+
+**Method (the Ranger's, `witches/ranger/src/R45_gear.js`, her stages 5 and 5b).** Every piece is a real shape lying on the real surface
+of his body. A thing that hangs has its own bone at its hinge and is a weight on that hinge with two angles (out from him, and along
+the belt): gravity pulls it in, the cloth under it is a floor it cannot go below, and the movement of the hinge sets it swinging.
+
+- **Bones added:** `hat` (child of `head`), `hatTip1`, `hatTip2` (the fold and the point); `ear` (child of `head`); `pouch`, `scroll`,
+  `charmS`, `charmL`, `dagger` (children of `hips`). `N47_shirt.js` `readBones` now makes room for bones added after it.
+- **Meshes added:** `hatFelt`, `hatBand`, `gPearl`, `gSteel`, `gFeather`, `gBelt`, `gPouch`, `gParch`, `gBrass`, `gDark`, `gLeaf`.
+  36,362 triangles in all (the hat 14,720). The whole model is 599,059.
+- **`HAT`** (top of the file): the hat's own frame. The opening for his head is an oval (0.088 by 0.117 m half-widths) in a plane tipped
+  back 23 degrees, its middle at (0, 1.687, -0.042). `HAT.kc(height)` is how the inside of the crown narrows. The crown's first three
+  rings are that same oval, level with the opening, so the crown round his head is exactly the room his hair is given.
+- **His hair under the hat: `hatPress` in `N99_static.js`.** A piece added to the vertex shader of every hair material (and the clay
+  hair, and the old painted hair): after the hair's bones and chains have moved a point, a point outside the hat's room (inside the
+  crown above the opening, under a cone below the brim outside it) is pulled straight in toward the hat's middle line. The hair's
+  design and its chains are not touched; with the hat off (`setHat(false)`, or the doll) the uniform `uHatOn` is 0 and the hair is as
+  it was. `hatRoom()` gives the shader the hat bone's place every frame. The crown's dents are limited to 3 mm where his head is, and
+  the hair is kept 5 mm inside, so no dent can show hair.
+- **The crown** is a loft along a bent middle line (`SP`: x, y, z, half-width across, half-width front to back), with folds, dents
+  and wrinkles added by `crownPt`; each point carries a brightness (`GEAR.SHADE`, a `color` attribute, checked against the point count)
+  so folds and the brim's under side are darker. `shadeGlow` makes that brightness dim the material's own glow as well.
+- **Pearls:** round the back and sides each bead sits on the collar's fold and takes the bone shares of the point of the fold under it
+  (the fold is a pinned edge of the shirt, so it goes exactly where the bones go); across the open front each bead sits on his skin or
+  on the cloth there and takes the skin's shares. Beads are rigid balls; there is no simulation in the strand.
+- **The belt** follows `beltY(u)` round the corset's bottom edge; `bodyAt(u, y)` is the corset's surface pushed out to the trouser
+  cloth wherever the trousers stand further out (`over`). Belt and second strap are skinned with `wTrouser`, so they move exactly as
+  the cloth they lie on. The ring leans on the corset at its top and the trousers at its bottom.
+- **`GEAR.step(dt, jump)`** is called from `animate`, `pose` and `play(name, true)` before the hair and cloth. A frame is cut into steps
+  of 8 ms or less and never taken longer than 0.05 s; every angle and speed is clamped. `floorOf(h)` first puts the thing's hinge where
+  the belt is now (`h.follow`), then finds every point of trouser cloth under it where that cloth is now (the cloth's own bone shares),
+  and returns the smallest angle that keeps the thing's back clear of all of them. The pouch also rests on the scroll's strap
+  (`restsOn`). The hat's point is two soft springs (`SPRING`).
+- **API:** `setHat(on)`, `hat`, `setProps(on)`, `props`, `gearKick()`; `debug.gear` (HANG, SPRING, step, settle), `debug.hat`.
+  `setDoll(true)` hides both; "Blank doll" turns them to clay (the hair's clay material is `CLAY_H`, which keeps the hat's press).
+- **Tools:** `tools/gear_cmp.py out.jpg hat|neck|belt|beltA|whole` (model beside the paintings at one scale, gridded in model metres);
+  `tools/gear_clear.py` (how deep any hanging thing is inside the trouser cloth, and how near his hands come, through stance, walk and
+  talk; it first turns the pouch into him on purpose to prove the meter reads); `tools/gear_walk.py prefix` (stills through walk and
+  talk); `tools/gear_checks.py` (same result on every run, clock jumps, rest, cost, triangles, attribute lengths).
+- **Known and not changed:** repeating a run inside one page does not give the same angles for the earring and the hat's point (up to
+  0.2 degrees), because his body's idle sway runs on a clock that `play()` does not reset, so his head is not in the same place. Two
+  fresh loads agree to six decimal places. The five things hung from his hips repeat exactly either way.
+- **Rough:** see the report. In short: the hat's folds are simpler than painted; the ring, pouch and dagger are smaller and sit a
+  little differently than in A1 (to clear his hands and the stance); the scroll has no writing; nothing here was watched moving.
+
 ## Stage 5 of the rebuild: ankles, a walk with weight, and a stance that is not an A-pose (November 14, 2026)
 
 Chris: "the boots, the ankles need to make a realistic motion as he walks. And I think the posturing of the whole body could be

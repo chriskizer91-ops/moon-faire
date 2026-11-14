@@ -44,7 +44,7 @@
     // Everything is worked out in his own space (the space of 'root'), not the world's: LM[i] is bone i's place in it. So he can be
     // scaled or stood anywhere. How he was moved since the last frame is handed to the cloth separately (carry, below).
     const LM = bones.map(() => new THREE.Matrix4()), rootInv = new THREE.Matrix4(), rootWas = new THREE.Matrix4(), carryM = new THREE.Matrix4();
-    function readBones() { rootInv.copy(root.matrixWorld).invert(); for (let i = 0; i < bones.length; i++) LM[i].multiplyMatrices(rootInv, bones[i].matrixWorld); }
+    function readBones() { rootInv.copy(root.matrixWorld).invert(); for (let i = 0; i < bones.length; i++) (LM[i] || (LM[i] = new THREE.Matrix4())).multiplyMatrices(rootInv, bones[i].matrixWorld); }      // bones added after this file (his hat and gear, N48_gear.js) get their place here too
     let cW = null, cW0 = null, cS = null; const _v = V3();
     function updateColliders(first) {
       const N = COLL.length; if (!cW) { cW = new Float32Array(N * 6); cW0 = new Float32Array(N * 6); cS = new Float32Array(N * 8); first = true; }
