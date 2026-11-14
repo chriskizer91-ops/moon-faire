@@ -317,12 +317,33 @@ four strap hooks as real objects, standing still. About 355,000 triangles.
     hand jump.
   - Decided by Chris: the fall stays as it is; the gem's two strong shots are to be arrows of light (not built yet).
   - Not covered: elbows and upper arms, weapons, charms, hair, and her body itself (there is no shape for her torso).
+- **Stage fourteen: the gem's two shots, and the finer Flipbook look.** Chris: "Let's do the two shot arrows of light and then
+  I think that's her for now. I think that's how we're going to put her in the game. There has been an update to the
+  instructions for the flipbook look button if you could check on that."
+  - **The gem's two shots** (move `shots`; in `lore/combat-balance.md` the gem is two shots of 200). One move in two parts.
+    First the gem touch, as in `gem`, up to `GEM_CUT` (1.75 of its own seconds, when her hand is down again). Then the bow
+    move with a second arrow: `armsAndBow(T, dt, two)`. `drawClock(T, two, o)` is that move's clock. Up to the first release
+    (`TR`, 2.45) it runs as it is. Then her body and the bow hold at full draw while the first arrow flies (0.45), her string
+    hand comes forward to the string again as the bow arm bends in to meet it (to 0.75), she draws (to 1.25), holds, and
+    lets go at `TR2` (`TR` + 1.5). After that the move runs on, late by `DL`. In `animate` the body block gets the same
+    clock, so her stance holds through both arrows.
+  - The two arrows are thicker (1.4 times) and longer (1.15 times) than Moonsteel Draw's. `gemGlow(Tb, ck)` keeps her gem
+    and the light on her arms lit from the touch until after the second arrow, and flares the gem as each one goes.
+  - `SHOTS.shots` 9.6 s. Page: "The gem's two shots" in the fight row. "The gem" alone is still there.
+  - Both arrows fly the same way; aiming each at a different foe is for the game. The bow dips only after the second.
+  - **The finer Flipbook look** (`claude/HOW-TO-flipbook-look.md`, section 11): the five changes from `patch_stage.py` in
+    `claude/flipbook-look-finer-and-pilot.md` are now in `viewer/stage.js` (`stage.pixelWhole`, `stage.snap`, a second small
+    picture and the pass that enlarges it). The page shows two sliders while the look is on, "Pixel size" and "Colours",
+    opening at the setting Chris liked for the witches: 1.2 mm of her to a pixel, full flipbook colours
+    (`claude/chris-on-flipbook-settings-light-weight-and-fight-camera.md`). Pixel size at chunky is the look as it was
+    (4.75 mm, whole screen pixels). The look still starts off.
+  - Chris: this is how she goes into the game for now. Jewellery is the one thing on her list not built.
 - Waiting for his notes: the moves again; stage two (head), stage three (hands and arms) and stage five.
 
 Rough or not built yet: her face does not move (no blink, no expressions); the hair has a smooth edge with none of the painted
 flyaway wisps, and the loose locks are simple; earrings and necklaces; bracelets; each charm is one stiff piece on a hinge (its chain does not bend, charms can
 pass through each other); the caps on the stones are plain cones; with her arms straight out the iron curls bend with her skin;
-the gem's two shots (to be arrows of light); jewellery.
+jewellery.
 
 ## What is here
 
@@ -493,6 +514,12 @@ take the lean out. Her arms keep the Jester's bone lengths (0.63 m; the painting
 
 ## Checking
 
+- Stage fourteen: stills at 9 moments of the gem's two shots (hands reached where they were wanted at each);
+  `clip_audit.sh` and `pop_audit.sh` with the new move (4 mm left while she holds the bow; no added jump), and the largest
+  one-frame hand movement at each hand-over inside the move (33 to 48 mm, the same as elsewhere in the bow move). The finer
+  Flipbook look at 1.2 mm: a still of the full draw and of her head; ink, colours and soft light all hold. Page test at
+  phone size, three parts, with the new button and both sliders: no errors.
+
 - Stage 13b: `tools/clip_audit.sh` over all 22 moves: 1 mm or less left after the fix in every move where her hands are free
   (while she holds the sword the number reads higher; her hand is on the hilt and is left alone). `tools/pop_audit.sh`: the
   fix adds no jump (the furthest a wrist moves in one frame is within 10 mm of the same move with the fix off). Stills of
@@ -594,7 +621,7 @@ Python that reads them with `-I`.
 Done at stage nine: fingers, the bow, Moonsteel Draw. Done at stage ten: the sword, its guard and a full cut (G4, H7).
 Done at stage eleven: the knives and their throw (G5, H8). Done at stage twelve: the gem (H9) and Silverglass (H6).
 Done at stage thirteen: hit reactions, a dodge, a win, a fall, and the emotes (court bow, wave, kneel, squat, sit, hover).
-Next: the gem's two shots as arrows of light (Chris's choice, November 13), then jewellery.
+Done at stage fourteen: the gem's two shots as arrows of light. Chris (November 13): that is her for now, and how she goes into the game. Left on her list: jewellery.
 Next, in the order Chris agreed (the first item below is now done): Silverglass (H6) and the gem (H9); then hit reactions, a dodge, a win and
 a fall. The older list below is kept for what is still open in it.
 

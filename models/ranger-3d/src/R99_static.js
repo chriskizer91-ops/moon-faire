@@ -133,8 +133,8 @@
   // that is not built yet), 'cheer' (a jump with an arm thrown up) and 'limber' (she shakes out and bounces). Every frame the bones
   // are set back to rest and the layers are added on top. The Jester's moves are the reference for what a full set holds, not copied.
   let lastPose = { arm: 15, leg: 0 }, mv = { name: 'pose', t: 0 }, wk = 0, jg = 0, gph = 0, clock = 0, blinkAt = 2.4, blinkT = -1, mouthAt = 0, mouthNow = 'rest', facePainted = '';
-  const SHOTS = { draw: 5.5, sword: 4.5, knives: 3.2, gem: 3.4, glass: 3.9, cheer: 1.5, limber: 3.9, hit: 1.3, hard: 2.4, dodge: 1.3, win: 3.6, bow: 3.2, wave: 2.7 }, SLOW = { draw: 1.22, sword: 1.25, knives: 1.3, gem: 1.3, glass: 1.3, limber: 1.5, hit: 1.25, hard: 1.2, dodge: 1.2, win: 1.2, bow: 1.2, wave: 1.2 },
-    MOVES = ['pose', 'idle', 'walk', 'jog', 'talk', 'draw', 'sword', 'knives', 'gem', 'glass', 'cheer', 'limber', 'hit', 'hard', 'dodge', 'win', 'fall', 'bow', 'wave', 'kneel', 'squat', 'sit', 'hover'];
+  const SHOTS = { shots: 9.6, draw: 5.5, sword: 4.5, knives: 3.2, gem: 3.4, glass: 3.9, cheer: 1.5, limber: 3.9, hit: 1.3, hard: 2.4, dodge: 1.3, win: 3.6, bow: 3.2, wave: 2.7 }, SLOW = { draw: 1.22, sword: 1.25, knives: 1.3, gem: 1.3, glass: 1.3, limber: 1.5, hit: 1.25, hard: 1.2, dodge: 1.2, win: 1.2, bow: 1.2, wave: 1.2 },
+    MOVES = ['pose', 'idle', 'walk', 'jog', 'talk', 'draw', 'sword', 'knives', 'gem', 'shots', 'glass', 'cheer', 'limber', 'hit', 'hard', 'dodge', 'win', 'fall', 'bow', 'wave', 'kneel', 'squat', 'sit', 'hover'];
   const add = (b, x, y, z) => { const r = SK[b].rotation; r.x += x; r.y += y; r.z += z; };
   function restAll() { for (const k in SK) if (!/^(bag|charm|slv|tail|lock)/.test(k)) SK[k].rotation.set(0, 0, 0); SK.hips.position.copy(SK.hips.userData.home); }
   // ---------- fingers ----------
@@ -236,6 +236,16 @@
     return { p: V3(0.012, y0, Math.min(z(y0), (z(y0 + h) + z(y0 - h)) / 2) - 0.019), q: Qn().setFromAxisAngle(XAX, tilt) }; })();
   const GRIP = [0.064 * HAND_S, 0.0235 * HAND_S, 0], HOOKP = [0.112 * HAND_S, 0.021 * HAND_S, 0.019 * HAND_S];      // where a held rod, and a hooked string, sit in her hand: [along her fingers, out from her palm, toward her thumb]
   const ANCH = V3(-0.060, 1.418, 0.040);                // the corner of her jaw on her right side, where the string comes back to (it rides on her head)
+  // The gem's two shots use the bow move with a second arrow. Its clock (drawClock): up to the first release it runs as it is. Then
+  // her body and the bow hold while her string hand comes forward again (the bow arm bends in to meet it, as at the first draw), she
+  // draws and lets go a second time at TR2; after that the move runs on, late by DL. GEM_CUT is where the gem touch hands over to it.
+  const drawClock = (T, two, o) => { o.T = T; o.ren = 1; o.arw = 1;
+    if (two && T >= TR2) o.T = T - DL;
+    else if (two && T >= TR) { const u = T - TR; o.aft = 0; o.loosed = false; o.dr = 0;
+      if (u < 0.45) { o.T = TR - 0.02; o.loosed = true; o.aft = u; } else if (u < 0.75) { o.ren = sm(0.45, 0.75, u); o.T = lerp(1.86, 1.30, o.ren); o.arw = 0; }
+      else if (u < 1.25) { o.T = lerp(1.30, 1.86, (u - 0.75) / 0.5); o.dr = sm(1.28, 1.86, o.T); } else { o.T = 1.86 + (u - 1.25); o.dr = 1; }
+      return o; }
+    o.loosed = o.T >= TR; o.aft = Math.max(0, o.T - TR); o.dr = o.loosed ? 0 : sm(1.28, 1.86, o.T); return o; }, DCK = {}, DCB = {}, GEM_CUT = 1.75;
   const TR = 2.45;                                       // the moment she lets go, in the move's own seconds
   const K1 = V3(-0.40, 1.17, -0.04), K2 = V3(0.07, 1.20, 0.31);      // the bow's way round her: out past her right side, then in front of her chest
   const D = { pBack: V3(), qBack: Qn(), p: V3(), q: Qn(), qS: Qn(), qt: Qn(), a: V3(), b: V3(), c: V3(), K3: V3(), shL: V3(), anch: V3(), F: V3(), P: V3(), Th: V3(), W: V3(), g: V3(), qH: Qn(), qG: Qn(), qFK: Qn(), pFK: V3(), hint: V3(),
@@ -246,10 +256,12 @@
     D.F.set(cy, 0, -sy).applyQuaternion(D.q); D.P.set(s * sy, 0, s * cy).applyQuaternion(D.q); D.Th.crossVectors(D.F, D.P).multiplyScalar(-s);
     outW.set(f, a, 0).applyQuaternion(D.q).add(D.p).addScaledVector(D.F, -GP[0]).addScaledVector(D.P, -GP[1]).addScaledVector(D.Th, -GP[2]); return handQ(S, D.F, D.P, outQ); };
   let lastRel = -1;
-  function armsAndBow(T, dt) {
+  const TR2 = TR + 1.50, DL = TR2 - TR;
+  function armsAndBow(T, dt, two) {
     inRoot();
     rpt(SK.spine3, BACK.p, D.pBack); rq(SK.spine3, D.qBack).multiply(BACK.q);
     if (T < 0) { SK.bow.position.copy(D.pBack); SK.bow.quaternion.copy(D.qBack); BOWK.set(0, 0, 0); SK.bow.updateMatrixWorld(true); lightsOff(); MATS.bowGem.emissiveIntensity = 0.45; return; }
+    const CK = drawClock(T, two, DCK), big = two ? 1.4 : 1; T = CK.T;
     // --- the beats of the move. She pulls the folded bow from her back with her right hand and brings it round to the front; her left
     // hand takes the grip and starts it out to her left while the limbs unroll; sparks, then the string; her right hand hooks the
     // string while it is still in reach, and she pushes the bow out and pulls the string back together. She holds, lets go, the bow
@@ -257,7 +269,7 @@
     const bring = sm(0.28, 0.80, T) * (1 - sm(3.46, 3.98, T)), lift = sm(0.20, 0.32, T) * (1 - sm(3.95, 4.08, T)), open = sm(0.84, 1.26, T) * (1 - sm(2.94, 3.36, T));
     const pres = (0.45 * sm(0.84, 1.24, T) + 0.55 * sm(1.28, 1.84, T)) * (1 - sm(2.95, 3.40, T));
     const wR = sm(0.02, 0.27, T) * (1 - sm(4.06, 4.3, T)), wRs = sm(0.86, 1.24, T) * (1 - sm(2.78, 3.22, T)), wLb = sm(0.58, 0.84, T) * (1 - sm(3.42, 3.64, T));
-    const loosed = T >= TR, aft = Math.max(0, T - TR), dr = loosed ? 0 : sm(1.28, 1.86, T), fol = sm(2.50, 2.80, T) * (1 - sm(2.95, 3.3, T));
+    const loosed = CK.loosed, aft = CK.aft, dr = CK.dr, fol = sm(2.50, 2.80, T) * (1 - sm(2.95, 3.3, T));
     // --- the bow's own way: off her back, round her right side, to the front, then out to her left at full reach
     D.a.set(0, 0, -0.045 * lift).applyQuaternion(D.qBack).add(D.pBack); bez(D.a, K1, K2, bring, D.p);
     rp(SK.uarmL, D.shL); rpt(SK.head, ANCH, D.anch); D.anch.z += 0.030;                                 // the string stands a little clear of her cheek
@@ -279,7 +291,7 @@
     // --- her right hand: pulls the bow free by the lower crescent; later goes to the string, draws, and springs back when she lets go
     if (wR > 0) { rp(SK.handR, D.pFK); rq(SK.handR, D.qFK); onBow('R', -BOWK.hubA, 0, -40 * DEG, GRIP, D.W, D.qG); D.qH.copy(D.qG);
       if (wRs > 0) { D.F.set(1, 0, 0).applyQuaternion(D.q); D.P.set(0, 0, -1).applyQuaternion(D.q); D.Th.crossVectors(D.F, D.P);
-        D.g.copy(loosed ? D.c : D.nock); if (loosed) { const e = 1 - Math.exp(-aft / 0.06); D.g.addScaledVector(D.F, -0.19 * e); D.g.y += 0.045 * e; }
+        D.g.copy(loosed ? D.c : D.nock); if (loosed) { const e = 1 - Math.exp(-aft / 0.06); D.g.addScaledVector(D.F, -0.19 * e); D.g.y += 0.045 * e; } else if (CK.ren < 1) { D.e1.copy(D.c).addScaledVector(D.F, -0.19); D.e1.y += 0.045; D.g.lerp(D.e1, 1 - CK.ren); }
         D.g.addScaledVector(D.F, -HOOKP[0]).addScaledVector(D.P, -HOOKP[1]).addScaledVector(D.Th, -HOOKP[2]); D.W.lerp(D.g, wRs); D.qH.slerp(handQ('R', D.F, D.P, D.qG), wRs); }
       D.W.lerp(D.pFK, 1 - wR); const arc = 4 * wR * (1 - wR); D.W.x -= 0.07 * arc; D.W.z -= 0.05 * arc; D.qG.copy(D.qH); D.qH.copy(D.qFK).slerp(D.qG, wR);
       D.hint.set(lerp(-0.6, -0.9, bring), lerp(-0.2, -0.45, bring), lerp(-1, 0.05, bring)).lerp(D.e1.set(-0.9, lerp(-0.25, 0.5, loosed ? 1 : dr), lerp(0.1, -0.2, loosed ? 1 : dr)), wRs);
@@ -296,12 +308,12 @@
     // the arrow: it forms on the string as she draws, and flies when she lets go
     if (!loosed) { lastRel = -1; D.dir.copy(D.pass).sub(D.nock).normalize(); D.tail.copy(D.nock); }
     else { if (lastRel !== mv) { lastRel = mv; D.rel.copy(D.c); D.relDir.copy(D.pass).sub(D.c).normalize(); } D.dir.copy(D.relDir); D.tail.copy(D.rel).addScaledVector(D.dir, 26 * aft); }
-    const aOn = loosed ? 1 - sm(0.7, 0.95, aft) : sm(1.34, 1.62, T), La = loosed ? 0.76 : 0.26 + 0.50 * dr;
+    const aOn = (loosed ? 1 - sm(0.7, 0.95, aft) : sm(1.34, 1.62, T)) * CK.arw, La = (loosed ? 0.76 : 0.26 + 0.50 * dr) * (two ? 1.15 : 1);
     D.tip.copy(D.tail).addScaledVector(D.dir, La); D.e1.copy(D.tip).addScaledVector(D.dir, -0.062);
-    setBeam(LT.shaft, D.tail, D.e1, 0.0021, aOn, 1.15);
+    setBeam(LT.shaft, D.tail, D.e1, 0.0021 * big, aOn, 1.15);
     for (let i = 0; i < 2; i++) { const m = LT.head[i], o = aOn * (i ? 0.26 : 1); m.visible = o > 0.004; if (m.visible) { const r = i ? 0.024 : 0.0105, L = i ? 0.10 : 0.062; m.position.copy(D.tip).addScaledVector(D.dir, -L + (i ? 0.02 : 0)); m.scale.set(r, L, r); m.quaternion.setFromUnitVectors(YAX, D.dir); m.material.opacity = o; } }
     for (let i = 0; i < 2; i++) { const m = LT.fl[i], o = aOn * (i ? 0.10 : 0.30); m.visible = o > 0.004; if (m.visible) { const r = i ? 0.020 : 0.009, L = i ? 0.15 : 0.10; m.position.copy(D.tail); m.scale.set(r, L, r); m.quaternion.setFromUnitVectors(YAX, D.dir); m.material.opacity = o; } }
-    setBeam(LT.trail, D.rel, D.tail, 0.0016, loosed ? 0.8 * Math.exp(-aft / 0.22) * (1 - sm(0.7, 0.95, aft)) : 0, 1.6);
+    setBeam(LT.trail, D.rel, D.tail, 0.0016 * big, loosed ? 0.8 * Math.exp(-aft / 0.22) * (1 - sm(0.7, 0.95, aft)) : 0, 1.6);
   }
   // ---------- planted feet: her legs are worked out the same way as her arms. Her knee folds backward and her shin does not twist ----------
   const NZ = V3(0, 0, -1), LEG = {}, FOOT_Y = SK.footR.userData.rest.y;
@@ -486,6 +498,10 @@
     MG.pane.visible = true; MG.pane.position.set(HV.p.x, 0.014, HV.p.z + 0.14); MG.pane.quaternion.copy(HV.q.setFromAxisAngle(XAX, -PI / 2)).multiply(HV.q2.setFromAxisAngle(ZAX, clock * 0.22)); MG.pane.scale.setScalar(0.5 + 0.55 * a); MG.pane.material.opacity = 0.50 * a;
     setSprite(MG.gGlow, HV.g, 0.15 + 0.02 * Math.sin(clock * 1.5), 0.55 * a); MATS.gem.emissiveIntensity = 0.9 * a;
     for (let i = 0; i < 10; i++) { const an = i * TAU / 10 + clock * 0.22 + 2 * rndK(i, 1), r = 0.40 + 0.16 * rndK(i, 2); HV.s.set(HV.p.x + r * Math.cos(an), HV.p.y - 0.12 + 0.75 * rndK(i, 3) + 0.035 * Math.sin(clock * 1.3 + i), HV.p.z + 0.12 + r * Math.sin(an)); setSprite(MG.sparks[i], HV.s, 0.022 + 0.022 * rndK(i, 4), a * (0.35 + 0.45 * (0.5 + 0.5 * Math.sin(clock * 2.1 + i * 1.7)))); } }
+  // While she looses the gem's two shots her gem and the light on her arms stay lit, and the gem flares as each arrow goes.
+  function gemGlow(Tb, ck) { inRoot(); rpt(SK.head, GEMP, HV.g); const k = lerp(0.70, 1, sm(0, 0.4, Tb)) * (1 - sm(TR2 + 0.25, TR2 + 1.2, Tb)), fl = ck.loosed ? Math.exp(-ck.aft / 0.18) : 0;
+    setSprite(MG.gGlow, HV.g, 0.07 + 0.07 * k + 0.14 * fl, 0.45 * k + 0.4 * fl); setSprite(MG.gStar, HV.g, 0.16 + 0.42 * fl + 0.05 * k * Math.sin(Tb * 9), Math.max(fl, 0.35 * k)); MATS.gem.emissiveIntensity = 2.2 * k + 1.5 * fl; MATS.lens.emissiveIntensity = 0.55 * k;
+    if (meshes.veins) { meshes.veins.visible = k > 0.01; MATS.veins.opacity = k; MATS.veins.map.offset.y = 0; } }
   const GEMP = (() => { const O = bandPt(0, bandPh(0), 0.0036); return V3(O[0], O[1], O[2] + 0.012); })();       // just in front of the gem on her headband (it rides on her head)
   const MW = { gw: V3(), F: V3(), P: V3(), W: V3(), qG: Qn(), qH: Qn(), fk: V3(), qfk: Qn(), hint: V3(), sh: V3(), n: V3(), side: V3(), C: V3(), v: V3(), palm: V3(), ft: V3(), qf: Qn(), q: Qn(), q2: Qn() };
   // The gem, in its own seconds: her right hand rises and two fingers touch the gem (0.45); it flares, a ring of light opens from it, and
@@ -680,7 +696,8 @@
     dt = dt > 0 ? Math.min(dt, 0.05) : 0; clock += dt;
     if (mv.name === 'pose') { if (gearTick) gearTick(dt); softTick(dt); return; }
     mv.t += dt; if (SHOTS[mv.name] && mv.t >= SHOTS[mv.name] + 1.2) mv.t = 0;       // a short move plays again after a pause, for as long as it is the one chosen
-    const N = SHOTS[mv.name] && mv.t >= SHOTS[mv.name] ? 'idle' : mv.name, T = mv.t / (SLOW[N] || 1); restAll();
+    let N = SHOTS[mv.name] && mv.t >= SHOTS[mv.name] ? 'idle' : mv.name, T = mv.t / (SLOW[N] || 1), two = 0, Tbow = T; restAll();
+    if (N === 'shots') { const cut = GEM_CUT * SLOW.gem; if (mv.t < cut) { N = 'gem'; T = Tbow = mv.t / SLOW.gem; } else { N = 'draw'; two = 1; Tbow = (mv.t - cut) / SLOW.draw; T = drawClock(Tbow, 1, DCB).T; } }       // the gem's two shots: the touch, then the bow with two arrows
     fWant.R = N === 'talk' ? FP.soft : N === 'cheer' && T > 0.25 && T < 1.2 ? FP.fist : FP.relax; fWant.L = FP.relax;
     wk += ((N === 'walk' ? 1 : 0) - wk) * Math.min(1, dt * 4.5); jg += ((N === 'jog' ? 1 : 0) - jg) * Math.min(1, dt * 4.5);
     { const P = N === 'fall' ? 'down' : N; let Wt = 0; for (const k in PW) { PW[k] = snapNow ? (P === k ? 1 : 0) : PW[k] + ((P === k ? 1 : 0) - PW[k]) * Math.min(1, dt * (k === 'down' ? 2.0 : 3.4)); PE[k] = sm(0, 1, PW[k]); Wt += PE[k]; } if (Wt > 1) for (const k in PW) PE[k] /= Wt; PE.all = Math.min(1, Wt); }
@@ -796,7 +813,7 @@
     if (N === 'limber') { const k = sm(0, 0.3, T) * (1 - sm(2.2, 2.6, T));
       bounce(0.020 * Math.abs(Math.sin(T * 9.5)) * k); for (const [S, s] of SIDES) { add('clav' + S, 0, 0, s * 0.16 * Math.sin(T * 5 + (s > 0 ? 1.6 : 0)) * k); add('uarm' + S, 0.14 * Math.sin(T * 9 + s) * k, 0, s * 0.06 * k); add('farm' + S, -(0.5 + 0.2 * Math.sin(T * 11 + s)) * k, 0, 0); add('shin' + S, 0.10 * k, 0, 0); add('thigh' + S, -0.05 * k, 0, 0); }
       add('head', 0, 0, 0.22 * Math.sin(T * 2.4) * k); add('neck', 0.04 * k, 0, 0.08 * Math.sin(T * 2.4) * k); }
-    armsAndBow(N === 'draw' ? T : -1, dt); swordStage(N === 'sword' ? T : -1, dt * (1 - stillK), snapNow); knifeStage(N === 'knives' ? T : -1); { const g1 = gemStage(N === 'gem' ? T : -1), g2 = glassStage(N === 'glass' ? T : -1); if (!g1 && !g2) magicOff(); else { if (!g1) { for (const k of ['gGlow', 'gStar', 'gRing']) MG[k].visible = false; for (const m of MG.sparks) m.visible = false; if (meshes.veins) meshes.veins.visible = false; MATS.gem.emissiveIntensity = 0; MATS.lens.emissiveIntensity = 0; } if (!g2) { MG.pane.visible = false; MG.flash.visible = false; for (const a of [MG.rim, MG.shards]) for (const m of a) m.visible = false; } } } emoteStage(N, T); hoverLight(); clearHands(N, dt, snapNow); fingersTick(dt, snapNow);
+    armsAndBow(N === 'draw' ? Tbow : -1, dt, two); swordStage(N === 'sword' ? T : -1, dt * (1 - stillK), snapNow); knifeStage(N === 'knives' ? T : -1); { const g1 = gemStage(N === 'gem' ? T : -1), g2 = glassStage(N === 'glass' ? T : -1); if (!g1 && !g2) magicOff(); else { if (!g1) { for (const k of ['gGlow', 'gStar', 'gRing']) MG[k].visible = false; for (const m of MG.sparks) m.visible = false; if (meshes.veins) meshes.veins.visible = false; MATS.gem.emissiveIntensity = 0; MATS.lens.emissiveIntensity = 0; } if (!g2) { MG.pane.visible = false; MG.flash.visible = false; for (const a of [MG.rim, MG.shards]) for (const m of a) m.visible = false; } } } emoteStage(N, T); hoverLight(); if (two) gemGlow(Tbow, DCB); clearHands(N, dt, snapNow); fingersTick(dt, snapNow);
     // her face: she blinks; her mouth moves when she talks
     if (clock > blinkAt) { blinkT = clock; blinkAt = clock + 2.2 + 2.6 * Math.abs(Math.sin(clock * 12.9)); }
     const bt = clock - blinkT, eyes = Math.max(squint, bt < 0.05 ? 0.5 : bt < 0.10 ? 1 : bt < 0.15 ? 0.5 : 0), key = eyes + '|' + mouthNow;

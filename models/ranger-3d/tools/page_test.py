@@ -3,7 +3,7 @@ import sys, os
 PART = os.environ.get('PART', '')       # the whole test is slow without a graphics card: PART=1 is the bow, the sword, the knives, the gem and Silverglass, PART=2 the older buttons, PART=3 the fight moves and emotes
 from playwright.sync_api import sync_playwright
 from PIL import Image
-PAGE = sys.argv[1] if len(sys.argv) > 1 else '/home/claude/ranger/deliver/Ranger_3D_stage13b.html'
+PAGE = sys.argv[1] if len(sys.argv) > 1 else '/home/claude/ranger/deliver/Ranger_3D_stage14.html'
 ARGS = ['--use-angle=swiftshader', '--enable-unsafe-swiftshader', '--ignore-gpu-blocklist', '--allow-file-access-from-files']
 with sync_playwright() as p:
     b = p.chromium.launch(executable_path='/usr/bin/google-chrome', args=ARGS)
@@ -20,6 +20,7 @@ with sync_playwright() as p:
         pg.click('#fight >> text="Sword"'); pg.wait_for_timeout(2600); shot('sword_1'); pg.wait_for_timeout(1500); shot('sword_2'); pg.wait_for_timeout(1500); shot('sword_3'); pg.wait_for_timeout(2500); shot('sword_4'); print('sword keys', pg.evaluate('["blade","swordSteel","scab"].map((k) => !!RANGER.R.meshes[k])'))
         pg.click('#fight >> text="Knives"'); pg.wait_for_timeout(2300); shot('knives_1'); pg.wait_for_timeout(1300); shot('knives_2'); pg.wait_for_timeout(1300); shot('knives_3'); print('knife keys', pg.evaluate('["knifeBlade","knifeCord","sheath"].map((k) => !!RANGER.R.meshes[k])'))
         pg.click('#fight >> text="The gem"'); pg.wait_for_timeout(2400); shot('gem_1'); pg.wait_for_timeout(1500); shot('gem_2'); pg.click('#fight >> text="Silverglass"'); pg.wait_for_timeout(3000); shot('glass_1'); pg.wait_for_timeout(1800); shot('glass_2'); print('veins', pg.evaluate('!!RANGER.R.meshes.veins'))
+        pg.click('#fight >> text="The gem\'s two shots"'); pg.wait_for_timeout(5350); shot('shots_1'); pg.wait_for_timeout(1750); shot('shots_2'); print('two shots: move', pg.evaluate('RANGER.R.moves.includes("shots")'))
     if PART == '1': print('errors:', logs[:4]); b.close()
     if PART in ('', '2'):
         for host, label in (('moves', 'Walk'), ('cam', 'Side'), ('moves', 'Jog'), ('cam', 'Hips'), ('moves', 'Stand still'), ('gear', 'Charms'), ('poses', 'Legs apart'), ('boots', 'Outer side'), ('hands', 'Left hand'), ('views', 'Front'), ('hviews', 'Face')):
@@ -37,6 +38,9 @@ with sync_playwright() as p:
         for host, label, waits in (('fight', 'Hit', (250, 900)), ('fight', 'Hard hit', (700, 1300)), ('fight', 'Dodge', (420,)), ('fight', 'Win', (1000, 1500)), ('fight', 'Fall', (3200,)), ('emotes', 'Court bow', (1500,)), ('emotes', 'Wave', (1200,)), ('emotes', 'Kneel', (2600,)), ('emotes', 'Squat', (2600,)), ('emotes', 'Sit', (2600,)), ('emotes', 'Hover', (3000,)), ('moves', 'Ready', (2600,))):
             pg.evaluate('window.scrollTo(0,0)'); pg.click('#%s >> text="%s"' % (host, label))
             for i, w in enumerate(waits): pg.wait_for_timeout(w); shot('%s_%s_%d' % (host, label.replace(' ', '_'), i))
+        pg.evaluate('window.scrollTo(0,0)'); pg.click('#flipB'); pg.wait_for_timeout(2500); shot('flip_fine'); a = pg.evaluate('[RANGER.stage.look, RANGER.stage.pixelWhole, +RANGER.stage.mmPerPixel.toFixed(2), RANGER.stage.snap, document.getElementById("flipset").style.display, document.getElementById("pixout").textContent]')
+        pg.evaluate('(() => { const e = document.getElementById("pix"); e.value = 0; e.dispatchEvent(new Event("input")); })()'); pg.wait_for_timeout(2500); shot('flip_chunky'); b2 = pg.evaluate('[RANGER.stage.pixelWhole, +RANGER.stage.mmPerPixel.toFixed(2)]'); pg.click('#flipB'); pg.wait_for_timeout(800)
+        print('Flipbook look on:', a, '| slid to chunky:', b2, '| off again:', pg.evaluate('[RANGER.stage.look, document.getElementById("flipset").style.display]'))
         print('moves', pg.evaluate('RANGER.R.moves.length'), 'pressed:', pg.evaluate('[...document.querySelectorAll("#moves .chip, #fight .chip, #emotes .chip")].filter((c) => c.getAttribute("aria-pressed") === "true").map((c) => c.textContent)'), 'hips y after standing up', pg.evaluate('+RANGER.R.SK.hips.position.y.toFixed(3)'), 'errors:', logs[:4]); b.close()
 ims = [Image.open(f).convert('RGB') for f in shots]; w = sum(i.width for i in ims) + 6 * (len(ims) - 1); m = Image.new('RGB', (w, ims[0].height), (20, 16, 24)); x = 0
 for i in ims: m.paste(i, (x, 0)); x += i.width + 6
