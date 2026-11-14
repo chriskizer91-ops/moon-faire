@@ -12,7 +12,7 @@
   const fxG = new THREE.Group(); fxG.name = 'ioSpells';
 
   // ----- specks of light: motes (0), four-pointed stars (1), small glowing leaves (2). One draw for all of them. -----
-  const PN = 900, IMN = 48, PT = { n: 0, pos: new Float32Array(PN * 3), vel: new Float32Array(PN * 3), life: new Float32Array(PN), max: new Float32Array(PN), size: new Float32Array(PN), col: new Float32Array(PN * 3), kind: new Float32Array(PN), rot: new Float32Array(PN), spin: new Float32Array(PN), drag: new Float32Array(PN), grav: new Float32Array(PN) }, IM = [];
+  const PN = 1100, IMN = 110, PT = { n: 0, pos: new Float32Array(PN * 3), vel: new Float32Array(PN * 3), life: new Float32Array(PN), max: new Float32Array(PN), size: new Float32Array(PN), col: new Float32Array(PN * 3), kind: new Float32Array(PN), rot: new Float32Array(PN), spin: new Float32Array(PN), drag: new Float32Array(PN), grav: new Float32Array(PN) }, IM = [];
   const aPos = new THREE.InstancedBufferAttribute(new Float32Array((PN + IMN) * 3), 3), aSize = new THREE.InstancedBufferAttribute(new Float32Array(PN + IMN), 1), aCol = new THREE.InstancedBufferAttribute(new Float32Array((PN + IMN) * 3), 3), aRot = new THREE.InstancedBufferAttribute(new Float32Array(PN + IMN), 1), aKind = new THREE.InstancedBufferAttribute(new Float32Array(PN + IMN), 1);
   const partGeo = new THREE.InstancedBufferGeometry(); partGeo.setAttribute('position', new THREE.Float32BufferAttribute([-0.5, -0.5, 0, 0.5, -0.5, 0, 0.5, 0.5, 0, -0.5, 0.5, 0], 3)); partGeo.setIndex([0, 1, 2, 0, 2, 3]);
   for (const [n, a] of [['iPos', aPos], ['iSize', aSize], ['iCol', aCol], ['iRot', aRot], ['iKind', aKind]]) { a.setUsage(THREE.DynamicDrawUsage); partGeo.setAttribute(n, a); }
@@ -87,10 +87,10 @@
   // how far each thing has come into being (0 gone .. 1 there), slid toward what the spell being cast wants
   const FXW = { dummy: 0, ally: 0 }; let dumA = 0, dumV = 0;
   function dummyHit(v) { dumV += v; }
-  function fxTick(dt, wantDummy, wantAlly) {
-    FXW.dummy += ((wantDummy ? 1 : 0) - FXW.dummy) * Math.min(1, dt * 4); FXW.ally += ((wantAlly ? 1 : 0) - FXW.ally) * Math.min(1, dt * 4);
-    for (const [g, w] of [[DUMMY, FXW.dummy], [ALLY, FXW.ally]]) { g.visible = w > 0.02; const e = sm(0, 1, w); g.scale.set(e, Math.max(0.001, e * (1 + 0.12 * Math.sin(PI * e))), e); }
+  function fxTick(dt, wantDummy, wantAlly, wantAlly2) {
+    FXW.dummy += ((wantDummy ? 1 : 0) - FXW.dummy) * Math.min(1, dt * 4); FXW.ally += ((wantAlly ? 1 : 0) - FXW.ally) * Math.min(1, dt * 4); FXW.ally2 += ((wantAlly2 ? 1 : 0) - FXW.ally2) * Math.min(1, dt * 4);
+    for (const [g, w] of [[DUMMY, FXW.dummy], [ALLY, FXW.ally], [ALLY2, FXW.ally2]]) { g.visible = w > 0.02; const e = sm(0, 1, w); g.scale.set(e, Math.max(0.001, e * (1 + 0.12 * Math.sin(PI * e))), e); }
     dumV += (-dumA * 95 - dumV * 6.5) * dt; dumA += dumV * dt; dummyTilt.rotation.x = dumA;                     // the dummy rocks on its post when it is struck, and settles
-    RIB_CUT.tick(dt); RIB_SALVE.tick(dt); RIB_SALVE2.tick(dt); fxParticles(dt);
+    RIB_CUT.tick(dt); RIB_SALVE.tick(dt); RIB_SALVE2.tick(dt); for (const v of VINES) v.tick(dt); fxParticles(dt);
   }
-  function fxClear() { PT.n = 0; IM.length = 0; RIB_CUT.pts.length = 0; RIB_SALVE.pts.length = 0; RIB_SALVE2.pts.length = 0; WAVE.visible = false; LEAF.visible = false; fxSeed = 20261114; }
+  function fxClear() { PT.n = 0; IM.length = 0; RIB_CUT.pts.length = 0; RIB_SALVE.pts.length = 0; RIB_SALVE2.pts.length = 0; WAVE.visible = false; LEAF.visible = false; fxSeed = 20261114; woodClear(); GARDEN.hide(); PAGES.visible = false; }

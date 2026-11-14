@@ -4,7 +4,57 @@ Started November 13, 2026. Built the way the HD Jester was (`claude/HOW-TO-3d-wi
 the Ranger's stage-one recipe: this folder began as a copy of the Ranger's stage-one code (`claude/ranger-3d-model`, commit
 `1d4c9d6`), with the Jester's platform boot builder (`claude/jester-3d-model`, pass 20) in place of the Ranger's boots.
 
-## Where she stands: stage eleven (November 14, 2026)
+## Where she stands: stage twelve (November 14, 2026)
+
+Two more spells: Elderwood Guardian (her one-time summon) and Moonflower Garden (her heal for the whole party).
+
+- **Chris (November 14):** stage eleven is "Wonderful. Let's continue to the Elderwood Guardian and the Moonflower" Garden,
+  then "Thornwake, Rootbound Return, Bramble Cradle, Being Hit, Falling, and Winning. I like that order."
+- **Elderwood Guardian** (`guardian`, 14.6 s; paintings H7 to H10, I4). She takes a seed from her pouch and holds it up; it
+  glows like a lantern and a shoot opens on it. She bends her knees and lets it sink into the ground at her right side; roots of
+  light spread. A sapling grows to her waist under her hand, twists itself into a fawn lying down, and the fawn stands up as a
+  stag of living wood that lowers its head to her hand. She sweeps her arm out and it leaps past her at the foe, coming apart
+  from the rump forward into vines, leaves and light; what is left bursts on the dummy and the vines whip once round it.
+  - For the game it cuts into three clips: the planting (0 to 7.0 s), the arriving (7.0 to 11.6 s), the charge (11.6 s on).
+  - Where things stand, in her own frame (`GRD`): the seed 0.5 m to her right and a little behind; the Guardian behind her right
+    shoulder, turned toward the foe. She is seen from her right and a little in front, so on screen it stands to her left in side
+    view (H9) and springs past her (H10). The foe for this spell stands 1.8 m ahead of her.
+- **Moonflower Garden** (`garden`, 12.4 s; H11, H12, I6). Her book floats open at her left side, its leaves lifting. She cups
+  glowing seeds at her chest with her eyes shut, flings both arms out wide and low, and twelve seeds fly out in a ring, each
+  trailing a thread of light. Shoots with tight white buds rise where they land, a vine with heart-shaped leaves creeps round,
+  the flowers open one after another from the front, and each glows like a small moon while light rises round the two friends
+  beside her. Then the garden sinks away in sparks.
+- **`src/I98b_wood.js`** (new): living wood.
+  - Everything is a BRAID (`wBraid`): round strands wound round a shape, every other one wound the other way and a little
+    deeper, with a dark core inside so the gaps read as deeper wood. `wTube`, `wLeaf`, `wStar` add to a bag of triangles;
+    `wMesh` makes the mesh, and can sort its triangles by a number so `wRange` can show part of it (growing, unravelling).
+  - `SEED` (with its `SHOOT`), `ROOTS` (flat strips of light that spread outward), `SAP` and `sapSet(place, grown, twisted)`.
+  - `STAG`: the Guardian, built facing +z as a puppet: body > neck > head > antlers, forelegs of two pieces and hind legs of
+    three. `STAG.pose(a, b, t, extra)` blends two of `stand`, `lie`, `gather`, `leap`, `land`; `STAG.set(place, turn, size,
+    antler size)`; the fawn is the same creature at 0.55 size, lying, with small antlers. `STAG.unravel(u)` hides its body from
+    the rump forward to the shoulders. Its shoulder is level with hers (1.3 m) and its antlers reach 2.6 m.
+  - `makeVine`: solid strands laid along the way something went, thinning as they age (the comet's tail in H10).
+- **`src/I98c_garden.js`** (new): `GARDEN`. Twelve flowers, each its own small mesh whose points slide from a twisted bud to
+  the open trumpet, so it truly opens (no morph targets, so every look draws the same shape). The vine is one braid shown
+  outward from where each seed fell. Heart leaves and star-flowers are instanced. `ALLY2` is a second grey friend; `PAGES` are
+  the four lifting leaves of the floating book.
+- **In `src/I99_static.js`:** the two spell blocks; `bookFloat` and `FLB` (the book floating at her left side); `FXVIEW`, the
+  way to the camera, which the page keeps up to date so the seeds' threads face it; `moveT` on the model (seconds into the move).
+- **Page:** stage twelve. A spell can have more than one camera place, each taken at a given second (`SPELL_CAM`): the Guardian
+  is planted at her side, stands behind her and leaps past her, and a phone is too narrow for all three at once. A drag or a
+  pinch takes the camera away from the spell.
+- **Checked:** `tools/pen.py guardian garden`: legs at the standing floor (about 100 points, 10 mm) in both, crouch included;
+  sleeves 106 points at most 24 mm (Guardian), 71 points (Garden), the same as the stage eleven spells; the Garden's book 0;
+  82 points at most 4 mm of her left palm under the book in the Guardian. The page at phone size, both spells, in the smooth
+  look and in the Flipbook look: no errors.
+- **Mine, for Chris to keep or drop:** she takes the seed from her pouch; the seed is let go a hand above the ground and sinks
+  by itself; the Guardian lowers its head and her hand rests on its cheek, not its neck; after it strikes, its vines whip
+  round the foe; the garden sinks away in sparks at the end; the flowers open in one go (his lore has them open over turns).
+- **Limits:** first builds, timed from stills; not watched playing; not on a real phone. The Guardian passes between her and the
+  camera for about a third of a second as it leaps. Its feet are not pinned, so they may slide a little as it gathers. In the
+  Flipbook look the shared 56 colours have no green, so its leaves and the garden's vine and leaves turn yellow and grey.
+
+## Stage eleven (November 14, 2026)
 
 Her first two spells: Harvest Crescent (her plain attack) and Silverleaf Salve (her heal for one friend).
 
@@ -629,12 +679,11 @@ All 26 arrived and match their index. Nothing is built from them yet.
 
 They also show her whole look from many sides, with the robe: useful when the robe and the cloth are built.
 
-## Next stages, in Chris's order (November 13)
+## Next stages, in Chris's order (November 14)
 
-1. His eye on Harvest Crescent and Silverleaf Salve (stage eleven).
-2. **The rest of her spells:** Elderwood Guardian (H7 to H10, I4: the seed, the sapling, the fawn, the stag of living wood and
-   its charge; the stag is a creature to build), Moonflower Garden (H11, H12, I6), Rootbound Return (H13), Thornwake (H14, H15,
-   I7, I8: the dagger and witchfire), Bramble Cradle (H16); then being hit, falling and winning (H17, H18).
+1. His eye on Elderwood Guardian and Moonflower Garden (stage twelve).
+2. **The rest, in the order he gave on November 14:** Thornwake (H14, H15, I7, I8: the dagger and witchfire, the briar),
+   Rootbound Return (H13), Bramble Cradle (H16); then being hit, falling and winning (H17, H18).
 3. Not wanted: more work on her boots; more detail on belt, pouch and necklace.
 4. Still open if he asks: the cloak nearer to M1; hair on top of her head; bringing her jog, squat, kneel and hover into line
    with the other witches' versions.

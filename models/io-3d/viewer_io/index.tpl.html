@@ -40,9 +40,9 @@ canvas#stage{display:block;width:100%;height:100%;touch-action:none;cursor:grab}
 <body>
 <div class="wrap">
   <header>
-    <p class="eyebrow">Moon Faire · stage eleven of her build</p>
+    <p class="eyebrow">Moon Faire · stage twelve of her build</p>
     <h1><em>Io</em>, the Herbal Witch</h1>
-    <p class="sub">New: her first two spells, under Her spells. Harvest Crescent is her attack and Silverleaf Salve heals a friend. Picking one turns the camera to her side. She stays in view while you scroll the buttons. Drag to turn her, pinch or scroll to zoom.</p>
+    <p class="sub">New under Her spells: Elderwood Guardian, her stag of living wood, and Moonflower Garden, her heal for the whole party. The camera moves by itself during a spell; drag to take it over, pinch to zoom.</p>
   </header>
   <div class="play">
   <div class="stagebox" id="box">
@@ -116,7 +116,7 @@ canvas#stage{display:block;width:100%;height:100%;touch-action:none;cursor:grab}
       b.addEventListener('click', () => { [...host.children].forEach((c) => c.setAttribute('aria-pressed', 'false')); b.setAttribute('aria-pressed', 'true'); onPick(it); }); host.appendChild(b); });
   }
   function setRef() { const im = $('ref'), src = REFS[refKey]; im.hidden = !(showRef && src); if (src && im.getAttribute('src') !== src) im.src = src; }
-  chips($('views'), VIEWS, (v) => { want = { az: v[1], el: v[2], dist: v[3], ty: v[4] }; easing = true; spin = false; refKey = v[5]; setRef(); $('spinB').setAttribute('aria-pressed', 'false'); }, -1);
+  chips($('views'), VIEWS, (v) => { camFree = true; want = { az: v[1], el: v[2], dist: v[3], ty: v[4] }; easing = true; spin = false; refKey = v[5]; setRef(); $('spinB').setAttribute('aria-pressed', 'false'); }, -1);
   const FACES = [['Blinking', null, null, false], ['Talking', null, null, true], ['Eyes shut', 1, null, false], ['Mouth open', null, 'open', false], ['Oo', null, 'oo', false], ['Smile', null, 'smile', false]];
   // her emotions, from painting C10 (stage ten): she holds the one that is picked, in whatever move she is doing
   const FEELS = [['None', null], ['Reading', 'reading'], ['Concentrating', 'casting'], ['Surprised', 'surprised'], ['Hit', 'hit'], ['Stern', 'stern'], ['Delighted', 'delighted']];
@@ -130,8 +130,14 @@ canvas#stage{display:block;width:100%;height:100%;touch-action:none;cursor:grab}
   chips($('poses'), POSES, (p) => { R.pose(p[1]); shown = 'pose'; press($('moves'), 0); press($('spells'), -1); }, -1);
   // her spells (stage eleven): each brings what it is cast at (a training dummy, or a friend to heal) and turns the camera to her side,
   // pulled back, so she casts toward the right as in her paintings and the whole spell is in view
-  const SPELLS = [['Harvest Crescent', 'crescent'], ['Silverleaf Salve', 'salve']], SPELL_VIEW = { az: -1.02, el: 0.07, dist: 8.3, ty: 0.92, tz: 0.60 };
-  chips($('spells'), SPELLS, (m) => { shown = R.play(m[1]); press($('moves'), -1); press($('poses'), -1); want = Object.assign({}, SPELL_VIEW); easing = true; spin = false; refKey = ''; setRef(); $('spinB').setAttribute('aria-pressed', 'false'); [...$('views').children].forEach((c) => c.setAttribute('aria-pressed', 'false')); }, -1);
+  const SPELLS = [['Harvest Crescent', 'crescent'], ['Silverleaf Salve', 'salve'], ['Elderwood Guardian', 'guardian'], ['Moonflower Garden', 'garden']], SPELL_VIEW = { az: -1.02, el: 0.07, dist: 8.3, ty: 0.92, tz: 0.60 };
+  // stage twelve: a long spell has more than one camera place, each taken at a given second of the spell: the Guardian is planted at
+  // her side, stands behind her, and leaps past her at the foe, and a phone is too narrow to hold all three at once. A drag or a
+  // pinch takes the camera away from the spell until another spell is picked.
+  const SPELL_CAM = { guardian: [[0, { az: -1.02, el: 0.07, dist: 8.3, ty: 0.92, tz: -0.39 }], [8.3, { az: -1.02, el: 0.07, dist: 11.3, ty: 1.15, tz: -1.03 }], [12.05, { az: -1.02, el: 0.07, dist: 10.0, ty: 0.97, tz: 0.74 }]],
+    garden: [[0, { az: 0.10, el: 0.20, dist: 11.2, ty: 0.76 }]] };
+  let camSpell = null, camKey = -1, camFree = false;
+  chips($('spells'), SPELLS, (m) => { shown = R.play(m[1]); press($('moves'), -1); press($('poses'), -1); camSpell = m[1]; camKey = 0; camFree = false; want = Object.assign({}, SPELL_CAM[m[1]] ? SPELL_CAM[m[1]][0][1] : SPELL_VIEW); easing = true; spin = false; refKey = ''; setRef(); $('spinB').setAttribute('aria-pressed', 'false'); [...$('views').children].forEach((c) => c.setAttribute('aria-pressed', 'false')); }, -1);
   R.pose(POSES[0][1]); R.play('idle');
   const toggle = (host, id, label, on, fn) => { const b = document.createElement('button'); b.className = 'chip'; b.type = 'button'; b.id = id; b.textContent = label; b.setAttribute('aria-pressed', on ? 'true' : 'false');
     b.addEventListener('click', () => { const v = b.getAttribute('aria-pressed') !== 'true'; b.setAttribute('aria-pressed', v ? 'true' : 'false'); fn(v); }); host.appendChild(b); };
@@ -150,13 +156,13 @@ canvas#stage{display:block;width:100%;height:100%;touch-action:none;cursor:grab}
   setRef();
   // drag to turn, pinch or wheel to zoom
   const pts = new Map(); let pinch0 = 0, dist0 = 0;
-  canvas.addEventListener('pointerdown', (e) => { canvas.setPointerCapture(e.pointerId); pts.set(e.pointerId, [e.clientX, e.clientY]); easing = false; if (pts.size === 2) { const a = [...pts.values()]; pinch0 = Math.hypot(a[0][0] - a[1][0], a[0][1] - a[1][1]); dist0 = orbit.dist; } });
+  canvas.addEventListener('pointerdown', (e) => { canvas.setPointerCapture(e.pointerId); pts.set(e.pointerId, [e.clientX, e.clientY]); easing = false; camFree = true; if (pts.size === 2) { const a = [...pts.values()]; pinch0 = Math.hypot(a[0][0] - a[1][0], a[0][1] - a[1][1]); dist0 = orbit.dist; } });
   canvas.addEventListener('pointermove', (e) => { const p = pts.get(e.pointerId); if (!p) return; const dx = e.clientX - p[0], dy = e.clientY - p[1]; pts.set(e.pointerId, [e.clientX, e.clientY]);
     if (pts.size === 1) { orbit.az -= dx * 0.008; orbit.el = Math.max(-0.3, Math.min(1.3, orbit.el + dy * 0.006)); }
     else if (pts.size === 2 && pinch0 > 0) { const a = [...pts.values()], d = Math.hypot(a[0][0] - a[1][0], a[0][1] - a[1][1]); orbit.dist = Math.max(1.2, Math.min(9, dist0 * pinch0 / d)); orbit.target.y = Math.max(0.1, Math.min(1.7, orbit.target.y + dy * 0.0012)); } });
   const up = (e) => { pts.delete(e.pointerId); pinch0 = 0; };
   canvas.addEventListener('pointerup', up); canvas.addEventListener('pointercancel', up);
-  canvas.addEventListener('wheel', (e) => { e.preventDefault(); easing = false; orbit.dist = Math.max(1.2, Math.min(9, orbit.dist * Math.exp(e.deltaY * 0.001))); }, { passive: false });
+  canvas.addEventListener('wheel', (e) => { e.preventDefault(); easing = false; camFree = true; orbit.dist = Math.max(1.2, Math.min(9, orbit.dist * Math.exp(e.deltaY * 0.001))); }, { passive: false });
   let sized = '';
   function fit() { const w = box.clientWidth, h = box.clientHeight, pr = Math.min(window.devicePixelRatio || 1, 2), k = w + 'x' + h + 'x' + pr; if (k !== sized && w > 0 && h > 0) { sized = k; stage.resize(w, h, pr); } }
   let last = 0;
@@ -164,11 +170,13 @@ canvas#stage{display:block;width:100%;height:100%;touch-action:none;cursor:grab}
     requestAnimationFrame(frame); const dt = Math.min(0.05, (now - last) / 1000 || 0.016); last = now; fit();
     R.animate(dt);
     if (R.move !== shown) { shown = R.move; press($('moves'), MOVES.findIndex((m) => m[1] === shown)); press($('spells'), SPELLS.findIndex((m) => m[1] === shown)); }       // a short move or a spell has ended
+    if (camSpell && !camFree && R.move === camSpell && SPELL_CAM[camSpell]) { const K = SPELL_CAM[camSpell]; let i = 0; while (i < K.length - 1 && K[i + 1][0] <= R.moveT) i++; if (i !== camKey) { camKey = i; want = Object.assign({}, K[i][1]); easing = true; } }
+    R.spellFx.view.set(Math.sin(orbit.az) * Math.cos(orbit.el), Math.sin(orbit.el), Math.cos(orbit.az) * Math.cos(orbit.el));
     if (spin) orbit.az += dt * 0.5;
-    if (easing) { let d = want.az - orbit.az; d = Math.atan2(Math.sin(d), Math.cos(d)); const k = Math.min(1, dt * 5); orbit.az += d * k; orbit.el += (want.el - orbit.el) * k; orbit.dist += (want.dist - orbit.dist) * k; orbit.target.y += (want.ty - orbit.target.y) * k; orbit.target.z += ((want.tz || 0) - orbit.target.z) * k; }
+    if (easing) { let d = want.az - orbit.az; d = Math.atan2(Math.sin(d), Math.cos(d)); const k = Math.min(1, dt * 5); orbit.az += d * k; orbit.el += (want.el - orbit.el) * k; orbit.dist += (want.dist - orbit.dist) * k; orbit.target.y += (want.ty - orbit.target.y) * k; orbit.target.z += ((want.tz || 0) - orbit.target.z) * k; orbit.target.x += ((want.tx || 0) - orbit.target.x) * k; }
     stage.render();
   }
-  $('hud').textContent = 'Stage eleven · ' + Math.round(R.triangles / 1000) + 'k triangles';
+  $('hud').textContent = 'Stage twelve · ' + Math.round(R.triangles / 1000) + 'k triangles';
   window.IO = { stage, R, step() { fit(); stage.render(); } };
   requestAnimationFrame(frame);
 })();

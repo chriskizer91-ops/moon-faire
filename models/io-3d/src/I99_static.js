@@ -291,7 +291,7 @@
 
   let lastPose = { arm: 15, leg: 0 }, mv = { name: 'pose', t: 0 }, wk = 0, gph = 0, spinWas = 0;
   let clock = 0, blinkAt = 1.6, blinkT = -1, mouthAt = 0, mouthNow = 'rest', facePainted = '', talking = false, held = null, blinking = true;
-  const SHOTS = { glasses: 2.4, hat: 2.6, curtsey: 3.0, twirl: 2.6, herb: 5.0, wave: 3.0, look: 3.6, sickle: 3.4, crescent: 4.7, salve: 7.2 }, MOVES = ['pose', 'idle', 'walk', 'jog', 'squat', 'kneel', 'hover', 'talk', 'read', 'glasses', 'hat', 'curtsey', 'twirl', 'herb', 'wave', 'look', 'sickle', 'crescent', 'salve'], SPELLS = ['crescent', 'salve'];
+  const SHOTS = { glasses: 2.4, hat: 2.6, curtsey: 3.0, twirl: 2.6, herb: 5.0, wave: 3.0, look: 3.6, sickle: 3.4, crescent: 4.7, salve: 7.2, guardian: 14.6, garden: 12.4 }, MOVES = ['pose', 'idle', 'walk', 'jog', 'squat', 'kneel', 'hover', 'talk', 'read', 'glasses', 'hat', 'curtsey', 'twirl', 'herb', 'wave', 'look', 'sickle', 'crescent', 'salve', 'guardian', 'garden'], SPELLS = ['crescent', 'salve', 'guardian', 'garden'];
   let jg = 0, hSq = 0, hKn = 0, hHv = 0;
   // Her emotions (C10; stage ten). feel: the one she is asked to hold (the page's Feelings buttons, setFeel); FW: how far she is into each,
   // for the small turn of her head and shoulders that goes with it. A move can also ask for one for a moment (her reading face when she reads).
@@ -301,9 +301,12 @@
   const BK_FLOAT = {},       // Chris, November 13: "her book should like appear when she does the read her book animation. I don't think she should just be holding it"
      bkP = V3(), bkQ = new THREE.Quaternion(), bkP2 = V3(), bkQ2 = new THREE.Quaternion(), EU = new THREE.Euler(); let bkF = 0, bkR = 0, bkS = 0, showProps = true;
   // SPB: where her left hand holds the open book for a spell (the paintings H3 to H6 show it in her left hand); FXWANT: what the spell being cast needs standing in front of her
-  const SPB = { P: V3(0.10, 1.03, 0.22), f: V3(-0.42, 0.30, 0.86), n: V3(-0.06, 0.90, -0.43), want: false }, FXWANT = { dummy: false, ally: false }; let afterHands = null, sickNow = false;
-  const propVis = (on, sick) => { const m = meshes, shut = false, open = Math.max(bkR, bkS) > 0.03; for (const [k, v] of [['bookShut', on && shut], ['bookShutPg', on && shut], ['bookRibbon', on && shut], ['bookOpen', on && open], ['bookOpenPg', on && open], ['sickleGold', on && sick], ['sickleGrip', on && sick]]) if (m[k]) m[k].visible = !!v && showProps; };
-  function bookPlace(dt, N) { const k = Math.min(1, dt * 3.2); bkF = 0; bkR += ((N === 'read' ? 1 : 0) - bkR) * k; bkS += ((SPB.want && N !== 'read' ? 1 : 0) - bkS) * k; return 0; }
+  const SPB = { P: V3(0.10, 1.03, 0.22), f: V3(-0.42, 0.30, 0.86), n: V3(-0.06, 0.90, -0.43), want: false }, FXWANT = { dummy: false, ally: false, ally2: false }; let afterHands = null, sickNow = false;
+  // FLB: her book floating open at her left side (H11: "her spellbook floats open in the air at her left side at waist height, its pages lifting"); FXVIEW: the way to the camera, which the page keeps up to date, so thin threads of light can face it
+  const FLB = { want: false, P: V3(0.57, 1.00, 0.05), lift: 0 }, FXVIEW = V3(0, 0.2, 1); let bkFl = 0;
+  function bookFloat(k, T) { const sc = Math.max(0.001, sm(0.05, 0.9, k)); EU.set(-0.86 + 0.05 * Math.sin(T * 1.1), -0.32 + 0.06 * Math.sin(T * 0.8), 0.05 * Math.sin(T * 1.3), 'YXZ'); bkQ.setFromEuler(EU); bkP.set(FLB.P.x, FLB.P.y + 0.012 * Math.sin(T * 1.7) - 0.07 * (1 - sc), FLB.P.z); SK.book.position.copy(bkP); SK.book.quaternion.copy(bkQ); SK.book.scale.setScalar(sc); }
+  const propVis = (on, sick) => { const m = meshes, shut = false, open = Math.max(bkR, bkS, bkFl) > 0.03; for (const [k, v] of [['bookShut', on && shut], ['bookShutPg', on && shut], ['bookRibbon', on && shut], ['bookOpen', on && open], ['bookOpenPg', on && open], ['sickleGold', on && sick], ['sickleGrip', on && sick]]) if (m[k]) m[k].visible = !!v && showProps; };
+  function bookPlace(dt, N) { const k = Math.min(1, dt * 3.2); bkF = 0; bkR += ((N === 'read' ? 1 : 0) - bkR) * k; bkS += ((SPB.want && N !== 'read' ? 1 : 0) - bkS) * k; bkFl += ((FLB.want ? 1 : 0) - bkFl) * k; return 0; }
   // Reading (stage nine; Chris, November 13: her pointing finger "is phasing through the book", and "the book's hovering above"
   // the hand that holds it). Her hands used to be sent to places worked out beside a book that was placed from her chest, so
   // neither truly touched it. Now, in order: her left hand goes to its place, palm up; the book is laid ON that palm, wherever the
@@ -365,6 +368,12 @@
   const yawOf = (bone) => { rootQuat(bone, spq); sp5.set(0, 0, 1).applyQuaternion(spq); return Math.atan2(sp5.x, sp5.z); };
   // the path the Salve's ribbon takes: out from her hand, down to her friend's feet, then once round them up to their shoulders (H6)
   const SALVE_A = V3();
+  // Elderwood Guardian: S0 where the seed is planted, F0 where the fawn lies, ST where the Guardian stands (at her right side, facing the foe), DUM where the foe stands for it, hit: the second it strikes
+  // (she is seen from her right and a little in front, so the Guardian stands behind her right shoulder, turned toward the foe: on screen it is to her left, in side view, as in H9, and it springs past her as in H10)
+  const GRD = { S0: V3(-0.52, 0, -0.20), F0: V3(-0.62, 0, -0.42), ST: V3(-0.82, 0, -1.20), DUM: V3(-0.20, 0, 1.80), rel: V3(), hit: 13.02, yaw: 0, h: V3(), end: V3() };
+  GRD.h.copy(GRD.DUM).sub(GRD.ST).setY(0).normalize(); GRD.yaw = Math.atan2(GRD.h.x, GRD.h.z); GRD.end.copy(GRD.DUM).addScaledVector(GRD.h, -1.42);
+  // Moonflower Garden: each seed's hand, how far it has flown, how far its shoot has risen and its flower opened
+  const GDN = { from: [], fly: [], shoot: [], open: [] }; for (let i = 0; i < GARDEN.NF; i++) { GDN.from.push(V3()); GDN.fly.push(-1); GDN.shoot.push(0); GDN.open.push(0); }
   function salvePath(u, out) { const AX = ALLY.position.x, AZ = ALLY.position.z, th0 = -PI / 2 - 0.55;
     if (u < 0.36) { const t = u / 0.36, a = (1 - t) * (1 - t), b = 2 * t * (1 - t), c = t * t; sp4.set(AX + 0.30 * Math.cos(th0), 0.12, AZ + 0.30 * Math.sin(th0)); return out.set(0, 0, 0).addScaledVector(SALVE_A, a).addScaledVector(sp5.copy(SALVE_A).add(sp3.set(0.16, 0.20, 0.50)), b).addScaledVector(sp4, c); }
     const v = (u - 0.36) / 0.64, th = th0 + TAU * 1.22 * v, r = lerp(0.30, 0.215, v); return out.set(AX + r * Math.cos(th), lerp(0.12, 1.44, Math.pow(v, 0.9)), AZ + r * Math.sin(th)); }
@@ -372,13 +381,13 @@
   function pose(o) {
     o = o || {}; mv = { name: 'pose', t: 0 }; wk = 0; lastPose = { arm: o.arm == null ? 15 : o.arm, leg: o.leg || 0 }; const arm = lastPose.arm * DEG - A_POSE, leg = lastPose.leg * DEG;
     restAll(); for (const [S, s] of SIDES) { SK['uarm' + S].rotation.z = s * arm; SK['thigh' + S].rotation.z = s * leg; SK['foot' + S].rotation.z = -s * leg; }
-    for (const o2 of SOFT) o2.lift = 0; sync(); softSettle(); root.updateMatrixWorld(true); bkF = 0; bkR = 0; bkS = 0; propVis(false, false);       // held still she carries nothing, as in the paintings she is checked against
+    for (const o2 of SOFT) o2.lift = 0; sync(); softSettle(); root.updateMatrixWorld(true); bkF = 0; bkR = 0; bkS = 0; bkFl = 0; propVis(false, false);       // held still she carries nothing, as in the paintings she is checked against
   }
   function play(name) { if (!MOVES.includes(name) || name === 'pose') { pose(lastPose); return 'pose'; } if (SPELLS.includes(name)) fxClear(); mv = { name, t: 0 }; return name; }
   // one frame of a move: returns her face { eyes, mouth }
   function body(N, T, dt) {
     restAll(); for (const o of SOFT) o.lift = 0;
-    afterHands = null; sickNow = false; SPB.want = false; FXWANT.dummy = false; FXWANT.ally = false;
+    afterHands = null; sickNow = false; SPB.want = false; FLB.want = false; FLB.lift = 0; FXWANT.dummy = false; FXWANT.ally = false; FXWANT.ally2 = false;
     let eyes = 0, mouth = 'rest', emo = null, plant = 1; const footP = { R: 0, L: 0 }, ank = { R: tgt.clone().copy(ANK.R), L: tgt.clone().copy(ANK.L) };
     wk += ((N === 'walk' || N === 'jog' ? 1 : 0) - wk) * Math.min(1, dt * 4.5); jg += ((N === 'jog' ? 1 : 0) - jg) * Math.min(1, dt * 4.5); const go = wk, still = 1 - go;
     hSq += ((N === 'squat' ? 1 : 0) - hSq) * Math.min(1, dt * 3.2); hKn += ((N === 'kneel' ? 1 : 0) - hKn) * Math.min(1, dt * 2.8); hHv += ((N === 'hover' ? 1 : 0) - hHv) * Math.min(1, dt * 2.2);
@@ -439,7 +448,7 @@
     // and she makes one wide cut that leaves a crescent of gold light; the light flies to the foe. The sickle folds back into the pendant.
     if (N === 'crescent') {
       const arm = pulse(T, 0.15, 0.62, 3.75, 4.3), grip = pulse(T, 0.2, 0.65, 1.02, 1.3), draw = sm(1.05, 1.55, T), cut = sm(1.86, 2.26, T), low = pulse(T, 1.95, 2.28, 2.8, 3.3), back = sm(2.9, 3.5, T), st = pulse(T, 0.95, 1.5, 2.95, 3.65), wind = draw * (1 - cut), sw = cut * (1 - back);
-      FXWANT.dummy = T < 4.35; SPB.want = T > 0.05 && T < 3.9; sickNow = T > 1.12 && T < 3.48;
+      FXWANT.dummy = T < 4.35; DUMMY.position.set(0, 0, 1.40); SPB.want = T > 0.05 && T < 3.9; sickNow = T > 1.12 && T < 3.48;
       // her stance: left foot forward, feet wide, knees bent; she sinks onto her front knee as the cut comes round
       const dy = -(0.07 * st + 0.21 * low), dz = 0.03 * st + 0.13 * low; SK.hips.position.y += dy; SK.hips.position.z += dz;
       ank.L.x += 0.07 * st; ank.L.z += (0.12 + 0.14 * low) * st; ank.R.x -= 0.10 * st; ank.R.z -= 0.17 * st; footP.R = Math.max(footP.R, 0.6 * low);
@@ -472,7 +481,7 @@
     // floats over her palm, and breaks into a ribbon of light and leaves that winds once round her friend.
     if (N === 'salve') {
       const look = pulse(T, 0.3, 0.9, 3.35, 3.9), pick = sm(0.85, 1.5, T), lift = sm(1.7, 2.4, T), open = sm(2.4, 3.0, T), give = sm(3.55, 4.15, T), down = sm(5.9, 6.6, T), fresh = sm(1.55, 2.5, T), lit = sm(2.3, 3.0, T) * (1 - sm(4.0, 4.3, T)), head = cl((T - 4.15) / 1.35, 0, 1);
-      FXWANT.ally = T < 6.85; SPB.want = T > 0.05 && T < 6.25; carried('spine3', 0.10, 1.03, 0.22, SPB.P); SPB.f.set(-0.42, 0.30, 0.86); SPB.n.set(-0.06, 0.90, -0.43);
+      FXWANT.ally = T < 6.85; ALLY.position.set(0, 0, 1.30); ALLY.rotation.y = PI; SPB.want = T > 0.05 && T < 6.25; carried('spine3', 0.10, 1.03, 0.22, SPB.P); SPB.f.set(-0.42, 0.30, 0.86); SPB.n.set(-0.06, 0.90, -0.43);
       add('head', 0.26 * look - 0.03 * give, -0.05 * look, 0); add('neck', 0.06 * look, 0, 0); add('spine3', 0.05 * give * (1 - down), 0.10 * give * (1 - down), 0); add('spine2', 0.03 * give * (1 - down), 0, 0);
       if (look > 0.5 && T < 3.4) emo = 'reading'; else if (T > 3.4 && T < 6.6) mouth = 'smile';
       afterHands = () => { if (bkS < 0.02) { LEAF.visible = false; return; }
@@ -502,6 +511,98 @@
         // where it has wound round them, soft light rises
         const heal = pulse(T, 5.2, 5.6, 6.0, 6.7); if (heal > 0.02) { const AX = ALLY.position.x, AZ = ALLY.position.z; glow(sp1.set(AX, 1.05, AZ), 1.5 * heal, FXC.gold, 0.30 * heal); glow(sp1.set(AX, 1.25, AZ), 0.7 * heal, FXC.pearl, 0.35 * heal);
           for (let i = 0; i < 3; i++) if (frnd() < heal) { const a = frnd() * TAU, r = 0.16 + frnd() * 0.16; emit(AX + r * Math.cos(a), 0.1 + frnd() * 1.4, AZ + r * Math.sin(a), 0, 0.28 + frnd() * 0.3, 0, 0.9 + frnd() * 0.6, 0.016 + frnd() * 0.014, mote(), frnd() < 0.15 ? 1 : 0, 0.3, -0.05); } }
+      };
+    }
+    // ----- Elderwood Guardian (H7 to H10, I4): her one-time summon. She takes a seed from her pouch and holds it up; it glows like a
+    // lantern. She lets it sink into the ground at her right side and roots of light spread. A sapling grows under her hand, twists
+    // itself into a fawn, and the fawn stands up as a stag of living wood. She sends it at the foe: it leaps, unravelling into vines.
+    // In the game these are three clips: the planting (0 to 7.0 s), the arriving (7.0 to 11.6 s) and the charge (11.6 s to the end).
+    if (N === 'guardian') {
+      const tk = sm(0.15, 0.6, T), up = sm(0.85, 1.75, T), cr = pulse(T, 2.9, 3.9, 4.35, 5.2), dn = sm(2.9, 4.0, T), ov = sm(4.3, 5.2, T), grow = sm(4.9, 7.0, T), tw = sm(7.0, 8.0, T), lowr = sm(7.2, 8.2, T), rise = sm(9.0, 10.8, T),
+        away = pulse(T, 9.0, 9.6, 10.3, 11.0), rest = sm(10.3, 11.1, T), pt = sm(11.6, 12.1, T), end = sm(13.4, 14.3, T), arm = tk * (1 - end), S0 = GRD.S0;
+      const lookUp = pulse(T, 1.0, 1.7, 2.75, 3.2), lookDn = pulse(T, 3.1, 3.8, 8.9, 9.7), lookSt = pulse(T, 9.3, 10.3, 11.45, 11.95), fwd = pulse(T, 11.7, 12.2, 13.5, 14.2);
+      FXWANT.dummy = T < 14.25; DUMMY.position.copy(GRD.DUM); SPB.want = T > 0.05 && T < 13.9; carried('spine3', 0.10, 1.03, 0.22, SPB.P); SPB.f.set(-0.42, 0.30, 0.86); SPB.n.set(-0.06, 0.90, -0.43);
+      // her body: she looks up at the seed; bends her knees and leans to her right to plant it; watches it grow; turns to the Guardian; then faces the foe
+      SK.hips.position.y -= 0.40 * cr; SK.hips.position.x -= 0.07 * cr; SK.hips.position.z -= 0.05 * cr; ank.R.x -= 0.07 * cr; ank.R.z -= 0.05 * cr; ank.L.x += 0.04 * cr; ank.L.z += 0.06 * cr;
+      add('hips', 0.10 * cr, -0.10 * cr - 0.06 * lookSt, 0); add('spine1', 0.24 * cr, -0.20 * cr - 0.06 * lookDn - 0.12 * lookSt, 0.16 * cr); add('spine2', 0.16 * cr, -0.20 * cr - 0.08 * lookDn - 0.14 * lookSt, 0.12 * cr); add('spine3', 0.05 * cr, -0.12 * cr - 0.06 * lookDn - 0.18 * lookSt + 0.06 * fwd, 0.05 * cr);
+      add('neck', -0.10 * lookUp + 0.08 * lookDn - 0.10 * cr, -0.14 * lookUp - 0.26 * lookDn - 0.30 * lookSt, 0); add('head', -0.20 * lookUp + 0.17 * lookDn - 0.12 * cr - 0.05 * lookSt, -0.20 * lookUp - 0.36 * lookDn - 0.40 * lookSt, 0);
+      // her right hand: to her pouch, high with the seed, down to the ground, palm down over the sapling, onto the Guardian's neck, then swept out at the foe
+      const hP = () => { const P = carried('hips', -0.150, 0.925, 0.120, V3()); P.lerp(carried('spine3', -0.50, 1.74, 0.24, sp1), up); P.lerp(sp1.set(S0.x + 0.02, 0.43, S0.z + 0.02), dn);
+        P.lerp(sp1.set(S0.x + 0.08, 0.78 + 0.50 * Math.pow(grow, 0.85) - 0.36 * lowr, S0.z + 0.05), ov); P.lerp(carried('spine3', -0.36, 1.20, 0.14, sp1), away);
+        P.lerp(STAG.pt(STAG.cheek, sp1).add(sp2.set(0.075, -0.045, 0.02)), rest); P.lerp(carried('spine3', -0.22, 1.36, 0.54, sp1), pt); return P; };
+      reaches.push(['R', hP, arm, -0.3 - 0.25 * up * (1 - dn)]);
+      aims.push(['R', V3(-0.45, 0.80, 0.30), V3(0.55, 0.45, 0.45), arm * up * (1 - dn)]); aims.push(['R', V3(-0.12, -0.92, 0.22), V3(0.55, -0.15, -0.80), arm * dn * (1 - ov)]); aims.push(['R', V3(-0.85, -0.10, 0.45), V3(0, -1, 0), arm * ov * (1 - away) * (1 - rest)]);
+      aims.push(['R', V3(-0.80, 0.52, -0.30), V3(-0.25, -0.20, -0.95), arm * rest * (1 - pt)]); aims.push(['R', V3(0.05, 0.02, 1), V3(0.25, -0.95, 0), arm * pt]);
+      fingers('R', lerp(0.24, 0.24 + 0.40 * tk * (1 - sm(3.95, 4.4, T)) - 0.10 * ov + 0.06 * rest - 0.14 * pt, arm));
+      if (T > 1.0 && T < 2.9) mouth = 'smile'; else if (T >= 2.9 && T < 9.2) emo = 'reading'; else if (T >= 9.2 && T < 11.65) emo = 'delighted'; else if (T >= 11.65 && T < 13.35) emo = 'stern'; else if (T >= 13.35) mouth = 'smile';
+      afterHands = () => {
+        handFrame('R'); const palm = rdW.clone().addScaledVector(rdF, 0.072).addScaledVector(rdN, 0.034), tips = rdW.clone().addScaledVector(rdF, 0.118).addScaledVector(rdN, 0.030);
+        // the seed: in her hand, then sinking into the ground
+        const held = palm.lerp(tips, sm(2.9, 3.6, T)); if (T < 4.0) GRD.rel.copy(held); const sink = sm(4.0, 4.8, T), sd = sp1.copy(GRD.rel).lerp(sp2.set(S0.x, -0.03, S0.z), sink), show = sm(0.62, 0.80, T) * (1 - sm(0.6, 1, sink)), lit = 0.22 + 0.78 * sm(1.4, 2.3, T);
+        SEED.visible = show > 0.01; if (SEED.visible) { SEED.position.copy(sd); SEED.rotation.set(0.10 * Math.sin(T * 1.3), T * 0.5, 0.10 * Math.cos(T * 1.1)); SEED.scale.setScalar(show); seedMat.emissiveIntensity = 0.9 * lit; SHOOT.scale.setScalar(Math.max(0.001, sm(1.9, 2.7, T)));
+          glow(sd, 0.30 * lit * show, FXC.gold, 0.55 * lit * show); glow(sd, 0.11 * show, FXC.pearl, 0.55 * lit * show); if (lit > 0.5 && frnd() < 0.30) emit(sd.x + frs(0.03), sd.y + frs(0.03), sd.z + frs(0.03), frs(0.04), 0.03 + frnd() * 0.10, frs(0.04), 0.8 + frnd() * 0.5, 0.013 + frnd() * 0.008, mote(), 0, 0.6, -0.02); }
+        if (T >= 0.66 && T - dt < 0.66) for (let i = 0; i < 8; i++) emit(sd.x, sd.y, sd.z, frs(0.2), frs(0.2), frs(0.2), 0.4, 0.02, FXC.gold, 1, 2, 0);
+        // roots of light over the ground, and the sapling drawn up under her hand
+        ROOTS.position.set(S0.x, 0, S0.z); ROOTS.userData.set(sm(4.45, 5.6, T), 1 - sm(6.3, 7.5, T)); const gl = pulse(T, 4.3, 4.9, 6.9, 7.6); if (gl > 0.02) glow(sp2.set(S0.x, 0.04, S0.z), 0.55 * gl, FXC.gold, 0.35 * gl);
+        sapSet(S0, grow, tw); if (grow > 0.02 && tw < 0.9) { const h = Math.pow(grow, 0.85) * (1 - 0.7 * tw); glow(sp2.set(S0.x + 0.02, 0.58 * h, S0.z), 0.34 * sm(0.45, 1, grow), FXC.green, 0.40 * sm(0.45, 1, grow) * (1 - tw)); glow(sp2, 0.12, FXC.pearl, 0.45 * sm(0.45, 1, grow) * (1 - tw));
+          if (frnd() < 0.55 * (grow < 1 ? 1 : 0.4)) { const a = frnd() * TAU, r = 0.05 + frnd() * 0.10; emit(S0.x + r * Math.cos(a), frnd() * h, S0.z + r * Math.sin(a), 0, 0.12 + frnd() * 0.2, 0, 0.9 + frnd() * 0.6, 0.014 + frnd() * 0.010, mote(), 0, 0.4, -0.04); } }
+        // it twists itself into a fawn, lying down, which lifts its head to her hand; the fawn stands up as the Guardian
+        const fl = pulse(T, 7.25, 7.7, 7.9, 8.5); if (fl > 0.01) { glow(sp2.set(S0.x, 0.30, S0.z), 1.0 * fl, FXC.gold, 0.50 * fl); glow(sp2, 0.45 * fl, FXC.pearl, 0.8 * fl, 1, T); }
+        if (T >= 7.55 && T - dt < 7.55) for (let i = 0; i < 44; i++) { const a = frnd() * TAU, v = 0.2 + frnd() * 0.7; emit(S0.x + frs(0.08), 0.10 + frnd() * 0.5, S0.z + frs(0.08), Math.cos(a) * v, 0.1 + frnd() * 0.7, Math.sin(a) * v, 0.6 + frnd() * 0.7, 0.020 + frnd() * 0.02, i % 4 === 0 ? FXC.leaf : mote(), i % 4 === 0 ? 2 : i % 3 === 0 ? 1 : 0, 1.8, 0.3, frs(4)); }
+        const here = T >= 7.45 && T < GRD.hit; STAG.G.visible = here;
+        if (here) { const riseP = sm(9.0, 10.5, T), ap = sm(7.45, 8.2, T), lift = sm(8.05, 8.9, T), gat = sm(11.72, 12.22, T), u = cl((T - 12.3) / (GRD.hit - 12.3), 0, 1), sc = lerp(lerp(0.20, 0.55, ap), 1, rise), brth = 0.006 * Math.sin(T * 2.1);
+          if (T < 12.3) { if (gat > 0) STAG.pose('stand', 'gather', gat, { by: brth }); else STAG.pose('lie', 'stand', riseP, { nk: lerp(0.62, -0.26, lift) * (1 - riseP) + 0.26 * lookSt, hd: lerp(0.25, -0.30, lift) * (1 - riseP) - 0.06 * lookSt, hy: 0.42 * lookSt, ny: 0.22 * lift * (1 - riseP) + 0.20 * lookSt, by: brth * riseP, fd: 0.04 * Math.sin(PI * riseP) }); }
+          else { const a = sm(0, 0.24, u), b = sm(0.66, 1, u); if (b > 0) STAG.pose('leap', 'land', b, { bp: -0.20 * Math.cos(PI * u) }); else STAG.pose('gather', 'leap', a, { bp: -0.20 * Math.cos(PI * u) * a }); }
+          const e = lerp(u, sm(0, 1, u), 0.35); sp2.copy(GRD.F0).lerp(GRD.ST, rise).lerp(GRD.end, e); sp2.y += 0.50 * Math.sin(PI * Math.pow(u, 0.92)) * (1 - 0.15 * u);
+          STAG.set(sp2, (1 - ap) * 3.2 + lerp(0.75, GRD.yaw, riseP), sc, lerp(0.30, 1, sm(9.3, 10.9, T))); const ur = sm(0.10, 0.94, u), zc = STAG.unravel(ur);
+          for (const eye of STAG.eyeP) { STAG.pt(eye, sp3); glow(sp3, 0.085 * sc, [0.75, 1.0, 0.35], 0.9 * ap); }
+          if (rise > 0.02 && rise < 0.98 && frnd() < 0.7) { const a = frnd() * TAU; emit(sp2.x + 0.3 * sc * Math.cos(a), frnd() * 1.2 * sc, sp2.z + 0.5 * sc * Math.sin(a), 0, 0.15 + frnd() * 0.25, 0, 0.9 + frnd() * 0.5, 0.016 + frnd() * 0.012, mote(), frnd() < 0.2 ? 2 : 0, 0.4, -0.04, frs(3)); }
+          // where it comes apart, vines and light trail behind it in a spiral, with leaves (H10)
+          if (ur > 0.01) { const rear = STAG.local(0, 1.06, zc, sp3), ph = T * 13;
+            const cy = Math.cos(GRD.yaw), sy = Math.sin(GRD.yaw); VINES.forEach((v, j) => { const a = ph * (j % 2 ? 1 : -0.8) + j * TAU / 5, r = 0.13 + 0.07 * Math.sin(T * 9 + j * 2); sp4.set(Math.cos(a) * cy, Math.sin(a), -Math.cos(a) * sy); sp5.set(-Math.sin(a) * cy, Math.cos(a), Math.sin(a) * sy); v.push(V3(rear.x + sp4.x * r, rear.y + sp4.y * r, rear.z + sp4.z * r), sp4, sp5); });
+            for (const [R, k] of [[RIB_SALVE, 0], [RIB_SALVE2, PI]]) { const a = ph * 0.6 + k, r = 0.22; sp4.set(Math.cos(a) * cy, Math.sin(a), -Math.cos(a) * sy); R.push(V3(rear.x + sp4.x * (r + 0.05), rear.y + sp4.y * (r + 0.05), rear.z + sp4.z * (r + 0.05)), V3(rear.x + sp4.x * (r - 0.05), rear.y + sp4.y * (r - 0.05), rear.z + sp4.z * (r - 0.05)), 0.9); }
+            for (let i = 0; i < 4; i++) emit(rear.x + frs(0.2), rear.y + frs(0.2), rear.z + frs(0.1), frs(0.3) - 0.15 * GRD.h.x, frs(0.3), -0.2 - frnd() * 0.8, 0.5 + frnd() * 0.7, 0.020 + frnd() * 0.03, i === 0 ? FXC.leaf : mote(), i === 0 ? 2 : i === 1 ? 1 : 0, 1.4, 0.15, frs(4)); glow(rear, 0.7, FXC.green, 0.30); glow(rear, 0.3, FXC.pearl, 0.5); } }
+        // it strikes: what is left of it bursts, and its vines whip once round the foe
+        const DX = GRD.DUM.x, DZ = GRD.DUM.z, w = (T - GRD.hit) / 0.6;
+        if (T >= GRD.hit && T - dt < GRD.hit) { dummyHit(4.2); for (let i = 0; i < 90; i++) { const a = frnd() * TAU, v = 0.4 + frnd() * 1.8; emit(DX - 0.25 * GRD.h.x + frs(0.2), 0.7 + frnd() * 1.1, DZ - 0.25 + frs(0.15), Math.cos(a) * v, frs(1) * v * 0.7 + 0.35, Math.sin(a) * v * 0.7 - 0.2, 0.5 + frnd() * 0.9, 0.024 + frnd() * 0.035, i % 3 === 0 ? FXC.leaf : mote(), i % 3 === 0 ? 2 : i % 3 === 1 ? 1 : 0, 2.0, 1.0, frs(5)); } }
+        if (w >= 0 && w < 1) VINES.forEach((v, j) => { const a = j * TAU / 5 + w * TAU * 1.25 + 2.6, r = 0.26 - 0.05 * w, y = lerp(1.15, j % 2 ? 0.45 : 1.55, w); sp4.set(Math.cos(a), 0, Math.sin(a)); v.push(V3(DX + sp4.x * r, y, DZ + sp4.z * r), sp4, UP); });
+        const hf = pulse(T, GRD.hit - 0.01, GRD.hit + 0.04, GRD.hit + 0.10, GRD.hit + 0.55); if (hf > 0.01) { sp2.set(DX, 1.1, DZ - 0.2); glow(sp2, 1.5 * hf, FXC.green, 0.45 * hf); glow(sp2, 0.6 * hf, FXC.pearl, hf, 1, 0.3); }
+        const ptg = pt * (1 - end); if (ptg > 0.05 && T < GRD.hit) { handFrame('R'); glow(sp2.copy(rdW).addScaledVector(rdF, 0.10), 0.16 * ptg, FXC.gold, 0.5 * ptg); }
+      };
+    }
+    // ----- Moonflower Garden (H11, H12, I6): she heals the whole party. Her book floats open at her left side. She cups a handful of
+    // glowing seeds at her chest, flings them out in a ring, and where they land shoots rise, a vine creeps round, and twelve white
+    // flowers open and glow like small moons; light rises round her friends. Then the garden sinks away.
+    if (N === 'garden') {
+      const inn = sm(0.35, 1.2, T), fl = sm(2.15, 2.62, T), end = sm(11.0, 12.0, T), w = inn * (1 - end), bloom = sm(7.4, 8.6, T) * (1 - sm(10.5, 11.2, T)), lit = sm(7.2, 8.6, T) * (1 - sm(10.3, 11.1, T)), gone = sm(11.0, 11.9, T);
+      FXWANT.ally = FXWANT.ally2 = T > 0.15 && T < 11.85; ALLY.position.set(-0.90, 0, 0.02); ALLY.rotation.y = 0; ALLY2.position.set(0.93, 0, 0.02); ALLY2.rotation.y = 0; FLB.want = T > 0.05 && T < 11.5; FLB.lift = sm(0.6, 1.6, T) * (1 - sm(10.6, 11.4, T));
+      add('head', 0.13 * inn * (1 - fl) - 0.05 * fl * (1 - end), 0, 0); add('neck', 0.04 * inn * (1 - fl), 0, 0); add('spine3', -0.04 * fl * (1 - end), 0, 0); add('spine2', -0.02 * fl * (1 - end), 0, 0);
+      for (const [S, s] of SIDES) { const P = () => carried('spine3', s * lerp(0.050, 0.43, fl), lerp(1.165, 0.965, fl) + 0.05 * Math.sin(PI * fl), lerp(0.215, 0.21, fl) + 0.10 * Math.sin(PI * fl), V3());
+        reaches.push([S, P, w, s * 0.25]); aims.push([S, V3(-s * 0.30, 0.45, 0.84).lerp(V3(s * 0.70, -0.12, 0.70), fl), V3(-s * 0.35, 0.85, -0.38).lerp(V3(-s * 0.10, 0.97, -0.20), fl), w]); fingers(S, lerp(0.24, lerp(0.55, 0.13, fl), w)); }
+      if ((T > 0.7 && T < 2.1) || (T > 7.7 && T < 10.7)) eyes = 1; if (T > 0.5 && T < 11.6) mouth = 'smile';
+      afterHands = () => {
+        const hand = {}; for (const [S] of SIDES) { handFrame(S); hand[S] = rdW.clone().addScaledVector(rdF, 0.075).addScaledVector(rdN, 0.03); } const mid = hand.R.clone().lerp(hand.L, 0.5);
+        // the seeds in her cupped hands
+        const cupG = sm(0.9, 1.7, T) * (1 - sm(2.2, 2.5, T)); if (cupG > 0.02) { glow(mid, 0.34 * cupG, FXC.gold, 0.6 * cupG); for (let i = 0; i < 9; i++) glow(sp1.set(mid.x + 0.045 * Math.sin(i * 2.4 + T * 0.7), mid.y + 0.012 * Math.sin(i * 1.3 + T * 1.9), mid.z + 0.03 * Math.cos(i * 2.4 + T * 0.5)), 0.035, FXC.pearl, 0.8 * cupG);
+          if (frnd() < 0.4 * cupG) emit(mid.x + frs(0.05), mid.y + 0.02, mid.z + frs(0.03), frs(0.02), 0.08 + frnd() * 0.12, frs(0.02), 0.8 + frnd() * 0.4, 0.013 + frnd() * 0.008, mote(), 0, 0.5, -0.02); }
+        // they fly out in a ring, each trailing a thread of light, and land
+        const F = GARDEN.flowers, shoot = GDN.shoot, opn = GDN.open;
+        for (let i = 0; i < GARDEN.NF; i++) { const f = F[i], t0 = 2.24 + 0.022 * ((i * 5) % GARDEN.NF), dur = 0.95 + 0.25 * wHash(i * 3.1), u = (T - t0) / dur; if (T <= t0) GDN.from[i].copy(f.p.x < 0 ? hand.R : hand.L); GDN.fly[i] = u;
+          if (u > 0 && u < 1) { GARDEN.seedAt(f, GDN.from[i], u, sp1); glow(sp1, 0.075, FXC.gold, 1); glow(sp1, 0.03, FXC.pearl, 1); }
+          const tl = t0 + dur; if (T >= tl && T - dt < tl) for (let k = 0; k < 7; k++) emit(f.p.x + frs(0.03), 0.04, f.p.z + frs(0.03), frs(0.25), 0.15 + frnd() * 0.35, frs(0.25), 0.5 + frnd() * 0.4, 0.018 + frnd() * 0.012, k % 2 ? FXC.gold : FXC.pearl, k % 3 === 0 ? 1 : 0, 2, 0.5);
+          const lf = pulse(T, tl - 0.02, tl + 0.05, tl + 0.2, tl + 0.9); if (lf > 0.02) glow(sp1.set(f.p.x, 0.05, f.p.z), 0.26 * lf, FXC.gold, 0.6 * lf);
+          shoot[i] = cl((T - tl - 0.05) / 1.5, 0, 1); let d = Math.abs(f.a - 0.2) % TAU; if (d > PI) d = TAU - d; opn[i] = cl((T - 6.0 - 0.42 * d) / 1.15, 0, 1); }
+        GARDEN.setThreads(GDN.fly, GDN.from, FXVIEW); GARDEN.set(shoot, opn, sm(4.2, 6.7, T), lit, gone);
+        // every open flower glows like a small moon, and motes rise from it
+        for (let i = 0; i < GARDEN.NF; i++) { const o = sm(0.5, 1, opn[i]) * (1 - gone); if (o < 0.02) continue; GARDEN.face(i, sp1); glow(sp1, 0.40 * o * (0.55 + 0.45 * lit), FXC.pearl, 0.26 * o * (0.25 + 0.75 * lit)); glow(sp1, 0.09 * o, FXC.pearl, 0.45 * o * lit);
+          if (frnd() < 0.20 * o * (0.3 + lit)) emit(sp1.x + frs(0.06), sp1.y + frs(0.03), sp1.z + frs(0.06), frs(0.03), 0.10 + frnd() * 0.20, frs(0.03), 1.3 + frnd() * 0.9, 0.014 + frnd() * 0.012, mote(), frnd() < 0.1 ? 1 : 0, 0.3, -0.03); }
+        // light rises round her friends as the garden blooms
+        if (bloom > 0.02) for (const A of [ALLY, ALLY2]) { glow(sp1.set(A.position.x, 1.0, A.position.z), 1.4 * bloom, FXC.gold, 0.22 * bloom); glow(sp1.set(A.position.x, 1.25, A.position.z), 0.6 * bloom, FXC.pearl, 0.28 * bloom);
+          for (let i = 0; i < 2; i++) if (frnd() < bloom) { const a = frnd() * TAU, r = 0.16 + frnd() * 0.16; emit(A.position.x + r * Math.cos(a), 0.1 + frnd() * 1.4, A.position.z + r * Math.sin(a), 0, 0.26 + frnd() * 0.3, 0, 0.9 + frnd() * 0.6, 0.016 + frnd() * 0.014, mote(), frnd() < 0.15 ? 1 : 0, 0.3, -0.05); } }
+        // her book: warm light and motes rise from its pages
+        const bk = FLB.lift; if (bk > 0.02 && bkFl > 0.5) { const c = bookPt(0, 0, 0.05, sp2); glow(c, 0.42 * bk, FXC.gold, 0.30 * bk); if (frnd() < 0.5 * bk) { const q = bookPt(frs(0.11), frs(0.08), 0.03, sp3); emit(q.x, q.y, q.z, frs(0.02), 0.12 + frnd() * 0.16, frs(0.02), 1.1 + frnd() * 0.6, 0.014 + frnd() * 0.01, mote(), 0, 0.4, -0.03); } }
+        // at the end the garden sinks away in sparks
+        if (gone > 0.02 && gone < 0.98) for (let k = 0; k < 3; k++) { const a = frnd() * TAU; GARDEN.ringP(a, sp1); emit(sp1.x + frs(0.08), 0.04 + frnd() * 0.16, sp1.z + frs(0.08), frs(0.1), 0.15 + frnd() * 0.3, frs(0.1), 0.6 + frnd() * 0.6, 0.018 + frnd() * 0.016, k ? mote() : FXC.pearl, k === 0 ? 1 : 0, 1, 0); }
       };
     }
     if (N === 'glasses') { const k = pulse(T, 0, 0.55, 1.5, 2.25), push = pulse(T, 0.62, 0.9, 1.05, 1.4);
@@ -551,6 +652,8 @@
     for (const [S] of SIDES) wristFix(S);
     if (bkR > 0.001 && SK.book) { sync(); readHands(N, T); }
     else if (bkS > 0.001 && SK.book) { sync(); bookOnPalm(bkS, SPB.P, SPB.f, SPB.n); }
+    else if (bkFl > 0.001 && SK.book) bookFloat(bkFl, T);
+    pagesSet(bkFl * FLB.lift, T);
     if (afterHands) { sync(); afterHands(); }       // what a spell does once her hands are where they will be drawn: fine finger work, and the lights that start from them
     propVis(true, (N === 'sickle' && T > 0.12 && T < 3.25) || sickNow);
     sync(); softTick(dt);
@@ -567,14 +670,15 @@
       mouth = mouthNow;
       if (mv.name === 'pose') { SK.head.rotation.set(0.030 * Math.sin(clock * 4.4) + 0.015, 0.045 * Math.sin(clock * 2.3 + 1), 0.020 * Math.sin(clock * 1.3)); SK.neck.rotation.set(0, 0.025 * Math.sin(clock * 2.3 + 1), 0); }
     } else if (mv.name === 'pose' && (SK.head.rotation.x || SK.head.rotation.y)) { SK.head.rotation.set(0, 0, 0); SK.neck.rotation.set(0, 0, 0); }
-    if (mv.name === 'pose') { FXWANT.dummy = FXWANT.ally = false; LEAF.visible = false; WAVE.visible = false; } else if (!SPELLS.includes(mv.name)) { LEAF.visible = false; WAVE.visible = false; }
-    fxTick(dt, FXWANT.dummy, FXWANT.ally);
+    if (mv.name === 'pose') { FXWANT.dummy = FXWANT.ally = FXWANT.ally2 = false; LEAF.visible = false; WAVE.visible = false; PAGES.visible = false; } else if (!SPELLS.includes(mv.name)) { LEAF.visible = false; WAVE.visible = false; }
+    if (mv.name !== 'guardian') woodHide(); if (mv.name !== 'garden') GARDEN.hide();
+    fxTick(dt, FXWANT.dummy, FXWANT.ally, FXWANT.ally2);
     if (feel) emo = feel; if (held) { if (held.eyes != null) eyes = held.eyes; if (held.mouth) mouth = held.mouth; }
     const key = eyes + '|' + mouth + '|' + emo; if (key !== facePainted) { paintFace(eyes, mouth, emo); facePainted = key; }
   }
   const talk = (on) => { talking = !!on; mouthAt = 0; return talking; };
   const setFace = (eyes, mouth) => { held = eyes == null && !mouth ? null : { eyes, mouth }; facePainted = ''; animate(0); };
   const setFeel = (name) => { feel = FEELS.includes(name) ? name : null; facePainted = ''; animate(0); return feel; };       // hold one of her emotions (or none)
-  return { root, skeleton, bones, SK, animate, pose, play, moves: MOVES, shots: SHOTS, settle: () => { sync(); softSettle(); root.updateMatrixWorld(true); }, meshes, spin: 0, time: 0, stanceProgress: 1, setStance() {}, talk, setFace, setFeel, feels: FEELS, spells: SPELLS, spellFx: { group: fxG, dummy: DUMMY, ally: ALLY, leaf: LEAF, parts: PT }, get feel() { return feel; }, setBlink: (on) => { blinking = !!on; }, setProps: (on) => { showProps = !!on; if (mv.name === 'pose') propVis(false, false); }, get move() { return mv.name; },
+  return { root, skeleton, bones, SK, animate, pose, play, moves: MOVES, shots: SHOTS, settle: () => { sync(); softSettle(); root.updateMatrixWorld(true); }, meshes, spin: 0, time: 0, stanceProgress: 1, setStance() {}, talk, setFace, setFeel, feels: FEELS, spells: SPELLS, spellFx: { group: fxG, dummy: DUMMY, ally: ALLY, ally2: ALLY2, leaf: LEAF, parts: PT, view: FXVIEW }, wood: { STAG, SAP, SEED, ROOTS, sapSet, VINES, GARDEN }, get moveT() { return mv.t; }, get feel() { return feel; }, setBlink: (on) => { blinking = !!on; }, setProps: (on) => { showProps = !!on; if (mv.name === 'pose') propVis(false, false); }, get move() { return mv.name; },
     debug: { SK, meshes, cloths: [], headPoint, headHalfW, JH, HC, FC, CHAINS, SOFT, COL, LEGCAP, LEGPAD, LEGS, HIP, SLV }, get triangles() { return triCount; } };
 }
