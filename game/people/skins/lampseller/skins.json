@@ -25,10 +25,11 @@
  "skins": [
   {
    "key": "lamps",
-   "name": "Old lamp-seller",
-   "who": "An old woman who has sold oil lamps and wicks at the fair for forty years.",
+   "name": "Lamp-seller",
+   "who": "A small woman in an ochre kerchief who has sold oil lamps and wicks at the fair all her life.",
    "body": "An ochre kerchief covers the top of her head, dotted with small pale cream spots and faded along the folds, and her grey hair shows below it at the sides and in a neat bun at the back. Her bodice and upper sleeves are moss green wool, worn shiny at the shoulders, and the lower sleeves are cream linen with faint soot smudges near the wrists. A narrow dark brown leather belt sits at the waist above a long rust skirt of heavy rough cloth with a darker scorched patch near one knee and a frayed hem. The cream apron over the front has a few small oil stains and one neat darned square, and her boots are dark brown and scuffed. Her hands are weathered and pinkish brown, with blackened fingertips from trimming wicks.",
-   "face": "An old woman with warm pinkish brown skin, deep lines across the forehead and around the eyes, soft shadows under them, and a small mole on one cheek. Her eyes are dark hazel under thin grey brows, and her lips are pale and thin with a faint rosy flush on the cheeks. Her expression is calm and patient, the mouth closed."
+   "face": "An old woman with warm pinkish brown skin, deep lines across the forehead and around the eyes, soft shadows under them, and a small mole on one cheek. Her eyes are dark hazel under thin grey brows, and her lips are pale and thin with a faint rosy flush on the cheeks. Her expression is calm and patient, the mouth closed.",
+   "id": "old-lamp-seller"
   },
   {
    "key": "pies",

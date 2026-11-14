@@ -31,7 +31,7 @@
      "doing": "sits on a stool behind the counter trimming wicks; beckons when the party comes near",
      "says": [
       "Evening, you four. Come and look, looking's free.",
-      "Forty years I've sold lamps. Never once saw a light get up and leave.",
+      "I've sold lamps since I could count change. Never once saw a light get up and leave.",
       "Take this wick out to the lamplighter, would you? Last lantern on the road."
      ]
     },
@@ -74,9 +74,9 @@
     {
      "code": "W1-b",
      "title": "The blue wagon",
-     "what": "The moon-painted wagon is drafted as the party's own and as the first rest spot, where they wake after any loss at the fair.",
+     "what": "The moon-painted wagon is the party's own and the first rest spot: they wake here after any loss at the fair.",
      "kind": "rest",
-     "needs": "the maker's yes that the wagon is theirs"
+     "needs": "nothing new (Chris said yes, November 13)"
     },
     {
      "code": "W1-c",
@@ -88,7 +88,7 @@
     {
      "code": "W1-d",
      "title": "A wick for the lamplighter",
-     "what": "The old lamp-seller asks the party to carry a trimmed wick to the lamplighter at the last lantern on the moor road. It ends at W4 with thanks and nothing else.",
+     "what": "The lamp-seller asks the party to carry a trimmed wick to the lamplighter at the last lantern on the moor road. It ends at W4 with thanks and nothing else.",
      "kind": "errand",
      "needs": "nothing new (a yes/no flag, no screen)"
     }
@@ -157,7 +157,7 @@
      "title": "Practice bouts in the ring",
      "what": "After W2-a the watchman waves the party into the ring whenever they like, to fight the wisps that keep drifting to its lamps. Bouts repeat, give no lamps and cost nothing to lose.",
      "kind": "fight",
-     "needs": "the maker's word on what the party spars against (see questions)"
+     "needs": "nothing new (Chris said yes to wisps, November 13)"
     },
     {
      "code": "W2-c",
@@ -540,9 +540,9 @@
     {
      "code": "W8-b",
      "title": "Rest aboard",
-     "what": "Drafted as a rest spot at the ladder, so a loss on the stair or in the lamp room wakes the party here and not back at the pool.",
+     "what": "A rest spot at the ladder: a loss on the stair or in the lamp room wakes the party here and not back at the pool.",
      "kind": "rest",
-     "needs": "the maker's yes; the plan names only the W6 rest spot"
+     "needs": "nothing new (Chris said yes, November 13)"
     },
     {
      "code": "W8-c",
@@ -732,11 +732,6 @@
    "for": "W3, W8, W9"
   },
   {
-   "what": "Area paintings for the nine places not yet painted",
-   "why": "Only W1 exists; the 'look' lines here are briefs for the rest.",
-   "for": "W2, W3, W4, W5, W6, W7, W8, W9, F5"
-  },
-  {
    "what": "The maker's own battle paintings for the fair and the lamp room, and ideally the crag",
    "why": "Nothing borrowed shows a tented fair, a tower-top room or a stair on a crag, so F2, F4 and F5 are stand-ins only.",
    "for": "W1, W2, W3, W9, F5"
@@ -763,16 +758,20 @@
   }
  ],
  "questions": [
-  "Once the twelve lamps are home, what light is the great wraith hoarding, why do the four go after it, and where does it go when she falls? I drafted only that the wisps all flew toward the beacon.",
-  "How are lamps counted? I drafted one from each wilds set fight and one per walking-fight win in that area until its number is reached (W4 3, W5 4, W6 5).",
-  "May I add two rest spots to the plan's one: the blue wagon in W1 as the party's own, and the airship at W8? Without the second, a loss in the lamp room wakes them back at the pool.",
-  "What does the party fight in the sparring ring, given the only foes are wraiths? I drafted wisps that keep drifting to the ring lamps, open after the W2 set fight.",
-  "Can fights use both kinds of borrowed picture? F1 and the numbered ones are seen level; the battle- ones look down from above like W1, and I used those for F2, F4 and F5.",
-  "Where is the fair gate, and do the models or the notes win? I put the gate in W3 and left W1's left and near paths shut. The lamplighter model reads to me as a woman in a red dress and headscarf, the gate-keeper as a man in hat and waistcoat, and the old lamp-seller as young."
+  "Which story? See \"Does it have to be lamps?\" on this page.",
+  "Fight pictures: seen level, or from above? See \"The two kinds of fight picture\" on this page.",
+  "Where is the fair gate? It is drafted in the mooring field (W3), with the fair square's left and near paths shut."
  ],
  "_made": {
   "by": "claude-fable-5-2@high",
   "cost": 1.700956,
   "seconds": 434.3
- }
+ },
+ "settled": [
+  "All nine walking places are painted: Chris painted W2 to W9 on the evening of November 13, and each kept its guide closely.",
+  "Three rest spots: the party's own wagon in the fair square, the camp by the pool, and the airship at the landing ledge.",
+  "The sparring ring: the party fights wisps that keep drifting to the ring lamps.",
+  "Where a person's 3D model looks different from their note, the note changes. Three notes changed: the lamp-seller is no longer called old, the old lamplighter is an elderly woman, and the gate keeper is a man in a flat hat and waistcoat.",
+  "The story is open again: does it have to be lamps? Opus 5.5 laid out options (below)."
+ ]
 }

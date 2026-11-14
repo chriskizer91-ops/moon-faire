@@ -29,12 +29,13 @@ Zone 1, the Moon Faire (party level 1 to 2):
 - W1 the fair square: the start. Chris has painted it: a cobbled square at dusk with a well, a cloth-seller's awning, a striped round tent, stalls, lamp posts and bunting.
 - W2 the stall row and the sparring ring.
 - W3 the mooring field: the captain and his airship. The twelve lamps light up on the moored ship as they are won back.
-- Three set fights as wisps come into the fair (one in each of W1, W2, W3) and practice bouts in the ring. No walking fights.
+- Three set fights as wisps come into the fair (one in each of W1, W2, W3) and practice bouts in the ring against wisps drawn to its lamps (Chris, November 13). No walking fights.
 
 Zone 2, the wilds (party level 2 to 4): walking fights about every 14 metres, one set fight in each of W4, W5, W6.
 - W4 the Last Lantern (holds 3 lamps).
 - W5 the standing stones (4 lamps): a Shadow Wraith bars the road.
 - W6 the still pool and the broken arch (5 lamps): a camp, a rest spot.
+- Rest spots (Chris, November 13): three. The party's own wagon in the fair square (W1), the camp by the pool (W6) and the airship at the landing ledge (W8).
 - W7 the hollow: hidden, off the path. A find: a healing amulet.
 
 Zone 3, the Dark Beacon (party level 4 to 5):
@@ -53,14 +54,14 @@ Rules of the game that matter for what can happen:
 
 ## The fair folk (people the party can talk to)
 Eleven painted people exist as 3D models, all stand-ins Chris may rename or re-cast. Each can stand, turn to face the party, talk, play emotes (nod, shake head, wave, greet bow, shrug, laugh, point, think, surprised, sad, cross, beckon, refuse, thanks), walk or run to a spot, and sit on a seat.
-- `old-lamp-seller`: An old woman who has sold oil lamps and wicks at the fair for forty years. Hello: beckon. Talks: calm. Most like them: nod, beckon, think.
+- `old-lamp-seller`: A small woman in an ochre kerchief who has sold oil lamps and wicks at the fair all her life. Hello: beckon. Talks: calm. Most like them: nod, beckon, think.
 - `pie-seller`: A sturdy middle-aged woman who sells hot meat pies from a cart by the gate. Hello: wave. Talks: lively, calm. Most like them: beckon, laugh, point.
 - `ballad-singer`: A young woman who sings old songs on a small stage between the stalls each night. Hello: greet_bow. Talks: calm, lively. Most like them: greet_bow, think, sad.
 - `fortune-teller`: A tall, thin fortune-teller who reads palms and cards in a dim tent at the edge of the fair. Hello: beckon. Talks: calm. Most like them: think, beckon, point.
-- `old-lamplighter`: An elderly man who walks the fair at dusk, lighting and trimming the lanterns along the stalls. Hello: wave. Talks: calm. Most like them: point, nod, wave.
+- `old-lamplighter`: An elderly woman in a red dress and headscarf who walks the fair at dusk, lighting and trimming the lanterns along the stalls. Hello: wave. Talks: calm. Most like them: point, nod, wave.
 - `old-night-watchman`: An old night-watchman who walks the fair rows after dark, checking stall shutters and lamps. Hello: nod. Talks: calm, gruff. Most like them: point, nod, cross.
 - `chestnut-roaster`: A cheerful middle-aged man who roasts chestnuts over a brazier at the fair gate. Hello: beckon. Talks: lively. Most like them: laugh, beckon, wave.
 - `fair-baker`: A stout, cheerful baker who sells warm loaves and buns from his oven cart at the night fair. Hello: wave. Talks: lively, calm. Most like them: laugh, thanks, beckon.
 - `ribbon-dyer`: An old, quiet dyer who boils and sells dyed ribbons and cloth lengths from a steaming stall at the fair. Hello: greet_bow. Talks: calm. Most like them: think, shrug, nod.
 - `farm-lad`: A cheerful young farmhand who carts hay and feed for the fair's ponies and stays on at night to help. Hello: wave. Talks: lively. Most like them: wave, laugh, surprised.
-- `gate-keeper`: A stern middle-aged woman who takes the coins at the fair gate and watches who comes and goes after dark. Hello: beckon. Talks: gruff. Most like them: cross, refuse, point.
+- `gate-keeper`: A stern middle-aged man in a flat hat and waistcoat who takes the coins at the fair gate and watches who comes and goes after dark. Hello: beckon. Talks: gruff. Most like them: cross, refuse, point.

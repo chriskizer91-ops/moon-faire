@@ -33,9 +33,10 @@
   {
    "key": "gatekeeper",
    "name": "Gate keeper",
-   "who": "A stern middle-aged woman who takes the coins at the fair gate and watches who comes and goes after dark.",
+   "who": "A stern middle-aged man in a flat hat and waistcoat who takes the coins at the fair gate and watches who comes and goes after dark.",
    "body": "A wide felt hat in charcoal grey, worn soft and dusty along the brim, with a deep plum band; beneath it, short black hair streaked with grey is cropped close at the nape. A teal kerchief with a small cream dot pattern is knotted at the throat. A cream linen shirt with thin faded blue stripes and three dull brass buttons, the sleeves rolled into cuffs above the elbow and the hem showing below a plum wool waistcoat edged with a narrow black braid, its lower corners rubbed shiny. Charcoal trousers with a dark green patch stitched neatly on the left thigh, and black boots that are scuffed grey at the toes. The bare forearms are deep brown and strong, with a thin pale scar across the back of one hand.",
-   "face": "A woman of about fifty with deep brown skin, fine lines at the corners of the eyes and two firm creases beside the mouth. Dark brown eyes under straight black brows touched with grey, full dusky lips and a small dark mole high on the left cheek. Her expression is calm and watchful, mouth closed, giving nothing away."
+   "face": "A woman of about fifty with deep brown skin, fine lines at the corners of the eyes and two firm creases beside the mouth. Dark brown eyes under straight black brows touched with grey, full dusky lips and a small dark mole high on the left cheek. Her expression is calm and watchful, mouth closed, giving nothing away.",
+   "id": "gate-keeper"
   }
  ],
  "written_by": "claude-opus-5-5@high",

@@ -1,6 +1,6 @@
 // Made by people/kit/build_npcs.py. The people are stand-ins, not Moon Faire lore: names and words are Chris's to change.
 window.MF_NPCS = { people: {
-  "old-lamp-seller": { name: "Old lamp-seller", who: "An old woman who has sold oil lamps and wicks at the fair for forty years.", shapes: "made by hand", shapeId: "lampseller", skin: "lampseller-A", fit: {"front": [0.99383, 1.01175, 0.00309, -0.00156], "back": [0.99383, 1.01175, 0.00309, -0.00156]}, faceFit: [1, 0, 0], skinColour: "#bd7c67", scale: {"height": 0.91, "build": [1.08, 1.06], "head": [1.04, 0.99, 1]},
+  "old-lamp-seller": { name: "Lamp-seller", who: "A small woman in an ochre kerchief who has sold oil lamps and wicks at the fair all her life.", shapes: "made by hand", shapeId: "lampseller", skin: "lampseller-A", fit: {"front": [0.99383, 1.01175, 0.00309, -0.00156], "back": [0.99383, 1.01175, 0.00309, -0.00156]}, faceFit: [1, 0, 0], skinColour: "#bd7c67", scale: {"height": 0.91, "build": [1.08, 1.06], "head": [1.04, 0.99, 1]},
     wiring: {"talk": ["talk_calm"], "greet": "beckon", "fidgets": ["fidget_hands"], "pace": 0.83, "likes": ["nod", "beckon", "think"], "moods": {"yes": "nod", "no": "shake_head", "happy": "laugh", "unsure": "think", "upset": "sad", "thanks": "greet_bow", "bye": "nod"}},
     SKIN: (function () {
 const SKIN = {
@@ -223,7 +223,7 @@ const PERSON = {
   },
 };
       return PERSON; } },
-  "old-lamplighter": { name: "Old lamplighter", who: "An elderly man who walks the fair at dusk, lighting and trimming the lanterns along the stalls.", shapes: "shapes by Fable 5.2", shapeId: "fortune-fable", skin: "fortune-B", fit: {"front": [1.01734, 1.00701, -0.00997, -0.00133], "back": [1.02023, 1.00701, -0.01077, -0.00133]}, faceFit: [1, 0, 0], skinColour: "#af7353", scale: {"height": 1.02, "build": [0.96, 0.96], "head": [1, 1, 1]},
+  "old-lamplighter": { name: "Old lamplighter", who: "An elderly woman in a red dress and headscarf who walks the fair at dusk, lighting and trimming the lanterns along the stalls.", shapes: "shapes by Fable 5.2", shapeId: "fortune-fable", skin: "fortune-B", fit: {"front": [1.01734, 1.00701, -0.00997, -0.00133], "back": [1.02023, 1.00701, -0.01077, -0.00133]}, faceFit: [1, 0, 0], skinColour: "#af7353", scale: {"height": 1.02, "build": [0.96, 0.96], "head": [1, 1, 1]},
     wiring: {"talk": ["talk_calm"], "greet": "wave", "fidgets": ["fidget_look", "fidget_shift"], "pace": 0.85, "likes": ["point", "nod", "wave"], "moods": {"yes": "nod", "no": "shake_head", "happy": "laugh", "unsure": "shrug", "upset": "sad", "thanks": "thanks", "bye": "wave"}},
     SKIN: (function () {
 const SKIN = {
@@ -721,7 +721,7 @@ const PERSON = {
   },
 };
       return PERSON; } },
-  "gate-keeper": { name: "Gate keeper", who: "A stern middle-aged woman who takes the coins at the fair gate and watches who comes and goes after dark.", shapes: "shapes by Fable 5.2", shapeId: "farmhand-fable", skin: "farmhand-B", fit: {"front": [1.00926, 1.00801, -0.00528, -0.00138], "back": [1.00926, 1.00801, -0.00528, -0.00138]}, faceFit: [1, 0, 0], skinColour: "#4e291c", scale: {},
+  "gate-keeper": { name: "Gate keeper", who: "A stern middle-aged man in a flat hat and waistcoat who takes the coins at the fair gate and watches who comes and goes after dark.", shapes: "shapes by Fable 5.2", shapeId: "farmhand-fable", skin: "farmhand-B", fit: {"front": [1.00926, 1.00801, -0.00528, -0.00138], "back": [1.00926, 1.00801, -0.00528, -0.00138]}, faceFit: [1, 0, 0], skinColour: "#4e291c", scale: {},
     wiring: {"talk": ["talk_gruff"], "greet": "beckon", "fidgets": ["fidget_look"], "pace": 1, "likes": ["cross", "refuse", "point"], "moods": {"yes": "nod", "no": "refuse", "happy": "nod", "unsure": "think", "upset": "cross", "thanks": "nod", "bye": "point"}},
     SKIN: (function () {
 const SKIN = {
@@ -881,7 +881,7 @@ const PERSON = {
   },
 };
       return PERSON; } },
-  "old-lamplighter-opus": { name: "Old lamplighter", who: "An elderly man who walks the fair at dusk, lighting and trimming the lanterns along the stalls.", shapes: "shapes by Opus 5.5", shapeId: "fortune-opus", skin: "fortune-B", fit: {"front": [1.01734, 1.00701, -0.00997, -0.00133], "back": [1.02023, 1.00701, -0.01077, -0.00133]}, faceFit: [1, 0, 0], skinColour: "#af7353", scale: {"height": 1.02, "build": [0.96, 0.96], "head": [1, 1, 1]},
+  "old-lamplighter-opus": { name: "Old lamplighter", who: "An elderly woman in a red dress and headscarf who walks the fair at dusk, lighting and trimming the lanterns along the stalls.", shapes: "shapes by Opus 5.5", shapeId: "fortune-opus", skin: "fortune-B", fit: {"front": [1.01734, 1.00701, -0.00997, -0.00133], "back": [1.02023, 1.00701, -0.01077, -0.00133]}, faceFit: [1, 0, 0], skinColour: "#af7353", scale: {"height": 1.02, "build": [0.96, 0.96], "head": [1, 1, 1]},
     wiring: {"talk": ["talk_calm"], "greet": "wave", "fidgets": ["fidget_look", "fidget_shift"], "pace": 0.85, "likes": ["point", "nod", "wave"], "moods": {"yes": "nod", "no": "shake_head", "happy": "laugh", "unsure": "shrug", "upset": "sad", "thanks": "thanks", "bye": "wave"}},
     SKIN: (function () {
 const SKIN = {

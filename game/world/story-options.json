@@ -1,0 +1,122 @@
+{
+ "read": "The lamp story is clear. One thing is taken, there are twelve to win back, and the player sees the count fill on the hull. Your new paintings are built for it: empty brackets at W3, all twelve lit at W8. It is thin in three ways. Nobody knows why wisps take lamps. Once all twelve are home the captain's problem is solved, so the climb to the beacon has nothing at stake. And little of what is special about your world shows: not the moon, not the once-in-a-lifetime fair, not crystal power, not the four themselves.",
+ "options": [
+  {
+   "id": "A",
+   "title": "Keep the lamps, give them a reason",
+   "pitch": "Wisps carry off the twelve lamps of the captain's airship. The four win them back on the moor. The captain flies them to the dead beacon, where the great wraith has been hoarding stolen light for years. The twelve lamps were only the newest she took. When she falls, all that light goes home.",
+   "start": "As drafted. Wisps drift into the fair after its lights, and the four see them off in the square and the stall row. At the mooring field they watch the last lit lamps lift off the hull and stream over the gate toward the moor. The captain says he won't fly her dark.",
+   "counted": "Lamps. Each one comes back from a wilds fight where a wisp is seen holding a ship's lamp in its tendrils. In W4, W5 and W6 the set fight always has one. After that, walking fights each give one until that area's number is reached (3, then 4, then 5). Then walking fights there give none. Someone says each number out loud: the lamplighter's 'three, by my count' at W4, and the Ranger counting at W5 and W6. Each lamp won lights on the hull at W3. Zone 3 opens when all twelve are lit.",
+   "wraith": "She sits in the cold cradle at the top of the beacon with every light she has taken since it died: lamps off passing ships, lanterns off the moor road, candles from windows. The flames in her ribs and the lanterns on her chain are those lights. The wisps fetch for her.",
+   "why_go": "With the twelfth lamp lit, the captain says the wisps will be back for them tomorrow night, and for the fair's lamps after. The dead post at the Last Lantern shows she has done this before. The candles on the rug still lean toward the crag. The four go to end it.",
+   "ending": "The flames in her ribs and the lanterns on her chain come loose. They pour out through the broken arches as a stream of small warm lights going home across the moor in every direction. One goes back to the dead post at the Last Lantern. The beacon stays dark, as you painted it at W9. The last thing seen is the lit airship far out in the sky.",
+   "shows": "The captain and his airship, and the fair's lamps and lamplighter. Little of the moon, the four's own story, or crystal power.",
+   "leans_on": "What the wraiths are: that the great wraith commands the wisps and takes light. The draft already assumes this, but it is yours to say.",
+   "changes": [
+    "Counting rule written down as above, with the lamp shown in the wisp's tendrils",
+    "Each wild area's number said out loud by someone",
+    "Captain's line after the twelfth lamp: they'll be back for these, and the fair's next",
+    "F5 ending rewritten: the light streams home, the beacon stays dark",
+    "W9 and F5 lines: the ship is far out in the sky, as painted, not below"
+   ],
+   "repaint": [],
+   "cost": "none",
+   "weak": "The last fight is not about the lamps any more, because they are already home. The climb runs on 'she'll do it again', and the four are doing an errand for a man they just met."
+  },
+  {
+   "id": "B",
+   "title": "The beacon's broken crystal heart",
+   "pitch": "The dead beacon ran on solar crystal: a great crystal heart that drank the sun by day and shone all night for airships. It cracked long ago and its pieces lie scattered over the moor. The wisps carry them, drawn to the last bit of sunlight inside. The four gather the pieces and take the heart back up to its cradle.",
+   "start": "Wisps come into the fair after its warm lights. At the mooring field three wisps hang round the captain's ship. When they are beaten, one drops a sliver of crystal giving off a thin, steam-like shine. The captain knows it: beacon crystal, from the crag. Ships have flown wide of that crag ever since it went dark. He says: bring me the heart whole, and I'll lay her on the ledge so you can put it back.",
+   "counted": "Pieces of the heart, won from wisps seen carrying a glowing piece. Same rule as A: the set fight in each wild area always has one, and walking fights give one each until the area's 3, 4 or 5. A small picture of the heart fills as pieces are won. Zone 3 opens when the heart is whole and starts to glow on its own.",
+   "wraith": "She has made the cold cradle her nest. The light in her ribs is the sunlight that leaked out when the heart cracked. The lanterns on her chain are lights she took from ships that came too near the dark crag.",
+   "why_go": "A whole heart is no use in a bag. It has to sit in the cradle, and she is sitting in it.",
+   "ending": "The heart is set in the cradle. Light rises from it like steam, up through the broken arches. A beam swings out over the moor and across the fair's glow, and the twelve lamps on the ship answer from below.",
+   "shows": "Crystal power that looks like steam, airships, why a beacon matters to people who fly, and the captain's world.",
+   "leans_on": "How solar crystal power works and that beacons ran on it. Also what wisps are: things drawn to crystal light.",
+   "changes": [
+    "The ship's-lamp prop becomes a glowing crystal piece a wisp carries",
+    "W3 opening scene rewritten: no lamps lift off the hull; a wisp drops a sliver of beacon crystal",
+    "The hull lamps lighting one by one goes, which saves work on the ship set piece; a small heart picture shows the count",
+    "The empty brackets at W3 are just the captain's lamps, stowed while moored; he hangs and lights all twelve to fly, which fits W8",
+    "F5: the cradle needs the whole heart set in it, and a rising light at the end",
+    "Great wraith: works as she is; you could change the glow colour to the crystal's light",
+    "Lines for the captain and the lamp-seller rewritten"
+   ],
+   "repaint": [],
+   "cost": "small",
+   "weak": "'Collect the pieces' is the most familiar shape in games, and the four are hired hands again. It also makes the demo say how crystal power works, which you may want to keep for yourself."
+  },
+  {
+   "id": "C",
+   "title": "The cold hearth calls every flame",
+   "pitch": "The crag beacon died long ago, and its fire went cold but never quite out. The great wraith is that fire: hungry, and calling every flame for miles to come and warm it. The wisps are flames that answered and went cold on the way, which is why they look so sad. Tonight the fair, the most light this moor has seen in a lifetime, is within reach of the call.",
+   "start": "At dusk the candles on the rug lean with no wind, as the singer already says. The lamplighter has gone out to hold the last lantern on the road because it keeps straining. Wisps drift into the fair after its lights. At the mooring field the captain has unhooked all twelve of his lamps and put them in a crate. 'They were pulling on their hooks. Toward the crag.' He won't fly, because the pull would drag the flames out over the rocks and leave him dark.",
+   "counted": "Wisps let go. A beaten wisp in the wilds does not die. Its light comes loose and drifts home toward the fair's glow on the horizon (painted in W4 and F1). Same 3, 4, 5 rule as A. The lamplighter's lantern at W4 shows the count: its flame leans toward the crag at first and stands straighter with each one let go. Zone 3 opens at twelve: the call is thin enough that the captain's lamps burn straight, so he hangs all twelve and flies.",
+   "wraith": "She lies coiled in the cold cradle round every light that answered her over the years. Those are the flames in her ribs and the lanterns on her chain. The wisps strung across the moor were her reach toward the fair.",
+   "why_go": "Letting the wisps go only thins the call for one night. While she sits in the cradle it will pull again tomorrow, at the fair's candles and the captain's lamps.",
+   "ending": "When she falls she does not vanish. Her flames and her lanterns' lights pour into the cradle and catch, and the beacon burns warm again, its old fire given back its hearth. The wisps still on the stair rise into it. Io's line already written fits: 'It isn't ours. Let it go where it belongs.'",
+   "shows": "The fair as the brightest thing this country sees once in a lifetime, which is why it all happens tonight. Also the wisps' sad faces, and Io and the Jester as people who mend rather than just win.",
+   "leans_on": "What the wraiths are: that wisps are cold flames and the great wraith is the beacon's own fire.",
+   "changes": [
+    "No lamp prop; after a wilds win, a freed light drifts off toward the fair's glow",
+    "Rug candles at W1 and the lantern flame at W4 lean toward the crag; the W4 flame straightens as the count climbs",
+    "W3 opening scene rewritten: the captain's lamps sit in a crate (one small prop); the empty brackets now mean that",
+    "The hull lamps lighting one by one goes; at twelve he hangs them all at once, which fits W8",
+    "Lamplighter's and captain's lines rewritten around the pull",
+    "F5 ending: the cradle catches fire and burns",
+    "Great wraith: no change"
+   ],
+   "repaint": [],
+   "cost": "small",
+   "weak": "The call is felt only through leaning flames, so the count is less solid in the hand than twelve lamps. Fighting wisps in order to free them needs one clear line, such as 'they put out whatever they touch', or it feels odd."
+  },
+  {
+   "id": "D",
+   "title": "The Fox sews the night shut",
+   "pitch": "Something has cut the night open over the moor, and wisps slip through the cut like draughts through a torn tent. Only the Fox, who cuts and sews the fabric of the world, can see it. She sews it shut a stitch at a time, using the light of each wisp the four beat as her thread. The cut runs all the way to the crag, where the great wraith is holding it open.",
+   "start": "At dusk in the square the rug candles lean and the Fox's bell rings by itself. She says the evening has a draught in it. At the mooring field wisps pour in over the gate from one spot in the sky. The Fox sees a thin, ragged line in the night, running over the moor toward the crag. The captain has taken his lamps in and won't fly: 'I don't take her into a sky that's coming apart.'",
+   "counted": "Stitches. After each wilds win the Fox pulls the beaten wisp's light thin and sews it in as one stitch. Same 3, 4, 5 rule as A. A cold blue line of stitches grows across the night sky in W4 to W6 and F1. Zone 3 opens at the twelfth stitch: the cut is closed across the moor, and the last open stretch hangs in the sky over the crag, which only the airship can reach.",
+   "wraith": "At the top of the beacon she has her long hands in the cut, holding it open. The flames in her ribs are light from whatever lies on the other side.",
+   "why_go": "In the Fox's words: a seam that isn't tied off isn't a seam. By morning it would unpick itself.",
+   "ending": "She falls. The others hold the edges together while the Fox puts the last stitch through, snips with her scissors, and her bell rings once. The blue thread glows and fades, the flames in the wraith's ribs go out as the night closes, and Auros is where it has been all evening.",
+   "shows": "The Fox's fabric magic, her bell, scissors and cold blue foxfire. It is a story about one of the four rather than about the captain.",
+   "leans_on": "Where wraiths come from (what is on the other side of the cut), how far the Fox's magic reaches, and who made the cut.",
+   "changes": [
+    "No lamp prop; a cold blue stitched line drawn over the night skies of W4 to W6 and F1, one stitch per win",
+    "W1: new moment, the Fox's bell rings by itself",
+    "W3 opening scene rewritten: wisps pour in from one spot in the sky; the hull lamps lighting one by one goes",
+    "A short sewing moment for the Fox after each wilds win",
+    "F5 ending: the last stitch over the cradle",
+    "Great wraith: look kept; you could change the glow colour"
+   ],
+   "repaint": [],
+   "cost": "medium",
+   "weak": "Magic fixing magic is hard to feel. The cut has to be drawn well over the paintings or the player sees nothing. The other three play second fiddle. And it raises a big question, what is on the other side, that the demo can't answer."
+  }
+ ],
+ "pick": {
+  "id": "C",
+  "why": "One idea answers both of the mapper's open questions. Wisps are flames answering a call, and the fair, the brightest light here in a lifetime, explains why it happens tonight. The stake is still alive at the top of the stair, because the call is still there after the twelfth wisp is let go. It uses lines already written (candles leaning with no wind, the lamplighter who won't leave her lantern, Io's 'let it go where it belongs'), makes the wisps' sad faces mean something, and costs little with no repaint."
+ },
+ "join": "A and C fit together well. Keep A's twelve lamps as the count, since W3, W8 and the counting rule are built for them. Put C's reason underneath: the lamps were pulled toward a cold hearth, not stolen. Then choose A's ending (the light goes home and the beacon stays dark, as W9 is painted) or C's (the beacon burns again). B's crystal heart could be what lies cold in the cradle in C. The Fox's stitching from D could be a small moment for her at the end of any of them.",
+ "ask": [
+  "Are the wisps villains, or sad lights that can be set free?",
+  "At the end, should the beacon burn, or stay dark as you painted it?",
+  "Do you want the demo to show crystal power at work, or keep it in the background?",
+  "Should the story be the captain's problem, or something that reaches the four themselves?"
+ ],
+ "_made": {
+  "by": "claude-opus-5-5@high",
+  "cost": 0.662073,
+  "seconds": 328.7,
+  "usage": {
+   "input_tokens": 16957,
+   "cache_creation_input_tokens": 2305,
+   "cache_read_input_tokens": 0,
+   "output_tokens": 29136
+  },
+  "lost": 0.85,
+  "note": "A first try at extra-high effort with a 40,000-token limit spent the whole limit thinking and wrote nothing (about $0.85, estimated from the limit). This answer is the second try, at high effort, shown the nine paintings."
+ }
+}

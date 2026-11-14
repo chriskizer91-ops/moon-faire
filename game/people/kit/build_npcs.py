@@ -16,7 +16,7 @@ for tag in ['hand', 'fable', 'opus']:
         for i, k in enumerate(sj['skins']):
             L = 'ABC'[i]; key = '%s-%s' % (pid, L); d = os.path.join(P, 'painted', '%s__%s' % (key, tag))
             if not os.path.exists(d + '/log.json') or (tag, pid) in DROPPED: continue
-            lg = json.load(open(d + '/log.json')); j = json.load(open(os.path.join(P, 'skins', pid, L + '.json'))); nid = slug(k['name']) + ('-opus' if tag == 'opus' else '')
+            lg = json.load(open(d + '/log.json')); j = json.load(open(os.path.join(P, 'skins', pid, L + '.json'))); nid = (k.get('id') or slug(k['name'])) + ('-opus' if tag == 'opus' else '')
             tex[key] = {'body': webp(os.path.join(P, 'skins', pid, L + '-body.webp')), 'face': webp(os.path.join(P, 'skins', pid, L + '-face.webp'))}
             sc = json.load(open(d + '/person-scale.json')) if os.path.exists(d + '/person-scale.json') else {}
             people.append('  %s: { name: %s, who: %s, shapes: %s, shapeId: %s, skin: %s, fit: %s, faceFit: %s, skinColour: %s, scale: %s,\n    wiring: %s,\n    SKIN: (function () {\n%s\n      return SKIN; })(),\n    person: function () {\n%s\n      return PERSON; } }' % (

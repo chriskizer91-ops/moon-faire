@@ -33,9 +33,10 @@
   {
    "key": "lamplighter",
    "name": "Old lamplighter",
-   "who": "An elderly man who walks the fair at dusk, lighting and trimming the lanterns along the stalls.",
+   "who": "An elderly woman in a red dress and headscarf who walks the fair at dusk, lighting and trimming the lanterns along the stalls.",
    "body": "A saffron-yellow headcloth wraps the crown with a thin dull copper band at the brow; its cloth hangs behind the ears to the shoulders and is knotted at the back with a short tail, smudged grey with soot along the edges. Long thin hair the colour of ash and white shows at the sides, falls in two loose locks over the chest and hangs down the back. A plain copper chain with a small round pendant lies on the chest. The heavy rust-red robe reaches the ankles, with wide cuffs on the forearms singed brown at their edges and darker soot marks on the front; its hem band is moss green and frayed, with a square patch in faded brown on one side. A cream sash with three thin moss-green stripes ties in a round knot at his left hip, its long tail stained with lamp oil. His boots are scuffed dark brown with worn soles, and his hands are knotted and tan with grey soot in the creases.",
-   "face": "A man near seventy with weathered, warm olive-brown skin, hollow cheeks, deep lines across the brow, and crow's feet. He has kind hazel-brown eyes under bushy white brows, a long nose, and a short grey stubble on the jaw. His thin pale lips are closed in a quiet, patient calm, with a faint dark smudge of soot on one cheekbone."
+   "face": "A man near seventy with weathered, warm olive-brown skin, hollow cheeks, deep lines across the brow, and crow's feet. He has kind hazel-brown eyes under bushy white brows, a long nose, and a short grey stubble on the jaw. His thin pale lips are closed in a quiet, patient calm, with a faint dark smudge of soot on one cheekbone.",
+   "id": "old-lamplighter"
   }
  ],
  "written_by": "claude-opus-5-5@high",
