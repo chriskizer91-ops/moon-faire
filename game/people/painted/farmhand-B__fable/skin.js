@@ -7,5 +7,9 @@ const SKIN = {
     soles: '#2a2523'
   },
   rough: { boots: 0.5 },
-  seam: 0.2
+  seam: 0.2,
+  move: {
+    straw: [0, -0.03, 0],
+    band: [0, -0.03, 0]
+  }
 };

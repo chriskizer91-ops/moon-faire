@@ -187,7 +187,7 @@ A third test gave the same four lines to Fable 5.2 through the key, at high effo
 
 High effort is the setting to use; extra-high adds little for three to five times the price. The fortune-teller at high effort stands beside the hand-made lamp-seller. The men do not, because of the template body and face. All three tests cost $12.34. Limits found: every person has the Jester's body and face shape (men and stout people only pass under a coat or apron, at a distance); shapes are stiff, so nothing sways; the painted beard only reaches round the mouth. Not measured: speed on Chris's laptop with several people in a scene.
 
-## Skins: one person model, several painted people (November 13) — 19 painted people, waiting for Chris to judge them
+## Skins: one person model, several painted people (November 13) — Chris: all the painted ones can be NPCs
 
 Chris's idea: paint a simple person model with images, so one model carries two or three different skins.
 
@@ -203,6 +203,33 @@ Chris's idea: paint a simple person model with images, so one model carries two 
 - Done: the lamp-seller model (3 skins), the four Fable 5.2 models (2 each) and the same skins on the four Opus 5.5 models (2 each): 19 painted people, about 11 cents and 16 seconds of fitting each ($2.01).
 - Found: the painted skin does most of the work, and the same pictures sit on the Opus models nearly as well as on the Fable models they were painted for. Still showing: hair as a flat-coloured shape round the face, angular shoulders, the Jester's body under men's clothes. ChatGPT did not have the style picture, so the skins are more lifelike than the witches' painted look.
 - Everything spent on Chris's key by the end of this step: about $15.23.
+
+## Fair folk wired for the game: talking and emotes (November 13)
+
+Chris passed all 19 painted people as NPCs, asked for the hats to be pulled down, and asked for them to be wired for talking and emotes so they drop into the game. The moves and each person's choice of them were written by Claude Fable 5.2 (high effort) through his API key.
+
+- Test page: https://claude.ai/artifact/Gqb3KJtYJ76eTn5k1bWkAM (file: `people/out/moon-faire-npcs.html`).
+- **Hats.** The fitter's file gained `move: { part: [left, up, forward] }`: a part of the model is moved with its paint (`moved()` in `person-kit.js`). Fable pulled every hat, cap and headcloth down 1 to 4.5 cm (`people/painted/*/skin.js`, `before.jpg` and `final.jpg`).
+- **Faces that blink and speak.** `person-kit.js` paints each face's own eyelids, open mouth and smile from its face picture (`faceParts`), in the places the template's face already swaps in. They are simple painted shapes, right for walking distance, plain in a close-up.
+- **New moves on the template.** `jester_kit.js` now hands out `defAction`, `FP` and `hasAction`, so moves are added from outside in her own pose language (hand targets, head and spine angles, fingers, eyes, mouth).
+- **The library.** `people/npc/emotes.js` (`window.MF_EMOTES`): three talking loops (`talk_calm`, `talk_lively`, `talk_gruff`), fourteen emotes (`nod`, `shake_head`, `wave`, `greet_bow`, `shrug`, `laugh`, `point`, `think`, `surprised`, `sad`, `cross`, `beckon`, `refuse`, `thanks`) and three idle fidgets. Written by `people/kit/make_emotes.py` from `people/kit/EMOTE-KIT.md`, with film strips shown back to the model (`people/npc/strips/`). $2.82.
+- **Each person's own way.** `people/npc/wiring.json` (by `make_wiring.py`): which talking loops, their hello, their fidgets, their pace, the three emotes most like them, and an emote for each of yes, no, happy, unsure, upset, thanks, bye.
+- **The pack the game loads** (made by `people/kit/build_npcs.py`): `people/npc/npcs.js` (`window.MF_NPCS`: shapes, skin fit, wiring), `npc_tex.js` (`window.MF_NPC_TEX`: the pictures, 1.9 MB) and `emotes.js`, with `people/npc/npc.js` (`window.MF_NPC`) as the one thing game code talks to.
+
+To put a person in a scene (after `three.r128.min.js`, `meshopt_simplifier.js`, `jester_tex.js`, `jester_kit.js`, `lod.js`, `window.MF_FACE_PLAIN`, `person-kit.js`, then `emotes.js`, `npcs.js`, `npc_tex.js`, `npc.js`):
+
+```js
+const npc = await MF_NPC.make('old-lamp-seller');      // ids: MF_NPC.list()
+stage.cast.add(npc.root, npc.fx); npc.root.position.set(x, 0, z);
+npc.update(dt);                                        // every frame: blinks, fidgets, runs whatever was asked
+npc.face(playerX, playerZ);                            // turn to face the party
+npc.greet();                                           // their own hello
+npc.talk(true);  /* words on screen */  npc.talk(false);
+npc.emote('laugh');  npc.emote(npc.wiring.moods.thanks);
+npc.headTop(vec3);                                     // a point above the head for a speech mark
+```
+
+Ids are the stand-in names (`old-lamp-seller`, `pie-seller`, `ballad-singer`, `fortune-teller`, `old-lamplighter`, `old-night-watchman`, `chestnut-roaster`, `fair-baker`, `ribbon-dyer`, `farm-lad`, `gate-keeper`); the last eight also exist with `-opus` on the end (the same skin on the Opus 5.5 shapes). Not done: nothing is placed in a game scene yet, the people cannot walk a path, and speed with several of them in a scene has not been measured on Chris's laptop. Everything spent on Chris's key by the end of this step: about $20.
 
 ## Next
 

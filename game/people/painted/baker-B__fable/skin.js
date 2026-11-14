@@ -5,4 +5,5 @@ const SKIN = {
   flat: { hair: '#5c5754', soles: '#2a2522' },
   rough: { boots: 0.5 },
   seam: 0.25,
+  move: { cap: [0, -0.035, 0], capband: [0, -0.035, 0] },
 };

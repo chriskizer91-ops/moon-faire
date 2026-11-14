@@ -83,6 +83,27 @@
     for (let i = 0; i < 2; i++) { const k = S[i] || 1; out[i] = auto[i] / k; out[2 + i] = (CEN[i] - (CEN[i] + m[i]) / k) * auto[i] + auto[2 + i]; }
     return new THREE.Vector4(out[0], out[1], out[2], out[3]);
   }
+  // the face's own blink and mouth shapes, painted from the person's face picture: lids in the skin colour found above each eye,
+  // an open mouth, and a smile's turned-up corners. Same places and sizes as the template's own patches
+  function faceParts(fc) {
+    const g0 = fc.getContext('2d'), mean = (x, y) => { const d = g0.getImageData(x - 5, y - 5, 11, 11).data; let r = 0, gg = 0, b = 0; for (let i = 0; i < d.length; i += 4) { r += d[i]; gg += d[i + 1]; b += d[i + 2]; } const n = d.length / 4; return [r / n, gg / n, b / n].map(Math.round); };
+    const part = (x, y, w, h, paint) => { const c = canvas(w, h), g = c.getContext('2d'); g.drawImage(fc, x, y, w, h, 0, 0, w, h); g.translate(-x, -y); paint(g); return { src: c.toDataURL('image/webp', 0.92), x: x / 1024, y: y / 1024, w: w / 1024, h: h / 1024 }; };
+    const oval = (g, x, y, rx, ry, c, a, edge) => { const gr = g.createRadialGradient(0, 0, 0, 0, 0, 1); gr.addColorStop(0, `rgba(${c},${a})`); gr.addColorStop(edge, `rgba(${c},${a})`); gr.addColorStop(1, `rgba(${c},0)`); g.save(); g.translate(x, y); g.scale(rx, ry); g.fillStyle = gr; g.beginPath(); g.arc(0, 0, 1, 0, 7); g.fill(); g.restore(); };
+    const line = (g, a, b, c, col, w) => { g.save(); g.strokeStyle = col; g.lineWidth = w; g.lineCap = 'round'; g.beginPath(); g.moveTo(a[0], a[1]); g.quadraticCurveTo(b[0], b[1], c[0], c[1]); g.stroke(); g.restore(); };
+    const eyes = [LAND.eyeL, LAND.eyeR], lids = eyes.map((e) => mean(e[0], e[1] - 44)), dark = lids.map((c) => c.map((v) => Math.round(v * 0.32)));
+    const lid = (k) => (g) => eyes.forEach((e, i) => { const y = e[1] + 2 - (1 - k) * 12; oval(g, e[0], y, 62, 10 + 16 * k, lids[i], 1, 0.72); line(g, [e[0] - 48, y + 4 + 6 * k], [e[0], y + 8 + 12 * k], [e[0] + 48, y + 4 + 6 * k], `rgba(${dark[i]},0.8)`, 4.5); });
+    const M = LAND.mouth, lip = mean(M[0], M[1] + 16).map((v) => Math.round(v * 0.22));
+    return { shut: part(187, 263, 649, 200, lid(1)), half: part(187, 263, 649, 200, lid(0.5)),
+      oh: part(349, 573, 325, 195, (g) => { oval(g, M[0], M[1] + 4, 36, 23, lip, 0.95, 0.6); }),
+      smile: part(349, 573, 325, 195, (g) => { for (const k of [-1, 1]) line(g, [M[0] + k * 58, M[1] - 2], [M[0] + k * 80, M[1] - 6], [M[0] + k * 92, M[1] - 20], `rgba(${lip},0.55)`, 5); }) };
+  }
+  // a part of the model moved a little (a hat pulled down): its paint moves with it
+  function moved(m, v, kind) {
+    const first = m.onBeforeCompile; m.customProgramCacheKey = () => 'moved-' + kind;
+    m.onBeforeCompile = (sh, r) => { if (first) first(sh, r); sh.uniforms.uMove = { value: new THREE.Vector3(v[0] || 0, v[1] || 0, v[2] || 0) };
+      sh.vertexShader = sh.vertexShader.replace('#include <common>', '#include <common>\nuniform vec3 uMove;').replace('#include <begin_vertex>', '#include <begin_vertex>\ntransformed += uMove;'); };
+    return m;
+  }
   async function prepareSkin(person, skin) {
     const T = window.JESTER_TEX, S = skin.SKIN || {}, hexSkin = S.skin || skin.skin || person.skin || '#d99f91', t = tone(hexSkin);
     const [pic, side, hands, body] = await Promise.all([load(skin.face), load(T.faceSide), load(T.hands), load(skin.body)]);
@@ -92,7 +113,7 @@
     const jaw = hex(rgb(hexSkin).map((v) => v * 0.94));
     return { faceError: '', faceCanvas: fc, bodyTex: tex, skin, S, front: layFit(skin.fit.front, S.front), back: layFit(skin.fit.back, S.back),
       textures: Object.assign({}, T, { face: fc.toDataURL('image/webp', 0.92), faceSide: skinned(plainSide(side, T.skinJaw || T.skin), side.width, side.height, t, false).toDataURL('image/png'),
-        hands: skinned(hands, 512, 512, t, false).toDataURL('image/webp', 0.9), skin: hexSkin, skinJaw: jaw, faceParts: {} }) };
+        hands: skinned(hands, 512, 512, t, false).toDataURL('image/webp', 0.9), skin: hexSkin, skinJaw: jaw, faceParts: faceParts(fc) }) };
   }
   // the body sheet read by where each point stands in the standing pose: the front half on what faces forward, the back half on what faces back
   function painted(K, P, rough) {
@@ -131,7 +152,8 @@
     lod.onGeometry = (key, g, B, K) => { if (key.slice(0, 2) !== 'p_') thin(key, g, B, K); };            // a person's own parts are already light
     lod.material = (key, B, K) => {
       if (prepared.bodyTex && key !== 'face' && key !== 'hand' && key !== 'skin') { const nm = key.slice(0, 2) === 'p_' ? key.slice(2) : (WORD[key] || key), S = prepared.S, fl = S.flat && S.flat[nm], ro = S.rough && S.rough[nm];
-        return fl ? material({ color: fl, rough: ro == null ? 0.8 : ro }, K) : painted(K, prepared, ro); }
+        const mt = fl ? material({ color: fl, rough: ro == null ? 0.8 : ro }, K) : painted(K, prepared, ro), mv = S.move && S.move[nm];
+        return mv ? moved(mt, mv, fl ? 'flat' : 'painted') : mt; }
       if (key.slice(0, 2) === 'p_') return material(parts[key.slice(2)] || '#888888', K);
       for (const w in BODY) if (BODY[w] === key) { let c = colors[w] || (w === 'puff' && colors.sleeve) || (w === 'forearm' && colors.cuff); if (!c) break; if (c === 'skin') c = skinHex;
         return material(Object.assign({ oneSided: true }, key === 'boot' ? { rough: 0.45 } : null, typeof c === 'string' ? { color: c } : c), K); }

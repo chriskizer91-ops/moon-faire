@@ -7,27 +7,27 @@
  "rounds": [
   {
    "n": 1,
-   "seconds": 15.1,
+   "seconds": 5.8,
    "usage": {
-    "input_tokens": 2568,
-    "output_tokens": 1206,
+    "input_tokens": 2658,
+    "output_tokens": 504,
     "cache_creation_input_tokens": 0,
-    "cache_read_input_tokens": 1193
+    "cache_read_input_tokens": 1386
    },
-   "cost": 0.0690226,
+   "cost": 0.041701199999999994,
    "said": "file"
   },
   {
    "n": 2,
-   "seconds": 9.2,
+   "seconds": 1.0,
    "usage": {
-    "input_tokens": 4983,
-    "output_tokens": 680,
+    "input_tokens": 4371,
+    "output_tokens": 5,
     "cache_creation_input_tokens": 0,
-    "cache_read_input_tokens": 1193
+    "cache_read_input_tokens": 1386
    },
-   "cost": 0.0673026,
-   "said": "file"
+   "cost": 0.035445199999999996,
+   "said": "DONE"
   }
  ],
  "parts": [
@@ -47,7 +47,15 @@
   "cap",
   "capband"
  ],
- "cost": 0.1363252,
- "seconds": 24.3,
+ "earlier": [
+  {
+   "cost": 0.1363252,
+   "seconds": 24.3,
+   "looks": 2
+  }
+ ],
+ "note": "",
+ "cost": 0.21347159999999998,
+ "seconds": 6.8,
  "looks": 2
 }

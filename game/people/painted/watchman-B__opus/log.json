@@ -7,26 +7,26 @@
  "rounds": [
   {
    "n": 1,
-   "seconds": 21.8,
+   "seconds": 6.0,
    "usage": {
-    "input_tokens": 2563,
-    "output_tokens": 1791,
+    "input_tokens": 2627,
+    "output_tokens": 522,
     "cache_creation_input_tokens": 0,
-    "cache_read_input_tokens": 1193
+    "cache_read_input_tokens": 1386
    },
-   "cost": 0.09238260000000001,
+   "cost": 0.042173199999999994,
    "said": "file"
   },
   {
    "n": 2,
-   "seconds": 1.4,
+   "seconds": 1.8,
    "usage": {
-    "input_tokens": 5563,
-    "output_tokens": 90,
+    "input_tokens": 4358,
+    "output_tokens": 110,
     "cache_creation_input_tokens": 0,
-    "cache_read_input_tokens": 1193
+    "cache_read_input_tokens": 1386
    },
-   "cost": 0.0483426,
+   "cost": 0.0395412,
    "said": "DONE"
   }
  ],
@@ -47,7 +47,15 @@
   "hair",
   "beard"
  ],
- "cost": 0.1407252,
- "seconds": 23.2,
+ "earlier": [
+  {
+   "cost": 0.1407252,
+   "seconds": 23.2,
+   "looks": 2
+  }
+ ],
+ "note": "",
+ "cost": 0.2224396,
+ "seconds": 7.8,
  "looks": 2
 }

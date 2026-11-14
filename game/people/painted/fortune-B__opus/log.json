@@ -7,26 +7,26 @@
  "rounds": [
   {
    "n": 1,
-   "seconds": 8.0,
+   "seconds": 13.0,
    "usage": {
-    "input_tokens": 2546,
-    "output_tokens": 547,
+    "input_tokens": 2550,
+    "output_tokens": 1077,
     "cache_creation_input_tokens": 0,
-    "cache_read_input_tokens": 1193
+    "cache_read_input_tokens": 1386
    },
-   "cost": 0.0424866,
+   "cost": 0.0637572,
    "said": "file"
   },
   {
    "n": 2,
-   "seconds": 4.9,
+   "seconds": 6.7,
    "usage": {
-    "input_tokens": 4302,
-    "output_tokens": 355,
+    "input_tokens": 4836,
+    "output_tokens": 573,
     "cache_creation_input_tokens": 0,
-    "cache_read_input_tokens": 1193
+    "cache_read_input_tokens": 1386
    },
-   "cost": 0.0488546,
+   "cost": 0.061885199999999994,
    "said": "file"
   }
  ],
@@ -43,7 +43,15 @@
   "hair",
   "scarf"
  ],
- "cost": 0.0913412,
- "seconds": 12.9,
+ "earlier": [
+  {
+   "cost": 0.0913412,
+   "seconds": 12.9,
+   "looks": 2
+  }
+ ],
+ "note": "",
+ "cost": 0.2169836,
+ "seconds": 19.7,
  "looks": 2
 }

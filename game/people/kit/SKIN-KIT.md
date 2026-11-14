@@ -13,6 +13,7 @@ const SKIN = {
   flat: { soles: '#2a1d16' },               // parts painted one flat colour instead of from the sheet: part name -> colour
   rough: { boots: 0.5 },                    // how matt a part is: 0.3 polished leather or metal, 0.9 wool (the default is 0.86)
   seam: 0.2,                                // how softly front and back meet at the sides: 0.05 a hard line, 0.5 a wide blend
+  move: { hat: [0, -0.03, 0] },             // move a part of the model, with its paint: [to her left, up, forward] in metres
 };
 ```
 
@@ -25,5 +26,6 @@ What to look for, in order of how much it matters:
 3. Skin. The hands and neck must match the painted face: set `skin`.
 4. The face. If the eyes, nose or mouth sit off the head's own eyes, nose and mouth, nudge `face` by a few pixels.
 5. A hard line or a smear where front and back meet at the sides: adjust `seam`.
+6. A hat, cap or headcloth that sits too high. It should sit on the head, its front edge just above the brows (the brows are 1.545 m up, the eyes 1.525 m, the top of the skull 1.645 m), never over the eyes. Hats built on this template usually perch about 3 cm too high. Use `move` on every part that makes up the hat (crown, brim, band, feather, pom-pom), all by the same amount so they stay together.
 
 You cannot change the shapes, the painting or the light. Do not try to fix those. Two looks are usually enough; say `DONE` as soon as what remains is small.

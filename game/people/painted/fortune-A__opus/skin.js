@@ -3,4 +3,5 @@ const SKIN = {
   flat: { soles: '#1c1618' },
   rough: { boots: 0.5, gold: 0.35, sash: 0.8 },
   seam: 0.2,
+  move: { scarf: [0, -0.03, 0], gold: [0, -0.03, 0] },
 };

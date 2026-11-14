@@ -22,5 +22,9 @@ for old, new, n in [("addPart('wine', spherePart(kc,", "addPart('capknot', spher
 a2 = "(LOD.material && LOD.material(key, B, { MATS, lin, sheen, std, phys })) || MATS[key] || MATS.cloth"
 assert s.count(a2) == 1
 s = s.replace(a2, "(LOD.material && LOD.material(key, B, { MATS, lin, sheen, std, phys })) || MATS[key] || MATS[{ capknot: 'wine', puff: 'wine', neckband: 'cloth' }[key]] || MATS.cloth")
+# new moves can be added from outside (a person's talking and emotes): defAction and the finger shapes are handed out
+a3 = "    root, fx, skeleton, bones, animate, play, ACTIONS, anchor,"
+assert s.count(a3) == 1
+s = s.replace(a3, "    root, fx, skeleton, bones, animate, play, ACTIONS, anchor, defAction, FP, hasAction: (n) => !!ACTS[n],")
 open(sys.argv[2], 'w', encoding='utf-8').write(s)
 print('ok', len(s))

@@ -7,27 +7,27 @@
  "rounds": [
   {
    "n": 1,
-   "seconds": 10.5,
+   "seconds": 5.5,
    "usage": {
-    "input_tokens": 2557,
-    "output_tokens": 857,
+    "input_tokens": 2604,
+    "output_tokens": 498,
     "cache_creation_input_tokens": 0,
-    "cache_read_input_tokens": 1193
+    "cache_read_input_tokens": 1386
    },
-   "cost": 0.0549746,
+   "cost": 0.041029199999999995,
    "said": "file"
   },
   {
    "n": 2,
-   "seconds": 3.9,
+   "seconds": 1.4,
    "usage": {
-    "input_tokens": 4623,
-    "output_tokens": 294,
+    "input_tokens": 4311,
+    "output_tokens": 52,
     "cache_creation_input_tokens": 0,
-    "cache_read_input_tokens": 1193
+    "cache_read_input_tokens": 1386
    },
-   "cost": 0.0489826,
-   "said": "file"
+   "cost": 0.036845199999999995,
+   "said": "DONE"
   }
  ],
  "parts": [
@@ -47,7 +47,15 @@
   "band",
   "boot"
  ],
- "cost": 0.1039572,
- "seconds": 14.4,
+ "earlier": [
+  {
+   "cost": 0.1039572,
+   "seconds": 14.4,
+   "looks": 2
+  }
+ ],
+ "note": "",
+ "cost": 0.18183159999999998,
+ "seconds": 6.9,
  "looks": 2
 }

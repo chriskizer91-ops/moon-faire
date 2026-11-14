@@ -7,26 +7,26 @@
  "rounds": [
   {
    "n": 1,
-   "seconds": 8.7,
+   "seconds": 3.8,
    "usage": {
-    "input_tokens": 2560,
-    "output_tokens": 727,
+    "input_tokens": 2599,
+    "output_tokens": 287,
     "cache_creation_input_tokens": 0,
-    "cache_read_input_tokens": 1193
+    "cache_read_input_tokens": 1386
    },
-   "cost": 0.0497986,
+   "cost": 0.0325492,
    "said": "file"
   },
   {
    "n": 2,
    "seconds": 0.9,
    "usage": {
-    "input_tokens": 4496,
-    "output_tokens": 5,
+    "input_tokens": 4095,
+    "output_tokens": 31,
     "cache_creation_input_tokens": 0,
-    "cache_read_input_tokens": 1193
+    "cache_read_input_tokens": 1386
    },
-   "cost": 0.0364066,
+   "cost": 0.034277199999999994,
    "said": "DONE"
   }
  ],
@@ -47,7 +47,15 @@
   "straw",
   "band"
  ],
- "cost": 0.0862052,
- "seconds": 9.6,
+ "earlier": [
+  {
+   "cost": 0.0862052,
+   "seconds": 9.6,
+   "looks": 2
+  }
+ ],
+ "note": "",
+ "cost": 0.1530316,
+ "seconds": 4.7,
  "looks": 2
 }

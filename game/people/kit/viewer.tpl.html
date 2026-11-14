@@ -11,7 +11,7 @@
   const canvas = document.getElementById('c');
   const stage = makeMFStage(canvas, { preserve: true, shadow: 1024 });
   stage.painting = false;
-  const VIEWS = { front: [0, 0.98, 2.35, 0], threeq: [35, 0.98, 2.35, 0], side: [90, 0.98, 2.35, 0], back: [180, 0.98, 2.35, 0], face: [0, 1.50, 0.50, 0], faceq: [40, 1.50, 0.50, 0], top: [20, 1.3, 1.6, 35] };
+  const VIEWS = { front: [0, 0.98, 2.35, 0], threeq: [35, 0.98, 2.35, 0], side: [90, 0.98, 2.35, 0], back: [180, 0.98, 2.35, 0], face: [0, 1.50, 0.50, 0], faceq: [40, 1.50, 0.50, 0], top: [20, 1.3, 1.6, 35], strip: [22, 0.98, 2.35, 4] };
   let J = null, t = 0;
   function view(name, heightK) {
     const v = VIEWS[name] || VIEWS.front, k = heightK || 1, a = v[0] * Math.PI / 180, e = v[3] * Math.PI / 180, d = v[2] * 5.2 * (name.slice(0, 4) === 'face' ? 1 : 1), y = v[1] * k;
@@ -36,6 +36,21 @@
     // walking: phase runs with the steps; standing: phase 0
     step(dt, n, walk) { for (let i = 0; i < (n || 1); i++) { t += dt; J.animate(walk ? t * 1.9 : 0, walk ? 1 : 0, t, dt, 0); } },
     draw(name) { view(name, J && J.person ? (J.person.height || 1) : 1); stage.render(); const i = stage.info(); return i; },
+    // emotes: the text of a file that sets EMOTES. Each becomes a move called e_<name>
+    defEmotes(code) {
+      const E = new Function('FP', code + '\n;return EMOTES;')(J.FP), CH = ['hip', 'hipR', 'sp', 'hd', 'sh', 'hR', 'hL', 'eR', 'eL', 'twR', 'twL', 'wrR', 'wrL', 'fR', 'fL', 'ftR', 'ftL', 'knR', 'knL', 'eyes', 'mouth'], bad = [], durs = {};
+      for (const n in E) { try { const e = E[n]; if (!(e.dur > 0) || !Array.isArray(e.keys)) throw new Error('needs dur and keys'); let last = -1;
+          for (const k of e.keys) { if (typeof k.t !== 'number' || k.t < last || k.t > e.dur) throw new Error('key times must rise and stay inside dur'); last = k.t; for (const c in k) if (c !== 't' && CH.indexOf(c) < 0) throw new Error('unknown channel ' + c); }
+          J.defAction('e_' + n, e.dur, e.keys, { outro: e.outro == null ? 0.4 : e.outro }); durs[n] = e.dur; } catch (err) { bad.push(n + ': ' + err.message); } }
+      return { durs, bad };
+    },
+    // n pictures of one emote, evenly through it, seen from the three-quarter front
+    strip(name, n, dur) {
+      const out = []; J.stop(); for (let i = 0; i < 20; i++) { t += 1 / 30; J.animate(0, 0, t, 1 / 30, 0); }
+      J.play('e_' + name, true); let at = 0;
+      for (let i = 0; i < n; i++) { const want = dur * (i + 0.6) / n; while (at < want) { t += 1 / 30; at += 1 / 30; J.animate(0, 0, t, 1 / 30, 0); } PV.draw('strip'); out.push(canvas.toDataURL('image/jpeg', 0.82)); }
+      J.stop(); return out;
+    },
     faceURL() { return null; },
   };
   window.PV.ready = true;

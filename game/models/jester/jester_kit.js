@@ -3855,7 +3855,7 @@ function makeJester(opts) {
   const state = {};
   function setFade(f) { const was = fade > 0.001; fade = cl(Number.isFinite(+f) ? +f : 1, 0, 1); const now = fade > 0.001; if (now !== was) { root.visible = now; fx.visible = now; } }
   return {
-    root, fx, skeleton, bones, animate, play, ACTIONS, anchor, setFade, state, setStance, STANCES: STANCE_LIST,
+    root, fx, skeleton, bones, animate, play, ACTIONS, anchor, defAction, FP, hasAction: (n) => !!ACTS[n], setFade, state, setStance, STANCES: STANCE_LIST,
     stop() { act = null; pending = ''; },
     reset() { act = null; pending = ''; stance = null; stanceTo = ''; resetCloth(); for (const c of chains) c.reset(); },
     get stance() { return stanceTo; }, set targetDist(v) { tgtK = v > 0 ? cl(v / 2.6, 0.4, 2.6) : 1; }, get spin() { return spinNow; },      // spin: the host adds this to the root's turn (a twirl)

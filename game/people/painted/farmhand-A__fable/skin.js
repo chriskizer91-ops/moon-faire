@@ -7,5 +7,9 @@ const SKIN = {
     soles: '#2a1d16'
   },
   rough: { boots: 0.6, straw: 0.8 },
-  seam: 0.2
+  seam: 0.2,
+  move: {
+    straw: [0, -0.05, 0],   // hat pulled down so the brim sits just above the brows
+    band:  [0, -0.05, 0]    // band moves with the hat
+  }
 };

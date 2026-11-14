@@ -1,0 +1,303 @@
+{
+ "wiring": {
+  "lampseller-A": {
+   "talk": [
+    "talk_calm"
+   ],
+   "greet": "beckon",
+   "fidgets": [
+    "fidget_hands"
+   ],
+   "pace": 0.83,
+   "likes": [
+    "nod",
+    "beckon",
+    "think"
+   ],
+   "moods": {
+    "yes": "nod",
+    "no": "shake_head",
+    "happy": "laugh",
+    "unsure": "think",
+    "upset": "sad",
+    "thanks": "greet_bow",
+    "bye": "nod"
+   }
+  },
+  "lampseller-B": {
+   "talk": [
+    "talk_lively",
+    "talk_calm"
+   ],
+   "greet": "wave",
+   "fidgets": [
+    "fidget_shift",
+    "fidget_hands"
+   ],
+   "pace": 1,
+   "likes": [
+    "beckon",
+    "laugh",
+    "point"
+   ],
+   "moods": {
+    "yes": "nod",
+    "no": "shake_head",
+    "happy": "laugh",
+    "unsure": "shrug",
+    "upset": "cross",
+    "thanks": "thanks",
+    "bye": "wave"
+   }
+  },
+  "lampseller-C": {
+   "talk": [
+    "talk_calm",
+    "talk_lively"
+   ],
+   "greet": "greet_bow",
+   "fidgets": [
+    "fidget_look",
+    "fidget_hands"
+   ],
+   "pace": 1.08,
+   "likes": [
+    "greet_bow",
+    "think",
+    "sad"
+   ],
+   "moods": {
+    "yes": "nod",
+    "no": "shake_head",
+    "happy": "laugh",
+    "unsure": "think",
+    "upset": "sad",
+    "thanks": "greet_bow",
+    "bye": "wave"
+   }
+  },
+  "fortune-A": {
+   "talk": [
+    "talk_calm"
+   ],
+   "greet": "beckon",
+   "fidgets": [
+    "fidget_hands"
+   ],
+   "pace": 0.94,
+   "likes": [
+    "think",
+    "beckon",
+    "point"
+   ],
+   "moods": {
+    "yes": "nod",
+    "no": "refuse",
+    "happy": "nod",
+    "unsure": "think",
+    "upset": "cross",
+    "thanks": "greet_bow",
+    "bye": "greet_bow"
+   }
+  },
+  "fortune-B": {
+   "talk": [
+    "talk_calm"
+   ],
+   "greet": "wave",
+   "fidgets": [
+    "fidget_look",
+    "fidget_shift"
+   ],
+   "pace": 0.85,
+   "likes": [
+    "point",
+    "nod",
+    "wave"
+   ],
+   "moods": {
+    "yes": "nod",
+    "no": "shake_head",
+    "happy": "laugh",
+    "unsure": "shrug",
+    "upset": "sad",
+    "thanks": "thanks",
+    "bye": "wave"
+   }
+  },
+  "watchman-A": {
+   "talk": [
+    "talk_calm",
+    "talk_gruff"
+   ],
+   "greet": "nod",
+   "fidgets": [
+    "fidget_look"
+   ],
+   "pace": 0.88,
+   "likes": [
+    "point",
+    "nod",
+    "cross"
+   ],
+   "moods": {
+    "yes": "nod",
+    "no": "shake_head",
+    "happy": "nod",
+    "unsure": "think",
+    "upset": "cross",
+    "thanks": "nod",
+    "bye": "wave"
+   }
+  },
+  "watchman-B": {
+   "talk": [
+    "talk_lively"
+   ],
+   "greet": "beckon",
+   "fidgets": [
+    "fidget_hands",
+    "fidget_shift"
+   ],
+   "pace": 1.05,
+   "likes": [
+    "laugh",
+    "beckon",
+    "wave"
+   ],
+   "moods": {
+    "yes": "nod",
+    "no": "shake_head",
+    "happy": "laugh",
+    "unsure": "shrug",
+    "upset": "sad",
+    "thanks": "thanks",
+    "bye": "wave"
+   }
+  },
+  "baker-A": {
+   "talk": [
+    "talk_lively",
+    "talk_calm"
+   ],
+   "greet": "wave",
+   "fidgets": [
+    "fidget_shift"
+   ],
+   "pace": 0.96,
+   "likes": [
+    "laugh",
+    "thanks",
+    "beckon"
+   ],
+   "moods": {
+    "yes": "nod",
+    "no": "shake_head",
+    "happy": "laugh",
+    "unsure": "think",
+    "upset": "sad",
+    "thanks": "thanks",
+    "bye": "wave"
+   }
+  },
+  "baker-B": {
+   "talk": [
+    "talk_calm"
+   ],
+   "greet": "greet_bow",
+   "fidgets": [
+    "fidget_hands",
+    "fidget_shift"
+   ],
+   "pace": 0.8,
+   "likes": [
+    "think",
+    "shrug",
+    "nod"
+   ],
+   "moods": {
+    "yes": "nod",
+    "no": "shake_head",
+    "happy": "nod",
+    "unsure": "shrug",
+    "upset": "sad",
+    "thanks": "greet_bow",
+    "bye": "nod"
+   }
+  },
+  "farmhand-A": {
+   "talk": [
+    "talk_lively"
+   ],
+   "greet": "wave",
+   "fidgets": [
+    "fidget_shift",
+    "fidget_look",
+    "fidget_hands"
+   ],
+   "pace": 1.15,
+   "likes": [
+    "wave",
+    "laugh",
+    "surprised"
+   ],
+   "moods": {
+    "yes": "nod",
+    "no": "shake_head",
+    "happy": "laugh",
+    "unsure": "shrug",
+    "upset": "sad",
+    "thanks": "thanks",
+    "bye": "wave"
+   }
+  },
+  "farmhand-B": {
+   "talk": [
+    "talk_gruff"
+   ],
+   "greet": "beckon",
+   "fidgets": [
+    "fidget_look"
+   ],
+   "pace": 1,
+   "likes": [
+    "cross",
+    "refuse",
+    "point"
+   ],
+   "moods": {
+    "yes": "nod",
+    "no": "refuse",
+    "happy": "nod",
+    "unsure": "think",
+    "upset": "cross",
+    "thanks": "nod",
+    "bye": "point"
+   }
+  }
+ },
+ "cost": 0.165608,
+ "seconds": 28.4,
+ "emotes": [
+  "talk_calm",
+  "talk_lively",
+  "talk_gruff",
+  "nod",
+  "shake_head",
+  "wave",
+  "greet_bow",
+  "shrug",
+  "laugh",
+  "point",
+  "think",
+  "surprised",
+  "sad",
+  "cross",
+  "beckon",
+  "refuse",
+  "thanks",
+  "fidget_shift",
+  "fidget_look",
+  "fidget_hands"
+ ]
+}

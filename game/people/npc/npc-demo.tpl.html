@@ -1,0 +1,77 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Moon Faire: fair folk who talk</title>
+<style>
+  :root { --bg: #1d1826; --panel: #2a2336; --line: #43395a; --ink: #efe8f6; --soft: #b9aecb; --gold: #e7b867; }
+  * { box-sizing: border-box; } [hidden] { display: none !important; }
+  html, body { margin: 0; background: var(--bg); color: var(--ink); font: 16px/1.5 Georgia, 'Times New Roman', serif; }
+  main { max-width: 980px; margin: 0 auto; padding: 18px 14px 60px; }
+  h1 { font-size: 1.7rem; margin: 6px 0 4px; color: var(--gold); font-weight: normal; } h2 { font-size: 1.2rem; margin: 26px 0 8px; color: var(--gold); font-weight: normal; }
+  p { margin: 8px 0; } .soft { color: var(--soft); } .small { font-size: 0.9rem; } ul { margin: 6px 0; padding-left: 20px; } li { margin: 4px 0; }
+  #stagebox { position: relative; background: #383043; border: 1px solid var(--line); border-radius: 10px; overflow: hidden; height: min(64vh, 600px); }
+  #stage { display: block; width: 100%; height: 100%; touch-action: pan-y; }
+  #who { position: absolute; left: 10px; top: 8px; right: 10px; font-size: 0.95rem; text-shadow: 0 1px 3px #000; pointer-events: none; }
+  #doing { position: absolute; left: 10px; bottom: 8px; font-size: 0.9rem; color: var(--gold); text-shadow: 0 1px 3px #000; pointer-events: none; }
+  .bar { display: flex; flex-wrap: wrap; gap: 8px; margin: 10px 0; align-items: center; }
+  select, button { font: inherit; color: var(--ink); background: var(--panel); border: 1px solid var(--line); border-radius: 8px; padding: 9px 12px; cursor: pointer; }
+  button.on { border-color: var(--gold); color: var(--gold); } button.like { border-color: #7d6a4a; } select { max-width: 100%; }
+  .card { background: var(--panel); border: 1px solid var(--line); border-radius: 10px; padding: 12px 14px; margin: 10px 0; }
+</style></head>
+<body><main>
+<h1>Fair folk who talk</h1>
+<p class="soft">Moon Faire, November 13. The painted people, wired for the game: each one stands, blinks, fidgets, turns to face you, talks and plays emotes. Drag to look round them.</p>
+<div id="stagebox"><canvas id="stage"></canvas><div id="who"></div><div id="doing"></div></div>
+<div class="bar"><select id="pick" aria-label="Person"></select><button id="bTalk">Talk</button><button id="bGreet">Say hello</button><button id="bL">Face left</button><button id="bF">Face you</button><button id="bR">Face right</button></div>
+<div class="bar" id="emotes"></div>
+<p class="soft small" id="facts"></p>
+<div class="card"><b>What is wired</b>
+<ul>
+  <li><b>Talking.</b> While Talk is on, the mouth opens and shuts in a speech rhythm, the head moves and the hands help. There are three ways of talking (calm, lively, gruff); each person has their own.</li>
+  <li><b>Emotes.</b> Every person can play every emote. The gold-edged buttons are the ones chosen as most like that person.</li>
+  <li><b>On their own.</b> They blink, shift and look about when left alone, each at their own pace.</li>
+  <li><b>Facing.</b> They turn to face a point, as they will turn to the party.</li>
+</ul>
+<p class="soft small">The moves were written by Claude Fable 5.2 through your key. The people, their names and their ways are stand-ins, not Moon Faire lore. No Claude session can measure speed on your laptop.</p></div>
+</main>
+/*SCRIPTS*/
+<script>
+(function () {
+  'use strict';
+  const $ = (id) => document.getElementById(id), canvas = $('stage'), ids = MF_NPC.list();
+  let stage, npc = null, last = performance.now(), yaw = 0.35, busy = false;
+  try { stage = makeMFStage(canvas, { preserve: true, shadow: 1024, maxPixelRatio: 2 }); stage.painting = false; } catch (e) { $('who').textContent = 'This page needs WebGL to draw.'; return; }
+  for (const id of ids) { const o = document.createElement('option'), d = MF_NPC.info(id); o.value = id; o.textContent = d.name + ' (' + d.shapes + ')'; $('pick').appendChild(o); }
+  const label = (n) => n.replace(/_/g, ' ');
+  async function choose(id) {
+    busy = true; $('who').textContent = 'Building…';
+    try {
+      const next = await MF_NPC.make(id); if (npc) { stage.cast.remove(npc.root, npc.fx); npc.dispose(); }
+      npc = next; stage.cast.add(npc.root, npc.fx); npc.model.camera = stage.camera; stage.follow(0, 0); $('who').textContent = npc.name + '. ' + npc.who; $('bTalk').classList.remove('on');
+      const W = npc.wiring, box = $('emotes'); box.innerHTML = '';
+      for (const n of npc.emotes) { const b = document.createElement('button'); b.textContent = label(n); if ((W.likes || []).indexOf(n) >= 0) b.className = 'like'; b.onclick = () => npc.emote(n); box.appendChild(b); }
+      $('facts').textContent = 'Talks: ' + (W.talk || []).map((n) => label(n).replace('talk ', '')).join(', then ') + '. Says hello with: ' + label(W.greet || 'nod') + '. Pace: ' + (W.pace || 1) + '.';
+      setTimeout(() => { if (npc && npc.id === id) npc.greet(); }, 900);
+    } catch (e) { $('who').textContent = 'This one did not build: ' + e.message; }
+    busy = false;
+  }
+  $('pick').onchange = () => choose($('pick').value);
+  $('bTalk').onclick = () => { if (!npc) return; npc.talk(!npc.talking); $('bTalk').classList.toggle('on', npc.talking); };
+  $('bGreet').onclick = () => npc && npc.greet();
+  const camPos = () => [Math.sin(yaw) * 12.2, Math.cos(yaw) * 12.2];
+  $('bL').onclick = () => npc && npc.face(-5, 1); $('bR').onclick = () => npc && npc.face(5, 1); $('bF').onclick = () => { if (npc) { const c = camPos(); npc.face(c[0], c[1]); } };
+  let drag = null; canvas.addEventListener('pointerdown', (e) => { drag = e.clientX; }); window.addEventListener('pointerup', () => { drag = null; });
+  window.addEventListener('pointermove', (e) => { if (drag != null) { yaw -= (e.clientX - drag) * 0.01; drag = e.clientX; } });
+  const manual = /[?&]shot=1/.test(location.search);
+  function draw(dt) {
+    if (!npc || busy) return; npc.update(dt);
+    stage.resize(); const w = canvas.clientWidth, h = canvas.clientHeight, need = Math.max(2.1, 1.5 * h / w), d = need / 2 / Math.tan(5.5 * Math.PI / 180);
+    stage.setScene({ kind: 'fight', frame: [w, h], camera: { fov: 11, h: 1, z: 10, pitch: 0 } });
+    stage.camera.position.set(Math.sin(yaw) * d, 1.0, Math.cos(yaw) * d); stage.camera.lookAt(0, 0.98, 0); stage.camera.updateMatrixWorld(); stage.render();
+    $('doing').textContent = npc.doing ? label(npc.doing) : '';
+  }
+  function frame(now) { requestAnimationFrame(frame); const dt = Math.min(0.05, (now - last) / 1000); last = now; draw(dt); }
+  window.MF_DEMO = { choose, step(dt, n) { for (let i = 0; i < n; i++) draw(dt); }, get npc() { return npc; }, ready: false };
+  choose(ids[0]).then(() => { window.MF_DEMO.ready = true; }); if (!manual) requestAnimationFrame(frame);
+})();
+</script>
+</body></html>
