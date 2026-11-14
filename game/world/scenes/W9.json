@@ -1,0 +1,403 @@
+{
+ "id": "W9",
+ "name": "The beacon stair",
+ "figure": [
+  0,
+  -1
+ ],
+ "ground": [
+  {
+   "kind": "box",
+   "name": "the top landing",
+   "x": 0,
+   "z": -1,
+   "w": 14,
+   "d": 7,
+   "turn": 0
+  },
+  {
+   "kind": "path",
+   "name": "stair head lane",
+   "a": [
+    -6,
+    0
+   ],
+   "b": [
+    -11,
+    0.5
+   ],
+   "w": 4
+  },
+  {
+   "kind": "path",
+   "name": "approach to the door",
+   "a": [
+    3.5,
+    -3
+   ],
+   "b": [
+    3.5,
+    -11.2
+   ],
+   "w": 3.5
+  },
+  {
+   "kind": "path",
+   "name": "side ledge, first bend",
+   "a": [
+    6,
+    -3
+   ],
+   "b": [
+    8.5,
+    -7
+   ],
+   "w": 2.5
+  },
+  {
+   "kind": "path",
+   "name": "side ledge along the tower foot",
+   "a": [
+    8.5,
+    -7
+   ],
+   "b": [
+    8.5,
+    -8.8
+   ],
+   "w": 2.5
+  }
+ ],
+ "flats": [
+  {
+   "kind": "box",
+   "name": "the drop beyond the near parapet, black night air",
+   "tone": "dark",
+   "x": 0,
+   "z": 7,
+   "w": 22,
+   "d": 2.4,
+   "turn": 0
+  },
+  {
+   "kind": "box",
+   "name": "the sheer drop off the side ledge",
+   "tone": "dark",
+   "x": 12.3,
+   "z": -7.5,
+   "w": 2.2,
+   "d": 8,
+   "turn": 0
+  }
+ ],
+ "solids": [
+  {
+   "kind": "cyl",
+   "name": "beacon tower wall",
+   "x": 3.5,
+   "z": -15.8,
+   "r": 4,
+   "h": 12
+  },
+  {
+   "kind": "box",
+   "name": "shut lamp-room door",
+   "tone": "wood",
+   "x": 3.5,
+   "z": -11.85,
+   "w": 1.2,
+   "d": 0.3,
+   "h": 2.3,
+   "turn": 0
+  },
+  {
+   "kind": "box",
+   "name": "left door jamb",
+   "tone": "stone",
+   "x": 2.6,
+   "z": -11.8,
+   "w": 0.5,
+   "d": 0.5,
+   "h": 2.7,
+   "turn": 0
+  },
+  {
+   "kind": "box",
+   "name": "right door jamb",
+   "tone": "stone",
+   "x": 4.4,
+   "z": -11.8,
+   "w": 0.5,
+   "d": 0.5,
+   "h": 2.7,
+   "turn": 0
+  },
+  {
+   "kind": "box",
+   "name": "old stone lamp pier at ledge end",
+   "tone": "stone",
+   "x": 8.5,
+   "z": -9.9,
+   "w": 0.6,
+   "d": 0.6,
+   "h": 2,
+   "turn": 0
+  },
+  {
+   "kind": "box",
+   "name": "empty iron lamp bracket on the pier",
+   "tone": "dark",
+   "x": 8.5,
+   "z": -9.5,
+   "w": 0.3,
+   "d": 0.3,
+   "h": 0.35,
+   "y": 1.5,
+   "turn": 0
+  },
+  {
+   "kind": "box",
+   "name": "low footing stones of the tower",
+   "tone": "stone",
+   "x": 6.3,
+   "z": -9.2,
+   "w": 1.2,
+   "d": 1.4,
+   "h": 0.8,
+   "turn": 0
+  },
+  {
+   "kind": "box",
+   "name": "ledge outer kerb block",
+   "tone": "stone",
+   "x": 10.8,
+   "z": -6.6,
+   "w": 0.5,
+   "d": 1.8,
+   "h": 0.6,
+   "turn": 0
+  },
+  {
+   "kind": "box",
+   "name": "ledge outer kerb block, far",
+   "tone": "stone",
+   "x": 10.8,
+   "z": -8.9,
+   "w": 0.5,
+   "d": 1.8,
+   "h": 0.6,
+   "turn": 0
+  },
+  {
+   "kind": "cone",
+   "name": "crag hump far left",
+   "x": -7.5,
+   "z": -9.5,
+   "r": 2,
+   "h": 2.6
+  },
+  {
+   "kind": "cone",
+   "name": "low crag hump",
+   "x": -3,
+   "z": -8,
+   "r": 1.5,
+   "h": 1.6
+  },
+  {
+   "kind": "cone",
+   "name": "crag hump beside the approach",
+   "x": -0.2,
+   "z": -10.5,
+   "r": 1.2,
+   "h": 2
+  },
+  {
+   "kind": "box",
+   "name": "worn kerb stone at back of landing",
+   "tone": "stone",
+   "x": -4.5,
+   "z": -5.8,
+   "w": 2.2,
+   "d": 0.5,
+   "h": 0.5,
+   "turn": 0
+  },
+  {
+   "kind": "box",
+   "name": "broken parapet stub, far side of stair head",
+   "tone": "stone",
+   "x": -9.3,
+   "z": -2.8,
+   "w": 1.8,
+   "d": 0.5,
+   "h": 0.6,
+   "turn": 0
+  },
+  {
+   "kind": "box",
+   "name": "broken parapet stub, near side of stair head",
+   "tone": "stone",
+   "x": -9.3,
+   "z": 4.2,
+   "w": 2,
+   "d": 0.5,
+   "h": 0.5,
+   "turn": 0
+  },
+  {
+   "kind": "box",
+   "name": "near parapet length 1",
+   "tone": "stone",
+   "x": -5.2,
+   "z": 4.7,
+   "w": 2.4,
+   "d": 0.5,
+   "h": 0.6,
+   "turn": 0
+  },
+  {
+   "kind": "box",
+   "name": "near parapet length 2",
+   "tone": "stone",
+   "x": -2.4,
+   "z": 4.7,
+   "w": 2.4,
+   "d": 0.5,
+   "h": 0.6,
+   "turn": 0
+  },
+  {
+   "kind": "box",
+   "name": "near parapet length 3",
+   "tone": "stone",
+   "x": 3,
+   "z": 4.7,
+   "w": 2.4,
+   "d": 0.5,
+   "h": 0.6,
+   "turn": 0
+  },
+  {
+   "kind": "box",
+   "name": "near parapet length 4",
+   "tone": "stone",
+   "x": 5.8,
+   "z": 4.7,
+   "w": 2.4,
+   "d": 0.5,
+   "h": 0.6,
+   "turn": 0
+  },
+  {
+   "kind": "box",
+   "name": "low parapet block on right edge of landing",
+   "tone": "stone",
+   "x": 8,
+   "z": 0.5,
+   "w": 0.5,
+   "d": 1.8,
+   "h": 0.6,
+   "turn": 0
+  },
+  {
+   "kind": "box",
+   "name": "rusted lampless lamp standard",
+   "tone": "dark",
+   "x": 9.3,
+   "z": 1.5,
+   "w": 0.25,
+   "d": 0.25,
+   "h": 2.6,
+   "turn": 0
+  }
+ ],
+ "exits": [
+  {
+   "to": "W8",
+   "side": "left",
+   "x": -10,
+   "z": 0.4
+  },
+  {
+   "to": "F5",
+   "side": "far",
+   "x": 3.5,
+   "z": -11.1
+  }
+ ],
+ "people": [],
+ "painting": {
+  "title": "THE BEACON STAIR IN DEEP NIGHT",
+  "intro": "The top landing of the long stair up a dead airship beacon: a level shelf of worn flagstones where the crag meets the foot of the great round tower, with the shut lamp-room door straight ahead at the end of a flagged approach. It is deep night, cold and still, and no lamp burns anywhere on the stair.",
+  "bullets": [
+   "The ground: every pale shape in the guide is the same flat, level paving of worn, pale grey flagstones, hollowed by old feet and tufted with dry moss in the joints. It is a broad landing in the middle, a lane running off the left edge, a straight flagged approach running back to the door, and a short narrow ledge bending away on the right. Everything outside the pale shapes is rough, dark, unpaved crag rock or empty air.",
+   "At the very back, right of centre, the approach ends at the foot of the beacon tower: a huge round drum of dark, weathered stone blocks streaked with lichen. Only its lowest courses show at the top of the ground; the wall carries on up through the sky band and out of the picture, and it has no windows.",
+   "Set in the tower's foot, facing us at the end of the approach, is the shut door: black oak planks bound with rusted iron straps. It stands between two squat stone jambs under one heavy stone lintel, with a level threshold and a hair-thin seam of faint warm light beneath it.",
+   "On the right the narrow flagged ledge leaves the landing's far right corner and bends back toward the tower's flank. It stops at a square old stone lamp pier about head height, with one rusted iron bracket on its face: an empty hook, no lamp. Past the pier the ledge crumbles to a broken lip that curves out of sight round the back of the tower. Two low kerb stones edge the ledge's outer side, with black empty air beyond (the dark strip). The low block between the ledge and the approach is a rough footing stone of the tower.",
+   "On the far left, behind a single worn kerb stone at the back of the landing, is bare crag: three rough humps of dark, cracked rock with wind-bent dry grass in the clefts. They are low enough that the sky stays open above them.",
+   "At the left edge the lane is the head of the stair we climbed: its top two worn stone treads show, dropping away down and out of the frame between two short stubs of broken parapet.",
+   "Along the near side stand the surviving lengths of a low, broken parapet of weathered coping stones, two on the left and two on the right, with a wide gap knocked out of the middle. One more low parapet block sits off the landing's right edge. Beyond them there is nothing but black night air (the dark strip along the bottom).",
+   "In the near right corner stands a thin, leaning, rusted iron lamp standard, taller than a person, whose cage at the top is empty and dark.",
+   "Light: deep night. Cold silver moonlight comes from the upper left, making the flagstones pale blue-grey and throwing long soft shadows toward the lower right, with hollows and the tower's shaded side nearly black. Nothing here is lit or warm except the faint seam under the door."
+  ],
+  "top": "Deep night sky, open and thick with stars across the left and centre of the band. Auros, the moon, is large, pale and nearly full in the upper left. Right of centre, directly above the flagged approach, the dark stone drum of the tower fills the band from bottom to top across about a third of the picture's width. The upper part of the shut door and its heavy lintel show at the band's bottom edge, with an empty rusted lamp bracket on the wall each side. Low in the band on the left, far below and very small, twelve tiny warm lamps sit close together in a line (the moored airship's hull) over the black, featureless moor, with the faintest pale line of horizon beyond."
+ },
+ "kind": "walk",
+ "frame": [
+  2048,
+  1024
+ ],
+ "camera": {
+  "fov": 12,
+  "pitch": 24,
+  "target": [
+   0,
+   0,
+   -2.5
+  ],
+  "span": 10.7
+ },
+ "skyBand": 0.15,
+ "moon": {
+  "u": 0.105,
+  "v": 0.072,
+  "d": 0.085
+ },
+ "_made": {
+  "by": "claude-fable-5-2@high",
+  "rounds": [
+   {
+    "n": 1,
+    "seconds": 175.6,
+    "cost": 0.6406046,
+    "said": "file"
+   },
+   {
+    "n": 2,
+    "seconds": 172.8,
+    "cost": 0.8041086,
+    "said": "file"
+   },
+   {
+    "n": 3,
+    "seconds": 1.4,
+    "cost": 0.29329259999999996,
+    "said": "DONE"
+   }
+  ],
+  "cost": 1.7380057999999998,
+  "checks": [
+   "Walkable ground: about 172 square metres."
+  ],
+  "area": 172.5,
+  "frame_info": {
+   "farZ": -13.53,
+   "nearZ": 8.14,
+   "halfWidthFar": 12.82,
+   "halfWidthMid": 10.45,
+   "halfWidthNear": 8.66,
+   "hide": 2.25
+  }
+ }
+}

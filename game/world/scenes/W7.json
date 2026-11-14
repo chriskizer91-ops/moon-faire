@@ -1,0 +1,318 @@
+{
+ "id": "W7",
+ "name": "The hollow",
+ "figure": [
+  2.2,
+  1.2
+ ],
+ "ground": [
+  {
+   "kind": "disc",
+   "name": "the hollow floor",
+   "x": 0,
+   "z": 0,
+   "r": 5
+  },
+  {
+   "kind": "path",
+   "name": "the climb back through the gorse",
+   "a": [
+    0.5,
+    -3
+   ],
+   "b": [
+    1.5,
+    -12.5
+   ],
+   "w": 3
+  }
+ ],
+ "flats": [
+  {
+   "kind": "box",
+   "name": "the flat grey stone",
+   "tone": "stone",
+   "x": 0,
+   "z": -0.8,
+   "w": 2.4,
+   "d": 1.5,
+   "turn": 0
+  },
+  {
+   "kind": "box",
+   "name": "the thread of water",
+   "tone": "water",
+   "x": -1.9,
+   "z": -2.5,
+   "w": 0.45,
+   "d": 6,
+   "turn": 0
+  },
+  {
+   "kind": "disc",
+   "name": "the seep pool",
+   "tone": "water",
+   "x": -1.9,
+   "z": 0.9,
+   "r": 0.7
+  }
+ ],
+ "solids": [
+  {
+   "kind": "box",
+   "name": "far left crag",
+   "tone": "stone",
+   "x": -6.5,
+   "z": -9,
+   "w": 7,
+   "d": 4,
+   "h": 4,
+   "turn": 0
+  },
+  {
+   "kind": "box",
+   "name": "far right crag",
+   "tone": "stone",
+   "x": 8,
+   "z": -9.5,
+   "w": 7,
+   "d": 4,
+   "h": 4.5,
+   "turn": 0
+  },
+  {
+   "kind": "box",
+   "name": "fallen standing stone",
+   "tone": "stone",
+   "x": -1.9,
+   "z": -12.7,
+   "w": 2.6,
+   "d": 0.9,
+   "h": 0.8,
+   "turn": 0
+  },
+  {
+   "kind": "cone",
+   "name": "gorse left of the climb",
+   "x": -3,
+   "z": -8.2,
+   "r": 1.2,
+   "h": 1.6
+  },
+  {
+   "kind": "cone",
+   "name": "gorse right of the climb",
+   "x": 4.6,
+   "z": -6.5,
+   "r": 1.3,
+   "h": 1.8
+  },
+  {
+   "kind": "cyl",
+   "name": "spring rock",
+   "x": -2.3,
+   "z": -5.9,
+   "r": 0.7,
+   "h": 0.9
+  },
+  {
+   "kind": "cyl",
+   "name": "left boulder",
+   "x": -5.2,
+   "z": -4.6,
+   "r": 1,
+   "h": 1.4
+  },
+  {
+   "kind": "cyl",
+   "name": "right boulder",
+   "x": 5.6,
+   "z": -4.2,
+   "r": 0.9,
+   "h": 1.2
+  },
+  {
+   "kind": "box",
+   "name": "left rock wall",
+   "tone": "stone",
+   "x": -8,
+   "z": -2.5,
+   "w": 4,
+   "d": 6,
+   "h": 3.2,
+   "turn": 0
+  },
+  {
+   "kind": "box",
+   "name": "right rock wall",
+   "tone": "stone",
+   "x": 8.2,
+   "z": -2,
+   "w": 4,
+   "d": 6,
+   "h": 3.4,
+   "turn": 0
+  },
+  {
+   "kind": "cone",
+   "name": "left gorse bank",
+   "x": -6.8,
+   "z": 2.5,
+   "r": 1.5,
+   "h": 1.8
+  },
+  {
+   "kind": "cone",
+   "name": "right gorse bank",
+   "x": 6.9,
+   "z": 3,
+   "r": 1.4,
+   "h": 1.7
+  },
+  {
+   "kind": "box",
+   "name": "near left corner rock",
+   "tone": "stone",
+   "x": -8,
+   "z": 6.3,
+   "w": 3,
+   "d": 3,
+   "h": 2.2,
+   "turn": 0
+  },
+  {
+   "kind": "box",
+   "name": "near right corner rock",
+   "tone": "stone",
+   "x": 8.1,
+   "z": 6.4,
+   "w": 3,
+   "d": 3,
+   "h": 2.4,
+   "turn": 0
+  },
+  {
+   "kind": "cone",
+   "name": "low gorse near left",
+   "x": -5.6,
+   "z": 6,
+   "r": 0.9,
+   "h": 0.8
+  },
+  {
+   "kind": "cone",
+   "name": "low gorse near right",
+   "x": 5.7,
+   "z": 6.1,
+   "r": 0.9,
+   "h": 0.8
+  },
+  {
+   "kind": "box",
+   "name": "low mossy rock near left",
+   "tone": "stone",
+   "x": -3.5,
+   "z": 6.9,
+   "w": 2.4,
+   "d": 1,
+   "h": 0.6,
+   "turn": 0
+  },
+  {
+   "kind": "cone",
+   "name": "bracken clump",
+   "x": 0.3,
+   "z": 7.2,
+   "r": 0.9,
+   "h": 0.5
+  },
+  {
+   "kind": "box",
+   "name": "low mossy rock near right",
+   "tone": "stone",
+   "x": 3.6,
+   "z": 7,
+   "w": 2,
+   "d": 0.9,
+   "h": 0.55,
+   "turn": 0
+  }
+ ],
+ "exits": [
+  {
+   "to": "W5",
+   "side": "far",
+   "x": 1.5,
+   "z": -12.5
+  }
+ ],
+ "people": [],
+ "painting": {
+  "title": "THE HOLLOW BELOW THE STONES AT NIGHT",
+  "intro": "A small steep-sided dip in the moor, hidden below the standing stones and out of the wind, floored with moss and closed in by rock and gorse. It is full night, lit only by cold moonlight from the upper left.",
+  "bullets": [
+   "The ground: the pale round area is the level floor of the hollow, short springy moss and flattened bracken, clearly open and walkable. The pale strip running from it to the far edge is a trodden path of bare earth and moss, which reads as the one way that climbs up and out.",
+   "At the far edge, left of the top of the path, the low long block is a fallen standing stone, grey and lichened, lying on its side at the rim.",
+   "The two big blocks at the far left and far right are crags of dark weathered moor rock, the steep back wall of the hollow, with turf and heather on top. The gap between them is where the path climbs out.",
+   "The two cones on either side of the path are thick gorse bushes, dark green with a few pale yellow flowers, leaving the path clear between them.",
+   "The small cylinder at the far left of the floor is a wet mossy spring rock. The thin blue strip running from it toward the viewer is a thread of clear water a hand wide, trickling through the moss and ending in the small round seep pool that glints with moonlight.",
+   "The flat grey rectangle at the middle of the floor is a flat grey stone slab lying almost level with the moss, smooth on top and pale in the moonlight, with the thread of water just to its left.",
+   "The two larger cylinders at the back left and back right of the floor are rounded boulders, half sunk in bracken.",
+   "The tall blocks along the left and right sides are steep rock walls of the hollow, cracked and mossy, with ferns in the cracks. The cones in front of them are banks of gorse and bracken growing up the slope.",
+   "The blocks in the two bottom corners are dark shoulders of rock at the near rim, in shadow.",
+   "Along the near edge the low shapes are knee-high mossy rocks, low gorse and a clump of bracken. All of them are low and dark, so the floor of the hollow is seen clearly over them."
+  ],
+  "top": "A narrow band of night sky above the rim of the hollow, deep blue-black and full of stars. The dark line of the moor runs along the rim, with the small far shapes of the standing stones against the sky. Auros, the moon, is large, pale and nearly full in the upper left, and its cold light falls down into the hollow."
+ },
+ "kind": "walk",
+ "frame": [
+  2048,
+  1024
+ ],
+ "camera": {
+  "fov": 12,
+  "pitch": 24,
+  "target": [
+   0,
+   0,
+   -2.5
+  ],
+  "span": 10.7
+ },
+ "skyBand": 0.15,
+ "moon": {
+  "u": 0.105,
+  "v": 0.072,
+  "d": 0.085
+ },
+ "_made": {
+  "by": "claude-fable-5-2@high",
+  "rounds": [
+   {
+    "n": 1,
+    "seconds": 92.2,
+    "cost": 0.35196459999999996,
+    "said": "file"
+   },
+   {
+    "n": 2,
+    "seconds": 3.8,
+    "cost": 0.09798860000000001,
+    "said": "DONE"
+   }
+  ],
+  "cost": 0.44995319999999994,
+  "checks": [
+   "Walkable ground: about 106 square metres."
+  ],
+  "area": 106.0,
+  "frame_info": {
+   "farZ": -13.53,
+   "nearZ": 8.14,
+   "halfWidthFar": 12.82,
+   "halfWidthMid": 10.45,
+   "halfWidthNear": 8.66,
+   "hide": 2.25
+  }
+ }
+}

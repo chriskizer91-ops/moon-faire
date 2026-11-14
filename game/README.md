@@ -265,6 +265,19 @@ Chris asked for an attempt at lighter versions of the NPC models that the painte
 - Not offered: sitting on the ground. The template's cross-legged sit breaks skirts, coats and aprons.
 - The test page has Walk about, Run about and Sit down (on a plain crate).
 
+## The demo mapped, and prompts for the eight places still to paint (November 13) — waiting for Chris to approve the map and paint
+
+Chris asked to use the API key to map all ten areas of the demo (three at the fair, four in the wilds, three at the Dark Beacon) with the fair folk and the lore, then for a page of the backgrounds already in use and prompts for what is left. His answers first: four wild areas; the planned three foes (wisp, Shadow Wraith, great wraith); **Envoi pictures for fights only**, walking places get Moon Faire's own paintings; a map page to approve first.
+
+- Page: https://claude.ai/artifact/Ju2Mo1hEK5jyA3pScXkYXz (file: `out/moon-faire-demo-map.html`). Starter pack for painting: `out/Moon_Faire_Demo_Painting_Starters.zip`. All prompts as text: `world/prompts.md`.
+- `world/LORE-BRIEF.md`: what is settled, written from the project's lore notes and the approved plan, with the eleven fair folk. It is what the mapper was given.
+- `world/make_map.py` with `world/MAP-KIT.md`: Fable 5.2 (high effort, through the key) wrote `world/world.json`: the evening in nine beats; for each of the ten areas its look, ways out, who stands there with stand-in lines, three to five things that can happen (each with a code such as `W2-c`, so Chris can cut by code), its fights and lamps; a borrowed Envoi battle backdrop for each fight place (`world/envoi-fight-backdrops/`, from Envoi's `art/backdrops` and `art/arena`); what is still needed; and six questions for Chris. $1.70.
+- `world/make_scenes.py` with `world/SCENE-KIT.md`: for W2 to W9, Fable 5.2 laid the scene out as grey boxes (`world/scenes/<id>.json`: walkable ground, flats, solids, exits, where people stand, and the words for its painting), was shown the labelled guide and a check of hidden or broken ground, and fixed it. $7.99 for eight. `world/guide2.js` draws the guide for any scene (`<id>_guide.png` for the painter, `<id>_key.jpg` with labels); `pilot/greybox.js` only knew the fair square.
+- **The camera for the new places is closer than the fair square's:** 10.7 m across the frame's height instead of 15, the same lens and angle, so a witch is about 40% larger without zooming, as Chris asked for the pilot. Frame 2:1, ground from z -13.5 to +8.
+- `world/build_world_page.py` builds the page, the prompts and the pack. Each prompt attaches the place's guide, the fair square painting (`style-fair-square.jpg`, for craft) and the Jester's standing picture, and uses `pilot/prompts/standing-rules.txt` with a line for the hour (dusk, night, deep night).
+- In use now: W1 and F1 (Chris's paintings). Borrowed for fights: F2 `battle-warm-road` (poor fit), F3 `11-warm-roads-moor` (fair), F4 `battle-northern-crossroads` (poor), F5 `battle-dead-moonwell` (fair).
+- Not done: nothing is walkable yet beyond the pilot's fair square; the scene files are made so the game can load them (ground shapes, exits, people's spots) once painted. Foes: Envoi has the wisp and the wraith with a great-wraith variant (`src/models/wraith.js`, `opts.great`); only the wisp is copied into `models/foes/` so far. The captain and the airship are not built.
+
 ## Next
 
 Step 5, and the two-person fair-folk test if Chris wants it: the remaining twelve prompts (with the lane lesson built in), every scene traced, the

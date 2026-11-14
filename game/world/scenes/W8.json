@@ -1,0 +1,350 @@
+{
+ "id": "W8",
+ "name": "The landing ledge",
+ "figure": [
+  2,
+  -1
+ ],
+ "ground": [
+  {
+   "kind": "box",
+   "name": "the ledge",
+   "x": 2,
+   "z": -0.85,
+   "w": 17,
+   "d": 6.7,
+   "turn": 0
+  },
+  {
+   "kind": "path",
+   "name": "gangplank onto the airship's deck",
+   "a": [
+    -1,
+    2
+   ],
+   "b": [
+    -1,
+    7.7
+   ],
+   "w": 1.8
+  }
+ ],
+ "flats": [
+  {
+   "kind": "box",
+   "name": "broken end of the shelf",
+   "tone": "stone",
+   "x": -8,
+   "z": -1,
+   "w": 3,
+   "d": 7,
+   "turn": 0
+  },
+  {
+   "kind": "box",
+   "name": "the drop off the end of the shelf",
+   "tone": "dark",
+   "x": -11.6,
+   "z": 0,
+   "w": 4.2,
+   "d": 16,
+   "turn": 0
+  }
+ ],
+ "solids": [
+  {
+   "kind": "box",
+   "name": "crag face, far left",
+   "tone": "stone",
+   "x": -9.05,
+   "z": -6.2,
+   "w": 4.95,
+   "d": 2.4,
+   "h": 3,
+   "turn": 0
+  },
+  {
+   "kind": "box",
+   "name": "crag face, left of middle",
+   "tone": "stone",
+   "x": -4.1,
+   "z": -6.2,
+   "w": 4.95,
+   "d": 2.4,
+   "h": 3.2,
+   "turn": 0
+  },
+  {
+   "kind": "box",
+   "name": "crag face, right of middle",
+   "tone": "stone",
+   "x": 0.85,
+   "z": -6.2,
+   "w": 4.95,
+   "d": 2.4,
+   "h": 3.1,
+   "turn": 0
+  },
+  {
+   "kind": "box",
+   "name": "crag face beside the stair",
+   "tone": "stone",
+   "x": 5.75,
+   "z": -6.2,
+   "w": 4.95,
+   "d": 2.4,
+   "h": 3.4,
+   "turn": 0
+  },
+  {
+   "kind": "box",
+   "name": "upper crag",
+   "tone": "stone",
+   "x": 8,
+   "z": -10.4,
+   "w": 12,
+   "d": 3.4,
+   "h": 6,
+   "turn": 0
+  },
+  {
+   "kind": "cyl",
+   "name": "the dead beacon tower, a black shape",
+   "x": 7,
+   "z": -11.5,
+   "r": 2.1,
+   "h": 13
+  },
+  {
+   "kind": "box",
+   "name": "stair step 1",
+   "tone": "stone",
+   "x": 9.8,
+   "z": -5.2,
+   "w": 2.8,
+   "d": 1,
+   "h": 0.35,
+   "turn": 0
+  },
+  {
+   "kind": "box",
+   "name": "stair step 2",
+   "tone": "stone",
+   "x": 9.8,
+   "z": -6.2,
+   "w": 2.8,
+   "d": 1,
+   "h": 0.8,
+   "turn": 0
+  },
+  {
+   "kind": "box",
+   "name": "stair step 3",
+   "tone": "stone",
+   "x": 9.8,
+   "z": -7.2,
+   "w": 2.8,
+   "d": 1,
+   "h": 1.25,
+   "turn": 0
+  },
+  {
+   "kind": "box",
+   "name": "stair step 4",
+   "tone": "stone",
+   "x": 9.8,
+   "z": -8.2,
+   "w": 2.8,
+   "d": 1,
+   "h": 1.7,
+   "turn": 0
+  },
+  {
+   "kind": "cone",
+   "name": "tall boulder at the shelf's end",
+   "x": -8.2,
+   "z": -2.5,
+   "r": 1.3,
+   "h": 2.6
+  },
+  {
+   "kind": "cone",
+   "name": "small boulder",
+   "x": -7.9,
+   "z": 0.6,
+   "r": 0.9,
+   "h": 1.4
+  },
+  {
+   "kind": "box",
+   "name": "airship hull and deck, aft half",
+   "tone": "hull",
+   "x": -5.85,
+   "z": 6.2,
+   "w": 7.3,
+   "d": 3.6,
+   "h": 0.8,
+   "turn": 0
+  },
+  {
+   "kind": "box",
+   "name": "airship hull and deck, fore half",
+   "tone": "hull",
+   "x": 4.6,
+   "z": 6.2,
+   "w": 8.8,
+   "d": 3.6,
+   "h": 0.8,
+   "turn": 0
+  },
+  {
+   "kind": "box",
+   "name": "airship stern cabin",
+   "tone": "hull",
+   "x": -8.2,
+   "z": 6.4,
+   "w": 2.4,
+   "d": 2.6,
+   "h": 2.4,
+   "turn": 0
+  },
+  {
+   "kind": "post",
+   "name": "ship's lamp stanchion 1",
+   "x": -6,
+   "z": 6.4,
+   "h": 1.6
+  },
+  {
+   "kind": "post",
+   "name": "ship's lamp stanchion 2",
+   "x": -4,
+   "z": 6.4,
+   "h": 1.6
+  },
+  {
+   "kind": "post",
+   "name": "ship's lamp stanchion 3",
+   "x": 1.5,
+   "z": 6.4,
+   "h": 1.6
+  },
+  {
+   "kind": "post",
+   "name": "ship's lamp stanchion 4",
+   "x": 3.5,
+   "z": 6.4,
+   "h": 1.6
+  },
+  {
+   "kind": "post",
+   "name": "ship's lamp stanchion 5",
+   "x": 5.5,
+   "z": 6.4,
+   "h": 1.6
+  },
+  {
+   "kind": "post",
+   "name": "ship's lamp stanchion 6",
+   "x": 7.5,
+   "z": 6.4,
+   "h": 1.6
+  }
+ ],
+ "exits": [
+  {
+   "to": "W3",
+   "side": "near",
+   "x": -1,
+   "z": 7.5
+  },
+  {
+   "to": "W9",
+   "side": "right",
+   "x": 10,
+   "z": -3
+  }
+ ],
+ "people": [
+  {
+   "who": "captain",
+   "x": 0.6,
+   "z": 1.5,
+   "seat": false
+  }
+ ],
+ "painting": {
+  "title": "THE LANDING LEDGE IN DEEP NIGHT",
+  "intro": "A narrow shelf of bare rock on the side of a high crag, with an airship lying alongside its near edge and a dead beacon tower above. It is deep night, cold and blue-black, and the ship's twelve lit lamps are the only warm light.",
+  "bullets": [
+   "The ground: one flat, open shelf of bare, wind-scoured grey rock running left to right across the middle of the picture, smooth and worn, cracked here and there, with nothing standing on it and nothing overhanging it; the lamplight from the ship warms its near edge and it falls to cold blue shadow toward the back, where a thin strip of loose scree lies at the foot of the rock face.",
+   "Far right, on top of the crag: the dead beacon tower, a tall round stone tower seen only as a black shape against the stars, with no light in it anywhere, rising out of the top of the picture.",
+   "Below the tower, the upper crag: a high mass of dark, broken rock stepping up to the right, unlit.",
+   "Along the whole back of the shelf: one continuous face of rough natural rock about twice a man's height (the four grey blocks side by side are a single unbroken cliff), dark and cold, with the night sky open above it on the left.",
+   "Far right corner: the first worn steps of a stair cut straight up into the rock, each step higher than the last, their edges rounded and hollowed by long use, climbing away into the dark cleft toward the tower. The flat rock at its foot is the way out to the right.",
+   "Left end of the shelf: the ledge breaks off in rough, unwalked rock with one tall grey boulder and one small one (bare stone, not trees), and beyond them only the black drop into empty night air.",
+   "Along the near edge of the shelf: the airship lying alongside, seen from above, its deck level with the ledge. It is a long, low wooden hull of dark weathered planks with a low rail, in two stretches with an open gap amidships.",
+   "In that gap: the ship's boarding ladder laid flat as a gangplank of pale planks, running from the rock of the ledge straight onto the deck. It is the way aboard, toward the viewer.",
+   "On the deck: six short brass stanchions along the hull, each carrying two lit lamps, twelve warm golden lamps in all, throwing soft pools of amber light on the deck and the edge of the rock.",
+   "Bottom left corner: the ship's stern cabin, a squat wooden deckhouse with a plank roof, catching the lamplight on its near side."
+  ],
+  "top": "Deep night sky thick with stars above the dark line of the crag. Auros, the moon, is large, pale and nearly full in the upper left, and on the right the black shape of the dead tower stands up against the stars with no light at its top."
+ },
+ "kind": "walk",
+ "frame": [
+  2048,
+  1024
+ ],
+ "camera": {
+  "fov": 12,
+  "pitch": 24,
+  "target": [
+   0,
+   0,
+   -2.5
+  ],
+  "span": 10.7
+ },
+ "skyBand": 0.15,
+ "moon": {
+  "u": 0.105,
+  "v": 0.072,
+  "d": 0.085
+ },
+ "_made": {
+  "by": "claude-fable-5-2@high",
+  "rounds": [
+   {
+    "n": 1,
+    "seconds": 122.6,
+    "cost": 0.470766,
+    "said": "file"
+   },
+   {
+    "n": 2,
+    "seconds": 27.4,
+    "cost": 0.24422860000000002,
+    "said": "file"
+   },
+   {
+    "n": 3,
+    "seconds": 49.6,
+    "cost": 0.3683246,
+    "said": "file"
+   }
+  ],
+  "cost": 1.0833192,
+  "checks": [
+   "Walkable ground: about 131 square metres."
+  ],
+  "area": 131.0,
+  "frame_info": {
+   "farZ": -13.53,
+   "nearZ": 8.14,
+   "halfWidthFar": 12.82,
+   "halfWidthMid": 10.45,
+   "halfWidthNear": 8.66,
+   "hide": 2.25
+  }
+ }
+}

@@ -1,0 +1,44 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Moon Faire demo: the map</title>
+<style>
+  :root { --bg: #1d1826; --panel: #2a2336; --line: #43395a; --ink: #efe8f6; --soft: #b9aecb; --gold: #e7b867; --ok: #9fd6a8; --todo: #f0b08a; }
+  * { box-sizing: border-box; }
+  html, body { margin: 0; background: var(--bg); color: var(--ink); font: 16px/1.5 Georgia, 'Times New Roman', serif; }
+  main { max-width: 940px; margin: 0 auto; padding: 18px 14px 60px; }
+  h1 { font-size: 1.7rem; margin: 6px 0 4px; color: var(--gold); font-weight: normal; } h2 { font-size: 1.3rem; margin: 34px 0 6px; color: var(--gold); font-weight: normal; }
+  h3 { font-size: 1.12rem; margin: 0 0 8px; font-weight: normal; color: var(--gold); } h4 { font-size: 1rem; margin: 14px 0 4px; font-weight: normal; color: var(--soft); text-transform: uppercase; letter-spacing: 0.04em; font-size: 0.82rem; }
+  p { margin: 8px 0; } .soft { color: var(--soft); } ol, ul { margin: 6px 0; padding-left: 22px; } li { margin: 6px 0; }
+  .card { background: var(--panel); border: 1px solid var(--line); border-radius: 10px; padding: 12px 14px; margin: 12px 0; }
+  img.pic { width: 100%; border-radius: 8px; display: block; } .tag { font-size: 0.9rem; margin: 4px 0 8px; color: var(--soft); } .tag.ok { color: var(--ok); } .tag.todo { color: var(--todo); }
+  .who { display: flex; gap: 10px; align-items: flex-start; margin: 8px 0; } .who img, .noface { width: 48px; height: 48px; border-radius: 50%; flex: none; background: #3b3348; object-fit: cover; }
+  .say { color: var(--ink); font-style: italic; margin-top: 2px; } .kind { font-size: 0.78rem; color: var(--bg); background: var(--soft); border-radius: 10px; padding: 1px 8px; white-space: nowrap; }
+  ul.hap { list-style: none; padding-left: 0; } ul.hap li { border-left: 3px solid var(--line); padding-left: 10px; }
+  figure.bd { margin: 8px 0; max-width: 420px; } figure.bd img { width: 100%; border-radius: 6px; display: block; } figcaption { color: var(--soft); font-size: 0.88rem; margin-top: 3px; }
+  .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(240px, 1fr)); gap: 12px; }
+  details { margin-top: 10px; border-top: 1px solid var(--line); padding-top: 8px; } summary { cursor: pointer; color: var(--gold); }
+  .bar { display: flex; flex-wrap: wrap; gap: 10px; align-items: center; margin: 8px 0 6px; } .bar button { margin-left: auto; }
+  button { font: inherit; color: var(--ink); background: #3a3049; border: 1px solid var(--line); border-radius: 8px; padding: 7px 12px; cursor: pointer; }
+  textarea { width: 100%; font: 0.84rem/1.45 ui-monospace, Menlo, Consolas, monospace; color: var(--ink); background: #17131f; border: 1px solid var(--line); border-radius: 8px; padding: 10px; resize: vertical; }
+  nav a { color: var(--gold); margin-right: 10px; white-space: nowrap; }
+</style></head>
+<body><main>
+<h1>The demo, mapped</h1>
+<p class="soft">Moon Faire, November 13. All ten areas of the demo: what each place looks like, who is there, what can happen, how the places join, and where the fights are. Claude Fable 5.2 drafted it through your key from the lore notes, the approved plan and the fair folk. Everything is a draft for you to cut: each thing that can happen has a code (W2-c), so you can say "cut W2-c" or "change W4-a".</p>
+<div class="card"><b>How to use this page</b>
+<ul>
+  <li><b>To approve the map:</b> read the ten cards and tell me what to cut or change, by code.</li>
+  <li><b>To paint what is left:</b> /*COUNT*/. Unzip <b>Moon_Faire_Demo_Painting_Starters.zip</b> from the chat. Each card below has its painting prompt; attach the place's guide and the two reference pictures.</li>
+  <li><b>Fights</b> use your own moor clearing and four pictures borrowed from Envoi, as you chose. Two of the borrowed ones fit poorly; they are marked.</li>
+  <li>Names, people and lines are stand-ins, not lore. Drafting this page cost /*COST*/ on your key.</li>
+</ul></div>
+<nav><a href="#W1">W1</a><a href="#W2">W2</a><a href="#W3">W3</a><a href="#W4">W4</a><a href="#W5">W5</a><a href="#W6">W6</a><a href="#W7">W7</a><a href="#W8">W8</a><a href="#W9">W9</a><a href="#F5">F5</a></nav>
+<h2>The evening, beat by beat</h2>
+<div class="card"><ol>/*STORY*/</ol></div>
+/*CARDS*/
+/*EXTRA*/
+</main>
+<script>
+document.querySelectorAll('[data-copy]').forEach(function (b) { b.onclick = function () { var t = b.parentNode.nextElementSibling; t.focus(); t.select(); try { document.execCommand('copy'); } catch (e) {} if (navigator.clipboard) navigator.clipboard.writeText(t.value).catch(function () {}); b.textContent = 'Copied (or select and copy)'; setTimeout(function () { b.textContent = 'Copy prompt'; }, 2500); }; });
+</script>
+</body></html>

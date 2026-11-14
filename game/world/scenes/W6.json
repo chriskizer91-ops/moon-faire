@@ -1,0 +1,327 @@
+{
+ "id": "W6",
+ "name": "The still pool and the broken arch",
+ "figure": [
+  1.5,
+  4.2
+ ],
+ "ground": [
+  {
+   "kind": "box",
+   "name": "the dry turf shelf on the near bank",
+   "x": 0,
+   "z": 4.25,
+   "w": 14,
+   "d": 4.5,
+   "turn": 0
+  },
+  {
+   "kind": "path",
+   "name": "the track back up to the stones",
+   "a": [
+    -6,
+    4
+   ],
+   "b": [
+    -12,
+    3.2
+   ],
+   "w": 3.5
+  },
+  {
+   "kind": "path",
+   "name": "the trodden path round the right bank",
+   "a": [
+    5.5,
+    3
+   ],
+   "b": [
+    6,
+    -6.2
+   ],
+   "w": 3
+  },
+  {
+   "kind": "path",
+   "name": "the far bank before the arch",
+   "a": [
+    6.5,
+    -6.0
+   ],
+   "b": [
+    -1.5,
+    -6.6
+   ],
+   "w": 3
+  }
+ ],
+ "flats": [
+  {
+   "kind": "disc",
+   "name": "the still black pool",
+   "tone": "water",
+   "x": -1,
+   "z": -1.9,
+   "r": 2.8
+  },
+  {
+   "kind": "box",
+   "name": "old threshold paving between the arch legs",
+   "tone": "stone",
+   "x": -0.9,
+   "z": -9.0,
+   "w": 2.4,
+   "d": 0.8,
+   "turn": 0
+  }
+ ],
+ "solids": [
+  {
+   "kind": "box",
+   "name": "turf bank of the moor",
+   "tone": "dark",
+   "x": -8.5,
+   "z": -9.8,
+   "w": 5,
+   "d": 2,
+   "h": 1.6,
+   "turn": -8
+  },
+  {
+   "kind": "box",
+   "name": "standing leg of the broken arch",
+   "tone": "stone",
+   "x": -2.6,
+   "z": -9.0,
+   "w": 1.0,
+   "d": 1.0,
+   "h": 3.0,
+   "turn": 0
+  },
+  {
+   "kind": "box",
+   "name": "broken stub of the arch span on top of the leg",
+   "tone": "stone",
+   "x": -2.05,
+   "z": -9.0,
+   "w": 1.7,
+   "d": 0.9,
+   "h": 0.6,
+   "y": 2.5,
+   "turn": 0
+  },
+  {
+   "kind": "box",
+   "name": "broken stump of the arch's other leg",
+   "tone": "stone",
+   "x": 0.8,
+   "z": -9.0,
+   "w": 1.0,
+   "d": 1.0,
+   "h": 1.1,
+   "turn": 0
+  },
+  {
+   "kind": "box",
+   "name": "fallen arch span lying in the reeds",
+   "tone": "stone",
+   "x": 2.9,
+   "z": -9.1,
+   "w": 2.6,
+   "d": 0.8,
+   "h": 0.6,
+   "turn": 18
+  },
+  {
+   "kind": "cone",
+   "name": "reed clump by the fallen span",
+   "x": 5.0,
+   "z": -9.4,
+   "r": 0.7,
+   "h": 1.1
+  },
+  {
+   "kind": "cone",
+   "name": "bent thorn tree",
+   "x": 10.2,
+   "z": -6.5,
+   "r": 1.6,
+   "h": 4.5
+  },
+  {
+   "kind": "cone",
+   "name": "tall reed clump on the pool's left bank",
+   "x": -4.9,
+   "z": -3.6,
+   "r": 0.9,
+   "h": 1.2
+  },
+  {
+   "kind": "cone",
+   "name": "reed clump on the pool's right bank",
+   "x": 2.9,
+   "z": -0.5,
+   "r": 0.6,
+   "h": 1.0
+  },
+  {
+   "kind": "cone",
+   "name": "moor rock outcrop beside the track",
+   "x": -9.3,
+   "z": -1.0,
+   "r": 1.4,
+   "h": 2.4
+  },
+  {
+   "kind": "box",
+   "name": "small leaning waymark stone",
+   "tone": "stone",
+   "x": -7.2,
+   "z": 0.6,
+   "w": 0.5,
+   "d": 0.4,
+   "h": 1.3,
+   "turn": 10
+  },
+  {
+   "kind": "box",
+   "name": "log seat at the pool's edge",
+   "tone": "wood",
+   "x": -2,
+   "z": 1.2,
+   "w": 2.4,
+   "d": 0.45,
+   "h": 0.45,
+   "turn": 0
+  },
+  {
+   "kind": "box",
+   "name": "bundle of cut rushes",
+   "tone": "wood",
+   "x": 0.4,
+   "z": 1.15,
+   "w": 0.9,
+   "d": 0.5,
+   "h": 0.4,
+   "turn": 12
+  },
+  {
+   "kind": "fire",
+   "name": "camp fire in a ring of stones",
+   "x": -2,
+   "z": 3.7,
+   "r": 0.6
+  },
+  {
+   "kind": "box",
+   "name": "low boulder on the near side of the track",
+   "tone": "stone",
+   "x": -8.6,
+   "z": 7.4,
+   "w": 1.3,
+   "d": 0.9,
+   "h": 0.6,
+   "turn": 15
+  },
+  {
+   "kind": "box",
+   "name": "low mossy boulder in the near right corner",
+   "tone": "stone",
+   "x": 8.5,
+   "z": 7.3,
+   "w": 1.6,
+   "d": 1.2,
+   "h": 0.9,
+   "turn": -10
+  }
+ ],
+ "exits": [
+  {
+   "to": "W5",
+   "side": "left",
+   "x": -9.6,
+   "z": 3.5
+  }
+ ],
+ "people": [
+  {
+   "who": "farm-lad",
+   "x": -3.7,
+   "z": 3.6,
+   "seat": true
+  }
+ ],
+ "painting": {
+  "title": "THE STILL POOL AND THE BROKEN ARCH AT NIGHT",
+  "intro": "A lonely hollow on the open moor where a rutted track comes down to a round black pool, with a small camp on the near bank and a ruined stone arch on the far one. It is full night, lit only by the moon and one small camp fire.",
+  "bullets": [
+   "The ground: one flat level of pale, trodden bare earth and short dry turf. It forms a broad shelf across the near bank, a worn footpath curving round the right side of the pool, and a strip of bare earth along the far bank in front of the arch. It is clearly paler than the dark heather and reeds around it, and nothing overhangs it.",
+   "At the far left a low dark bank of turf and heather closes the hollow, the moor rising gently behind it.",
+   "On the far bank stands the broken arch of old grey weathered stone. Its left leg is upright and tall, rising against the sky, with a jagged stub of the span still jutting from its top. The right leg is a waist-high broken stump, and a few worn paving slabs lie between the two.",
+   "To the right of the stump the fallen span lies as one long curved block, half sunk in reeds, with a clump of pale dry reeds at its end. At the far right edge a bent, bare thorn tree leans with the wind.",
+   "In the middle lies the pool: perfectly round, black and dead still like glass, with a narrow rim of dark mud. It holds a clear pale reflection of the moon and a few stars, and tall reed clumps stand on its left and right banks, well back from the paths.",
+   "On the left the rutted earth track comes in level from the frame's edge onto the turf shelf. A rough rock outcrop and a small leaning waymark stone stand on its far side, and one low boulder on its near side.",
+   "On the near shelf a small camp fire burns in a ring of blackened stones, throwing a warm orange circle over the turf. Just beyond it at the water's edge lies a weathered log seat, with a tied bundle of fresh-cut green rushes beside it.",
+   "In the near right corner a low mossy boulder sits in dark heather. The rest of the near edge is low rough grass falling into shadow.",
+   "Light: cold blue-silver moonlight from the upper left with long soft shadows. The fire is the only warm light, and everything else is deep night blues and blacks."
+  ],
+  "top": "A clear night sky full of stars over a low, dark, rolling moor skyline with no buildings. Auros, the moon, is large, pale and nearly full in the upper left. The top of the standing arch leg and the thorn tree's crown show as black shapes against the sky."
+ },
+ "kind": "walk",
+ "frame": [
+  2048,
+  1024
+ ],
+ "camera": {
+  "fov": 12,
+  "pitch": 24,
+  "target": [
+   0,
+   0,
+   -2.5
+  ],
+  "span": 10.7
+ },
+ "skyBand": 0.15,
+ "moon": {
+  "u": 0.105,
+  "v": 0.072,
+  "d": 0.085
+ },
+ "_made": {
+  "by": "claude-fable-5-2@high",
+  "rounds": [
+   {
+    "n": 1,
+    "seconds": 82.7,
+    "cost": 0.3255806,
+    "said": "file"
+   },
+   {
+    "n": 2,
+    "seconds": 66.5,
+    "cost": 0.3582046,
+    "said": "file"
+   },
+   {
+    "n": 3,
+    "seconds": 1.0,
+    "cost": 0.15266860000000002,
+    "said": "DONE"
+   }
+  ],
+  "cost": 0.8364538,
+  "checks": [
+   "Walkable ground: about 143 square metres."
+  ],
+  "area": 143.5,
+  "frame_info": {
+   "farZ": -13.53,
+   "nearZ": 8.14,
+   "halfWidthFar": 12.82,
+   "halfWidthMid": 10.45,
+   "halfWidthNear": 8.66,
+   "hide": 2.25
+  }
+ }
+}

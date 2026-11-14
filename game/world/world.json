@@ -1,0 +1,778 @@
+{
+ "story": [
+  "At dusk the four witches are at home in the fair square, among people who know them.",
+  "Wisps drift in after the fair's lights, and the four see them off in the square and the stall row.",
+  "At the mooring field they arrive as wisps carry the twelve lamps of the captain's airship out over the gate, and he will not fly her dark.",
+  "They go out onto the moor at night and win the first lamps back at the Last Lantern.",
+  "A Shadow Wraith bars the road at the standing stones, and they break through.",
+  "At the still pool they find a camp to rest at and win the last lamps; a hollow off the path hides a healing amulet.",
+  "With all twelve lit on the hull, the captain flies them to a dead airship beacon on a crag.",
+  "In deep night they climb the beacon stair.",
+  "In the lamp room at the top a great wraith hoards the stolen light, and they take it back."
+ ],
+ "areas": [
+  {
+   "id": "W1",
+   "zone": 1,
+   "name": "The fair square",
+   "light": "dusk",
+   "look": "The existing painting: a ring of worn cobbles round packed earth, with a red rug edged in candles at its centre, a roofed stone well to the right, and paths leaving left, right and near. Round it stand a red-and-cream striped round tent and a gold tent (far left), two awning stalls of bottles and cloth (far), a blue star-patterned tent (far right), a basket stall and a green-and-gold tent (right), a lamp stall and a blue moon-painted wagon (near left), crates and barrels (near right) and about eight lit lamp posts; I see no bunting. The sky band is violet dusk with pink on the horizon, low hills and far tent tops, and Auros full in the upper left.",
+   "exits": [
+    {
+     "to": "W2",
+     "side": "right",
+     "how": "the path between the basket stall and the green-and-gold tent"
+    }
+   ],
+   "people": [
+    {
+     "who": "old-lamp-seller",
+     "where": "at the lamp stall on the near left, beside the blue wagon",
+     "doing": "sits on a stool behind the counter trimming wicks; beckons when the party comes near",
+     "says": [
+      "Evening, you four. Come and look, looking's free.",
+      "Forty years I've sold lamps. Never once saw a light get up and leave.",
+      "Take this wick out to the lamplighter, would you? Last lantern on the road."
+     ]
+    },
+    {
+     "who": "ribbon-dyer",
+     "where": "under the far awning hung with cloth",
+     "doing": "stands stirring a dye pot; greets with a bow, thinks before answering",
+     "says": [
+      "Blue is short tonight. The one with the fox ears had most of it.",
+      "Dusk is the best light for red. In an hour it's all one colour."
+     ]
+    },
+    {
+     "who": "fortune-teller",
+     "where": "in the doorway of the blue star-patterned tent, far right",
+     "doing": "stands turning one card over and over; beckons",
+     "says": [
+      "One coin, one card. You travel with us and you've never once sat down.",
+      "A road, and something standing on it. That's all the card says."
+     ]
+    },
+    {
+     "who": "ballad-singer",
+     "where": "on the red rug in the middle of the ring, among its candles",
+     "doing": "stands singing; stops and bows when spoken to",
+     "says": [
+      "I'll do the long one when the lamps are all lit. People stay for the long one.",
+      "The candles keep leaning. There's no wind."
+     ]
+    }
+   ],
+   "happens": [
+    {
+     "code": "W1-a",
+     "title": "The rug candles gutter",
+     "what": "As the walking witch heads for the right-hand path, the candles on the rug dip and a single wisp drops over the well: the first set fight, one wisp, to teach turns. Jester: 'Oh good. I was getting bored.'",
+     "kind": "fight",
+     "needs": "nothing new beyond the F2 backdrop"
+    },
+    {
+     "code": "W1-b",
+     "title": "The blue wagon",
+     "what": "The moon-painted wagon is drafted as the party's own and as the first rest spot, where they wake after any loss at the fair.",
+     "kind": "rest",
+     "needs": "the maker's yes that the wagon is theirs"
+    },
+    {
+     "code": "W1-c",
+     "title": "One coin, one card",
+     "what": "The fortune-teller turns a card and gives the one line about a road. Jester: 'It says that for everyone.' Io: 'Then everyone should mind the road.'",
+     "kind": "talk",
+     "needs": "nothing new"
+    },
+    {
+     "code": "W1-d",
+     "title": "A wick for the lamplighter",
+     "what": "The old lamp-seller asks the party to carry a trimmed wick to the lamplighter at the last lantern on the moor road. It ends at W4 with thanks and nothing else.",
+     "kind": "errand",
+     "needs": "nothing new (a yes/no flag, no screen)"
+    }
+   ],
+   "fights": "One set fight (a single wisp at the rug candles); no walking fights.",
+   "lamps": 0,
+   "backdrop": "F2"
+  },
+  {
+   "id": "W2",
+   "zone": 1,
+   "name": "The stall row and the sparring ring",
+   "light": "dusk",
+   "look": "To be painted: a straight lane of trodden earth and straw running left to right between awning stalls and shuttered booths, opening midway on the far side onto a roped ring of sawdust with a lamp post at each corner. An oven cart stands at the left end and a pie cart at the right. The sky band is a shade deeper than W1, with tent tops and bare flag poles against it and Auros in the upper left.",
+   "exits": [
+    {
+     "to": "W1",
+     "side": "left",
+     "how": "the lane back to the square"
+    },
+    {
+     "to": "W3",
+     "side": "right",
+     "how": "the end of the row, where the stalls stop and the field begins"
+    }
+   ],
+   "people": [
+    {
+     "who": "fair-baker",
+     "where": "at the oven cart, left end of the row",
+     "doing": "stands at the oven door; waves a floury hand, laughs easily",
+     "says": [
+      "Buns are just out. Mind, they're hot.",
+      "If they come for my oven they'll get the peel across the nose. Do they have noses?"
+     ]
+    },
+    {
+     "who": "old-night-watchman",
+     "where": "at a corner post of the sparring ring",
+     "doing": "stands watching the four ring lamps; nods, points at the ring",
+     "says": [
+      "Shutters first, then lamps. That's my round, and something's ahead of me tonight.",
+      "Knocked flat? You'll wake up by your wagon. No shame in it. Go again."
+     ]
+    },
+    {
+     "who": "pie-seller",
+     "where": "at her cart, right end of the row, on the way to the gate",
+     "doing": "stands behind the cart; waves, points at the pies",
+     "says": [
+      "Hot pies! Mutton, and the other one's mutton too.",
+      "That captain's had nothing since noon. Take him one, he's good for the coin."
+     ]
+    }
+   ],
+   "happens": [
+    {
+     "code": "W2-a",
+     "title": "Wisps at the ring lamps",
+     "what": "Two wisps circle the corner lamps of the ring; passing the ring mouth starts the second set fight. Fox: 'Two! One each and two to share.'",
+     "kind": "fight",
+     "needs": "nothing new beyond the F2 backdrop"
+    },
+    {
+     "code": "W2-b",
+     "title": "Practice bouts in the ring",
+     "what": "After W2-a the watchman waves the party into the ring whenever they like, to fight the wisps that keep drifting to its lamps. Bouts repeat, give no lamps and cost nothing to lose.",
+     "kind": "fight",
+     "needs": "the maker's word on what the party spars against (see questions)"
+    },
+    {
+     "code": "W2-c",
+     "title": "A pie for the captain",
+     "what": "The pie-seller sends a pie to the mooring field; the captain's thanks ('Mutton. Good woman.') ends it. Ranger: 'I'm carrying it. You three would eat it.'",
+     "kind": "errand",
+     "needs": "nothing new (a flag; a pie prop is optional)"
+    },
+    {
+     "code": "W2-d",
+     "title": "The watchman's advice",
+     "what": "Talking to the watchman after a first loss or first bout gives his line about waking by the wagon, so the rule is told by a person and not a screen.",
+     "kind": "talk",
+     "needs": "nothing new"
+    }
+   ],
+   "fights": "One set fight (two wisps at the ring lamps) and repeatable practice bouts in the ring; no walking fights.",
+   "lamps": 0,
+   "backdrop": "F2"
+  },
+  {
+   "id": "W3",
+   "zone": 1,
+   "name": "The mooring field",
+   "light": "dusk",
+   "look": "To be painted: trampled grass at the edge of the fair, with the last tent backs on the left and the fair gate on the right (two poles, a bar, a coin table and a brazier), where the road runs out into darkening heather. The captain's airship is moored along the far side, with a ladder down to two mooring posts and twelve lamp brackets along the hull. The sky band holds the last red of dusk under violet, the ship's rigging dark against it, and Auros in the upper left.",
+   "exits": [
+    {
+     "to": "W2",
+     "side": "left",
+     "how": "back into the stall row"
+    },
+    {
+     "to": "W4",
+     "side": "right",
+     "how": "out under the gate bar onto the moor road"
+    },
+    {
+     "to": "W8",
+     "side": "far",
+     "how": "up the ship's ladder; the captain flies them once all twelve lamps are lit"
+    }
+   ],
+   "people": [
+    {
+     "who": "gate-keeper",
+     "where": "at the coin table by the gate bar",
+     "doing": "stands with arms folded watching the moor road; points, looks cross",
+     "says": [
+      "Out is free. Back in after dark, I look at your face first.",
+      "Twelve lights went over my gate and not one paid. I counted."
+     ]
+    },
+    {
+     "who": "chestnut-roaster",
+     "where": "at the brazier just inside the gate",
+     "doing": "stands turning chestnuts; beckons and laughs",
+     "says": [
+      "Here, a handful for the road. No, put your purse away.",
+      "Went straight over my head, the lot of them. Nearly had my hat."
+     ]
+    },
+    {
+     "who": "the captain",
+     "where": "at the foot of the ship's ladder, between the mooring posts",
+     "doing": "walks from post to post looking up at the dark hull; turns to the party when spoken to",
+     "says": [
+      "Twelve lamps, and they lifted every one like fruit off a branch.",
+      "I don't take her up dark. Bring my lamps home and I'll fly you wherever you point."
+     ]
+    }
+   ],
+   "happens": [
+    {
+     "code": "W3-a",
+     "title": "Twelve lamps go",
+     "what": "On first entering, the party sees the last lit lamps lift off the hull and stream over the gate toward the moor, each carried by a wisp. The captain runs to the ladder too late.",
+     "kind": "scene",
+     "needs": "the captain's model; the airship with twelve lamps that can be lit or dark; a lamp a wisp can be seen carrying"
+    },
+    {
+     "code": "W3-b",
+     "title": "Stragglers at the mooring ropes",
+     "what": "Three wisps that stayed behind at the mooring posts: the third set fight. Io: 'Keep them off the ropes.' Jester: 'Keep them on me.'",
+     "kind": "fight",
+     "needs": "nothing new beyond the F2 backdrop"
+    },
+    {
+     "code": "W3-c",
+     "title": "The captain asks",
+     "what": "After W3-b the captain tells the four the lamps went out over the moor and asks for them back; the gate-keeper's line about counting twelve backs him up. Nothing bars the gate.",
+     "kind": "talk",
+     "needs": "the captain's model and picture card"
+    },
+    {
+     "code": "W3-d",
+     "title": "The lamps come home",
+     "what": "Each time the party returns, the brackets on the hull light to match the lamps won so far, and the captain has a new line.",
+     "kind": "scene",
+     "needs": "the airship's lamps lighting one by one"
+    },
+    {
+     "code": "W3-e",
+     "title": "All twelve lit",
+     "what": "With the twelfth lamp lit the captain lowers the ladder; talking to him flies the party to the landing ledge. This is the plan's gate to zone 3.",
+     "kind": "gate",
+     "needs": "a short flight cut or a fade; the maker's choice"
+    }
+   ],
+   "fights": "One set fight (three wisps at the mooring ropes); no walking fights.",
+   "lamps": 0,
+   "backdrop": "F2"
+  },
+  {
+   "id": "W4",
+   "zone": 2,
+   "name": "The Last Lantern",
+   "light": "night",
+   "look": "To be painted to sit beside F1: a rutted track running left to right through heather and gorse, with a drystone wall, a wind-bent thorn and, midway, a tall iron post carrying the last lit lantern of the fair's road. The sky band is night with stars, the fair a small warm glow low on the left horizon as in F1, and Auros in the upper left.",
+   "exits": [
+    {
+     "to": "W3",
+     "side": "left",
+     "how": "the road back to the fair gate"
+    },
+    {
+     "to": "W5",
+     "side": "right",
+     "how": "the track climbing toward the stones"
+    }
+   ],
+   "people": [
+    {
+     "who": "old-lamplighter",
+     "where": "under the lantern post",
+     "doing": "stands with one hand on the post; waves, points out into the heather. Met beyond the fair because this lantern is the end of the nightly round and the lamplighter will not leave it for the wisps.",
+     "says": [
+      "This one's the last on my round. I'm not walking off and leaving it for them.",
+      "There are lights out in the heather that I never lit. Three, by my count."
+     ]
+    }
+   ],
+   "happens": [
+    {
+     "code": "W4-a",
+     "title": "The wisps at the lantern",
+     "what": "Wisps circle the lantern post, one of them carrying a ship's lamp: the set fight. Winning brings back the first lamp.",
+     "kind": "fight",
+     "needs": "nothing new"
+    },
+    {
+     "code": "W4-b",
+     "title": "Two more in the heather",
+     "what": "Walking fights along the track; in this draft the first two wins after the set fight each bring back a lamp, making this area's three.",
+     "kind": "fight",
+     "needs": "a small 'lamp won' line and sound"
+    },
+    {
+     "code": "W4-c",
+     "title": "The wick delivered",
+     "what": "Handing over the lamp-seller's wick ends the errand from W1 with a nod and thanks. 'Tell her it's the right size for once.'",
+     "kind": "errand",
+     "needs": "nothing new"
+    },
+    {
+     "code": "W4-d",
+     "title": "Looking back at the fair",
+     "what": "At the left end of the track, with the fair's glow small behind them, the Fox says: 'It looks like something you could put in a pocket.' Ranger: 'Then let's not lose it.'",
+     "kind": "scene",
+     "needs": "nothing new"
+    }
+   ],
+   "fights": "One set fight at the lantern post and walking fights about every 14 metres.",
+   "lamps": 3,
+   "backdrop": "F1"
+  },
+  {
+   "id": "W5",
+   "zone": 2,
+   "name": "The standing stones",
+   "light": "night",
+   "look": "To be painted: the track climbs onto a rise of short turf and passes left to right through a ring of leaning grey stones, between the two tallest. One stone lies fallen on the near side with gorse grown up behind it, and heather falls away all round. The sky band is night with stars, the moor rolling off dark, and Auros in the upper left.",
+   "exits": [
+    {
+     "to": "W4",
+     "side": "left",
+     "how": "the track back down to the Last Lantern"
+    },
+    {
+     "to": "W6",
+     "side": "right",
+     "how": "the road between the two tallest stones, shut until the Shadow Wraith is beaten"
+    },
+    {
+     "to": "W7",
+     "side": "near",
+     "how": "a gap in the gorse behind the fallen stone, easy to miss"
+    }
+   ],
+   "people": [],
+   "happens": [
+    {
+     "code": "W5-a",
+     "title": "A word before the stones",
+     "what": "On arriving the party sees the shape standing in the road. Io: 'That is no wisp.' Jester: 'No. That one's mine.'",
+     "kind": "scene",
+     "needs": "nothing new"
+    },
+    {
+     "code": "W5-b",
+     "title": "The wraith on the road",
+     "what": "A Shadow Wraith stands between the two tallest stones and the road beyond stays shut until it is beaten: the set fight. Winning brings back a lamp.",
+     "kind": "fight",
+     "needs": "the F3 backdrop"
+    },
+    {
+     "code": "W5-c",
+     "title": "Lamps among the stones",
+     "what": "Walking fights round the ring against wisps, later with a Shadow Wraith among them; three wins bring back this area's other three lamps.",
+     "kind": "fight",
+     "needs": "nothing new"
+    },
+    {
+     "code": "W5-d",
+     "title": "The gap behind the fallen stone",
+     "what": "A narrow way down through the gorse on the near side leads to the hollow. Nothing marks it but a faint shine below.",
+     "kind": "find",
+     "needs": "a small glow at the gap"
+    }
+   ],
+   "fights": "The set fight against the Shadow Wraith that bars the road, and walking fights about every 14 metres.",
+   "lamps": 4,
+   "backdrop": "F3"
+  },
+  {
+   "id": "W6",
+   "zone": 2,
+   "name": "The still pool and the broken arch",
+   "light": "night",
+   "look": "To be painted: the track runs down to a round black pool lying dead still, with a dry shelf of turf on the near bank holding a fire ring, a log seat and a bundle of cut rushes. On the far bank stands a broken stone arch, one leg upright and the span fallen in the reeds. The sky band is night with stars, and Auros in the upper left shows a second time in the water.",
+   "exits": [
+    {
+     "to": "W5",
+     "side": "left",
+     "how": "the track back up to the stones"
+    }
+   ],
+   "people": [
+    {
+     "who": "farm-lad",
+     "where": "on the log by the camp fire",
+     "doing": "sits feeding the fire; jumps up and waves. Met beyond the fair because he came out by day to cut rushes for the ponies' bedding and would not walk back past the wraith on the road.",
+     "says": [
+      "You came past the stones? Past that thing? I've been sat here since it sat there.",
+      "Came out for rushes for the ponies' beds. Got the rushes. Can't say much else for the day.",
+      "There's a dip back by the stones, behind the one that's fallen. Something shines down there. I didn't go and look."
+     ]
+    }
+   ],
+   "happens": [
+    {
+     "code": "W6-a",
+     "title": "The camp by the pool",
+     "what": "The fire and the log are the plan's rest spot: the party rests here and wakes here after a loss on the moor. Fox: 'A fire nobody stole. Lovely.'",
+     "kind": "rest",
+     "needs": "a fire prop and a log seat"
+    },
+    {
+     "code": "W6-b",
+     "title": "Under the broken arch",
+     "what": "A Shadow Wraith and two wisps hold lamps under the arch on the far bank: the set fight. Winning brings back a lamp.",
+     "kind": "fight",
+     "needs": "nothing new"
+    },
+    {
+     "code": "W6-c",
+     "title": "The last lamps",
+     "what": "Walking fights round the bank; four wins bring back this area's other four lamps.",
+     "kind": "fight",
+     "needs": "nothing new"
+    },
+    {
+     "code": "W6-d",
+     "title": "What the farm lad saw",
+     "what": "His third line points the party back to the fallen stone at W5 and the hollow below it.",
+     "kind": "talk",
+     "needs": "nothing new"
+    },
+    {
+     "code": "W6-e",
+     "title": "Twelve in hand",
+     "what": "When the twelfth lamp is won, most likely here, the Ranger says: 'That's twelve. Back to the ship.' Jester: 'And then wherever they were taking them.'",
+     "kind": "scene",
+     "needs": "nothing new"
+    }
+   ],
+   "fights": "One set fight under the broken arch and walking fights about every 14 metres.",
+   "lamps": 5,
+   "backdrop": "F1"
+  },
+  {
+   "id": "W7",
+   "zone": 2,
+   "name": "The hollow",
+   "light": "night",
+   "look": "To be painted: a steep-sided dip below the stones, floored with moss and bracken, with a flat grey stone at its middle and a thread of water beside it. Rock and gorse close it in on every side but the far one, where the way climbs back. The sky band is narrow above the rim, with stars and Auros in the upper left.",
+   "exits": [
+    {
+     "to": "W5",
+     "side": "far",
+     "how": "the climb back through the gorse to the fallen stone"
+    }
+   ],
+   "people": [],
+   "happens": [
+    {
+     "code": "W7-a",
+     "title": "Down out of the wind",
+     "what": "On entering, the Fox says: 'Oh, I like it down here. Nobody tell anybody.'",
+     "kind": "scene",
+     "needs": "nothing new"
+    },
+    {
+     "code": "W7-b",
+     "title": "The amulet on the flat stone",
+     "what": "The plan's healing amulet lies on the flat stone, giving off the faint shine seen from above. Io: 'It mends. I'll carry it.'",
+     "kind": "find",
+     "needs": "an amulet prop; what it does is the maker's"
+    },
+    {
+     "code": "W7-c",
+     "title": "Wisps follow them down",
+     "what": "Walking fights happen here as on the rest of the moor but bring no lamps, only practice.",
+     "kind": "fight",
+     "needs": "nothing new"
+    }
+   ],
+   "fights": "Walking fights about every 14 metres as in the rest of the wilds; no set fight and no lamps.",
+   "lamps": 0,
+   "backdrop": "F1"
+  },
+  {
+   "id": "W8",
+   "zone": 3,
+   "name": "The landing ledge",
+   "light": "deep night",
+   "look": "To be painted: a narrow shelf of bare rock on the side of the crag, with the airship lying along its near edge and all twelve lamps lit, the only warm light in the picture. At the right the first worn steps of a stair are cut up into the rock, and the dead tower stands above as a black shape. The sky band is deep night, thick with stars, with Auros in the upper left.",
+   "exits": [
+    {
+     "to": "W3",
+     "side": "near",
+     "how": "aboard the airship; the captain flies them back to the mooring field"
+    },
+    {
+     "to": "W9",
+     "side": "right",
+     "how": "the foot of the stair"
+    }
+   ],
+   "people": [
+    {
+     "who": "the captain",
+     "where": "at the ship's ladder on the near edge of the ledge",
+     "doing": "stands with one hand on the ladder, looking up at the tower; turns to the party when spoken to",
+     "says": [
+      "This ledge is as near as I can lay her. The rest is stairs.",
+      "I'll keep all twelve burning. Look down if you lose heart.",
+      "Rest aboard whenever you like. I'm going nowhere without you."
+     ]
+    }
+   ],
+   "happens": [
+    {
+     "code": "W8-a",
+     "title": "Setting down on the ledge",
+     "what": "The arrival: the ship comes alongside and the four step off into the dark. Io: 'No light at the top. None at all.' Jester: 'Then we'll bring some.'",
+     "kind": "scene",
+     "needs": "the captain's model; the airship with all twelve lamps lit"
+    },
+    {
+     "code": "W8-b",
+     "title": "Rest aboard",
+     "what": "Drafted as a rest spot at the ladder, so a loss on the stair or in the lamp room wakes the party here and not back at the pool.",
+     "kind": "rest",
+     "needs": "the maker's yes; the plan names only the W6 rest spot"
+    },
+    {
+     "code": "W8-c",
+     "title": "Back to the fair",
+     "what": "Talking to the captain flies the party back to the mooring field, for the ring or anything left undone.",
+     "kind": "talk",
+     "needs": "nothing new beyond the flight cut or fade"
+    },
+    {
+     "code": "W8-d",
+     "title": "The first step",
+     "what": "At the foot of the stair the Ranger says: 'I'll count the steps.' Fox: 'Count them on the way down. It's more cheerful.'",
+     "kind": "scene",
+     "needs": "nothing new"
+    }
+   ],
+   "fights": "none",
+   "lamps": 0,
+   "backdrop": null
+  },
+  {
+   "id": "W9",
+   "zone": 3,
+   "name": "The beacon stair",
+   "light": "deep night",
+   "look": "To be painted: worn stone steps climbing the crag and then winding round the outside of the tower, with small landings and rusted lamp brackets on the wall, every one empty. One landing gives onto a side ledge round the back of the tower, and the stair ends at a shut door. The sky band is deep night, open and starry on the outer side, with Auros in the upper left and the ship's twelve lamps small and warm far below.",
+   "exits": [
+    {
+     "to": "W8",
+     "side": "left",
+     "how": "down the stair to the landing ledge"
+    },
+    {
+     "to": "F5",
+     "side": "far",
+     "how": "the door at the top of the stair, which opens at level 5"
+    }
+   ],
+   "people": [],
+   "happens": [
+    {
+     "code": "W9-a",
+     "title": "Wraiths on the stair",
+     "what": "Walking fights up the steps and landings against Shadow Wraiths with wisps.",
+     "kind": "fight",
+     "needs": "the F4 backdrop"
+    },
+    {
+     "code": "W9-b",
+     "title": "The charm on the side ledge",
+     "what": "Off one landing, round the back of the tower, the plan's charm hangs from an empty lamp bracket. Ranger: 'Somebody climbed all this way to hang that up.'",
+     "kind": "find",
+     "needs": "a charm prop; what it does is the maker's"
+    },
+    {
+     "code": "W9-c",
+     "title": "The door at the top",
+     "what": "The lamp-room door stays shut until the party is level 5; before that the Ranger says 'Not yet. We're not ready.' This is the plan's level gate.",
+     "kind": "gate",
+     "needs": "nothing new"
+    },
+    {
+     "code": "W9-d",
+     "title": "The ship below",
+     "what": "On the top landing the twelve lamps show far below. Io: 'He kept them lit.' Jester: 'He'd better. We paid for them.'",
+     "kind": "scene",
+     "needs": "the lit ship painted small into the view"
+    }
+   ],
+   "fights": "Walking fights about every 14 metres against Shadow Wraiths and wisps; no set fight.",
+   "lamps": 0,
+   "backdrop": "F4"
+  },
+  {
+   "id": "F5",
+   "zone": 3,
+   "name": "The lamp room",
+   "light": "deep night",
+   "look": "To be painted: a round stone floor at the top of the tower, walled by a ring of tall broken window arches open to the night. In the middle stands a stepped stone cradle where the beacon's lamp should burn, cold and dark; how the hoarded light shows is the maker's to decide. Through the arches the sky band is deep night and stars, with Auros in the upper left where it has been all evening.",
+   "exits": [
+    {
+     "to": "W9",
+     "side": "near",
+     "how": "the door back onto the top landing"
+    }
+   ],
+   "people": [],
+   "happens": [
+    {
+     "code": "F5-a",
+     "title": "A word at the door",
+     "what": "Before the fight the Jester says: 'Stay behind me. I mean it this time.' Fox: 'You always mean it.' Jester: 'This time I'll do it.'",
+     "kind": "scene",
+     "needs": "nothing new"
+    },
+    {
+     "code": "F5-b",
+     "title": "The great wraith",
+     "what": "The plan's last set fight: the great wraith, two Shadow Wraiths and two wisps. Losing wakes the party at the last rest spot.",
+     "kind": "fight",
+     "needs": "the F5 backdrop"
+    },
+    {
+     "code": "F5-c",
+     "title": "The light let go",
+     "what": "When the great wraith falls, the stolen light comes loose in the room. Io: 'It isn't ours. Let it go where it belongs.'",
+     "kind": "scene",
+     "needs": "a light effect, and the maker's word on where the light goes"
+    },
+    {
+     "code": "F5-d",
+     "title": "Down to the ship",
+     "what": "The demo's last moment: the walking witch goes back out onto the landing with the twelve lamps below. Fox: 'Race you down.' Ranger: 'No.'",
+     "kind": "scene",
+     "needs": "an end card or fade"
+    }
+   ],
+   "fights": "The great wraith with two Shadow Wraiths and two wisps, behind the door that opens at level 5.",
+   "lamps": 0,
+   "backdrop": "F5"
+  }
+ ],
+ "backdrops": [
+  {
+   "id": "F1",
+   "name": "The moor clearing",
+   "for": "W4, W6 and W7 fights",
+   "envoi": null,
+   "why": "The maker's own painting exists, and its heather, wall, thorn and far fair-glow are what W4, W6 and W7 are drawn to match.",
+   "fit": "good"
+  },
+  {
+   "id": "F2",
+   "name": "The fair from the ring",
+   "for": "W1, W2 (set fight and ring bouts) and W3 fights",
+   "envoi": "battle-warm-road",
+   "why": "Lamplit cobbles running out into heather under an upper-left moon come nearest to the fair's edge, but it has no tents and is full night, not dusk; night-square was passed over because its chapel and stone houses would turn the fair into a town with a church.",
+   "fit": "poor"
+  },
+  {
+   "id": "F3",
+   "name": "Among the standing stones",
+   "for": "W5 fights",
+   "envoi": "11-warm-roads-moor",
+   "why": "A heather moor with a standing stone, seen level and with the moon almost where F1 has it, so it sits beside the maker's clearing, though it shows one stone, not a ring, and snow peaks F1 lacks; battle-gloamwood-road was passed over for its forest, right-hand moon and moon-carved stone.",
+   "fit": "fair"
+  },
+  {
+   "id": "F4",
+   "name": "The crag",
+   "for": "W9 walking fights",
+   "envoi": "battle-northern-crossroads",
+   "why": "Bare frosted flagstones with a flight of steps and far peaks under the moon read as cold high ground, but the well, signpost and trees belong to a crossroads, not a stair up a tower.",
+   "fit": "poor"
+  },
+  {
+   "id": "F5",
+   "name": "The lamp room",
+   "for": "the F5 fight",
+   "envoi": "battle-dead-moonwell",
+   "why": "Dead grey stone, cold braziers, an upper-left moon and a round stepped basin that can pass for the dead lamp's cradle, but it is an open court with spires above it, not a tower top; 14-dead-moonwell was passed over because its moon is a crescent.",
+   "fit": "fair"
+  }
+ ],
+ "captain": {
+  "W3": [
+   "Twelve lamps, and they lifted every one like fruit off a branch.",
+   "I don't take her up dark. Bring my lamps home and I'll fly you wherever you point.",
+   "Every one of them went the same way. Out past the stones, toward the old beacon."
+  ],
+  "W8": [
+   "This ledge is as near as I can lay her. The rest is stairs.",
+   "I'll keep all twelve burning. Look down if you lose heart.",
+   "Rest aboard whenever you like. I'm going nowhere without you."
+  ]
+ },
+ "unused": [],
+ "needs": [
+  {
+   "what": "The captain's 3D model and picture card",
+   "why": "He speaks in two areas and opens the way to zone 3.",
+   "for": "W3, W8"
+  },
+  {
+   "what": "The airship as a moored set piece with twelve lamps that light one at a time",
+   "why": "The lamp count is shown on the hull, and the lit ship is the only warm light at the beacon.",
+   "for": "W3, W8, W9"
+  },
+  {
+   "what": "Area paintings for the nine places not yet painted",
+   "why": "Only W1 exists; the 'look' lines here are briefs for the rest.",
+   "for": "W2, W3, W4, W5, W6, W7, W8, W9, F5"
+  },
+  {
+   "what": "The maker's own battle paintings for the fair and the lamp room, and ideally the crag",
+   "why": "Nothing borrowed shows a tented fair, a tower-top room or a stair on a crag, so F2, F4 and F5 are stand-ins only.",
+   "for": "W1, W2, W3, W9, F5"
+  },
+  {
+   "what": "A ship's lamp a wisp can be seen carrying, and a short 'lamp won' sound and line",
+   "why": "The theft at the field and each lamp's return need to be seen and heard.",
+   "for": "W3, W4, W5, W6"
+  },
+  {
+   "what": "Small props: stools and a log to sit on, a dye pot with steam, oven cart, pie cart, brazier, coin table and gate bar, ring ropes, camp fire, amulet, charm",
+   "why": "People need something to stand at or sit on, and the two finds need something to pick up.",
+   "for": "W1, W2, W3, W6, W7, W9"
+  },
+  {
+   "what": "A short sung tune for the ballad-singer",
+   "why": "She is drafted as singing on the rug until spoken to.",
+   "for": "W1"
+  },
+  {
+   "what": "Picture cards for the eleven fair folk and the four witches, if not already made",
+   "why": "Every talk shows a card beside the text box.",
+   "for": "all"
+  }
+ ],
+ "questions": [
+  "Once the twelve lamps are home, what light is the great wraith hoarding, why do the four go after it, and where does it go when she falls? I drafted only that the wisps all flew toward the beacon.",
+  "How are lamps counted? I drafted one from each wilds set fight and one per walking-fight win in that area until its number is reached (W4 3, W5 4, W6 5).",
+  "May I add two rest spots to the plan's one: the blue wagon in W1 as the party's own, and the airship at W8? Without the second, a loss in the lamp room wakes them back at the pool.",
+  "What does the party fight in the sparring ring, given the only foes are wraiths? I drafted wisps that keep drifting to the ring lamps, open after the W2 set fight.",
+  "Can fights use both kinds of borrowed picture? F1 and the numbered ones are seen level; the battle- ones look down from above like W1, and I used those for F2, F4 and F5.",
+  "Where is the fair gate, and do the models or the notes win? I put the gate in W3 and left W1's left and near paths shut. The lamplighter model reads to me as a woman in a red dress and headscarf, the gate-keeper as a man in hat and waistcoat, and the old lamp-seller as young."
+ ],
+ "_made": {
+  "by": "claude-fable-5-2@high",
+  "cost": 1.700956,
+  "seconds": 434.3
+ }
+}

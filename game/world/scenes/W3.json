@@ -1,0 +1,373 @@
+{
+ "id": "W3",
+ "name": "The mooring field",
+ "figure": [
+  0,
+  -1
+ ],
+ "ground": [
+  {
+   "kind": "box",
+   "name": "the trampled field",
+   "x": 0,
+   "z": -1,
+   "w": 14,
+   "d": 8.5,
+   "turn": 0
+  },
+  {
+   "kind": "path",
+   "name": "lane back to the stall row",
+   "a": [
+    -6.5,
+    -0.5
+   ],
+   "b": [
+    -11,
+    0
+   ],
+   "w": 3.4
+  },
+  {
+   "kind": "path",
+   "name": "moor road under the gate",
+   "a": [
+    6.5,
+    -0.5
+   ],
+   "b": [
+    10.6,
+    0
+   ],
+   "w": 3.4
+  },
+  {
+   "kind": "path",
+   "name": "trodden way to the ship's ladder",
+   "a": [
+    1,
+    -5
+   ],
+   "b": [
+    1,
+    -12.3
+   ],
+   "w": 2.8
+  }
+ ],
+ "flats": [
+  {
+   "kind": "box",
+   "name": "rough grass verge",
+   "tone": "grass",
+   "x": 0,
+   "z": 5.9,
+   "w": 18,
+   "d": 3.8,
+   "turn": 0
+  },
+  {
+   "kind": "box",
+   "name": "heather beyond the fence",
+   "tone": "grass",
+   "x": 11.3,
+   "z": -5.5,
+   "w": 3,
+   "d": 5.6,
+   "turn": 0
+  }
+ ],
+ "solids": [
+  {
+   "kind": "box",
+   "name": "airship hull, stern end",
+   "tone": "hull",
+   "x": 5.7,
+   "z": -10,
+   "w": 4.2,
+   "d": 3,
+   "h": 2.4,
+   "y": 0.3,
+   "turn": 0
+  },
+  {
+   "kind": "box",
+   "name": "airship hull",
+   "tone": "hull",
+   "x": 9.9,
+   "z": -10,
+   "w": 4.2,
+   "d": 3,
+   "h": 2.4,
+   "y": 0.3,
+   "turn": 0
+  },
+  {
+   "kind": "box",
+   "name": "ship's ladder",
+   "tone": "wood",
+   "x": 3.2,
+   "z": -11.4,
+   "w": 0.5,
+   "d": 0.16,
+   "h": 2.7,
+   "turn": 0
+  },
+  {
+   "kind": "cyl",
+   "name": "mooring post",
+   "x": -1.1,
+   "z": -10.0,
+   "r": 0.2,
+   "h": 1.1
+  },
+  {
+   "kind": "cyl",
+   "name": "mooring post",
+   "x": 2.9,
+   "z": -7.9,
+   "r": 0.2,
+   "h": 1.1
+  },
+  {
+   "kind": "tent-round",
+   "name": "tent back",
+   "x": -10,
+   "z": -6,
+   "r": 2.2,
+   "wall": 1.8,
+   "top": 3.2
+  },
+  {
+   "kind": "tent-square",
+   "name": "last tent back",
+   "x": -6,
+   "z": -8.8,
+   "w": 4,
+   "d": 3.4,
+   "wall": 1.9,
+   "top": 2.8
+  },
+  {
+   "kind": "box",
+   "name": "ship's cargo crates",
+   "tone": "wood",
+   "x": -2.6,
+   "z": -8.4,
+   "w": 1.6,
+   "d": 1.4,
+   "h": 1.1,
+   "turn": 0
+  },
+  {
+   "kind": "post",
+   "name": "lantern post by the tents",
+   "x": -8.2,
+   "z": -2.9,
+   "h": 2.6
+  },
+  {
+   "kind": "cyl",
+   "name": "gate pole",
+   "x": 9.3,
+   "z": -2.6,
+   "r": 0.12,
+   "h": 2.9
+  },
+  {
+   "kind": "cyl",
+   "name": "gate pole",
+   "x": 9.3,
+   "z": 2.0,
+   "r": 0.12,
+   "h": 2.9
+  },
+  {
+   "kind": "box",
+   "name": "coin table",
+   "tone": "wood",
+   "x": 8.1,
+   "z": -3.4,
+   "w": 1.0,
+   "d": 0.7,
+   "h": 0.8,
+   "turn": 0
+  },
+  {
+   "kind": "fire",
+   "name": "chestnut brazier",
+   "x": 6.6,
+   "z": -6.4,
+   "r": 0.4
+  },
+  {
+   "kind": "post",
+   "name": "gate lantern post",
+   "x": 8.9,
+   "z": -4.6,
+   "h": 2.6
+  },
+  {
+   "kind": "box",
+   "name": "fair fence",
+   "tone": "wood",
+   "x": 9.5,
+   "z": -4.0,
+   "w": 0.2,
+   "d": 2.2,
+   "h": 1.0,
+   "turn": 0
+  },
+  {
+   "kind": "box",
+   "name": "fair fence",
+   "tone": "wood",
+   "x": 9.5,
+   "z": -6.6,
+   "w": 0.2,
+   "d": 2.2,
+   "h": 1.0,
+   "turn": 0
+  },
+  {
+   "kind": "box",
+   "name": "low crates",
+   "tone": "wood",
+   "x": -5.5,
+   "z": 6.4,
+   "w": 1.6,
+   "d": 1.0,
+   "h": 0.8,
+   "turn": 0
+  },
+  {
+   "kind": "cyl",
+   "name": "barrels",
+   "x": 5.6,
+   "z": 6.5,
+   "r": 0.45,
+   "h": 0.9
+  },
+  {
+   "kind": "cyl",
+   "name": "coil of mooring rope",
+   "x": 2.2,
+   "z": 6.2,
+   "r": 0.55,
+   "h": 0.35
+  }
+ ],
+ "exits": [
+  {
+   "to": "W2",
+   "side": "left",
+   "x": -10,
+   "z": -0.1
+  },
+  {
+   "to": "W4",
+   "side": "right",
+   "x": 10,
+   "z": -0.1
+  },
+  {
+   "to": "W8",
+   "side": "far",
+   "x": 1,
+   "z": -12.0
+  }
+ ],
+ "people": [
+  {
+   "who": "gate-keeper",
+   "x": 7.8,
+   "z": -1.7,
+   "seat": false
+  },
+  {
+   "who": "chestnut-roaster",
+   "x": 6.4,
+   "z": -4.8,
+   "seat": false
+  },
+  {
+   "who": "captain",
+   "x": 1,
+   "z": -9.6,
+   "seat": false
+  }
+ ],
+ "painting": {
+  "title": "THE MOORING FIELD AT DUSK",
+  "intro": "The trampled grass field at the edge of the fair, where the captain's airship is moored along the far side and the fair gate opens onto the moor road. It is dusk: the last red light is going, and the ship's hull is dark.",
+  "bullets": [
+   "The ground: one flat field of trampled, flattened grass worn to bare earth in the middle, clearly paler than the rough grass around it. A trodden earth lane leaves on the left toward the fair, a rutted earth road leaves on the right through the gate, and a worn track runs straight back from the middle of the field, between the tents and the ship's stern, to the foot of the ship's ladder.",
+   "Along the far side on the right lies the long dark timber hull of the captain's airship, moored low so its keel hangs just above the grass. It is tarred planks with a row of empty iron lamp brackets spaced along its side, all unlit, and its bow runs out of the picture to the right. The upper hull, rail and masts rise out of the top of the ground into the sky.",
+   "At the ship's blunt stern, beside the far end of the worn track, a plain wooden rung ladder hangs straight down from the rail to the grass. Two short, thick timber mooring posts stand either side of the track, with heavy ropes running taut from them up to the hull.",
+   "On the far left are the backs of the last two fair tents: a round one and a square one in faded striped canvas, with guy ropes and pegs and no doors on this side. A small stack of the ship's cargo crates sits between the square tent and the track.",
+   "A lantern post with a warm lit lantern stands in front of the round tent, where the lane leaves on the left.",
+   "On the right is the fair gate: two tall rough wooden poles, one each side of the earth road, with a single thin wooden bar lashed across their very tops, high above head height. The road passes between them out into dark heather.",
+   "Just inside the gate on its far side are a small wooden coin table and a second lantern post with a lit lantern. A low post-and-rail fence runs from the far gate pole back to the ship's hull, with darkening heather beyond it. In front of the hull stands an iron brazier of glowing coals on three legs.",
+   "Along the near edge is rough, untrodden grass with only low things on it: a couple of crates on the left, a coil of heavy mooring rope, and two barrels on the right.",
+   "Light: deep dusk, cool violet shadow over everything. The only warm light is the two lanterns and the brazier, which throw small pools of orange onto the grass and a faint glow onto the nearest hull planks; the lamp brackets stay dark."
+  ],
+  "top": "The sky band holds the last red of dusk low on the horizon under deepening violet, over a flat dark line of moor. On the right half the ship's upper hull, deck rail, masts and rigging stand black against the sky. Auros, the moon, is large, pale and nearly full in the upper left, clear of the ship, above the tent tops."
+ },
+ "kind": "walk",
+ "frame": [
+  2048,
+  1024
+ ],
+ "camera": {
+  "fov": 12,
+  "pitch": 24,
+  "target": [
+   0,
+   0,
+   -2.5
+  ],
+  "span": 10.7
+ },
+ "skyBand": 0.15,
+ "moon": {
+  "u": 0.105,
+  "v": 0.072,
+  "d": 0.085
+ },
+ "_made": {
+  "by": "claude-fable-5-2@high",
+  "rounds": [
+   {
+    "n": 1,
+    "seconds": 183.4,
+    "cost": 0.6787726,
+    "said": "file"
+   },
+   {
+    "n": 2,
+    "seconds": 154.3,
+    "cost": 0.7408526,
+    "said": "file"
+   },
+   {
+    "n": 3,
+    "seconds": 3.2,
+    "cost": 0.28795659999999995,
+    "said": "DONE"
+   }
+  ],
+  "cost": 1.7075817999999998,
+  "checks": [
+   "Walkable ground: about 177 square metres."
+  ],
+  "area": 177.0,
+  "frame_info": {
+   "farZ": -13.53,
+   "nearZ": 8.14,
+   "halfWidthFar": 12.82,
+   "halfWidthMid": 10.45,
+   "halfWidthNear": 8.66,
+   "hide": 2.25
+  }
+ }
+}
