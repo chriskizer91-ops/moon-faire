@@ -1,0 +1,241 @@
+{
+ "kind": "fight",
+ "frame": [
+  2048,
+  1536
+ ],
+ "camera": {
+  "fov": 38,
+  "h": 2,
+  "z": 18,
+  "pitch": -4.2
+ },
+ "figure": [
+  -2.2,
+  0.6
+ ],
+ "party": [
+  [
+   "Jester",
+   -2.2,
+   0.6
+  ],
+  [
+   "Ranger",
+   -3.6,
+   -1.4
+  ],
+  [
+   "Fox",
+   -3.8,
+   2.0
+  ],
+  [
+   "Io",
+   -5.2,
+   0.2
+  ]
+ ],
+ "foes": [
+  [
+   "foe",
+   2.6,
+   0.8
+  ],
+  [
+   "foe",
+   3.8,
+   -1.2
+  ],
+  [
+   "boss",
+   4.5,
+   0
+  ],
+  [
+   "foe",
+   5.4,
+   1.8
+  ]
+ ],
+ "id": "F4",
+ "name": "The beacon stair",
+ "clear": {
+  "x": 0,
+  "z": 0,
+  "rx": 7.5,
+  "rz": 4.2
+ },
+ "flats": [
+  {
+   "kind": "box",
+   "name": "landing of stone flags",
+   "tone": "stone",
+   "x": 0,
+   "z": 2,
+   "w": 30,
+   "d": 22,
+   "turn": 0
+  },
+  {
+   "kind": "box",
+   "name": "sea, far below, out to the horizon",
+   "tone": "water",
+   "x": -74,
+   "z": -80,
+   "w": 150,
+   "d": 136,
+   "turn": 0
+  }
+ ],
+ "solids": [
+  {
+   "kind": "box",
+   "name": "crag rock under the tower",
+   "x": 11,
+   "z": -29.5,
+   "w": 22,
+   "d": 17,
+   "h": 5,
+   "turn": 0,
+   "y": 0,
+   "tone": "stone"
+  },
+  {
+   "kind": "cyl",
+   "name": "dead beacon tower",
+   "x": 11,
+   "z": -32,
+   "r": 5,
+   "h": 9,
+   "y": 5,
+   "tone": "dark"
+  },
+  {
+   "kind": "cyl",
+   "name": "broken lamp-room crown",
+   "x": 11,
+   "z": -32,
+   "r": 5.5,
+   "h": 2,
+   "y": 14,
+   "tone": "dark"
+  },
+  {
+   "kind": "box",
+   "name": "stair, first flight",
+   "x": 8,
+   "z": -9.5,
+   "w": 4,
+   "d": 3,
+   "h": 0.8,
+   "turn": 0,
+   "y": 0,
+   "tone": "stone"
+  },
+  {
+   "kind": "box",
+   "name": "stair, second flight",
+   "x": 9,
+   "z": -12.5,
+   "w": 4,
+   "d": 3,
+   "h": 1.6,
+   "turn": 0,
+   "y": 0,
+   "tone": "stone"
+  },
+  {
+   "kind": "box",
+   "name": "stair, third flight",
+   "x": 10,
+   "z": -15.5,
+   "w": 4,
+   "d": 3,
+   "h": 2.5,
+   "turn": 0,
+   "y": 0,
+   "tone": "stone"
+  },
+  {
+   "kind": "box",
+   "name": "stair, fourth flight",
+   "x": 11,
+   "z": -18.5,
+   "w": 4,
+   "d": 3,
+   "h": 3.6,
+   "turn": 0,
+   "y": 0,
+   "tone": "stone"
+  },
+  {
+   "kind": "box",
+   "name": "rock wall beside the stair",
+   "x": 15.5,
+   "z": -13,
+   "w": 5,
+   "d": 6,
+   "h": 4.5,
+   "turn": 0,
+   "y": 0,
+   "tone": "stone"
+  },
+  {
+   "kind": "box",
+   "name": "parapet block",
+   "x": -10.5,
+   "z": -9.4,
+   "w": 3.2,
+   "d": 0.9,
+   "h": 0.9,
+   "turn": 0,
+   "y": 0,
+   "tone": "stone"
+  },
+  {
+   "kind": "box",
+   "name": "parapet block",
+   "x": -6.2,
+   "z": -9.4,
+   "w": 3.2,
+   "d": 0.9,
+   "h": 0.9,
+   "turn": 0,
+   "y": 0,
+   "tone": "stone"
+  },
+  {
+   "kind": "box",
+   "name": "parapet block",
+   "x": -0.8,
+   "z": -9.4,
+   "w": 2.8,
+   "d": 0.9,
+   "h": 0.9,
+   "turn": 0,
+   "y": 0,
+   "tone": "stone"
+  },
+  {
+   "kind": "cone",
+   "name": "rock shoulder with dry grass",
+   "x": -13.5,
+   "z": -15,
+   "r": 3.5,
+   "h": 4,
+   "tone": "stone"
+  },
+  {
+   "kind": "cyl",
+   "name": "dead iron lamp post, unlit",
+   "x": -8.4,
+   "z": -8.5,
+   "r": 0.12,
+   "h": 3.4,
+   "y": 0,
+   "tone": "dark"
+  }
+ ],
+ "moon": true
+}

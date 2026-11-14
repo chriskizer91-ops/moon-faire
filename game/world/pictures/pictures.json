@@ -1,0 +1,842 @@
+{
+ "fights": {
+  "F5": {
+   "name": "The lamp room",
+   "clear": {
+    "x": 0,
+    "z": 0,
+    "rx": 7.5,
+    "rz": 4.2
+   },
+   "flats": [
+    {
+     "kind": "disc",
+     "name": "round tower-top floor",
+     "tone": "stone",
+     "x": 0,
+     "z": -6,
+     "r": 19.5
+    },
+    {
+     "kind": "disc",
+     "name": "soot-dark flags round the plinth",
+     "tone": "dark",
+     "x": 0,
+     "z": -11,
+     "r": 4.6
+    }
+   ],
+   "solids": [
+    {
+     "kind": "box",
+     "name": "near broken pier, left edge",
+     "x": -15.5,
+     "z": -16.1,
+     "w": 2.4,
+     "d": 2.4,
+     "h": 5.5,
+     "turn": 0,
+     "y": 0,
+     "tone": "stone"
+    },
+    {
+     "kind": "box",
+     "name": "tall pier, left",
+     "x": -11.4,
+     "z": -20.6,
+     "w": 2.2,
+     "d": 2.2,
+     "h": 8.5,
+     "turn": 0,
+     "y": 0,
+     "tone": "stone"
+    },
+    {
+     "kind": "box",
+     "name": "arch pier, left",
+     "x": -4.8,
+     "z": -23.9,
+     "w": 2.2,
+     "d": 2.2,
+     "h": 7,
+     "turn": 0,
+     "y": 0,
+     "tone": "stone"
+    },
+    {
+     "kind": "box",
+     "name": "arch pier, right",
+     "x": 4.8,
+     "z": -23.9,
+     "w": 2.2,
+     "d": 2.2,
+     "h": 7,
+     "turn": 0,
+     "y": 0,
+     "tone": "stone"
+    },
+    {
+     "kind": "box",
+     "name": "arch span, the one whole arch",
+     "x": 0,
+     "z": -23.9,
+     "w": 11.8,
+     "d": 1.8,
+     "h": 1.3,
+     "turn": 0,
+     "y": 7,
+     "tone": "stone"
+    },
+    {
+     "kind": "box",
+     "name": "broken pier, right",
+     "x": 11.4,
+     "z": -20.6,
+     "w": 2.2,
+     "d": 2.2,
+     "h": 5,
+     "turn": 0,
+     "y": 0,
+     "tone": "stone"
+    },
+    {
+     "kind": "box",
+     "name": "near tall pier, right edge",
+     "x": 15.5,
+     "z": -16.1,
+     "w": 2.4,
+     "d": 2.4,
+     "h": 8,
+     "turn": 0,
+     "y": 0,
+     "tone": "stone"
+    },
+    {
+     "kind": "cyl",
+     "name": "plinth, lower step",
+     "x": 0,
+     "z": -11,
+     "r": 3.2,
+     "h": 0.8,
+     "y": 0,
+     "tone": "stone"
+    },
+    {
+     "kind": "cyl",
+     "name": "plinth, upper step",
+     "x": 0,
+     "z": -11,
+     "r": 2.2,
+     "h": 0.8,
+     "y": 0.8,
+     "tone": "stone"
+    },
+    {
+     "kind": "cyl",
+     "name": "iron fire cradle, cold and empty",
+     "x": 0,
+     "z": -11,
+     "r": 1.6,
+     "h": 2.4,
+     "y": 1.6,
+     "tone": "dark"
+    },
+    {
+     "kind": "box",
+     "name": "fallen arch stones",
+     "x": -8.5,
+     "z": -18.5,
+     "w": 3,
+     "d": 1.6,
+     "h": 1,
+     "turn": 20,
+     "y": 0,
+     "tone": "stone"
+    },
+    {
+     "kind": "box",
+     "name": "fallen arch stones",
+     "x": 9,
+     "z": -17,
+     "w": 2.6,
+     "d": 1.6,
+     "h": 0.9,
+     "turn": -15,
+     "y": 0,
+     "tone": "stone"
+    }
+   ],
+   "moon": true,
+   "ground": "Big worn stone flags laid in rings, pale grey-blue in moonlight, cracked, with old soot stains. Flat, dry, bare and empty all the way to the bottom edge.",
+   "scene": "The open top of a dead beacon tower in deep night: a wide round stone floor ringed by broken piers, high above a dark sea under a full moon.",
+   "shows": [
+    "The fire cradle, dead centre, just behind the open floor: a great black iron basket of bars, taller than a person, on a round stone plinth of two steps. Cold and empty: no flame, no ember, no glow. Its top stands a little above the horizon line, clear against sea and sky.",
+    "Straight behind the cradle: the one window arch still whole, two stone piers with the arch between them. The cradle is seen inside it.",
+    "Four more piers in a curve, broken off at different heights: a tall one a fifth of the way in from the left, a short broken one a fifth in from the right, a short broken one at the left edge and a tall one at the right edge. No roof. Open sky above.",
+    "On every pier at head height: a rusted iron lamp bracket, empty.",
+    "Between the piers the floor ends at a low broken kerb. Beyond it: a strip of dark sea far below, up to a level horizon 61% down, then night sky thick with stars.",
+    "The full moon at 31% across, 17% down, in open sky between the left piers, with a pale path of light on the sea under it.",
+    "Two low heaps of fallen arch stones at the back, left and right, near the feet of the piers. Nothing else on the floor."
+   ]
+  },
+  "F2": {
+   "name": "The fair",
+   "clear": {
+    "x": 0,
+    "z": 0,
+    "rx": 7.5,
+    "rz": 4.2
+   },
+   "flats": [
+    {
+     "kind": "path",
+     "name": "trodden lane across the back",
+     "tone": "path",
+     "a": [
+      -18,
+      -8.5
+     ],
+     "b": [
+      18,
+      -8.5
+     ],
+     "w": 3
+    },
+    {
+     "kind": "path",
+     "name": "path back between the stalls",
+     "tone": "path",
+     "a": [
+      1.5,
+      -10
+     ],
+     "b": [
+      2,
+      -30
+     ],
+     "w": 3.5
+    }
+   ],
+   "solids": [
+    {
+     "kind": "tent-round",
+     "x": -11.5,
+     "z": -16,
+     "r": 4.5,
+     "wall": 3,
+     "top": 7.5
+    },
+    {
+     "kind": "tent-round",
+     "x": 12,
+     "z": -17,
+     "r": 4.5,
+     "wall": 3.2,
+     "top": 8
+    },
+    {
+     "kind": "tent-round",
+     "x": 2,
+     "z": -36,
+     "r": 9,
+     "wall": 4.5,
+     "top": 13
+    },
+    {
+     "kind": "tent-square",
+     "x": -5,
+     "z": -24,
+     "w": 6,
+     "d": 5,
+     "wall": 2.8,
+     "top": 5.5,
+     "turn": 0
+    },
+    {
+     "kind": "stall",
+     "x": -2.5,
+     "z": -13,
+     "w": 4.5,
+     "d": 2.5,
+     "h": 3,
+     "turn": 0
+    },
+    {
+     "kind": "stall",
+     "x": 5.5,
+     "z": -13.5,
+     "w": 4.5,
+     "d": 2.5,
+     "h": 3,
+     "turn": 0
+    },
+    {
+     "kind": "post",
+     "x": -8,
+     "z": -10.5,
+     "h": 3.6
+    },
+    {
+     "kind": "post",
+     "x": 3,
+     "z": -11,
+     "h": 3.6
+    },
+    {
+     "kind": "post",
+     "x": 8.5,
+     "z": -10.5,
+     "h": 3.6
+    },
+    {
+     "kind": "box",
+     "name": "crates",
+     "x": 11,
+     "z": -12.5,
+     "w": 2,
+     "d": 1.6,
+     "h": 1.4,
+     "turn": 10,
+     "y": 0,
+     "tone": "wood"
+    },
+    {
+     "kind": "cyl",
+     "name": "barrel",
+     "x": 12.7,
+     "z": -12,
+     "r": 0.5,
+     "h": 1.1,
+     "y": 0,
+     "tone": "wood"
+    }
+   ],
+   "moon": true,
+   "ground": "Trodden bare earth, brown and dry, with a few wisps of straw and worn cobbles showing through. Warm lamp light falls across it from behind; it is flat and empty to the bottom edge.",
+   "scene": "A trodden space between the tents of a travelling fair at dusk, lamps lit, the fair spread out behind.",
+   "shows": [
+    "Left, behind the open ground: a big round tent in red and cream stripes with a scalloped gold edge. Its peak is a little over a third of the way down the picture. Its left side runs off the picture.",
+    "Right, behind: a round tent of deep blue cloth patterned with gold stars, the same size.",
+    "Centre, behind: two wooden awning stalls side by side with a gap between them, one of bottles, one of folded cloth. No signs, no lettering.",
+    "Three lit iron lantern posts along the far side of a trodden lane: one a fifth of the way in from the left, one just right of centre, one a fifth in from the right. Every flame leans a little to the right, though nothing else stirs.",
+    "Far behind, seen over the stalls in the centre: a very large striped tent in dusky blue and cream, its peak a third of the way down. To its left, lower, a gold tent. A few bare flag poles.",
+    "Right, beside the blue tent: two crates and a barrel.",
+    "Sky: violet dusk with a pink band on the horizon and low dark hills. The full moon at 31% across, 17% down, in clear sky between the red tent's peak and the big tent."
+   ]
+  },
+  "F4": {
+   "name": "The beacon stair",
+   "clear": {
+    "x": 0,
+    "z": 0,
+    "rx": 7.5,
+    "rz": 4.2
+   },
+   "flats": [
+    {
+     "kind": "box",
+     "name": "landing of stone flags",
+     "tone": "stone",
+     "x": 0,
+     "z": 2,
+     "w": 30,
+     "d": 22,
+     "turn": 0
+    },
+    {
+     "kind": "box",
+     "name": "sea, far below, out to the horizon",
+     "tone": "water",
+     "x": -74,
+     "z": -80,
+     "w": 150,
+     "d": 136,
+     "turn": 0
+    }
+   ],
+   "solids": [
+    {
+     "kind": "box",
+     "name": "crag rock under the tower",
+     "x": 11,
+     "z": -29.5,
+     "w": 22,
+     "d": 17,
+     "h": 5,
+     "turn": 0,
+     "y": 0,
+     "tone": "stone"
+    },
+    {
+     "kind": "cyl",
+     "name": "dead beacon tower",
+     "x": 11,
+     "z": -32,
+     "r": 5,
+     "h": 9,
+     "y": 5,
+     "tone": "dark"
+    },
+    {
+     "kind": "cyl",
+     "name": "broken lamp-room crown",
+     "x": 11,
+     "z": -32,
+     "r": 5.5,
+     "h": 2,
+     "y": 14,
+     "tone": "dark"
+    },
+    {
+     "kind": "box",
+     "name": "stair, first flight",
+     "x": 8,
+     "z": -9.5,
+     "w": 4,
+     "d": 3,
+     "h": 0.8,
+     "turn": 0,
+     "y": 0,
+     "tone": "stone"
+    },
+    {
+     "kind": "box",
+     "name": "stair, second flight",
+     "x": 9,
+     "z": -12.5,
+     "w": 4,
+     "d": 3,
+     "h": 1.6,
+     "turn": 0,
+     "y": 0,
+     "tone": "stone"
+    },
+    {
+     "kind": "box",
+     "name": "stair, third flight",
+     "x": 10,
+     "z": -15.5,
+     "w": 4,
+     "d": 3,
+     "h": 2.5,
+     "turn": 0,
+     "y": 0,
+     "tone": "stone"
+    },
+    {
+     "kind": "box",
+     "name": "stair, fourth flight",
+     "x": 11,
+     "z": -18.5,
+     "w": 4,
+     "d": 3,
+     "h": 3.6,
+     "turn": 0,
+     "y": 0,
+     "tone": "stone"
+    },
+    {
+     "kind": "box",
+     "name": "rock wall beside the stair",
+     "x": 15.5,
+     "z": -13,
+     "w": 5,
+     "d": 6,
+     "h": 4.5,
+     "turn": 0,
+     "y": 0,
+     "tone": "stone"
+    },
+    {
+     "kind": "box",
+     "name": "parapet block",
+     "x": -10.5,
+     "z": -9.4,
+     "w": 3.2,
+     "d": 0.9,
+     "h": 0.9,
+     "turn": 0,
+     "y": 0,
+     "tone": "stone"
+    },
+    {
+     "kind": "box",
+     "name": "parapet block",
+     "x": -6.2,
+     "z": -9.4,
+     "w": 3.2,
+     "d": 0.9,
+     "h": 0.9,
+     "turn": 0,
+     "y": 0,
+     "tone": "stone"
+    },
+    {
+     "kind": "box",
+     "name": "parapet block",
+     "x": -0.8,
+     "z": -9.4,
+     "w": 2.8,
+     "d": 0.9,
+     "h": 0.9,
+     "turn": 0,
+     "y": 0,
+     "tone": "stone"
+    },
+    {
+     "kind": "cone",
+     "name": "rock shoulder with dry grass",
+     "x": -13.5,
+     "z": -15,
+     "r": 3.5,
+     "h": 4,
+     "tone": "stone"
+    },
+    {
+     "kind": "cyl",
+     "name": "dead iron lamp post, unlit",
+     "x": -8.4,
+     "z": -8.5,
+     "r": 0.12,
+     "h": 3.4,
+     "y": 0,
+     "tone": "dark"
+    }
+   ],
+   "moon": true,
+   "ground": "Broad worn stone flags, grey-blue in moonlight, with dry grass in the joints and a few old cracks. Level, bare and empty to the bottom edge.",
+   "scene": "A broad stone landing on the stair up a sea crag in deep night, with the dead beacon tower above and behind on the right and open sea on the left.",
+   "shows": [
+    "Right, far behind and above: the round beacon tower, between 63% and 85% across, rising from the top of the crag. Its whole top is in the picture, about a seventh of the way down, with open sky above it: a broken ring of piers. No light anywhere on it; moonlight catches its left side.",
+    "Under the tower: the bare rock of the crag, a dark mass filling the right half behind the landing, its top edge about half-way down the picture.",
+    "Back right: worn stone steps climbing from the landing up the rock toward the tower, in four rising flights. Empty rusted lamp brackets on the rock beside them.",
+    "Back left, along the landing's outer edge: three low broken parapet blocks with gaps between. In one gap stands a rusted iron lamp post, unlit.",
+    "Left, beyond the parapet: a shoulder of bare rock with dry grass at the far left edge, then dark open sea far below to a level horizon 61% down.",
+    "The full moon at 31% across, 17% down, over the sea, with a pale path on the water. Stars thick.",
+    "Very small, low in the sky under the moon, about a quarter of the way across: a far airship as a short row of twelve pin-prick warm lights. They are the only warm light in the picture."
+   ]
+  },
+  "F3": {
+   "name": "The standing stones",
+   "clear": {
+    "x": 0,
+    "z": 0,
+    "rx": 7.5,
+    "rz": 4.2
+   },
+   "flats": [
+    {
+     "kind": "disc",
+     "name": "short turf on the crown of the rise",
+     "tone": "grass",
+     "x": 0,
+     "z": -4,
+     "r": 13
+    },
+    {
+     "kind": "path",
+     "name": "track out between the two tallest stones",
+     "tone": "path",
+     "a": [
+      6.5,
+      -7
+     ],
+     "b": [
+      12,
+      -40
+     ],
+     "w": 2.4
+    }
+   ],
+   "solids": [
+    {
+     "kind": "box",
+     "name": "leaning stone",
+     "x": -9.4,
+     "z": -9.5,
+     "w": 1.3,
+     "d": 0.8,
+     "h": 3,
+     "turn": 12,
+     "y": 0,
+     "tone": "stone"
+    },
+    {
+     "kind": "box",
+     "name": "leaning stone",
+     "x": -5.3,
+     "z": -12.8,
+     "w": 1.4,
+     "d": 0.8,
+     "h": 3.6,
+     "turn": -8,
+     "y": 0,
+     "tone": "stone"
+    },
+    {
+     "kind": "box",
+     "name": "leaning stone",
+     "x": -1.2,
+     "z": -14,
+     "w": 1.3,
+     "d": 0.8,
+     "h": 3.3,
+     "turn": 5,
+     "y": 0,
+     "tone": "stone"
+    },
+    {
+     "kind": "box",
+     "name": "tallest stone",
+     "x": 5.1,
+     "z": -12.9,
+     "w": 1.7,
+     "d": 1,
+     "h": 5.6,
+     "turn": -6,
+     "y": 0,
+     "tone": "stone"
+    },
+    {
+     "kind": "box",
+     "name": "second tallest stone",
+     "x": 9.3,
+     "z": -9.6,
+     "w": 1.6,
+     "d": 1,
+     "h": 5.2,
+     "turn": 10,
+     "y": 0,
+     "tone": "stone"
+    },
+    {
+     "kind": "box",
+     "name": "stump of a stone",
+     "x": -12.5,
+     "z": -13,
+     "w": 1,
+     "d": 0.8,
+     "h": 1.2,
+     "turn": 0,
+     "y": 0,
+     "tone": "stone"
+    },
+    {
+     "kind": "box",
+     "name": "fallen stone",
+     "x": -8.6,
+     "z": -16.5,
+     "w": 3.4,
+     "d": 1.1,
+     "h": 0.7,
+     "turn": 15,
+     "y": 0,
+     "tone": "stone"
+    },
+    {
+     "kind": "cone",
+     "name": "gorse clump",
+     "x": -10,
+     "z": -19,
+     "r": 1.8,
+     "h": 1.4,
+     "tone": "tree"
+    },
+    {
+     "kind": "cone",
+     "name": "gorse clump",
+     "x": 13,
+     "z": -15,
+     "r": 1.7,
+     "h": 1.3,
+     "tone": "tree"
+    },
+    {
+     "kind": "cone",
+     "name": "far crag on the horizon (stand-in: really a mile off over the sea)",
+     "x": 7,
+     "z": -90,
+     "r": 3,
+     "h": 3.2,
+     "tone": "dark"
+    },
+    {
+     "kind": "cyl",
+     "name": "far dead tower on the crag (stand-in)",
+     "x": 7,
+     "z": -90,
+     "r": 0.45,
+     "h": 2.4,
+     "y": 2.8,
+     "tone": "dark"
+    }
+   ],
+   "moon": true,
+   "ground": "Short wind-cropped turf, grey-green in moonlight, with the faint pale line of a worn track crossing it and a little heather creeping in at the edges. Flat and empty to the bottom edge.",
+   "scene": "The crown of a moor rise inside a ring of tall standing stones at night, with the sea and a far crag on the horizon.",
+   "shows": [
+    "Right, behind the open turf: the two tallest stones, rough grey slabs leaning slightly, about three times a person's height. One stands two thirds of the way across, one near the right edge. A pale track runs out between them.",
+    "Left and centre, behind: three shorter leaning stones in a curve, at about 13%, 31% and 46% across, each about twice a person's height.",
+    "Back left: one stone lying fallen in the grass with a clump of gorse behind it. A small stump of stone at the far left edge. Another gorse clump at the far right.",
+    "On the horizon at 57% across, in the gap between the middle stone and the first tall stone: the far crag. A tiny steep dark rock island standing in the sea, with a thin black tower on top, no wider than the moon. No light on it.",
+    "Along the horizon right of centre: a thin band of dark sea, where the moor ends in a cliff edge. To the left: low rolling dark hills.",
+    "Behind the stones the ground falls away in dark heather.",
+    "The full moon at 31% across, 17% down, in clear sky above the left stones. Stars and a few thin clouds."
+   ]
+  }
+ },
+ "stills": {
+  "S1": {
+   "view": "Very close, from just above and behind the hands, as if looking down past your own wrists. The hands fill the middle third of the wide frame.",
+   "shows": [
+    "Two bare hands cupped together, palms up, in the centre. They come in from the bottom edge. The fingers point away from the viewer.",
+    "Only hands, wrists and sleeve cuffs. The cuffs match the attached character picture exactly. The picture is cropped at the wrists: no arms, no body, no face, no hair.",
+    "One small flame floats just above the palms, no taller than a thumb. A plain flame: no face, no eyes.",
+    "The flame is changing colour. Its base and outer edge are still cold pale green. Its heart and tip have turned warm gold. The gold is winning.",
+    "Behind the hands: dark heather and gorse, blurred, almost black.",
+    "In the upper right, out of focus: the lit lantern on its tall iron post, a soft amber disc of light."
+   ],
+   "light": "The flame is the main light: warm gold on the palms and inner fingers, a last cold green on the fingertips and the cuff edges. Cool blue moonlight on the backs of the hands; the lantern is only a soft amber blur.",
+   "attach": [
+    "W4: lantern post, heather, night colours"
+   ]
+  },
+  "S2": {
+   "view": "Standing on the rise among the standing stones at eye level, looking far out over the moor to the sea. Very wide and still. The horizon is a little below the middle. No people anywhere.",
+   "shows": [
+    "Foreground: three tall leaning grey stones as dark shapes. One at the left edge, the tallest a third of the way in from the left, one at the right edge. Short turf at their feet.",
+    "On the horizon, in the right third: a small steep rock island in a band of dark sea, with a round black tower on top. No light on it.",
+    "Far left, low on the horizon: the fair as a small warm glow with many pin-prick lights.",
+    "Left middle distance: one lit lantern on a tall iron post beside a pale track, a single warm point.",
+    "Lower right middle distance: one small campfire beside a round black pool.",
+    "From every one of these flames runs one hair-fine thread of cold blue light. Each is dead straight and pulled tight. All of them meet at the top of the far tower. From the fair they rise as a thin fan of dozens.",
+    "The thread from the lone lantern touches the shoulder of the tallest stone and bends a little there before running on."
+   ],
+   "light": "Cold blue-violet moonlight from the full moon in the upper left, with stars. The flames are tiny warm points; the threads are the finest and brightest lines in the picture, like spider silk, never thick beams.",
+   "attach": [
+    "W5: the stones' shape and turf",
+    "F1: night sky, moor, fair glow"
+   ]
+  },
+  "S3": {
+   "view": "In the air, behind the ship and a little above it, far enough back that the ship is small. Looking forward and slightly down. The horizon is about a third of the way down.",
+   "shows": [
+    "The airship, small, a little left of centre and just below the middle, seen from astern, flying away toward the upper right. Wooden hull, masts and dark rigging as in the attached paintings. No gas bag, no sails set, no figures on deck.",
+    "Twelve small warm lamps along its deck rails, all lit. Every flame is bent toward the bow, as if drawn forward. They are the only warm light in the picture.",
+    "Below and behind the ship: the night moor, dark heather with a pale thread of track. A ring of standing stones, tiny, on a rise in the lower left.",
+    "Across the middle distance: the cliff coast, running from the left edge to the right edge on a slight slant. Dark rock with a thin white line of surf.",
+    "Beyond the coast: dark open sea to the horizon, with a broken path of moonlight.",
+    "Ahead of the ship, two thirds of the way across, just under the horizon: a steep dark rock island close off the coast, with a round black tower on top. No light on it.",
+    "Do not paint any threads, stitches or lines of light on the ship or in the air."
+   ],
+   "light": "Deep night. Full moon high in the upper left, cool blue-violet over land and sea, stars thick. The twelve lamps glow warm gold and tint only the deck and rails.",
+   "attach": [
+    "W3: airship hull, masts and rigging",
+    "W8: deck and twelve lit lamps"
+   ]
+  },
+  "S4": {
+   "view": "Standing on the open top of the tower, just behind the fire cradle, looking out and down over the sea to the coast and the moor. Very high up. The horizon is a third of the way down.",
+   "shows": [
+    "Hundreds of small warm gold lights in the air, like slow star dust. They stream outward and downward from the tower in every direction at once, in loose arcs, each with a short soft trail. Near ones are larger; far ones are pin-pricks.",
+    "Below: dark sea, then the cliff coast across the middle, then the wide dark moor beyond it to the horizon.",
+    "On the horizon, a third of the way in from the left: the small warm glow of the far fair. A loose stream of the lights is heading that way.",
+    "One light, apart from the rest, heads for a single tiny lantern glow out on the moor.",
+    "Foreground, low, right of centre along the bottom edge: the black iron rim and upright bars of the fire cradle, cut off by the bottom edge. On it burns one small ordinary flame, candle-sized, yellow, standing straight up.",
+    "At the far left and far right edges: the dark sides of two broken stone piers, each with an empty iron lamp bracket.",
+    "No people anywhere."
+   ],
+   "light": "Deep night, full moon in the upper left, stars. The drifting lights are warm gold against blue-black and lay faint gold flecks on the sea; the small flame warms the cradle's rim and a little of the stone beside it.",
+   "attach": [
+    "W9: tower stone and night sea",
+    "MAP: where coast and fair lie"
+   ]
+  },
+  "T1": {
+   "view": "On the moor road a little way outside the fair, at standing height, looking back at it. The whole fair fits across the middle of the frame.",
+   "shows": [
+    "The moon, huge and nearly full, in the upper left above the tents, about a quarter of the picture's height across. Pale and sharp with a soft halo. It is the biggest single thing in the picture.",
+    "The fair across the left and centre, in the middle distance: a cluster of round and square tents, striped and patterned in red, cream, gold, green and deep blue with stars.",
+    "The big top rises above the rest, left of centre: the tallest tent, round, striped red and cream, with a gold finial. A blue-and-cream striped tent stands beside it.",
+    "Dozens of lit lanterns on iron posts among the tents and awning stalls. Warm amber pools on canvas and trodden earth.",
+    "At the right edge of the fair: the airship moored just above the grass, side on. Wooden hull, masts and dark rigging, a ladder down to two mooring posts. Twelve lit lamps in a row along its side.",
+    "The road: pale rutted earth from the bottom edge, right of centre, curving in to the fair gate (two poles and a bar) beside the ship. Dark heather and gorse on both sides.",
+    "No people anywhere. No signs, no lettering. The upper right sky is left calm and empty."
+   ],
+   "light": "Dusk: violet sky with a pink band on the horizon, low dark hills, the first stars. Cool moonlight on the heather; the fair glows warm amber from within.",
+   "attach": [
+    "W1: tents, lanterns and dusk colours",
+    "W3: airship, gate and fair's edge"
+   ]
+  }
+ },
+ "edits": {
+  "E1": {
+   "change": [
+    "The tower's top is above the picture's top edge, so the new light itself is not seen. Add only its glow: soft warm gold light falling down the tower wall from the top edge, brightest at the top edge directly above the door, fading out by the middle of the door's height.",
+    "The glow lightly touches the top of the door's stone lintel and the upper edges of the two rusted brackets either side of the door. The brackets stay empty.",
+    "Far left, low in the sky below the moon: the far airship's row of twelve tiny lamps. Make them a little brighter and a touch larger, warm gold, each with a small halo. Same place, same size of ship."
+   ],
+   "keep": "Everything else exactly as painted, at the same size and framing: the moon and stars, the dark sea, the rocks and dry grass, every paving flag and parapet block, the shut door and the thin warm line under it, the unlit iron lamp post at lower right. No new lights anywhere else, no figures, no lettering."
+  },
+  "E2": {
+   "change": [
+    "The second post is the bare, rusted, leaning iron post in front of the right-hand wall, about an eighth of the way in from the right edge. Add one small steady flame just under its hooked top: warm gold, upright, no bigger than the flame in the lit lantern.",
+    "Add no lantern and no glass. The post stays as it is, and the flame sits bare in the curl of its hook.",
+    "Add the flame's light: a small pool of warm light on the wall top behind the post, on the heather beside it and on the ground at its foot. Smaller and fainter than the pool under the lit lantern. A warm edge on the post's rust."
+   ],
+   "keep": "Everything else exactly as painted, at the same size and framing: the lit lantern on its post in the middle and its pool of light, the moon and stars, the fair's small glow on the left horizon, the pond and its reflection, the bent thorn, the drystone walls and boulders, the track, the heather and gorse. No figures, no lettering."
+  }
+ },
+ "items": {
+  "cloth": "One 3:2 sheet of plain near-black plum wool cloth, with no folds, seams, borders, dividing lines or lettering, read as two rows of three equal squares; each thing lies alone in the exact middle of its own square and fills about 60% of it, all under the same soft cool light from the upper left with a short soft shadow to the lower right, and any glow stays inside its own square.",
+  "cells": [
+   "Top left, the cold lantern glass: one clear glass lantern chimney, a short barrel-shaped tube open at both ends, lying on its side at a slant. Empty, no flame. White frost on its rims and a pale ice-green tint in the glass.",
+   "Top middle, the cut thread: a short length of fine thread glowing cold blue, wound in one loose coil of three or four turns. One end is cut clean and lifts off the cloth, pointing to the upper right. Thin but bright, with a faint blue glow on the cloth.",
+   "Top right, the warm stone: one smooth rounded grey hearth stone the size of a fist. One side is soot-black. A soft ember-orange warmth shows in a crack on the sooty side and on the cloth just around it. No flame.",
+   "Bottom left, the hollow amulet: a round pendant of pale grey-green stone carved with one spiral, rimmed in worn silver, with a speck of moss in the carving. Its leather cord lies in a loop above it. A soft rose-gold sheen on the stone, like warm skin, not like fire.",
+   "Bottom middle, the keeper's charm: a small flat charm of black wrought iron, a plain flame shape inside a ring, hanging from one short hook-shaped link. Rust-flecked, dull and cold, no glow; only a thin pale edge of light.",
+   "Bottom right, the ship lamp, lit: one small brass ship's lantern standing upright, with four glass panes and a domed cap with a carrying ring. A steady warm flame inside. It glows gold on the brass and on the cloth around it."
+  ]
+ },
+ "_made": {
+  "model": "claude-fable-5-2",
+  "effort": "high",
+  "rounds": [
+   {
+    "cost": 2.44736,
+    "seconds": 609.9,
+    "stop": "end_turn",
+    "notes": {
+     "F5": [],
+     "F2": [],
+     "F4": [],
+     "F3": []
+    }
+   },
+   {
+    "cost": 1.10584,
+    "seconds": 105.9,
+    "stop": "end_turn",
+    "notes": {
+     "F5": [],
+     "F2": [],
+     "F4": [],
+     "F3": []
+    }
+   },
+   {
+    "cost": 1.02672,
+    "seconds": 49.1,
+    "stop": "end_turn",
+    "notes": {
+     "F5": [],
+     "F2": [],
+     "F4": [],
+     "F3": []
+    }
+   }
+  ],
+  "cost": 4.57992
+ }
+}

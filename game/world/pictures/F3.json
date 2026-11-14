@@ -1,0 +1,217 @@
+{
+ "kind": "fight",
+ "frame": [
+  2048,
+  1536
+ ],
+ "camera": {
+  "fov": 38,
+  "h": 2,
+  "z": 18,
+  "pitch": -4.2
+ },
+ "figure": [
+  -2.2,
+  0.6
+ ],
+ "party": [
+  [
+   "Jester",
+   -2.2,
+   0.6
+  ],
+  [
+   "Ranger",
+   -3.6,
+   -1.4
+  ],
+  [
+   "Fox",
+   -3.8,
+   2.0
+  ],
+  [
+   "Io",
+   -5.2,
+   0.2
+  ]
+ ],
+ "foes": [
+  [
+   "foe",
+   2.6,
+   0.8
+  ],
+  [
+   "foe",
+   3.8,
+   -1.2
+  ],
+  [
+   "boss",
+   4.5,
+   0
+  ],
+  [
+   "foe",
+   5.4,
+   1.8
+  ]
+ ],
+ "id": "F3",
+ "name": "The standing stones",
+ "clear": {
+  "x": 0,
+  "z": 0,
+  "rx": 7.5,
+  "rz": 4.2
+ },
+ "flats": [
+  {
+   "kind": "disc",
+   "name": "short turf on the crown of the rise",
+   "tone": "grass",
+   "x": 0,
+   "z": -4,
+   "r": 13
+  },
+  {
+   "kind": "path",
+   "name": "track out between the two tallest stones",
+   "tone": "path",
+   "a": [
+    6.5,
+    -7
+   ],
+   "b": [
+    12,
+    -40
+   ],
+   "w": 2.4
+  }
+ ],
+ "solids": [
+  {
+   "kind": "box",
+   "name": "leaning stone",
+   "x": -9.4,
+   "z": -9.5,
+   "w": 1.3,
+   "d": 0.8,
+   "h": 3,
+   "turn": 12,
+   "y": 0,
+   "tone": "stone"
+  },
+  {
+   "kind": "box",
+   "name": "leaning stone",
+   "x": -5.3,
+   "z": -12.8,
+   "w": 1.4,
+   "d": 0.8,
+   "h": 3.6,
+   "turn": -8,
+   "y": 0,
+   "tone": "stone"
+  },
+  {
+   "kind": "box",
+   "name": "leaning stone",
+   "x": -1.2,
+   "z": -14,
+   "w": 1.3,
+   "d": 0.8,
+   "h": 3.3,
+   "turn": 5,
+   "y": 0,
+   "tone": "stone"
+  },
+  {
+   "kind": "box",
+   "name": "tallest stone",
+   "x": 5.1,
+   "z": -12.9,
+   "w": 1.7,
+   "d": 1,
+   "h": 5.6,
+   "turn": -6,
+   "y": 0,
+   "tone": "stone"
+  },
+  {
+   "kind": "box",
+   "name": "second tallest stone",
+   "x": 9.3,
+   "z": -9.6,
+   "w": 1.6,
+   "d": 1,
+   "h": 5.2,
+   "turn": 10,
+   "y": 0,
+   "tone": "stone"
+  },
+  {
+   "kind": "box",
+   "name": "stump of a stone",
+   "x": -12.5,
+   "z": -13,
+   "w": 1,
+   "d": 0.8,
+   "h": 1.2,
+   "turn": 0,
+   "y": 0,
+   "tone": "stone"
+  },
+  {
+   "kind": "box",
+   "name": "fallen stone",
+   "x": -8.6,
+   "z": -16.5,
+   "w": 3.4,
+   "d": 1.1,
+   "h": 0.7,
+   "turn": 15,
+   "y": 0,
+   "tone": "stone"
+  },
+  {
+   "kind": "cone",
+   "name": "gorse clump",
+   "x": -10,
+   "z": -19,
+   "r": 1.8,
+   "h": 1.4,
+   "tone": "tree"
+  },
+  {
+   "kind": "cone",
+   "name": "gorse clump",
+   "x": 13,
+   "z": -15,
+   "r": 1.7,
+   "h": 1.3,
+   "tone": "tree"
+  },
+  {
+   "kind": "cone",
+   "name": "far crag on the horizon (stand-in: really a mile off over the sea)",
+   "x": 7,
+   "z": -90,
+   "r": 3,
+   "h": 3.2,
+   "tone": "dark"
+  },
+  {
+   "kind": "cyl",
+   "name": "far dead tower on the crag (stand-in)",
+   "x": 7,
+   "z": -90,
+   "r": 0.45,
+   "h": 2.4,
+   "y": 2.8,
+   "tone": "dark"
+  }
+ ],
+ "moon": true
+}

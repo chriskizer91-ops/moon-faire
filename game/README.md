@@ -319,6 +319,17 @@ Chris: "I want you to think about the witches and choose." Same page, republishe
 - `world.json` `invented` lists every new fact the rewrite made up. What wisps and wraiths are is a stand-in until Chris says.
 - Not done: nothing is walkable or playable from this yet. The numbers on the finds are not in the combat rules (`lore/combat-balance.md` is unchanged).
 
+## The extra pictures the story needs: prompts and fight-place guides (November 14) — waiting for Chris to paint
+
+Chris: "If we need extra pictures for like narrative beats, you can make a prompt for that now that we know the story." Page: "Moon Faire: story pictures to paint" (file: `out/moon-faire-story-pictures.html`; pack: `out/Moon_Faire_Story_Pictures_To_Paint.zip`; prompts as text: `world/pictures/prompts.md`).
+
+- **No witches in any picture.** The game stages its 3D witches, fair folk and foes on paintings, so they always look like themselves. The one exception is a pair of hands (Io's, from `art-pipeline/smoothing-pack/reference/herbal_witch_portrait_ref.png`).
+- **Twelve pictures, seven the story needs.** Needed: F5 the lamp room (a fight place; there was no picture of it at all), S1 "Warm in her hands", S2 "The threads", S3 "The flight to the crag", S4 "The lights go home", E1 "Thirteen lights" (a change to the W9 painting), I1 the item sheet (the five finds and a ship's lamp, to be cut into six card pictures). Can wait: F2 the fair, F4 the beacon stair and F3 the standing stones as fight places of Moon Faire's own, E2 the dead post lit (a change to W4), T1 the title picture.
+- **Fight places are seen level,** from the pilot's fight camera (38 degree lens, 2 m up, 18 m back, tilted 4.2 degrees up; horizon 61% down; 2048 x 1536), like Chris's own F1. `world/guide2.js` now draws a guide for any fight place (`kind: 'fight'`: the open ground, what stands behind it, the sky and the moon behind the shapes, and in the key where the party and the foes stand). Walking guides are unchanged, pixel for pixel.
+- `world/make_story_pictures.py` with `world/STORY-PICTURES-KIT.md`: Fable 5.2 (high effort, through the key, $4.58), shown the nine paintings, F1 and the map, wrote what each picture shows and laid out the four fight guides, then checked the guides twice. `world/pictures/pictures.json` holds it all; `F*.json`, `F*_guide.png`, `F*_key.jpg` are the fight layouts and guides.
+- `world/build_pictures_page.py` assembles each prompt (fight places reuse the pilot's F1 wording and `pilot/prompts/standing-rules.txt`), the page and the pack.
+- Read on the way, from other sessions (nothing of theirs is in this branch yet): Chris will trace the walking maps himself in the map editor (`claude/moon-faire-map-editor.md`; none sent yet on November 14); five fight cameras exist as a patch on a copy of the pilot (`claude/pilot-fight-cameras.md`); and his rule for which weight of a witch is used where (`claude/chris-which-weight-where.md`: Lightest for walking and far fights, Light for close-ups, Full only in a view-my-character mode).
+
 ## Next
 
 Step 5, and the two-person fair-folk test if Chris wants it: the remaining twelve prompts (with the lane lesson built in), every scene traced, the

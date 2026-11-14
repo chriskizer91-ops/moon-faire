@@ -1,0 +1,194 @@
+{
+ "kind": "fight",
+ "frame": [
+  2048,
+  1536
+ ],
+ "camera": {
+  "fov": 38,
+  "h": 2,
+  "z": 18,
+  "pitch": -4.2
+ },
+ "figure": [
+  -2.2,
+  0.6
+ ],
+ "party": [
+  [
+   "Jester",
+   -2.2,
+   0.6
+  ],
+  [
+   "Ranger",
+   -3.6,
+   -1.4
+  ],
+  [
+   "Fox",
+   -3.8,
+   2.0
+  ],
+  [
+   "Io",
+   -5.2,
+   0.2
+  ]
+ ],
+ "foes": [
+  [
+   "foe",
+   2.6,
+   0.8
+  ],
+  [
+   "foe",
+   3.8,
+   -1.2
+  ],
+  [
+   "boss",
+   4.5,
+   0
+  ],
+  [
+   "foe",
+   5.4,
+   1.8
+  ]
+ ],
+ "id": "F2",
+ "name": "The fair",
+ "clear": {
+  "x": 0,
+  "z": 0,
+  "rx": 7.5,
+  "rz": 4.2
+ },
+ "flats": [
+  {
+   "kind": "path",
+   "name": "trodden lane across the back",
+   "tone": "path",
+   "a": [
+    -18,
+    -8.5
+   ],
+   "b": [
+    18,
+    -8.5
+   ],
+   "w": 3
+  },
+  {
+   "kind": "path",
+   "name": "path back between the stalls",
+   "tone": "path",
+   "a": [
+    1.5,
+    -10
+   ],
+   "b": [
+    2,
+    -30
+   ],
+   "w": 3.5
+  }
+ ],
+ "solids": [
+  {
+   "kind": "tent-round",
+   "x": -11.5,
+   "z": -16,
+   "r": 4.5,
+   "wall": 3,
+   "top": 7.5
+  },
+  {
+   "kind": "tent-round",
+   "x": 12,
+   "z": -17,
+   "r": 4.5,
+   "wall": 3.2,
+   "top": 8
+  },
+  {
+   "kind": "tent-round",
+   "x": 2,
+   "z": -36,
+   "r": 9,
+   "wall": 4.5,
+   "top": 13
+  },
+  {
+   "kind": "tent-square",
+   "x": -5,
+   "z": -24,
+   "w": 6,
+   "d": 5,
+   "wall": 2.8,
+   "top": 5.5,
+   "turn": 0
+  },
+  {
+   "kind": "stall",
+   "x": -2.5,
+   "z": -13,
+   "w": 4.5,
+   "d": 2.5,
+   "h": 3,
+   "turn": 0
+  },
+  {
+   "kind": "stall",
+   "x": 5.5,
+   "z": -13.5,
+   "w": 4.5,
+   "d": 2.5,
+   "h": 3,
+   "turn": 0
+  },
+  {
+   "kind": "post",
+   "x": -8,
+   "z": -10.5,
+   "h": 3.6
+  },
+  {
+   "kind": "post",
+   "x": 3,
+   "z": -11,
+   "h": 3.6
+  },
+  {
+   "kind": "post",
+   "x": 8.5,
+   "z": -10.5,
+   "h": 3.6
+  },
+  {
+   "kind": "box",
+   "name": "crates",
+   "x": 11,
+   "z": -12.5,
+   "w": 2,
+   "d": 1.6,
+   "h": 1.4,
+   "turn": 10,
+   "y": 0,
+   "tone": "wood"
+  },
+  {
+   "kind": "cyl",
+   "name": "barrel",
+   "x": 12.7,
+   "z": -12,
+   "r": 0.5,
+   "h": 1.1,
+   "y": 0,
+   "tone": "wood"
+  }
+ ],
+ "moon": true
+}

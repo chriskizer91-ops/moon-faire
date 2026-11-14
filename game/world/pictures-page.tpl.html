@@ -1,0 +1,39 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Moon Faire: story pictures to paint</title>
+<style>
+  :root { --bg: #1d1826; --panel: #2a2336; --line: #43395a; --ink: #efe8f6; --soft: #b9aecb; --gold: #e7b867; }
+  * { box-sizing: border-box; }
+  html, body { margin: 0; background: var(--bg); color: var(--ink); font: 16px/1.5 Georgia, 'Times New Roman', serif; }
+  main { max-width: 900px; margin: 0 auto; padding: 18px 14px 60px; }
+  h1 { font-size: 1.7rem; margin: 6px 0 4px; color: var(--gold); font-weight: normal; } h2 { font-size: 1.3rem; margin: 34px 0 6px; color: var(--gold); font-weight: normal; }
+  h3 { font-size: 1.12rem; margin: 0 0 8px; font-weight: normal; color: var(--gold); }
+  p { margin: 8px 0; } .soft { color: var(--soft); } ol, ul { margin: 6px 0; padding-left: 22px; } li { margin: 6px 0; }
+  .card { background: var(--panel); border: 1px solid var(--line); border-radius: 10px; padding: 12px 14px; margin: 12px 0; } .pick { border-color: var(--gold); }
+  img.pic { width: 100%; border-radius: 8px; display: block; }
+  .kind { font-size: 0.78rem; color: var(--bg); background: var(--soft); border-radius: 10px; padding: 1px 8px; white-space: nowrap; } .kind.must { background: var(--gold); }
+  .bar { display: flex; flex-wrap: wrap; gap: 10px; align-items: center; margin: 8px 0 6px; } .bar button { margin-left: auto; }
+  button { font: inherit; color: var(--ink); background: #3a3049; border: 1px solid var(--line); border-radius: 8px; padding: 7px 12px; cursor: pointer; }
+  textarea { width: 100%; font: 0.84rem/1.45 ui-monospace, Menlo, Consolas, monospace; color: var(--ink); background: #17131f; border: 1px solid var(--line); border-radius: 8px; padding: 10px; resize: vertical; }
+  nav { display: flex; flex-wrap: wrap; gap: 4px 12px; } nav a { color: var(--gold); }
+</style></head>
+<body><main>
+<h1>Moon Faire: story pictures to paint</h1>
+<p class="soft">November 14. The extra pictures the chosen story, "The fire that would not end", needs beyond the nine walking places and the map. /*NMUST*/ the story needs, and /*NWAIT*/ that can wait.</p>
+<div class="card"><ul>
+  <li><b>How to use this:</b> unzip <b>Moon_Faire_Story_Pictures_To_Paint.zip</b> from the chat. For each picture, attach the files its card names, in that order, paste its prompt, and save the result under the name on the card.</li>
+  <li><b>No witches in any of them.</b> The game puts its 3D witches, fair folk and foes on top of paintings, so they always look like themselves. The one exception is a pair of hands.</li>
+  <li><b>Three kinds.</b> Fight places are painted from a guide, like your moor clearing, so fighters' feet sit on the ground. Story pictures fill the screen with one line of words under them. Two are small changes to paintings you already have.</li>
+  <li><b>Fights are seen level in all four fight places,</b> like your own moor clearing. That was my suggestion on the map page; if you would rather have them from above, tell me before you paint these.</li>
+  <li>Claude Fable 5.2 wrote what each picture shows and laid out the fight guides, through your key (/*COST*/).</li>
+</ul></div>
+<nav>/*NAV*/</nav>
+<h2>The story needs these</h2>
+/*MUST*/
+<h2>These can wait</h2>
+/*WAIT*/
+</main>
+<script>
+document.querySelectorAll('[data-copy]').forEach(function (b) { b.onclick = function () { var t = b.parentNode.nextElementSibling; t.focus(); t.select(); try { document.execCommand('copy'); } catch (e) {} if (navigator.clipboard) navigator.clipboard.writeText(t.value).catch(function () {}); b.textContent = 'Copied (or select and copy)'; setTimeout(function () { b.textContent = 'Copy prompt'; }, 2500); }; });
+</script>
+</body></html>
