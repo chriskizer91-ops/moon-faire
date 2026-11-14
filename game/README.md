@@ -255,6 +255,16 @@ Chris asked for an attempt at lighter versions of the NPC models that the painte
 - **The Flipbook look** is now in `src/stage.js` (`stage.flip = { on, rows, snap, painting }`), applied from the other session's patch in the project note `claude/flipbook-look-finer-and-pilot.md` by `tools/patch_stage_flipbook.py`, with `models/jester/palette.js` (the witches' 56 colours, copied from `models/jester-3d/out/palette.js` on branch `claude/jester-3d-model`, commit 31b6351). With `flip.on` false a picture is drawn as before. The pilot page's own switch and sliders (the rest of that patch) are not added and the pilot page is not republished.
 - On the test page the switch starts off. On, it uses Chris's setting: 1.2 mm of the person to a pixel and never finer than the screen, full flipbook colours, with 2.2 and 4.75 mm to compare. **Finding:** the witches' shared list of colours does not suit the fair folk (it has almost no green or cream: a green coat goes brown, a cream apron goes pink), so the page starts on each person's own 64 colours, worked out from their body sheet, and offers the witches' list beside it. The look holds one list of 64 for everyone on screen, so how the fair folk and the witches share it in one scene is not solved.
 
+## Fair folk: walking, running, sitting, and Chris's choices (November 13)
+
+- **Chris's choices.** The game uses **a quarter of the triangles** for the fair folk ("it actually looks pretty good for what they are, especially with the flipbook turned on"). `MF_NPC.make(id)` now builds a quarter unless `{ weight: 'half' }` or `'full'` is asked for. The **farm lad and the gate keeper on the Opus 5.5 shapes are dropped** (their waist goes missing at the lighter weights; the Fable 5.2 versions do not have the gap): `DROPPED` in `people/kit/build_npcs.py`. Their files stay in `people/painted/` and `people/weights/`. The pack now holds 17: eleven different people, six of them on two sets of shapes.
+- **Walking, running and sitting** are the template's own (the Jester's walk, run and `sit_chair` stance), wired in `people/npc/npc.js`. No API spend:
+  - `await npc.walkTo(x, z)`, `await npc.runTo(x, z)`: they stand up if seated, turn to the way they are going, and keep their feet in step with the ground (0.84 and 2.3 m/s, times the person's pace and height). The promise settles `true` on arriving, `false` if something else took over. `npc.stop()`, `npc.moving`.
+  - `npc.sit()`, `npc.stand()`, `npc.sitting`, `npc.seated`. The scene gives the seat: `npc.seat()` says where its top must be (`height`, about 0.45 m times the person's height, and `x`, `z` about 0.36 m behind where they stand). The Jester's conjured stool and its puff are hidden on a person.
+  - Talking and emotes play while seated or walking.
+- Not offered: sitting on the ground. The template's cross-legged sit breaks skirts, coats and aprons.
+- The test page has Walk about, Run about and Sit down (on a plain crate).
+
 ## Next
 
 Step 5, and the two-person fair-folk test if Chris wants it: the remaining twelve prompts (with the lane lesson built in), every scene traced, the

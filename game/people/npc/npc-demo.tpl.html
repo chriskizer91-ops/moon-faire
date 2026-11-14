@@ -22,9 +22,10 @@
 <p class="soft">Moon Faire, November 13. The painted people, wired for the game: each one stands, blinks, fidgets, turns to face you, talks and plays emotes. Drag to look round them.</p>
 <div id="stagebox"><canvas id="stage"></canvas><div id="who"></div><div id="doing"></div></div>
 <div class="bar"><select id="pick" aria-label="Person"></select><button id="bTalk">Talk</button><button id="bGreet">Say hello</button><button id="bL">Face left</button><button id="bF">Face you</button><button id="bR">Face right</button></div>
+<div class="bar"><button id="bWalk">Walk about</button><button id="bRun">Run about</button><button id="bSit">Sit down</button></div>
 <div class="bar" id="emotes"></div>
 <div class="bar">
-  <select id="weight" aria-label="Weight"><option value="full">Full weight</option><option value="half">Half the triangles</option><option value="quarter">A quarter of the triangles</option></select>
+  <select id="weight" aria-label="Weight"><option value="quarter">A quarter of the triangles (the game)</option><option value="half">Half the triangles</option><option value="full">Full weight</option></select>
   <button id="bFlip" aria-pressed="false">Flipbook look</button>
   <select id="pix" hidden aria-label="Pixel size"><option value="1.2">1.2 mm of them to a pixel</option><option value="2.2">2.2 mm</option><option value="4.75">4.75 mm (the sprites' size)</option></select>
   <select id="cols" hidden aria-label="Colours"><option value="own">Their own colours</option><option value="witch">The witches' colours</option></select>
@@ -36,6 +37,7 @@
   <li><b>Emotes.</b> Every person can play every emote. The gold-edged buttons are the ones chosen as most like that person.</li>
   <li><b>On their own.</b> They blink, shift and look about when left alone, each at their own pace.</li>
   <li><b>Facing.</b> They turn to face a point, as they will turn to the party.</li>
+  <li><b>Walking, running, sitting.</b> They walk or run to a point and sit on a seat the scene gives them (a plain crate here). These are the Jester's own walk, run and sit, which every person shares.</li>
   <li><b>Lighter weights.</b> Each person can be built with half or a quarter of the triangles. The painted skin lies on the lighter build as it is.</li>
   <li><b>Flipbook look.</b> The switch the witches have: flipbook colours and an inked outline. It starts off.</li>
 </ul>
@@ -57,7 +59,7 @@
     busy = true; $('who').textContent = 'Building…';
     try {
       const next = await MF_NPC.make(id, { weight: $('weight').value }); if (npc) { stage.cast.remove(npc.root, npc.fx); npc.dispose(); }
-      npc = next; stage.cast.add(npc.root, npc.fx); npc.model.camera = stage.camera; stage.follow(0, 0); $('who').textContent = npc.name + '. ' + npc.who; $('bTalk').classList.remove('on');
+      npc = next; stage.cast.add(npc.root, npc.fx); npc.model.camera = stage.camera; stage.follow(0, 0); $('bSit').textContent = 'Sit down'; $('who').textContent = npc.name + '. ' + npc.who; $('bTalk').classList.remove('on');
       const W = npc.wiring, box = $('emotes'); box.innerHTML = '';
       for (const n of npc.emotes) { const b = document.createElement('button'); b.textContent = label(n); if ((W.likes || []).indexOf(n) >= 0) b.className = 'like'; b.onclick = () => npc.emote(n); box.appendChild(b); }
       const ws = (MF_NPCS.weights || {})[MF_NPC.info(id).shapeId]; for (const o of $('weight').options) o.hidden = o.value !== 'full' && !ws;
@@ -80,12 +82,18 @@
   $('bTalk').onclick = () => { if (!npc) return; npc.talk(!npc.talking); $('bTalk').classList.toggle('on', npc.talking); };
   $('bGreet').onclick = () => npc && npc.greet();
   const camPos = () => [Math.sin(yaw) * 12.2, Math.cos(yaw) * 12.2];
+  // a plain crate to sit on, standing in for whatever seat a scene has
+  const crate = new THREE.Mesh(new THREE.BoxGeometry(0.44, 1, 0.40), new THREE.MeshStandardMaterial({ color: new THREE.Color('#6b4a2e').convertSRGBToLinear(), roughness: 0.9 })); crate.castShadow = crate.receiveShadow = true; crate.visible = false; stage.cast.add(crate);
+  const about = async (run) => { if (!npc) return; const me = npc; $('bSit').textContent = 'Sit down'; for (const [x, z] of [[-1.15, 0], [1.15, 0], [0, 0]]) { if (npc !== me || !(await me.walkTo(x, z, { run }))) return; } const c = camPos(); me.face(c[0], c[1]); };
+  $('bWalk').onclick = () => about(false); $('bRun').onclick = () => about(true);
+  $('bSit').onclick = () => { if (!npc) return; if (npc.sitting) { npc.stand(); $('bSit').textContent = 'Sit down'; } else { npc.sit(); $('bSit').textContent = 'Stand up'; } };
   $('bL').onclick = () => npc && npc.face(-5, 1); $('bR').onclick = () => npc && npc.face(5, 1); $('bF').onclick = () => { if (npc) { const c = camPos(); npc.face(c[0], c[1]); } };
   let drag = null; canvas.addEventListener('pointerdown', (e) => { drag = e.clientX; }); window.addEventListener('pointerup', () => { drag = null; });
   window.addEventListener('pointermove', (e) => { if (drag != null) { yaw -= (e.clientX - drag) * 0.01; drag = e.clientX; } });
   const manual = /[?&]shot=1/.test(location.search);
   function draw(dt) {
-    if (!npc || busy) return; npc.update(dt);
+    if (!npc || busy) return; npc.update(dt); stage.follow(npc.root.position.x, npc.root.position.z);
+    { const s = npc.seat(), on = npc.sitting || npc.model.stanceNow === 'sit_chair'; crate.visible = on; if (on) { crate.scale.y = s.height - 0.012; crate.position.set(s.x, crate.scale.y / 2, s.z); crate.rotation.y = npc.root.rotation.y; } }
     stage.resize(); const w = canvas.clientWidth, h = canvas.clientHeight; need = Math.max(2.1, 1.5 * h / w); const d = need / 2 / Math.tan(5.5 * Math.PI / 180); stage.flip.rows = need / (+$('pix').value / 1000);
     stage.setScene({ kind: 'fight', frame: [w, h], camera: { fov: 11, h: 1, z: 10, pitch: 0 } });
     stage.camera.position.set(Math.sin(yaw) * d, 1.0, Math.cos(yaw) * d); stage.camera.lookAt(0, 0.98, 0); stage.camera.updateMatrixWorld(); stage.render();

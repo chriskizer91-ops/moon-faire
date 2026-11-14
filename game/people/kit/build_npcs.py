@@ -8,13 +8,14 @@ P = os.path.join(GAME, 'people'); NPC = os.path.join(P, 'npc')
 slug = lambda s: re.sub(r'[^a-z0-9]+', '-', s.lower()).strip('-')
 webp = lambda p: 'data:image/webp;base64,' + base64.b64encode(open(p, 'rb').read()).decode()
 wiring = json.load(open(os.path.join(NPC, 'wiring.json')))['wiring']; MAKER = {'hand': 'made by hand', 'fable': 'shapes by Fable 5.2', 'opus': 'shapes by Opus 5.5'}
+DROPPED = {('opus', 'farmhand')}      # Chris, November 13: the farm lad and the gate keeper on the Opus 5.5 shapes are out (the waist goes missing at the lighter weights)
 people, tex, order = [], {}, []
 for tag in ['hand', 'fable', 'opus']:
     for pid in ['lampseller', 'fortune', 'watchman', 'baker', 'farmhand']:
         sj = json.load(open(os.path.join(P, 'skins', pid, 'skins.json')))
         for i, k in enumerate(sj['skins']):
             L = 'ABC'[i]; key = '%s-%s' % (pid, L); d = os.path.join(P, 'painted', '%s__%s' % (key, tag))
-            if not os.path.exists(d + '/log.json'): continue
+            if not os.path.exists(d + '/log.json') or (tag, pid) in DROPPED: continue
             lg = json.load(open(d + '/log.json')); j = json.load(open(os.path.join(P, 'skins', pid, L + '.json'))); nid = slug(k['name']) + ('-opus' if tag == 'opus' else '')
             tex[key] = {'body': webp(os.path.join(P, 'skins', pid, L + '-body.webp')), 'face': webp(os.path.join(P, 'skins', pid, L + '-face.webp'))}
             sc = json.load(open(d + '/person-scale.json')) if os.path.exists(d + '/person-scale.json') else {}
