@@ -215,12 +215,33 @@ four strap hooks as real objects, standing still. About 355,000 triangles.
   - Rough: one cut only; no vine on the blade or leaf work on the guard; plain straps; her left arm can swing through the
     hilt when she walks or jogs; the blade's point passes through the scabbard's side for a moment as it leaves; in
     Moonsteel Draw her feet still slide.
+- **Stage eleven: her knives.** Chris: "Yes, let's do the knives and the wind up in the throw."
+  - **Knives** (`src/R48_knives.js`; materials `knifeBlade`, `knifeSteel`, `knifeCord`). From G5, two alike, each one piece
+    of moonsteel 20 cm long: a ring with a crescent moon standing in it, a 3.8 cm handle bound in dark blue cord between two
+    collars, a leaf-shaped blade 11.9 cm long and 2.6 cm wide. Each is built in a place of its own with one bone (`knifeR`,
+    `knifeL`), a child of `root`: up the blade is +Y.
+  - **Sheath** (`sheath`, `knifeGem`, on `hips`). Black leather: two pockets side by side, splayed a little, a band across
+    their mouths with a blue stud, two loops over her belt. At the small of her back, mouths at 0.93 m, handles up.
+    `KNK.sheath[i]` gives each knife's place in it; the two lie mirrored, so each hand finds its own with its palm to her
+    back. The folded bow was raised 2 cm (`BACK` y 1.205) to clear the rings.
+  - **Knives move** (move `knives`; `knifeBeats`, `knifeHand`, `knifeStage`). In the move's own seconds: both hands behind
+    her to the handles (to 0.24); the knives up out of the pockets and round her sides as she hops her feet 52 cm apart,
+    left foot toward screen right, planted (to 0.6); right hand up by her head, left low in front (H8); a coil; the first
+    thrown with her right hand as her body turns 62 degrees toward screen right (let go at 0.88); the second already
+    coming up, thrown with her left as her body turns back (let go at 1.20); each arm relaxes after its throw. The body's
+    turn leads the arm in each throw (`y1`, `y2`) and the wrist snaps late. A thrown knife flies point first at 19 m a
+    second with a thin trail of light and is gone after half a second.
+  - A choice of mine, told to Chris: from 1.95 the knives come back to their sheath in a small glint of light (each bone
+    is scaled up from nothing), so the move can be played again.
+  - `SHOTS.knives` 3.2 s, `SLOW.knives` 1.3. Page: "Knives" in the moves row, "Knives" switch.
+  - Rough: no engraving on the blades, no silver leaf work on the sheath; from behind her hands lie over the handles more
+    than they close round them.
 - Waiting for his notes: the moves again; stage two (head), stage three (hands and arms) and stage five.
 
 Rough or not built yet: her face does not move (no blink, no expressions); the hair has a smooth edge with none of the painted
 flyaway wisps, and the loose locks are simple; earrings and necklaces; bracelets; each charm is one stiff piece on a hinge (its chain does not bend, charms can
 pass through each other); the caps on the stones are plain cones; with her arms straight out the iron curls bend with her skin;
-knives; Silverglass and the gem; hit reactions, a dodge, a win and a fall.
+Silverglass and the gem; hit reactions, a dodge, a win and a fall.
 
 ## What is here
 
@@ -237,7 +258,8 @@ knives; Silverglass and the gem; hit reactions, a dodge, a win and a fall.
   - `R45_gear.js`: belts with buckles, studs and tucked ends; satchel and pouch; the four strap hooks; charms.
   - `R46_bow.js`: her bow, open and rolled up (stage nine).
   - `R47_sword.js`: her sword, and its scabbard at her left hip (stage ten).
-  - `R99_static.js`: materials, binding, `pose({arm, leg})`, her moves, her fingers, the solver for arms and legs, the bow and the sword at work, and their light.
+  - `R48_knives.js`: her two throwing knives and their sheath at the small of her back (stage eleven).
+  - `R99_static.js`: materials, binding, `pose({arm, leg})`, her moves, her fingers, the solver for arms and legs, the bow, the sword and the knives at work, and their light.
 - `tools/tables.py`: the one place her body tables live. The model and the body bake both read them.
 - `tools/sil.py`: lifts a figure off a painting's flat background. `tools/measure.py` and `tools/more.py` print widths and depths
   by height. `tools/cmp_r.py` puts the model beside a painting at one scale with the two outlines laid over each other.
@@ -389,6 +411,10 @@ take the lean out. Her arms keep the Jester's bone lengths (0.63 m; the painting
 
 ## Checking
 
+- Stage eleven: stills at 16 moments of the knives move from the front, the grab and the return from behind, the
+  sheath on her back from three sides and close up, and a throw in the Flipbook look. Hands and feet reached where they were
+  wanted at every still (0 mm short). Page test at phone size, both halves: no errors; a drag turns her (0.64 rad).
+
 - Stage ten: stills at 16 moments of the sword move from the front, the lunge from the target's side, from behind and from
   above, her hand on the grip, the sword at her hip from four sides, in Ready, Walk, Jog and at full draw of the bow, and
   the cut in the Flipbook look. Hands and feet reached where they were wanted at every still (0 mm short). Page test at
@@ -470,7 +496,7 @@ Python that reads them with `-I`.
 ## Next stages
 
 Done at stage nine: fingers, the bow, Moonsteel Draw. Done at stage ten: the sword, its guard and a full cut (G4, H7).
-Next, in the order Chris agreed: the knives with their throw (G5, H8); Silverglass (H6) and the gem (H9); then hit reactions, a dodge, a win and
+Done at stage eleven: the knives and their throw (G5, H8). Next, in the order Chris agreed: Silverglass (H6) and the gem (H9); then hit reactions, a dodge, a win and
 a fall. The older list below is kept for what is still open in it.
 
 

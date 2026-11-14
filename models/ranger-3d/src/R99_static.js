@@ -79,6 +79,10 @@
     swordGrip: std({ color: lin('#263c8a'), roughness: 0.74, envMapIntensity: 0.3 }), swordGold: std({ color: lin('#c9963c'), metalness: 1, roughness: 0.32, envMapIntensity: 1.5 }),
     swordGem: phys({ color: lin('#1f9ec4'), roughness: 0.12, clearcoat: 1, clearcoatRoughness: 0.08, envMapIntensity: 1.4, emissive: lin('#0c6f9a'), emissiveIntensity: 0.4 }),
     scab: std({ color: lin('#17141a'), roughness: 0.58, envMapIntensity: 0.5 }), scabStrap: std({ color: lin('#2a2020'), roughness: 0.8 }),
+    // her knives (G5): each one piece of moonsteel with a handle of dark blue cord; a black leather sheath with a blue stud
+    knifeBlade: std({ color: lin('#eef1f6'), metalness: 1, roughness: 0.20, envMapIntensity: 2.0 }), knifeSteel: std({ color: lin('#e2e6ee'), metalness: 1, roughness: 0.30, envMapIntensity: 1.7 }),
+    knifeCord: std({ color: lin('#24397f'), roughness: 0.85, envMapIntensity: 0.2 }), sheath: std({ color: lin('#17141a'), roughness: 0.58, envMapIntensity: 0.5 }),
+    knifeGem: phys({ color: lin('#2191c8'), roughness: 0.12, clearcoat: 1, clearcoatRoughness: 0.08, envMapIntensity: 1.4, emissive: lin('#0c5fa8'), emissiveIntensity: 0.4 }),
     bowGem: phys({ color: lin('#2191c8'), roughness: 0.12, clearcoat: 1, clearcoatRoughness: 0.08, envMapIntensity: 1.4, emissive: lin('#0c5fa8'), emissiveIntensity: 0.45 }),
     iron: std({ color: lin('#1b1a1e'), metalness: 0.75, roughness: 0.48, envMapIntensity: 1.0 }),
     sock: std({ map: sockTexR(), color: lin('#d2cbc8'), roughness: 0.97 }),
@@ -87,7 +91,7 @@
 
   // ---------- bind: one skinned mesh per material ----------
   const root = new THREE.Group(); root.name = 'ranger';
-  root.add(SK.hips); if (SK.bow) root.add(SK.bow); if (SK.sword) root.add(SK.sword); root.updateMatrixWorld(true);
+  root.add(SK.hips); if (SK.bow) root.add(SK.bow); if (SK.sword) root.add(SK.sword); if (SK.knifeR) root.add(SK.knifeR, SK.knifeL); root.updateMatrixWorld(true);
   const skeleton = new THREE.Skeleton(bones);
   const meshes = {};
   let triCount = 0;
@@ -122,7 +126,7 @@
   // that is not built yet), 'cheer' (a jump with an arm thrown up) and 'limber' (she shakes out and bounces). Every frame the bones
   // are set back to rest and the layers are added on top. The Jester's moves are the reference for what a full set holds, not copied.
   let lastPose = { arm: 15, leg: 0 }, mv = { name: 'pose', t: 0 }, wk = 0, jg = 0, gph = 0, clock = 0, blinkAt = 2.4, blinkT = -1, mouthAt = 0, mouthNow = 'rest', facePainted = '';
-  const SHOTS = { draw: 5.5, sword: 4.5, cheer: 1.5, limber: 3.9 }, SLOW = { draw: 1.22, sword: 1.25, limber: 1.5 }, MOVES = ['pose', 'idle', 'walk', 'jog', 'talk', 'draw', 'sword', 'cheer', 'limber'];
+  const SHOTS = { draw: 5.5, sword: 4.5, knives: 3.2, cheer: 1.5, limber: 3.9 }, SLOW = { draw: 1.22, sword: 1.25, knives: 1.3, limber: 1.5 }, MOVES = ['pose', 'idle', 'walk', 'jog', 'talk', 'draw', 'sword', 'knives', 'cheer', 'limber'];
   const add = (b, x, y, z) => { const r = SK[b].rotation; r.x += x; r.y += y; r.z += z; };
   function restAll() { for (const k in SK) if (!/^(bag|charm|slv|tail|lock)/.test(k)) SK[k].rotation.set(0, 0, 0); SK.hips.position.copy(SK.hips.userData.home); }
   // ---------- fingers ----------
@@ -208,7 +212,7 @@
 
   // ---------- her bow: on her back, in her hands, drawn ----------
   // Where the folded bow rides (G6): flat and upright against the middle of her back, following the slope of her back.
-  const BACK = (() => { const z = (y) => rTorso(0, y)[2], y0 = 1.185, h = 0.12, tilt = Math.atan2(z(y0 + h) - z(y0 - h), 2 * h);
+  const BACK = (() => { const z = (y) => rTorso(0, y)[2], y0 = 1.205, h = 0.12, tilt = Math.atan2(z(y0 + h) - z(y0 - h), 2 * h);
     return { p: V3(0.012, y0, Math.min(z(y0), (z(y0 + h) + z(y0 - h)) / 2) - 0.019), q: Qn().setFromAxisAngle(XAX, tilt) }; })();
   const GRIP = [0.064 * HAND_S, 0.0235 * HAND_S, 0], HOOKP = [0.112 * HAND_S, 0.021 * HAND_S, 0.019 * HAND_S];      // where a held rod, and a hooked string, sit in her hand: [along her fingers, out from her palm, toward her thumb]
   const ANCH = V3(-0.060, 1.418, 0.040);                // the corner of her jaw on her right side, where the string comes back to (it rides on her head)
@@ -366,6 +370,63 @@
         trailC[k + v * 3] = c * 0.72; trailC[k + v * 3 + 1] = c * 0.86; trailC[k + v * 3 + 2] = c; } }
     trailM.visible = most > 0.01 && o.free > 0.99; if (trailM.visible) { trailG.attributes.position.needsUpdate = true; trailG.attributes.color.needsUpdate = true; }
   }
+  // ---------- her knives: in their sheath, in her hands, thrown ----------
+  // The beats, in the move's own seconds: both hands go behind her to the handles (to 0.24); the knives come up out of the sheath and
+  // round her sides as she hops her feet wide, left foot toward screen right (to 0.6). Her right hand is up by her head, her left low
+  // in front (H8). She coils, throws the first with her right hand (let go at 0.88) while the second is already coming up, and
+  // throws that with her left as her body unwinds (let go at 1.20). She watches them go, stands up, and the knives come back to
+  // their sheath in a glint of light (from 1.95).
+  const KNB = {}, KNQ = {}, TK = [0.88, 1.20], KH = { p: V3(), phi: 0 }, KR = { p: V3(), phi: 0 };
+  const knifeBeats = (T, o) => { o.T = T; o.on = sm(0.02, 0.24, T) * (1 - sm(1.50, 1.90, T)); o.st = sm(0.30, 0.58, T) * (1 - sm(1.62, 1.96, T)); o.hop = Math.sin(PI * sm(0.30, 0.58, T)) + Math.sin(PI * sm(1.62, 1.96, T));
+    o.slide = sm(0.22, 0.38, T); o.free = sm(0.30, 0.60, T); o.coil = sm(0.56, 0.76, T) * (1 - sm(0.78, 0.88, T)); o.t1 = sm(0.78, 0.90, T); o.f1 = sm(0.88, 1.06, T); o.up2 = sm(0.82, 1.04, T); o.t2 = sm(1.10, 1.22, T); o.f2 = sm(1.20, 1.38, T);
+    o.y1 = sm(0.74, 0.88, T); o.y2 = sm(1.06, 1.20, T); o.onH = [o.on * (1 - sm(1.08, 1.42, T)), o.on * (1 - sm(1.40, 1.72, T))]; o.out = sm(1.50, 1.90, T); o.back = sm(1.95, 2.25, T); return o; };
+  // where each knife is held and how it is turned once it is in her hand, measured from that hand's shoulder. It turns in the plane of
+  // the picture: phi is how far its point is raised from pointing straight at screen right. The wrist snaps late in each throw.
+  const knifeHand = (i, o, sh, out) => {
+    if (i === 0) { const up = Math.sin(PI * o.t1) * (1 - o.f1); out.phi = lerp(lerp(112 + 10 * o.coil, 6, o.t1 * o.t1), -45, o.f1) * DEG;
+      out.p.set(sh.x + lerp(lerp(-0.10 - 0.04 * o.coil, 0.40, o.t1), 0.34, o.f1) + 0.06 * up, sh.y + lerp(lerp(0.22, 0.04, o.t1), -0.22, o.f1) + 0.03 * up, sh.z + lerp(lerp(0.03, 0.07, o.t1), 0.14, o.f1)); }
+    else { const up = Math.sin(PI * o.t2) * (1 - o.f2); out.phi = lerp(lerp(lerp(20, 108, o.up2), 6, o.t2 * o.t2), -45, o.f2) * DEG;
+      out.p.set(sh.x + lerp(lerp(lerp(0.12, -0.02, o.up2), 0.42, o.t2), 0.36, o.f2) + 0.06 * up, sh.y + lerp(lerp(lerp(-0.32, 0.21, o.up2), 0.04, o.t2), -0.20, o.f2) + 0.03 * up, sh.z + lerp(lerp(lerp(0.22, 0.06, o.up2), 0.06, o.t2), 0.16, o.f2)); }
+    return out; };
+  const KW = { qh: Qn(), ps: V3(), qs: Qn(), ax: V3(), sh: V3(), p: V3(), q: Qn(), q2: Qn(), a: V3(), e: V3(), F: V3(), P: V3(), W: V3(), fk: V3(), qfk: Qn(), qG: Qn(), qH: Qn(), hint: V3(), ft: V3(), qf: Qn(), dir: V3(), v1: V3(), v2: V3() };
+  const KGRIP = [0.060 * HAND_S, 0.0195 * HAND_S], FLY = V3(Math.cos(3 * DEG), Math.sin(3 * DEG), 0);
+  LT.kTrail = [beam(), beam()]; LT.kGlint = [[beam(), beam()], [beam(), beam()]];
+  const knifeLightOff = () => { for (const B of LT.kTrail) for (const m of B) m.visible = false; for (const G of LT.kGlint) for (const B of G) for (const m of B) m.visible = false; };
+  function knifeStage(T) {
+    inRoot();
+    const drawn = T >= 0, o = drawn ? knifeBeats(T, KNB) : null;
+    if (!drawn) knifeLightOff();
+    else { const kLeg = sm(0, 0.2, o.st);       // her feet: hopped wide and planted, her left toward screen right
+      if (kLeg > 0) for (const [Sd] of SIDES) { const lead = Sd === 'L', yaw = (lead ? 50 : -5) * DEG * o.st;
+        KW.ft.set(lead ? 0.27 : -0.25, FOOT_Y, lead ? 0.03 : -0.02).lerp(SK['foot' + Sd].userData.rest, 1 - o.st); KW.ft.y = FOOT_Y + 0.06 * o.hop;
+        const miss = plant(Sd, KW.ft, KW.qf.setFromAxisAngle(YAX, yaw), KW.hint.set(Math.sin(yaw), 0.25, Math.cos(yaw)), kLeg); if (miss > D.missLeg) D.missLeg = miss; } }
+    rq(SK.hips, KW.qh);
+    for (let i = 0; i < 2; i++) { const B = SK[KNK.names[i]], S = i ? 'L' : 'R', s8 = KNK.sheath[i];
+      rpt(SK.hips, s8.P, KW.ps); KW.qs.copy(KW.qh).multiply(s8.Q); KW.ax.copy(s8.ax).applyQuaternion(KW.qh);
+      if (!drawn) { B.position.copy(KW.ps); B.quaternion.copy(KW.qs); B.scale.setScalar(1); B.updateMatrixWorld(true); continue; }
+      // the knife as her hand holds it: up out of its pocket, round her side, then on that hand's own path
+      rp(SK['uarm' + S], KW.sh); knifeHand(i, o, KW.sh, KH);
+      const arc = 4 * o.free * (1 - o.free); KW.p.copy(KW.ps).addScaledVector(KW.ax, -KNK.pull * o.slide).lerp(KH.p, o.free); KW.p.x += (i ? 0.14 : -0.16) * arc; KW.p.z -= 0.03 * arc;
+      KW.q.copy(KW.qs).slerp(KW.q2.setFromAxisAngle(ZAX, KH.phi - PI / 2), o.free);
+      // her hand, from the knife: the handle in her fist, the blade out past her thumb
+      const cb = Math.cos(15 * DEG), sb = Math.sin(15 * DEG), a = KW.a.set(0, 1, 0).applyQuaternion(KW.q), e = KW.e.set(1, 0, 0).applyQuaternion(KW.q);
+      KW.F.copy(e).multiplyScalar(cb).addScaledVector(a, sb); KW.v1.copy(a).multiplyScalar(cb).addScaledVector(e, -sb); if (i) KW.P.crossVectors(KW.F, KW.v1); else KW.P.crossVectors(KW.v1, KW.F);
+      KW.W.copy(KW.p).addScaledVector(KW.F, -KGRIP[0]).addScaledVector(KW.P, -KGRIP[1]); handQ(S, KW.F, KW.P, KW.qG);
+      const on = o.onH[i]; rp(SK['hand' + S], KW.fk); rq(SK['hand' + S], KW.qfk); KW.W.lerp(KW.fk, 1 - on); if (T < 0.5) { const ar = 4 * on * (1 - on); KW.W.x += (i ? 0.06 : -0.06) * ar; KW.W.z -= 0.08 * ar; } KW.qH.copy(KW.qfk).slerp(KW.qG, on);
+      KW.hint.set((i ? 1 : -1) * lerp(0.6, 0.8, o.free), lerp(-0.3, -0.5, o.free), lerp(-1, 0.3, o.free));
+      { const miss = reach(S, KW.W, KW.qH, KW.hint, sm(0, 0.25, on)); if (i) { if (miss > D.missL) D.missL = miss; } else if (miss > D.missR) D.missR = miss; }
+      // the knife itself: in her hand until she lets go, then flying point first, then back in its pocket
+      const aft = T - TK[i], G = LT.kGlint[i]; let trail = 0, glint = 0;
+      if (aft < 0) { B.position.copy(KW.p); B.quaternion.copy(KW.q); B.scale.setScalar(1); }
+      else if (o.back <= 0) { knifeHand(i, knifeBeats(TK[i], KNQ), KW.sh, KR); B.position.copy(KR.p).addScaledVector(FLY, 0.02 + 19 * aft); B.quaternion.setFromAxisAngle(ZAX, 3 * DEG - PI / 2); B.scale.setScalar(aft < 0.5 ? 1 : 0.0001);
+        trail = 0.75 * Math.exp(-aft / 0.16) * (1 - sm(0.35, 0.5, aft)); KW.v2.copy(B.position).addScaledVector(FLY, -Math.min(19 * aft, 1.6)); }
+      else { B.position.copy(KW.ps); B.quaternion.copy(KW.qs); B.scale.setScalar(Math.max(0.0001, o.back)); glint = Math.sin(PI * o.back); }
+      B.updateMatrixWorld(true);
+      setBeam(LT.kTrail[i], KW.v2, B.position, 0.0018, trail, 1.5);
+      KW.v1.copy(KW.ps).addScaledVector(XAX, -0.045 * glint); KW.v2.copy(KW.ps).addScaledVector(XAX, 0.045 * glint); setBeam(G[0], KW.v1, KW.v2, 0.0008, glint, 1);
+      KW.v1.copy(KW.ps).addScaledVector(YAX, -0.065 * glint); KW.v2.copy(KW.ps).addScaledVector(YAX, 0.065 * glint); setBeam(G[1], KW.v1, KW.v2, 0.0008, glint, 1);
+      const held = aft < 0 && on > 0.8; if (i) fWant.L = held ? FP.fist : aft >= 0 && aft < 0.35 ? FP.open : FP.relax; else fWant.R = held ? FP.fist : aft >= 0 && aft < 0.35 ? FP.open : FP.relax; }
+  }
   // Soft things (SOFT): each hangs from its root and its tip is a weight on a spring. It is pulled to where it would rest (its built
   // direction, bent toward straight down), it lags when its root moves, and it cannot swing past a set angle. A sleeve may hang
   // further the more her elbow folds, so her forearm does not pass through it.
@@ -402,7 +463,7 @@
   function pose(o) {
     o = o || {}; mv = { name: 'pose', t: 0 }; wk = 0; jg = 0; lastPose = { arm: o.arm == null ? 15 : o.arm, leg: o.leg || 0 }; const arm = lastPose.arm * DEG - A_POSE, leg = lastPose.leg * DEG;
     restAll(); for (const [S, s] of SIDES) { SK['uarm' + S].rotation.z = s * arm; SK['thigh' + S].rotation.z = s * leg; SK['foot' + S].rotation.z = -s * leg; }
-    armsAndBow(-1, 0); swordStage(-1, 0, true); root.updateMatrixWorld(true);
+    armsAndBow(-1, 0); swordStage(-1, 0, true); knifeStage(-1); root.updateMatrixWorld(true);
     if (gearSettle) { gearSettle(); root.updateMatrixWorld(true); }       // the bags come to rest against her in the new pose
     softTick(0, true); root.updateMatrixWorld(true);
   }
@@ -469,6 +530,13 @@
       add('spine1', 0.07 * o.st + 0.13 * o.lun, 0.03 * o.st, 0); add('spine2', 0.03 * o.st + 0.05 * o.lun, 0.04 * o.st - 0.12 * o.a * (1 - o.b) + 0.08 * o.b * (1 - o.c), 0);
       add('neck', -0.06 * o.lun, 0.04 * o.st, 0); add('head', -0.05 * o.st - 0.08 * o.lun, 0.06 * o.st, 0);
       for (const [S] of SIDES) { add('farm' + S, -0.10 * easeIn, 0, 0); add('shin' + S, 0.03 * easeIn, 0, 0); add('thigh' + S, -0.015 * easeIn, 0, 0); add('foot' + S, -0.015 * easeIn, 0, 0); } }
+    // Knives (G5, H8): both from the back of her belt, a wide stance with her chest to us, the first thrown with her right hand as her
+    // body turns toward screen right, the second with her left as it turns back. Her feet, arms and the knives are worked out in knifeStage.
+    if (N === 'knives') { const o = knifeBeats(T, KNB), yaw = (4 * o.st - 14 * o.coil + 62 * o.y1 * (1 - o.y2) + 6 * o.y2) * (1 - o.out) * DEG, lean = 0.10 * (o.t1 * (1 - 0.5 * o.f1) + 0.5 * o.t2 * (1 - o.f2)) * (1 - o.out);
+      const look = sm(0.45, 0.70, T) * (1 - sm(1.55, 1.85, T)), hy = (62 * DEG - yaw) * look, easeIn = 1 - sm(0, 0.2, T) + sm(2.2, 2.45, T);
+      add('hips', 0, 0.40 * yaw, 0); add('spine1', Math.sin(0.5 * yaw) * lean, 0.10 * yaw, -Math.cos(0.5 * yaw) * lean); add('spine2', 0, 0.28 * yaw, 0); add('spine3', 0, 0.22 * yaw, 0);
+      add('neck', 0, 0.45 * hy, 0); add('head', 0, 0.55 * hy, 0); SK.hips.position.x += (-0.03 * o.coil + 0.07 * o.t1) * o.st; SK.hips.position.y += 0.05 * o.hop - 0.07 * o.st;
+      for (const [S] of SIDES) { add('farm' + S, -0.10 * easeIn, 0, 0); add('shin' + S, 0.03 * easeIn, 0, 0); add('thigh' + S, -0.015 * easeIn, 0, 0); add('foot' + S, -0.015 * easeIn, 0, 0); } }
     // a cheer: she dips, jumps, throws an arm up, lands soft
     if (N === 'cheer') { const c1 = sm(0, 0.22, T) * (1 - sm(0.22, 0.36, T)), u = cl((T - 0.36) / 0.5, 0, 1), air = Math.sin(PI * u), c2 = sm(0.84, 0.94, T) * (1 - sm(0.94, 1.3, T)), c = c1 + 0.8 * c2, k = sm(0.2, 0.45, T) * (1 - sm(1.0, 1.45, T));
       for (const [S] of SIDES) { add('thigh' + S, -0.45 * c - 0.25 * air, 0, 0); add('shin' + S, 0.9 * c + 0.5 * air, 0, 0); add('foot' + S, -0.45 * c + 0.2 * air, 0, 0); }
@@ -478,7 +546,7 @@
     if (N === 'limber') { const k = sm(0, 0.3, T) * (1 - sm(2.2, 2.6, T));
       bounce(0.020 * Math.abs(Math.sin(T * 9.5)) * k); for (const [S, s] of SIDES) { add('clav' + S, 0, 0, s * 0.16 * Math.sin(T * 5 + (s > 0 ? 1.6 : 0)) * k); add('uarm' + S, 0.14 * Math.sin(T * 9 + s) * k, 0, s * 0.06 * k); add('farm' + S, -(0.5 + 0.2 * Math.sin(T * 11 + s)) * k, 0, 0); add('shin' + S, 0.10 * k, 0, 0); add('thigh' + S, -0.05 * k, 0, 0); }
       add('head', 0, 0, 0.22 * Math.sin(T * 2.4) * k); add('neck', 0.04 * k, 0, 0.08 * Math.sin(T * 2.4) * k); }
-    armsAndBow(N === 'draw' ? T : -1, dt); swordStage(N === 'sword' ? T : -1, dt, snapNow); fingersTick(dt, snapNow);
+    armsAndBow(N === 'draw' ? T : -1, dt); swordStage(N === 'sword' ? T : -1, dt, snapNow); knifeStage(N === 'knives' ? T : -1); fingersTick(dt, snapNow);
     // her face: she blinks; her mouth moves when she talks
     if (clock > blinkAt) { blinkT = clock; blinkAt = clock + 2.2 + 2.6 * Math.abs(Math.sin(clock * 12.9)); }
     const bt = clock - blinkT, eyes = Math.max(squint, bt < 0.05 ? 0.5 : bt < 0.10 ? 1 : bt < 0.15 ? 0.5 : 0), key = eyes + '|' + mouthNow;
@@ -486,5 +554,5 @@
     if (gearTick) gearTick(dt);       // the bags and charms swing with her
     softTick(dt);       // and her sleeves, the tails of her headband and her loose locks
   }
-  return { root, skeleton, bones, SK, animate, pose, play, seek, moves: MOVES, walk, bow: BOWK, sword: SWK, light: FX, swing: () => { if (gearKick) gearKick(); }, setLook, meshes, spin: 0, time: 0, stanceProgress: 1, setStance() {}, setFace: (eyes, mouth) => paintFace(eyes || 0, mouth || 'rest'), debug: { SK, meshes, D, cloths: [], headPoint, JH, hairPt, phOfY }, get triangles() { return triCount; } };
+  return { root, skeleton, bones, SK, animate, pose, play, seek, moves: MOVES, walk, bow: BOWK, sword: SWK, knives: KNK, light: FX, swing: () => { if (gearKick) gearKick(); }, setLook, meshes, spin: 0, time: 0, stanceProgress: 1, setStance() {}, setFace: (eyes, mouth) => paintFace(eyes || 0, mouth || 'rest'), debug: { SK, meshes, D, cloths: [], headPoint, JH, hairPt, phOfY }, get triangles() { return triCount; } };
 }
