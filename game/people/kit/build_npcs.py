@@ -17,8 +17,9 @@ for tag in ['hand', 'fable', 'opus']:
             if not os.path.exists(d + '/log.json'): continue
             lg = json.load(open(d + '/log.json')); j = json.load(open(os.path.join(P, 'skins', pid, L + '.json'))); nid = slug(k['name']) + ('-opus' if tag == 'opus' else '')
             tex[key] = {'body': webp(os.path.join(P, 'skins', pid, L + '-body.webp')), 'face': webp(os.path.join(P, 'skins', pid, L + '-face.webp'))}
-            people.append('  %s: { name: %s, who: %s, shapes: %s, skin: %s, fit: %s, faceFit: %s, skinColour: %s,\n    wiring: %s,\n    SKIN: (function () {\n%s\n      return SKIN; })(),\n    person: function () {\n%s\n      return PERSON; } }' % (
-                json.dumps(nid), json.dumps(k['name'][0].upper() + k['name'][1:]), json.dumps(k['who']), json.dumps(MAKER[tag]), json.dumps(key), json.dumps(j['fit']), json.dumps(j.get('faceFit', [1, 0, 0])), json.dumps(j['skin']),
+            sc = json.load(open(d + '/person-scale.json')) if os.path.exists(d + '/person-scale.json') else {}
+            people.append('  %s: { name: %s, who: %s, shapes: %s, skin: %s, fit: %s, faceFit: %s, skinColour: %s, scale: %s,\n    wiring: %s,\n    SKIN: (function () {\n%s\n      return SKIN; })(),\n    person: function () {\n%s\n      return PERSON; } }' % (
+                json.dumps(nid), json.dumps(k['name'][0].upper() + k['name'][1:]), json.dumps(k['who']), json.dumps(MAKER[tag]), json.dumps(key), json.dumps(j['fit']), json.dumps(j.get('faceFit', [1, 0, 0])), json.dumps(j['skin']), json.dumps(sc),
                 json.dumps(wiring.get(key, {})), open(d + '/skin.js').read().strip(), open(os.path.join(P, lg['person'])).read().strip()))
             order.append(nid)
 npcs = '// Made by people/kit/build_npcs.py. The people are stand-ins, not Moon Faire lore: names and words are Chris\'s to change.\nwindow.MF_NPCS = { people: {\n' + ',\n'.join(people) + '\n} };\n'

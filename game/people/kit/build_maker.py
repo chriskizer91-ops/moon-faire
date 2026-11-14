@@ -28,7 +28,7 @@ for tag in ['hand', 'fable', 'opus']:
             lg = json.load(open(d + '/log.json')); j = json.load(open(os.path.join(SKINS, pid, L + '.json'))); key = '%s-%s' % (pid, L)
             skins[key] = {'body': webp(os.path.join(SKINS, pid, L + '-body.webp')), 'face': webp(os.path.join(SKINS, pid, L + '-face.webp')), 'fit': j['fit'], 'faceFit': j.get('faceFit', [1, 0, 0]), 'skin': j['skin']}
             paint_cost += lg['cost']; paint_secs += lg['seconds']; paint_n += 1
-            people.append({'name': k['name'][0].upper() + k['name'][1:], 'model': 'painted-' + tag, 'desc': k['who'], 'code': open(os.path.join(GAME, 'people', lg['person'])).read(), 'cost': lg['cost'], 'skin': key, 'skinText': open(d + '/skin.js').read()})
+            people.append({'name': k['name'][0].upper() + k['name'][1:], 'model': 'painted-' + tag, 'desc': k['who'], 'code': open(os.path.join(GAME, 'people', lg['person'])).read(), 'cost': lg['cost'], 'skin': key, 'skinText': open(d + '/skin.js').read(), 'scale': json.load(open(d + '/person-scale.json')) if os.path.exists(d + '/person-scale.json') else {}})
             shots.append({'src': uri(d + '/final.jpg'), 'caption': '%s, painted on %s. Fitting by Fable 5.2: %s, %d s. %s' % (people[-1]['name'], MAKER[tag], money(lg['cost']), lg['seconds'], k['who'])})
 people.append({'name': 'Lamp-seller', 'model': 'hand', 'desc': 'An old woman who sells lamps: grey hair in a bun under an ochre kerchief, a moss-green bodice, a long rust skirt and a cream apron.', 'code': rd('people/lampseller.js'), 'cost': 0})
 people[-1]['name'] = 'Lamp-seller, flat colours'

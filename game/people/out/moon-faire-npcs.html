@@ -4783,12 +4783,14 @@ window.MF_FACE_PLAIN = "data:image/webp;base64,UklGRpqSAQBXRUJQVlA4II6SAQDQPQWdA
       smile: part(349, 573, 325, 195, (g) => { for (const k of [-1, 1]) line(g, [M[0] + k * 58, M[1] - 2], [M[0] + k * 80, M[1] - 6], [M[0] + k * 92, M[1] - 20], `rgba(${lip},0.55)`, 5); }) };
   }
   // a part of the model moved a little (a hat pulled down): its paint moves with it
-  function moved(m, v, kind) {
+  function moved(m, v, kind, size, mid) {
     const first = m.onBeforeCompile; m.customProgramCacheKey = () => 'moved-' + kind;
     m.onBeforeCompile = (sh, r) => { if (first) first(sh, r); sh.uniforms.uMove = { value: new THREE.Vector3(v[0] || 0, v[1] || 0, v[2] || 0) };
-      sh.vertexShader = sh.vertexShader.replace('#include <common>', '#include <common>\nuniform vec3 uMove;').replace('#include <begin_vertex>', '#include <begin_vertex>\ntransformed += uMove;'); };
+      sh.uniforms.uSize = { value: new THREE.Vector3(size[0] || 1, size[1] || 1, size[2] || 1) }; sh.uniforms.uMid = { value: new THREE.Vector3(mid[0], mid[1], mid[2]) };
+      sh.vertexShader = sh.vertexShader.replace('#include <common>', '#include <common>\nuniform vec3 uMove; uniform vec3 uSize; uniform vec3 uMid;').replace('#include <begin_vertex>', '#include <begin_vertex>\ntransformed = ( transformed - uMid ) * uSize + uMid + uMove;'); };
     return m;
   }
+  const middle = (pos) => { const lo = [1e9, 1e9, 1e9], hi = [-1e9, -1e9, -1e9]; for (let i = 0; i < pos.length; i += 3) for (let k = 0; k < 3; k++) { lo[k] = Math.min(lo[k], pos[i + k]); hi[k] = Math.max(hi[k], pos[i + k]); } return [0, 1, 2].map((k) => (lo[k] + hi[k]) / 2); };
   async function prepareSkin(person, skin) {
     const T = window.JESTER_TEX, S = skin.SKIN || {}, hexSkin = S.skin || skin.skin || person.skin || '#d99f91', t = tone(hexSkin);
     const [pic, side, hands, body] = await Promise.all([load(skin.face), load(T.faceSide), load(T.hands), load(skin.body)]);
@@ -4826,7 +4828,7 @@ window.MF_FACE_PLAIN = "data:image/webp;base64,UklGRpqSAQBXRUJQVlA4II6SAQDQPQWdA
     if (spec.pattern) o.map = patternTex(spec); else o.color = K.lin(spec.color || '#888888');
     if (spec.metal) o.envMapIntensity = 1.4;
     const c = rgb(spec.color || '#888888').map((v) => v + (255 - v) * 0.45);
-    return K.sheen(K.std(o), spec.sheen || hex(c), 2.6, spec.metal ? 0 : 0.28);
+    return K.sheen(K.std(o), spec.sheen || hex(c), 2.6, spec.metal ? 0 : (spec.sheenK == null ? 0.28 : spec.sheenK));
   }
   // build the person. prepared: what prepare() returned
   function make(person, prepared, extra) {
@@ -4837,8 +4839,8 @@ window.MF_FACE_PLAIN = "data:image/webp;base64,UklGRpqSAQBXRUJQVlA4II6SAQDQPQWdA
     lod.onGeometry = (key, g, B, K) => { if (key.slice(0, 2) !== 'p_') thin(key, g, B, K); };            // a person's own parts are already light
     lod.material = (key, B, K) => {
       if (prepared.bodyTex && key !== 'face' && key !== 'hand' && key !== 'skin') { const nm = key.slice(0, 2) === 'p_' ? key.slice(2) : (WORD[key] || key), S = prepared.S, fl = S.flat && S.flat[nm], ro = S.rough && S.rough[nm];
-        const mt = fl ? material({ color: fl, rough: ro == null ? 0.8 : ro }, K) : painted(K, prepared, ro), mv = S.move && S.move[nm];
-        return mv ? moved(mt, mv, fl ? 'flat' : 'painted') : mt; }
+        const mt = fl ? material({ color: fl, rough: ro == null ? 0.8 : ro, sheen: fl, sheenK: 0.05 }, K) : painted(K, prepared, ro), mv = S.move && S.move[nm], sz = S.size && S.size[nm];
+        return mv || sz ? moved(mt, mv || [0, 0, 0], fl ? 'flat' : 'painted', sz || [1, 1, 1], middle(B.pos)) : mt; }
       if (key.slice(0, 2) === 'p_') return material(parts[key.slice(2)] || '#888888', K);
       for (const w in BODY) if (BODY[w] === key) { let c = colors[w] || (w === 'puff' && colors.sleeve) || (w === 'forearm' && colors.cuff); if (!c) break; if (c === 'skin') c = skinHex;
         return material(Object.assign({ oneSided: true }, key === 'boot' ? { rough: 0.45 } : null, typeof c === 'string' ? { color: c } : c), K); }
@@ -5245,18 +5247,22 @@ return EMOTES; };
 <script>
 // Made by people/kit/build_npcs.py. The people are stand-ins, not Moon Faire lore: names and words are Chris's to change.
 window.MF_NPCS = { people: {
-  "old-lamp-seller": { name: "Old lamp-seller", who: "An old woman who has sold oil lamps and wicks at the fair for forty years.", shapes: "made by hand", skin: "lampseller-A", fit: {"front": [0.99383, 1.01175, 0.00309, -0.00156], "back": [0.99383, 1.01175, 0.00309, -0.00156]}, faceFit: [1, 0, 0], skinColour: "#bd7c67",
+  "old-lamp-seller": { name: "Old lamp-seller", who: "An old woman who has sold oil lamps and wicks at the fair for forty years.", shapes: "made by hand", skin: "lampseller-A", fit: {"front": [0.99383, 1.01175, 0.00309, -0.00156], "back": [0.99383, 1.01175, 0.00309, -0.00156]}, faceFit: [1, 0, 0], skinColour: "#bd7c67", scale: {"height": 0.91, "build": [1.08, 1.06], "head": [1.04, 0.99, 1]},
     wiring: {"talk": ["talk_calm"], "greet": "beckon", "fidgets": ["fidget_hands"], "pace": 0.83, "likes": ["nod", "beckon", "think"], "moods": {"yes": "nod", "no": "shake_head", "happy": "laugh", "unsure": "think", "upset": "sad", "thanks": "greet_bow", "bye": "nod"}},
     SKIN: (function () {
 const SKIN = {
-  skin: '#b9917a',
-  flat: {
-    hair: '#7f7a76',
-    sleeve: '#465034',
-    soles: '#2a1d16'
-  },
-  rough: { belt: 0.45, boots: 0.55 },
-  seam: 0.2
+ "skin": "#b9917a",
+ "flat": {
+  "hair": "#6f6a64",
+  "sleeve": "#465034",
+  "soles": "#2a1d16"
+ },
+ "rough": {
+  "belt": 0.45,
+  "boots": 0.55,
+  "hair": 0.95
+ },
+ "seam": 0.2
 };
       return SKIN; })(),
     person: function () {
@@ -5288,10 +5294,15 @@ const PERSON = {
   },
 };
       return PERSON; } },
-  "pie-seller": { name: "Pie seller", who: "A sturdy middle-aged woman who sells hot meat pies from a cart by the gate.", shapes: "made by hand", skin: "lampseller-B", fit: {"front": [1.00617, 1.01058, -0.00309, -0.00053], "back": [1.00309, 1.01058, -0.00219, -0.00053]}, faceFit: [1, 0, 0], skinColour: "#78412d",
+  "pie-seller": { name: "Pie seller", who: "A sturdy middle-aged woman who sells hot meat pies from a cart by the gate.", shapes: "made by hand", skin: "lampseller-B", fit: {"front": [1.00617, 1.01058, -0.00309, -0.00053], "back": [1.00309, 1.01058, -0.00219, -0.00053]}, faceFit: [1, 0, 0], skinColour: "#78412d", scale: {"height": 0.95, "build": [1.15, 1.12], "head": [0.98, 0.99, 0.96]},
     wiring: {"talk": ["talk_lively", "talk_calm"], "greet": "wave", "fidgets": ["fidget_shift", "fidget_hands"], "pace": 1, "likes": ["beckon", "laugh", "point"], "moods": {"yes": "nod", "no": "shake_head", "happy": "laugh", "unsure": "shrug", "upset": "cross", "thanks": "thanks", "bye": "wave"}},
     SKIN: (function () {
-const SKIN = { skin: "#78412d" };
+const SKIN = {
+ "skin": "#78412d",
+ "rough": {
+  "hair": 0.9
+ }
+};
       return SKIN; })(),
     person: function () {
 // The worked example for the person kit, made by hand (no API): an old lamp-seller.
@@ -5322,10 +5333,12 @@ const PERSON = {
   },
 };
       return PERSON; } },
-  "ballad-singer": { name: "Ballad singer", who: "A young woman who sings old songs on a small stage between the stalls each night.", shapes: "made by hand", skin: "lampseller-C", fit: {"front": [1.00926, 1.01998, -0.00528, -0.00295], "back": [1.00617, 1.0188, -0.00309, -0.00289]}, faceFit: [1, 0, 0], skinColour: "#e5b8ae",
+  "ballad-singer": { name: "Ballad singer", who: "A young woman who sings old songs on a small stage between the stalls each night.", shapes: "made by hand", skin: "lampseller-C", fit: {"front": [1.00926, 1.01998, -0.00528, -0.00295], "back": [1.00617, 1.0188, -0.00309, -0.00289]}, faceFit: [1, 0, 0], skinColour: "#e5b8ae", scale: {"height": 0.98, "build": [0.98, 0.97], "head": [1.04, 1, 1.03]},
     wiring: {"talk": ["talk_calm", "talk_lively"], "greet": "greet_bow", "fidgets": ["fidget_look", "fidget_hands"], "pace": 1.08, "likes": ["greet_bow", "think", "sad"], "moods": {"yes": "nod", "no": "shake_head", "happy": "laugh", "unsure": "think", "upset": "sad", "thanks": "greet_bow", "bye": "wave"}},
     SKIN: (function () {
-const SKIN = { skin: "#e5b8ae" };
+const SKIN = {
+ "skin": "#e5b8ae"
+};
       return SKIN; })(),
     person: function () {
 // The worked example for the person kit, made by hand (no API): an old lamp-seller.
@@ -5356,17 +5369,53 @@ const PERSON = {
   },
 };
       return PERSON; } },
-  "fortune-teller": { name: "Fortune-teller", who: "A tall, thin fortune-teller who reads palms and cards in a dim tent at the edge of the fair.", shapes: "shapes by Fable 5.2", skin: "fortune-A", fit: {"front": [1.02023, 1.00467, -0.01077, -0.00121], "back": [1.02023, 1.0035, -0.01077, -0.00115]}, faceFit: [1, 0, 0], skinColour: "#c7b0b2",
+  "fortune-teller": { name: "Fortune-teller", who: "A tall, thin fortune-teller who reads palms and cards in a dim tent at the edge of the fair.", shapes: "shapes by Fable 5.2", skin: "fortune-A", fit: {"front": [1.02023, 1.00467, -0.01077, -0.00121], "back": [1.02023, 1.0035, -0.01077, -0.00115]}, faceFit: [1, 0, 0], skinColour: "#c7b0b2", scale: {"height": 1.05, "build": [0.93, 0.94], "head": [1, 1, 1]},
     wiring: {"talk": ["talk_calm"], "greet": "beckon", "fidgets": ["fidget_hands"], "pace": 0.94, "likes": ["think", "beckon", "point"], "moods": {"yes": "nod", "no": "refuse", "happy": "nod", "unsure": "think", "upset": "cross", "thanks": "greet_bow", "bye": "greet_bow"}},
     SKIN: (function () {
 const SKIN = {
-  front: { scale: [1.04, 1], move: [0, 0.01] },
-  back:  { scale: [1.04, 1], move: [0, 0.01] },
-  skin: '#d9c1bc',
-  flat: { hair: '#17131a', soles: '#1c161a' },
-  rough: { gold: 0.35, boots: 0.5 },
-  seam: 0.2,
-  move: { scarf: [0, -0.012, 0], gold: [0, -0.012, 0] },
+ "front": {
+  "scale": [
+   1.04,
+   1
+  ],
+  "move": [
+   0,
+   0.01
+  ]
+ },
+ "back": {
+  "scale": [
+   1.04,
+   1
+  ],
+  "move": [
+   0,
+   0.01
+  ]
+ },
+ "skin": "#d9c1bc",
+ "flat": {
+  "hair": "#17131a",
+  "soles": "#1c161a"
+ },
+ "rough": {
+  "gold": 0.35,
+  "boots": 0.5,
+  "hair": 0.85
+ },
+ "seam": 0.2,
+ "move": {
+  "scarf": [
+   0,
+   -0.012,
+   0
+  ],
+  "gold": [
+   0,
+   -0.012,
+   0
+  ]
+ }
 };
       return SKIN; })(),
     person: function () {
@@ -5421,14 +5470,30 @@ const PERSON = {
   },
 };
       return PERSON; } },
-  "old-lamplighter": { name: "Old lamplighter", who: "An elderly man who walks the fair at dusk, lighting and trimming the lanterns along the stalls.", shapes: "shapes by Fable 5.2", skin: "fortune-B", fit: {"front": [1.01734, 1.00701, -0.00997, -0.00133], "back": [1.02023, 1.00701, -0.01077, -0.00133]}, faceFit: [1, 0, 0], skinColour: "#af7353",
+  "old-lamplighter": { name: "Old lamplighter", who: "An elderly man who walks the fair at dusk, lighting and trimming the lanterns along the stalls.", shapes: "shapes by Fable 5.2", skin: "fortune-B", fit: {"front": [1.01734, 1.00701, -0.00997, -0.00133], "back": [1.02023, 1.00701, -0.01077, -0.00133]}, faceFit: [1, 0, 0], skinColour: "#af7353", scale: {"height": 1.02, "build": [0.96, 0.96], "head": [1, 1, 1]},
     wiring: {"talk": ["talk_calm"], "greet": "wave", "fidgets": ["fidget_look", "fidget_shift"], "pace": 0.85, "likes": ["point", "nod", "wave"], "moods": {"yes": "nod", "no": "shake_head", "happy": "laugh", "unsure": "shrug", "upset": "sad", "thanks": "thanks", "bye": "wave"}},
     SKIN: (function () {
 const SKIN = {
-  skin: '#af7353',
-  flat: { hair: '#8e867b' },
-  seam: 0.2,
-  move: { scarf: [0, -0.012, 0], gold: [0, -0.012, 0] },
+ "skin": "#af7353",
+ "flat": {
+  "hair": "#7a736a"
+ },
+ "seam": 0.2,
+ "move": {
+  "scarf": [
+   0,
+   -0.012,
+   0
+  ],
+  "gold": [
+   0,
+   -0.012,
+   0
+  ]
+ },
+ "rough": {
+  "hair": 0.95
+ }
 };
       return SKIN; })(),
     person: function () {
@@ -5483,14 +5548,33 @@ const PERSON = {
   },
 };
       return PERSON; } },
-  "old-night-watchman": { name: "Old night-watchman", who: "An old night-watchman who walks the fair rows after dark, checking stall shutters and lamps.", shapes: "shapes by Fable 5.2", skin: "watchman-A", fit: {"front": [1.01852, 1.01302, -0.01056, -0.00553], "back": [1.01543, 1.01302, -0.00707, -0.00553]}, faceFit: [1, 0, 0], skinColour: "#4f2a1d",
+  "old-night-watchman": { name: "Old night-watchman", who: "An old night-watchman who walks the fair rows after dark, checking stall shutters and lamps.", shapes: "shapes by Fable 5.2", skin: "watchman-A", fit: {"front": [1.01852, 1.01302, -0.01056, -0.00553], "back": [1.01543, 1.01302, -0.00707, -0.00553]}, faceFit: [1, 0, 0], skinColour: "#4f2a1d", scale: {"height": 1.01, "build": [1.1, 1.08], "head": [1, 1, 1]},
     wiring: {"talk": ["talk_calm", "talk_gruff"], "greet": "nod", "fidgets": ["fidget_look"], "pace": 0.88, "likes": ["point", "nod", "cross"], "moods": {"yes": "nod", "no": "shake_head", "happy": "nod", "unsure": "think", "upset": "cross", "thanks": "nod", "bye": "wave"}},
     SKIN: (function () {
 const SKIN = {
-  skin: '#6b4030',
-  flat: { hair: '#5a5855', soles: '#1e1b18' },
-  rough: { boots: 0.5, belt: 0.45, brass: 0.35 },
-  move: { hat: [0, -0.03, 0], band: [0, -0.03, 0] },
+ "skin": "#6b4030",
+ "flat": {
+  "hair": "#5a5855",
+  "soles": "#1e1b18"
+ },
+ "rough": {
+  "boots": 0.5,
+  "belt": 0.45,
+  "brass": 0.35,
+  "hair": 0.95
+ },
+ "move": {
+  "hat": [
+   0,
+   -0.03,
+   0
+  ],
+  "band": [
+   0,
+   -0.03,
+   0
+  ]
+ }
 };
       return SKIN; })(),
     person: function () {
@@ -5536,20 +5620,35 @@ const PERSON = {
   },
 };
       return PERSON; } },
-  "chestnut-roaster": { name: "Chestnut roaster", who: "A cheerful middle-aged man who roasts chestnuts over a brazier at the fair gate.", shapes: "shapes by Fable 5.2", skin: "watchman-B", fit: {"front": [1.01543, 1.04013, -0.00837, -0.01274], "back": [1.01235, 1.04013, -0.00747, -0.01274]}, faceFit: [1, 0, 0], skinColour: "#d99c8d",
+  "chestnut-roaster": { name: "Chestnut roaster", who: "A cheerful middle-aged man who roasts chestnuts over a brazier at the fair gate.", shapes: "shapes by Fable 5.2", skin: "watchman-B", fit: {"front": [1.01543, 1.04013, -0.00837, -0.01274], "back": [1.01235, 1.04013, -0.00747, -0.01274]}, faceFit: [1, 0, 0], skinColour: "#d99c8d", scale: {"height": 1.04, "build": [1.1, 1.08], "head": [1, 1, 1]},
     wiring: {"talk": ["talk_lively"], "greet": "beckon", "fidgets": ["fidget_hands", "fidget_shift"], "pace": 1.05, "likes": ["laugh", "beckon", "wave"], "moods": {"yes": "nod", "no": "shake_head", "happy": "laugh", "unsure": "shrug", "upset": "sad", "thanks": "thanks", "bye": "wave"}},
     SKIN: (function () {
 const SKIN = {
-  skin: '#cd927c',
-  flat: {
-    soles: '#2a1d16'
-  },
-  rough: { boots: 0.5, belt: 0.5, brass: 0.35, boot: 0.5 },
-  seam: 0.2,
-  move: {
-    hat: [0, -0.035, 0],
-    band: [0, -0.035, 0]
-  }
+ "skin": "#cd927c",
+ "flat": {
+  "soles": "#2a1d16",
+  "hair": "#7c4528"
+ },
+ "rough": {
+  "boots": 0.5,
+  "belt": 0.5,
+  "brass": 0.35,
+  "boot": 0.5,
+  "hair": 0.9
+ },
+ "seam": 0.2,
+ "move": {
+  "hat": [
+   0,
+   -0.035,
+   0
+  ],
+  "band": [
+   0,
+   -0.035,
+   0
+  ]
+ }
 };
       return SKIN; })(),
     person: function () {
@@ -5595,15 +5694,45 @@ const PERSON = {
   },
 };
       return PERSON; } },
-  "fair-baker": { name: "Fair Baker", who: "A stout, cheerful baker who sells warm loaves and buns from his oven cart at the night fair.", shapes: "shapes by Fable 5.2", skin: "baker-A", fit: {"front": [1.10494, 1.0412, -0.05247, -0.00596], "back": [1.11111, 1.0412, -0.05556, -0.00596]}, faceFit: [1, 0, 0], skinColour: "#d0826c",
+  "fair-baker": { name: "Fair Baker", who: "A stout, cheerful baker who sells warm loaves and buns from his oven cart at the night fair.", shapes: "shapes by Fable 5.2", skin: "baker-A", fit: {"front": [1.10494, 1.0412, -0.05247, -0.00596], "back": [1.11111, 1.0412, -0.05556, -0.00596]}, faceFit: [1, 0, 0], skinColour: "#d0826c", scale: {},
     wiring: {"talk": ["talk_lively", "talk_calm"], "greet": "wave", "fidgets": ["fidget_shift"], "pace": 0.96, "likes": ["laugh", "thanks", "beckon"], "moods": {"yes": "nod", "no": "shake_head", "happy": "laugh", "unsure": "think", "upset": "sad", "thanks": "thanks", "bye": "wave"}},
     SKIN: (function () {
 const SKIN = {
-  skin: '#d0826c',
-  flat: { hair: '#5a3b28', soles: '#2a1d16' },
-  rough: { boots: 0.5, apron: 0.9, cap: 0.9 },
-  seam: 0.2,
-  move: { cap: [0, -0.045, 0], capband: [0, -0.045, 0] },
+ "skin": "#d0826c",
+ "flat": {
+  "hair": "#5a3b28",
+  "soles": "#2a1d16"
+ },
+ "rough": {
+  "boots": 0.5,
+  "apron": 0.9,
+  "cap": 0.9
+ },
+ "seam": 0.2,
+ "move": {
+  "cap": [
+   0,
+   -0.045,
+   0
+  ],
+  "capband": [
+   0,
+   -0.045,
+   0
+  ],
+  "beard": [
+   0,
+   0.005,
+   -0.012
+  ]
+ },
+ "size": {
+  "beard": [
+   0.9,
+   0.88,
+   0.72
+  ]
+ }
 };
       return SKIN; })(),
     person: function () {
@@ -5654,17 +5783,66 @@ const PERSON = {
   },
 };
       return PERSON; } },
-  "ribbon-dyer": { name: "Ribbon Dyer", who: "An old, quiet dyer who boils and sells dyed ribbons and cloth lengths from a steaming stall at the fair.", shapes: "shapes by Fable 5.2", skin: "baker-B", fit: {"front": [1.0216, 1.0078, -0.01145, -0.00039], "back": [1.0216, 1.0078, -0.01015, -0.00039]}, faceFit: [1, 0, 0], skinColour: "#af9f83",
+  "ribbon-dyer": { name: "Ribbon Dyer", who: "An old, quiet dyer who boils and sells dyed ribbons and cloth lengths from a steaming stall at the fair.", shapes: "shapes by Fable 5.2", skin: "baker-B", fit: {"front": [1.0216, 1.0078, -0.01145, -0.00039], "back": [1.0216, 1.0078, -0.01015, -0.00039]}, faceFit: [1, 0, 0], skinColour: "#af9f83", scale: {"height": 0.97, "build": [1.12, 1.12], "head": [1.06, 1, 1.04]},
     wiring: {"talk": ["talk_calm"], "greet": "greet_bow", "fidgets": ["fidget_hands", "fidget_shift"], "pace": 0.8, "likes": ["think", "shrug", "nod"], "moods": {"yes": "nod", "no": "shake_head", "happy": "nod", "unsure": "shrug", "upset": "sad", "thanks": "greet_bow", "bye": "nod"}},
     SKIN: (function () {
 const SKIN = {
-  front: { scale: [1.03, 1.03], move: [0, 0.015] },
-  back:  { scale: [1.03, 1.03], move: [0, 0.015] },
-  skin: '#b48a6d',
-  flat: { hair: '#5c5754', soles: '#2a2522' },
-  rough: { boots: 0.5 },
-  seam: 0.25,
-  move: { cap: [0, -0.035, 0], capband: [0, -0.035, 0] },
+ "front": {
+  "scale": [
+   1.03,
+   1.03
+  ],
+  "move": [
+   0,
+   0.015
+  ]
+ },
+ "back": {
+  "scale": [
+   1.03,
+   1.03
+  ],
+  "move": [
+   0,
+   0.015
+  ]
+ },
+ "skin": "#a8917f",
+ "flat": {
+  "hair": "#4e4a47",
+  "soles": "#2a2522",
+  "beard": "#857f78"
+ },
+ "rough": {
+  "boots": 0.5,
+  "hair": 0.95,
+  "beard": 0.95
+ },
+ "seam": 0.25,
+ "move": {
+  "cap": [
+   0,
+   -0.035,
+   0
+  ],
+  "capband": [
+   0,
+   -0.035,
+   0
+  ],
+  "beard": [
+   0,
+   0.04,
+   -0.06
+  ]
+ },
+ "size": {
+  "beard": [
+   0.05,
+   0.05,
+   0.05
+  ]
+ }
 };
       return SKIN; })(),
     person: function () {
@@ -5715,23 +5893,34 @@ const PERSON = {
   },
 };
       return PERSON; } },
-  "farm-lad": { name: "Farm lad", who: "A cheerful young farmhand who carts hay and feed for the fair's ponies and stays on at night to help.", shapes: "shapes by Fable 5.2", skin: "farmhand-A", fit: {"front": [1.00617, 1.01945, -0.00309, -0.00195], "back": [1.00309, 1.01945, -0.00089, -0.00195]}, faceFit: [1, 0, 0], skinColour: "#d99789",
+  "farm-lad": { name: "Farm lad", who: "A cheerful young farmhand who carts hay and feed for the fair's ponies and stays on at night to help.", shapes: "shapes by Fable 5.2", skin: "farmhand-A", fit: {"front": [1.00617, 1.01945, -0.00309, -0.00195], "back": [1.00309, 1.01945, -0.00089, -0.00195]}, faceFit: [1, 0, 0], skinColour: "#d99789", scale: {"height": 1.01, "build": [1, 0.98], "head": [1.02, 1, 1]},
     wiring: {"talk": ["talk_lively"], "greet": "wave", "fidgets": ["fidget_shift", "fidget_look", "fidget_hands"], "pace": 1.15, "likes": ["wave", "laugh", "surprised"], "moods": {"yes": "nod", "no": "shake_head", "happy": "laugh", "unsure": "shrug", "upset": "sad", "thanks": "thanks", "bye": "wave"}},
     SKIN: (function () {
 const SKIN = {
-  skin: '#d99789',
-  flat: {
-    hair: '#7b5a38',    // hair around the face was picking up painted forehead and cheek
-    straw: '#d6a85a',   // the brim was picking up dark streaks instead of straw
-    button: '#5a3a24',  // small buttons that stick out forward
-    soles: '#2a1d16'
-  },
-  rough: { boots: 0.6, straw: 0.8 },
-  seam: 0.2,
-  move: {
-    straw: [0, -0.05, 0],   // hat pulled down so the brim sits just above the brows
-    band:  [0, -0.05, 0]    // band moves with the hat
-  }
+ "skin": "#d99789",
+ "flat": {
+  "hair": "#7b5a38",
+  "straw": "#d6a85a",
+  "button": "#5a3a24",
+  "soles": "#2a1d16"
+ },
+ "rough": {
+  "boots": 0.6,
+  "straw": 0.9
+ },
+ "seam": 0.2,
+ "move": {
+  "straw": [
+   0,
+   -0.035,
+   0
+  ],
+  "band": [
+   0,
+   -0.035,
+   0
+  ]
+ }
 };
       return SKIN; })(),
     person: function () {
@@ -5779,23 +5968,34 @@ const PERSON = {
   },
 };
       return PERSON; } },
-  "gate-keeper": { name: "Gate keeper", who: "A stern middle-aged woman who takes the coins at the fair gate and watches who comes and goes after dark.", shapes: "shapes by Fable 5.2", skin: "farmhand-B", fit: {"front": [1.00926, 1.00801, -0.00528, -0.00138], "back": [1.00926, 1.00801, -0.00528, -0.00138]}, faceFit: [1, 0, 0], skinColour: "#4e291c",
+  "gate-keeper": { name: "Gate keeper", who: "A stern middle-aged woman who takes the coins at the fair gate and watches who comes and goes after dark.", shapes: "shapes by Fable 5.2", skin: "farmhand-B", fit: {"front": [1.00926, 1.00801, -0.00528, -0.00138], "back": [1.00926, 1.00801, -0.00528, -0.00138]}, faceFit: [1, 0, 0], skinColour: "#4e291c", scale: {},
     wiring: {"talk": ["talk_gruff"], "greet": "beckon", "fidgets": ["fidget_look"], "pace": 1, "likes": ["cross", "refuse", "point"], "moods": {"yes": "nod", "no": "refuse", "happy": "nod", "unsure": "think", "upset": "cross", "thanks": "nod", "bye": "point"}},
     SKIN: (function () {
 const SKIN = {
-  skin: '#5e3222',
-  flat: {
-    hair: '#433f3e',
-    button: '#8c6b3c',
-    patch: '#4d5238',
-    soles: '#2a2523'
-  },
-  rough: { boots: 0.5 },
-  seam: 0.2,
-  move: {
-    straw: [0, -0.03, 0],
-    band: [0, -0.03, 0]
-  }
+ "skin": "#5e3222",
+ "flat": {
+  "hair": "#2f2b29",
+  "button": "#8c6b3c",
+  "patch": "#4d5238",
+  "soles": "#2a2523"
+ },
+ "rough": {
+  "boots": 0.5,
+  "hair": 0.95
+ },
+ "seam": 0.2,
+ "move": {
+  "straw": [
+   0,
+   -0.03,
+   0
+  ],
+  "band": [
+   0,
+   -0.03,
+   0
+  ]
+ }
 };
       return SKIN; })(),
     person: function () {
@@ -5843,15 +6043,34 @@ const PERSON = {
   },
 };
       return PERSON; } },
-  "fortune-teller-opus": { name: "Fortune-teller", who: "A tall, thin fortune-teller who reads palms and cards in a dim tent at the edge of the fair.", shapes: "shapes by Opus 5.5", skin: "fortune-A", fit: {"front": [1.02023, 1.00467, -0.01077, -0.00121], "back": [1.02023, 1.0035, -0.01077, -0.00115]}, faceFit: [1, 0, 0], skinColour: "#c7b0b2",
+  "fortune-teller-opus": { name: "Fortune-teller", who: "A tall, thin fortune-teller who reads palms and cards in a dim tent at the edge of the fair.", shapes: "shapes by Opus 5.5", skin: "fortune-A", fit: {"front": [1.02023, 1.00467, -0.01077, -0.00121], "back": [1.02023, 1.0035, -0.01077, -0.00115]}, faceFit: [1, 0, 0], skinColour: "#c7b0b2", scale: {"height": 1.05, "build": [0.92, 0.95], "head": [1, 1, 1]},
     wiring: {"talk": ["talk_calm"], "greet": "beckon", "fidgets": ["fidget_hands"], "pace": 0.94, "likes": ["think", "beckon", "point"], "moods": {"yes": "nod", "no": "refuse", "happy": "nod", "unsure": "think", "upset": "cross", "thanks": "greet_bow", "bye": "greet_bow"}},
     SKIN: (function () {
 const SKIN = {
-  skin: '#d6c8ca',
-  flat: { soles: '#1c1618' },
-  rough: { boots: 0.5, gold: 0.35, sash: 0.8 },
-  seam: 0.2,
-  move: { scarf: [0, -0.03, 0], gold: [0, -0.03, 0] },
+ "skin": "#d6c8ca",
+ "flat": {
+  "soles": "#1c1618",
+  "hair": "#17131a"
+ },
+ "rough": {
+  "boots": 0.5,
+  "gold": 0.35,
+  "sash": 0.8,
+  "hair": 0.85
+ },
+ "seam": 0.2,
+ "move": {
+  "scarf": [
+   0,
+   -0.018,
+   0
+  ],
+  "gold": [
+   0,
+   -0.018,
+   0
+  ]
+ }
 };
       return SKIN; })(),
     person: function () {
@@ -5909,13 +6128,29 @@ const PERSON = {
   },
 };
       return PERSON; } },
-  "old-lamplighter-opus": { name: "Old lamplighter", who: "An elderly man who walks the fair at dusk, lighting and trimming the lanterns along the stalls.", shapes: "shapes by Opus 5.5", skin: "fortune-B", fit: {"front": [1.01734, 1.00701, -0.00997, -0.00133], "back": [1.02023, 1.00701, -0.01077, -0.00133]}, faceFit: [1, 0, 0], skinColour: "#af7353",
+  "old-lamplighter-opus": { name: "Old lamplighter", who: "An elderly man who walks the fair at dusk, lighting and trimming the lanterns along the stalls.", shapes: "shapes by Opus 5.5", skin: "fortune-B", fit: {"front": [1.01734, 1.00701, -0.00997, -0.00133], "back": [1.02023, 1.00701, -0.01077, -0.00133]}, faceFit: [1, 0, 0], skinColour: "#af7353", scale: {"height": 1.02, "build": [0.96, 0.96], "head": [1, 1, 1]},
     wiring: {"talk": ["talk_calm"], "greet": "wave", "fidgets": ["fidget_look", "fidget_shift"], "pace": 0.85, "likes": ["point", "nod", "wave"], "moods": {"yes": "nod", "no": "shake_head", "happy": "laugh", "unsure": "shrug", "upset": "sad", "thanks": "thanks", "bye": "wave"}},
     SKIN: (function () {
 const SKIN = {
-  skin: "#af7353",
-  flat: { hair: "#8c847a" },
-  move: { scarf: [0, -0.03, 0], gold: [0, -0.03, 0] },
+ "skin": "#af7353",
+ "flat": {
+  "hair": "#7a736a"
+ },
+ "move": {
+  "scarf": [
+   0,
+   -0.03,
+   0
+  ],
+  "gold": [
+   0,
+   -0.03,
+   0
+  ]
+ },
+ "rough": {
+  "hair": 0.95
+ }
 };
       return SKIN; })(),
     person: function () {
@@ -5973,20 +6208,33 @@ const PERSON = {
   },
 };
       return PERSON; } },
-  "old-night-watchman-opus": { name: "Old night-watchman", who: "An old night-watchman who walks the fair rows after dark, checking stall shutters and lamps.", shapes: "shapes by Opus 5.5", skin: "watchman-A", fit: {"front": [1.01852, 1.01302, -0.01056, -0.00553], "back": [1.01543, 1.01302, -0.00707, -0.00553]}, faceFit: [1, 0, 0], skinColour: "#4f2a1d",
+  "old-night-watchman-opus": { name: "Old night-watchman", who: "An old night-watchman who walks the fair rows after dark, checking stall shutters and lamps.", shapes: "shapes by Opus 5.5", skin: "watchman-A", fit: {"front": [1.01852, 1.01302, -0.01056, -0.00553], "back": [1.01543, 1.01302, -0.00707, -0.00553]}, faceFit: [1, 0, 0], skinColour: "#4f2a1d", scale: {"height": 1.01, "build": [1.1, 1.08], "head": [1, 1, 1]},
     wiring: {"talk": ["talk_calm", "talk_gruff"], "greet": "nod", "fidgets": ["fidget_look"], "pace": 0.88, "likes": ["point", "nod", "cross"], "moods": {"yes": "nod", "no": "shake_head", "happy": "nod", "unsure": "think", "upset": "cross", "thanks": "nod", "bye": "wave"}},
     SKIN: (function () {
 const SKIN = {
-  skin: '#6e4230',
-  flat: {
-    soles: '#231c18'
-  },
-  rough: { boots: 0.5, belt: 0.45, brass: 0.3, hatband: 0.8 },
-  seam: 0.2,
-  move: {
-    hat: [0, -0.03, 0],
-    hatband: [0, -0.03, 0]
-  }
+ "skin": "#6e4230",
+ "flat": {
+  "soles": "#231c18"
+ },
+ "rough": {
+  "boots": 0.5,
+  "belt": 0.45,
+  "brass": 0.3,
+  "hatband": 0.8
+ },
+ "seam": 0.2,
+ "move": {
+  "hat": [
+   0,
+   -0.03,
+   0
+  ],
+  "hatband": [
+   0,
+   -0.03,
+   0
+  ]
+ }
 };
       return SKIN; })(),
     person: function () {
@@ -6032,21 +6280,33 @@ const PERSON = {
   },
 };
       return PERSON; } },
-  "chestnut-roaster-opus": { name: "Chestnut roaster", who: "A cheerful middle-aged man who roasts chestnuts over a brazier at the fair gate.", shapes: "shapes by Opus 5.5", skin: "watchman-B", fit: {"front": [1.01543, 1.04013, -0.00837, -0.01274], "back": [1.01235, 1.04013, -0.00747, -0.01274]}, faceFit: [1, 0, 0], skinColour: "#d99c8d",
+  "chestnut-roaster-opus": { name: "Chestnut roaster", who: "A cheerful middle-aged man who roasts chestnuts over a brazier at the fair gate.", shapes: "shapes by Opus 5.5", skin: "watchman-B", fit: {"front": [1.01543, 1.04013, -0.00837, -0.01274], "back": [1.01235, 1.04013, -0.00747, -0.01274]}, faceFit: [1, 0, 0], skinColour: "#d99c8d", scale: {"height": 1.04, "build": [1.1, 1.08], "head": [1, 1, 1]},
     wiring: {"talk": ["talk_lively"], "greet": "beckon", "fidgets": ["fidget_hands", "fidget_shift"], "pace": 1.05, "likes": ["laugh", "beckon", "wave"], "moods": {"yes": "nod", "no": "shake_head", "happy": "laugh", "unsure": "shrug", "upset": "sad", "thanks": "thanks", "bye": "wave"}},
     SKIN: (function () {
 const SKIN = {
-  skin: '#c98f79',
-  flat: {
-    hair: '#7c4528',
-    beard: '#8a5233',
-    soles: '#2a1d16'
-  },
-  rough: { boots: 0.5, belt: 0.5, brass: 0.3 },
-  move: {
-    hat: [0, -0.04, 0],
-    hatband: [0, -0.04, 0]
-  }
+ "skin": "#c98f79",
+ "flat": {
+  "hair": "#7c4528",
+  "soles": "#2a1d16"
+ },
+ "rough": {
+  "boots": 0.5,
+  "belt": 0.5,
+  "brass": 0.3,
+  "hair": 0.9
+ },
+ "move": {
+  "hat": [
+   0,
+   -0.04,
+   0
+  ],
+  "hatband": [
+   0,
+   -0.04,
+   0
+  ]
+ }
 };
       return SKIN; })(),
     person: function () {
@@ -6092,7 +6352,7 @@ const PERSON = {
   },
 };
       return PERSON; } },
-  "fair-baker-opus": { name: "Fair Baker", who: "A stout, cheerful baker who sells warm loaves and buns from his oven cart at the night fair.", shapes: "shapes by Opus 5.5", skin: "baker-A", fit: {"front": [1.10494, 1.0412, -0.05247, -0.00596], "back": [1.11111, 1.0412, -0.05556, -0.00596]}, faceFit: [1, 0, 0], skinColour: "#d0826c",
+  "fair-baker-opus": { name: "Fair Baker", who: "A stout, cheerful baker who sells warm loaves and buns from his oven cart at the night fair.", shapes: "shapes by Opus 5.5", skin: "baker-A", fit: {"front": [1.10494, 1.0412, -0.05247, -0.00596], "back": [1.11111, 1.0412, -0.05556, -0.00596]}, faceFit: [1, 0, 0], skinColour: "#d0826c", scale: {},
     wiring: {"talk": ["talk_lively", "talk_calm"], "greet": "wave", "fidgets": ["fidget_shift"], "pace": 0.96, "likes": ["laugh", "thanks", "beckon"], "moods": {"yes": "nod", "no": "shake_head", "happy": "laugh", "unsure": "think", "upset": "sad", "thanks": "thanks", "bye": "wave"}},
     SKIN: (function () {
 const SKIN = {
@@ -6151,17 +6411,57 @@ const PERSON = {
   },
 };
       return PERSON; } },
-  "ribbon-dyer-opus": { name: "Ribbon Dyer", who: "An old, quiet dyer who boils and sells dyed ribbons and cloth lengths from a steaming stall at the fair.", shapes: "shapes by Opus 5.5", skin: "baker-B", fit: {"front": [1.0216, 1.0078, -0.01145, -0.00039], "back": [1.0216, 1.0078, -0.01015, -0.00039]}, faceFit: [1, 0, 0], skinColour: "#af9f83",
+  "ribbon-dyer-opus": { name: "Ribbon Dyer", who: "An old, quiet dyer who boils and sells dyed ribbons and cloth lengths from a steaming stall at the fair.", shapes: "shapes by Opus 5.5", skin: "baker-B", fit: {"front": [1.0216, 1.0078, -0.01145, -0.00039], "back": [1.0216, 1.0078, -0.01015, -0.00039]}, faceFit: [1, 0, 0], skinColour: "#af9f83", scale: {"height": 0.97, "build": [1.12, 1.1], "head": [1.06, 1, 1.04]},
     wiring: {"talk": ["talk_calm"], "greet": "greet_bow", "fidgets": ["fidget_hands", "fidget_shift"], "pace": 0.8, "likes": ["think", "shrug", "nod"], "moods": {"yes": "nod", "no": "shake_head", "happy": "nod", "unsure": "shrug", "upset": "sad", "thanks": "greet_bow", "bye": "nod"}},
     SKIN: (function () {
 const SKIN = {
-  front: { scale: [1.04, 1.01], move: [0, 0.01] },
-  back:  { scale: [1.04, 1.01], move: [0, 0.01] },
-  skin: '#b48a70',
-  flat: { hair: '#76726c', beard: '#9c968e', soles: '#231c18' },
-  rough: { boots: 0.5, apron: 0.8 },
-  seam: 0.25,
-  move: { cap: [0, -0.03, 0] },
+ "front": {
+  "scale": [
+   1.04,
+   1.01
+  ],
+  "move": [
+   0,
+   0.01
+  ]
+ },
+ "back": {
+  "scale": [
+   1.04,
+   1.01
+  ],
+  "move": [
+   0,
+   0.01
+  ]
+ },
+ "skin": "#a8917f",
+ "flat": {
+  "hair": "#4e4a47",
+  "beard": "#857f78",
+  "soles": "#231c18"
+ },
+ "rough": {
+  "boots": 0.5,
+  "apron": 0.8,
+  "hair": 0.95,
+  "beard": 0.95
+ },
+ "seam": 0.25,
+ "move": {
+  "cap": [
+   0,
+   -0.03,
+   0
+  ]
+ },
+ "size": {
+  "beard": [
+   0.94,
+   0.85,
+   0.9
+  ]
+ }
 };
       return SKIN; })(),
     person: function () {
@@ -6213,21 +6513,45 @@ const PERSON = {
   },
 };
       return PERSON; } },
-  "farm-lad-opus": { name: "Farm lad", who: "A cheerful young farmhand who carts hay and feed for the fair's ponies and stays on at night to help.", shapes: "shapes by Opus 5.5", skin: "farmhand-A", fit: {"front": [1.00617, 1.01945, -0.00309, -0.00195], "back": [1.00309, 1.01945, -0.00089, -0.00195]}, faceFit: [1, 0, 0], skinColour: "#d99789",
+  "farm-lad-opus": { name: "Farm lad", who: "A cheerful young farmhand who carts hay and feed for the fair's ponies and stays on at night to help.", shapes: "shapes by Opus 5.5", skin: "farmhand-A", fit: {"front": [1.00617, 1.01945, -0.00309, -0.00195], "back": [1.00309, 1.01945, -0.00089, -0.00195]}, faceFit: [1, 0, 0], skinColour: "#d99789", scale: {"height": 1.01, "build": [1.03, 1], "head": [1.04, 1, 1]},
     wiring: {"talk": ["talk_lively"], "greet": "wave", "fidgets": ["fidget_shift", "fidget_look", "fidget_hands"], "pace": 1.15, "likes": ["wave", "laugh", "surprised"], "moods": {"yes": "nod", "no": "shake_head", "happy": "laugh", "unsure": "shrug", "upset": "sad", "thanks": "thanks", "bye": "wave"}},
     SKIN: (function () {
 const SKIN = {
-  skin: '#d69a86',
-  flat: {
-    straw: '#d0a253',   // the brim was picking up pink from the painted face behind it
-    soles: '#2a1d16'
-  },
-  rough: { boots: 0.6, straw: 0.9, brass: 0.35 },
-  seam: 0.2,
-  move: {
-    straw: [0, -0.025, 0],   // hat lowered 2.5 cm so the brim sits just above the brows
-    band:  [0, -0.025, 0]    // band moves with it
-  }
+ "skin": "#d69a86",
+ "flat": {
+  "straw": "#d0a253",
+  "soles": "#2a1d16"
+ },
+ "rough": {
+  "boots": 0.6,
+  "straw": 0.9,
+  "brass": 0.35
+ },
+ "seam": 0.2,
+ "move": {
+  "straw": [
+   0,
+   -0.025,
+   0
+  ],
+  "band": [
+   0,
+   -0.025,
+   0
+  ]
+ },
+ "size": {
+  "straw": [
+   0.8,
+   1,
+   0.8
+  ],
+  "band": [
+   0.8,
+   1,
+   0.8
+  ]
+ }
 };
       return SKIN; })(),
     person: function () {
@@ -6273,14 +6597,44 @@ const PERSON = {
   },
 };
       return PERSON; } },
-  "gate-keeper-opus": { name: "Gate keeper", who: "A stern middle-aged woman who takes the coins at the fair gate and watches who comes and goes after dark.", shapes: "shapes by Opus 5.5", skin: "farmhand-B", fit: {"front": [1.00926, 1.00801, -0.00528, -0.00138], "back": [1.00926, 1.00801, -0.00528, -0.00138]}, faceFit: [1, 0, 0], skinColour: "#4e291c",
+  "gate-keeper-opus": { name: "Gate keeper", who: "A stern middle-aged woman who takes the coins at the fair gate and watches who comes and goes after dark.", shapes: "shapes by Opus 5.5", skin: "farmhand-B", fit: {"front": [1.00926, 1.00801, -0.00528, -0.00138], "back": [1.00926, 1.00801, -0.00528, -0.00138]}, faceFit: [1, 0, 0], skinColour: "#4e291c", scale: {},
     wiring: {"talk": ["talk_gruff"], "greet": "beckon", "fidgets": ["fidget_look"], "pace": 1, "likes": ["cross", "refuse", "point"], "moods": {"yes": "nod", "no": "refuse", "happy": "nod", "unsure": "think", "upset": "cross", "thanks": "nod", "bye": "point"}},
     SKIN: (function () {
 const SKIN = {
-  skin: '#6a3d2a',
-  flat: { hair: '#3b3837', soles: '#2a2522' },
-  rough: { boots: 0.5, brass: 0.35 },
-  move: { straw: [0, -0.035, 0], band: [0, -0.035, 0] },
+ "skin": "#6a3d2a",
+ "flat": {
+  "hair": "#2f2b29",
+  "soles": "#2a2522"
+ },
+ "rough": {
+  "boots": 0.5,
+  "brass": 0.35,
+  "hair": 0.95
+ },
+ "move": {
+  "straw": [
+   0,
+   -0.012,
+   0
+  ],
+  "band": [
+   0,
+   -0.012,
+   0
+  ]
+ },
+ "size": {
+  "straw": [
+   0.8,
+   1,
+   0.8
+  ],
+  "band": [
+   0.8,
+   1,
+   0.8
+  ]
+ }
 };
       return SKIN; })(),
     person: function () {
@@ -6352,7 +6706,7 @@ window.MF_NPC_TEX = {"lampseller-A": {"body": "data:image/webp;base64,UklGRsAkAQ
   const hash = (s) => { let h = 2166136261; for (let i = 0; i < s.length; i++) { h ^= s.charCodeAt(i); h = Math.imul(h, 16777619); } return h >>> 0; };
   async function make(id, o) {
     o = o || {}; const D = window.MF_NPCS.people[id]; if (!D) throw new Error('no person called ' + id);
-    const T = window.MF_NPC_TEX[D.skin], person = D.person(), W = D.wiring || {};
+    const T = window.MF_NPC_TEX[D.skin], person = Object.assign(D.person(), D.scale || {}), W = D.wiring || {};
     const prepared = await window.MF_PERSON.prepare(person, { body: T.body, face: T.face, fit: D.fit, faceFit: D.faceFit, skin: D.skinColour, SKIN: D.SKIN });
     const J = window.MF_PERSON.make(person, prepared, o.opts); J.fx.remove(J.spellLight);
     const E = window.MF_EMOTES(J.FP), all = Object.keys(E);

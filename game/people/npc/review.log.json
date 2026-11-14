@@ -1,0 +1,795 @@
+{
+ "model": "claude-fable-5-2",
+ "effort": "high",
+ "rounds": [
+  {
+   "n": 1,
+   "seconds": 229.9,
+   "usage": {
+    "input_tokens": 19788,
+    "output_tokens": 21081,
+    "cache_creation_input_tokens": 1623,
+    "cache_read_input_tokens": 0
+   },
+   "cost": 1.017774,
+   "fixed": [
+    "ballad-singer",
+    "chestnut-roaster",
+    "chestnut-roaster-opus",
+    "fair-baker",
+    "farm-lad",
+    "farm-lad-opus",
+    "fortune-teller",
+    "fortune-teller-opus",
+    "gate-keeper",
+    "gate-keeper-opus",
+    "old-lamp-seller",
+    "old-lamplighter",
+    "old-lamplighter-opus",
+    "old-night-watchman",
+    "old-night-watchman-opus",
+    "pie-seller",
+    "ribbon-dyer",
+    "ribbon-dyer-opus"
+   ]
+  },
+  {
+   "n": 2,
+   "seconds": 41.6,
+   "usage": {
+    "input_tokens": 60180,
+    "output_tokens": 3669,
+    "cache_creation_input_tokens": 0,
+    "cache_read_input_tokens": 1623
+   },
+   "cost": 0.6285246,
+   "fixed": [
+    "gate-keeper-opus",
+    "ribbon-dyer"
+   ]
+  },
+  {
+   "n": 3,
+   "seconds": 5.9,
+   "usage": {
+    "input_tokens": 69151,
+    "output_tokens": 478,
+    "cache_creation_input_tokens": 0,
+    "cache_read_input_tokens": 1623
+   },
+   "cost": 0.5726526,
+   "fixed": []
+  }
+ ],
+ "changed": {
+  "old-lamp-seller": {
+   "scale": {
+    "height": 0.91,
+    "build": [
+     1.08,
+     1.06
+    ],
+    "head": [
+     1.04,
+     0.99,
+     1
+    ]
+   },
+   "SKIN": {
+    "skin": "#b9917a",
+    "flat": {
+     "hair": "#6f6a64",
+     "sleeve": "#465034",
+     "soles": "#2a1d16"
+    },
+    "rough": {
+     "belt": 0.45,
+     "boots": 0.55,
+     "hair": 0.95
+    },
+    "seam": 0.2
+   }
+  },
+  "pie-seller": {
+   "scale": {
+    "height": 0.95,
+    "build": [
+     1.15,
+     1.12
+    ],
+    "head": [
+     0.98,
+     0.99,
+     0.96
+    ]
+   },
+   "SKIN": {
+    "skin": "#78412d",
+    "rough": {
+     "hair": 0.9
+    }
+   }
+  },
+  "ballad-singer": {
+   "scale": {
+    "height": 0.98,
+    "build": [
+     0.98,
+     0.97
+    ],
+    "head": [
+     1.04,
+     1,
+     1.03
+    ]
+   },
+   "SKIN": {
+    "skin": "#e5b8ae"
+   }
+  },
+  "fortune-teller": {
+   "scale": {
+    "height": 1.05,
+    "build": [
+     0.93,
+     0.94
+    ],
+    "head": [
+     1,
+     1,
+     1
+    ]
+   },
+   "SKIN": {
+    "front": {
+     "scale": [
+      1.04,
+      1
+     ],
+     "move": [
+      0,
+      0.01
+     ]
+    },
+    "back": {
+     "scale": [
+      1.04,
+      1
+     ],
+     "move": [
+      0,
+      0.01
+     ]
+    },
+    "skin": "#d9c1bc",
+    "flat": {
+     "hair": "#17131a",
+     "soles": "#1c161a"
+    },
+    "rough": {
+     "gold": 0.35,
+     "boots": 0.5,
+     "hair": 0.85
+    },
+    "seam": 0.2,
+    "move": {
+     "scarf": [
+      0,
+      -0.012,
+      0
+     ],
+     "gold": [
+      0,
+      -0.012,
+      0
+     ]
+    }
+   }
+  },
+  "old-lamplighter": {
+   "scale": {
+    "height": 1.02,
+    "build": [
+     0.96,
+     0.96
+    ],
+    "head": [
+     1,
+     1,
+     1
+    ]
+   },
+   "SKIN": {
+    "skin": "#af7353",
+    "flat": {
+     "hair": "#7a736a"
+    },
+    "seam": 0.2,
+    "move": {
+     "scarf": [
+      0,
+      -0.012,
+      0
+     ],
+     "gold": [
+      0,
+      -0.012,
+      0
+     ]
+    },
+    "rough": {
+     "hair": 0.95
+    }
+   }
+  },
+  "old-night-watchman": {
+   "scale": {
+    "height": 1.01,
+    "build": [
+     1.1,
+     1.08
+    ],
+    "head": [
+     1,
+     1,
+     1
+    ]
+   },
+   "SKIN": {
+    "skin": "#6b4030",
+    "flat": {
+     "hair": "#5a5855",
+     "soles": "#1e1b18"
+    },
+    "rough": {
+     "boots": 0.5,
+     "belt": 0.45,
+     "brass": 0.35,
+     "hair": 0.95
+    },
+    "move": {
+     "hat": [
+      0,
+      -0.03,
+      0
+     ],
+     "band": [
+      0,
+      -0.03,
+      0
+     ]
+    }
+   }
+  },
+  "chestnut-roaster": {
+   "scale": {
+    "height": 1.04,
+    "build": [
+     1.1,
+     1.08
+    ],
+    "head": [
+     1,
+     1,
+     1
+    ]
+   },
+   "SKIN": {
+    "skin": "#cd927c",
+    "flat": {
+     "soles": "#2a1d16",
+     "hair": "#7c4528"
+    },
+    "rough": {
+     "boots": 0.5,
+     "belt": 0.5,
+     "brass": 0.35,
+     "boot": 0.5,
+     "hair": 0.9
+    },
+    "seam": 0.2,
+    "move": {
+     "hat": [
+      0,
+      -0.035,
+      0
+     ],
+     "band": [
+      0,
+      -0.035,
+      0
+     ]
+    }
+   }
+  },
+  "fair-baker": {
+   "scale": {},
+   "SKIN": {
+    "skin": "#d0826c",
+    "flat": {
+     "hair": "#5a3b28",
+     "soles": "#2a1d16"
+    },
+    "rough": {
+     "boots": 0.5,
+     "apron": 0.9,
+     "cap": 0.9
+    },
+    "seam": 0.2,
+    "move": {
+     "cap": [
+      0,
+      -0.045,
+      0
+     ],
+     "capband": [
+      0,
+      -0.045,
+      0
+     ],
+     "beard": [
+      0,
+      0.005,
+      -0.012
+     ]
+    },
+    "size": {
+     "beard": [
+      0.9,
+      0.88,
+      0.72
+     ]
+    }
+   }
+  },
+  "ribbon-dyer": {
+   "scale": {
+    "height": 0.97,
+    "build": [
+     1.12,
+     1.12
+    ],
+    "head": [
+     1.06,
+     1,
+     1.04
+    ]
+   },
+   "SKIN": {
+    "front": {
+     "scale": [
+      1.03,
+      1.03
+     ],
+     "move": [
+      0,
+      0.015
+     ]
+    },
+    "back": {
+     "scale": [
+      1.03,
+      1.03
+     ],
+     "move": [
+      0,
+      0.015
+     ]
+    },
+    "skin": "#a8917f",
+    "flat": {
+     "hair": "#4e4a47",
+     "soles": "#2a2522",
+     "beard": "#857f78"
+    },
+    "rough": {
+     "boots": 0.5,
+     "hair": 0.95,
+     "beard": 0.95
+    },
+    "seam": 0.25,
+    "move": {
+     "cap": [
+      0,
+      -0.035,
+      0
+     ],
+     "capband": [
+      0,
+      -0.035,
+      0
+     ],
+     "beard": [
+      0,
+      0.04,
+      -0.06
+     ]
+    },
+    "size": {
+     "beard": [
+      0.05,
+      0.05,
+      0.05
+     ]
+    }
+   }
+  },
+  "farm-lad": {
+   "scale": {
+    "height": 1.01,
+    "build": [
+     1,
+     0.98
+    ],
+    "head": [
+     1.02,
+     1,
+     1
+    ]
+   },
+   "SKIN": {
+    "skin": "#d99789",
+    "flat": {
+     "hair": "#7b5a38",
+     "straw": "#d6a85a",
+     "button": "#5a3a24",
+     "soles": "#2a1d16"
+    },
+    "rough": {
+     "boots": 0.6,
+     "straw": 0.9
+    },
+    "seam": 0.2,
+    "move": {
+     "straw": [
+      0,
+      -0.035,
+      0
+     ],
+     "band": [
+      0,
+      -0.035,
+      0
+     ]
+    }
+   }
+  },
+  "gate-keeper": {
+   "scale": {},
+   "SKIN": {
+    "skin": "#5e3222",
+    "flat": {
+     "hair": "#2f2b29",
+     "button": "#8c6b3c",
+     "patch": "#4d5238",
+     "soles": "#2a2523"
+    },
+    "rough": {
+     "boots": 0.5,
+     "hair": 0.95
+    },
+    "seam": 0.2,
+    "move": {
+     "straw": [
+      0,
+      -0.03,
+      0
+     ],
+     "band": [
+      0,
+      -0.03,
+      0
+     ]
+    }
+   }
+  },
+  "fortune-teller-opus": {
+   "scale": {
+    "height": 1.05,
+    "build": [
+     0.92,
+     0.95
+    ],
+    "head": [
+     1,
+     1,
+     1
+    ]
+   },
+   "SKIN": {
+    "skin": "#d6c8ca",
+    "flat": {
+     "soles": "#1c1618",
+     "hair": "#17131a"
+    },
+    "rough": {
+     "boots": 0.5,
+     "gold": 0.35,
+     "sash": 0.8,
+     "hair": 0.85
+    },
+    "seam": 0.2,
+    "move": {
+     "scarf": [
+      0,
+      -0.018,
+      0
+     ],
+     "gold": [
+      0,
+      -0.018,
+      0
+     ]
+    }
+   }
+  },
+  "old-lamplighter-opus": {
+   "scale": {
+    "height": 1.02,
+    "build": [
+     0.96,
+     0.96
+    ],
+    "head": [
+     1,
+     1,
+     1
+    ]
+   },
+   "SKIN": {
+    "skin": "#af7353",
+    "flat": {
+     "hair": "#7a736a"
+    },
+    "move": {
+     "scarf": [
+      0,
+      -0.03,
+      0
+     ],
+     "gold": [
+      0,
+      -0.03,
+      0
+     ]
+    },
+    "rough": {
+     "hair": 0.95
+    }
+   }
+  },
+  "old-night-watchman-opus": {
+   "scale": {
+    "height": 1.01,
+    "build": [
+     1.1,
+     1.08
+    ],
+    "head": [
+     1,
+     1,
+     1
+    ]
+   },
+   "SKIN": {
+    "skin": "#6e4230",
+    "flat": {
+     "soles": "#231c18"
+    },
+    "rough": {
+     "boots": 0.5,
+     "belt": 0.45,
+     "brass": 0.3,
+     "hatband": 0.8
+    },
+    "seam": 0.2,
+    "move": {
+     "hat": [
+      0,
+      -0.03,
+      0
+     ],
+     "hatband": [
+      0,
+      -0.03,
+      0
+     ]
+    }
+   }
+  },
+  "chestnut-roaster-opus": {
+   "scale": {
+    "height": 1.04,
+    "build": [
+     1.1,
+     1.08
+    ],
+    "head": [
+     1,
+     1,
+     1
+    ]
+   },
+   "SKIN": {
+    "skin": "#c98f79",
+    "flat": {
+     "hair": "#7c4528",
+     "soles": "#2a1d16"
+    },
+    "rough": {
+     "boots": 0.5,
+     "belt": 0.5,
+     "brass": 0.3,
+     "hair": 0.9
+    },
+    "move": {
+     "hat": [
+      0,
+      -0.04,
+      0
+     ],
+     "hatband": [
+      0,
+      -0.04,
+      0
+     ]
+    }
+   }
+  },
+  "ribbon-dyer-opus": {
+   "scale": {
+    "height": 0.97,
+    "build": [
+     1.12,
+     1.1
+    ],
+    "head": [
+     1.06,
+     1,
+     1.04
+    ]
+   },
+   "SKIN": {
+    "front": {
+     "scale": [
+      1.04,
+      1.01
+     ],
+     "move": [
+      0,
+      0.01
+     ]
+    },
+    "back": {
+     "scale": [
+      1.04,
+      1.01
+     ],
+     "move": [
+      0,
+      0.01
+     ]
+    },
+    "skin": "#a8917f",
+    "flat": {
+     "hair": "#4e4a47",
+     "beard": "#857f78",
+     "soles": "#231c18"
+    },
+    "rough": {
+     "boots": 0.5,
+     "apron": 0.8,
+     "hair": 0.95,
+     "beard": 0.95
+    },
+    "seam": 0.25,
+    "move": {
+     "cap": [
+      0,
+      -0.03,
+      0
+     ]
+    },
+    "size": {
+     "beard": [
+      0.94,
+      0.85,
+      0.9
+     ]
+    }
+   }
+  },
+  "farm-lad-opus": {
+   "scale": {
+    "height": 1.01,
+    "build": [
+     1.03,
+     1
+    ],
+    "head": [
+     1.04,
+     1,
+     1
+    ]
+   },
+   "SKIN": {
+    "skin": "#d69a86",
+    "flat": {
+     "straw": "#d0a253",
+     "soles": "#2a1d16"
+    },
+    "rough": {
+     "boots": 0.6,
+     "straw": 0.9,
+     "brass": 0.35
+    },
+    "seam": 0.2,
+    "move": {
+     "straw": [
+      0,
+      -0.025,
+      0
+     ],
+     "band": [
+      0,
+      -0.025,
+      0
+     ]
+    },
+    "size": {
+     "straw": [
+      0.8,
+      1,
+      0.8
+     ],
+     "band": [
+      0.8,
+      1,
+      0.8
+     ]
+    }
+   }
+  },
+  "gate-keeper-opus": {
+   "scale": {},
+   "SKIN": {
+    "skin": "#6a3d2a",
+    "flat": {
+     "hair": "#2f2b29",
+     "soles": "#2a2522"
+    },
+    "rough": {
+     "boots": 0.5,
+     "brass": 0.35,
+     "hair": 0.95
+    },
+    "move": {
+     "straw": [
+      0,
+      -0.012,
+      0
+     ],
+     "band": [
+      0,
+      -0.012,
+      0
+     ]
+    },
+    "size": {
+     "straw": [
+      0.8,
+      1,
+      0.8
+     ],
+     "band": [
+      0.8,
+      1,
+      0.8
+     ]
+    }
+   }
+  }
+ },
+ "cost": 2.2189512,
+ "seconds": 277.4
+}

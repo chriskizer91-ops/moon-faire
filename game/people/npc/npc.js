@@ -15,7 +15,7 @@
   const hash = (s) => { let h = 2166136261; for (let i = 0; i < s.length; i++) { h ^= s.charCodeAt(i); h = Math.imul(h, 16777619); } return h >>> 0; };
   async function make(id, o) {
     o = o || {}; const D = window.MF_NPCS.people[id]; if (!D) throw new Error('no person called ' + id);
-    const T = window.MF_NPC_TEX[D.skin], person = D.person(), W = D.wiring || {};
+    const T = window.MF_NPC_TEX[D.skin], person = Object.assign(D.person(), D.scale || {}), W = D.wiring || {};
     const prepared = await window.MF_PERSON.prepare(person, { body: T.body, face: T.face, fit: D.fit, faceFit: D.faceFit, skin: D.skinColour, SKIN: D.SKIN });
     const J = window.MF_PERSON.make(person, prepared, o.opts); J.fx.remove(J.spellLight);
     const E = window.MF_EMOTES(J.FP), all = Object.keys(E);

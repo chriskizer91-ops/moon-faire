@@ -88,7 +88,7 @@
   }
   function drop() { if (!J) return; stage.cast.remove(J.root, J.fx); J.root.traverse((m) => { if (m.geometry) m.geometry.dispose(); }); for (const x of (J.debug.textures || [])) x.dispose(); J = null; }
   async function show(code, sk) {
-    const person = new Function(code + '\n;return PERSON;')();
+    const person = new Function(code + '\n;return PERSON;')(); if (sk && sk.person) Object.assign(person, sk.person);
     const prepared = await MF_PERSON.prepare(person, sk || null); drop();
     J = MF_PERSON.make(person, prepared); J.fx.remove(J.spellLight); stage.cast.add(J.root, J.fx); J.camera = stage.camera; stage.follow(0, 0);
     await new Promise((r) => setTimeout(r, 500));                       // her paintings load a moment after she is built
@@ -120,7 +120,7 @@
   D.people.forEach(option);
   async function choose(i) {
     const p = D.people[i]; busy = true; $('who').textContent = 'Building…';
-    try { let sk = null; if (p.skin) { sk = Object.assign({}, D.skins[p.skin]); sk.SKIN = new Function(p.skinText + '\n;return SKIN;')(); }
+    try { let sk = null; if (p.skin) { sk = Object.assign({}, D.skins[p.skin]); sk.SKIN = new Function(p.skinText + '\n;return SKIN;')(); sk.person = p.scale || null; }
       const f = await show(p.code, sk); $('who').textContent = p.desc; $('facts').textContent = p.skin ? 'Your painted skin on ' + NAMES[p.model] + ': ' + f.triangles.toLocaleString() + ' triangles. Fitting by Fable 5.2 cost ' + money(p.cost) + '.' : 'Built here just now from a ' + Math.round(p.code.length / 100) / 10 + ' KB file: ' + f.triangles.toLocaleString() + ' triangles.' + (p.cost ? ' Made by ' + NAMES[p.model] + ' for ' + money(p.cost) + '.' : ' Made by hand by Claude Fable 5.2, as the worked example in the instructions.'); }
     catch (e) { $('who').textContent = 'This one did not build: ' + e.message; }
     busy = false;

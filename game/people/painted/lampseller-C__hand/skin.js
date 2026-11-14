@@ -1,1 +1,3 @@
-const SKIN = { skin: "#e5b8ae" };
+const SKIN = {
+ "skin": "#e5b8ae"
+};

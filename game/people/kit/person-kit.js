@@ -98,12 +98,14 @@
       smile: part(349, 573, 325, 195, (g) => { for (const k of [-1, 1]) line(g, [M[0] + k * 58, M[1] - 2], [M[0] + k * 80, M[1] - 6], [M[0] + k * 92, M[1] - 20], `rgba(${lip},0.55)`, 5); }) };
   }
   // a part of the model moved a little (a hat pulled down): its paint moves with it
-  function moved(m, v, kind) {
+  function moved(m, v, kind, size, mid) {
     const first = m.onBeforeCompile; m.customProgramCacheKey = () => 'moved-' + kind;
     m.onBeforeCompile = (sh, r) => { if (first) first(sh, r); sh.uniforms.uMove = { value: new THREE.Vector3(v[0] || 0, v[1] || 0, v[2] || 0) };
-      sh.vertexShader = sh.vertexShader.replace('#include <common>', '#include <common>\nuniform vec3 uMove;').replace('#include <begin_vertex>', '#include <begin_vertex>\ntransformed += uMove;'); };
+      sh.uniforms.uSize = { value: new THREE.Vector3(size[0] || 1, size[1] || 1, size[2] || 1) }; sh.uniforms.uMid = { value: new THREE.Vector3(mid[0], mid[1], mid[2]) };
+      sh.vertexShader = sh.vertexShader.replace('#include <common>', '#include <common>\nuniform vec3 uMove; uniform vec3 uSize; uniform vec3 uMid;').replace('#include <begin_vertex>', '#include <begin_vertex>\ntransformed = ( transformed - uMid ) * uSize + uMid + uMove;'); };
     return m;
   }
+  const middle = (pos) => { const lo = [1e9, 1e9, 1e9], hi = [-1e9, -1e9, -1e9]; for (let i = 0; i < pos.length; i += 3) for (let k = 0; k < 3; k++) { lo[k] = Math.min(lo[k], pos[i + k]); hi[k] = Math.max(hi[k], pos[i + k]); } return [0, 1, 2].map((k) => (lo[k] + hi[k]) / 2); };
   async function prepareSkin(person, skin) {
     const T = window.JESTER_TEX, S = skin.SKIN || {}, hexSkin = S.skin || skin.skin || person.skin || '#d99f91', t = tone(hexSkin);
     const [pic, side, hands, body] = await Promise.all([load(skin.face), load(T.faceSide), load(T.hands), load(skin.body)]);
@@ -141,7 +143,7 @@
     if (spec.pattern) o.map = patternTex(spec); else o.color = K.lin(spec.color || '#888888');
     if (spec.metal) o.envMapIntensity = 1.4;
     const c = rgb(spec.color || '#888888').map((v) => v + (255 - v) * 0.45);
-    return K.sheen(K.std(o), spec.sheen || hex(c), 2.6, spec.metal ? 0 : 0.28);
+    return K.sheen(K.std(o), spec.sheen || hex(c), 2.6, spec.metal ? 0 : (spec.sheenK == null ? 0.28 : spec.sheenK));
   }
   // build the person. prepared: what prepare() returned
   function make(person, prepared, extra) {
@@ -152,8 +154,8 @@
     lod.onGeometry = (key, g, B, K) => { if (key.slice(0, 2) !== 'p_') thin(key, g, B, K); };            // a person's own parts are already light
     lod.material = (key, B, K) => {
       if (prepared.bodyTex && key !== 'face' && key !== 'hand' && key !== 'skin') { const nm = key.slice(0, 2) === 'p_' ? key.slice(2) : (WORD[key] || key), S = prepared.S, fl = S.flat && S.flat[nm], ro = S.rough && S.rough[nm];
-        const mt = fl ? material({ color: fl, rough: ro == null ? 0.8 : ro }, K) : painted(K, prepared, ro), mv = S.move && S.move[nm];
-        return mv ? moved(mt, mv, fl ? 'flat' : 'painted') : mt; }
+        const mt = fl ? material({ color: fl, rough: ro == null ? 0.8 : ro, sheen: fl, sheenK: 0.05 }, K) : painted(K, prepared, ro), mv = S.move && S.move[nm], sz = S.size && S.size[nm];
+        return mv || sz ? moved(mt, mv || [0, 0, 0], fl ? 'flat' : 'painted', sz || [1, 1, 1], middle(B.pos)) : mt; }
       if (key.slice(0, 2) === 'p_') return material(parts[key.slice(2)] || '#888888', K);
       for (const w in BODY) if (BODY[w] === key) { let c = colors[w] || (w === 'puff' && colors.sleeve) || (w === 'forearm' && colors.cuff); if (!c) break; if (c === 'skin') c = skinHex;
         return material(Object.assign({ oneSided: true }, key === 'boot' ? { rough: 0.45 } : null, typeof c === 'string' ? { color: c } : c), K); }

@@ -229,7 +229,19 @@ npc.emote('laugh');  npc.emote(npc.wiring.moods.thanks);
 npc.headTop(vec3);                                     // a point above the head for a speech mark
 ```
 
-Ids are the stand-in names (`old-lamp-seller`, `pie-seller`, `ballad-singer`, `fortune-teller`, `old-lamplighter`, `old-night-watchman`, `chestnut-roaster`, `fair-baker`, `ribbon-dyer`, `farm-lad`, `gate-keeper`); the last eight also exist with `-opus` on the end (the same skin on the Opus 5.5 shapes). Not done: nothing is placed in a game scene yet, the people cannot walk a path, and speed with several of them in a scene has not been measured on Chris's laptop. Everything spent on Chris's key by the end of this step: about $20.
+Ids are the stand-in names (`old-lamp-seller`, `pie-seller`, `ballad-singer`, `fortune-teller`, `old-lamplighter`, `old-night-watchman`, `chestnut-roaster`, `fair-baker`, `ribbon-dyer`, `farm-lad`, `gate-keeper`); the last eight also exist with `-opus` on the end (the same skin on the Opus 5.5 shapes). Not done: nothing is placed in a game scene yet, the people cannot walk a path, and speed with several of them in a scene has not been measured on Chris's laptop. Everything spent on Chris's key by the end of this step: about $20 (about $21.80 after the review below).
+
+## The fair folk reviewed in one Fable 5.2 session (November 13)
+
+Chris asked for all the painted, wired people to be handed to a single Fable 5.2 session (high effort, through the key) to review scale and look and make its own fixes.
+
+- `people/kit/review_npcs.py` with `people/kit/REVIEW-KIT.md`: one conversation is shown a line-up of everyone beside the Jester (1.65 m, for scale) and each person's sheet, card and skin file. It writes a review, a fixes file and notes for the maker, sees the result, and may fix again. Three looks, $2.22.
+- What it could change: each person's `height`, `build` and `head` (`people/painted/<...>/person-scale.json`, applied over the person file by `npc.js` and the pages) and the skin file, which gained `size: { part: [w, h, d] }` (a part resized about its own middle, with its paint).
+- It changed 18 of the 19: heights now run from 1.50 m (old lamp-seller) to 1.73 m (fortune-teller) instead of three fixed heights; the pie seller is sturdier, the ballad singer slimmer, the ribbon dyer smaller; the Opus straw hat is narrowed; hair made matt; a ring beard hidden; skin of hands and neck matched on the dyer. The old files are kept as `skin.before-review.js` and `before-review.jpg`.
+- Its words are in `people/npc/review.md`; the line-ups before and after are in `people/npc/review/` and `people/out/fair-folk-review-1.jpg` and `-2.jpg`.
+- One fault it found was in the kit, not the people: a flat-coloured part of a painted skin (grey hair above all) came out pale lilac whatever colour it was given, from the cloth sheen on flat materials under the rig's rim lights. Fixed in `person-kit.js` (flat skin parts have almost no sheen). `people/kit/reshoot_painted.py` redraws everyone without calling the API.
+- What it says needs a repaint or a rebuild (not done): the old lamplighter reads as an old woman on the fortune-teller's shapes; hair is flat plates beside the face; the ring beard and the box beard; the three lamp-seller-model women share one outline; the roaster's hat, the lamp-seller's kerchief and the straw hats want repainting.
+- Its pick where a person exists twice: Fable shapes for the fortune-teller, lamplighter, farm lad and gate keeper; Opus shapes for the night-watchman, chestnut roaster, fair baker and ribbon dyer. Chris has not chosen yet.
 
 ## Next
 

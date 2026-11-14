@@ -11,7 +11,7 @@
   const canvas = document.getElementById('c');
   const stage = makeMFStage(canvas, { preserve: true, shadow: 1024 });
   stage.painting = false;
-  const VIEWS = { front: [0, 0.98, 2.35, 0], threeq: [35, 0.98, 2.35, 0], side: [90, 0.98, 2.35, 0], back: [180, 0.98, 2.35, 0], face: [0, 1.50, 0.50, 0], faceq: [40, 1.50, 0.50, 0], top: [20, 1.3, 1.6, 35], strip: [22, 0.98, 2.35, 4] };
+  const VIEWS = { front: [0, 0.98, 2.35, 0], threeq: [35, 0.98, 2.35, 0], side: [90, 0.98, 2.35, 0], back: [180, 0.98, 2.35, 0], face: [0, 1.50, 0.50, 0], faceq: [40, 1.50, 0.50, 0], top: [20, 1.3, 1.6, 35], strip: [22, 0.98, 2.35, 4], line: [0, 0.98, 2.35, 0] };
   let J = null, t = 0;
   function view(name, heightK) {
     const v = VIEWS[name] || VIEWS.front, k = heightK || 1, a = v[0] * Math.PI / 180, e = v[3] * Math.PI / 180, d = v[2] * 5.2 * (name.slice(0, 4) === 'face' ? 1 : 1), y = v[1] * k;
@@ -26,16 +26,17 @@
     async show(person, skin) {
       drop();
       if (typeof person === 'string') person = new Function(person + '\n;return PERSON;')();
+      if (skin && skin.person) Object.assign(person, skin.person);
       const a = performance.now(), prepared = await MF_PERSON.prepare(person, skin || null), b = performance.now();
       J = MF_PERSON.make(person, prepared); J.fx.remove(J.spellLight); stage.cast.add(J.root, J.fx); J.camera = stage.camera; stage.follow(0, 0);
       const c = performance.now(); t = 0; PV.step(1 / 30, 45);
       let tris = 0, parts = 0; J.root.traverse((m) => { if (m.isMesh && m.visible && m.geometry && m.geometry.index) { tris += m.geometry.index.count / 3; parts++; } });
       const own = {}; for (const k in J.debug.meshes) if (k.slice(0, 2) === 'p_') own[k.slice(2)] = J.debug.meshes[k].geometry.index.count / 3;
-      return { partNames: J.partNames, errors: J.personErrors, prepareMs: Math.round(b - a), buildMs: Math.round(c - b), triangles: Math.round(tris), parts, own };
+      return { scale: { height: person.height || 1, build: person.build || [1, 1], head: person.head || [1, 1, 1] }, partNames: J.partNames, errors: J.personErrors, prepareMs: Math.round(b - a), buildMs: Math.round(c - b), triangles: Math.round(tris), parts, own };
     },
     // walking: phase runs with the steps; standing: phase 0
     step(dt, n, walk) { for (let i = 0; i < (n || 1); i++) { t += dt; J.animate(walk ? t * 1.9 : 0, walk ? 1 : 0, t, dt, 0); } },
-    draw(name) { view(name, J && J.person ? (J.person.height || 1) : 1); stage.render(); const i = stage.info(); return i; },
+    draw(name) { view(name, name !== 'line' && J && J.person ? (J.person.height || 1) : 1); stage.render(); const i = stage.info(); return i; },
     // emotes: the text of a file that sets EMOTES. Each becomes a move called e_<name>
     defEmotes(code) {
       const E = new Function('FP', code + '\n;return EMOTES;')(J.FP), CH = ['hip', 'hipR', 'sp', 'hd', 'sh', 'hR', 'hL', 'eR', 'eL', 'twR', 'twL', 'wrR', 'wrL', 'fR', 'fL', 'ftR', 'ftL', 'knR', 'knL', 'eyes', 'mouth'], bad = [], durs = {};
@@ -51,6 +52,10 @@
       for (let i = 0; i < n; i++) { const want = dur * (i + 0.6) / n; while (at < want) { t += 1 / 30; at += 1 / 30; J.animate(0, 0, t, 1 / 30, 0); } PV.draw('strip'); out.push(canvas.toDataURL('image/jpeg', 0.82)); }
       J.stop(); return out;
     },
+    // the Jester herself, for scale
+    showWitch() { drop(); J = WITCH_LOD.make('light', { treadmill: false }); J.fx.remove(J.spellLight); stage.cast.add(J.root, J.fx); J.camera = stage.camera; stage.follow(0, 0); t = 0; PV.step(1 / 30, 45); return true; },
+    // a file that sets a constant, as plain data
+    data(code, name) { return JSON.stringify(new Function(code + '\n;return ' + name + ';')()); },
     faceURL() { return null; },
   };
   window.PV.ready = true;

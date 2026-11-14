@@ -1,15 +1,26 @@
 const SKIN = {
-  skin: '#d99789',
-  flat: {
-    hair: '#7b5a38',    // hair around the face was picking up painted forehead and cheek
-    straw: '#d6a85a',   // the brim was picking up dark streaks instead of straw
-    button: '#5a3a24',  // small buttons that stick out forward
-    soles: '#2a1d16'
-  },
-  rough: { boots: 0.6, straw: 0.8 },
-  seam: 0.2,
-  move: {
-    straw: [0, -0.05, 0],   // hat pulled down so the brim sits just above the brows
-    band:  [0, -0.05, 0]    // band moves with the hat
-  }
+ "skin": "#d99789",
+ "flat": {
+  "hair": "#7b5a38",
+  "straw": "#d6a85a",
+  "button": "#5a3a24",
+  "soles": "#2a1d16"
+ },
+ "rough": {
+  "boots": 0.6,
+  "straw": 0.9
+ },
+ "seam": 0.2,
+ "move": {
+  "straw": [
+   0,
+   -0.035,
+   0
+  ],
+  "band": [
+   0,
+   -0.035,
+   0
+  ]
+ }
 };
