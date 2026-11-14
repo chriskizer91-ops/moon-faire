@@ -53,6 +53,7 @@
     addBone('uarm' + S, 'clav' + S, sh.x, sh.y, sh.z);
     addBone('farm' + S, 'uarm' + S, el.x, el.y, el.z);
     addBone('hand' + S, 'farm' + S, wr.x, wr.y, wr.z);
+    { const m = el.clone().addScaledVector(d, 0.10); addBone('ftw' + S, 'farm' + S, m.x, m.y, m.z); }       // the turn of her forearm: when her hand turns over, most of the turn is spread along the forearm, as the two bones of a real forearm do it
     addBone('thigh' + S, 'hips', s * 0.085, IO_HIP_Y, 0);
     addBone('shin' + S, 'thigh' + S, s * 0.083, IO_KNEE_Y, 0.006);
     addBone('foot' + S, 'shin' + S, s * 0.081, 0.105, -0.012);

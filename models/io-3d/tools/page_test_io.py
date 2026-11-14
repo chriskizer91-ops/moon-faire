@@ -9,7 +9,7 @@ with sync_playwright() as p:
     pg.set_default_timeout(150000)
     pg.on('console', lambda m: logs.append(m.type + ': ' + m.text[:300]) if m.type == 'error' else None)
     pg.on('pageerror', lambda e: logs.append('PAGEERR: ' + str(e)[:500]))
-    pg.goto('file:///home/claude/io/deliver/' + (sys.argv[1] if len(sys.argv) > 1 else 'Io_3D_stage5.html')); pg.wait_for_function('window.IO || !document.getElementById("err").hidden')
+    pg.goto('file:///home/claude/io/deliver/' + (sys.argv[1] if len(sys.argv) > 1 else 'Io_3D_stage6.html')); pg.wait_for_function('window.IO || !document.getElementById("err").hidden')
     pg.wait_for_timeout(3000)
     print('hud:', pg.inner_text('#hud'), '| err hidden:', pg.evaluate('document.getElementById("err").hidden'), '| scrollW', pg.evaluate('document.documentElement.scrollWidth'), 'clientW', pg.evaluate('document.documentElement.clientWidth'))
     print('buttons:', pg.evaluate('[...document.querySelectorAll(".chip")].map(b => b.textContent)'))

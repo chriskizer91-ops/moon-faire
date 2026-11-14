@@ -40,9 +40,9 @@ canvas#stage{display:block;width:100%;height:100%;touch-action:none;cursor:grab}
 <body>
 <div class="wrap">
   <header>
-    <p class="eyebrow">Moon Faire · stage five of her build</p>
+    <p class="eyebrow">Moon Faire · stage six of her build</p>
     <h1><em>Io</em>, the Herbal Witch</h1>
-    <p class="sub">New: her belt, pouch and crystal, both necklaces and her bracelets, on top of the cloak with its mossy frill. Pick a move under Moves; the pouch and crystal swing. She stays in view while you scroll the buttons. Drag to turn her, pinch or scroll to zoom.</p>
+    <p class="sub">New: her ankles in the walk and her wrists in the wave, the talk and her other hand moves. Pick a move under Moves; the short ones end by themselves. She stays in view while you scroll the buttons. Drag to turn her, pinch or scroll to zoom.</p>
   </header>
   <div class="play">
   <div class="stagebox" id="box">
@@ -60,16 +60,14 @@ canvas#stage{display:block;width:100%;height:100%;touch-action:none;cursor:grab}
   <div class="notes">
     <h2>New in this stage</h2>
     <ul>
-      <li>Belt: dark leather round her waist with the gold ring buckle (F3).</li>
-      <li>Pouch: on her right hip, hanging from the belt, with two gold pieces on its front and the gold ball under it. It swings.</li>
-      <li>Crystal: a clear point with a gold cap, on a gold chain from the belt at the front of her left hip. It swings.</li>
-      <li>Necklaces (F1, F2): the fine silver chain with its clear drop, and the dark cord with the two gold moons and the cross.</li>
-      <li>Bracelets (F1, D4): on each wrist, black beads, wood beads and small gold beads. The cloak's sleeves now stop short of her wrists on the outside so they show.</li>
-      <li>"Belt and jewellery" under Show takes them off.</li>
+      <li>Ankles: when she walks, her sole lies flat on the ground until her leg is too far back, then her heel lifts. In the air her foot hangs loose with the toes down, and comes up to land on the heel. Her ankle can no longer bend further than a real one, and her stiff boots no longer fold at the toe.</li>
+      <li>Her knee starts to give as her foot leaves the ground.</li>
+      <li>Wrists: when her hand turns over, the turn now runs along her forearm instead of twisting at the wrist. Her wrist can no longer bend further than a real one.</li>
+      <li>The wave now comes from her elbow: her forearm swings from side to side and her hand follows a moment behind. It is a little slower and longer.</li>
     </ul>
     <h2 style="margin-top:12px">From the earlier stages</h2>
     <ul>
-      <li>Her cloak with the moss, and her painted hands (stage four). Her arms, her moving hair and skirt, and her first moves (stage three). Her face, glasses, hair and hat (stage two). Her body, bodice and skirt (stage one).</li>
+      <li>Her belt, pouch, crystal, necklaces and bracelets (stage five). Her cloak with the moss, and her painted hands (stage four). Her arms, her moving hair and skirt, and her first moves (stage three). Her face, glasses, hair and hat (stage two). Her body, bodice and skirt (stage one).</li>
     </ul>
     <h2 style="margin-top:12px">What is rough, and what is not here yet</h2>
     <ul class="m">
@@ -157,7 +155,7 @@ canvas#stage{display:block;width:100%;height:100%;touch-action:none;cursor:grab}
     if (easing) { let d = want.az - orbit.az; d = Math.atan2(Math.sin(d), Math.cos(d)); const k = Math.min(1, dt * 5); orbit.az += d * k; orbit.el += (want.el - orbit.el) * k; orbit.dist += (want.dist - orbit.dist) * k; orbit.target.y += (want.ty - orbit.target.y) * k; }
     stage.render();
   }
-  $('hud').textContent = 'Stage five · ' + Math.round(R.triangles / 1000) + 'k triangles';
+  $('hud').textContent = 'Stage six · ' + Math.round(R.triangles / 1000) + 'k triangles';
   window.IO = { stage, R, step() { fit(); stage.render(); } };
   requestAnimationFrame(frame);
 })();

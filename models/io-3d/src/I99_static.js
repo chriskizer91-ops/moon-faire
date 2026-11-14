@@ -182,6 +182,16 @@
     rootQuat(SK['clav' + S], _qa); _qa.multiply(SK['uarm' + S].quaternion).multiply(SK['farm' + S].quaternion).invert();
     SK['hand' + S].quaternion.slerp(_qa.multiply(_qc), w);
   }
+  // A wrist only bends so far, and it does not twist: the turn of a hand is made along the forearm. So whatever a move asked of a hand,
+  // its turn about the arm's own line is taken out, most of it is given to the forearm (ftw), and the bend that is left is held to WRIST_MAX.
+  const WRIST_MAX = 0.62, QI = new THREE.Quaternion();
+  function wristFix(S) {
+    const h = SK['hand' + S].quaternion, a = armDir[S]; if (h.w < 0) h.set(-h.x, -h.y, -h.z, -h.w);
+    const dp = h.x * a.x + h.y * a.y + h.z * a.z; _qa.set(a.x * dp, a.y * dp, a.z * dp, h.w); if (_qa.lengthSq() < 1e-8) _qa.set(0, 0, 0, 1); _qa.normalize();       // the turn about her arm's line
+    _qb.copy(_qa).invert(); _qc.copy(h).multiply(_qb);                                                                  // what is left: the bend of the wrist
+    const ang = 2 * Math.acos(Math.min(1, Math.abs(_qc.w))); if (ang > WRIST_MAX) _qc.copy(QI.set(0, 0, 0, 1).slerp(_qc, WRIST_MAX / ang));
+    h.copy(_qc).multiply(_qa); SK['ftw' + S].quaternion.set(0, 0, 0, 1).slerp(_qa, 0.8);
+  }
   // after a leg has reached, set its foot level on the ground (pitch: + heel up), toes the way she started out facing
   function flatFoot(S, pitch, w) {
     if (w <= 0.0005) return;
@@ -197,7 +207,7 @@
 
   let lastPose = { arm: 15, leg: 0 }, mv = { name: 'pose', t: 0 }, wk = 0, gph = 0, spinWas = 0;
   let clock = 0, blinkAt = 1.6, blinkT = -1, mouthAt = 0, mouthNow = 'rest', facePainted = '', talking = false, held = null, blinking = true;
-  const SHOTS = { glasses: 2.4, hat: 2.6, curtsey: 3.0, twirl: 2.6, herb: 5.0, wave: 2.6, look: 3.6 }, MOVES = ['pose', 'idle', 'walk', 'talk', 'glasses', 'hat', 'curtsey', 'twirl', 'herb', 'wave', 'look'];
+  const SHOTS = { glasses: 2.4, hat: 2.6, curtsey: 3.0, twirl: 2.6, herb: 5.0, wave: 3.0, look: 3.6 }, MOVES = ['pose', 'idle', 'walk', 'talk', 'glasses', 'hat', 'curtsey', 'twirl', 'herb', 'wave', 'look'];
   const pulse = (t, a, b, c, d) => sm(a, b, t) * (1 - sm(c, d, t)), ANK = {}; for (const [S] of SIDES) ANK[S] = SK['foot' + S].userData.rest.clone();
   const tgt = V3(), tg2 = V3(), fv = V3(), nv = V3();
   function pose(o) {
@@ -220,8 +230,12 @@
     if (go > 0.001) { gph += dt * TAU / 1.12; const A = 0.30, sn = Math.sin(gph), cs = Math.cos(gph); plant *= still;
       for (const [S, s] of SIDES) { const p = gph + (s < 0 ? 0 : PI), si = Math.sin(p), co = Math.cos(p), sw = Math.max(0, co), st = Math.max(0, -co);
         const th = -(A * si + 0.04) * go, kn = (0.95 * Math.pow(sw, 1.3) + 0.18 * Math.pow(Math.max(0, Math.sin(p - 0.5)), 3) * st + 0.04) * go;
-        const up = 0.20 * Math.pow(Math.max(0, si), 3) * go, off = 0.50 * Math.max(0, -si) * st * go;
-        add('thigh' + S, th, 0, 0); add('shin' + S, kn, 0, 0); add('foot' + S, -(th + kn) * 0.92 - up + off, 0, 0); add('toe' + S, -off * 0.9, 0, 0);
+        // Her feet (Chris, November 13: her ankles were "not bending the right way at the back of her step"; the Ranger's had the same fault).
+        // On the ground her sole lies flat until the leg is too far back for an ankle, then her heel lifts. In the air the foot hangs
+        // loose, toes down, and comes up to land on the heel. The ankle is held to 0.26 up and 0.30 down. Her boots are stiff: no toe fold.
+        const u = (((p / TAU) % 1) + 1) % 1, onG = sm(0.22, 0.28, u) * (1 - sm(0.72, 0.78, u)), sp = ((((u - 0.75) % 1) + 1) % 1) / 0.5;
+        const kn2 = kn + 0.30 * Math.exp(-Math.pow((u - 0.76) / 0.07, 2)) * go;       // her knee is already giving as the foot leaves the ground
+        add('thigh' + S, th, 0, 0); add('shin' + S, kn2, 0, 0); add('foot' + S, lerp(lerp(0.24, -0.14, sm(0.55, 1.0, sp)) * go, cl(-(th + kn2), -0.26, 0.30), onG), 0, 0);
         add('uarm' + S, 0.24 * si * go, 0, 0); add('farm' + S, -(0.16 + 0.14 * Math.max(0, -si)) * go, 0, 0); }
       SK.hips.position.y += -0.035 * sn * sn * go; SK.hips.position.x += 0.011 * cs * go;
       add('hips', 0.015 * go, 0.08 * sn * go, 0.03 * cs * go); add('spine1', 0.015 * go, -0.04 * sn * go, -0.018 * cs * go); add('spine2', 0, -0.07 * sn * go, -0.016 * cs * go); add('spine3', 0, -0.04 * sn * go, 0);
@@ -241,15 +255,16 @@
       add('head', 0.17 * tip, 0.05 * k, 0); add('neck', 0.06 * tip, 0, 0); add('spine3', 0.04 * tip, 0, 0); sync();
       fv.set(-0.30, 0.90, -0.32).normalize(); carried('head', 0.126, 1.546, 0.102, tgt).addScaledVector(fv, -0.135);
       reaches.push(['L', tgt.clone(), k, -0.35]); aims.push(['L', fv.clone(), V3(-0.75, 0.1, -0.65), k]); fingers('L', lerp(0.24, 0.55, k)); if (tip > 0.4) mouth = 'smile'; }
-    if (N === 'wave') { const k = pulse(T, 0, 0.5, 2.0, 2.5), wv = Math.sin((T - 0.5) * 11) * pulse(T, 0.5, 0.75, 1.75, 2.0);
+    if (N === 'wave') { const k = pulse(T, 0, 0.5, 2.3, 2.9), env = pulse(T, 0.5, 0.8, 2.0, 2.35), ph = (T - 0.5) * 8.5, w1 = Math.sin(ph) * env, w2 = Math.sin(ph - 0.8) * env;
       add('head', 0, -0.06 * k, 0.07 * k); add('spine3', 0, -0.04 * k, 0);
-      reaches.push(['R', V3(-0.27, 1.40, 0.13), k, -0.9]); aims.push(['R', V3(-0.10 + 0.32 * wv, 1, 0.06), V3(0, 0, 1), k]); fingers('R', lerp(0.24, 0.05, k)); if (k > 0.5) mouth = 'smile'; }
+      // the wave comes from her elbow: her forearm swings from side to side, and her hand follows a moment behind it
+      reaches.push(['R', V3(-0.275 - 0.075 * w1, 1.40 - 0.012 * Math.abs(w1), 0.13), k, -0.9]); aims.push(['R', V3(-0.07 - 0.24 * w2, 1, 0.08), V3(0, 0, 1), k]); fingers('R', lerp(0.24, 0.05, k)); if (k > 0.5) mouth = 'smile'; }
     if (N === 'look') { const yaw = 0.95 * (pulse(T, 1.8, 2.4, 2.9, 3.4) - pulse(T, 0.1, 0.7, 1.2, 1.7));
       add('head', 0.02 * Math.abs(yaw), 0.50 * yaw, 0); add('neck', 0, 0.30 * yaw, 0); add('spine3', 0, 0.12 * yaw, 0); add('spine2', 0, 0.08 * yaw, 0); }
     if (N === 'twirl') { const u = cl((T - 0.35) / 1.55, 0, 1), k = pulse(T, 0.2, 0.6, 1.7, 2.3), up = pulse(T, 0.4, 0.7, 1.7, 2.0);
       const ang = TAU * u * u * (3 - 2 * u) - 0.22 * pulse(T, 0, 0.3, 0.38, 0.6), rate = dt > 0 ? Math.abs(ang - spinWas) / dt : 0; spinWas = ang;
       add('hips', 0, ang, 0); plant *= 1 - pulse(T, 0.2, 0.36, 1.92, 2.1);
-      const h = 0.035 * up, ah = h / 0.10; SK.hips.position.y += h; for (const [S, s] of SIDES) { add('foot' + S, ah, 0, 0); add('toe' + S, -ah, 0, 0); add('uarm' + S, 0, 0, s * 0.72 * k); add('farm' + S, -0.22 * k, 0, 0); }
+      const h = 0.035 * up, ah = h / 0.10; SK.hips.position.y += h; for (const [S, s] of SIDES) { add('foot' + S, ah, 0, 0); add('uarm' + S, 0, 0, s * 0.72 * k); add('farm' + S, -0.22 * k, 0, 0); }
       add('head', -0.07 * k, 0, 0); add('spine3', -0.04 * k, 0, 0); for (const o of SOFT) if (!o.hair) o.lift = Math.min(0.55, 0.075 * rate); if (k > 0.4) mouth = 'smile'; } else spinWas = 0;
     if (N === 'curtsey') { const k = pulse(T, 0, 0.7, 2.15, 2.9), dip = pulse(T, 0.6, 1.25, 1.75, 2.4);
       SK.hips.position.y -= 0.13 * dip; SK.hips.position.z -= 0.015 * dip; add('hips', 0.08 * dip, 0, 0); add('spine1', 0.09 * dip, 0, 0); add('spine2', 0.07 * dip, 0, 0); add('neck', 0.10 * dip, 0, 0); add('head', 0.20 * dip, 0, 0);
@@ -267,12 +282,13 @@
       if (sml > 0.6) eyes = 1; if (T > 3.0 && T < 4.4) mouth = 'smile'; }
     // her body is in place: plant her feet, then her hands
     sync();
-    for (const [S] of SIDES) { ik2(SK['thigh' + S], SK['shin' + S], SK['foot' + S], ank[S], plant, 0, 1); flatFoot(S, footP[S], plant); if (footP[S]) SK['toe' + S].rotation.x = -footP[S] * 0.85 * plant; }
+    for (const [S] of SIDES) { ik2(SK['thigh' + S], SK['shin' + S], SK['foot' + S], ank[S], plant, 0, 1); flatFoot(S, footP[S], plant); }
     sync();
     // a hand travels from where it hangs to its point, a little forward on the way so it clears her skirt and her hair, with its elbow bending as it goes
     for (const r of reaches) { const k = r[2]; if (k <= 0.0005) continue; const P = typeof r[1] === 'function' ? r[1]() : r[1], e = k * k * (3 - 2 * k);
       SK['hand' + r[0]].getWorldPosition(_p).applyMatrix4(_inv).lerp(P, e); _p.z += 0.09 * Math.sin(PI * e); reach(r[0], tg2.copy(_p), sm(0, 0.15, k), (r[3] || 0) * e); }
     for (const a of aims) aimHand(a[0], a[1], a[2], a[3]);
+    for (const [S] of SIDES) wristFix(S);
     sync(); softTick(dt);
     return { eyes, mouth };
   }

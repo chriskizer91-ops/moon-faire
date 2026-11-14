@@ -43,7 +43,7 @@
       const d = tip.clone().sub(p1).normalize(), q = (s) => p1.clone().add(V3(0, -0.006, 0)).addScaledVector(d, s);
       const rings = tubeRings([q(0), q(0.004), q(0.046), q(0.060)], [0.0052, 0.0076, 0.0070, 0.0004], 6, null); addPart('crystal', loft(rings, { capA: true, capB: true }), wC, { out: q(0.03) }); }
     // ----- bracelets: black beads nearest her hand, then wood, then small gold (D4) -----
-    for (const [S, s] of SIDES) { const wF = () => [BI['farm' + S], 1], ox = s * Math.cos(A_POSE), oy = Math.sin(A_POSE);
+    for (const [S, s] of SIDES) { const wF = () => [BI['ftw' + S], 1], ox = s * Math.cos(A_POSE), oy = Math.sin(A_POSE);
       for (const [key, sl, rb, N] of [['bead', 0.4285, 0.0042, 19], ['wood', 0.4175, 0.0046, 17], ['gearGold', 0.4085, 0.0022, 36]])
         for (let k = 0; k < N; k++) { const a = (k / N) * TAU + sl * 40, p = armPt(S, sl, a), e = rb * 0.8; ball(key, V3(p[0] + ox * Math.cos(a) * e, p[1] + oy * Math.cos(a) * e, p[2] + Math.sin(a) * e), rb, wF); } }
   })();

@@ -4,7 +4,31 @@ Started November 13, 2026. Built the way the HD Jester was (`claude/HOW-TO-3d-wi
 the Ranger's stage-one recipe: this folder began as a copy of the Ranger's stage-one code (`claude/ranger-3d-model`, commit
 `1d4c9d6`), with the Jester's platform boot builder (`claude/jester-3d-model`, pass 20) in place of the Ranger's boots.
 
-## Where she stands: stage five (November 13, 2026)
+## Where she stands: stage six (November 13, 2026)
+
+Her ankles and wrists move as real ones do.
+
+- **Chris (November 13), after stage five:** "the skeleton movement animation needs to be worked on the way her ankles move when
+  she's walking or not bending the right way at the back of her step as well as the way her wrists move when she waves and
+  does a few other things".
+- **Page:** the same link as every stage. One offline file: `deliver/Io_3D_stage6.html`. `deliver/Io_stage6_ankles_wrists.jpg`
+  is eight moments of one step from the side, the wave, and her open hand in the talk.
+- **Ankles (`body()` in `src/I99_static.js`, the walk).** The cause was the Ranger's (her stage 6c): the foot was kept level at
+  all times, so behind her the ankle bent past what an ankle can do. Now: on the ground the sole lies flat until the leg is too
+  far back, then the heel lifts; in the air the foot hangs loose, toes down, and comes up to land on the heel. The ankle is held
+  to 0.26 rad up and 0.30 down. Her boots are stiff, so the toe bone is never turned (walk, twirl, curtsey). Her knee gives by
+  0.30 rad as the foot leaves the ground.
+- **Wrists.** A new bone on each forearm, `ftwL` / `ftwR` (`src/10_geom.js`), carries the turn of her hand: `wristFix` splits what
+  a move asked of the hand into the turn about the arm's own line and the bend that is left; 80% of the turn goes to the
+  forearm bone, and the bend is held to 0.62 rad (`WRIST_MAX`). The arm's skin goes over to that bone down the forearm (`wArm`),
+  and the bracelets ride it. It runs every frame for both hands, after the reaches and aims.
+- **Wave.** It comes from her elbow: the wrist target swings 7.5 cm each way and the hand's lean follows 0.8 rad of phase behind.
+  3.0 s now (was 2.6), 1.35 swings a second (was 1.75).
+- **Rule for every witch's moves from here:** never hold a foot level by force; clamp the ankle and let the heel lift. Never turn
+  a hand at the wrist alone; give the turn to the forearm. Stiff boots do not fold at the toe.
+- 234 bones.
+
+## Stage five (November 13, 2026)
 
 Belt, pouch, crystal, both necklaces and her bracelets are on her, over the cloak with its moss.
 
@@ -172,7 +196,7 @@ python3 -I bake_head_io.py         # adds her face, profile, skin tones, hat swa
 python3 -I bake_arms_io.py         # adds her arm skin from D3
 python3 -I bake_hands_io.py        # adds her hands from D1 and D2 (landmarks in hand_marks.json)
 ./build_io.sh                      # tools/tables.py, then out/io.js
-python3 -I build_single_io.py      # deliver/Io_3D_stage5.html, one offline file
+python3 -I build_single_io.py      # deliver/Io_3D_stage6.html, one offline file
 python3 tools/prof_io.py 8 shots/prof.png             # her profile against the model's, by height
 python3 tools/cmp_head_io.py shots/cmp_head.jpg       # head, hat and hair beside C4 and C5
 python3 tools/cmp_io.py shots/cmp_front.jpg front     # also back, sideR, sideL
@@ -424,9 +448,9 @@ They also show her whole look from many sides, with the robe: useful when the ro
 
 ## Next stages
 
-1. **Chris's notes** on the belt, pouch, crystal, necklaces and bracelets.
-2. Detail on them if he wants it: belt vine and holes, the pouch's flap, studs and filigree, leather from F9, a swinging pendant.
-3. The cloak nearer to M1: wider sleeve wings, a narrower pointed back, sheer cloth cut from F10 and F12.
-4. Her own boots (E1 to E8); legs from B5; the emotions in C10; hair on top of her head.
-5. Book and blades (G1 to G6, held as in G9).
-6. Her spells and attacks (H1 to H18, I1 to I8, and round 4).
+1. **Chris's eye on the walk and the hand moves again.** If more is wanted: the Ranger's other cures for stiffness (spine, neck
+   and head each a beat behind the part below; forearm and hand trailing the upper arm), slower short moves, a half-speed switch.
+2. Detail on the belt, pouch and necklaces; the cloak nearer to M1 (wider sleeve wings, a narrower pointed back, sheer cloth).
+3. Her own boots (E1 to E8); legs from B5; the emotions in C10; hair on top of her head.
+4. Book and blades (G1 to G6, held as in G9).
+5. Her spells and attacks (H1 to H18, I1 to I8, and round 4).

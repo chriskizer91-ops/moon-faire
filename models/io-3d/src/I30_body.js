@@ -75,7 +75,8 @@
   function wArm(S, sLen, a) {
     if (sLen < 0.02) return [BI['uarm' + S], 1];       // the arm turns in her shoulder like a ball in a socket: all of it moves as one piece about the joint
     if (sLen < L_UARM + 0.07) { const bk = a == null ? 0 : Math.max(0, -Math.sin(a)), c = L_UARM - 0.016 * bk, h = 0.046 - 0.010 * bk, u = sm(c - h, c + h, sLen); return [BI['uarm' + S], 1 - u, BI['farm' + S], u]; }
-    const u = sm(L_UARM + L_FARM - 0.02, L_UARM + L_FARM + 0.012, sLen); return [BI['farm' + S], 1 - u, BI['hand' + S], u];
+    const u = sm(L_UARM + L_FARM - 0.02, L_UARM + L_FARM + 0.012, sLen), tw = sm(0.30, 0.415, sLen);       // down the forearm the skin goes over to the bone that turns with her hand
+    return [BI['farm' + S], (1 - tw) * (1 - u), BI['ftw' + S], tw * (1 - u), BI['hand' + S], u];
   }
   for (const [S, s] of SIDES) {
     const NS = Q(60, 24), NU = Q(32, 14), rings = [], ss = [], vs = [];
