@@ -1,9 +1,9 @@
 # page_test.py : opens the one-file page at phone size, presses the hand and arm buttons, drags, and saves what the stage shows
 import sys, os
-PART = os.environ.get('PART', '')       # the whole test is slow without a graphics card: PART=1 is the bow, the draw, the sword and the knives, PART=2 the rest
+PART = os.environ.get('PART', '')       # the whole test is slow without a graphics card: PART=1 is the bow, the sword, the knives, the gem and Silverglass, PART=2 the rest
 from playwright.sync_api import sync_playwright
 from PIL import Image
-PAGE = sys.argv[1] if len(sys.argv) > 1 else '/home/claude/ranger/deliver/Ranger_3D_stage11.html'
+PAGE = sys.argv[1] if len(sys.argv) > 1 else '/home/claude/ranger/deliver/Ranger_3D_stage12.html'
 ARGS = ['--use-angle=swiftshader', '--enable-unsafe-swiftshader', '--ignore-gpu-blocklist', '--allow-file-access-from-files']
 with sync_playwright() as p:
     b = p.chromium.launch(executable_path='/usr/bin/google-chrome', args=ARGS)
@@ -19,6 +19,7 @@ with sync_playwright() as p:
         pg.click('#moves >> text="Ready"'); pg.click('#cam >> text="Back"'); pg.wait_for_timeout(5000); shot('back'); pg.click('#flipB'); pg.click('#moves >> text="Moonsteel Draw"'); pg.wait_for_timeout(5000); shot('draw_flip'); pg.click('#flipB'); pg.click('#bowB'); pg.wait_for_timeout(1500); shot('no_bow'); pg.click('#bowB')
         pg.click('#moves >> text="Sword"'); pg.wait_for_timeout(2600); shot('sword_1'); pg.wait_for_timeout(1500); shot('sword_2'); pg.wait_for_timeout(1500); shot('sword_3'); pg.wait_for_timeout(2500); shot('sword_4'); print('sword keys', pg.evaluate('["blade","swordSteel","scab"].map((k) => !!RANGER.R.meshes[k])'))
         pg.click('#moves >> text="Knives"'); pg.wait_for_timeout(2300); shot('knives_1'); pg.wait_for_timeout(1300); shot('knives_2'); pg.wait_for_timeout(1300); shot('knives_3'); print('knife keys', pg.evaluate('["knifeBlade","knifeCord","sheath"].map((k) => !!RANGER.R.meshes[k])'))
+        pg.click('#moves >> text="The gem"'); pg.wait_for_timeout(2400); shot('gem_1'); pg.wait_for_timeout(1500); shot('gem_2'); pg.click('#moves >> text="Silverglass"'); pg.wait_for_timeout(3000); shot('glass_1'); pg.wait_for_timeout(1800); shot('glass_2'); print('veins', pg.evaluate('!!RANGER.R.meshes.veins'))
     if PART == '1': print('errors:', logs[:4]); b.close()
     if PART != '1':
         for host, label in (('moves', 'Walk'), ('cam', 'Side'), ('moves', 'Jog'), ('cam', 'Hips'), ('moves', 'Stand still'), ('gear', 'Charms'), ('poses', 'Legs apart'), ('boots', 'Outer side'), ('hands', 'Left hand'), ('views', 'Front'), ('hviews', 'Face')):

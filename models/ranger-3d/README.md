@@ -236,12 +236,36 @@ four strap hooks as real objects, standing still. About 355,000 triangles.
   - `SHOTS.knives` 3.2 s, `SLOW.knives` 1.3. Page: "Knives" in the moves row, "Knives" switch.
   - Rough: no engraving on the blades, no silver leaf work on the sheath; from behind her hands lie over the handles more
     than they close round them.
+- **Stage twelve: wrists in the throw, the gem, Silverglass.** Chris: "when she throws the knives, her hands look like her
+  wrists are broken. I don't know if that can be adjusted. It's fine. If not, let's move on to the silver glass in the gem."
+  He also said yes to the knives coming back to their sheath.
+  - **Wrists** (`forearmDir`, `wristLimit`, used in `knifeStage`). The cause: her hand was turned to suit the knife's written
+    angle whatever her forearm was doing, up to 70 degrees at the release and more after it. Now the angle between her hand
+    and her forearm is held to 34 degrees while she holds the knife and 12 once it has gone, and the knife turns with her
+    hand. It leaves with its point still about 40 degrees up and straightens over the first 7 hundredths of a second.
+    The bow and the sword do not use the limit; their grips were already within it.
+  - **The gem** (move `gem`; `gemBeats`, `gemStage`; painting H9). Two fingers of her right hand on the headband gem
+    (`GEMP`, finger shape `two`). Light, after I6: a soft glow, a star with four rays at the touch, a ring that opens and
+    fades; the gem and her lenses glow. Light runs down her arms: `src/R49_veins.js` lays thin tubes over the front of each
+    arm from shoulder to knuckles (mesh `veins`), and `MATS.veins` slides a small picture along them so the lit part grows.
+    "The moment": `stillK` holds her bags, charms, scabbard, sleeves, tails and locks still from 0.55 to 1.15, with 18 sparks
+    hanging in the air (I4); then `gearKick()` lets everything go. Eyes shut, a smile. `SHOTS.gem` 3.4 s.
+  - In the agreed combat (`lore/combat-balance.md`) the gem is two shots of 200. This move is only the touch that powers
+    her up. The two shots are not built; Chris has been told.
+  - **Silverglass** (move `glass`; `glassBeats`, `glassStage`; paintings H6, I2, I3). Feet hopped 49 cm apart and planted, her
+    left palm pushed out flat along `PN` (toward screen right and 37 degrees toward the camera, so the pane shows as an
+    oval, as in H6), her right hand raised open behind it. The pane is one flat square wearing a picture drawn in code
+    (`TXP`: circles laid over one another, a rim, a crescent moon), a metre across; it opens from 0.52 to 0.92, stands to
+    1.90, then breaks: 20 shards (long diamonds, slivers, crescents; six of them float at the rim while it stands) fly out,
+    turn, slow and fade by 2.95. `SHOTS.glass` 3.9 s. What the glass does to a blow or to her next attacks is not shown.
+  - All of it is light only (`glowOnly`), sprites and flat shapes under `R.light`.
+  - `tools/hand_seq.sh` takes close stills of one hand through a move.
 - Waiting for his notes: the moves again; stage two (head), stage three (hands and arms) and stage five.
 
 Rough or not built yet: her face does not move (no blink, no expressions); the hair has a smooth edge with none of the painted
 flyaway wisps, and the loose locks are simple; earrings and necklaces; bracelets; each charm is one stiff piece on a hinge (its chain does not bend, charms can
 pass through each other); the caps on the stones are plain cones; with her arms straight out the iron curls bend with her skin;
-Silverglass and the gem; hit reactions, a dodge, a win and a fall.
+the gem's two shots; hit reactions, a dodge, a win and a fall.
 
 ## What is here
 
@@ -259,7 +283,8 @@ Silverglass and the gem; hit reactions, a dodge, a win and a fall.
   - `R46_bow.js`: her bow, open and rolled up (stage nine).
   - `R47_sword.js`: her sword, and its scabbard at her left hip (stage ten).
   - `R48_knives.js`: her two throwing knives and their sheath at the small of her back (stage eleven).
-  - `R99_static.js`: materials, binding, `pose({arm, leg})`, her moves, her fingers, the solver for arms and legs, the bow, the sword and the knives at work, and their light.
+  - `R49_veins.js`: the lines of light on her arms for the gem (stage twelve).
+  - `R99_static.js`: materials, binding, `pose({arm, leg})`, her moves, her fingers, the solver for arms and legs, the bow, the sword and the knives at work, the gem and Silverglass, and their light.
 - `tools/tables.py`: the one place her body tables live. The model and the body bake both read them.
 - `tools/sil.py`: lifts a figure off a painting's flat background. `tools/measure.py` and `tools/more.py` print widths and depths
   by height. `tools/cmp_r.py` puts the model beside a painting at one scale with the two outlines laid over each other.
@@ -411,6 +436,10 @@ take the lean out. Her arms keep the Jester's bone lengths (0.63 m; the painting
 
 ## Checking
 
+- Stage twelve: close stills of each hand through its throw and wider stills of both releases (the hand keeps to the
+  forearm); stills at 7 moments of the gem and 8 of Silverglass; both in the Flipbook look. Hands and feet reached where
+  they were wanted at every still. Page test at phone size, both halves: no errors; a drag turns her (0.64 rad).
+
 - Stage eleven: stills at 16 moments of the knives move from the front, the grab and the return from behind, the
   sheath on her back from three sides and close up, and a throw in the Flipbook look. Hands and feet reached where they were
   wanted at every still (0 mm short). Page test at phone size, both halves: no errors; a drag turns her (0.64 rad).
@@ -496,7 +525,8 @@ Python that reads them with `-I`.
 ## Next stages
 
 Done at stage nine: fingers, the bow, Moonsteel Draw. Done at stage ten: the sword, its guard and a full cut (G4, H7).
-Done at stage eleven: the knives and their throw (G5, H8). Next, in the order Chris agreed: Silverglass (H6) and the gem (H9); then hit reactions, a dodge, a win and
+Done at stage eleven: the knives and their throw (G5, H8). Done at stage twelve: the gem (H9) and Silverglass (H6).
+Next, in the order Chris agreed (the first item below is now done): Silverglass (H6) and the gem (H9); then hit reactions, a dodge, a win and
 a fall. The older list below is kept for what is still open in it.
 
 

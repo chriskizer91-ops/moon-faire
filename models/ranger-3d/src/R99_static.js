@@ -82,6 +82,13 @@
     // her knives (G5): each one piece of moonsteel with a handle of dark blue cord; a black leather sheath with a blue stud
     knifeBlade: std({ color: lin('#eef1f6'), metalness: 1, roughness: 0.20, envMapIntensity: 2.0 }), knifeSteel: std({ color: lin('#e2e6ee'), metalness: 1, roughness: 0.30, envMapIntensity: 1.7 }),
     knifeCord: std({ color: lin('#24397f'), roughness: 0.85, envMapIntensity: 0.2 }), sheath: std({ color: lin('#17141a'), roughness: 0.58, envMapIntensity: 0.5 }),
+    // the light that runs down her arms (R49_veins.js): a picture two wide and 256 long that is lit for its first half, brightest at the
+    // leading edge; sliding it along makes the light run. Light only.
+    veins: (() => { const n = 256, d = new Uint8Array(2 * n * 4); for (let j = 0; j < n; j++) { const sv = (j + 0.5) / n, lit = sv < 0.5 ? 0.45 + 0.55 * Math.exp(-(0.5 - sv) / 0.035) : 0;
+        for (let i = 0; i < 2; i++) { const k = (j * 2 + i) * 4, v = Math.round(255 * lit * (i ? 0.24 : 1)); d[k] = Math.round(v * 0.78); d[k + 1] = Math.round(v * 0.90); d[k + 2] = v; d[k + 3] = 255; } }
+      const t = new THREE.DataTexture(d, 2, n, THREE.RGBAFormat); t.magFilter = THREE.LinearFilter; t.minFilter = THREE.LinearFilter; t.wrapS = t.wrapT = THREE.ClampToEdgeWrapping; t.needsUpdate = true;
+      const m = new THREE.MeshBasicMaterial({ skinning: true, map: t, color: new THREE.Color('#b4d6ff'), transparent: true, opacity: 0, depthWrite: false, toneMapped: false, fog: false });
+      m.blending = THREE.CustomBlending; m.blendEquation = THREE.AddEquation; m.blendSrc = THREE.SrcAlphaFactor; m.blendDst = THREE.OneFactor; m.blendSrcAlpha = THREE.ZeroFactor; m.blendDstAlpha = THREE.OneFactor; return m; })(),
     knifeGem: phys({ color: lin('#2191c8'), roughness: 0.12, clearcoat: 1, clearcoatRoughness: 0.08, envMapIntensity: 1.4, emissive: lin('#0c5fa8'), emissiveIntensity: 0.4 }),
     bowGem: phys({ color: lin('#2191c8'), roughness: 0.12, clearcoat: 1, clearcoatRoughness: 0.08, envMapIntensity: 1.4, emissive: lin('#0c5fa8'), emissiveIntensity: 0.45 }),
     iron: std({ color: lin('#1b1a1e'), metalness: 0.75, roughness: 0.48, envMapIntensity: 1.0 }),
@@ -126,7 +133,7 @@
   // that is not built yet), 'cheer' (a jump with an arm thrown up) and 'limber' (she shakes out and bounces). Every frame the bones
   // are set back to rest and the layers are added on top. The Jester's moves are the reference for what a full set holds, not copied.
   let lastPose = { arm: 15, leg: 0 }, mv = { name: 'pose', t: 0 }, wk = 0, jg = 0, gph = 0, clock = 0, blinkAt = 2.4, blinkT = -1, mouthAt = 0, mouthNow = 'rest', facePainted = '';
-  const SHOTS = { draw: 5.5, sword: 4.5, knives: 3.2, cheer: 1.5, limber: 3.9 }, SLOW = { draw: 1.22, sword: 1.25, knives: 1.3, limber: 1.5 }, MOVES = ['pose', 'idle', 'walk', 'jog', 'talk', 'draw', 'sword', 'knives', 'cheer', 'limber'];
+  const SHOTS = { draw: 5.5, sword: 4.5, knives: 3.2, gem: 3.4, glass: 3.9, cheer: 1.5, limber: 3.9 }, SLOW = { draw: 1.22, sword: 1.25, knives: 1.3, gem: 1.3, glass: 1.3, limber: 1.5 }, MOVES = ['pose', 'idle', 'walk', 'jog', 'talk', 'draw', 'sword', 'knives', 'gem', 'glass', 'cheer', 'limber'];
   const add = (b, x, y, z) => { const r = SK[b].rotation; r.x += x; r.y += y; r.z += z; };
   function restAll() { for (const k in SK) if (!/^(bag|charm|slv|tail|lock)/.test(k)) SK[k].rotation.set(0, 0, 0); SK.hips.position.copy(SK.hips.userData.home); }
   // ---------- fingers ----------
@@ -135,6 +142,7 @@
   // shape to the next. (The angles and axes are the Jester's; the shapes are hers.)
   const HOOK = [0.30, 1.30, 0.70];
   const FP = { relax: [0.30, 0.26, 0.32, 0.38, 0.44, 0.15], soft: [0.14, 0.12, 0.17, 0.22, 0.28, 0.55], open: [0.04, 0.03, 0.02, 0.05, 0.09, 0.95], fist: [0.72, 0.95, 0.96, 0.96, 0.95, 0],
+    two: [0.62, 0.04, 0.07, 0.92, 0.94, 0.12], flat: [0.10, 0.02, 0.02, 0.04, 0.08, 0.50],
     grip: [0.62, 0.72, 0.76, 0.79, 0.80, 0.05], hold: [0.58, 0.76, 0.80, 0.83, 0.84, 0], hook: [0.50, HOOK, HOOK, HOOK, 0.84, 0] };
   const handAxes = {}, _qa = new THREE.Quaternion(), _qb = new THREE.Quaternion(), SPREAD = [0, 1, 0.3, -0.45, -1.0];
   for (const [S, s] of SIDES) {
@@ -190,6 +198,17 @@
     if (qH) H.quaternion.slerp(ik.lH.copy(qF).invert().multiply(qH), k);
     U.updateMatrixWorld(true); return far - dist;       // more than zero: the place asked for is further than her arm
   }
+
+  // which way the forearm of chain A will run, elbow to wrist, when its wrist is put at W (the same working as solve, without moving her)
+  const forearmDir = (A, W, hint, out) => { const p0 = rp(A.U, ik.p0), d = ik.d.copy(W).sub(p0), far = d.length(), dist = cl(far, Math.abs(A.l1 - A.l2) + 0.004, A.l1 + A.l2 - 0.0008); d.multiplyScalar(1 / Math.max(1e-6, far));
+    const a = (A.l1 * A.l1 - A.l2 * A.l2 + dist * dist) / (2 * dist), h = Math.sqrt(Math.max(0, A.l1 * A.l1 - a * a)), pole = ik.pole.copy(hint).addScaledVector(d, -hint.dot(d)); if (pole.lengthSq() < 1e-8) pole.set(0, -1, 0).addScaledVector(d, d.y); pole.normalize();
+    const E = ik.E.copy(d).multiplyScalar(a).addScaledVector(pole, h).normalize().multiplyScalar(A.l1).add(p0); return out.copy(d).multiplyScalar(dist).add(p0).sub(E).normalize(); };
+  // A wrist bends only so far. If the way a hand is asked to point (F) is more than lim from her forearm, it is brought back to lim, and
+  // the turn that did it is handed back (qFix) so whatever she holds can turn with her hand. Returns true when it had to.
+  const _wl = { fd: V3(), v: V3(), n: V3() };
+  const wristLimit = (A, W, hint, F, P, lim, qFix) => { const fd = forearmDir(A, W, hint, _wl.fd), c = cl(F.dot(fd), -1, 1); qFix.identity(); if (Math.acos(c) <= lim) return false;
+    const v = _wl.v.copy(F).addScaledVector(fd, -c); if (v.lengthSq() < 1e-10) return false; v.normalize(); const n = _wl.n.copy(fd).multiplyScalar(Math.cos(lim)).addScaledVector(v, Math.sin(lim));
+    qFix.setFromUnitVectors(F, n); F.copy(n); P.applyQuaternion(qFix); return true; };
 
   // ---------- light: her bowstring, her arrow (I1) and the sparks where the string is about to be ----------
   // These only ever add light to the picture (HOW-TO-flipbook-look, section 6), so in the Flipbook look they are neither inked nor
@@ -388,7 +407,7 @@
     else { const up = Math.sin(PI * o.t2) * (1 - o.f2); out.phi = lerp(lerp(lerp(20, 108, o.up2), 6, o.t2 * o.t2), -45, o.f2) * DEG;
       out.p.set(sh.x + lerp(lerp(lerp(0.12, -0.02, o.up2), 0.42, o.t2), 0.36, o.f2) + 0.06 * up, sh.y + lerp(lerp(lerp(-0.32, 0.21, o.up2), 0.04, o.t2), -0.20, o.f2) + 0.03 * up, sh.z + lerp(lerp(lerp(0.22, 0.06, o.up2), 0.06, o.t2), 0.16, o.f2)); }
     return out; };
-  const KW = { qh: Qn(), ps: V3(), qs: Qn(), ax: V3(), sh: V3(), p: V3(), q: Qn(), q2: Qn(), a: V3(), e: V3(), F: V3(), P: V3(), W: V3(), fk: V3(), qfk: Qn(), qG: Qn(), qH: Qn(), hint: V3(), ft: V3(), qf: Qn(), dir: V3(), v1: V3(), v2: V3() };
+  const KW = { qfix: Qn(), qh: Qn(), ps: V3(), qs: Qn(), ax: V3(), sh: V3(), p: V3(), q: Qn(), q2: Qn(), a: V3(), e: V3(), F: V3(), P: V3(), W: V3(), fk: V3(), qfk: Qn(), qG: Qn(), qH: Qn(), hint: V3(), ft: V3(), qf: Qn(), dir: V3(), v1: V3(), v2: V3() };
   const KGRIP = [0.060 * HAND_S, 0.0195 * HAND_S], FLY = V3(Math.cos(3 * DEG), Math.sin(3 * DEG), 0);
   LT.kTrail = [beam(), beam()]; LT.kGlint = [[beam(), beam()], [beam(), beam()]];
   const knifeLightOff = () => { for (const B of LT.kTrail) for (const m of B) m.visible = false; for (const G of LT.kGlint) for (const B of G) for (const m of B) m.visible = false; };
@@ -411,14 +430,19 @@
       // her hand, from the knife: the handle in her fist, the blade out past her thumb
       const cb = Math.cos(15 * DEG), sb = Math.sin(15 * DEG), a = KW.a.set(0, 1, 0).applyQuaternion(KW.q), e = KW.e.set(1, 0, 0).applyQuaternion(KW.q);
       KW.F.copy(e).multiplyScalar(cb).addScaledVector(a, sb); KW.v1.copy(a).multiplyScalar(cb).addScaledVector(e, -sb); if (i) KW.P.crossVectors(KW.F, KW.v1); else KW.P.crossVectors(KW.v1, KW.F);
-      KW.W.copy(KW.p).addScaledVector(KW.F, -KGRIP[0]).addScaledVector(KW.P, -KGRIP[1]); handQ(S, KW.F, KW.P, KW.qG);
-      const on = o.onH[i]; rp(SK['hand' + S], KW.fk); rq(SK['hand' + S], KW.qfk); KW.W.lerp(KW.fk, 1 - on); if (T < 0.5) { const ar = 4 * on * (1 - on); KW.W.x += (i ? 0.06 : -0.06) * ar; KW.W.z -= 0.08 * ar; } KW.qH.copy(KW.qfk).slerp(KW.qG, on);
+      KW.W.copy(KW.p).addScaledVector(KW.F, -KGRIP[0]).addScaledVector(KW.P, -KGRIP[1]);
       KW.hint.set((i ? 1 : -1) * lerp(0.6, 0.8, o.free), lerp(-0.3, -0.5, o.free), lerp(-1, 0.3, o.free));
+      // Her wrist: cocked back a little in the wind-up, snapped forward at the throw, never past what a wrist can do. Once the knife has
+      // gone her open hand follows her forearm. The knife turns with her hand, so its point is still high when she lets go.
+      { const aft0 = T - TK[i], lim = lerp(34, 12, sm(0, 0.10, aft0)) * DEG;
+        for (let it = 0; it < 2; it++) { if (!wristLimit(ARM[S], KW.W, KW.hint, KW.F, KW.P, lim, KW.qfix)) break; KW.q.premultiply(KW.q2.identity().slerp(KW.qfix, o.free)); KW.W.copy(KW.p).addScaledVector(KW.F, -KGRIP[0]).addScaledVector(KW.P, -KGRIP[1]); } }
+      handQ(S, KW.F, KW.P, KW.qG);
+      const on = o.onH[i]; rp(SK['hand' + S], KW.fk); rq(SK['hand' + S], KW.qfk); KW.W.lerp(KW.fk, 1 - on); if (T < 0.5) { const ar = 4 * on * (1 - on); KW.W.x += (i ? 0.06 : -0.06) * ar; KW.W.z -= 0.08 * ar; } KW.qH.copy(KW.qfk).slerp(KW.qG, on);
       { const miss = reach(S, KW.W, KW.qH, KW.hint, sm(0, 0.25, on)); if (i) { if (miss > D.missL) D.missL = miss; } else if (miss > D.missR) D.missR = miss; }
       // the knife itself: in her hand until she lets go, then flying point first, then back in its pocket
       const aft = T - TK[i], G = LT.kGlint[i]; let trail = 0, glint = 0;
       if (aft < 0) { B.position.copy(KW.p); B.quaternion.copy(KW.q); B.scale.setScalar(1); }
-      else if (o.back <= 0) { knifeHand(i, knifeBeats(TK[i], KNQ), KW.sh, KR); B.position.copy(KR.p).addScaledVector(FLY, 0.02 + 19 * aft); B.quaternion.setFromAxisAngle(ZAX, 3 * DEG - PI / 2); B.scale.setScalar(aft < 0.5 ? 1 : 0.0001);
+      else if (o.back <= 0) { knifeHand(i, knifeBeats(TK[i], KNQ), KW.sh, KR); B.position.copy(KR.p).addScaledVector(FLY, 0.02 + 19 * aft); B.quaternion.setFromAxisAngle(ZAX, lerp(40, 3, sm(0, 0.07, aft)) * DEG - PI / 2); B.scale.setScalar(aft < 0.5 ? 1 : 0.0001);
         trail = 0.75 * Math.exp(-aft / 0.16) * (1 - sm(0.35, 0.5, aft)); KW.v2.copy(B.position).addScaledVector(FLY, -Math.min(19 * aft, 1.6)); }
       else { B.position.copy(KW.ps); B.quaternion.copy(KW.qs); B.scale.setScalar(Math.max(0.0001, o.back)); glint = Math.sin(PI * o.back); }
       B.updateMatrixWorld(true);
@@ -426,6 +450,91 @@
       KW.v1.copy(KW.ps).addScaledVector(XAX, -0.045 * glint); KW.v2.copy(KW.ps).addScaledVector(XAX, 0.045 * glint); setBeam(G[0], KW.v1, KW.v2, 0.0008, glint, 1);
       KW.v1.copy(KW.ps).addScaledVector(YAX, -0.065 * glint); KW.v2.copy(KW.ps).addScaledVector(YAX, 0.065 * glint); setBeam(G[1], KW.v1, KW.v2, 0.0008, glint, 1);
       const held = aft < 0 && on > 0.8; if (i) fWant.L = held ? FP.fist : aft >= 0 && aft < 0.35 ? FP.open : FP.relax; else fWant.R = held ? FP.fist : aft >= 0 && aft < 0.35 ? FP.open : FP.relax; }
+  }
+  // ---------- her magic: the gem (H9) and Silverglass (H6), with their light (I2, I3, I4, I6) ----------
+  // Small pictures of light, drawn once: a soft round glow, a star with four long rays, a thin ring, and the pane of glass.
+  const cvTex = (n, draw) => { const c = document.createElement('canvas'); c.width = c.height = n; draw(c.getContext('2d'), n); const t = new THREE.CanvasTexture(c); t.encoding = THREE.sRGBEncoding; return t; };
+  const TXG = cvTex(128, (g, n) => { const r = g.createRadialGradient(n / 2, n / 2, 0, n / 2, n / 2, n / 2); r.addColorStop(0, 'rgba(255,255,255,1)'); r.addColorStop(0.25, 'rgba(255,255,255,0.55)'); r.addColorStop(0.6, 'rgba(255,255,255,0.12)'); r.addColorStop(1, 'rgba(255,255,255,0)'); g.fillStyle = r; g.fillRect(0, 0, n, n); });
+  const TXS = cvTex(256, (g, n) => { for (const [sx, sy] of [[1, 0.035], [0.035, 1], [0.16, 0.16]]) { g.save(); g.translate(n / 2, n / 2); g.scale(sx, sy); const r = g.createRadialGradient(0, 0, 0, 0, 0, n / 2); r.addColorStop(0, 'rgba(255,255,255,1)'); r.addColorStop(0.3, 'rgba(255,255,255,0.5)'); r.addColorStop(1, 'rgba(255,255,255,0)'); g.fillStyle = r; g.beginPath(); g.arc(0, 0, n / 2, 0, TAU); g.fill(); g.restore(); } });
+  const TXR = cvTex(256, (g, n) => { g.strokeStyle = 'rgba(255,255,255,1)'; g.shadowColor = 'rgba(255,255,255,1)'; g.shadowBlur = n * 0.03; g.lineWidth = n * 0.012; g.beginPath(); g.arc(n / 2, n / 2, n * 0.42, 0, TAU); g.stroke(); g.stroke(); });
+  // The pane (I2): a round window of thin petal-shaped facets, made of circles laid over one another, with a crescent moon at its centre
+  const TXP = cvTex(768, (g, n) => { const c = n / 2, R = n * 0.455; g.globalCompositeOperation = 'lighter'; g.save(); g.beginPath(); g.arc(c, c, R, 0, TAU); g.clip();
+    for (const [k, q, rr] of [[12, 0.5, 0.5], [12, 0.75, 0.25], [6, 0.5, 0.25]]) for (let i = 0; i < k; i++) { const a = (i / k) * TAU + (rr < 0.3 ? 0.26 : 0), x = c + R * q * Math.cos(a), y = c + R * q * Math.sin(a);
+      g.beginPath(); g.arc(x, y, R * rr, 0, TAU); g.fillStyle = i % 3 ? 'rgba(60,110,255,0.055)' : 'rgba(120,90,240,0.065)'; g.fill(); g.strokeStyle = 'rgba(205,228,255,0.50)'; g.lineWidth = n * 0.0032; g.shadowColor = 'rgba(150,190,255,0.9)'; g.shadowBlur = n * 0.008; g.stroke(); }
+    g.restore(); g.shadowColor = 'rgba(160,200,255,1)'; g.shadowBlur = n * 0.02; g.strokeStyle = 'rgba(235,245,255,0.95)'; g.lineWidth = n * 0.008; g.beginPath(); g.arc(c, c, R, 0, TAU); g.stroke(); g.stroke();
+    g.globalCompositeOperation = 'destination-out'; g.shadowBlur = 0; g.fillStyle = 'rgba(0,0,0,0.85)'; g.beginPath(); g.arc(c, c, R * 0.235, 0, TAU); g.fill();
+    g.globalCompositeOperation = 'lighter'; g.save(); g.beginPath(); g.arc(c - R * 0.02, c, R * 0.20, 0, TAU); g.clip(); g.beginPath(); g.rect(0, 0, n, n); g.arc(c + R * 0.075, c - R * 0.03, R * 0.175, 0, TAU, true); g.fillStyle = 'rgba(232,242,255,0.96)'; g.fill('evenodd'); g.restore(); });
+  const sprite = (tex, hex) => { const sp = new THREE.Sprite(glowOnly(new THREE.SpriteMaterial({ map: tex, color: new THREE.Color(hex), transparent: true, opacity: 0, depthWrite: false, toneMapped: false, fog: false }))); sp.visible = false; sp.renderOrder = 8; FX.add(sp); return sp; };
+  const setSprite = (sp, p, size, op) => { sp.visible = op > 0.004 && size > 1e-4; if (!sp.visible) return; sp.position.copy(p); sp.scale.set(size, size, 1); sp.material.opacity = op; };
+  const rndK = (i, k) => { const x = Math.sin(i * 127.1 + k * 311.7) * 43758.5453; return x - Math.floor(x); };       // the same scatter every time
+  const MG = { gGlow: sprite(TXG, '#9fd0ff'), gStar: sprite(TXS, '#eaf4ff'), gRing: sprite(TXR, '#a8d4ff'), flash: sprite(TXG, '#cfe4ff'), sparks: [], rim: [], shards: [] };
+  for (let i = 0; i < 18; i++) MG.sparks.push(sprite(i % 3 ? TXS : TXG, i % 2 ? '#cfe4ff' : '#f4f9ff'));
+  for (let i = 0; i < 12; i++) MG.rim.push(sprite(TXS, '#dcebff'));
+  MG.pane = new THREE.Mesh(new THREE.PlaneGeometry(1, 1), glowOnly(new THREE.MeshBasicMaterial({ map: TXP, color: new THREE.Color('#ffffff'), transparent: true, opacity: 0, depthWrite: false, toneMapped: false, fog: false, side: THREE.DoubleSide })));
+  MG.pane.frustumCulled = false; MG.pane.visible = false; MG.pane.renderOrder = 7; FX.add(MG.pane);
+  // shards (I3): long diamonds, thin slivers and crescents
+  { const flatG = (pts, tris) => { const g = new THREE.BufferGeometry(); g.setAttribute('position', new THREE.Float32BufferAttribute(pts, 3)); g.setIndex(tris); return g; };
+    const dia = (w) => flatG([0, 1, 0, w, 0, 0, 0, -1, 0, -w, 0, 0], [0, 3, 1, 1, 3, 2]), cres = (() => { const p = [], ix = [], n = 10; for (let i = 0; i <= n; i++) { const a = lerp(-1.25, 1.25, i / n), k = Math.cos(a / 1.25 * PI / 2); p.push(Math.cos(a) - 0.55, Math.sin(a), 0, Math.cos(a) - 0.55 - 0.42 * k, Math.sin(a), 0); } for (let i = 0; i < n; i++) { const a = i * 2; ix.push(a, a + 1, a + 2, a + 1, a + 3, a + 2); } return flatG(p, ix); })();
+    const GS = [dia(0.34), cres, dia(0.15)]; for (let i = 0; i < 20; i++) MG.shards.push(lightMesh(GS[i % 3], i % 4 === 0 ? '#eaf2ff' : i % 2 ? '#a9c8ff' : '#b9b0ff')); }
+  const magicOff = () => { for (const k of ['gGlow', 'gStar', 'gRing', 'flash']) MG[k].visible = false; for (const a of [MG.sparks, MG.rim, MG.shards]) for (const m of a) m.visible = false; MG.pane.visible = false; if (meshes.veins) meshes.veins.visible = false; MATS.gem.emissiveIntensity = 0; MATS.lens.emissiveIntensity = 0; };
+  MATS.gem.emissive = lin('#7fc4ff'); MATS.gem.emissiveIntensity = 0; MATS.lens.emissive = lin('#9fc8ff'); MATS.lens.emissiveIntensity = 0; if (meshes.veins) { meshes.veins.visible = false; meshes.veins.castShadow = false; meshes.veins.renderOrder = 7; }
+  const GEMP = (() => { const O = bandPt(0, bandPh(0), 0.0036); return V3(O[0], O[1], O[2] + 0.012); })();       // just in front of the gem on her headband (it rides on her head)
+  const MW = { gw: V3(), F: V3(), P: V3(), W: V3(), qG: Qn(), qH: Qn(), fk: V3(), qfk: Qn(), hint: V3(), sh: V3(), n: V3(), side: V3(), C: V3(), v: V3(), palm: V3(), ft: V3(), qf: Qn(), q: Qn(), q2: Qn() };
+  // The gem, in its own seconds: her right hand rises and two fingers touch the gem (0.45); it flares, a ring of light opens from it, and
+  // light runs down both her arms to her knuckles (to 1.05). For one breath (0.55 to 1.15) everything hangs still: sparks in the air
+  // round her, her sleeves, hair and charms. Then it all lets go at once, her eyes open and her hand comes down. Her arms stay lit a while.
+  const GMB = {}; let stillK = 0, gemWas = 9;
+  const gemBeats = (T, o) => { o.T = T; o.up = sm(0.05, 0.45, T) * (1 - sm(1.20, 1.65, T)); o.touch = sm(0.42, 0.50, T); o.run = sm(0.46, 1.05, T); o.still = sm(0.55, 0.66, T) * (1 - sm(1.15, 1.19, T)); o.lit = o.touch * (1 - sm(1.35, 2.45, T)); o.eyes = sm(0.30, 0.42, T) * (1 - sm(1.18, 1.30, T)); o.burst = sm(1.15, 1.55, T); return o; };
+  function gemStage(T) {
+    if (T < 0) { gemWas = 9; return false; }
+    inRoot(); const o = gemBeats(T, GMB); rpt(SK.head, GEMP, MW.gw);
+    // her right hand: first two fingers straight, the others folded, their tips on the gem
+    if (o.up > 0) { MW.F.set(0.50, 0.80, -0.35).normalize(); MW.P.set(-0.10, -0.35, -0.93); MW.W.copy(MW.gw).addScaledVector(MW.F, -0.150).addScaledVector(MW.P.normalize(), -0.004); handQ('R', MW.F, MW.P, MW.qG);
+      rp(SK.handR, MW.fk); rq(SK.handR, MW.qfk); MW.W.lerp(MW.fk, 1 - o.up); { const arc = 4 * o.up * (1 - o.up); MW.W.z += 0.10 * arc; MW.W.x -= 0.05 * arc; } MW.qH.copy(MW.qfk).slerp(MW.qG, o.up);
+      const miss = reach('R', MW.W, MW.qH, MW.hint.set(-0.8, -0.3, 0.5), sm(0, 0.25, o.up)); if (miss > D.missR) D.missR = miss; }
+    fWant.R = o.up > 0.5 ? FP.two : FP.relax;
+    // the gem's light (I6): a soft glow, a star with four rays when she touches it, a ring that opens and fades
+    const since = Math.max(0, T - 0.46), flare = o.touch * Math.exp(-since / 0.28), ru = cl(since / 0.55, 0, 1);
+    setSprite(MG.gGlow, MW.gw, 0.07 + 0.07 * o.lit + 0.14 * flare, 0.45 * o.lit + 0.4 * flare); setSprite(MG.gStar, MW.gw, 0.16 + 0.42 * flare + 0.05 * o.lit * Math.sin(T * 9), Math.max(flare, 0.35 * o.lit));
+    setSprite(MG.gRing, MW.gw, 0.05 + 0.85 * ru, o.touch * Math.pow(1 - ru, 1.6)); MATS.gem.emissiveIntensity = 2.2 * o.lit; MATS.lens.emissiveIntensity = 0.55 * o.lit;
+    // the light down her arms: the picture slides so the lit part grows from her shoulders to her knuckles
+    if (meshes.veins) { meshes.veins.visible = o.lit > 0.01; MATS.veins.opacity = o.lit; MATS.veins.map.offset.y = 0.5 * (1 - o.run); }
+    // the moment: sparks hang where they are, then drift up and out and fade
+    for (let i = 0; i < MG.sparks.length; i++) { const a = rndK(i, 1) * TAU, r = 0.28 + 0.42 * rndK(i, 2), y = 0.35 + 1.45 * rndK(i, 3), on = sm(0.52 + 0.1 * rndK(i, 4), 0.66 + 0.1 * rndK(i, 4), T) * (1 - sm(0.1, 1, o.burst));
+      MW.v.set(Math.cos(a) * r * (1 + 0.5 * o.burst), y + 0.22 * o.burst * o.burst, 0.10 + Math.sin(a) * r * 0.55 * (1 + 0.5 * o.burst)); setSprite(MG.sparks[i], MW.v, (0.035 + 0.06 * rndK(i, 5)) * (i % 3 ? 1.5 : 0.6), on * (0.55 + 0.45 * rndK(i, 6))); }
+    if (gemWas < 1.17 && T >= 1.17 && gearKick) gearKick(); gemWas = T;       // everything lets go at once
+    return true;
+  }
+  // Silverglass, in its own seconds: she hops her feet wide and draws her left hand back (to 0.36), pushes her palm out flat toward screen
+  // right and a little toward us (0.36 to 0.60), and the pane opens in front of it (0.52 to 0.92): a round window of glass a metre
+  // across, with loose shards floating at its rim. She holds it (to 1.90), then it breaks into shards that scatter and fade.
+  const GLB = {}, PN = V3(0.80, 0, 0.60).normalize(), PSIDE = V3(0.60, 0, -0.80), PQ = Qn().setFromUnitVectors(ZAX, PN);
+  const glassBeats = (T, o) => { o.T = T; o.st = sm(0.05, 0.36, T) * (1 - sm(2.15, 2.55, T)); o.hop = Math.sin(PI * sm(0.05, 0.36, T)) + Math.sin(PI * sm(2.15, 2.55, T)); o.back = sm(0.10, 0.34, T) * (1 - sm(0.36, 0.56, T)); o.push = sm(0.36, 0.60, T) * (1 - sm(2.02, 2.40, T));
+    o.arms = sm(0.08, 0.36, T) * (1 - sm(2.05, 2.50, T)); o.form = sm(0.52, 0.92, T); o.brk = sm(1.90, 2.00, T); return o; };
+  function glassStage(T) {
+    if (T < 0) return false;
+    inRoot(); const o = glassBeats(T, GLB), kLeg = sm(0, 0.2, o.st);
+    if (kLeg > 0) for (const [Sd] of SIDES) { const lead = Sd === 'L', yaw = (lead ? 35 : -8) * DEG * o.st; MW.ft.set(lead ? 0.25 : -0.24, FOOT_Y, lead ? 0.04 : -0.03).lerp(SK['foot' + Sd].userData.rest, 1 - o.st); MW.ft.y = FOOT_Y + 0.05 * o.hop;
+      const miss = plant(Sd, MW.ft, MW.qf.setFromAxisAngle(YAX, yaw), MW.hint.set(Math.sin(yaw), 0.25, Math.cos(yaw)), kLeg); if (miss > D.missLeg) D.missLeg = miss; }
+    // her left palm, flat, fingers up, pushed out along the way the pane faces; her right hand raised open behind it
+    rp(SK.uarmL, MW.sh); MW.F.set(0.06, 1, 0).normalize(); MW.P.copy(PN); MW.W.copy(MW.sh).addScaledVector(PN, 0.20 - 0.08 * o.back + 0.235 * o.push); MW.W.y += 0.04; handQ('L', MW.F, MW.P, MW.qG); MW.palm.copy(MW.W).addScaledVector(MW.F, 0.085);
+    rp(SK.handL, MW.fk); rq(SK.handL, MW.qfk); MW.W.lerp(MW.fk, 1 - o.arms); MW.qH.copy(MW.qfk).slerp(MW.qG, o.arms); { const miss = reach('L', MW.W, MW.qH, MW.hint.set(0.3, -1, -0.4), sm(0, 0.25, o.arms)); if (miss > D.missL) D.missL = miss; }
+    rp(SK.uarmR, MW.sh); MW.F.set(0.25, 0.95, 0.10).normalize(); MW.P.copy(PN); MW.W.copy(MW.sh).add(MW.v.set(0.17, 0.02 + 0.03 * o.push, 0.24)); handQ('R', MW.F, MW.P, MW.qG);
+    rp(SK.handR, MW.fk); rq(SK.handR, MW.qfk); MW.W.lerp(MW.fk, 1 - o.arms); { const arc = 4 * o.arms * (1 - o.arms); MW.W.z += 0.08 * arc; } MW.qH.copy(MW.qfk).slerp(MW.qG, o.arms); { const miss = reach('R', MW.W, MW.qH, MW.hint.set(-0.7, -0.7, 0.2), sm(0, 0.25, o.arms)); if (miss > D.missR) D.missR = miss; }
+    fWant.L = o.arms > 0.5 ? FP.flat : FP.relax; fWant.R = o.arms > 0.5 ? FP.soft : FP.relax;
+    // the pane: in front of her palm, its centre a little below and beyond it
+    const R = 0.50, grow = o.form < 1 ? o.form * (1 + 0.35 * Math.sin(PI * o.form) * (1 - o.form)) : 1, alive = o.form * (1 - o.brk);
+    MW.C.copy(MW.palm).addScaledVector(PN, 0.07).addScaledVector(PSIDE, 0.10); MW.C.y -= 0.13;
+    MG.pane.visible = alive > 0.01; if (MG.pane.visible) { MG.pane.position.copy(MW.C); MG.pane.quaternion.copy(PQ).multiply(MW.q2.setFromAxisAngle(ZAX, 0.9 * (1 - o.form) + 0.05 * Math.sin(T * 1.7))); MG.pane.scale.setScalar(2 * R / 0.91 * Math.max(0.02, grow)); MG.pane.material.opacity = alive * (0.86 + 0.14 * Math.sin(T * 13)); }
+    const fl = Math.sin(PI * sm(1.86, 2.12, T)) + 0.6 * Math.sin(PI * sm(0.50, 0.80, T)); setSprite(MG.flash, MW.C, 0.5 + 0.9 * fl, 0.55 * fl);
+    for (let i = 0; i < MG.rim.length; i++) { const a = (i / MG.rim.length) * TAU + T * 0.5, tw = 0.5 + 0.5 * Math.sin(T * (17 + i * 2.3) + i), on = sm(0.50, 0.70, T) * (1 - o.brk) * tw; MW.v.copy(MW.C).addScaledVector(PSIDE, Math.cos(a) * R * grow).addScaledVector(YAX, Math.sin(a) * R * grow); setSprite(MG.rim[i], MW.v, 0.03 + 0.05 * tw, on); }
+    // shards: six float at the rim while the pane stands; when it breaks, all of them fly out from where the glass was, turn, slow and fade
+    const e = T < 1.92 ? 0 : 1 - Math.exp(-(T - 1.92) / 0.30), gone = 1 - sm(2.25, 2.95, T);
+    for (let i = 0; i < MG.shards.length; i++) { const m = MG.shards[i], loose = i < 6, a = rndK(i, 7) * TAU, r0 = loose ? R * (1.08 + 0.12 * rndK(i, 8)) : R * Math.sqrt(0.08 + 0.9 * rndK(i, 8)), op = (loose ? sm(0.62, 0.95, T) : o.brk) * gone * (0.30 + 0.35 * rndK(i, 9));
+      m.visible = op > 0.01; if (!m.visible) continue; const rr = r0 * (1 + 0.85 * e * (0.5 + rndK(i, 10))), bob = loose ? 0.02 * Math.sin(T * 2.1 + i) * (1 - o.brk) : 0, sz = (loose ? 0.045 : 0.035) + 0.06 * rndK(i, 11);
+      m.position.copy(MW.C).addScaledVector(PSIDE, Math.cos(a) * rr).addScaledVector(YAX, Math.sin(a) * rr + bob - 0.22 * e * e).addScaledVector(PN, (rndK(i, 12) - 0.35) * 0.45 * e + (loose ? 0.02 : 0));
+      m.quaternion.copy(PQ).multiply(MW.q2.setFromAxisAngle(MW.v.set(rndK(i, 13) - 0.5, rndK(i, 14) - 0.5, 0.6).normalize(), a + T * (loose ? 0.6 : 0.3) + 5 * e * (rndK(i, 15) - 0.5))); m.scale.setScalar(sz); m.material.opacity = op; }
+    return true;
   }
   // Soft things (SOFT): each hangs from its root and its tip is a weight on a spring. It is pulled to where it would rest (its built
   // direction, bent toward straight down), it lags when its root moves, and it cannot swing past a set angle. A sleeve may hang
@@ -463,7 +572,7 @@
   function pose(o) {
     o = o || {}; mv = { name: 'pose', t: 0 }; wk = 0; jg = 0; lastPose = { arm: o.arm == null ? 15 : o.arm, leg: o.leg || 0 }; const arm = lastPose.arm * DEG - A_POSE, leg = lastPose.leg * DEG;
     restAll(); for (const [S, s] of SIDES) { SK['uarm' + S].rotation.z = s * arm; SK['thigh' + S].rotation.z = s * leg; SK['foot' + S].rotation.z = -s * leg; }
-    armsAndBow(-1, 0); swordStage(-1, 0, true); knifeStage(-1); root.updateMatrixWorld(true);
+    armsAndBow(-1, 0); swordStage(-1, 0, true); knifeStage(-1); magicOff(); stillK = 0; root.updateMatrixWorld(true);
     if (gearSettle) { gearSettle(); root.updateMatrixWorld(true); }       // the bags come to rest against her in the new pose
     softTick(0, true); root.updateMatrixWorld(true);
   }
@@ -537,6 +646,14 @@
       add('hips', 0, 0.40 * yaw, 0); add('spine1', Math.sin(0.5 * yaw) * lean, 0.10 * yaw, -Math.cos(0.5 * yaw) * lean); add('spine2', 0, 0.28 * yaw, 0); add('spine3', 0, 0.22 * yaw, 0);
       add('neck', 0, 0.45 * hy, 0); add('head', 0, 0.55 * hy, 0); SK.hips.position.x += (-0.03 * o.coil + 0.07 * o.t1) * o.st; SK.hips.position.y += 0.05 * o.hop - 0.07 * o.st;
       for (const [S] of SIDES) { add('farm' + S, -0.10 * easeIn, 0, 0); add('shin' + S, 0.03 * easeIn, 0, 0); add('thigh' + S, -0.015 * easeIn, 0, 0); add('foot' + S, -0.015 * easeIn, 0, 0); } }
+    // The gem (H9): she stands straight and still, eyes closed, a small smile. Her hand and the light are worked out in gemStage.
+    stillK = 0;
+    if (N === 'gem') { const o = gemBeats(T, GMB); stillK = o.still; add('head', 0.05 * o.up, 0, 0); add('neck', 0.03 * o.up, 0, 0); add('spine3', -0.02 * o.up, 0, 0); for (const [S] of SIDES) add('farm' + S, -0.10, 0, 0);
+      squint = Math.max(squint, o.eyes); if (o.eyes > 0.5) mouthNow = 'smile'; }
+    // Silverglass (H6): feet wide, her body turned a little toward screen right and leaning into her palm. The rest is in glassStage.
+    if (N === 'glass') { const o = glassBeats(T, GLB), easeIn = 1 - sm(0, 0.15, T) + sm(2.6, 2.9, T);
+      add('hips', 0, 8 * DEG * o.st, 0); add('spine1', 0.05 * o.push, 0, -0.03 * o.push); add('spine2', 0, (12 * o.st + 6 * o.push - 8 * o.back) * DEG, 0); add('neck', 0, 0.20 * o.st, 0); add('head', 0, 0.26 * o.st, 0);
+      SK.hips.position.x += 0.03 * o.push * o.st; SK.hips.position.y += 0.04 * o.hop - 0.06 * o.st; for (const [S] of SIDES) add('farm' + S, -0.10 * easeIn, 0, 0); }
     // a cheer: she dips, jumps, throws an arm up, lands soft
     if (N === 'cheer') { const c1 = sm(0, 0.22, T) * (1 - sm(0.22, 0.36, T)), u = cl((T - 0.36) / 0.5, 0, 1), air = Math.sin(PI * u), c2 = sm(0.84, 0.94, T) * (1 - sm(0.94, 1.3, T)), c = c1 + 0.8 * c2, k = sm(0.2, 0.45, T) * (1 - sm(1.0, 1.45, T));
       for (const [S] of SIDES) { add('thigh' + S, -0.45 * c - 0.25 * air, 0, 0); add('shin' + S, 0.9 * c + 0.5 * air, 0, 0); add('foot' + S, -0.45 * c + 0.2 * air, 0, 0); }
@@ -546,13 +663,13 @@
     if (N === 'limber') { const k = sm(0, 0.3, T) * (1 - sm(2.2, 2.6, T));
       bounce(0.020 * Math.abs(Math.sin(T * 9.5)) * k); for (const [S, s] of SIDES) { add('clav' + S, 0, 0, s * 0.16 * Math.sin(T * 5 + (s > 0 ? 1.6 : 0)) * k); add('uarm' + S, 0.14 * Math.sin(T * 9 + s) * k, 0, s * 0.06 * k); add('farm' + S, -(0.5 + 0.2 * Math.sin(T * 11 + s)) * k, 0, 0); add('shin' + S, 0.10 * k, 0, 0); add('thigh' + S, -0.05 * k, 0, 0); }
       add('head', 0, 0, 0.22 * Math.sin(T * 2.4) * k); add('neck', 0.04 * k, 0, 0.08 * Math.sin(T * 2.4) * k); }
-    armsAndBow(N === 'draw' ? T : -1, dt); swordStage(N === 'sword' ? T : -1, dt, snapNow); knifeStage(N === 'knives' ? T : -1); fingersTick(dt, snapNow);
+    armsAndBow(N === 'draw' ? T : -1, dt); swordStage(N === 'sword' ? T : -1, dt * (1 - stillK), snapNow); knifeStage(N === 'knives' ? T : -1); { const g1 = gemStage(N === 'gem' ? T : -1), g2 = glassStage(N === 'glass' ? T : -1); if (!g1 && !g2) magicOff(); else { if (!g1) { for (const k of ['gGlow', 'gStar', 'gRing']) MG[k].visible = false; for (const m of MG.sparks) m.visible = false; if (meshes.veins) meshes.veins.visible = false; MATS.gem.emissiveIntensity = 0; MATS.lens.emissiveIntensity = 0; } if (!g2) { MG.pane.visible = false; MG.flash.visible = false; for (const a of [MG.rim, MG.shards]) for (const m of a) m.visible = false; } } } fingersTick(dt, snapNow);
     // her face: she blinks; her mouth moves when she talks
     if (clock > blinkAt) { blinkT = clock; blinkAt = clock + 2.2 + 2.6 * Math.abs(Math.sin(clock * 12.9)); }
     const bt = clock - blinkT, eyes = Math.max(squint, bt < 0.05 ? 0.5 : bt < 0.10 ? 1 : bt < 0.15 ? 0.5 : 0), key = eyes + '|' + mouthNow;
     if (key !== facePainted) { paintFace(eyes, mouthNow); facePainted = key; }
-    if (gearTick) gearTick(dt);       // the bags and charms swing with her
-    softTick(dt);       // and her sleeves, the tails of her headband and her loose locks
+    if (gearTick) gearTick(dt * (1 - stillK));       // the bags and charms swing with her (and hang still for the breath of the gem)
+    softTick(dt * (1 - stillK));       // and her sleeves, the tails of her headband and her loose locks
   }
   return { root, skeleton, bones, SK, animate, pose, play, seek, moves: MOVES, walk, bow: BOWK, sword: SWK, knives: KNK, light: FX, swing: () => { if (gearKick) gearKick(); }, setLook, meshes, spin: 0, time: 0, stanceProgress: 1, setStance() {}, setFace: (eyes, mouth) => paintFace(eyes || 0, mouth || 'rest'), debug: { SK, meshes, D, cloths: [], headPoint, JH, hairPt, phOfY }, get triangles() { return triCount; } };
 }
