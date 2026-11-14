@@ -9,7 +9,7 @@ with sync_playwright() as p:
     pg.set_default_timeout(150000)
     pg.on('console', lambda m: logs.append(m.type + ': ' + m.text[:300]) if m.type == 'error' else None)
     pg.on('pageerror', lambda e: logs.append('PAGEERR: ' + str(e)[:500]))
-    pg.goto('file:///home/claude/io/deliver/' + (sys.argv[1] if len(sys.argv) > 1 else 'Io_3D_stage13.html')); pg.wait_for_function('window.IO || !document.getElementById("err").hidden')
+    pg.goto('file:///home/claude/io/deliver/' + (sys.argv[1] if len(sys.argv) > 1 else 'Io_3D_stage14.html')); pg.wait_for_function('window.IO || !document.getElementById("err").hidden')
     pg.wait_for_timeout(3000)
     print('hud:', pg.inner_text('#hud'), '| err hidden:', pg.evaluate('document.getElementById("err").hidden'), '| scrollW', pg.evaluate('document.documentElement.scrollWidth'), 'clientW', pg.evaluate('document.documentElement.clientWidth'))
     print('buttons:', pg.evaluate('[...document.querySelectorAll(".chip")].map(b => b.textContent)'))
@@ -29,6 +29,7 @@ with sync_playwright() as p:
     print('faces painted:', pg.evaluate('Object.keys(IO.R.debug.JH ? {a:1} : {}).length'), '| talk on then held:', pg.evaluate('typeof IO.R.talk'))
     pg.evaluate('document.querySelector("#faces").children[0].click()')
     sp = []
+    for i in range(3): pg.evaluate('document.querySelector("#reacts").children[%d].click()' % i); pg.evaluate("(() => { const R = IO.R, n = Math.round(R.shots[R.move] * 0.5 * 60); for (let k = 0; k < n; k++) R.animate(0, 0, 0, 1 / 60); })()"); pg.wait_for_timeout(1500); print('reaction', pg.evaluate('IO.R.move'))
     for i in range(7): pg.evaluate('document.querySelector("#spells").children[%d].click()' % i); pg.evaluate("(() => { const R = IO.R, n = Math.round(R.shots[R.move] * 0.62 * 60); for (let k = 0; k < n; k++) R.animate(0, 0, 0, 1 / 60); })()"); pg.wait_for_timeout(2600); sp.append((pg.evaluate('IO.R.move'), pg.evaluate('IO.R.spellFx.parts.n'), pg.evaluate('IO.R.spellFx.dummy.visible || IO.R.spellFx.ally.visible'))); still('spell_%d' % i)
     pg.evaluate('document.querySelector("#moves").children[1].click()'); pg.wait_for_timeout(600); print('spells (move, specks of light alive, target standing):', sp, '| back to:', pg.evaluate('IO.R.move'))
     fl = []

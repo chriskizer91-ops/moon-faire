@@ -291,7 +291,7 @@
 
   let lastPose = { arm: 15, leg: 0 }, mv = { name: 'pose', t: 0 }, wk = 0, gph = 0, spinWas = 0;
   let clock = 0, blinkAt = 1.6, blinkT = -1, mouthAt = 0, mouthNow = 'rest', facePainted = '', talking = false, held = null, blinking = true;
-  const SHOTS = { glasses: 2.4, hat: 2.6, curtsey: 3.0, twirl: 2.6, herb: 5.0, wave: 3.0, look: 3.6, sickle: 3.4, crescent: 4.7, salve: 7.2, guardian: 14.6, garden: 12.4, thorn: 7.6, revive: 9.8, cradle: 6.4 }, MOVES = ['pose', 'idle', 'walk', 'jog', 'squat', 'kneel', 'hover', 'talk', 'read', 'glasses', 'hat', 'curtsey', 'twirl', 'herb', 'wave', 'look', 'sickle', 'crescent', 'salve', 'guardian', 'garden', 'thorn', 'revive', 'cradle'], SPELLS = ['crescent', 'salve', 'guardian', 'garden', 'thorn', 'revive', 'cradle'];
+  const SHOTS = { glasses: 2.4, hat: 2.6, curtsey: 3.0, twirl: 2.6, herb: 5.0, wave: 3.0, look: 3.6, sickle: 3.4, crescent: 4.7, salve: 7.2, guardian: 14.6, garden: 12.4, thorn: 7.6, revive: 9.8, cradle: 6.4, hit: 1.6, down: 5.6, win: 3.8 }, MOVES = ['pose', 'idle', 'walk', 'jog', 'squat', 'kneel', 'hover', 'talk', 'read', 'glasses', 'hat', 'curtsey', 'twirl', 'herb', 'wave', 'look', 'sickle', 'crescent', 'salve', 'guardian', 'garden', 'thorn', 'revive', 'cradle', 'hit', 'down', 'win'], SPELLS = ['crescent', 'salve', 'guardian', 'garden', 'thorn', 'revive', 'cradle'];
   let jg = 0, hSq = 0, hKn = 0, hHv = 0;
   // Her emotions (C10; stage ten). feel: the one she is asked to hold (the page's Feelings buttons, setFeel); FW: how far she is into each,
   // for the small turn of her head and shoulders that goes with it. A move can also ask for one for a moment (her reading face when she reads).
@@ -374,8 +374,11 @@
   GRD.h.copy(GRD.DUM).sub(GRD.ST).setY(0).normalize(); GRD.yaw = Math.atan2(GRD.h.x, GRD.h.z); GRD.end.copy(GRD.DUM).addScaledVector(GRD.h, -1.42);
   // Moonflower Garden: each seed's hand, how far it has flown, how far its shoot has risen and its flower opened
   // stage thirteen. HUG: the closed book hugged to her chest in her left arm (H14, H16); DG: her drawn dagger in her right hand; THN: where Thornwake's crack starts; RVV: where the fallen friend lies (beside her on her right, head toward the foe)
-  const HUG = { want: false }, THN = { from: V3() }, RVV = { x: -0.60, z0: -0.95 }, DG = { Pc: restPts.wrR.clone().addScaledVector(armDir.R, 0.073).addScaledVector(V3(Math.cos(A_POSE), -Math.sin(A_POSE), 0), 0.024), tip: V3() }; let bkH = 0;
-  function bookHug(k) { const sc = Math.max(0.001, sm(0.3, 0.9, k)); carried('spine3', 0.086, 1.185, 0.150, bkP); rootQuat(SK.spine3, bkQ).multiply(bkQ2.setFromEuler(EU.set(-0.10, 0.10, -0.20, 'XYZ'))); SK.book.position.copy(bkP); SK.book.quaternion.copy(bkQ); SK.book.scale.setScalar(sc); }
+  const HUG = { want: false, mode: 'hug' }, THN = { from: V3() }, RVV = { x: -0.60, z0: -0.95 }, DG = { Pc: restPts.wrR.clone().addScaledVector(armDir.R, 0.073).addScaledVector(V3(Math.cos(A_POSE), -Math.sin(A_POSE), 0), 0.024), tip: V3() }; let bkH = 0;
+  function bookHug(k) { const sc = Math.max(0.001, sm(0.3, 0.9, k));
+    if (HUG.mode === 'hand') { handFrame('L'); bkP.copy(rdW).addScaledVector(rdF, 0.105).addScaledVector(rdN, 0.036); sp4.crossVectors(rdF, rdN).normalize(); bkQ.setFromRotationMatrix(rdB.makeBasis(sp4, rdF, rdN)); }       // held up in her left hand, its back against her palm
+    else if (HUG.mode === 'ground') { handFrame('L'); bkP.set(rdW.x + rdF.x * 0.07, 0.024, rdW.z + rdF.z * 0.07); bkQ.setFromEuler(EU.set(-PI / 2, 0.45, 0, 'YXZ')); }       // lying on the ground under her left hand
+    else { carried('spine3', 0.086, 1.185, 0.150, bkP); rootQuat(SK.spine3, bkQ).multiply(bkQ2.setFromEuler(EU.set(-0.10, 0.10, -0.20, 'XYZ'))); } SK.book.position.copy(bkP); SK.book.quaternion.copy(bkQ); SK.book.scale.setScalar(sc); }
   const hugArm = (reaches, aims, w) => { reaches.push(['L', () => carried('spine3', 0.190, 1.085, 0.215, V3()), w, 0.55]); aims.push(['L', V3(-0.55, 0.80, 0.10), V3(-0.15, 0.05, -1), w]); fingers('L', lerp(0.24, 0.30, w)); };
   // her dagger is laid in her closed right hand, wherever the hand is; returns the way its grip points (the blade runs the other way)
   function daggerInHand(scale) { const c = carried('handR', DG.Pc.x, DG.Pc.y, DG.Pc.z, V3()), ax = carried('handR', DG.Pc.x + 1, DG.Pc.y, DG.Pc.z, V3()).sub(c).normalize(), az = carried('handR', DG.Pc.x, DG.Pc.y, DG.Pc.z + 1, V3()).sub(c).normalize(), ay = V3().crossVectors(az, ax);
@@ -388,13 +391,13 @@
   function pose(o) {
     o = o || {}; mv = { name: 'pose', t: 0 }; wk = 0; lastPose = { arm: o.arm == null ? 15 : o.arm, leg: o.leg || 0 }; const arm = lastPose.arm * DEG - A_POSE, leg = lastPose.leg * DEG;
     restAll(); for (const [S, s] of SIDES) { SK['uarm' + S].rotation.z = s * arm; SK['thigh' + S].rotation.z = s * leg; SK['foot' + S].rotation.z = -s * leg; }
-    for (const o2 of SOFT) o2.lift = 0; sync(); softSettle(); root.updateMatrixWorld(true); bkF = 0; bkR = 0; bkS = 0; bkFl = 0; bkH = 0; propVis(false, false);       // held still she carries nothing, as in the paintings she is checked against
+    for (const o2 of SOFT) o2.lift = 0; sync(); softSettle(); root.updateMatrixWorld(true); bkF = 0; bkR = 0; bkS = 0; bkFl = 0; bkH = 0; hatK = 0; hatApply(0); propVis(false, false);       // held still she carries nothing, as in the paintings she is checked against
   }
   function play(name) { if (!MOVES.includes(name) || name === 'pose') { pose(lastPose); return 'pose'; } if (SPELLS.includes(name)) fxClear(); mv = { name, t: 0 }; return name; }
   // one frame of a move: returns her face { eyes, mouth }
   function body(N, T, dt) {
     restAll(); for (const o of SOFT) o.lift = 0;
-    afterHands = null; sickNow = false; SPB.want = false; FLB.want = false; FLB.lift = 0; HUG.want = false; FXWANT.dummy = false; FXWANT.ally = false; FXWANT.ally2 = false;
+    afterHands = null; sickNow = false; SPB.want = false; FLB.want = false; FLB.lift = 0; HUG.want = false; HUG.mode = 'hug'; hatK = 0; FXWANT.dummy = false; FXWANT.ally = false; FXWANT.ally2 = false;
     let eyes = 0, mouth = 'rest', emo = null, plant = 1; const footP = { R: 0, L: 0 }, ank = { R: tgt.clone().copy(ANK.R), L: tgt.clone().copy(ANK.L) };
     wk += ((N === 'walk' || N === 'jog' ? 1 : 0) - wk) * Math.min(1, dt * 4.5); jg += ((N === 'jog' ? 1 : 0) - jg) * Math.min(1, dt * 4.5); const go = wk, still = 1 - go;
     hSq += ((N === 'squat' ? 1 : 0) - hSq) * Math.min(1, dt * 3.2); hKn += ((N === 'kneel' ? 1 : 0) - hKn) * Math.min(1, dt * 2.8); hHv += ((N === 'hover' ? 1 : 0) - hHv) * Math.min(1, dt * 2.2);
@@ -674,6 +677,32 @@
       CRADLE.userData.set(g, shake);
       if (g > 0.02 && g < 0.98 && T < 3) for (let i = 0; i < 3; i++) { const p = CRADLE.userData.at(frnd() * TAU, Math.min(0.99, g * (0.9 + 0.1 * frnd()))); emit(p.x, p.y, p.z, frs(0.05), 0.1 + frnd() * 0.2, frs(0.05), 0.6 + frnd() * 0.5, 0.014 + frnd() * 0.012, mote(), 0, 0.5, -0.03); }
     }
+    // ----- her reactions (stage fourteen; H17, H18). Hit: she staggers back from the blow, bent, her right hand clapped on her hat
+    // to hold it on, the closed book hugged tight, her eyes shut. Down: she sinks to the ground and sits on her hip, legs folded to
+    // one side, leaning on her right hand, head bowed; her hat has fallen off and lies beside her, the book under her left hand.
+    // Win: her weight on one hip, she snaps the book shut beside her with a puff of dust and tips her hat brim with two fingers.
+    if (N === 'hit') { const k = pulse(T, 0, 0.10, 0.80, 1.5), jolt = pulse(T, 0, 0.06, 0.12, 0.5), w = sm(0, 0.12, T) * (1 - sm(1.05, 1.55, T));
+      HUG.want = T < 1.25; bkH = Math.max(bkH, sm(0, 0.12, T) * (1 - sm(1.2, 1.5, T))); hugArm(reaches, aims, w);
+      SK.hips.position.z -= 0.13 * k + 0.04 * jolt; SK.hips.position.y -= 0.07 * k; add('hips', 0.10 * k, 0.10 * k, 0); add('spine1', 0.20 * k, 0.08 * k, -0.05 * k); add('spine2', 0.16 * k + 0.10 * jolt, 0.06 * k, 0); add('spine3', 0.08 * k, 0, 0); add('neck', 0.14 * k, 0, 0.05 * k); add('head', 0.16 * k, -0.10 * k, 0.06 * k);
+      ank.R.z -= 0.22 * k; ank.R.x -= 0.04 * k; ank.L.z -= 0.02 * k; if (k > 0.05 && k < 0.95) ank.R.y += 0.03 * Math.sin(PI * k);
+      reaches.push(['R', () => carried('head', -0.115, 1.690, 0.045, V3()), w, -0.6]); aims.push(['R', V3(0.85, -0.22, 0.20), V3(0.15, -1, 0), w]); fingers('R', lerp(0.24, 0.42, w));
+      if (k > 0.25) emo = 'hit'; }
+    if (N === 'win') { const k = sm(0.1, 0.7, T) * (1 - sm(3.0, 3.7, T)), up = sm(0.85, 1.2, T), tipW = sm(1.25, 1.7, T) * (1 - sm(2.7, 3.3, T)), tip = pulse(T, 1.75, 2.0, 2.3, 2.6), snapT = 1.05, shut = T >= snapT && T < 3.45;
+      SK.hips.position.x += 0.035 * k; add('hips', 0, 0, -0.07 * k); add('spine1', 0, 0, 0.05 * k); add('spine3', 0, 0, 0.03 * k); add('neck', 0.05 * tip, 0, 0); add('head', 0.13 * tip, 0.06 * k, -0.04 * k);
+      SPB.want = T > 0.1 && T < snapT; if (shut) { bkS = 0; bkH = 1; HUG.want = true; HUG.mode = 'hand'; } else if (T >= 3.45) bkH = 0;
+      carried('spine3', 0.20, 1.20, 0.25, SPB.P); SPB.f.set(-0.30, 0.30, 0.90); SPB.n.set(-0.10, 0.92, -0.38);
+      if (T >= 0.85) { reaches.push(['L', () => carried('spine3', lerp(0.22, 0.345, up), lerp(1.15, 1.395, up), lerp(0.24, 0.17, up), V3()), k, 0.45]); aims.push(['L', V3(0.05, 1, 0.05), V3(-0.22, 0.02, 1), k * up]); fingers('L', lerp(0.24, 0.5, k * up)); }
+      fv.set(0.30, 0.90, -0.32).normalize(); reaches.push(['R', () => carried('head', -0.126, 1.546, 0.102, V3()).addScaledVector(fv, -0.135), tipW, 0.35]); aims.push(['R', fv.clone(), V3(0.75, 0.1, -0.65), tipW]); fingers('R', lerp(0.24, 0.55, tipW));
+      if (T > 0.9 && T < 3.3) emo = 'delighted'; else if (T > 0.3) mouth = 'smile';
+      afterHands = () => { if (T >= snapT && T - dt < snapT) { const c = bookPt(0, 0, 0.02, sp1); for (let i = 0; i < 16; i++) emit(c.x + frs(0.06), c.y + frs(0.08), c.z + 0.03, frs(0.12), 0.05 + frnd() * 0.22, 0.05 + frnd() * 0.15, 0.7 + frnd() * 0.6, 0.016 + frnd() * 0.02, [0.86, 0.78, 0.60], 0, 1.6, -0.05); } }; }
+    if (N === 'down') { const q = sm(0.12, 1.25, T) * (1 - sm(4.3, 5.5, T)), hipY = SK.hips.userData.home.y + SK.thighL.position.y, hand = sm(0.5, 1.2, T) * (1 - sm(4.2, 4.9, T));
+      SK.hips.position.y -= (hipY - 0.135) * q; SK.hips.position.x -= 0.04 * q; SK.hips.position.z -= 0.16 * q; plant *= 1 - sm(0.1, 0.6, q);
+      add('hips', -0.04 * q, 0.22 * q, 0.30 * q); add('spine1', 0.16 * q, 0, 0.14 * q); add('spine2', 0.14 * q, 0, 0.10 * q); add('spine3', 0.08 * q, 0, 0.04 * q); add('neck', 0.20 * q, 0, -0.08 * q); add('head', 0.26 * q, 0.10 * q, -0.10 * q);
+      for (const [S, s] of SIDES) { const D = (s > 0 ? V3(0.40, -0.22, 0.88) : V3(0.62, -0.30, 0.72)).normalize(), H = V3(0, 1, 0).addScaledVector(D, -D.y).normalize(), nD = D.clone().negate();
+        _qc.setFromRotationMatrix(_mb.makeBasis(H, nD, V3().crossVectors(H, nD))); SK['thigh' + S].quaternion.slerp(_qc, q); add('shin' + S, (s > 0 ? 2.15 : 2.0) * q, 0, 0); add('foot' + S, 0.5 * q, 0, 0); }
+      reaches.push(['R', V3(-0.50, 0.075, 0.08), hand, -0.2]); aims.push(['R', V3(-0.45, -0.05, 0.88), V3(0, -1, 0), hand]); fingers('R', lerp(0.24, 0.10, hand));
+      reaches.push(['L', V3(0.03, 0.085, 0.27), hand, 0.3]); aims.push(['L', V3(0.25, -0.08, 0.95), V3(0, -1, 0), hand]); fingers('L', lerp(0.24, 0.14, hand));
+      HUG.want = T > 0.7 && T < 4.3; HUG.mode = 'ground'; hatK = sm(0.45, 1.2, T) * (1 - sm(4.4, 5.1, T)); if (q > 0.55) eyes = 1; }
     if (N === 'glasses') { const k = pulse(T, 0, 0.55, 1.5, 2.25), push = pulse(T, 0.62, 0.9, 1.05, 1.4);
       add('head', 0.09 * k - 0.07 * push, -0.04 * k, 0); add('neck', 0.03 * k, 0, 0); sync();
       fv.set(0.16, 0.93, -0.30).normalize(); carried('head', -0.003, 1.497 + 0.010 * push, 0.108, tgt).addScaledVector(fv, -0.150);
@@ -723,7 +752,7 @@
     else if (bkS > 0.001 && SK.book) { sync(); bookOnPalm(bkS, SPB.P, SPB.f, SPB.n); }
     else if (bkH > 0.001 && SK.book) { sync(); bookHug(bkH); }
     else if (bkFl > 0.001 && SK.book) bookFloat(bkFl, T);
-    pagesSet(bkFl * FLB.lift, T);
+    pagesSet(bkFl * FLB.lift, T); hatApply(hatK, sp5.set(-0.66, 0.04, 0.40), 0.9);
     if (afterHands) { sync(); afterHands(); }       // what a spell does once her hands are where they will be drawn: fine finger work, and the lights that start from them
     propVis(true, (N === 'sickle' && T > 0.12 && T < 3.25) || sickNow);
     sync(); softTick(dt);
@@ -750,6 +779,6 @@
   const talk = (on) => { talking = !!on; mouthAt = 0; return talking; };
   const setFace = (eyes, mouth) => { held = eyes == null && !mouth ? null : { eyes, mouth }; facePainted = ''; animate(0); };
   const setFeel = (name) => { feel = FEELS.includes(name) ? name : null; facePainted = ''; animate(0); return feel; };       // hold one of her emotions (or none)
-  return { root, skeleton, bones, SK, animate, pose, play, moves: MOVES, shots: SHOTS, settle: () => { sync(); softSettle(); root.updateMatrixWorld(true); }, meshes, spin: 0, time: 0, stanceProgress: 1, setStance() {}, talk, setFace, setFeel, feels: FEELS, spells: SPELLS, spellFx: { group: fxG, dummy: DUMMY, ally: ALLY, ally2: ALLY2, leaf: LEAF, parts: PT, view: FXVIEW }, wood: { STAG, SAP, SEED, ROOTS, sapSet, VINES, GARDEN, DAGGER, BRIAR, CRADLE, FALLEN, TRACE }, get moveT() { return mv.t; }, get feel() { return feel; }, setBlink: (on) => { blinking = !!on; }, setProps: (on) => { showProps = !!on; if (mv.name === 'pose') propVis(false, false); }, get move() { return mv.name; },
+  return { root, skeleton, bones, SK, animate, pose, play, moves: MOVES, shots: SHOTS, reacts: ['hit', 'down', 'win'], settle: () => { sync(); softSettle(); root.updateMatrixWorld(true); }, meshes, spin: 0, time: 0, stanceProgress: 1, setStance() {}, talk, setFace, setFeel, feels: FEELS, spells: SPELLS, spellFx: { group: fxG, dummy: DUMMY, ally: ALLY, ally2: ALLY2, leaf: LEAF, parts: PT, view: FXVIEW }, wood: { STAG, SAP, SEED, ROOTS, sapSet, VINES, GARDEN, DAGGER, BRIAR, CRADLE, FALLEN, TRACE }, get moveT() { return mv.t; }, get feel() { return feel; }, setBlink: (on) => { blinking = !!on; }, setProps: (on) => { showProps = !!on; if (mv.name === 'pose') propVis(false, false); }, get move() { return mv.name; },
     debug: { SK, meshes, cloths: [], headPoint, headHalfW, JH, HC, FC, CHAINS, SOFT, COL, LEGCAP, LEGPAD, LEGS, HIP, SLV }, get triangles() { return triCount; } };
 }

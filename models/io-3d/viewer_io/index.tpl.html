@@ -40,9 +40,9 @@ canvas#stage{display:block;width:100%;height:100%;touch-action:none;cursor:grab}
 <body>
 <div class="wrap">
   <header>
-    <p class="eyebrow">Moon Faire · stage thirteen of her build</p>
+    <p class="eyebrow">Moon Faire · stage fourteen of her build</p>
     <h1><em>Io</em>, the Herbal Witch</h1>
-    <p class="sub">New under Her spells: Thornwake, her one spell that harms; Rootbound Return, which brings a fallen friend back; and Bramble Cradle, her guard. The camera moves by itself during a spell; drag to take it over, pinch to zoom.</p>
+    <p class="sub">New: Her reactions. Hit: she holds her hat on. Down: she sinks to the ground and her hat falls off. Win: she snaps her book shut and tips her hat. Drag to turn her, pinch to zoom.</p>
   </header>
   <div class="play">
   <div class="stagebox" id="box">
@@ -53,6 +53,7 @@ canvas#stage{display:block;width:100%;height:100%;touch-action:none;cursor:grab}
   </div>
   <div><p class="label">Moves</p><div class="chips" id="moves"></div></div>
   <div><p class="label">Her spells</p><div class="chips" id="spells"></div></div>
+  <div><p class="label">Her reactions</p><div class="chips" id="reacts"></div></div>
   <div><p class="label">View</p><div class="chips" id="views"></div></div>
   <div><p class="label">Her feelings</p><div class="chips" id="feels"></div></div>
   <div><p class="label">Her face</p><div class="chips" id="faces"></div></div>
@@ -126,8 +127,8 @@ canvas#stage{display:block;width:100%;height:100%;touch-action:none;cursor:grab}
   const MOVES = [['Stand still', 'pose'], ['Standing', 'idle'], ['Walk', 'walk'], ['Talk', 'talk'], ['Push up glasses', 'glasses'], ['Tip her hat', 'hat'], ['Curtsey', 'curtsey'], ['Twirl', 'twirl'], ['Pick a herb', 'herb'], ['Wave', 'wave'], ['Look round', 'look'], ['Read her book', 'read'], ['Hold her sickle', 'sickle'], ['Jog', 'jog'], ['Squat', 'squat'], ['Kneel', 'kneel'], ['Hover', 'hover']];
   const press = (host, i) => [...host.children].forEach((c, j) => c.setAttribute('aria-pressed', j === i ? 'true' : 'false'));
   let shown = 'idle';
-  chips($('moves'), MOVES, (m) => { press($('spells'), -1); if (m[1] === 'pose') { R.pose(POSES[0][1]); shown = 'pose'; press($('poses'), 0); } else { shown = R.play(m[1]); press($('poses'), -1); } }, 1);
-  chips($('poses'), POSES, (p) => { R.pose(p[1]); shown = 'pose'; press($('moves'), 0); press($('spells'), -1); }, -1);
+  chips($('moves'), MOVES, (m) => { press($('spells'), -1); press($('reacts'), -1); if (m[1] === 'pose') { R.pose(POSES[0][1]); shown = 'pose'; press($('poses'), 0); } else { shown = R.play(m[1]); press($('poses'), -1); } }, 1);
+  chips($('poses'), POSES, (p) => { R.pose(p[1]); shown = 'pose'; press($('moves'), 0); press($('spells'), -1); press($('reacts'), -1); }, -1);
   // her spells (stage eleven): each brings what it is cast at (a training dummy, or a friend to heal) and turns the camera to her side,
   // pulled back, so she casts toward the right as in her paintings and the whole spell is in view
   const SPELLS = [['Harvest Crescent', 'crescent'], ['Silverleaf Salve', 'salve'], ['Elderwood Guardian', 'guardian'], ['Moonflower Garden', 'garden'], ['Thornwake', 'thorn'], ['Rootbound Return', 'revive'], ['Bramble Cradle', 'cradle']], SPELL_VIEW = { az: -1.02, el: 0.07, dist: 8.3, ty: 0.92, tz: 0.60 };
@@ -137,7 +138,10 @@ canvas#stage{display:block;width:100%;height:100%;touch-action:none;cursor:grab}
   const SPELL_CAM = { guardian: [[0, { az: -1.02, el: 0.07, dist: 8.3, ty: 0.92, tz: -0.39 }], [8.3, { az: -1.02, el: 0.07, dist: 11.3, ty: 1.15, tz: -1.03 }], [12.05, { az: -1.02, el: 0.07, dist: 10.0, ty: 0.97, tz: 0.74 }]],
     garden: [[0, { az: 0.10, el: 0.20, dist: 11.2, ty: 0.76 }]], revive: [[0, { az: -1.02, el: 0.14, dist: 8.2, ty: 0.62, tz: -0.42 }]], cradle: [[0, { az: -0.6, el: 0.08, dist: 9.4, ty: 1.12 }]] };
   let camSpell = null, camKey = -1, camFree = false;
-  chips($('spells'), SPELLS, (m) => { shown = R.play(m[1]); press($('moves'), -1); press($('poses'), -1); camSpell = m[1]; camKey = 0; camFree = false; want = Object.assign({}, SPELL_CAM[m[1]] ? SPELL_CAM[m[1]][0][1] : SPELL_VIEW); easing = true; spin = false; refKey = ''; setRef(); $('spinB').setAttribute('aria-pressed', 'false'); [...$('views').children].forEach((c) => c.setAttribute('aria-pressed', 'false')); }, -1);
+  chips($('spells'), SPELLS, (m) => { shown = R.play(m[1]); press($('moves'), -1); press($('poses'), -1); press($('reacts'), -1); camSpell = m[1]; camKey = 0; camFree = false; want = Object.assign({}, SPELL_CAM[m[1]] ? SPELL_CAM[m[1]][0][1] : SPELL_VIEW); easing = true; spin = false; refKey = ''; setRef(); $('spinB').setAttribute('aria-pressed', 'false'); [...$('views').children].forEach((c) => c.setAttribute('aria-pressed', 'false')); }, -1);
+  // stage fourteen: her reactions (hit, down, win), seen from a little to her right
+  const REACTS = [['Hit', 'hit'], ['Down', 'down'], ['Win', 'win']];
+  chips($('reacts'), REACTS, (m) => { shown = R.play(m[1]); press($('moves'), -1); press($('poses'), -1); press($('spells'), -1); camSpell = null; camFree = false; want = m[1] === 'down' ? { az: -0.45, el: 0.16, dist: 7.6, ty: 0.72 } : { az: -0.45, el: 0.08, dist: 7.4, ty: 0.98 }; easing = true; spin = false; refKey = ''; setRef(); $('spinB').setAttribute('aria-pressed', 'false'); [...$('views').children].forEach((c) => c.setAttribute('aria-pressed', 'false')); }, -1);
   R.pose(POSES[0][1]); R.play('idle');
   const toggle = (host, id, label, on, fn) => { const b = document.createElement('button'); b.className = 'chip'; b.type = 'button'; b.id = id; b.textContent = label; b.setAttribute('aria-pressed', on ? 'true' : 'false');
     b.addEventListener('click', () => { const v = b.getAttribute('aria-pressed') !== 'true'; b.setAttribute('aria-pressed', v ? 'true' : 'false'); fn(v); }); host.appendChild(b); };
@@ -169,14 +173,14 @@ canvas#stage{display:block;width:100%;height:100%;touch-action:none;cursor:grab}
   function frame(now) {
     requestAnimationFrame(frame); const dt = Math.min(0.05, (now - last) / 1000 || 0.016); last = now; fit();
     R.animate(dt);
-    if (R.move !== shown) { shown = R.move; press($('moves'), MOVES.findIndex((m) => m[1] === shown)); press($('spells'), SPELLS.findIndex((m) => m[1] === shown)); }       // a short move or a spell has ended
+    if (R.move !== shown) { shown = R.move; press($('moves'), MOVES.findIndex((m) => m[1] === shown)); press($('spells'), SPELLS.findIndex((m) => m[1] === shown)); press($('reacts'), REACTS.findIndex((m) => m[1] === shown)); }       // a short move or a spell has ended
     if (camSpell && !camFree && R.move === camSpell && SPELL_CAM[camSpell]) { const K = SPELL_CAM[camSpell]; let i = 0; while (i < K.length - 1 && K[i + 1][0] <= R.moveT) i++; if (i !== camKey) { camKey = i; want = Object.assign({}, K[i][1]); easing = true; } }
     R.spellFx.view.set(Math.sin(orbit.az) * Math.cos(orbit.el), Math.sin(orbit.el), Math.cos(orbit.az) * Math.cos(orbit.el));
     if (spin) orbit.az += dt * 0.5;
     if (easing) { let d = want.az - orbit.az; d = Math.atan2(Math.sin(d), Math.cos(d)); const k = Math.min(1, dt * 5); orbit.az += d * k; orbit.el += (want.el - orbit.el) * k; orbit.dist += (want.dist - orbit.dist) * k; orbit.target.y += (want.ty - orbit.target.y) * k; orbit.target.z += ((want.tz || 0) - orbit.target.z) * k; orbit.target.x += ((want.tx || 0) - orbit.target.x) * k; }
     stage.render();
   }
-  $('hud').textContent = 'Stage thirteen · ' + Math.round(R.triangles / 1000) + 'k triangles';
+  $('hud').textContent = 'Stage fourteen · ' + Math.round(R.triangles / 1000) + 'k triangles';
   window.IO = { stage, R, step() { fit(); stage.render(); } };
   requestAnimationFrame(frame);
 })();

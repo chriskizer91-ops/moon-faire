@@ -4,7 +4,36 @@ Started November 13, 2026. Built the way the HD Jester was (`claude/HOW-TO-3d-wi
 the Ranger's stage-one recipe: this folder began as a copy of the Ranger's stage-one code (`claude/ranger-3d-model`, commit
 `1d4c9d6`), with the Jester's platform boot builder (`claude/jester-3d-model`, pass 20) in place of the Ranger's boots.
 
-## Where she stands: stage thirteen (November 14, 2026)
+## Where she stands: stage fourteen (November 14, 2026)
+
+Her reactions: being hit, falling, and winning (painting H17, H18). With these every move planned for her has a first build.
+
+- **Chris (November 14):** "Yes, let's continue on to her reactions and then we'll double back into a higher detailed pass
+  over all the spells."
+- **Hit** (`hit`, 1.6 s). She staggers back from the blow with her body bent, her right hand clapped on her hat to hold it on,
+  the closed book hugged tight to her chest, her eyes shut tight (the Hit face from stage ten). She steps back and recovers.
+- **Down** (`down`, 5.6 s). She sinks to the ground and sits on her hip with her legs folded to her left, leaning on her right
+  hand, her head bowed and her eyes closed. Her hat tumbles off and lies beside her; the closed book lies under her left hand.
+  After about three seconds she gets up again and the hat goes back on (the page needs her standing for the next button; in
+  the game the pose would be held).
+- **Win** (`win`, 3.8 s). Her weight on one hip, the open book on her left hand; she snaps it shut with a puff of dust and
+  holds it up beside her, tips the brim of her hat with her right hand, and smiles (the Delighted face).
+- **`src/I98e_react.js`** (new). Her hat is part of her head (skinned to the head bone), so to lose it the worn hat's six
+  meshes are hidden and a copy of them (`HATD`, made the first time it is needed) is shown tumbling to where it lies:
+  `hatApply(k, place, turn)`. Under the hat she had no hair on top, so `HAIRTOP` is that hair: tresses combed down each side
+  from a middle parting and down the back of her crown, shown only while the hat is off.
+- **In `src/I99_static.js`:** the three blocks. Her legs in Down are set directly, as in the hover (thigh direction, then the
+  shin folded), not solved from her feet. The closed book has three places now (`HUG.mode`): hugged to her chest, held up in
+  her left hand, and lying on the ground under her left hand. `reacts` on the model lists the three.
+- **Page:** stage fourteen; a row Her reactions.
+- **Checked:** `tools/pen.py hit down win`: legs at the standing floor in all three, sitting on the ground included; sleeves
+  29 points (Hit), 71 (Down), and 97 points at most 35 mm in Win while her left arm is raised with the book.
+- **Limits:** first builds, timed from stills; not watched playing; not on a real phone; not looked at in the Flipbook look.
+  The hair on top of her head is plain coloured tresses, not painted like the rest of her hair. The hat drops as a stiff copy:
+  its tip does not flop as it lands. The hat goes back onto her head by itself when she gets up. Hit is one blow from the
+  front; there is no second version for a blow from behind.
+
+## Stage thirteen (November 14, 2026)
 
 Her last three spells: Thornwake (her one spell that harms), Rootbound Return (she brings a fallen friend back) and Bramble
 Cradle (her guard). With these all seven of her spells have a first build.
@@ -715,13 +744,11 @@ They also show her whole look from many sides, with the robe: useful when the ro
 
 ## Next stages, in Chris's order (November 14)
 
-1. His eye on Thornwake, Rootbound Return and Bramble Cradle (stage thirteen).
-2. **Her reactions:** being hit, falling and winning (H17, H18). She holds her hat on when she is hit, loses it when she falls,
-   and tips its brim when she wins.
-3. **Then the higher-detail pass over all her spells** (Chris, November 14: "then we'll come back to it"): the Guardian's face,
+1. His eye on her reactions (stage fourteen).
+2. **The higher-detail pass over all her spells** (Chris, November 14: "then we'll come back to it"): the Guardian's face,
    finer roots and planted feet; the sapling truly twisting into the fawn; the stag peeling apart strand by strand; the
    flowers' star crease and stamens; the sickle unfolding from the pendant; real tongues of witchfire; her magic's light on her
    face and clothes; her hair and cloak stirring as she casts; greens that survive the Flipbook look.
-4. Not wanted: more work on her boots; more detail on belt, pouch and necklace.
-5. Still open if he asks: the cloak nearer to M1; hair on top of her head; bringing her jog, squat, kneel and hover into line
+3. Not wanted: more work on her boots; more detail on belt, pouch and necklace.
+4. Still open if he asks: the cloak nearer to M1; hair on top of her head; bringing her jog, squat, kneel and hover into line
    with the other witches' versions.
