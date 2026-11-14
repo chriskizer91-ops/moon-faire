@@ -288,6 +288,17 @@ Same page, republished: https://claude.ai/artifact/Ju2Mo1hEK5jyA3pScXkYXz (file:
 - **The two kinds of fight picture** (the mapper's fifth question) are shown side by side on the page: Envoi's numbered pictures and Chris's own F1 are seen level; the `battle-` ones are seen from above. Suggested: keep every fight level; Envoi has level pictures of the same places for the crag (`13-northern-crossroads`) and the lamp room (`14-dead-moonwell`). Not changed in `world.json` until Chris says.
 - Not done: the story is not chosen, so nothing in the map's lines or things-that-can-happen was rewritten for it. Nothing is walkable yet beyond the pilot's fair square. Foes, captain and airship as before.
 
+## The world map: every place on a grid, a reference drawing and its painting prompt (November 13, night) — waiting for Chris to have the map painted
+
+Chris asked for one map of the whole game: all the scenes set on a grid with a fictional land around them, as a reference drawing plus detailed descriptions so a single map image can be generated. It is a new section on the same page: https://claude.ai/artifact/Ju2Mo1hEK5jyA3pScXkYXz.
+
+- **The grid:** 12 squares across (A to L) by 8 down (1 to 8), north up, 1536 x 1024. In every scene the camera looks north, so a scene's left is west and its far side is north. W1 C6, W2 D6, W3 E6 (the fair, one fairground across three squares); W4 G6; W5 I5; W7 I6 (the hollow, just south of the stones); W6 K6; W8 J3, W9 K3, F5 K2 (the beacon crag, in the sea, reached only by airship).
+- `world/make_map_picture.py` with `world/MAP-PICTURE-KIT.md`: Fable 5.2 (high effort, through the key), shown the nine paintings, drew the reference as flat shapes and wrote the words, then looked at its drawing under the grid and pins and fixed it. $4.36: the first answer ran out of room at 48,000 tokens ($2.02) and the next round wrote it out.
+- `world/map/`: `map.svg`, `map_guide.png` (**the file for the painter: no words, no pins, no grid**), `map_key.jpg` (grid, pins, labels), `map_scenes.jpg` (Chris's paintings set on their squares), `map.json` (the squares, the joins, the words, and a list of everything made up), `map-prompt.md`.
+- `world/build_map.py` assembles the prompt and the scenes picture. The painting is asked for with **no words and no map furniture**: the game draws names, pins and the grid on top, so names can change. Once `map.png` exists, `scenes_picture(J, names, picture)` lays the scenes over it.
+- **The land around the places is a stand-in, not lore:** the settled country and its river and bridge, wooded hills, the moor's edge, the open moor with a high tor, the cliff coast, the dark sea, the beacon crag, a ruined beacon road with two broken pier stumps facing the crag, and a river marsh along the south. `map.json` lists each made-up thing under `invented`.
+- Not done: no painted map yet, and nothing in the game shows a map screen.
+
 ## Next
 
 Step 5, and the two-person fair-folk test if Chris wants it: the remaining twelve prompts (with the lane lesson built in), every scene traced, the

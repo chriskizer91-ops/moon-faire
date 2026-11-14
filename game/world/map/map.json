@@ -1,0 +1,244 @@
+{
+ "whole": "A hand-painted pictorial fantasy map seen from straight above, north at the top, with landmarks drawn as small upright pictures, larger than life, as on old maps. Farmed fields and wooded hills fill the left; a small travelling fair of striped tents sits in the lower left where the fields end, and a pale road runs from it east across a wide purple heather moor to a lone lit lantern, a ring of standing stones and a round dark pool near the right edge. The upper right is a dark sea under cliffs, and in it stands a tall bare rock crag with a dead dark tower on top, cut off by water on every side. It is evening: the last dusk warmth lies on the fields at the left, night on the moor, deepest night on the sea; cold moonlight comes from the upper left and every shadow falls to the lower right. The only warm lights are the fair's lanterns, one lantern on the moor road and one small camp fire by the pool. No words, letters, labels, border, compass or grid anywhere; modest real country in muted colours, with no castles, towns or glowing magic.",
+ "land": [
+  {
+   "name": "the settled country",
+   "where": "the left edge of the map, from a quarter of the way down to the bottom",
+   "paint": "A patchwork of small hedged fields in two soft greens, with three thatched farms and a few copses. A river runs down through it from the hills, and a pale cart road comes in from the left edge, crosses the river on a small wooden bridge and runs on to the fair. Paint it tidy and quiet, with the last dusk light on it.",
+   "label": [
+    110,
+    470
+   ]
+  },
+  {
+   "name": "the wooded hills",
+   "where": "the top left corner",
+   "paint": "Low rounded hills under dark green woodland, with two bare grassy hilltops showing through the trees. The river rises here and runs out of the woods to the south. Keep it dark and simple.",
+   "label": [
+    200,
+    100
+   ]
+  },
+  {
+   "name": "the moor's edge",
+   "where": "a band of rough pasture between the fields and the heather, all round the fair",
+   "paint": "Rough grey-green grass with scattered gorse bushes, one long broken drystone wall and a few grey rocks. The fair stands in the middle of it. It fades into purple heather to the east.",
+   "label": [
+    450,
+    560
+   ]
+  },
+  {
+   "name": "the open moor",
+   "where": "the whole middle of the map, from the fair east to the pool",
+   "paint": "Rolling purple heather with dark green gorse, patches of rough grass, broken drystone walls, a few lone grey stones, small rock outcrops and small still pools. It is wide and empty, and quieter the farther it is from the road.",
+   "label": [
+    700,
+    470
+   ]
+  },
+  {
+   "name": "the high tor",
+   "where": "the upper middle, just left of centre",
+   "paint": "A pile of weathered grey rock on a low grassy rise, the highest point of the moor. Its shadow falls to the lower right. Smaller rocks lie round it.",
+   "label": [
+    690,
+    330
+   ]
+  },
+  {
+   "name": "the cliff coast",
+   "where": "a line running from the top edge, just right of the middle, down and across to the right edge a little below half height",
+   "paint": "The moor ends in short clifftop grass and then dark rock cliffs that drop straight into the sea. The edge is ragged, with small coves and headlands. A thin line of pale surf at the foot is enough.",
+   "label": [
+    925,
+    335
+   ]
+  },
+  {
+   "name": "the dark sea",
+   "where": "the upper right of the map",
+   "paint": "Deep blue-black water under a night sky, flat and cold, with a few small bare rocks breaking the surface. No ships and no lights.",
+   "label": [
+    1090,
+    110
+   ]
+  },
+  {
+   "name": "the beacon crag",
+   "where": "in the sea in the upper right, well off the coast",
+   "paint": "A tall island of bare grey rock with sheer dark sides, lit cold on its upper left faces and black on its lower right. Open water lies all round it. A dead tower stands on its top, a low rock shelf sits on its lower left side and a stair climbs between them.",
+   "label": [
+    1300,
+    450
+   ]
+  },
+  {
+   "name": "the old beacon road",
+   "where": "from just east of the standing stones north to the cliff edge facing the crag",
+   "paint": "A short, grassed-over ruin of a road, shown as broken pale patches, ending on a small headland. Two worn stone pier stumps stand in the sea beyond it, with wide water between them and the crag. Nothing crosses.",
+   "label": [
+    1215,
+    548
+   ]
+  },
+  {
+   "name": "the river marsh",
+   "where": "along the whole bottom edge, from the fields eastward",
+   "paint": "The moor slopes down through rough grass to a flat grey-green marsh of reeds and still pools. The river winds east through it and leaves by the right edge near the bottom. A thin stream runs down to it from the moor.",
+   "label": [
+    760,
+    975
+   ]
+  }
+ ],
+ "places": {
+  "W1": "About a fifth of the way in from the left edge and two thirds of the way down: a small round square of packed earth ringed with worn cobbles, with a red rug at its centre and a little roofed stone well just to the right of it. Striped and patterned tents in red, cream, gold, blue and green stand round it with a few awning stalls and a painted wagon, and several lamp posts give small warm lights. The road from the west comes in on its left side and a lane leaves on its right.",
+  "W2": "Just east of the square: a straight lane of trodden earth with a row of small awning stalls on each side. Halfway along the north row the stalls open onto a square roped ring of pale sawdust with a lit lamp post at each corner, and one big striped tent stands behind the ring. A small oven cart sits at the west end and a pie cart at the east end.",
+  "W3": "Just east of the stall row, where the fair ends: an open field of trampled earth and grass. A wooden airship lies moored along its north side, drawn as a ship's hull with two bare masts and no lamps lit, with two mooring posts below it; two tents stand on the field's west side. On its east side stands the fair gate, two tall poles with a bar across and a small brazier, and the road passes under it out onto the moor.",
+  "W4": "Just right of the middle of the map and two thirds of the way down: a tall iron post with one warm lit lantern standing in a gap in a broken drystone wall on the north side of the rutted road. A second post with a dark, dead lantern stands a little to the east, by a wind-bent bare thorn, and a small moor pool lies to the north-west. This is the only light on the moor road.",
+  "W5": "A little more than two thirds of the way across and just below half height: a ring of eight tall leaning grey stones on a low rise of short worn turf, with heather falling away all round. The track comes in on the west side and leaves on the east between the two tallest stones. One stone lies fallen on the south side with gorse behind it.",
+  "W6": "Near the right edge, two thirds of the way down: a round, black, perfectly still pool in a patch of turf, with the moon reflected in it as a pale dot. On its north bank stands a broken stone arch, one leg upright and the span fallen beside it; on its south bank is a small camp fire in a ring of stones with a log seat. The road ends at the fire, and a thin path curls round the pool's east side to the arch.",
+  "W7": "Directly south of the standing stones, a short way off: a small steep-sided rocky dip, darker than the moor round it, walled with grey rock and closed in by gorse. On its floor are a flat grey stone and a tiny pool. It is easy to miss; only a break in the rock on its north side lets in the faint path.",
+  "W8": "Low on the crag's south-west side: a flat shelf of bare pale rock just above the sea, with a dark cliff wall behind it to the north and a sheer drop to the water below. The first worn steps of the stair start at its east end. It is empty and unlit: no ship and no lamps.",
+  "W9": "On the crag's south face: a worn stone stair that runs east from the shelf to a small flagged landing with a low broken parapet, then zigzags north up the dark rock to the foot of the tower. Its lamp brackets are rusted and empty. No light.",
+  "F5": "At the very top of the crag: a small round dark stone tower, drawn upright, with a ring of broken open window arches at its top and a shut door at its foot. It is black and dead, with no light in it at all. Its long shadow falls to the lower right across the bare summit."
+ },
+ "routes": [
+  {
+   "from": "W1",
+   "to": "W2",
+   "name": "the fair lane, west half",
+   "paint": "A short straight lane of pale trodden earth leaving the east side of the square between a stall and a tent and running into the stall row."
+  },
+  {
+   "from": "W2",
+   "to": "W3",
+   "name": "the fair lane, east half",
+   "paint": "The same lane running on east past the last stalls and out into the open mooring field, as far as the gate."
+  },
+  {
+   "from": "W3",
+   "to": "W4",
+   "name": "the moor road",
+   "paint": "A pale rutted cart road running east from the fair gate through rough grass into heather, with one gentle bend, to the lit lantern."
+  },
+  {
+   "from": "W4",
+   "to": "W5",
+   "name": "the stones track",
+   "paint": "A narrower pale track that leaves the lantern eastward, then climbs north-east through heather and gorse onto the rise and enters the stone ring from the west."
+  },
+  {
+   "from": "W5",
+   "to": "W6",
+   "name": "the pool road",
+   "paint": "The track leaves the ring between its two tallest stones and curves east and south, downhill, to the camp fire on the pool's south bank, where it stops."
+  },
+  {
+   "from": "W5",
+   "to": "W7",
+   "name": "the gorse gap",
+   "paint": "A barely visible thread of trodden ground from behind the fallen stone, south through a gap in the gorse, down to the hollow. Paint it so faint that it is easy to miss."
+  },
+  {
+   "from": "W8",
+   "to": "W9",
+   "name": "the foot of the stair",
+   "paint": "Worn steps cut into the rock from the east end of the shelf along the crag's south face to the small landing."
+  },
+  {
+   "from": "W9",
+   "to": "F5",
+   "name": "the upper stair",
+   "paint": "The steps zigzag from the landing up the dark rock to the tower's door."
+  },
+  {
+   "from": "W3",
+   "to": "W8",
+   "name": "the flight",
+   "paint": "Paint nothing for this. No road, bridge or line joins the moor to the crag; there is only open sea between them."
+  }
+ ],
+ "invented": [
+  "the old beacon road: a ruined spur from the stones to the cliff edge",
+  "the small headland and two stone pier stumps in the sea, a causeway long broken",
+  "the high tor on the north moor",
+  "the course of the river: rising in the wooded hills, through the fields, then east along the marsh and out by the right edge",
+  "the positions of the bridge and the three farms, and the copses among the fields",
+  "the two bare hilltops in the woods",
+  "the band of rough pasture called the moor's edge",
+  "the drystone walls across the moor and the round sheepfold south-east of the fair",
+  "the lone stones, small outcrops and small pools scattered over the moor (only the pool by the Last Lantern is from a painting)",
+  "the thin stream that rises a little south of the hollow and runs down to the marsh",
+  "the small bare rocks in the sea",
+  "the dusk-to-deep-night change of light from west to east across the map",
+  "the small landing on the stair where the W9 pin sits, placed below the tower rather than at its door"
+ ],
+ "cells": {
+  "W1": "C6",
+  "W2": "D6",
+  "W3": "E6",
+  "W4": "G6",
+  "W5": "I5",
+  "W7": "I6",
+  "W6": "K6",
+  "W8": "J3",
+  "W9": "K3",
+  "F5": "K2"
+ },
+ "joins": [
+  [
+   "W1",
+   "W2",
+   "walk"
+  ],
+  [
+   "W2",
+   "W3",
+   "walk"
+  ],
+  [
+   "W3",
+   "W4",
+   "walk"
+  ],
+  [
+   "W4",
+   "W5",
+   "walk"
+  ],
+  [
+   "W5",
+   "W6",
+   "walk"
+  ],
+  [
+   "W5",
+   "W7",
+   "walk"
+  ],
+  [
+   "W3",
+   "W8",
+   "fly"
+  ],
+  [
+   "W8",
+   "W9",
+   "walk"
+  ],
+  [
+   "W9",
+   "F5",
+   "walk"
+  ]
+ ],
+ "grid": {
+  "cols": 12,
+  "rows": 8,
+  "cell": 128,
+  "width": 1536,
+  "height": 1024
+ }
+}

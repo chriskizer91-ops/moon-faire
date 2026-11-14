@@ -1,0 +1,27 @@
+{
+ "model": "claude-fable-5-2",
+ "effort": "high",
+ "rounds": [
+  {
+   "cost": 2.022236,
+   "seconds": 537.0,
+   "stop": "max_tokens",
+   "done": false
+  },
+  {
+   "cost": 1.117724,
+   "seconds": 123.6,
+   "stop": "end_turn",
+   "done": false,
+   "notes": []
+  },
+  {
+   "cost": 1.2203084,
+   "seconds": 120.6,
+   "stop": "end_turn",
+   "done": false,
+   "notes": []
+  }
+ ],
+ "cost": 4.3602684
+}
