@@ -28,6 +28,7 @@
     addBone('uarm' + S, 'clav' + S, sh.x, sh.y, sh.z);
     addBone('farm' + S, 'uarm' + S, el.x, el.y, el.z);
     addBone('hand' + S, 'farm' + S, wr.x, wr.y, wr.z);
+    { const tw = el.clone().addScaledVector(d, 0.10); addBone('ftw' + S, 'farm' + S, tw.x, tw.y, tw.z); }      // stage 5: the turn of his hand is made along his forearm, as a real one is. This bone only ever turns about the arm's own line; the skin of the lower forearm and the leather cuff ride it (wArm), the hand stays on the forearm bone (the method is Io's, her stage six)
     addBone('thigh' + S, 'hips', s * 0.100, N_HIP_Y, 0);
     addBone('shin' + S, 'thigh' + S, s * 0.128, N_KNEE_Y, -0.010);
     addBone('foot' + S, 'shin' + S, s * 0.152, 0.11, -0.045);

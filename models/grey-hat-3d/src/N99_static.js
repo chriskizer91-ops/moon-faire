@@ -320,54 +320,230 @@
     root.add(m); shirtMeshes[c.name] = m; triCount += c.tris;
   }
 
-  // ---------- holding still, and a first few moves ----------
-  // pose() holds him still for checking against the paintings (arm: degrees out from straight down; leg: degrees apart).
-  // play(name) starts a move: 'idle' (he stands and breathes, arms hanging), 'walk' (a first walk, on the spot, so the gold dust can
-  // be seen following his boots) and 'talk' (one hand, small nods; no mouth yet). Every frame the bones go back to rest and the
-  // layers are added on top. The walk is the Ranger's stride slowed and widened for him; it is a first draft, not his own walk.
-  const A_REST = N_APOSE, MOVES = ['pose', 'idle', 'walk', 'talk'];
-  let lastPose = { arm: A_REST, leg: 0 }, mv = { name: 'pose', t: 0 }, wk = 0, gph = 0, clock = 0;
+  // ---------- holding still, standing, walking and talking (stage 5 of the rebuild) ----------
+  // Chris: "the boots, the ankles need to make a realistic motion as he walks. And I think the posturing of the whole body could be
+  // improved as well. There is a how to do this. And you could also look at one of the other models for the witches."
+  //   pose(o)        the measuring pose: his paintings' A-pose (arm: degrees out from straight down; leg: degrees apart). Nothing moves.
+  //                  Every view that lays him over a painting needs this one, so it is kept exactly as it was.
+  //   play('stand')  his resting stance, held still: weight on his right leg, left foot a little forward and turned out, arms hanging
+  //                  by his sides with the palms turned in, chest open, head up.
+  //   play('idle')   the same stance, alive: breath, a slow shift of his weight over planted feet, his head looking about.
+  //   play('walk')   his walk, on the spot (the ground passes under him at WALK_SPEED, so the gold dust streams away behind).
+  //   play('talk')   the stance with gestures of its own from his hands and head.
+  //   play(name, true) goes there at once and lays the cloth afresh, for still pictures; without it he eases from one to the next.
+  // WHERE THE METHOD COMES FROM (the four finished witches):
+  //   - Feet are placed on the ground and the legs are worked out from them (the Jester's walk, 75_pose.js: "each foot is down for 62%
+  //     of the stride ... the heel lands first and the toe leaves last, the swinging foot stays low"), not swung by angles.
+  //   - "Never hold a foot level by force; clamp the ankle and let the heel lift" (Io's README, stage six; the Ranger's 6c was the same
+  //     fault). Here the foot is never held level: it stands on its heel's back edge, then flat, then on its ball, then on its toe tip,
+  //     and where the ankle is follows from that. If the leg is too short to reach, the heel lifts further (heelFor).
+  //   - "A foot follows the ground when standing and its own shin when the legs are folded" (the Jester's crossed legs). On the ground
+  //     his foot is turned to the ground whatever the shin does; in the air it is given its own pitch and the ankle takes what is left.
+  //   - Looser, not "Terminator" (the Ranger's 6c): spine, shoulders, neck and head each follow a beat behind the part below; forearm
+  //     and hand trail the upper arm.
+  //   - A hand is never turned at the wrist alone: the turn goes to the forearm (Io's wristFix and ftw bone).
+  // One thing differs from Io and the Ranger on purpose: their stiff boots never fold at the toe. Chris asked for his to bend at the
+  // ball as the toe pushes off, so the toe bone turns, by at most TOE_MAX (a thick lug sole gives less than a shoe).
+  const A_REST = N_APOSE, MOVES = ['pose', 'stand', 'idle', 'walk', 'talk'];
+  let lastPose = { arm: A_REST, leg: 0 }, mv = { name: 'pose', t: 0 }, wk = 0, tk = 0, live = 0, gph = 0, clock = 0;
   const add = (b, x, y, z) => { const r = SK[b].rotation; r.x += x; r.y += y; r.z += z; };
   function restAll() { for (const k in SK) SK[k].rotation.set(0, 0, 0); SK.hips.position.copy(SK.hips.userData.home); }
   function pose(o) {
-    o = o || {}; mv = { name: 'pose', t: 0 }; wk = 0; lastPose = { arm: o.arm == null ? A_REST : o.arm, leg: o.leg || 0 };
+    o = o || {}; mv = { name: 'pose', t: 0 }; wk = 0; tk = 0; live = 0; lastPose = { arm: o.arm == null ? A_REST : o.arm, leg: o.leg || 0 };
     const arm = lastPose.arm * DEG - A_POSE, leg = lastPose.leg * DEG;
     restAll(); for (const [S, s] of SIDES) { SK['uarm' + S].rotation.z = s * arm; SK['thigh' + S].rotation.z = s * leg; SK['foot' + S].rotation.z = -s * leg; }
     root.updateMatrixWorld(true);
     HAIRSIM.step(0, true); CLOTH.step(0, true); TR_SWAY.step(0, true);     // the cloth is laid on him in the new pose and left to settle, so a still picture is right at once
   }
-  function play(name) { if (!MOVES.includes(name) || name === 'pose') { pose(lastPose); return 'pose'; } mv = { name, t: 0 }; return name; }
-  const WALK_SPEED = 1.15;                          // metres a second his stride would cover; the page tells the dust the ground is passing at this speed
+  const AX = V3(1, 0, 0), AY = V3(0, 1, 0), AZ = V3(0, 0, 1), Qt = () => new THREE.Quaternion();
+  const _q1 = Qt(), _q2 = Qt(), _q3 = Qt(), _q4 = Qt(), _v1 = V3(), _v2 = V3(), _v3 = V3();
+  // ----- his feet -----
+  // A boot touches the ground along three lines across it: the back edge of the heel, the ball (under the toe joint) and the tip of
+  // the toe. Each is kept here as a point in the foot's own frame, measured from the ankle joint, as he rests.
+  const FOOT = {}, TOE_MAX = 0.48, HEEL_Z = -0.1126, TIP_Z = 0.169;      // the sole's back and front ends at rest (N_BOOT, the row at height 0)
+  for (const [S] of SIDES) { const J = SK['foot' + S].userData.rest, Tj = SK['toe' + S].userData.rest; FOOT[S] = { J, heel: V3(0, -J.y, HEEL_Z - J.z), tj: V3(0, Tj.y - J.y, Tj.z - J.z), tip: V3(0, -J.y, TIP_Z - J.z), ball: V3(0, -J.y, Tj.z - J.z) }; }
+  // A foot on the ground. F: where its ankle would be if it stood flat there; yaw: which way it points; pitch: how far the heel is up
+  // (negative: toes up, standing on the heel's back edge). Gives the ankle's place (out.p), the foot's turn (out.q, in his own space)
+  // and how far the boot is bent at the ball (out.bend). The line it stands on does not move as the pitch changes, so a planted
+  // foot cannot slide: on its heel it turns about the heel's edge; with the heel up, the toe piece stays flat on the ground and the
+  // foot turns about the toe joint, until the boot is bent as far as it goes (TOE_MAX), then all of it turns about the toe's tip.
+  function footOn(S, F, yaw, pitch, out) {
+    const f = FOOT[S]; _q1.setFromAxisAngle(AY, yaw); out.q.copy(_q1).multiply(_q2.setFromAxisAngle(AX, pitch));
+    if (pitch <= 0) { out.p.copy(f.heel).applyQuaternion(_q1).add(F).sub(_v1.copy(f.heel).applyQuaternion(out.q)); out.bend = 0; return out; }
+    const bend = Math.min(pitch, TOE_MAX), tipUp = pitch - bend;
+    if (tipUp <= 0) out.p.copy(f.tj).applyQuaternion(_q1).add(F);
+    else { out.p.copy(f.tip).applyQuaternion(_q1).add(F); _q2.setFromAxisAngle(AX, tipUp); out.p.add(_v1.subVectors(f.tj, f.tip).applyQuaternion(_q3.copy(_q1).multiply(_q2))); }
+    out.p.sub(_v1.copy(f.tj).applyQuaternion(out.q)); out.bend = bend; return out;
+  }
+  // how far below the ankle the lowest point of the sole is, for a foot in the air at this pitch with its boot bent this much
+  function soleLow(S, pitch, bend) {
+    const f = FOOT[S], c = Math.cos(pitch), sn = Math.sin(pitch), c2 = Math.cos(pitch - bend), s2 = Math.sin(pitch - bend), dy = f.tip.y - f.tj.y, dz = f.tip.z - f.tj.z;
+    return Math.min(f.heel.y * c - f.heel.z * sn, f.ball.y * c - f.ball.z * sn, f.tj.y * c - f.tj.z * sn + dy * c2 - dz * s2);
+  }
+  // ----- a leg onto its ankle -----
+  // The thigh and shin are turned so that the ankle joint is exactly at P (his own space). Exact matters: the Ranger's and Io's
+  // solver takes thigh and shin to lie in one line at rest, which his do not quite (3 degrees), and 3 degrees at the knee is 2 cm
+  // at the ankle: a sliding foot. The knee is a hinge about the shin's own X; it folds back. Returns how far the knee is bent.
+  const LEG = {};
+  for (const [S] of SIDES) { const a = SK['shin' + S].position, b = SK['foot' + S].position, A = a.y * b.y + a.z * b.z, B = a.z * b.y - a.y * b.z;
+    LEG[S] = { a, b, M: Math.hypot(A, B), del: Math.atan2(B, A), c0: a.lengthSq() + b.lengthSq() + 2 * a.x * b.x, hip: V3() }; LEG[S].max = Math.sqrt(LEG[S].c0 + 2 * LEG[S].M * Math.cos(0.035)); }
+  const hipAt = (S) => LEG[S].hip.copy(SK['thigh' + S].position).applyQuaternion(SK.hips.quaternion).add(SK.hips.position);      // the hip joint, in his own space (the hips bone hangs straight from root)
+  function legTo(S, P, swivel) {
+    const g = LEG[S], th = SK['thigh' + S], sh = SK['shin' + S];
+    _v1.copy(P).sub(SK.hips.position).applyQuaternion(_q1.copy(SK.hips.quaternion).invert()).sub(th.position);
+    const L = Math.min(_v1.length(), g.max), phi = g.del + Math.acos(cl((L * L - g.c0) / (2 * g.M), -1, 1));
+    _v2.copy(g.b).applyAxisAngle(AX, phi).add(g.a).normalize(); _v1.normalize();
+    th.quaternion.setFromUnitVectors(_v2, _v1); if (swivel) th.quaternion.premultiply(_q2.setFromAxisAngle(_v1, swivel));
+    sh.rotation.set(phi, 0, 0); return phi;
+  }
+  // the foot is then turned to face the way it was asked to (q, his own space), whatever its shin is doing, and the boot bent at the ball
+  function footTo(S, q, bend) {
+    _q1.copy(SK.hips.quaternion).multiply(SK['thigh' + S].quaternion).multiply(SK['shin' + S].quaternion).invert();
+    SK['foot' + S].quaternion.copy(_q1.multiply(q)); SK['toe' + S].rotation.set(-bend, 0, 0);
+  }
+  // ----- his hands -----
+  // fingers: curl 0 open .. 1.4 a fist (Io's; his hands rest turned on the wrist, so the hinge is worked out, not taken as Z)
+  const FING = {}; for (const [S, s] of SIDES) FING[S] = handDir(s, 0, 0, 1).normalize();
+  function fingers(S, curl, idx) {
+    const s = S === 'L' ? 1 : -1, ax = FING[S];
+    for (const fn of ['idx', 'mid', 'rng', 'pnk']) { const c = fn === 'idx' && idx != null ? idx : curl * (fn === 'pnk' ? 1.1 : 1); for (let k = 0; k < 3; k++) SK[fn + k + S].quaternion.setFromAxisAngle(ax, -s * c * [0.85, 1.1, 0.7][k]); }
+    SK['thb1' + S].quaternion.setFromAxisAngle(ax, -s * curl * 0.25); SK['thb2' + S].quaternion.setFromAxisAngle(ax, -s * curl * 0.35);
+  }
+  // A wrist only bends so far, and it does not twist: the turn of a hand is made along the forearm (Io's wristFix). Whatever a move
+  // asked of a hand, its turn about the arm's own line is taken out, 80% of it is given to the forearm's bone (ftw), and the bend
+  // that is left is held to WRIST_MAX.
+  const WRIST_MAX = 0.62, QI = Qt();
+  function wristFix(S) {
+    const h = SK['hand' + S].quaternion, a = armDir[S]; if (h.w < 0) h.set(-h.x, -h.y, -h.z, -h.w);
+    const dp = h.x * a.x + h.y * a.y + h.z * a.z; _q1.set(a.x * dp, a.y * dp, a.z * dp, h.w); if (_q1.lengthSq() < 1e-8) _q1.set(0, 0, 0, 1); _q1.normalize();
+    _q2.copy(_q1).invert(); _q3.copy(h).multiply(_q2);
+    const ang = 2 * Math.acos(Math.min(1, Math.abs(_q3.w))); if (ang > WRIST_MAX) _q3.copy(QI.set(0, 0, 0, 1).slerp(_q3, WRIST_MAX / ang));
+    h.copy(_q3).multiply(_q1); SK['ftw' + S].quaternion.set(0, 0, 0, 1).slerp(_q1, 0.8);
+  }
+  // an arm, from hanging: out (radians from straight down), fwd (the upper arm swung forward), turn (the whole arm turned outward
+  // about its own line: the elbow's fold then opens away from him), elbow (bent), palm (the hand turned from "palm to his thigh"
+  // toward "palm up"), wrist (the hand bent back at the wrist). His hands are built with their backs forward (HAND_TW); here they are turned palm-in.
+  // the hanging arm. palmIn: how far the hand is turned back from the way it is built (palm to the thigh and a little behind); turn: the whole arm turned in a
+  // little, as a relaxed one is; hang: the arm this far out from straight down (his full sleeves and baggy trousers need the room); elbow: never quite straight
+  const TUNE = { palmIn: 0.90, turn: -0.10, hang: 8.5 * DEG, elbow: 0.20 };
+  function armSet(S, s, out, fwd, turn, elbow, palm, wrist) {
+    SK['uarm' + S].rotation.set(-fwd, s * turn, s * (out - A_POSE)); SK['farm' + S].rotation.set(-elbow, 0, 0);
+    SK['hand' + S].quaternion.setFromAxisAngle(armDir[S], -s * (TUNE.palmIn + palm)); if (wrist) SK['hand' + S].quaternion.multiply(_q4.setFromAxisAngle(FING[S], s * wrist));
+    wristFix(S);
+  }
+  const pulse = (t, a, b, c, d) => sm(a, b, t) * (1 - sm(c, d, t)), frac = (v) => v - Math.floor(v);
+  const herm = (p0, p1, m0, m1, t) => { const t2 = t * t, t3 = t2 * t; return (2 * t3 - 3 * t2 + 1) * p0 + (t3 - 2 * t2 + t) * m0 + (-2 * t3 + 3 * t2) * p1 + (t3 - t2) * m1; };
+  // ----- the walk's numbers -----
+  // One stride (two steps) is W_L metres and takes W_T seconds: an unhurried 1.08 m a second. Each foot is down for W_ST of it.
+  const W_T = 1.22, W_L = 1.32, W_ST = 0.62, W_X = 0.100, W_YAW = 0.13, W_Z0 = 0.310;      // W_X: his ankles this far from his middle line (heavy boots, a little wide); W_YAW: toes turned out; W_Z0: how far ahead of him the foot would stand flat as its heel lands
+  const W_STRIKE = 0.30, W_FLAT = 0.16, W_HEEL = 0.50, W_OFF = 0.85, W_CLEAR = 0.028;       // toes up as the heel lands (radians); flat by this share of its time on the ground; the heel starts up at this share; heel up this far as the toe leaves; the sole's lowest point clears the ground by this much in the swing
+  const WALK_SPEED = W_L / W_T;                     // metres a second his stride covers; the page tells the dust the ground is passing at this speed
+  const FA = { p: V3(), q: Qt(), bend: 0 }, FB = { p: V3(), q: Qt(), bend: 0 }, FF = V3(), ANK = { R: V3(), L: V3() }, FQ = { R: Qt(), L: Qt() }, FBEND = { R: 0, L: 0 }, WF = { p: V3(), q: Qt(), bend: 0, pitch: 0, down: 0 };
+  const stPitch = (u) => (u < W_FLAT ? -W_STRIKE * Math.pow(1 - u / W_FLAT, 1.4) : u > W_HEEL ? W_OFF * Math.pow((u - W_HEEL) / (1 - W_HEEL), 1.7) : 0);
+  // with the heel up: if the hip has gone too far ahead for the leg to reach the ankle, the heel lifts further until it can
+  function heelFor(S, s, zF, pitch, out) {
+    FF.set(s * W_X, FOOT[S].J.y, zF); footOn(S, FF, s * W_YAW, pitch, out); if (pitch <= 0) return pitch;
+    const hip = hipAt(S), lim = LEG[S].max * 0.9985; if (out.p.distanceTo(hip) <= lim) return pitch;
+    let lo = pitch, hi = 1.25; for (let i = 0; i < 9; i++) { const m = (lo + hi) / 2; footOn(S, FF, s * W_YAW, m, out); if (out.p.distanceTo(hip) > lim) lo = m; else hi = m; }
+    footOn(S, FF, s * W_YAW, hi, out); return hi;
+  }
+  // one foot of the walk at q (0 as its heel lands, W_ST as its toe leaves, 1 as the heel lands again): fills WF
+  function walkFoot(S, s, q) {
+    const reach = W_L * W_ST, yaw = s * W_YAW;
+    if (q < W_ST) { const u = q / W_ST; WF.pitch = heelFor(S, s, W_Z0 - reach * u, stPitch(u), WF); WF.down = 1; return WF; }
+    // In the air. It leaves as the ground foot's formula left it (toe tip down, heel high) and arrives toes-up on the heel's edge, moving
+    // back at the ground's own speed so it does not skid as it lands. Between, its lowest point is kept a little above the ground.
+    const w = (q - W_ST) / (1 - W_ST), e = 0.012;
+    const pOff = heelFor(S, s, W_Z0 - reach, W_OFF, FA), z0 = FA.p.z, x0 = FA.p.x; const pE = heelFor(S, s, W_Z0 - reach * (1 - e), stPitch(1 - e), FB), vz0 = (z0 - FB.p.z) / e * (1 - W_ST) / W_ST, vp0 = (pOff - pE) / e * (1 - W_ST) / W_ST;
+    FF.set(s * W_X, FOOT[S].J.y, W_Z0); footOn(S, FF, yaw, -W_STRIKE, FB);
+    const pitch = herm(pOff, -W_STRIKE, Math.min(vp0, 1.1) * 0.55, 0, sm(0, 0.92, w) * 0.5 + w * 0.5), bend = FA.bend * (1 - sm(0, 0.30, w));
+    WF.p.set(lerp(x0, FB.p.x, w), W_CLEAR * Math.pow(Math.sin(PI * w), 0.9) - soleLow(S, pitch, bend), herm(z0, FB.p.z, vz0, -W_L * (1 - W_ST), w));
+    WF.q.setFromAxisAngle(AY, yaw).multiply(_q2.setFromAxisAngle(AX, pitch)); WF.bend = bend; WF.pitch = pitch; WF.down = 0; return WF;
+  }
+  // ----- his resting stance -----
+  // Weight on his right leg; his left foot stands a little forward and turned out, its knee soft. [ankle x, z, toes out]
+  const STAND = { R: [-0.118, -0.050, 0.10], L: [0.150, 0.030, 0.30] };
+  const gait = { q: 0, pitch: { R: 0, L: 0 }, down: { R: 1, L: 1 }, knee: { R: 0, L: 0 } };
+  function snapTo(name) { wk = name === 'walk' ? 1 : 0; tk = name === 'talk' ? 1 : 0; live = name === 'stand' ? 0 : 1; if (name === 'walk') gph = 0; }
+  function play(name, now) {
+    if (!MOVES.includes(name) || name === 'pose') { pose(lastPose); return 'pose'; }
+    const from = mv.name; mv = { name, t: 0 };
+    if (now || from === 'pose') { snapTo(name); body(0); root.updateMatrixWorld(true); HAIRSIM.step(0, true); CLOTH.step(0, true); TR_SWAY.step(0, true); }      // from the measuring pose there is nothing sensible to ease through
+    return name;
+  }
+  // one frame of standing, walking or talking
+  function body(dt) {
+    const N = mv.name, T = mv.t, ease = (v, to, rate) => v + (to - v) * Math.min(1, dt * rate);
+    wk = ease(wk, N === 'walk' ? 1 : 0, 3.2); tk = ease(tk, N === 'talk' ? 1 : 0, 3.5); live = ease(live, N === 'stand' ? 0 : 1, 2.5);
+    const go = wk * wk * (3 - 2 * wk), still = 1 - go, al = live;
+    restAll();
+    // --- always: breath, and while he stands a slow shift of his weight and a look about ---
+    const br = Math.sin(clock * 1.45) * al, br2 = Math.sin(clock * 1.45 - 0.9) * al, sway = Math.sin(clock * 0.52) * al * still, sw2 = Math.sin(clock * 0.33 + 1.3) * al * still, look = Math.sin(clock * 0.21 + 0.4) * al * still;
+    // --- standing: the hips sit over the right leg and drop on the left; the chest leans back the other way and opens; head level ---
+    const H = SK.hips;
+    H.position.x += (-0.044 + 0.010 * sway) * still; H.position.z += (-0.012 + 0.004 * sw2) * still;
+    add('hips', 0.010 * still, (0.070 + 0.015 * sw2) * still, (-0.066 + 0.012 * sway) * still);
+    add('spine1', -0.012 * still, -0.024 * still, (0.034 - 0.006 * sway) * still); add('spine2', -0.022 * still + 0.012 * br, -0.024 * still, (0.032 - 0.006 * sway) * still); add('spine3', -0.026 * still + 0.011 * br, -0.012 * still, 0.016 * still);
+    add('neck', 0.020 * still, 0.02 * look, -0.006 * still); add('head', (-0.012 + 0.010 * sw2) * still + 0.006 * br2, (-0.010 + 0.07 * look) * still, (-0.012 + 0.012 * sway) * still);
+    for (const [S, s] of SIDES) add('clav' + S, 0, -s * 0.030 * still, s * (0.012 * br - 0.010 * still));
+    // how high his hips are is not chosen: it is what leaves the leg he stands on almost straight (its knee 6 to 12 degrees off straight as he breathes and shifts), so
+    // the weight is seen to be on it, and it can never be asked to reach further than it is long
+    if (still > 0.001) { const g = LEG.R, hp = hipAt('R'), hx = hp.x - STAND.R[0], hz = hp.z - STAND.R[1], want = FOOT.R.J.y + Math.sqrt(g.c0 + 2 * g.M * Math.cos(0.10) - hx * hx - hz * hz);
+      H.position.y += (want - hp.y - 0.0012 * (1 + br) - 0.0015 * (1 + sw2)) * still; }
+    // --- walking ---
+    let ph = 0;
+    if (go > 0.001) {
+      gph += dt * TAU / W_T; if (gph > TAU * 64) gph -= TAU * 64; ph = gph;
+      const c1 = Math.cos(ph - 0.10), dsup = 0.5 + 0.5 * Math.cos(2 * (ph - TAU * 0.045));       // dsup: 1 when both feet are down (he is lowest then), 0 when one leg stands under him
+      H.position.y += (-0.009 - 0.021 * dsup) * go; H.position.x += -0.020 * Math.sin(ph - TAU * 0.07) * go; H.position.z += 0.012 * go;
+      const yawH = 0.085 * c1, rollH = -0.050 * Math.sin(ph + 0.15);                           // the hip of the leading leg goes forward; the hip of the swinging leg drops
+      add('hips', 0.035 * go, yawH * go, rollH * go);
+      // above the hips each part turns the other way, a beat later than the one below: shoulders against hips, and the head stays on his heading
+      const yb = (lag) => 0.085 * Math.cos(ph - 0.10 - lag), rb = (lag) => -0.050 * Math.sin(ph + 0.15 - lag);
+      add('spine1', -0.005 * go, -0.50 * yb(0.25) * go, -0.42 * rb(0.20) * go); add('spine2', 0, -0.62 * yb(0.45) * go, -0.42 * rb(0.35) * go); add('spine3', -0.012 * go, -0.52 * yb(0.65) * go, -0.34 * rb(0.5) * go);
+      add('neck', -0.010 * go, 0.30 * yb(0.75) * go, 0.08 * rb(0.6) * go); add('head', -0.012 * go + 0.010 * Math.cos(2 * ph - 1.2) * go, 0.34 * yb(0.9) * go, 0.10 * rb(0.7) * go);
+    }
+    // --- arms: hanging, palms in, elbows soft; swinging from the shoulder as he walks, each against its own leg, the forearm trailing ---
+    const TK = talkArms(T, tk);
+    for (const [S, s] of SIDES) {
+      const p = ph + (s < 0 ? 0 : PI), sw = Math.cos(p - 0.30) * go, late = Math.cos(p - 0.85) * go, g = TK[S];
+      const out = TUNE.hang + 0.02 * go + (s < 0 ? 0.012 : -0.006) * still + 0.004 * br + g.out, fwd = 0.02 * still - (0.27 * sw - 0.02 * go) + 0.010 * br2 + g.fwd;
+      const elbow = TUNE.elbow * still + (0.24 - 0.17 * late) * go + 0.012 * br2 + g.elbow, turn = TUNE.turn + g.turn;
+      armSet(S, s, out, fwd, turn, elbow, 0.04 * late + g.palm, -0.05 + 0.10 * late * go + g.wrist); fingers(S, lerp(0.42 + 0.04 * late, g.curl, g.k), lerp(0.30, g.idx, g.k));
+      add('clav' + S, 0, s * 0.035 * sw, s * g.shrug);                 // the shoulder goes forward with its own arm (measured: with the sign the other way the shoulders cancelled the counter-turn of the chest)
+    }
+    // --- talking: his head and chest go with his hands ---
+    if (tk > 0.001) { const g = TK; add('head', g.nod, g.turn, g.tilt); add('neck', 0.35 * g.nod, 0.4 * g.turn, 0); add('spine3', g.lean, 0.3 * g.turn, 0); add('spine2', 0.6 * g.lean, 0, 0); }
+    // --- feet on the ground, legs to them ---
+    for (const [S, s] of SIDES) {
+      const st = STAND[S], J = FOOT[S].J, A = ANK[S];
+      A.set(st[0], J.y, st[1]); FQ[S].setFromAxisAngle(AY, s * st[2]); FBEND[S] = 0; gait.pitch[S] = 0; gait.down[S] = 1;
+      if (go > 0.001) { const f = walkFoot(S, s, frac(ph / TAU + (s < 0 ? 0 : 0.5))); A.lerp(f.p, go); FQ[S].slerp(f.q, go); FBEND[S] = f.bend * go; gait.pitch[S] = f.pitch; gait.down[S] = f.down; }
+      gait.knee[S] = legTo(S, A, s * 0.03 * go); footTo(S, FQ[S], FBEND[S]);
+    }
+    gait.q = frac(ph / TAU);
+  }
+  // What his hands and head do when he talks: a loop of TALK_T seconds with three gestures in it, and small beats on each.
+  //   1. his right hand comes up, palm half up, and offers the thing he is saying; it beats twice
+  //   2. both hands open outward, a small shrug, head tipped: "and there you have it"
+  //   3. his left hand lifts and one finger marks a point; his head turns that way
+  // Between them the arms hang. Returned per arm: what to add to the hanging arm (armSet's numbers), finger curl, and k (how far the
+  // fingers have gone over to the gesture); and for his head and chest: nod, turn, tilt, lean.
+  const TALK_T = 9.6, TKO = { R: { out: 0, fwd: 0, turn: 0, elbow: 0, palm: 0, wrist: 0, curl: 0, idx: 0, k: 0, shrug: 0 }, L: { out: 0, fwd: 0, turn: 0, elbow: 0, palm: 0, wrist: 0, curl: 0, idx: 0, k: 0, shrug: 0 }, nod: 0, turn: 0, tilt: 0, lean: 0 };
+  function talkArms(T, k) {
+    const o = TKO; for (const S of ['R', 'L']) { const a = o[S]; a.out = a.fwd = a.turn = a.elbow = a.palm = a.wrist = a.curl = a.idx = a.k = a.shrug = 0; } o.nod = o.turn = o.tilt = o.lean = 0;
+    if (k <= 0.001) return o;
+    const t = T % TALK_T, g1 = pulse(t, 0.15, 0.85, 2.55, 3.25) * k, g2 = pulse(t, 3.45, 4.15, 5.75, 6.45) * k, g3 = pulse(t, 6.65, 7.25, 8.6, 9.3) * k;
+    const b1 = Math.sin((t - 0.85) * 5.2) * sm(0.85, 1.1, t) * g1, b2 = Math.sin((t - 4.1) * 3.4) * g2, b3 = Math.sin((t - 7.2) * 6.0) * sm(7.2, 7.4, t) * g3;
+    const R = o.R, L = o.L;
+    R.fwd = 0.38 * g1 + 0.05 * b1 + 0.20 * g2; R.out = 0.02 * g1 + 0.10 * g2; R.turn = 0.02 * g1 + 0.42 * g2; R.elbow = 1.28 * g1 + 0.12 * b1 + 1.12 * g2 + 0.05 * b2; R.palm = 0.80 * g1 + 0.95 * g2; R.wrist = 0.22 * g1 + 0.08 * b1 + 0.26 * g2; R.curl = lerp(0.20, 0.10, g2); R.idx = R.curl * 0.7; R.k = Math.max(g1, g2); R.shrug = 0.07 * g2;
+    L.fwd = 0.20 * g2 + 0.30 * g3 + 0.04 * b3; L.out = 0.10 * g2 + 0.04 * g3; L.turn = 0.42 * g2 + 0.05 * g3; L.elbow = 1.12 * g2 + 0.05 * b2 + 1.45 * g3 + 0.10 * b3; L.palm = 0.95 * g2 + 0.25 * g3; L.wrist = 0.26 * g2 + 0.05 * g3; L.curl = g3 > g2 ? 1.0 : 0.10; L.idx = g3 > g2 ? 0.06 : 0.07; L.k = Math.max(g2, g3); L.shrug = 0.07 * g2;
+    o.nod = 0.05 * g1 + 0.030 * b1 - 0.03 * g2 + 0.04 * g3 + 0.025 * b3 + 0.012 * Math.sin(T * 2.3) * k; o.turn = -0.12 * g1 + 0.02 * b2 + 0.16 * g3 + 0.03 * Math.sin(T * 0.9) * k; o.tilt = 0.03 * g1 - 0.07 * g2 + 0.04 * g3; o.lean = 0.025 * g1 - 0.015 * g2 + 0.02 * g3;
+    return o;
+  }
   function animate(dt) {
     dt = dt > 0 ? Math.min(dt, 0.05) : 0; clock += dt;
-    if (mv.name !== 'pose') {
-      mv.t += dt; const N = mv.name, T = mv.t; restAll();
-      wk += ((N === 'walk' ? 1 : 0) - wk) * Math.min(1, dt * 4.5); const go = wk, still = 1 - go;
-      for (const [S, s] of SIDES) SK['uarm' + S].rotation.z = s * (17 * DEG - A_POSE);       // arms hang, as near his sides as the big sleeves allow
-      const br = Math.sin(clock * 1.5), sway = Math.sin(clock * 0.8);
-      add('spine2', 0.012 * br, 0, 0); add('spine3', 0.010 * br, 0, 0); for (const [S, s] of SIDES) add('clav' + S, 0, 0, s * 0.012 * br);
-      SK.hips.position.x += 0.008 * sway * still; add('hips', 0, 0, 0.012 * sway * still); add('spine1', 0, 0, -0.012 * sway * still); add('head', 0.015 * Math.sin(clock * 0.6), 0.05 * Math.sin(clock * 0.37) * still, 0);
-      if (go > 0.001) {
-        gph += dt * TAU / 1.06; const A = 0.36, sn = Math.sin(gph), cs = Math.cos(gph);
-        for (const [S, s] of SIDES) {
-          const p = gph + (s < 0 ? 0 : PI), si = Math.sin(p), co = Math.cos(p), sw = Math.max(0, co), st = Math.max(0, -co);
-          const th = -(A * si + 0.04) * go, kn = (0.95 * Math.pow(sw, 1.3) + 0.18 * Math.pow(Math.max(0, Math.sin(p - 0.5)), 3) * st + 0.04) * go;       // thigh; knee folding in the swing and giving a little as the foot lands
-          const up = 0.20 * Math.pow(Math.max(0, si), 3) * go, off = 0.50 * Math.max(0, -si) * st * go;                                                // toes up to land on the heel; heel up to push off
-          add('thigh' + S, th, 0, -s * 0.035 * go); add('shin' + S, kn, 0, 0); add('foot' + S, -(th + kn) * 0.92 - up + off, 0, s * 0.035 * go); add('toe' + S, -off * 0.9, 0, 0);       // his feet come in a little under him as he walks
-          add('uarm' + S, 0.34 * si * go, 0, 0); add('farm' + S, -(0.24 + 0.26 * Math.max(0, -si)) * go, 0, 0);
-        }
-        SK.hips.position.y += -0.040 * sn * sn * go; SK.hips.position.x += 0.016 * cs * go;
-        add('hips', 0.02 * go, 0.09 * sn * go, 0.03 * cs * go); add('spine1', 0.02 * go, -0.045 * sn * go, -0.02 * cs * go); add('spine2', 0, -0.08 * sn * go, -0.02 * cs * go); add('spine3', 0, -0.05 * sn * go, 0);
-        add('neck', -0.03 * go, 0.08 * sn * go, 0);
-      }
-      if (N === 'talk') {
-        const k = sm(0, 0.4, T), a1 = Math.sin(T * 3.6), a2 = Math.sin(T * 1.9 + 1), a3 = Math.sin(T * 5.2);
-        SK.hips.position.x += 0.014 * k; add('hips', 0, 0.08 * k, 0.025 * k); add('spine1', 0, -0.05 * k, -0.03 * k);
-        add('uarmR', -(0.50 + 0.10 * a2) * k, 0, -0.08 * k); add('farmR', -(1.35 + 0.25 * a1) * k, 0, 0); add('handR', 0.2 * a3 * k, 0.4 * a2 * k, 0);
-        add('farmL', -0.18 * k, 0, 0); add('head', (0.05 * a1 + 0.02) * k, 0.10 * a2 * k, 0.04 * Math.sin(T * 1.3) * k); add('neck', 0, 0.05 * a2 * k, 0);
-      }
-      root.updateMatrixWorld(true);
-    }
+    if (mv.name !== 'pose') { mv.t += dt; body(dt); root.updateMatrixWorld(true); }
     HAIRSIM.step(dt, false); root.updateMatrixWorld(true); CLOTH.step(dt, false); TR_SWAY.step(dt, false);
     DUST.ground.set(-Math.sin(root.rotation.y), 0, -Math.cos(root.rotation.y)).multiplyScalar(api.walkOnSpot ? WALK_SPEED * wk : 0);
     DUST.update(dt);
@@ -457,7 +633,7 @@
   for (const M of [meshes, shirtMeshes]) for (const k in M) { const g = M[k].geometry, n = g.attributes.position.count; for (const a in g.attributes) if (g.attributes[a].count !== n) throw new Error('mesh "' + k + '": ' + a + ' has ' + g.attributes[a].count + ' entries for ' + n + ' points'); }
   // and no triangle may name a point that is not there (the cut meshes above share their lists of points, so this is checked too)
   for (const M of [meshes, shirtMeshes]) for (const k in M) { const g = M[k].geometry, n = g.attributes.position.count, ix = g.index.array; if (ix.length % 3) throw new Error('mesh "' + k + '": its list of triangles is not a multiple of three'); for (let i = 0; i < ix.length; i++) if (ix[i] >= n) throw new Error('mesh "' + k + '": a triangle names point ' + ix[i] + ' of ' + n); }
-  const api = { root, fx, skeleton, bones, SK, animate, pose, play, moves: MOVES, meshes, dust: DUST, setBlank, get blank() { return blank; }, setDoll, get doll() { return doll; }, setOldSkin, get oldSkin() { return Object.assign({}, oldOn); }, setOldTrousers, get oldTrousers() { return oldOn.legs; }, setOldShirt, get oldShirt() { return oldOn.arms; }, setCloth, get cloth() { return CLOTH.on; }, setOldHair, get oldHair() { return oldHair; }, setHair, get hair() { return hairOn; }, shirtMeshes, walkOnSpot: true, walkSpeed: WALK_SPEED, name: 'Noiz', debug: { SK, meshes, trunkPt, legPt, bootPt, headPoint, hairPt, armAt, doll: DOLL, trousers: TROUSERS, holes: TR_HOLES, cloth: CLOTH, shirt: SHIRT, sway: TR_SWAY, hair: HAIR, hairSim: HAIRSIM }, get triangles() { return triCount; } };
+  const api = { root, fx, skeleton, bones, SK, animate, pose, play, moves: MOVES, meshes, dust: DUST, setBlank, get blank() { return blank; }, setDoll, get doll() { return doll; }, setOldSkin, get oldSkin() { return Object.assign({}, oldOn); }, setOldTrousers, get oldTrousers() { return oldOn.legs; }, setOldShirt, get oldShirt() { return oldOn.arms; }, setCloth, get cloth() { return CLOTH.on; }, setOldHair, get oldHair() { return oldHair; }, setHair, get hair() { return hairOn; }, shirtMeshes, walkOnSpot: true, walkSpeed: WALK_SPEED, stride: W_L, strideTime: W_T, name: 'Noiz', debug: { SK, meshes, trunkPt, legPt, bootPt, headPoint, hairPt, armAt, doll: DOLL, trousers: TROUSERS, holes: TR_HOLES, cloth: CLOTH, shirt: SHIRT, sway: TR_SWAY, hair: HAIR, hairSim: HAIRSIM, gait, FOOT, LEG, soleLow, TUNE }, get triangles() { return triCount; } };
   pose(lastPose);
   return api;
 }

@@ -76,9 +76,16 @@
     const [hw, c, zf, zb] = spline(N_BOOT, cl(y, 0, B_Y1)), cz = (zf + zb) / 2, e = 2 / 2.4, sn = Math.sin(a), co = Math.cos(a);
     return [s * c + hw * sgnPow(sn, e), y, cz + (co >= 0 ? zf - cz : cz - zb) * sgnPow(co, e)];
   }
+  // How a boot follows his leg (stage 5; Chris: "the boots, the ankles need to make a realistic motion as he walks").
+  //   the shaft   goes with the shin, whole, from 22 cm up: it is a stiff tube and the trousers' hem sits on its rim
+  //   the ankle   the leather hands over from foot to shin over 10 cm of height, lower at the front (the crease across the instep, where
+  //               a boot folds when the shin comes forward over the foot) and higher at the back (above the stiff cup round the heel)
+  //   the ball    the front of the foot goes with the toes over 9 cm of its length, sole and upper together, so the boot bends across
+  //               the ball when his heel lifts and the toe box stays one piece
+  // The doll's foot and the gold flecks use the same numbers, so they stay inside and on the leather.
   function wBoot(S, x, y, z) {
-    if (y > 0.21) return [BI['shin' + S], 1];
-    const a = sm(0.10, 0.21, y), t = sm(0.04, 0.10, z) * sm(0.11, 0.05, y);          // the ankle; the front of the foot bends with the toes
+    if (y > 0.225) return [BI['shin' + S], 1];
+    const up = 0.030 * sm(0.06, -0.10, z), a = sm(0.090 + up, 0.190 + up, y), t = sm(0.030, 0.120, z) * sm(0.175, 0.125, y);
     return [BI['shin' + S], a, BI['foot' + S], (1 - a) * (1 - t), BI['toe' + S], (1 - a) * t];
   }
   for (const [S, s] of SIDES) {
@@ -104,7 +111,9 @@
   function wArm(S, sl) {
     if (sl < 0.06) { const u = sm(-0.04, 0.06, sl); return [BI['clav' + S], (1 - u) * 0.6, BI.spine3, (1 - u) * 0.4, BI['uarm' + S], u]; }
     if (sl < L_UARM + 0.05) { const u = sm(L_UARM - 0.05, L_UARM + 0.05, sl); return [BI['uarm' + S], 1 - u, BI['farm' + S], u]; }
-    const u = sm(L_UARM + L_FARM - 0.02, L_UARM + L_FARM + 0.012, sl); return [BI['farm' + S], 1 - u, BI['hand' + S], u];
+    const u = sm(L_UARM + L_FARM - 0.02, L_UARM + L_FARM + 0.012, sl), k = sm(0.345, 0.470, sl);
+    if (k <= 0) return [BI['farm' + S], 1 - u, BI['hand' + S], u];
+    return [BI['farm' + S], (1 - u) * (1 - k), BI['ftw' + S], (1 - u) * k, BI['hand' + S], u];       // from below the lace cuff to the wrist the skin goes over to the bone that carries the turn of his hand
   }
   for (const [S, s] of SIDES) {
     const d = armDir[S], sh = restPts['sh' + S], nrm = V3(s * Math.cos(A_POSE), Math.sin(A_POSE), 0), NU = Q(48, 24), pts = [], rad = [], ss = [];

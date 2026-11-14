@@ -10,6 +10,58 @@ something or just talks to them", and he gets his own folder because he is a cha
   Project docs `claude/HOW-TO-3d-witch-models.md` and `claude/HOW-TO-3d-witch-faces.md`. Read both before writing any code.
 - Project note for this folder: `claude/grey-hat-3d-reference-prompts.md`.
 
+## Stage 5 of the rebuild: ankles, a walk with weight, and a stance that is not an A-pose (November 14, 2026)
+
+Chris: "the boots, the ankles need to make a realistic motion as he walks. And I think the posturing of the whole body could be
+improved as well. There is a how to do this. And you could also look at one of the other models for the witches, because they
+are finished." Report: `builder/stage5_report.md`. Before this stage: `src_before_walk/`.
+
+- **Where it is.** All of it is the block "holding still, standing, walking and talking" in `src/N99_static.js` (`pose`, `play`,
+  `body`, `footOn`, `walkFoot`, `legTo`, `footTo`, `armSet`, `wristFix`, `talkArms`), plus `wBoot` in `src/N30_body.js` (how the
+  boot's leather follows shin, foot and toe), one new bone a side in `src/10_geom.js` (`ftw`, the turn of the forearm) and its
+  weights in `wArm` and `src/32_hands.js`.
+- **What `play` and `pose` do now.** `pose(o)` is the measuring pose of his paintings (the A-pose), exactly as before: every tool
+  that lays him over a painting uses it, and the model still starts in it. `play('stand')` is his resting stance held still,
+  `play('idle')` the same stance breathing and shifting, `play('walk')`, `play('talk')`. `play(name, true)` goes there at once and
+  lays the cloth afresh (for still pictures); without `true` he eases from one move to the next.
+- **Feet are placed, legs follow** (the Jester's walk, `witches/jester/src/75_pose.js`). A foot on the ground is given by where it
+  stands, which way it points and how far its heel is up (`footOn`). It turns about the back edge of the heel while the toes are
+  up, lies flat, then the toe piece stays flat on the ground and the foot turns about the toe joint (the boot bends at the ball,
+  by at most `TOE_MAX`, 27 degrees), then all of it turns about the tip of the toe. The line it stands on never moves, so a
+  planted foot cannot slide. The ankle's place follows from that, and `legTo` turns thigh and shin to put the ankle joint exactly
+  there. Exact matters: the witches' leg solver takes thigh and shin to lie in one line at rest; his are 3.3 degrees off, which
+  would be 2 cm at the ankle.
+- **The ankle is never held level by force** (Io's README, stage six; the Ranger's 6c was the same fault). If the hip has gone too
+  far ahead for the back leg to reach, the heel lifts further until it can (`heelFor`). In the air the foot is given its own
+  pitch: it leaves heel-high, levels, and arrives toes-up 17 degrees on the heel's edge, moving back at the ground's own speed.
+- **The walk's numbers** (`W_T`, `W_L`, `W_ST` and the rest, one line of constants): a stride of 1.32 m in 1.22 s (1.08 m/s), each
+  foot down 62% of it, both down 25%, the swinging sole 28 mm clear at most. Hips: 21 mm rise and fall, 20 mm to each side over
+  the standing leg, 4.9 degrees of turn; the chest turns against them (shoulders 3.8 degrees the other way at that moment), each
+  part of the spine a beat later than the one below (the Ranger's 6c), and neck and head turn back so his face stays on his
+  heading (1.2 degrees). Arms swing from the shoulder, each against its own leg, elbows soft, forearm trailing.
+- **The stance.** Weight on his right leg (hips 44 mm over it and tipped, left hip low), left foot forward and turned out, its
+  knee soft; chest leaning back the other way and open; arms 8.5 degrees out from straight down (the full sleeves and baggy
+  trousers need the room), elbows never straight, hands turned palm-in. The height of his hips is not chosen: it is what leaves
+  the standing leg almost straight, so it can never be asked to reach further than it is long.
+- **Hands turn along the forearm** (Io's `wristFix` and `ftw` bone). His hands are built with their backs forward, as B1 paints
+  them; to hang palm-in the hand is turned 52 degrees about the arm's own line, 80% of which the lower forearm's skin and the
+  leather cuff take up on `ftw`. The wrist itself bends 36 degrees at most.
+- **The boots' skin** (`wBoot`): shaft whole on the shin from 22.5 cm up; foot to shin over 10 cm of height, lower at the front
+  (the crease across the instep) and 3 cm higher at the back (above the stiff cup round the heel); the front of the foot goes over
+  to the toe bone across 9 cm at the ball, sole and upper together. The doll's foot uses the same weights. In the A-pose the
+  boots are the same picture as before, pixel for pixel.
+- **Checks:** `python3 tools/walk_check.py [frames a stride]` prints the stride as a table (heel-up angle, knee, shin, ankle, bend
+  at the ball, the sole's lowest point), foot slide measured twice (on the bones and on the boot's own skin), the turn of hips,
+  shoulders and head, and how far the boots move in 24 s of idle and of talk. `python3 tools/hand_clear.py` prints how near his
+  hands come to the trousers and corset. Keep the frames a stride at 25 or more, or think about it: `animate` never takes a step
+  longer than 0.05 s, and a check that assumes it did reports a slide that is not there (the tool now cuts long steps in two).
+- **The page:** it opens with him in the stance ("Idle"). "A-pose" under Show puts the measuring pose back; the three "Arms"
+  buttons are versions of the A-pose and switch it on. The "Hands" view looks at wherever his left hand is.
+- **Rough:** while he eases from standing to walking and back (about half a second) his feet glide to their new places; nobody
+  has watched him move (stills only); the walk is on the spot; the boots are still the old painted skin, and the underside of the
+  soles, which now shows from behind as each heel lifts, is plain black; the old painted
+  trousers and shirt ("Old trousers", "Old shirt") were not checked in the new poses.
+
 ## Stage 4 of the rebuild: his hair, remade over real ears (November 14, 2026)
 
 Chris: "his ear is printed on his hair", "the hair is one piece and has clothing and face printed on it", "The hair's bad,

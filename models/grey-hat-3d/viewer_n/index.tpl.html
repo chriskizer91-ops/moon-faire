@@ -43,7 +43,7 @@ canvas#stage{display:block;width:100%;height:100%;touch-action:none;cursor:grab}
   <header>
     <p class="eyebrow">Moon Faire · the man they meet · first build</p>
     <h1>Noiz, <em>the Grey Hat</em></h1>
-    <p class="sub">Where he stands right now, part-way through his first build: no hat, belt or jewellery yet. Drag to turn him, pinch or scroll to zoom. His hair is new: real locks over real ears, and it moves. His shirt is real cloth that moves, over a painted body. His trousers are real cloth with real holes. "Doll" shows the body under his clothes. "Blank doll" shows his shape without paint. "Walk" shows the gold dust following his boots.</p>
+    <p class="sub">Where he stands right now, part-way through his first build: no hat, belt or jewellery yet. Drag to turn him, pinch or scroll to zoom. New: he stands at rest instead of with his arms out, and his walk and his boots' ankles are rebuilt. Press "Walk" and "Talk". "A-pose" puts the arms-out pose back. His hair is real locks over real ears, and it moves. His shirt is real cloth that moves, over a painted body. His trousers are real cloth with real holes. "Doll" shows the body under his clothes. "Blank doll" shows his shape without paint. "Walk" shows the gold dust following his boots.</p>
   </header>
   <div class="stagebox" id="box">
     <canvas id="stage"></canvas>
@@ -53,22 +53,28 @@ canvas#stage{display:block;width:100%;height:100%;touch-action:none;cursor:grab}
   </div>
   <div><p class="label">Look at</p><div class="chips" id="views"></div></div>
   <div><p class="label">Movement</p><div class="chips" id="moves"></div></div>
-  <div><p class="label">Arms</p><div class="chips" id="poses"></div></div>
+  <div><p class="label">Arms, in the A-pose</p><div class="chips" id="poses"></div></div>
   <div><p class="label">Show</p><div class="chips" id="shows"></div></div>
   <div class="notes">
     <div>
-      <h2>New: his hair is hair, over real ears</h2>
+      <h2>New: he stands and walks like a man</h2>
       <ul>
-        <li>You said his ear was printed on his hair, and that the hair was one piece with clothing and face printed on it. <b>That hair is gone.</b></li>
-        <li><b>His hair is built from locks now:</b> about 130 wavy ribbons of strands in three layers, from a middle parting down past his shoulders, over a thin cap of hair on his scalp. It is measured from your painting C4 and its outline is within about a centimetre of it: the height on top, the width beside his face, the reach behind his head.</li>
-        <li><b>Nothing but hair is printed on it.</b> The colour is a strand picture drawn for it in his own browns, taken from your painting of his hair from behind (C12), with lighter strands and darker under layers.</li>
-        <li><b>He has real ears.</b> They are skin, they stand where C4 paints them, and his hair is tucked behind them. Each has its black plug as a small object of its own.</li>
-        <li><b>His glasses</b> now rest on his ears: each arm goes over the top of the ear and hooks down behind it.</li>
-        <li><b>It moves.</b> The hanging hair lags and settles when he walks, turns or nods, and stays off his face. Press "Walk" or "Talk".</li>
-        <li>Press <b>"Old hair"</b> to put the old shell back and compare. "Blank doll" shows the new hair as clay.</li>
-        <li><b>Rough for now:</b> the top of his head looks combed flat, where C4 has soft waves from the parting, and the hairline across his forehead is a hard edge. The waves lower down are tidier and thinner than you painted, with none of the curls at the ends. Your whole-figure painting (B1) shows bigger hair than the head painting (C4): I built to C4 and went part of the way toward B1 below his ears. Very close up the strands look scratchy.</li>
-        <li>His face from the front is untouched. From the side, the painting between his beard and his ear is stretched a little, because the ear moved to where C4 has it. The feather earring and the hat are not built yet: the left plug is where the feather will hang.</li>
-        <li>I cannot watch him move from here, only look at stills. If the hair does something odd when he walks or turns his head, tell me.</li>
+        <li>You said his boots and ankles need to move as real ones do when he walks, and that his whole posture could be better.</li>
+        <li><b>He no longer stands with his arms out.</b> His weight is on his right leg, his left foot a little forward and turned out, chest open, head up. His arms hang by his sides with the palms turned in. He breathes and shifts a little.</li>
+        <li><b>Press "Walk".</b> His heel lands first with the toes up, the foot rolls flat, then the heel lifts and the boot bends at the ball as the toe pushes off. The other foot swings through low. His feet do not slide on the ground while they are down.</li>
+        <li><b>The walk has weight.</b> His hips move over the leg he is standing on, his shoulders turn a little against his hips, his arms swing from the shoulder with soft elbows, and his head stays steady. It is an unhurried walk, about one step every 0.6 seconds.</li>
+        <li><b>Press "Talk".</b> He offers something with his right hand, opens both hands, then marks a point with a finger of his left. His head goes with his hands.</li>
+        <li><b>"A-pose"</b> (under Show) puts back the old arms-out pose, which matches your paintings. The three "Arms" buttons belong to it.</li>
+        <li>The boot's shaft now follows his shin and the foot follows the ground, with a crease at the ankle. His shirt sleeves, trousers and hair were checked in the new poses.</li>
+        <li><b>Rough for now:</b> he walks on the spot. When he starts or stops walking his feet glide into place for about half a second. The boots are still the old painted leather, not rebuilt yet, and the underside of the soles is plain black: you can see it from behind when a heel lifts.</li>
+        <li><b>I cannot watch him move from here,</b> only look at stills one after another. The timing and the feel of the walk need your eye: tell me if it is too slow, too stiff or too much.</li>
+      </ul>
+    </div>
+    <div>
+      <h2>Before that: his hair is hair, over real ears</h2>
+      <ul class="m">
+        <li>His hair is built from about 130 wavy locks over a thin cap, with real ears and glasses that rest on them. It moves when he walks or nods. "Old hair" puts the old shell back.</li>
+        <li>Rough: the top of his head looks combed flat, the hairline is a hard edge, and close up the strands look scratchy.</li>
       </ul>
     </div>
     <div>
@@ -150,7 +156,7 @@ canvas#stage{display:block;width:100%;height:100%;touch-action:none;cursor:grab}
   let want = { az: 0.5, el: 0.06, dist: 6.2, ty: 0.90, tx: 0, tz: 0 }, easing = true, spin = false;
   // name, azimuth, elevation, distance, target height, painting, target x, target z
   const VIEWS = [['Three-quarter', 0.5, 0.06, 6.2, 0.90, 'front'], ['Front', 0, 0.05, 6.2, 0.90, 'front'], ['Side', Math.PI / 2, 0.05, 6.2, 0.90, 'side'], ['Back', Math.PI, 0.05, 6.2, 0.90, 'back'],
-    ['Face', 0, 0.03, 2.0, 1.63, 'face'], ['Head, turned', 0.6, 0.05, 2.3, 1.61, 'faceq'], ['Profile', -Math.PI / 2, 0.03, 2.3, 1.61, 'prof'], ['Shirt and corset', 0.3, 0.05, 2.9, 1.24, 'chest'], ['Trousers', 0.3, 0.05, 3.3, 0.70, 'legs'], ['Close on the holes', 0.55, 0.02, 1.5, 0.66, 'legs', 0.13, 0], ['Boots', 0.6, 0.16, 2.3, 0.20, 'boot', 0, 0.03], ['Hands', 0.9, 0.10, 2.0, 0.92, 'hand', 0.44, -0.06]];
+    ['Face', 0, 0.03, 2.0, 1.63, 'face'], ['Head, turned', 0.6, 0.05, 2.3, 1.61, 'faceq'], ['Profile', -Math.PI / 2, 0.03, 2.3, 1.61, 'prof'], ['Shirt and corset', 0.3, 0.05, 2.9, 1.24, 'chest'], ['Trousers', 0.3, 0.05, 3.3, 0.70, 'legs'], ['Close on the holes', 0.55, 0.02, 1.5, 0.66, 'legs', 0.13, 0], ['Boots', 0.6, 0.16, 2.3, 0.20, 'boot', 0, 0.03], ['Hands', 0.9, 0.10, 2.0, 0.92, 'hand', 0.44, -0.06, 'handL']];
   const POSES = [['As painted', {}], ['Arms down', { arm: 17 }], ['Arms out', { arm: 90 }]];
   let refKey = 'front', showRef = true;
   function chips(host, items, onPick, first) {
@@ -159,13 +165,21 @@ canvas#stage{display:block;width:100%;height:100%;touch-action:none;cursor:grab}
   }
   function setRef() { const im = $('ref'), src = REFS[refKey]; im.hidden = !(showRef && src); if (src && im.getAttribute('src') !== src) im.src = src; }
   const press = (host, i) => [...$(host).children].forEach((c, k) => { if (!c.dataset.toggle) c.setAttribute('aria-pressed', k === i ? 'true' : 'false'); });
-  const pickView = (v) => { want = { az: v[1], el: v[2], dist: v[3], ty: v[4], tx: v[6] || 0, tz: v[7] || 0 }; easing = true; spin = false; refKey = v[5]; setRef(); const sb = $('spinB'); if (sb) sb.setAttribute('aria-pressed', 'false'); };
+  // a view with a bone's name at its end looks at where that bone is now (his hand hangs by his thigh in the stance and is out to the side in the A-pose)
+  const pickView = (v) => { want = { az: v[1], el: v[2], dist: v[3], ty: v[4], tx: v[6] || 0, tz: v[7] || 0 }; if (v[8] && R.SK[v[8]]) { R.root.updateMatrixWorld(true); const e = R.SK[v[8]].matrixWorld.elements; want.tx = e[12]; want.ty = e[13] - 0.05; want.tz = e[14]; } easing = true; spin = false; refKey = v[5]; setRef(); const sb = $('spinB'); if (sb) sb.setAttribute('aria-pressed', 'false'); };
   chips($('views'), VIEWS, pickView, 0);
-  chips($('moves'), [['Stand still', 'pose'], ['Idle', 'idle'], ['Walk', 'walk'], ['Talk', 'talk']], (v) => { if (v[1] === 'pose') { R.pose(POSES[0][1]); press('poses', 0); return; } R.play(v[1]); press('poses', -1); }, 0);
-  chips($('poses'), POSES, (p) => { R.pose(p[1]); press('moves', 0); }, 0);
+  // He starts in his resting stance, breathing ("Idle"). "A-pose" (under Show) puts back the pose of his paintings, which is the one he is
+  // measured in. The three "Arms" buttons are versions of that pose, so pressing one turns "A-pose" on; pressing a movement turns it off.
+  const MOVES = [['Stand still', 'stand'], ['Idle', 'idle'], ['Walk', 'walk'], ['Talk', 'talk']];
+  let move = 'idle', aPose = 0;
+  const setA = (on) => { const b = $('aposeB'); if (b) b.setAttribute('aria-pressed', on ? 'true' : 'false'); };
+  chips($('moves'), MOVES, (v) => { move = v[1]; R.play(move); press('poses', -1); setA(false); }, 1);
+  chips($('poses'), POSES, (p) => { aPose = POSES.indexOf(p); R.pose(p[1]); press('moves', -1); setA(true); }, -1);
+  R.play('idle', true);
   const toggle = (host, id, label, on, fn) => { const b = document.createElement('button'); b.className = 'chip'; b.type = 'button'; b.id = id; b.dataset.toggle = '1'; b.textContent = label; b.setAttribute('aria-pressed', on ? 'true' : 'false');
     b.addEventListener('click', () => { const v = b.getAttribute('aria-pressed') !== 'true'; b.setAttribute('aria-pressed', v ? 'true' : 'false'); fn(v); }); host.appendChild(b); };
   toggle($('shows'), 'refB', 'Painting beside him', true, (v) => { showRef = v; setRef(); });
+  toggle($('shows'), 'aposeB', 'A-pose', false, (v) => { if (v) { R.pose(POSES[aPose][1]); press('poses', aPose); press('moves', -1); } else { R.play(move); press('poses', -1); press('moves', MOVES.findIndex((m) => m[1] === move)); } });
   toggle($('shows'), 'spinB', 'Turn slowly', false, (v) => { spin = v; easing = false; });
   toggle($('shows'), 'dustB', 'Gold dust', true, (v) => { R.dust.amount = v ? 1 : 0; });
   toggle($('shows'), 'blankB', 'Blank doll', false, (v) => { R.setBlank(v); });
