@@ -97,16 +97,21 @@
   const faceC = cvs(1024, 1024), faceT = ctex(faceC), bakedFace = { base: null, parts: {} }, faceNow = { eyes: 0, mouth: 'rest' };
   { const g0 = faceC.getContext('2d'); g0.fillStyle = (BAKED && BAKED.skinChest) || '#d59d7f'; g0.fillRect(0, 0, 1024, 1024); }
   const LOOKS = { own: bakedFace }; bakedFace.rects = (BAKED && BAKED.faceParts) || {}; let lookNow = 'own';
-  function paintFace(eyes, mouth) {                 // eyes: 0 open .. 1 shut; mouth: 'rest', 'open', 'oo' or 'smile'
-    faceNow.eyes = eyes; faceNow.mouth = mouth; const L = LOOKS[lookNow] && LOOKS[lookNow].base ? LOOKS[lookNow] : LOOKS.own; if (!L.base) return;
+  // Her emotions (C10; stage ten) are whole-face patches named 'emo_<name>': reading, casting, surprised, hit, stern, delighted.
+  // Only two of them have her eyes open as they are at rest, so only those can blink; her talking mouths can be set over any of
+  // them, but not the plain smile (an emotion brings its own mouth and cheeks).
+  const EMO_BLINK = { casting: 1, stern: 1 };
+  function paintFace(eyes, mouth, emo) {            // eyes: 0 open .. 1 shut; mouth: 'rest', 'open', 'oo' or 'smile'; emo: one of her emotions, or nothing
+    faceNow.eyes = eyes; faceNow.mouth = mouth; faceNow.emo = emo || null; const L = LOOKS[lookNow] && LOOKS[lookNow].base ? LOOKS[lookNow] : LOOKS.own; if (!L.base) return;
     const W = faceC.width, H = faceC.height, g = faceC.getContext('2d'), put = (n) => { const im = L.parts[n], r = L.rects[n]; if (im && r) g.drawImage(im, r.x * W, r.y * H, r.w * W, r.h * H); };
     g.drawImage(L.base, 0, 0, W, H);
-    if (eyes >= 0.75) put('shut'); else if (eyes >= 0.25) put('half');
-    if (mouth === 'open') put('oh'); else if (mouth === 'oo') put('oo'); else if (mouth === 'smile') put('smile');
+    const e = emo && L.parts['emo_' + emo] ? emo : null; if (e) put('emo_' + e);
+    if (!e || EMO_BLINK[e]) { if (eyes >= 0.75) put('shut'); else if (eyes >= 0.25) put('half'); }
+    if (mouth === 'open') put('oh'); else if (mouth === 'oo') put('oo'); else if (mouth === 'smile' && !e) put('smile');
     faceT.needsUpdate = true;
   }
-  onBaked('face', (im) => { bakedFace.base = im; paintFace(faceNow.eyes, faceNow.mouth); });
-  if (BAKED && BAKED.faceParts) for (const n in BAKED.faceParts) onBaked('facePart_' + n, (im) => { bakedFace.parts[n] = im; paintFace(faceNow.eyes, faceNow.mouth); }, BAKED.faceParts[n].src);
+  onBaked('face', (im) => { bakedFace.base = im; paintFace(faceNow.eyes, faceNow.mouth, faceNow.emo); });
+  if (BAKED && BAKED.faceParts) for (const n in BAKED.faceParts) onBaked('facePart_' + n, (im) => { bakedFace.parts[n] = im; paintFace(faceNow.eyes, faceNow.mouth, faceNow.emo); }, BAKED.faceParts[n].src);
   // ---------- ears: a dished shell standing off the side of the head, wearing the profile painting ----------
   (function buildEars() {
     const NT = Q(72, 30), N1 = Q(16, 8), N2 = Q(7, 4), c0 = Math.cos(EAR.tilt), s0 = Math.sin(EAR.tilt);

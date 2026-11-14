@@ -165,6 +165,71 @@ for name, k, box, ells in (('shut', 1, (-0.064, 0.064, J_EYE - 0.018, J_EYE + 0.
     o, gn = state(name, k, *box, ells); shots.append(o); print(' ', name, 'tone gain', gn.tolist(), len(T['faceParts'][name]['src']) // 1024, 'KB')
 sheet = np.concatenate([np.concatenate([s_[250:900:2, 150:874:2] for s_ in shots[:3]], 1), np.concatenate([s_[250:900:2, 150:874:2] for s_ in shots[3:]], 1)], 0)
 Image.fromarray(np.clip(sheet, 0, 255).astype(np.uint8)).save(SH + 'bake_states.jpg', quality=88)
+
+# ---------- her emotions, from C10: six faces in a grid like C9's (stage ten) ----------
+# reading (eyes lowered, a small smile), casting (brows drawn together, eyes narrowed), surprised, hit (a wince), stern, delighted.
+# An expression moves the whole face, so each is lifted as one patch of the face inside its outline, not as eyes or a mouth alone.
+# C10's faces are larger in their boxes than C9's, so each is settled onto C9's first face with a free fit that starts from the
+# distance between her eyes (142 px here, 115 px there), using the parts an expression moves least: her nose, the sides of her
+# cheeks, her chin, her forehead. The fit is then made rigid again (one size both ways, no shear), so a face is never stretched.
+C10 = load(REF + 'C10.png'); ecells = [C10[512 * i:512 * (i + 1), 512 * j:512 * (j + 1)] for i in range(2) for j in range(3)]
+EMO = ['reading', 'casting', 'surprised', 'hit', 'stern', 'delighted']
+em = fm.copy(); em[150:262, :] = 0; em[296:410, 165:385] = 0; ys, xs = np.nonzero(em); cen = np.array([xs.mean(), ys.mean()])
+WE = {}; s0 = 1.19                                  # her face is 1.19 times larger in C10's boxes than in C9's (eyes 137 px apart against 115, eye line to lip line 139 against 117)
+def find_face(c):                                   # the middle of her face (where it is most alike left and right) and the row of her lip line
+    lum = ndi.gaussian_filter(c.mean(-1), 2.0); best = None
+    for m in range(195, 300):
+        d = np.arange(4, 100); e = np.abs(lum[170:400, m + d] - lum[170:400, m - d]).mean()
+        if best is None or e < best[0]: best = (e, m)
+    m = best[1]; lip = 330 + int(np.argmin(lum[330:410, m - 10:m + 11].mean(1))); return m, lip
+for k in range(6):
+    mx, lip = find_face(ecells[k])
+    W0 = np.array([[s0, 0, mx - s0 * 275.0], [0, s0, lip - s0 * 341.0]], np.float32)       # C9's first face: middle at 275, lip line at row 341
+    emk = cv2.warpAffine(em, W0, (512, 512)); how = 'fitted'                               # the mask, laid on C10's face
+    try:
+        cc, Wa = cv2.findTransformECC(gray(cells[0]), gray(ecells[k]), W0.copy(), cv2.MOTION_AFFINE, crit, emk, 7)
+        U, sv, Vt = np.linalg.svd(Wa[:, :2].astype(np.float64)); Rm = U @ Vt; sc = float(np.sqrt(sv[0] * sv[1])); ang = float(np.degrees(np.arctan2(Rm[1, 0], Rm[0, 0])))
+        if not (1.12 <= sc <= 1.27 and abs(ang) < 5 and sv[0] / sv[1] < 1.12): raise ValueError('a poor fit: size %.3f, turn %.2f, stretch %.3f' % (sc, ang, sv[0] / sv[1]))
+        A = sc * Rm; t = (Wa[:, :2] @ cen + Wa[:, 2]) - A @ cen; WE[k] = np.concatenate([A, t[:, None]], 1)
+    except Exception as ex:
+        WE[k] = W0.astype(np.float64); cc, sc, ang, how = 0.0, s0, 0.0, 'kept at its first placing (' + str(ex)[:60] + ')'
+    print('  C10 face %d (%s): middle %d, lip row %d; %s: fit %.3f, size %.3f, turned %.2f deg' % (k + 1, EMO[k], mx, lip, how, cc, sc, ang))
+def to_ecell(k, col, row):                          # C1 pixel -> pixel in C10's face k
+    x = W1[0, 0] * col / 2 + W1[0, 1] * row / 2 + W1[0, 2]; y = W1[1, 0] * col / 2 + W1[1, 1] * row / 2 + W1[1, 2]; Wk = WE[k]
+    return Wk[0, 0] * x + Wk[0, 1] * y + Wk[0, 2], Wk[1, 0] * x + Wk[1, 1] * y + Wk[1, 2]
+# the patch: her face inside its outline in C1, kept well clear of the outline and of her hairline, with a soft edge
+ins = ndi.binary_erosion(inside & (rr[:, None] >= 262), iterations=30).astype(np.float32); ins = ndi.gaussian_filter(ins, 11.0)
+ex0, ex1, ey0, ey1 = -0.074, 0.074, 1.408, 1.582
+j0, j1 = int((ex0 - FX0) / (FX1 - FX0) * S), int(np.ceil((ex1 - FX0) / (FX1 - FX0) * S)); i0, i1 = int((FY1 - ey1) / (FY1 - FY0) * S), int(np.ceil((FY1 - ey0) / (FY1 - FY0) * S))
+Xe = FXg[i0:i1, j0:j1]; Ye = FYg[i0:i1, j0:j1]; c1c, c1r = col_of(Xe), row_of(Ye)
+ale = np.clip(ndi.map_coordinates(ins, [c1r, c1c], order=1, mode='constant', cval=0.0), 0, 1); ale = np.clip((ale - 0.08) / 0.84, 0, 1); ale = ale * ale * (3 - 2 * ale)
+# narrower toward her forehead, where her hair comes in at her temples; and it stops above her chin, so the head keeps its own chin and jaw
+lim = np.interp(Ye, [1.440, 1.500, J_EYE, 1.541, 1.556, 1.572, 1.582], [0.052, 0.062, 0.062, 0.058, 0.050, 0.040, 0.030])
+sd = np.clip((lim - np.abs(Xe)) / 0.008, 0, 1); bt = np.clip((Ye - 1.424) / 0.012, 0, 1); ale = ale * sd * sd * (3 - 2 * sd) * bt * bt * (3 - 2 * bt)
+ale[0, :] = 0; ale[-1, :] = 0; ale[:, 0] = 0; ale[:, -1] = 0
+featz = ((np.abs(Xe) <= 0.057) & (Ye > J_EYE - 0.022) & (Ye < J_EYE + 0.036)) | ((np.abs(Xe) <= 0.045) & (Ye > 1.436) & (Ye < 1.482)) | ((np.abs(Xe) <= 0.020) & (Ye > 1.468) & (Ye < 1.494))       # her brows and eyes, her mouth, her nostrils: dark there is hers
+def lowpass(a, w, sig): return np.stack([ndi.gaussian_filter(a[..., c] * w, sig) for c in range(3)], -1) / np.maximum(ndi.gaussian_filter(w, sig), 1e-4)[..., None]
+def webp_rgba_q(rgb, al, q):
+    im = Image.fromarray(np.dstack([np.clip(rgb, 0, 255), np.clip(al * 255, 0, 255)]).astype(np.uint8), 'RGBA'); b = io.BytesIO(); im.save(b, 'WEBP', quality=q, method=6)
+    return 'data:image/webp;base64,' + base64.b64encode(b.getvalue()).decode()
+eshots = []
+for k, name in enumerate(EMO):
+    cx, cy = to_ecell(k, c1c, c1r)
+    pt = np.stack([ndi.map_coordinates(ecells[k][..., c], [cy, cx], order=1, mode='nearest') for c in range(3)], -1)
+    base = face[i0:i1, j0:j1]; rim = (ale > 0.04) & (ale < 0.55); gain = np.clip(base[rim].mean(0) / pt[rim].mean(0), 0.80, 1.30); pt = pt * gain
+    # strands of hair and backdrop that fall inside the patch are left out: anything much darker than her skin there, away from her features
+    dark = (pt.mean(-1) < 0.66 * ndi.gaussian_filter(base.mean(-1), 12.0)) & ~featz; hm = ndi.gaussian_filter(ndi.binary_dilation(dark, iterations=5).astype(np.float32), 4.0)
+    al = ale * np.clip(1 - 1.6 * hm, 0, 1)
+    # toward its rim the patch takes the broad light and colour of the face under it, so no edge shows; its middle keeps its own
+    wm = (al > 0.02).astype(np.float32)
+    pt = pt * (1 + (np.clip(lowpass(base, wm, 60.0) / np.maximum(lowpass(pt, wm, 60.0), 1.0), 0.80, 1.25) - 1) * 0.75)       # and all over, most of the way to the face's own broad tone: C10's six faces are not lit quite alike
+    ratio = np.clip(lowpass(base, wm, 26.0) / np.maximum(lowpass(pt, wm, 26.0), 1.0), 0.78, 1.28)
+    dist = ndi.distance_transform_edt(al > 0.5); we = np.clip(1 - dist / 80.0, 0, 1)[..., None]; pt = pt * (1 + (ratio - 1) * we)
+    T['faceParts']['emo_' + name] = dict(src=webp_rgba_q(pt, al, 86), x=round(j0 / S, 5), y=round(i0 / S, 5), w=round((j1 - j0) / S, 5), h=round((i1 - i0) / S, 5))
+    out = face.copy(); out[i0:i1, j0:j1] = base * (1 - al[..., None]) + pt * al[..., None]; eshots.append(out)
+    print('  emotion', name, 'tone gain', np.round(gain, 3).tolist(), len(T['faceParts']['emo_' + name]['src']) // 1024, 'KB')
+sheet = np.concatenate([np.concatenate([s_[60:960:2, 130:894:2] for s_ in [face] + eshots[:3]], 1), np.concatenate([s_[60:960:2, 130:894:2] for s_ in [face] + eshots[3:]], 1)], 0)
+Image.fromarray(np.clip(sheet, 0, 255).astype(np.uint8)).save(SH + 'bake_emotions.jpg', quality=88)
 js = 'window.IO_TEX=' + json.dumps(T, separators=(',', ':')) + ';'
 open(OUT + 'io_tex.js', 'w').write(js); print('io_tex.js', len(js) // 1024, 'KB', list(T.keys()))
 

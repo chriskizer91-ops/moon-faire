@@ -40,9 +40,9 @@ canvas#stage{display:block;width:100%;height:100%;touch-action:none;cursor:grab}
 <body>
 <div class="wrap">
   <header>
-    <p class="eyebrow">Moon Faire · stage nine of her build</p>
+    <p class="eyebrow">Moon Faire · stage ten of her build</p>
     <h1><em>Io</em>, the Herbal Witch</h1>
-    <p class="sub">New: one pass on things passing through each other. Her book rests on her hand and her finger rests on the page, her skirt and cloak go over her legs, and her arms stay inside her sleeves. Pick a move under Moves. She stays in view while you scroll the buttons. Drag to turn her, pinch or scroll to zoom.</p>
+    <p class="sub">New: her six feelings from painting C10, under Her feelings, and a slower, smoother hand when she reads. Pick View, then Face, to see them close. She stays in view while you scroll the buttons. Drag to turn her, pinch or scroll to zoom.</p>
   </header>
   <div class="play">
   <div class="stagebox" id="box">
@@ -53,6 +53,7 @@ canvas#stage{display:block;width:100%;height:100%;touch-action:none;cursor:grab}
   </div>
   <div><p class="label">Moves</p><div class="chips" id="moves"></div></div>
   <div><p class="label">View</p><div class="chips" id="views"></div></div>
+  <div><p class="label">Her feelings</p><div class="chips" id="feels"></div></div>
   <div><p class="label">Her face</p><div class="chips" id="faces"></div></div>
   <div><p class="label">Held still, to check her against the paintings</p><div class="chips" id="poses"></div></div>
   <div><p class="label">Show</p><div class="chips" id="shows"></div></div>
@@ -60,13 +61,13 @@ canvas#stage{display:block;width:100%;height:100%;touch-action:none;cursor:grab}
   <div class="notes">
     <h2>New in this stage</h2>
     <ul>
-      <li>Read her book: the book now lies on her left palm, and her right forefinger rests on the page. Her other fingers are folded up clear of it.</li>
-      <li>Skirt and cloak: the cloth is kept outside her legs. A knee pushes it forward when she walks or jogs, and it lies over her lap when she squats, kneels or hovers. Her left leg still shows through the slit in the skirt, as it is painted.</li>
-      <li>Sleeves: each tier is now a ring of cloth round her arm. It follows her arm round her elbow, and on a raised arm it rests on top of the arm and hangs below it, as in painting F5. The long point hangs from the cuff.</li>
+      <li>Her feelings: Reading (eyes lowered, a small smile), Concentrating, Surprised, Hit (a wince), Stern and Delighted. Each is her whole painted face from C10, with a small turn of her head and shoulders. She keeps the one you pick while she does any move; None takes it off.</li>
+      <li>Some moves now use them by themselves: her reading face when she reads and at the bottom of her curtsey, her concentrating face when she lifts her sickle, her delighted face in the twirl and when she smells the herb.</li>
+      <li>Reading: her finger now takes twelve seconds to go down the page and turn the leaf, and its speed never jumps. Before, it jumped back to the top of the page in a single frame every five seconds, and turned the leaf in under half a second. That was my timing, not your screen.</li>
     </ul>
     <h2 style="margin-top:12px">From the earlier stages</h2>
     <ul>
-      <li>The party's moves, and the book that appears when she reads (stage eight). Her book, dagger and sickle (stage seven). Her ankles, her wrists and her coy wave (stage six). Her belt, pouch, crystal, necklaces and bracelets (stage five). Her cloak with the moss, and her painted hands (stage four). Her arms, her moving hair and skirt, and her first moves (stage three). Her face, glasses, hair and hat (stage two). Her body, bodice and skirt (stage one).</li>
+      <li>The pass on things passing through each other: book and hands, legs and cloth, arms and sleeves (stage nine). The party's moves, and the book that appears when she reads (stage eight). Her book, dagger and sickle (stage seven). Her ankles, her wrists and her coy wave (stage six). Her belt, pouch, crystal, necklaces and bracelets (stage five). Her cloak with the moss, and her painted hands (stage four). Her arms, her moving hair and skirt, and her first moves (stage three). Her face, glasses, hair and hat (stage two). Her body, bodice and skirt (stage one).</li>
     </ul>
     <h2 style="margin-top:12px">What is rough, and what is not here yet</h2>
     <ul class="m">
@@ -77,7 +78,8 @@ canvas#stage{display:block;width:100%;height:100%;touch-action:none;cursor:grab}
       <li>The thin edge of each hand (thumb side, little-finger side) is soft paint with no detail: the paintings do not show it.</li>
       <li>The new pieces are plain shapes: the belt has no gold vine or holes yet, the pouch has no flap, studs or filigree, and the necklace pendant does not swing.</li>
       <li>Her fingers do not wrap the sickle exactly, the dagger cannot be drawn yet, and the sickle simply appears in her hand.</li>
-      <li>Not here yet: the faces in C10; her spells and attacks.</li>
+      <li>Her feelings are painted on: the shape of her head does not change, so from the side they show less than from the front. She blinks only in Concentrating and Stern; the others hold their own eyes.</li>
+      <li>Not here yet: her spells and attacks.</li>
     </ul>
   </div>
 </div>
@@ -113,6 +115,9 @@ canvas#stage{display:block;width:100%;height:100%;touch-action:none;cursor:grab}
   function setRef() { const im = $('ref'), src = REFS[refKey]; im.hidden = !(showRef && src); if (src && im.getAttribute('src') !== src) im.src = src; }
   chips($('views'), VIEWS, (v) => { want = { az: v[1], el: v[2], dist: v[3], ty: v[4] }; easing = true; spin = false; refKey = v[5]; setRef(); $('spinB').setAttribute('aria-pressed', 'false'); }, -1);
   const FACES = [['Blinking', null, null, false], ['Talking', null, null, true], ['Eyes shut', 1, null, false], ['Mouth open', null, 'open', false], ['Oo', null, 'oo', false], ['Smile', null, 'smile', false]];
+  // her emotions, from painting C10 (stage ten): she holds the one that is picked, in whatever move she is doing
+  const FEELS = [['None', null], ['Reading', 'reading'], ['Concentrating', 'casting'], ['Surprised', 'surprised'], ['Hit', 'hit'], ['Stern', 'stern'], ['Delighted', 'delighted']];
+  chips($('feels'), FEELS, (f) => { R.setFeel(f[1]); }, 0);
   chips($('faces'), FACES, (f) => { R.talk(f[3]); if (f[1] == null && !f[2]) R.setFace(); else R.setFace(f[1] == null ? undefined : f[1], f[2]); }, 0);
   // her moves: 'pose' holds her still; the short ones end by themselves and she goes back to standing
   const MOVES = [['Stand still', 'pose'], ['Standing', 'idle'], ['Walk', 'walk'], ['Talk', 'talk'], ['Push up glasses', 'glasses'], ['Tip her hat', 'hat'], ['Curtsey', 'curtsey'], ['Twirl', 'twirl'], ['Pick a herb', 'herb'], ['Wave', 'wave'], ['Look round', 'look'], ['Read her book', 'read'], ['Hold her sickle', 'sickle'], ['Jog', 'jog'], ['Squat', 'squat'], ['Kneel', 'kneel'], ['Hover', 'hover']];
@@ -156,7 +161,7 @@ canvas#stage{display:block;width:100%;height:100%;touch-action:none;cursor:grab}
     if (easing) { let d = want.az - orbit.az; d = Math.atan2(Math.sin(d), Math.cos(d)); const k = Math.min(1, dt * 5); orbit.az += d * k; orbit.el += (want.el - orbit.el) * k; orbit.dist += (want.dist - orbit.dist) * k; orbit.target.y += (want.ty - orbit.target.y) * k; }
     stage.render();
   }
-  $('hud').textContent = 'Stage nine · ' + Math.round(R.triangles / 1000) + 'k triangles';
+  $('hud').textContent = 'Stage ten · ' + Math.round(R.triangles / 1000) + 'k triangles';
   window.IO = { stage, R, step() { fit(); stage.render(); } };
   requestAnimationFrame(frame);
 })();

@@ -4,7 +4,44 @@ Started November 13, 2026. Built the way the HD Jester was (`claude/HOW-TO-3d-wi
 the Ranger's stage-one recipe: this folder began as a copy of the Ranger's stage-one code (`claude/ranger-3d-model`, commit
 `1d4c9d6`), with the Jester's platform boot builder (`claude/jester-3d-model`, pass 20) in place of the Ranger's boots.
 
-## Where she stands: stage nine (November 13, 2026)
+## Where she stands: stage ten (November 13, 2026)
+
+Her emotions (the faces in C10), and a slower, smoother hand when she reads.
+
+- **Chris (November 13):** "When she's reading the book her pointer hand ... she's like following the lines reading the book. Can
+  you slow that movement down? It's like kind of jerky moving fast. I don't know if that's a rendering issue or that's how you
+  timed it ... And move on to doing her emotions for the next pass. The faces in C10."
+- **The reading hand was my timing, not his screen.** `tools/tipspeed.py` measures the fingertip's speed over the page, frame by
+  frame. Before: it jumped 11 cm back to the top of the page in one frame every 5.2 s (652 cm/s for that frame), and turned the
+  leaf in under half a second (over 80 cm/s). Now (`RD` in `readHands`, `src/I99_static.js`): one round takes 12 s: 8.4 s down the
+  page with a slow drift along the lines, then lift, out to the edge, across with the leaf, and back to the top. Every stretch
+  eases in and out. Mean 3.2 cm/s, fastest 12 cm/s (the leaf), and the speed never changes by more than 0.6 cm/s between frames.
+- **Her six emotions** (C10's prompt: "reading, working a spell, being surprised, being hit, being stern, being delighted"):
+  `reading` (eyes lowered, a small smile), `casting` (brows drawn together, eyes narrowed; the page calls it Concentrating),
+  `surprised`, `hit` (a wince), `stern`, `delighted`.
+  - **Baked** by `bake_head_io.py` (the section after C9's states) as whole-face patches `faceParts.emo_<name>`, about 50 KB each.
+    An expression moves the whole face, so each patch is her face inside its outline, not eyes or a mouth alone.
+  - **Placing them:** C10's faces are 1.19 times larger in their boxes than C9's and do not sit in the same place from box to
+    box (the middles are at 258, 226, 290, 258 and 227 px), so each is placed by its own middle (where the face is most alike
+    left and right) and its lip line. A free fit by picture-matching (ECC) was tried on top and rejected for all six: it changed
+    their size by up to 13% and stretched them. `find_face` is what is used.
+  - **Edges:** the patch narrows toward her forehead and drops anything much darker than her skin away from her features (hair
+    at her temples), stops above her chin (the head keeps its own chin and jaw), and takes the broad light and colour of the face
+    under it, fully at its rim and three-quarters of the way everywhere else.
+  - **Painting** (`paintFace(eyes, mouth, emo)` in `src/I40_head.js`): base, then the emotion, then the blink only for `casting`
+    and `stern` (the others hold their own eyes), then a talking mouth if there is one. The plain smile is not laid over an emotion.
+  - **Holding one** (`setFeel(name)`; `feels`, `feel`): she keeps it through any move. With it goes a small turn of her head and
+    shoulders (`FW` in `body()`): surprise and a hit come quickly, the others ease in.
+  - **Moves that ask for one themselves** (`emo` returned by `body()`): reading face in `read` and at the bottom of `curtsey`;
+    concentrating when the sickle is lifted; delighted in `twirl` and when she smells the herb.
+- **Page:** stage ten; a new row, Her feelings (None, Reading, Concentrating, Surprised, Hit, Stern, Delighted). One offline file:
+  `deliver/Io_3D_stage10.html` (3.2 MB). `deliver/Io_stage10_feelings.jpg`.
+- Limits: the feelings are paint on a head whose shape does not change, so from the side they show less than from the front
+  (the side of her head wears the profile painting, which is at rest). Surprised looks paler than the rest because her head tips
+  back out of the shade of her hat. Checked in stills from three angles, by the fingertip meter, the pass-through meter and the
+  page test. Not watched playing, not on a real phone.
+
+## Stage nine (November 13, 2026)
 
 One pass on things passing through each other: her hands and her book, her legs and her skirt and cloak, her arms and her sleeves.
 
@@ -553,10 +590,9 @@ They also show her whole look from many sides, with the robe: useful when the ro
 
 ## Next stages, in Chris's order (November 13)
 
-1. His eye on the pass-through fixes of stage nine.
-2. **Her emotions:** the faces in C10.
-3. **Her spells and attacks** (H1 to H18, I1 to I8, and round 4): the pendant becoming the sickle, the dagger drawn with
+1. His eye on her feelings and on the slower reading hand (stage ten).
+2. **Her spells and attacks** (H1 to H18, I1 to I8, and round 4): the pendant becoming the sickle, the dagger drawn with
    witchfire, the book floating with its pages turning.
-4. Not wanted: more work on her boots; more detail on belt, pouch and necklace.
-5. Still open if he asks: the cloak nearer to M1; hair on top of her head; bringing her jog, squat, kneel and hover into line
+3. Not wanted: more work on her boots; more detail on belt, pouch and necklace.
+4. Still open if he asks: the cloak nearer to M1; hair on top of her head; bringing her jog, squat, kneel and hover into line
    with the other witches' versions.

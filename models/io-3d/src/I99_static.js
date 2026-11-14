@@ -292,7 +292,10 @@
   let lastPose = { arm: 15, leg: 0 }, mv = { name: 'pose', t: 0 }, wk = 0, gph = 0, spinWas = 0;
   let clock = 0, blinkAt = 1.6, blinkT = -1, mouthAt = 0, mouthNow = 'rest', facePainted = '', talking = false, held = null, blinking = true;
   const SHOTS = { glasses: 2.4, hat: 2.6, curtsey: 3.0, twirl: 2.6, herb: 5.0, wave: 3.0, look: 3.6, sickle: 3.4 }, MOVES = ['pose', 'idle', 'walk', 'jog', 'squat', 'kneel', 'hover', 'talk', 'read', 'glasses', 'hat', 'curtsey', 'twirl', 'herb', 'wave', 'look', 'sickle'];
-  let jg = 0, hSq = 0, hKn = 0, hHv = 0;       // the moves all four witches share (Chris, November 13: "squat ... kneel ... hover, and jog"); each slides in and out
+  let jg = 0, hSq = 0, hKn = 0, hHv = 0;
+  // Her emotions (C10; stage ten). feel: the one she is asked to hold (the page's Feelings buttons, setFeel); FW: how far she is into each,
+  // for the small turn of her head and shoulders that goes with it. A move can also ask for one for a moment (her reading face when she reads).
+  const FEELS = ['reading', 'casting', 'surprised', 'hit', 'stern', 'delighted'], FW = {}; for (const n of FEELS) FW[n] = 0; let feel = null;       // the moves all four witches share (Chris, November 13: "squat ... kneel ... hover, and jog"); each slides in and out
   // Her book (G8, and the rule in her prompts: it is in her LEFT hand; when she lets go of it, it floats open at her left side).
   // bkR: 1 open on her left palm to read (see readHands). bkF is no longer used: she does not carry it.
   const BK_FLOAT = {},       // Chris, November 13: "her book should like appear when she does the read her book animation. I don't think she should just be holding it"
@@ -311,7 +314,7 @@
   function armTo(S, P, k, swivel, f, n, from) { const e = k * k * (3 - 2 * k); rdV.copy(from).lerp(P, e); rdV.z += 0.09 * Math.sin(PI * e); reach(S, rdV, sm(0, 0.15, k), swivel * e); aimHand(S, f, n, k); wristFix(S); }
   const rdFrom = { L: V3(), R: V3() };
   function readHands(N, T) {
-    const k = bkR, tn = N === 'read' ? pulse(T % 5.2, 3.6, 4.0, 4.3, 4.7) : 0, ln = (T % 5.2) / 5.2;
+    const k = bkR;
     for (const [S] of SIDES) rdFrom[S].setFromMatrixPosition(SK['hand' + S].matrixWorld).applyMatrix4(_inv);
     // her left hand: palm up and a little toward her face, at the foot of her ribs
     fingers('L', lerp(0.24, 0.12, k)); carried('spine3', 0.082, 1.040, 0.215, rdP); armTo('L', rdP, k, 0.3, fv.set(-0.42, 0.30, 0.86), nv.set(-0.06, 0.90, -0.43), rdFrom.L); sync();
@@ -324,7 +327,14 @@
     fingers('R', lerp(0.24, 1.2, k)); for (const fn of ['mid', 'rng', 'pnk']) [0.75, 1.75, 0.90].forEach((a, j) => { SK[fn + j + 'R'].rotation.z = lerp(0.24 * [0.85, 1.1, 0.7][j], a, k); });
     [0.95, 0.20, 0.15].forEach((a, j) => { SK['idx' + j + 'R'].rotation.z = lerp(0.24 * [0.85, 1.1, 0.7][j], a, k); }); sync();
     rootQuat(SK.handR, _qa).invert(); rdT.copy(TIP0.R).applyMatrix4(SK.idx2R.matrixWorld).applyMatrix4(_inv).sub(_e.setFromMatrixPosition(SK.handR.matrixWorld).applyMatrix4(_inv)).applyQuaternion(_qa);       // where her fingertip is from her wrist, in her hand's own frame
-    const px = lerp(0.050 + 0.014 * Math.sin(T * 1.9), 0.118 - 0.125 * sm(0.45, 1, tn), sm(0, 0.45, tn)), py = lerp(0.055 - 0.11 * ln, 0.0, tn), tipTo = bookPt(px, py, pageZ(px) + 0.0075 + 0.030 * Math.sin(PI * tn), V3());
+    // Where her fingertip goes (Chris, November 13: the reading hand was "kind of jerky moving fast": it jumped back to the top of
+    // the page in one frame every 5.2 s, and turned a leaf in under half a second). One slow round now takes 12 s: 8.4 s down the
+    // page at about 1.5 cm a second with a slow drift along the lines, then it lifts, goes to the edge, turns the leaf across, and
+    // comes back to the top. Every stretch eases in and out, so its speed never jumps.
+    const RD = [[0, 0.055, 0.050, 0], [8.4, 0.055, -0.040, 0], [9.5, 0.110, -0.010, 0.026], [10.9, 0.000, 0.004, 0.034], [12.0, 0.055, 0.050, 0]], tc = N === 'read' ? T % 12 : 0;
+    let px = RD[0][1], py = RD[0][2], pz = 0; for (let i = 0; i < RD.length - 1; i++) if (tc >= RD[i][0] && tc <= RD[i + 1][0]) { const e = sm(RD[i][0], RD[i + 1][0], tc); px = lerp(RD[i][1], RD[i + 1][1], e); py = lerp(RD[i][2], RD[i + 1][2], e); pz = lerp(RD[i][3], RD[i + 1][3], e); }
+    px += 0.014 * Math.sin(tc * TAU / 4.2) * sm(0, 1.2, tc) * (1 - sm(7.2, 8.4, tc));
+    const tipTo = bookPt(px, py, pageZ(px) + 0.0075 + pz, V3());
     fv.set(-0.50, 0.85, 0.12).applyQuaternion(bkQ).normalize(); nv.set(0, 0, -1).applyQuaternion(bkQ);
     _t.copy(fv); _n.copy(nv).addScaledVector(_t, -_t.dot(nv)).normalize(); _d.crossVectors(_t, _n); _qc.setFromRotationMatrix(rdB.makeBasis(_t, _n, _d)).multiply(HAND0.R);       // the turn her hand is asked for
     rdP.copy(tipTo).sub(_e.copy(rdT).applyQuaternion(_qc)); const want = rdP.clone(), f2 = fv.clone(), n2 = nv.clone();
@@ -344,7 +354,7 @@
   // one frame of a move: returns her face { eyes, mouth }
   function body(N, T, dt) {
     restAll(); for (const o of SOFT) o.lift = 0;
-    let eyes = 0, mouth = 'rest', plant = 1; const footP = { R: 0, L: 0 }, ank = { R: tgt.clone().copy(ANK.R), L: tgt.clone().copy(ANK.L) };
+    let eyes = 0, mouth = 'rest', emo = null, plant = 1; const footP = { R: 0, L: 0 }, ank = { R: tgt.clone().copy(ANK.R), L: tgt.clone().copy(ANK.L) };
     wk += ((N === 'walk' || N === 'jog' ? 1 : 0) - wk) * Math.min(1, dt * 4.5); jg += ((N === 'jog' ? 1 : 0) - jg) * Math.min(1, dt * 4.5); const go = wk, still = 1 - go;
     hSq += ((N === 'squat' ? 1 : 0) - hSq) * Math.min(1, dt * 3.2); hKn += ((N === 'kneel' ? 1 : 0) - hKn) * Math.min(1, dt * 2.8); hHv += ((N === 'hover' ? 1 : 0) - hHv) * Math.min(1, dt * 2.2);
     // always: arms hanging easy, fingers a little curled, her breath, and a slow shift of her weight when she stands
@@ -352,6 +362,14 @@
     for (const [S, s] of SIDES) { add('uarm' + S, 0, 0, s * (13 * DEG - A_POSE)); add('farm' + S, -0.10, 0, 0); fingers(S, 0.24); add('clav' + S, 0, 0, s * 0.012 * br); }
     add('spine2', 0.010 * br, 0, 0); add('spine3', 0.009 * br, 0, 0);
     SK.hips.position.x += 0.009 * sway * still; add('hips', 0, 0, 0.014 * sway * still); add('spine1', 0, 0, -0.012 * sway * still); add('head', 0.012 * sw2 * still, 0.03 * sw2 * still, 0.014 * sway * still);
+    // a feeling she holds: small, as all her gestures are. Surprise and a hit come quickly; the others ease in.
+    { for (const n of FEELS) FW[n] += ((feel === n ? 1 : 0) - FW[n]) * Math.min(1, dt * (n === 'surprised' || n === 'hit' ? 10 : 4));
+      const a = FW.reading, b = FW.casting, c = FW.surprised, d = FW.hit, e = FW.stern, f = FW.delighted;
+      if (a + b + c + d + e + f > 0.002) {
+        add('head', 0.15 * a + 0.05 * b - 0.07 * c + 0.11 * d - 0.025 * e + 0.02 * f, 0.20 * d, 0.05 * a + 0.07 * d + 0.09 * f); add('neck', 0.06 * a + 0.03 * b - 0.03 * c + 0.05 * d, 0.08 * d, 0.03 * f);
+        add('spine3', 0.02 * b - 0.035 * c + 0.05 * d - 0.02 * e, 0.04 * d, 0); add('spine2', -0.02 * c + 0.04 * d - 0.015 * e, 0, 0);
+        for (const [S, s] of SIDES) { add('clav' + S, 0, 0, s * (0.07 * c + 0.09 * d + 0.03 * f - 0.02 * a)); add('farm' + S, -(0.10 * c + 0.16 * d), 0, 0); }
+        SK.hips.position.y += 0.005 * Math.sin(clock * 7) * f; SK.hips.position.z -= 0.012 * d; } }
     // walking: an unhurried step; her hips turn a little, her arms swing small
     if (go > 0.001) { gph += dt * TAU / lerp(1.12, 0.72, jg); const A = lerp(0.30, 0.50, jg), sn = Math.sin(gph), cs = Math.cos(gph); plant *= still;       // jog: the same step made quick and light, elbows bent
       for (const [S, s] of SIDES) { const p = gph + (s < 0 ? 0 : PI), si = Math.sin(p), co = Math.cos(p), sw = Math.max(0, co), st = Math.max(0, -co);
@@ -387,11 +405,11 @@
         _qc.setFromRotationMatrix(_mb.makeBasis(H, nD, V3().crossVectors(H, nD))); SK['thigh' + S].quaternion.slerp(_qc, q); add('shin' + S, (s > 0 ? 2.34 : 2.16) * q, 0, 0); add('foot' + S, 0.40 * q, 0, 0);
         reaches.push([S, knee(S), q, s * 0.2]); aims.push([S, V3(s * 0.45, -0.1, 0.9), V3(0, 1, 0.1), q]); fingers(S, lerp(0.24, 0.40, q)); }
       if (q > 0.6) { eyes = 1; mouth = 'smile'; } }
-    if (N === 'read') { const k = sm(0, 0.7, T), turn = pulse(T % 5.2, 3.6, 4.0, 4.3, 4.7);       // she reads: her head down to the page, a finger following the lines, and now and then she turns a leaf
-      add('head', 0.30 * k, 0.05 * Math.sin(T * 0.7) * k, 0); add('neck', 0.12 * k, 0, 0); add('spine3', 0.04 * k, 0, 0); eyes = 0.5 * (k > 0.6 ? 1 : 0); if (T % 9 > 7.6) mouth = 'smile'; }
+    if (N === 'read') { const k = sm(0, 0.7, T);       // she reads: her head down to the page, a finger following the lines, and now and then she turns a leaf
+      add('head', 0.30 * k, 0.05 * Math.sin(T * 0.7) * k, 0); add('neck', 0.12 * k, 0, 0); add('spine3', 0.04 * k, 0, 0); if (k > 0.6) emo = 'reading'; }       // her reading face (C10): eyes lowered to the page, a small smile
     if (N === 'sickle') { const k = pulse(T, 0, 0.6, 2.5, 3.3), up = pulse(T, 0.9, 1.4, 1.9, 2.5);       // she lifts her sickle and turns it to the light (the moon pendant will become it when her spells are built)
       add('head', -0.05 * up, -0.14 * k, 0); add('spine3', 0, -0.05 * k, 0);
-      reaches.push(['R', V3(-0.21 - 0.03 * up, 1.14 + 0.14 * up, 0.27), k, -0.3]); aims.push(['R', V3(0.10 * up, 0.25 + 0.45 * up, 1), V3(1, 0.1 * Math.sin(T * 3) * up, 0), k]); fingers('R', lerp(0.24, 1.35, sm(0, 0.25, k))); }
+      reaches.push(['R', V3(-0.21 - 0.03 * up, 1.14 + 0.14 * up, 0.27), k, -0.3]); aims.push(['R', V3(0.10 * up, 0.25 + 0.45 * up, 1), V3(1, 0.1 * Math.sin(T * 3) * up, 0), k]); fingers('R', lerp(0.24, 1.35, sm(0, 0.25, k))); if (up > 0.35) emo = 'casting'; }
     if (N === 'glasses') { const k = pulse(T, 0, 0.55, 1.5, 2.25), push = pulse(T, 0.62, 0.9, 1.05, 1.4);
       add('head', 0.09 * k - 0.07 * push, -0.04 * k, 0); add('neck', 0.03 * k, 0, 0); sync();
       fv.set(0.16, 0.93, -0.30).normalize(); carried('head', -0.003, 1.497 + 0.010 * push, 0.108, tgt).addScaledVector(fv, -0.150);
@@ -412,13 +430,13 @@
       const ang = TAU * u * u * (3 - 2 * u) - 0.22 * pulse(T, 0, 0.3, 0.38, 0.6), rate = dt > 0 ? Math.abs(ang - spinWas) / dt : 0; spinWas = ang;
       add('hips', 0, ang, 0); plant *= 1 - pulse(T, 0.2, 0.36, 1.92, 2.1);
       const h = 0.035 * up, ah = h / 0.10; SK.hips.position.y += h; for (const [S, s] of SIDES) { add('foot' + S, ah, 0, 0); add('uarm' + S, 0, 0, s * 0.72 * k); add('farm' + S, -0.22 * k, 0, 0); }
-      add('head', -0.07 * k, 0, 0); add('spine3', -0.04 * k, 0, 0); for (const o of SOFT) if (!o.hair) o.lift = Math.min(0.55, 0.075 * rate); if (k > 0.4) mouth = 'smile'; } else spinWas = 0;
+      add('head', -0.07 * k, 0, 0); add('spine3', -0.04 * k, 0, 0); for (const o of SOFT) if (!o.hair) o.lift = Math.min(0.55, 0.075 * rate); if (k > 0.4) mouth = 'smile'; if (up > 0.5) emo = 'delighted'; } else spinWas = 0;
     if (N === 'curtsey') { const k = pulse(T, 0, 0.7, 2.15, 2.9), dip = pulse(T, 0.6, 1.25, 1.75, 2.4);
       SK.hips.position.y -= 0.13 * dip; SK.hips.position.z -= 0.015 * dip; add('hips', 0.08 * dip, 0, 0); add('spine1', 0.09 * dip, 0, 0); add('spine2', 0.07 * dip, 0, 0); add('neck', 0.10 * dip, 0, 0); add('head', 0.20 * dip, 0, 0);
       ank.R.set(lerp(ANK.R.x, 0.05, k), ANK.R.y + 0.03 * k, lerp(ANK.R.z, -0.24, k)); footP.R = 0.55 * k;
       for (const [S, s] of SIDES) { reaches.push([S, V3(s * 0.335, 0.865 - 0.10 * dip, 0.015), k, s * 0.12]); fingers(S, lerp(0.24, 0.95, k)); }
       for (const o of SOFT) if (!o.hair) { const side = Math.abs(Math.sin(o.ch.a)); o.lift = 0.5 * k * Math.pow(side, 3); }
-      if (dip > 0.5) mouth = 'smile'; if (dip > 0.85) eyes = 1; }
+      if (dip > 0.5) mouth = 'smile'; if (dip > 0.8) emo = 'reading'; }       // at the bottom of the curtsey her eyes are lowered
     if (N === 'herb') { const d1 = pulse(T, 0, 0.9, 3.6, 4.7), rg = pulse(T, 0.6, 1.3, 1.65, 2.25), sml = pulse(T, 2.05, 2.65, 3.25, 3.8), lean = 0.80 * rg + 0.10 * d1 * (1 - rg);
       SK.hips.position.y -= 0.47 * d1; SK.hips.position.z += 0.05 * d1;
       add('spine1', 0.36 * lean, 0, 0); add('spine2', 0.36 * lean, 0, 0); add('spine3', 0.28 * lean, -0.10 * rg, 0); add('neck', -0.10 * rg + 0.06 * sml, 0, 0); add('head', 0.10 * rg + 0.14 * sml, -0.08 * rg, 0);
@@ -426,7 +444,7 @@
       const wR = Math.max(rg, sml), a = wR > 1e-4 ? sml / (rg + sml) : 0; fv.set(0.22, 0.86, -0.46).normalize(); carried('head', -0.012, 1.452, 0.128, tg2).addScaledVector(fv, -0.125); tgt.set(-0.15, 0.22, 0.52).lerp(tg2, a);
       reaches.push(['R', tgt.clone(), wR, -0.4]); aims.push(['R', V3(0.05, -0.85, 0.5), V3(0, -0.4, -0.9), rg * (1 - a)]); aims.push(['R', fv.clone(), V3(0.55, 0, -0.83), sml]); fingers('R', lerp(0.24, 0.8, wR));
       reaches.push(['L', () => carried('shinL', ANK.L.x + 0.02, IO_KNEE_Y + 0.085, 0.006, V3()), 0.9 * d1, 0.3]);       // her left hand rests on her raised knee
-      if (sml > 0.6) eyes = 1; if (T > 3.0 && T < 4.4) mouth = 'smile'; }
+      if (sml > 0.6) emo = 'delighted'; else if (T > 3.0 && T < 4.4) mouth = 'smile'; }
     // her body is in place: plant her feet, then her hands
     sync();
     for (const [S] of SIDES) { ik2(SK['thigh' + S], SK['shin' + S], SK['foot' + S], ank[S], plant, 0, 1); flatFoot(S, footP[S], plant); }
@@ -440,12 +458,12 @@
     if (bkR > 0.001 && SK.book) { sync(); readHands(N, T); }
     propVis(true, N === 'sickle' && T > 0.12 && T < 3.25);
     sync(); softTick(dt);
-    return { eyes, mouth };
+    return { eyes, mouth, emo };
   }
   function animate(a0, a1, a2, a3) {
     let dt = a3 !== undefined ? a3 : a0; dt = dt > 0 ? Math.min(dt, 0.05) : 0; clock += dt;
-    let eyes = 0, mouth = 'rest';
-    if (mv.name !== 'pose') { mv.t += dt; if (SHOTS[mv.name] && mv.t >= SHOTS[mv.name]) mv = { name: 'idle', t: 0 }; const f = body(mv.name, mv.t, dt); eyes = f.eyes; mouth = f.mouth; }
+    let eyes = 0, mouth = 'rest', emo = null;
+    if (mv.name !== 'pose') { mv.t += dt; if (SHOTS[mv.name] && mv.t >= SHOTS[mv.name]) mv = { name: 'idle', t: 0 }; const f = body(mv.name, mv.t, dt); eyes = f.eyes; mouth = f.mouth; emo = f.emo; }
     if (blinking && clock > blinkAt) { blinkT = clock; blinkAt = clock + 2.2 + 2.6 * Math.abs(Math.sin(clock * 12.9)); }
     const bt = clock - blinkT; eyes = Math.max(eyes, bt < 0.05 ? 0.5 : bt < 0.11 ? 1 : bt < 0.17 ? 0.5 : 0);
     if (talking && mv.name !== 'talk') {
@@ -453,11 +471,12 @@
       mouth = mouthNow;
       if (mv.name === 'pose') { SK.head.rotation.set(0.030 * Math.sin(clock * 4.4) + 0.015, 0.045 * Math.sin(clock * 2.3 + 1), 0.020 * Math.sin(clock * 1.3)); SK.neck.rotation.set(0, 0.025 * Math.sin(clock * 2.3 + 1), 0); }
     } else if (mv.name === 'pose' && (SK.head.rotation.x || SK.head.rotation.y)) { SK.head.rotation.set(0, 0, 0); SK.neck.rotation.set(0, 0, 0); }
-    if (held) { if (held.eyes != null) eyes = held.eyes; if (held.mouth) mouth = held.mouth; }
-    const key = eyes + '|' + mouth; if (key !== facePainted) { paintFace(eyes, mouth); facePainted = key; }
+    if (feel) emo = feel; if (held) { if (held.eyes != null) eyes = held.eyes; if (held.mouth) mouth = held.mouth; }
+    const key = eyes + '|' + mouth + '|' + emo; if (key !== facePainted) { paintFace(eyes, mouth, emo); facePainted = key; }
   }
   const talk = (on) => { talking = !!on; mouthAt = 0; return talking; };
   const setFace = (eyes, mouth) => { held = eyes == null && !mouth ? null : { eyes, mouth }; facePainted = ''; animate(0); };
-  return { root, skeleton, bones, SK, animate, pose, play, moves: MOVES, shots: SHOTS, settle: () => { sync(); softSettle(); root.updateMatrixWorld(true); }, meshes, spin: 0, time: 0, stanceProgress: 1, setStance() {}, talk, setFace, setBlink: (on) => { blinking = !!on; }, setProps: (on) => { showProps = !!on; if (mv.name === 'pose') propVis(false, false); }, get move() { return mv.name; },
+  const setFeel = (name) => { feel = FEELS.includes(name) ? name : null; facePainted = ''; animate(0); return feel; };       // hold one of her emotions (or none)
+  return { root, skeleton, bones, SK, animate, pose, play, moves: MOVES, shots: SHOTS, settle: () => { sync(); softSettle(); root.updateMatrixWorld(true); }, meshes, spin: 0, time: 0, stanceProgress: 1, setStance() {}, talk, setFace, setFeel, feels: FEELS, get feel() { return feel; }, setBlink: (on) => { blinking = !!on; }, setProps: (on) => { showProps = !!on; if (mv.name === 'pose') propVis(false, false); }, get move() { return mv.name; },
     debug: { SK, meshes, cloths: [], headPoint, headHalfW, JH, HC, FC, CHAINS, SOFT, COL, LEGCAP, LEGPAD, LEGS, HIP, SLV }, get triangles() { return triCount; } };
 }
