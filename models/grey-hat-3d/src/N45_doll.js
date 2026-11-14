@@ -307,10 +307,15 @@
   // rest of him. The body now has its own tone (DOLL_SKIN), set so that in a test picture his chest comes out between his painted face
   // and his hands (tools/trouser_check.py prints the three). It still runs into the tone of his neck at the foot of the neck and into the
   // tone of his hands at the wrists, so neither join shows as a change of colour.
+  // Arms and trunk. Chris (stage 3): "now we need to paint onto his at least his lower arms and his upper chest so that we can then put
+  // the shirt on top of that." That paint is drawn by the doll's material (N99_static.js, "the paint on his trunk and arms"), not stored
+  // point by point here, because collarbones and hairs are finer than the doll's points are spaced. It is placed by where a point RESTS
+  // (its place on the trunk, or dollArm below for the arms), so it follows him when he moves.
   // Legs. Chris (stage 2): "the pants are going to have actual holes should the skin of the doll be painted before putting clothes over
   // it". Yes: from the hips down the doll wears painted shading (legShade, below: knee, shin, calf, the hollow behind the knee) and black
   // fishnet tights, which the doll's material draws (N99_static.js) from where each point sits round its leg (dollLeg, below).
   const DOLL_SKIN = '#b9735c';
+  const dollArm = [];                                 // three numbers a point, for the paint on his arms (stage 3): out from the arm's middle line (away from his body), forward of it, and how far down the arm from the shoulder joint
   const dollCol = [], dollLeg = [];                   // dollLeg, three numbers a point: out from the leg's middle line, forward of it, and 1 on the trunk and legs / 0 on the arms
   const gauss = (v, w) => Math.exp(-v * v / (w * w));
   // painted light and dark on a leg, as B5 has it: [brightness, redness] at an angle round the leg (0 outside, a quarter turn the front) and a height
@@ -337,6 +342,7 @@
       const L = G.legAt(y), dx = s * x - L[0], dz = z - L[1], leg = G.part[v] < 3 ? 1 : 0;
       if (leg && y < 1.0) { const sh = legShade(Math.atan2(dz, dx), y), k = sm(1.0, 0.90, y); r *= 1 + k * (sh[0] - 1 + 0.020 * sh[1]); g *= 1 + k * (sh[0] - 1 - 0.035 * sh[1]); b *= 1 + k * (sh[0] - 1 - 0.030 * sh[1]); }
       dollCol.push(r, g, b); dollLeg.push(dx, dz, leg);
+      { const S = s < 0 ? 'R' : 'L', sh = restPts['sh' + S], d = armDir[S], ex = x - sh.x, ey = y - sh.y; dollArm.push(ex * s * Math.cos(A_POSE) + ey * Math.sin(A_POSE), z - sh.z, ex * d.x + ey * d.y); }
     }
     addPart('doll', { pos, uv: G.uv, idx: G.idx }, (x, y, z, i) => wts[i], { nor });
   })();

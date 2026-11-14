@@ -43,7 +43,7 @@ canvas#stage{display:block;width:100%;height:100%;touch-action:none;cursor:grab}
   <header>
     <p class="eyebrow">Moon Faire · the man they meet · first build</p>
     <h1>Noiz, <em>the Grey Hat</em></h1>
-    <p class="sub">Where he stands right now, part-way through his first build: no hat, belt or jewellery yet. Drag to turn him, pinch or scroll to zoom. His trousers are new: real cloth with real holes. "Doll" shows the body under his clothes. "Blank doll" shows his shape without paint. "Walk" shows the gold dust following his boots.</p>
+    <p class="sub">Where he stands right now, part-way through his first build: no hat, belt or jewellery yet. Drag to turn him, pinch or scroll to zoom. His shirt is new: real cloth that moves, over a painted body. His trousers are real cloth with real holes. "Doll" shows the body under his clothes. "Blank doll" shows his shape without paint. "Walk" shows the gold dust following his boots.</p>
   </header>
   <div class="stagebox" id="box">
     <canvas id="stage"></canvas>
@@ -57,16 +57,18 @@ canvas#stage{display:block;width:100%;height:100%;touch-action:none;cursor:grab}
   <div><p class="label">Show</p><div class="chips" id="shows"></div></div>
   <div class="notes">
     <div>
-      <h2>New: real trousers</h2>
+      <h2>New: a real shirt that moves</h2>
       <ul>
-        <li>You said his legs were printed on his trousers. <b>They are not any more.</b> His trousers are now their own piece of cloth, hanging over the doll's legs.</li>
-        <li><b>The holes are real holes.</b> Where your paintings show a tear, there is no cloth, and you look through at his leg. Turn him and the leg moves behind the hole. Press "Close on the holes" to go in near.</li>
-        <li>You asked if the doll's skin should be painted first. Yes, and it is: his legs have skin, shading and black fishnet painted on them. Press "Doll" to see the legs with the trousers off.</li>
-        <li>Each leg is torn its own way, as you painted them: six long steep tears on his left leg, five shorter flatter ones on his right.</li>
-        <li>The cloth is your flat pattern from the close painting of the hole, repeated, so it is sharp all the way round.</li>
-        <li>Press "Old trousers" to put the old painted legs back and compare.</li>
-        <li><b>Rough for now:</b> the cloth moves with his legs but does not swing or flap yet. Your front painting and your side painting put the holes in different places, so I set them between the two: they match the front best, and from the side they sit nearer the front edge than you painted.</li>
-        <li>I cannot watch him move from here. If the trousers do something odd when he walks, tell me.</li>
+        <li>You asked for paint on his lower arms and upper chest first, then the shirt on top. <b>Both are done.</b></li>
+        <li><b>The doll is painted.</b> His forearms have skin, shading and dark hair. His chest has collarbones, a little hair and soft shading, and so do his belly, back and upper arms. Press "Doll" to see it with the clothes off.</li>
+        <li><b>The shirt is its own piece of cloth now.</b> Nothing of his body is printed on it. It has a body, two full sleeves gathered into a band below the elbow, lace cuffs in two layers, a ruffled front in three layers, a collar, and dark red lacing through eight small eyelets. In the open front you see his real chest behind the lacing.</li>
+        <li><b>It moves.</b> The sleeves, cuffs, ruffles and the loose part of the body hang by their own weight, lag behind him and settle. Press "Walk" or "Talk" to see it. His arms are kept inside his sleeves.</li>
+        <li>The lace is cut from your close painting of the fabrics, with real holes in it. The linen is from the same painting.</li>
+        <li><b>The trousers sway a little</b> when he walks: the baggy part trails his legs by up to a centimetre. The holes are untouched.</li>
+        <li>The corset is still the old painted piece, cut down to just the corset, sitting over the shirt.</li>
+        <li>Press "Old shirt" to put the old painted shirt back and compare.</li>
+        <li><b>Rough for now:</b> the ruffled front is flatter and tidier than you painted it. There is a small step in the cloth at each top corner of the open front, by his neck. The sleeves are plainer than you painted them. The leather wrist cuffs are still the old painted piece and their top edge is uneven. His hair still has the old collar painted on it at the back: that goes when his hair is remade.</li>
+        <li>I cannot watch him move from here, only look at stills. If the shirt does something odd when he walks or talks, tell me.</li>
       </ul>
     </div>
     <div>
@@ -157,6 +159,8 @@ canvas#stage{display:block;width:100%;height:100%;touch-action:none;cursor:grab}
   toggle($('shows'), 'dollB', 'Doll', false, (v) => { R.setDoll(v); });
   // "Old trousers": the old painted leg skin goes back on in place of the new trousers, for comparing
   toggle($('shows'), 'oldTB', 'Old trousers', false, (v) => { R.setOldTrousers(v); });
+  // "Old shirt": the old painted shirt skin goes back on in place of the new cloth shirt, for comparing
+  toggle($('shows'), 'oldSB', 'Old shirt', false, (v) => { R.setOldShirt(v); });
   setRef();
   // drag to turn, pinch or wheel to zoom
   const pts = new Map(); let pinch0 = 0, dist0 = 0;

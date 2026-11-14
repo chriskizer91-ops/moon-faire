@@ -10,6 +10,52 @@ something or just talks to them", and he gets his own folder because he is a cha
   Project docs `claude/HOW-TO-3d-witch-models.md` and `claude/HOW-TO-3d-witch-faces.md`. Read both before writing any code.
 - Project note for this folder: `claude/grey-hat-3d-reference-prompts.md`.
 
+## Stage 3 of the rebuild: painted arms and chest, and a real shirt that moves (November 14, 2026)
+
+Chris: "now we need to paint onto his at least his lower arms and his upper chest so that we can then put the shirt on top of
+that. So that it looks real, and the shirt's actual fabric that moves because it's like flowy and billowy like the pants are."
+**Stage 3 is built. Nothing is published yet.** Report: `/home/claude/builder/stage3_report.md`. Pictures:
+`/home/claude/builder/work3/final/`. The source as it was before: `src_before_shirt/`.
+
+- **Paint on the doll** (`src/N99_static.js`, the doll's material, "the paint on his trunk and arms"; `dollArm` in `src/N45_doll.js`).
+  Drawn by the material, not stored point by point: collarbones, the notch at the neck, breastbone, chest, nipples, belly, navel, spine
+  and shoulder blades, armpits, the shade under his chin where the painted neck stands in the doll, light and dark along the arms, red at
+  the elbows, and body hair (short strokes on a grid, which turn into an even tint far away so they never shimmer) on the chest, down the
+  belly and on the forearms. It is placed by where a point rests, so it follows him. The doll's shape was not changed.
+- **The shirt** (`src/N47_shirt.js`): fourteen sheets of cloth and a small skinned shape. `body` (neck to inside the corset, open in a V),
+  `sleeveR` / `sleeveL` (a closed tube from the armhole seam to the band 0.326 m down the arm), `cuffR0/1`, `cuffL0/1` (two lace-edged
+  tiers from each band), `ruffleR0/1/2`, `ruffleL0/1/2` (three tiers each side of the lacing), `collar`, and `lacing` (cord and eight
+  eyelets, skinned). Cloth paint: `bake_shirt.py` cuts the linen square and one repeat of the lace band out of F13 into
+  `out/tex_shirt.json` (linen, lace, laceMask). Lace holes are a hard cut-out. Folds are shape (the `fold` and `shift` of each sheet)
+  and paint (each point is darker down in a fold, lighter on a crest).
+- **How it moves** (`CLOTH` at the top of `src/N47_shirt.js`; the engine is the Jester's `50_cloth.js`): coarse sheets of points with
+  links, each point with a target carried by bones and a pin; gravity, kept speed, push out of capsules on his arms. His own additions:
+  a leash on every loose point; sleeves whose slack is slid toward the ground (`HANG`, from the Ranger's and Io's sleeve notes); a smooth
+  curve through the points when drawing; the drawn points pushed out of his arms as well as the simulated ones. It works in his own
+  space (`root`), is the same on every run, and lays itself afresh after `pose()` or a jump. `api.setCloth(false)` freezes it.
+  **Do not change `H_SUB` from 1/120**: pins are counted per step, so at 1/60 every loose piece sags to the end of its leash (tried).
+- **The sleeve is kept out of his arm only, not out of his trunk.** In the armpit the arm is inside the trunk's capsule; pushing out of
+  both tore a hole. Under the arm the sleeve runs into the body of the shirt and is hidden there.
+- **Trousers** sway a little (`TR_SWAY` in `src/N47_shirt.js`): four springs (thigh and knee of each leg) whose lag moves the trousers'
+  points in the material, scaled by the room between cloth and leg. They are still the skinned garment of stage 2; the holes are untouched.
+- **The corset** is still the old trunk skin, cut down to the corset (`SHIRT_CUT`, `CUT_GLSL` in `src/N99_static.js`): it is thrown
+  away above the corset's top edge, and where the paintings have ruffle or cord over the corset it is given plain leather. It is not
+  yet its own shell.
+- **The leather wrist cuffs** are a piece cut out of the old arm skin (`projCuff`). The doll is not drawn under them when he is dressed.
+- **Switches.** Default: new shirt over the painted doll; `projArm` and `projRuffle` off; `projTrunk` drawn as the corset only.
+  `api.setOldShirt(true)` ("Old shirt" on the page) puts the old painted shirt back. `setOldTrousers`, `setDoll`, `setBlank` work in
+  every state (nine states were pictured). `api.setCloth(on)`.
+- **Tools.** `tools/shirt_measure.py` (the shirt and corset edge off B1 and B2, gridded pictures), `tools/shirt_cmp.py` (painting beside
+  model, outline and cloth colour tables), `tools/shirt_walk.py` (stills; doll seen where shirt should be; the cloth's meters; thrown
+  about; same every run) with `tools/shirt_through.js` (is the arm inside the sleeve, by rays, with a check on the test itself).
+  `tools/trouser_walk.py` now gives its white stand-in trousers the sway too, and takes a multiplier to check it can see a fault.
+- **Rough:** the ruffled front has three tiers (B2 shows four or five) and is flatter and tidier than painted; the sleeves are plainer
+  than painted; a square step in the cloth at each top corner of the open front; where the collar's lace crosses the top of each
+  shoulder, a few of its holes show dark and there is a short dark bar at the hem (cause not found: it stays with the old hair skin
+  hidden, with the shirt's body hidden and with the collar's shadow off); the old hair skin still has the old collar painted on
+  it. Movement was judged from stills only.
+- Triangles: 429,459 before, 487,453 now (57,994 added: 55,936 cloth, 2,058 lacing).
+
 ## Stage 2 of the rebuild: painted legs and real trousers (November 14, 2026)
 
 Chris: "the pants are going to have actual holes should the skin of the doll be painted before putting clothes over it". Yes.
