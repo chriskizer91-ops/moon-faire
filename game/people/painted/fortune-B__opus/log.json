@@ -1,0 +1,49 @@
+{
+ "person": "runs/fortune__claude-opus-5-5@high/v3.js",
+ "skin": "fortune-B",
+ "tag": "opus",
+ "model": "claude-fable-5-2",
+ "effort": "high",
+ "rounds": [
+  {
+   "n": 1,
+   "seconds": 8.0,
+   "usage": {
+    "input_tokens": 2546,
+    "output_tokens": 547,
+    "cache_creation_input_tokens": 0,
+    "cache_read_input_tokens": 1193
+   },
+   "cost": 0.0424866,
+   "said": "file"
+  },
+  {
+   "n": 2,
+   "seconds": 4.9,
+   "usage": {
+    "input_tokens": 4302,
+    "output_tokens": 355,
+    "cache_creation_input_tokens": 0,
+    "cache_read_input_tokens": 1193
+   },
+   "cost": 0.0488546,
+   "said": "file"
+  }
+ ],
+ "parts": [
+  "torso",
+  "sleeve",
+  "forearm",
+  "legs",
+  "boots",
+  "soles",
+  "robe",
+  "sash",
+  "gold",
+  "hair",
+  "scarf"
+ ],
+ "cost": 0.0913412,
+ "seconds": 12.9,
+ "looks": 2
+}

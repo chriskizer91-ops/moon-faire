@@ -1,0 +1,53 @@
+{
+ "person": "runs/watchman__claude-fable-5-2@high/v3.js",
+ "skin": "watchman-B",
+ "tag": "fable",
+ "model": "claude-fable-5-2",
+ "effort": "high",
+ "rounds": [
+  {
+   "n": 1,
+   "seconds": 10.8,
+   "usage": {
+    "input_tokens": 2558,
+    "output_tokens": 807,
+    "cache_creation_input_tokens": 0,
+    "cache_read_input_tokens": 1193
+   },
+   "cost": 0.0529826,
+   "said": "file"
+  },
+  {
+   "n": 2,
+   "seconds": 8.1,
+   "usage": {
+    "input_tokens": 4574,
+    "output_tokens": 562,
+    "cache_creation_input_tokens": 0,
+    "cache_read_input_tokens": 1193
+   },
+   "cost": 0.0593106,
+   "said": "file"
+  }
+ ],
+ "parts": [
+  "torso",
+  "sleeve",
+  "forearm",
+  "legs",
+  "boots",
+  "soles",
+  "coat",
+  "belt",
+  "brass",
+  "scarf",
+  "hair",
+  "beard",
+  "hat",
+  "band",
+  "boot"
+ ],
+ "cost": 0.1122932,
+ "seconds": 18.9,
+ "looks": 2
+}

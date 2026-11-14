@@ -1,0 +1,53 @@
+{
+ "person": "runs/farmhand__claude-opus-5-5@high/v2.js",
+ "skin": "farmhand-A",
+ "tag": "opus",
+ "model": "claude-fable-5-2",
+ "effort": "high",
+ "rounds": [
+  {
+   "n": 1,
+   "seconds": 12.0,
+   "usage": {
+    "input_tokens": 2558,
+    "output_tokens": 893,
+    "cache_creation_input_tokens": 0,
+    "cache_read_input_tokens": 1193
+   },
+   "cost": 0.056422599999999996,
+   "said": "file"
+  },
+  {
+   "n": 2,
+   "seconds": 1.9,
+   "usage": {
+    "input_tokens": 4660,
+    "output_tokens": 5,
+    "cache_creation_input_tokens": 0,
+    "cache_read_input_tokens": 1193
+   },
+   "cost": 0.0377186,
+   "said": "DONE"
+  }
+ ],
+ "parts": [
+  "torso",
+  "sleeve",
+  "forearm",
+  "legs",
+  "boots",
+  "soles",
+  "shirt",
+  "belt",
+  "vest",
+  "brass",
+  "kerchief",
+  "patch",
+  "hair",
+  "straw",
+  "band"
+ ],
+ "cost": 0.0941412,
+ "seconds": 13.9,
+ "looks": 2
+}

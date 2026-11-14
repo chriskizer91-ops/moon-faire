@@ -1,0 +1,53 @@
+{
+ "person": "runs/baker__claude-fable-5-2@high/v3.js",
+ "skin": "baker-A",
+ "tag": "fable",
+ "model": "claude-fable-5-2",
+ "effort": "high",
+ "rounds": [
+  {
+   "n": 1,
+   "seconds": 12.7,
+   "usage": {
+    "input_tokens": 2557,
+    "output_tokens": 1018,
+    "cache_creation_input_tokens": 0,
+    "cache_read_input_tokens": 1193
+   },
+   "cost": 0.0614146,
+   "said": "file"
+  },
+  {
+   "n": 2,
+   "seconds": 1.5,
+   "usage": {
+    "input_tokens": 4784,
+    "output_tokens": 52,
+    "cache_creation_input_tokens": 0,
+    "cache_read_input_tokens": 1193
+   },
+   "cost": 0.0405906,
+   "said": "DONE"
+  }
+ ],
+ "parts": [
+  "torso",
+  "sleeve",
+  "forearm",
+  "legs",
+  "boots",
+  "soles",
+  "shirt",
+  "apron",
+  "tie",
+  "towel",
+  "roll",
+  "hair",
+  "beard",
+  "cap",
+  "capband"
+ ],
+ "cost": 0.10200519999999999,
+ "seconds": 14.2,
+ "looks": 2
+}

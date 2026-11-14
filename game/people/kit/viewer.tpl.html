@@ -23,15 +23,15 @@
   window.PV = {
     stage, get J() { return J; },
     // person: the object, or the text of a file that sets PERSON
-    async show(person) {
+    async show(person, skin) {
       drop();
       if (typeof person === 'string') person = new Function(person + '\n;return PERSON;')();
-      const a = performance.now(), prepared = await MF_PERSON.prepare(person), b = performance.now();
+      const a = performance.now(), prepared = await MF_PERSON.prepare(person, skin || null), b = performance.now();
       J = MF_PERSON.make(person, prepared); J.fx.remove(J.spellLight); stage.cast.add(J.root, J.fx); J.camera = stage.camera; stage.follow(0, 0);
       const c = performance.now(); t = 0; PV.step(1 / 30, 45);
       let tris = 0, parts = 0; J.root.traverse((m) => { if (m.isMesh && m.visible && m.geometry && m.geometry.index) { tris += m.geometry.index.count / 3; parts++; } });
       const own = {}; for (const k in J.debug.meshes) if (k.slice(0, 2) === 'p_') own[k.slice(2)] = J.debug.meshes[k].geometry.index.count / 3;
-      return { errors: J.personErrors, prepareMs: Math.round(b - a), buildMs: Math.round(c - b), triangles: Math.round(tris), parts, own };
+      return { partNames: J.partNames, errors: J.personErrors, prepareMs: Math.round(b - a), buildMs: Math.round(c - b), triangles: Math.round(tris), parts, own };
     },
     // walking: phase runs with the steps; standing: phase 0
     step(dt, n, walk) { for (let i = 0; i < (n || 1); i++) { t += dt; J.animate(walk ? t * 1.9 : 0, walk ? 1 : 0, t, dt, 0); } },

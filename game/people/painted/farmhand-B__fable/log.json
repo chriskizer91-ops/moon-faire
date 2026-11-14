@@ -1,0 +1,52 @@
+{
+ "person": "runs/farmhand__claude-fable-5-2@high/v2.js",
+ "skin": "farmhand-B",
+ "tag": "fable",
+ "model": "claude-fable-5-2",
+ "effort": "high",
+ "rounds": [
+  {
+   "n": 1,
+   "seconds": 11.6,
+   "usage": {
+    "input_tokens": 2559,
+    "output_tokens": 913,
+    "cache_creation_input_tokens": 0,
+    "cache_read_input_tokens": 1193
+   },
+   "cost": 0.0572306,
+   "said": "file"
+  },
+  {
+   "n": 2,
+   "seconds": 4.8,
+   "usage": {
+    "input_tokens": 4681,
+    "output_tokens": 398,
+    "cache_creation_input_tokens": 0,
+    "cache_read_input_tokens": 1193
+   },
+   "cost": 0.0536066,
+   "said": "file"
+  }
+ ],
+ "parts": [
+  "torso",
+  "sleeve",
+  "forearm",
+  "legs",
+  "boots",
+  "soles",
+  "shirt",
+  "waistcoat",
+  "button",
+  "kerchief",
+  "patch",
+  "hair",
+  "straw",
+  "band"
+ ],
+ "cost": 0.1108372,
+ "seconds": 16.4,
+ "looks": 2
+}

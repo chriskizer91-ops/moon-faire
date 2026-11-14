@@ -1,0 +1,37 @@
+{
+ "person": "lampseller.js",
+ "skin": "lampseller-C",
+ "tag": "hand",
+ "model": "claude-fable-5-2",
+ "effort": "high",
+ "rounds": [
+  {
+   "n": 1,
+   "seconds": 16.6,
+   "usage": {
+    "input_tokens": 2539,
+    "output_tokens": 1240,
+    "cache_creation_input_tokens": 0,
+    "cache_read_input_tokens": 1193
+   },
+   "cost": 0.07015060000000001,
+   "said": "DONE"
+  }
+ ],
+ "parts": [
+  "torso",
+  "sleeve",
+  "forearm",
+  "legs",
+  "boots",
+  "soles",
+  "skirt",
+  "apron",
+  "belt",
+  "hair",
+  "kerchief"
+ ],
+ "cost": 0.07015060000000001,
+ "seconds": 16.6,
+ "looks": 1
+}

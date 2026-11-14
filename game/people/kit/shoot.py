@@ -20,11 +20,13 @@ class Shooter:
         await pg.goto('file://' + PAGE); await pg.wait_for_function('window.PV && PV.ready', timeout=120000); return pg
     async def stop(self): await self.b.close(); await self.pw.stop()
     # code: the text of a person file (it sets PERSON). Returns (facts, sheet picture or None)
-    async def shoot(self, code, scale=1.0):
+    async def shoot(self, code, scale=1.0, skin=None):
         self.errs.clear()
         try:
-            facts = await self.body.evaluate('(c) => PV.show(c)', code)
-            await self.head.evaluate('(c) => PV.show(c)', code)
+            js = '([c, s]) => { if (s && s.SKIN_TEXT) s.SKIN = new Function(s.SKIN_TEXT + "\\n;return SKIN;")(); return PV.show(c, s); }'
+            facts = await self.body.evaluate(js, [code, skin])
+            await self.head.evaluate(js, [code, skin])
+            if skin: await self.head.wait_for_timeout(600)
         except Exception as e:
             return {'errors': ['the file did not run: ' + str(e).split('\n')[0][:400]]}, None
         shots = []

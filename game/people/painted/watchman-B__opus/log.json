@@ -1,0 +1,53 @@
+{
+ "person": "runs/watchman__claude-opus-5-5@high/v2.js",
+ "skin": "watchman-B",
+ "tag": "opus",
+ "model": "claude-fable-5-2",
+ "effort": "high",
+ "rounds": [
+  {
+   "n": 1,
+   "seconds": 21.8,
+   "usage": {
+    "input_tokens": 2563,
+    "output_tokens": 1791,
+    "cache_creation_input_tokens": 0,
+    "cache_read_input_tokens": 1193
+   },
+   "cost": 0.09238260000000001,
+   "said": "file"
+  },
+  {
+   "n": 2,
+   "seconds": 1.4,
+   "usage": {
+    "input_tokens": 5563,
+    "output_tokens": 90,
+    "cache_creation_input_tokens": 0,
+    "cache_read_input_tokens": 1193
+   },
+   "cost": 0.0483426,
+   "said": "DONE"
+  }
+ ],
+ "parts": [
+  "torso",
+  "sleeve",
+  "forearm",
+  "legs",
+  "boots",
+  "soles",
+  "coat",
+  "coatTrim",
+  "belt",
+  "brass",
+  "scarf",
+  "hat",
+  "hatband",
+  "hair",
+  "beard"
+ ],
+ "cost": 0.1407252,
+ "seconds": 23.2,
+ "looks": 2
+}

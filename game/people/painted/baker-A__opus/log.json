@@ -1,0 +1,52 @@
+{
+ "person": "runs/baker__claude-opus-5-5@high/v2.js",
+ "skin": "baker-A",
+ "tag": "opus",
+ "model": "claude-fable-5-2",
+ "effort": "high",
+ "rounds": [
+  {
+   "n": 1,
+   "seconds": 15.5,
+   "usage": {
+    "input_tokens": 2556,
+    "output_tokens": 1197,
+    "cache_creation_input_tokens": 0,
+    "cache_read_input_tokens": 1193
+   },
+   "cost": 0.0685666,
+   "said": "file"
+  },
+  {
+   "n": 2,
+   "seconds": 1.9,
+   "usage": {
+    "input_tokens": 4962,
+    "output_tokens": 159,
+    "cache_creation_input_tokens": 0,
+    "cache_read_input_tokens": 1193
+   },
+   "cost": 0.0462946,
+   "said": "file"
+  }
+ ],
+ "parts": [
+  "torso",
+  "sleeve",
+  "forearm",
+  "legs",
+  "boots",
+  "soles",
+  "shirt",
+  "trousers",
+  "apron",
+  "pocket",
+  "roll",
+  "hair",
+  "beard",
+  "cap"
+ ],
+ "cost": 0.1148612,
+ "seconds": 17.4,
+ "looks": 2
+}

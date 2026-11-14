@@ -26,7 +26,7 @@
 </style></head>
 <body><main>
 <h1>People from a template</h1>
-<p class="soft">A test for Moon Faire, November 13. The Jester's finished model is the template. A Claude model reads one line about a person and writes a small file: colours, skin, a repainted face, hair, a hat, clothes. The Jester's skeleton and all her moves are reused, so every person can already stand, turn and walk. The lamp-seller was made by hand; the rest were made through your API key.</p>
+<p class="soft">Moon Faire, November 13. The Jester's finished model is the template for a simple person. The first people in the menu wear your painted skins: one body sheet and one face picture each, made in ChatGPT and laid onto the model. Drag to turn them.</p>
 
 <div id="stagebox"><canvas id="stage"></canvas><div id="who"></div></div>
 <div class="bar">
@@ -36,17 +36,18 @@
 <p class="soft small" id="facts"></p>
 
 <h2>What it cost</h2>
-<p>Three tests, twenty-four people, all through your key, for <b>/*TOTAL*/</b> in all (that includes about 35 cents for writing the skin prompts). The first test gave four one-line descriptions to three models at their default settings, written for people seen small. After you ruled that the only people in the game are ones the party talks to, the second test gave the same four lines to Opus 5.5 at high and at extra-high effort, written for a person seen up close, with up to three fixes. The third gave them to Fable 5.2 the same way.</p>
+<p>Everything here went through your key, for <b>/*TOTAL*/</b> in all. Making the models: three tests of the same four one-line descriptions, twenty-four people. Painting them: Fable 5.2 at high effort looked at each painted person and wrote a small file that finishes the fit (skin colour for hands and neck, which parts should be one flat colour, how shiny, small nudges). <b id="paintline"></b></p>
 <table><thead><tr><th>Made by</th><th>Each person</th><th>Time</th></tr></thead><tbody id="costs"></tbody></table>
 <ul id="notes"></ul>
 <p class="soft small">Prices are the list prices on Anthropic's pricing page on November 13, 2026, applied to the token counts each reply reported.</p>
 <div class="card">
   <b>What this says</b>
   <ul>
-    <li>Opus 5.5 at high effort is the setting to use: about 38 cents and two minutes a person. Extra-high costs about $1.33 and seven minutes for little more. Fable 5.2 through the key costs about $1.08 and comes out about level with Opus at high.</li>
-    <li>The lamp-seller is better than all of them for two reasons that are not the model: she was made by hand with several looks and adjustments, and an old woman in a long skirt, apron and kerchief suits the template.</li>
-    <li>What decides whether a person is good enough is mostly the design, not the price. A woman in long clothes (the lamp-seller, the fortune-teller) suits the template and holds up. A man does not yet, because every person has the Jester's body and the shape of her face.</li>
-    <li>Each person is about 12 thousand triangles and 15 draws. The Jester took 106 thousand when she walked the fair square on your laptop. No Claude session can measure speed on your laptop.</li>
+    <li>The painted skin is what turns a simple model into a person. The same lamp-seller model is three different women, and the men now have men's faces.</li>
+    <li>A new person costs two ChatGPT pictures and about a dime of fitting. The model underneath is made once (38 cents with Opus 5.5 at high effort, $1.08 with Fable 5.2) and reused for every skin.</li>
+    <li>The same pictures sit on the Opus 5.5 models nearly as well as on the Fable 5.2 models they were painted for, so which model built the shapes matters less than the painting.</li>
+    <li>What still shows: hair is a flat-coloured shape around the face, shoulders are angular, and the body under a man's clothes is still the Jester's. The skins came out more lifelike than the witches' painted look, because ChatGPT did not have the style picture.</li>
+    <li>Each person is about 12 thousand triangles and 15 draws, about a ninth of the Jester walking the fair square on your laptop. No Claude session can measure speed on your laptop.</li>
   </ul>
 </div>
 
@@ -64,8 +65,8 @@
   <div id="log"></div><img id="sheet" hidden alt="The picture the model was shown">
 </div>
 
-<h2>The lamp-seller, then the second and third tests</h2>
-<p class="soft">The four descriptions are stand-ins written for this test, not Moon Faire lore. Each picture shows front, three-quarter, side, back, walking, and the face twice. The twelve people of the first test are in the menu under the 3D view.</p>
+<h2>The painted people</h2>
+<p class="soft">The lamp-seller model first, then the Fable 5.2 models, then the same skins on the Opus 5.5 models. The people are stand-ins, not Moon Faire lore. Each picture shows front, three-quarter, side, back, walking, and the face twice. The flat-coloured people from the earlier tests are still in the menu.</p>
 <div class="shots" id="shots"></div>
 </main>
 /*SCRIPTS*/
@@ -74,9 +75,10 @@
   'use strict';
   const $ = (id) => document.getElementById(id), D = window.MF_PEOPLE_DATA, canvas = $('stage');
   const PRICES = { 'claude-opus-5-5': [4, 20, 5, 0.20], 'claude-fable-5-2': [8, 40, 10, 0.20] };
-  const NAMES = Object.assign({ hand: 'made by hand', yours: 'your key, made here' }, D.names);
+  const NAMES = Object.assign({ hand: 'made by hand', yours: 'your key, made here', 'painted-hand': 'the lamp-seller model', 'painted-fable': 'the Fable 5.2 model', 'painted-opus': 'the Opus 5.5 model' }, D.names);
   const BANNED = ['fetch(', 'XMLHttpRequest', 'document.', 'window.', 'eval(', 'Function(', 'import(', 'import ', 'localStorage', 'location', 'navigator', 'WebSocket', 'require(', 'globalThis', 'setTimeout', 'setInterval', 'while (true', 'while(true'];
   const money = (v) => v >= 1 ? '$' + v.toFixed(2) : (v * 100).toFixed(v < 0.01 ? 2 : v < 0.1 ? 1 : 0) + ' cents';
+  $('paintline').textContent = D.paint.n + ' painted people, about ' + money(D.paint.each) + ' and ' + Math.round(D.paint.secs) + ' seconds each.';
   let stage, J = null, t = 0, last = performance.now(), turn = true, walk = false, spin = 0.5, busy = false, made = null;
   try { stage = makeMFStage(canvas, { preserve: true, shadow: 1024, maxPixelRatio: 2 }); stage.painting = false; } catch (e) { $('who').textContent = 'This page needs WebGL to draw.'; return; }
 
@@ -85,9 +87,9 @@
     const a = deg * Math.PI / 180; stage.camera.position.set(Math.sin(a) * dist, y, Math.cos(a) * dist); stage.camera.lookAt(0, y, 0); stage.camera.updateMatrixWorld();
   }
   function drop() { if (!J) return; stage.cast.remove(J.root, J.fx); J.root.traverse((m) => { if (m.geometry) m.geometry.dispose(); }); for (const x of (J.debug.textures || [])) x.dispose(); J = null; }
-  async function show(code) {
+  async function show(code, sk) {
     const person = new Function(code + '\n;return PERSON;')();
-    const prepared = await MF_PERSON.prepare(person); drop();
+    const prepared = await MF_PERSON.prepare(person, sk || null); drop();
     J = MF_PERSON.make(person, prepared); J.fx.remove(J.spellLight); stage.cast.add(J.root, J.fx); J.camera = stage.camera; stage.follow(0, 0);
     await new Promise((r) => setTimeout(r, 500));                       // her paintings load a moment after she is built
     for (let i = 0; i < 40; i++) { t += 1 / 30; J.animate(0, 0, t, 1 / 30, 0); }
@@ -114,11 +116,12 @@
 
   // ---------- the people already made ----------
   const pick = $('pick');
-  function option(p, i) { const o = document.createElement('option'); o.value = i; o.textContent = p.name + ' (' + (NAMES[p.model] || p.model) + ')'; pick.appendChild(o); }
+  function option(p, i) { const o = document.createElement('option'); o.value = i; o.textContent = p.skin ? p.name + ' (painted, ' + NAMES[p.model] + ')' : p.name + ' (' + (NAMES[p.model] || p.model) + ')'; pick.appendChild(o); }
   D.people.forEach(option);
   async function choose(i) {
     const p = D.people[i]; busy = true; $('who').textContent = 'Building…';
-    try { const f = await show(p.code); $('who').textContent = p.desc; $('facts').textContent = 'Built here just now from a ' + Math.round(p.code.length / 100) / 10 + ' KB file: ' + f.triangles.toLocaleString() + ' triangles.' + (p.cost ? ' Made by ' + NAMES[p.model] + ' for ' + money(p.cost) + '.' : ' Made by hand by Claude Fable 5.2, as the worked example in the instructions.'); }
+    try { let sk = null; if (p.skin) { sk = Object.assign({}, D.skins[p.skin]); sk.SKIN = new Function(p.skinText + '\n;return SKIN;')(); }
+      const f = await show(p.code, sk); $('who').textContent = p.desc; $('facts').textContent = p.skin ? 'Your painted skin on ' + NAMES[p.model] + ': ' + f.triangles.toLocaleString() + ' triangles. Fitting by Fable 5.2 cost ' + money(p.cost) + '.' : 'Built here just now from a ' + Math.round(p.code.length / 100) / 10 + ' KB file: ' + f.triangles.toLocaleString() + ' triangles.' + (p.cost ? ' Made by ' + NAMES[p.model] + ' for ' + money(p.cost) + '.' : ' Made by hand by Claude Fable 5.2, as the worked example in the instructions.'); }
     catch (e) { $('who').textContent = 'This one did not build: ' + e.message; }
     busy = false;
   }

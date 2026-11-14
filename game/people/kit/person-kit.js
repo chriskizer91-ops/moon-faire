@@ -64,7 +64,8 @@
   // her profile painting still wears her rouge: most of it is covered with plain skin, leaving a hint of the modelling
   function plainSide(img, skin) { const c = canvas(img.width, img.height), g = c.getContext('2d'); g.drawImage(img, 0, 0); g.globalAlpha = 0.78; g.fillStyle = skin; g.fillRect(0, 0, c.width, c.height); return c; }
   // get a person's pictures ready: the repainted face, and her hands and profile in the person's skin
-  async function prepare(person) {
+  async function prepare(person, skin) {
+    if (skin) return prepareSkin(person, skin);
     const T = window.JESTER_TEX, t = tone(person.skin), [plain, side, hands] = await Promise.all([load(window.MF_FACE_PLAIN), load(T.faceSide), load(T.hands)]);
     const fc = canvas(1024, 1024), g = fc.getContext('2d'); g.drawImage(plain, 0, 0, 1024, 1024);
     let faceError = '';
@@ -74,6 +75,37 @@
     return { faceError, faceCanvas: face, textures: Object.assign({}, T, { face: face.toDataURL('image/webp', 0.92), faceSide: skinned(plainSide(side, T.skinJaw || T.skin), side.width, side.height, t, false).toDataURL('image/png'),
       hands: skinned(hands, 512, 512, t, false).toDataURL('image/webp', 0.9), skin: sk(T.skin), skinJaw: sk(T.skinJaw), faceParts: {} }) };
   }
+  // ---------- a painted skin: one body sheet (front | back) and one face picture, laid onto the person ----------
+  // skin: { body, face (data URIs), fit: { front, back: [sx, sy, ox, oy] }, faceFit: [scale, dx, dy], skin: '#hex', SKIN: the fitter's file or null }
+  const CEN = [0.5, 0.5];                                                // the middle of a half picture: x = 0, y = 0.9 m
+  function layFit(auto, nudge) {                                        // a guide point g (0..1) is read from the picture at g * s + o
+    const S = (nudge && nudge.scale) || [1, 1], M = (nudge && nudge.move) || [0, 0], m = [M[0] / 1.5, M[1] / 2.0], out = [0, 0, 0, 0];
+    for (let i = 0; i < 2; i++) { const k = S[i] || 1; out[i] = auto[i] / k; out[2 + i] = (CEN[i] - (CEN[i] + m[i]) / k) * auto[i] + auto[2 + i]; }
+    return new THREE.Vector4(out[0], out[1], out[2], out[3]);
+  }
+  async function prepareSkin(person, skin) {
+    const T = window.JESTER_TEX, S = skin.SKIN || {}, hexSkin = S.skin || skin.skin || person.skin || '#d99f91', t = tone(hexSkin);
+    const [pic, side, hands, body] = await Promise.all([load(skin.face), load(T.faceSide), load(T.hands), load(skin.body)]);
+    const fc = canvas(1024, 1024), g = fc.getContext('2d'), a = skin.faceFit || [1, 0, 0], n = S.face || {}, k = a[0] * (n.scale || 1), mv = n.move || [0, 0];
+    g.fillStyle = hexSkin; g.fillRect(0, 0, 1024, 1024); g.translate(512 + a[1] + mv[0], 512 + a[2] + mv[1]); g.scale(k, k); g.drawImage(pic, -512, -512, 1024, 1024);
+    const tex = new THREE.Texture(body); tex.encoding = THREE.sRGBEncoding; tex.anisotropy = 4; tex.needsUpdate = true;
+    const jaw = hex(rgb(hexSkin).map((v) => v * 0.94));
+    return { faceError: '', faceCanvas: fc, bodyTex: tex, skin, S, front: layFit(skin.fit.front, S.front), back: layFit(skin.fit.back, S.back),
+      textures: Object.assign({}, T, { face: fc.toDataURL('image/webp', 0.92), faceSide: skinned(plainSide(side, T.skinJaw || T.skin), side.width, side.height, t, false).toDataURL('image/png'),
+        hands: skinned(hands, 512, 512, t, false).toDataURL('image/webp', 0.9), skin: hexSkin, skinJaw: jaw, faceParts: {} }) };
+  }
+  // the body sheet read by where each point stands in the standing pose: the front half on what faces forward, the back half on what faces back
+  function painted(K, P, rough) {
+    const m = K.sheen(K.std({ map: P.bodyTex, roughness: rough == null ? 0.86 : rough, side: THREE.DoubleSide, envMapIntensity: 0.25 }), '#cbbcc4', 2.6, 0.1), first = m.onBeforeCompile;
+    m.onBeforeCompile = (sh, r) => {
+      if (first) first(sh, r); sh.uniforms.uFront = { value: P.front }; sh.uniforms.uBack = { value: P.back }; sh.uniforms.uSeam = { value: (P.S.seam == null ? 0.2 : P.S.seam) };
+      sh.vertexShader = sh.vertexShader.replace('#include <common>', '#include <common>\nvarying vec3 vBindP; varying float vBindNz;').replace('#include <begin_vertex>', '#include <begin_vertex>\nvBindP = position; vBindNz = normal.z;');
+      sh.fragmentShader = sh.fragmentShader.replace('#include <common>', '#include <common>\nuniform vec4 uFront; uniform vec4 uBack; uniform float uSeam; varying vec3 vBindP; varying float vBindNz;')
+        .replace('#include <map_fragment>', 'vec2 gP = vec2( ( vBindP.x + 0.75 ) / 1.5, ( vBindP.y + 0.1 ) / 2.0 );\n vec2 fP = clamp( gP * uFront.xy + uFront.zw, 0.002, 0.998 );\n vec2 bP = clamp( vec2( 1.0 - gP.x, gP.y ) * uBack.xy + uBack.zw, 0.002, 0.998 );\n vec3 cF = mapTexelToLinear( texture2D( map, vec2( fP.x * 0.5, fP.y ) ) ).rgb;\n vec3 cB = mapTexelToLinear( texture2D( map, vec2( 0.5 + bP.x * 0.5, bP.y ) ) ).rgb;\n diffuseColor.rgb *= mix( cB, cF, smoothstep( -uSeam, uSeam, vBindNz ) );');
+    };
+    return m;
+  }
+  const WORD = {}; for (const w in BODY) WORD[BODY[w]] = w;              // her key for a body part -> a person's word for it
   // small cloth patterns, painted in code
   function patternTex(spec) {
     const c = canvas(64, 64), g = c.getContext('2d'), p = spec.pattern; g.fillStyle = spec.color; g.fillRect(0, 0, 64, 64); g.fillStyle = p.color || '#ffffff';
@@ -98,6 +130,8 @@
     const thin = lod.onGeometry, own = lod.material, colors = person.colors || {}, parts = person.parts || {}, skinHex = person.skin || '#d99f91';
     lod.onGeometry = (key, g, B, K) => { if (key.slice(0, 2) !== 'p_') thin(key, g, B, K); };            // a person's own parts are already light
     lod.material = (key, B, K) => {
+      if (prepared.bodyTex && key !== 'face' && key !== 'hand' && key !== 'skin') { const nm = key.slice(0, 2) === 'p_' ? key.slice(2) : (WORD[key] || key), S = prepared.S, fl = S.flat && S.flat[nm], ro = S.rough && S.rough[nm];
+        return fl ? material({ color: fl, rough: ro == null ? 0.8 : ro }, K) : painted(K, prepared, ro); }
       if (key.slice(0, 2) === 'p_') return material(parts[key.slice(2)] || '#888888', K);
       for (const w in BODY) if (BODY[w] === key) { let c = colors[w] || (w === 'puff' && colors.sleeve) || (w === 'forearm' && colors.cuff); if (!c) break; if (c === 'skin') c = skinHex;
         return material(Object.assign({ oneSided: true }, key === 'boot' ? { rough: 0.45 } : null, typeof c === 'string' ? { color: c } : c), K); }
@@ -144,6 +178,7 @@
     const J = window.makeJester(o);
     const h = person.height || 1, b = person.build || [1, 1]; J.root.scale.set(h * (b[0] || 1), h, h * (b[1] || 1));
     if (person.head) { const q = person.head, hs = J.debug.SK.head.scale; hs.set(hs.x * (q[0] || 1), hs.y * (q[1] || 1), hs.z * (q[2] || 1)); }
+    J.partNames = Object.keys(J.debug.meshes).filter((k) => k !== 'face' && k !== 'hand' && k !== 'skin').map((k) => k.slice(0, 2) === 'p_' ? k.slice(2) : (WORD[k] || k));
     J.person = person; J.personErrors = errors.concat(prepared.faceError ? ['face: ' + prepared.faceError] : []);
     return J;
   }

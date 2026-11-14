@@ -1,0 +1,50 @@
+{
+ "person": "runs/fortune__claude-fable-5-2@high/v2.js",
+ "skin": "fortune-B",
+ "tag": "fable",
+ "model": "claude-fable-5-2",
+ "effort": "high",
+ "rounds": [
+  {
+   "n": 1,
+   "seconds": 9.2,
+   "usage": {
+    "input_tokens": 2549,
+    "output_tokens": 729,
+    "cache_creation_input_tokens": 0,
+    "cache_read_input_tokens": 1193
+   },
+   "cost": 0.0497906,
+   "said": "file"
+  },
+  {
+   "n": 2,
+   "seconds": 4.2,
+   "usage": {
+    "input_tokens": 4487,
+    "output_tokens": 264,
+    "cache_creation_input_tokens": 0,
+    "cache_read_input_tokens": 1193
+   },
+   "cost": 0.046694599999999996,
+   "said": "file"
+  }
+ ],
+ "parts": [
+  "torso",
+  "sleeve",
+  "forearm",
+  "legs",
+  "boots",
+  "soles",
+  "robe",
+  "hem",
+  "sash",
+  "hair",
+  "scarf",
+  "gold"
+ ],
+ "cost": 0.0964852,
+ "seconds": 13.4,
+ "looks": 2
+}

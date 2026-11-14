@@ -187,7 +187,7 @@ A third test gave the same four lines to Fable 5.2 through the key, at high effo
 
 High effort is the setting to use; extra-high adds little for three to five times the price. The fortune-teller at high effort stands beside the hand-made lamp-seller. The men do not, because of the template body and face. All three tests cost $12.34. Limits found: every person has the Jester's body and face shape (men and stout people only pass under a coat or apron, at a distance); shapes are stiff, so nothing sways; the painted beard only reaches round the mouth. Not measured: speed on Chris's laptop with several people in a scene.
 
-## Skins: one person model, several painted people (November 13) — prompts ready, waiting for Chris's pictures
+## Skins: one person model, several painted people (November 13) — 19 painted people, waiting for Chris to judge them
 
 Chris's idea: paint a simple person model with images, so one model carries two or three different skins.
 
@@ -196,7 +196,13 @@ Chris's idea: paint a simple person model with images, so one model carries two 
 - `people/kit/guides.py` draws a model's painting guide: the standing pose in plain greys, flat from the front (left half) and from behind (right half), 1536 x 1024, each half 1.5 m wide (x -0.75 to 0.75) and 2 m tall (y -0.1 to 1.9), 512 pixels to the metre. A painting made over it can be laid back onto the model by position.
 - The face is a second picture painted over `people/skins/face-guide.png` (her face with the make-up painted out), so the eyes, nose and mouth stay where the head expects them.
 - `people/kit/make_skins.py` has Opus 5.5 (high effort, through the key) look at the guide and the model's file and write the skins (`people/skins/<id>/skins.json`): about 5 cents a model. They are stand-ins, not lore. `people/kit/build_skin_prompts.py` builds the page, the text and the pack.
-- Not built yet: laying the pictures onto the model (front and back by position, the face onto the face painting) and using the key to check and nudge the fit. That waits for the first pair of pictures (lampseller-A), which is the pilot.
+- Chris made all 22 pictures in ChatGPT (11 skins). His originals are not in the repo (about 55 MB); `people/skins/<model>/<letter>-body.webp` and `-face.webp` are the prepared copies the game would load, 1.4 MB in all.
+- `people/kit/prep_skin.py` prepares a pair: it finds the painted figures, measures how they sit against the guide (within 1 to 2 percent, as in the starter-world pilot; `<letter>.json`), spreads the figure's edge colours over the grey background, paints out the small unused face on the body sheet, and resizes the face.
+- `people/kit/person-kit.js` lays a skin on a person: `MF_PERSON.prepare(person, skin)`. Every part but the face and hands reads the body sheet by where its points stand in the standing pose (front half on what faces forward, back half on what faces back). The face picture replaces the face painting. Hands and neck take the skin colour.
+- `people/kit/paint_person.py` has Fable 5.2 (high effort, through the key) look at the painted person and write a small file that finishes the fit (`people/kit/SKIN-KIT.md` is its instruction): skin colour, which parts are one flat colour, how shiny, small nudges. Results in `people/painted/<model>-<letter>__<hand|fable|opus>/` (`skin.js`, `auto.jpg` the automatic fit alone, `final.jpg`, `log.json`).
+- Done: the lamp-seller model (3 skins), the four Fable 5.2 models (2 each) and the same skins on the four Opus 5.5 models (2 each): 19 painted people, about 11 cents and 16 seconds of fitting each ($2.01).
+- Found: the painted skin does most of the work, and the same pictures sit on the Opus models nearly as well as on the Fable models they were painted for. Still showing: hair as a flat-coloured shape round the face, angular shoulders, the Jester's body under men's clothes. ChatGPT did not have the style picture, so the skins are more lifelike than the witches' painted look.
+- Everything spent on Chris's key by the end of this step: about $15.23.
 
 ## Next
 
