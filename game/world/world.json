@@ -294,7 +294,9 @@
      "what": "When the twelfth lamp is home the Fox says they will only go again. Then she sews each flame to its post: twelve quick stitches of cold blue thread run up over the rail, and she rings her bell once. Fox: 'There. Now they're not going anywhere I haven't said.' The captain waves them up the ladder, and talking to him flies the party to the landing ledge. This is the gate to zone 3.",
      "kind": "gate",
      "witch": "Fox",
-     "needs": "a blue thread effect, a bell sound, and a short flight cut or a fade"
+     "needs": "a blue thread effect, a bell sound, and a short flight cut or a fade",
+     "picture": "art/story/S3.png",
+     "picture_name": "The flight to the crag, shown after this"
     }
    ],
    "fights": "One set fight (three wisps at the chestnut-roaster's brazier); no walking fights.",
@@ -360,7 +362,9 @@
      "what": "After the set fight Io kneels and holds a beaten wisp in her cupped hands until it turns warm. It lifts and drifts back toward the fair's glow on the left. Io: 'It wasn't stealing. It was cold. It's a flame that got lost on the way.' Fox: 'So we're not fighting them. We're walking them home.' From now on every beaten wisp drifts home the same way.",
      "kind": "scene",
      "witch": "Io",
-     "needs": "a wisp that warms in colour and drifts off toward the fair"
+     "needs": "a wisp that warms in colour and drifts off toward the fair",
+     "picture": "art/story/S1.png",
+     "picture_name": "Warm in her hands"
     },
     {
      "code": "W4-f",
@@ -436,7 +440,9 @@
      "what": "Between the stones the Fox stops and stares at nothing. She sees the call as thread: one from every flame on the moor, pulled tight toward the crag. One has caught on the tallest stone. She snips it with her shears and keeps the cut end. Fox: 'Something is tacking the whole moor to that hill.' Ranger: 'Can you stop it?' Fox: 'Not the pull. One thread at a time, though. I'm very quick.'",
      "kind": "find",
      "witch": "Fox",
-     "needs": "a shimmer to walk to and the item card; faint threads toward the crag if wanted"
+     "needs": "a shimmer to walk to and the item card; faint threads toward the crag if wanted",
+     "picture": "art/story/S2.png",
+     "picture_name": "The threads"
     }
    ],
    "fights": "The set fight against the Shadow Wraith that bars the road, and walking fights about every 14 metres.",
@@ -712,7 +718,9 @@
      "what": "However the fight is won, the scene after it is the Jester's. Jester: 'Curtain call.' Every lamp gutters, curtains of night close across the room, and the old fire gets the ending it never had. When the curtains part, the lights it took fall as star dust and go home every way at once, over the sea and the moor. One of them goes back to the dead post at the Last Lantern. In the cradle one small ordinary flame is left burning. Io: 'That one's new. It'll want minding.' Jester: 'Then it'll get some.'",
      "kind": "scene",
      "witch": "Jester",
-     "needs": "the Curtain Call ending effect"
+     "needs": "the Curtain Call ending effect",
+     "picture": "art/story/S4.png",
+     "picture_name": "The lights go home"
     },
     {
      "code": "F5-d",
@@ -720,7 +728,9 @@
      "what": "The demo's last moment. Back on the landing, a small warm light shows at the top of the tower, and far off the ship's twelve lamps brighten to answer it. Ranger: 'Thirteen lights. I counted.' Fox: 'Race you down.' Ranger: 'No.'",
      "kind": "scene",
      "witch": "Ranger",
-     "needs": "a glow above the tower door, the far ship's lamps brightening, and an end card or fade"
+     "needs": "a glow above the tower door, the far ship's lamps brightening, and an end card or fade",
+     "picture": "art/world/W9-thirteen-lights.png",
+     "picture_name": "Thirteen lights: the beacon stair painting, changed"
     }
    ],
    "fights": "The great wraith with two Shadow Wraiths and two wisps, behind the door that opens at level 5.",
@@ -743,7 +753,9 @@
    "for": "W1, W2 (set fight and ring bouts) and W3 fights",
    "envoi": "battle-warm-road",
    "why": "Lamplit cobbles running out into heather under an upper-left moon come nearest to the fair's edge, but it has no tents and is full night, not dusk; night-square was passed over because its chapel and stone houses would turn the fair into a town with a church.",
-   "fit": "poor"
+   "fit": "own",
+   "own": "art/fights/F2.png",
+   "was": "battle-warm-road"
   },
   {
    "id": "F3",
@@ -751,7 +763,9 @@
    "for": "W5 fights",
    "envoi": "11-warm-roads-moor",
    "why": "A heather moor with a standing stone, seen level and with the moon almost where F1 has it, so it sits beside the maker's clearing, though it shows one stone, not a ring, and snow peaks F1 lacks; battle-gloamwood-road was passed over for its forest, right-hand moon and moon-carved stone.",
-   "fit": "fair"
+   "fit": "own",
+   "own": "art/fights/F3.png",
+   "was": "11-warm-roads-moor"
   },
   {
    "id": "F4",
@@ -759,7 +773,9 @@
    "for": "W9 walking fights",
    "envoi": "battle-northern-crossroads",
    "why": "Bare frosted flagstones with a flight of steps and far peaks under the moon read as cold high ground, but the well, signpost and trees belong to a crossroads, not a stair up a tower.",
-   "fit": "poor"
+   "fit": "own",
+   "own": "art/fights/F4.png",
+   "was": "battle-northern-crossroads"
   },
   {
    "id": "F5",
@@ -767,7 +783,9 @@
    "for": "the F5 fight",
    "envoi": "battle-dead-moonwell",
    "why": "Dead grey stone, cold braziers, an upper-left moon and a round stepped basin that can pass for the dead lamp's cradle, but it is an open court with spires above it, not a tower top; 14-dead-moonwell was passed over because its moon is a crescent.",
-   "fit": "fair"
+   "fit": "own",
+   "own": "art/fights/F5.png",
+   "was": "battle-dead-moonwell"
   }
  ],
  "captain": {
@@ -833,7 +851,6 @@
   "After the end, can the player still walk the map? If so, the dead post at the Last Lantern could show its new flame, and the folk could each have a last line. Or does the demo stop at the end card?",
   "The W3 painting shows empty brackets on the hull, and the W8 painting shows the lamps on posts on deck. I wrote that the lamps hang on the hull when moored and stand on deck posts in flight, so the hull brackets stay empty all evening. Is that right, or should the hull brackets light up as the lamps come home?",
   "The four are a troupe, so I had the ballad-singer say they are on after her, and their show never happens except as the Curtain Call. Do you want that, or should their stage stay off-screen?",
-  "Fight pictures: seen level, or from above? See \"The two kinds of fight picture\" on this page.",
   "Where is the fair gate? It is drafted in the mooring field (W3), with the fair square's left and near paths shut."
  ],
  "_made": {
@@ -853,7 +870,8 @@
   "The sparring ring: the party fights wisps that keep drifting to the ring lamps.",
   "Where a person's 3D model looks different from their note, the note changes. Three notes changed: the lamp-seller is no longer called old, the old lamplighter is an elderly woman, and the gate keeper is a man in a flat hat and waistcoat.",
   "The story: Chris asked Claude to think about the witches and choose (November 13, late). Chosen: \"The fire that would not end\". The map's lines and things that can happen were rewritten for it by Opus 5.5.",
-  "The story: Chris asked Claude to think about the witches and choose (November 13, late). Chosen: \"The fire that would not end\". The map's lines and things that can happen were rewritten for it by Opus 5.5."
+  "Every fight is seen level, on Moon Faire's own paintings: Chris painted the fair, the standing stones, the beacon stair and the lamp room as fight places on November 14. With his moor clearing that makes five, and no Envoi picture is used any more.",
+  "The story has its pictures: the four story pictures, the two changed paintings, the item sheet (cut into six cards) and the title picture, all painted by Chris on November 14."
  ],
  "finds": [
   {
@@ -861,35 +879,40 @@
    "area": "W4",
    "name": "Cold lantern glass",
    "card": "A lantern's glass, found in the heather a long way from any post. The flame behind it answered the call one night and pulled the glass halfway after it. It is still cold to hold.",
-   "does": "All four have 5% more MP."
+   "does": "All four have 5% more MP.",
+   "picture": "art/items/cold-lantern-glass.png"
   },
   {
    "code": "W5-e",
    "area": "W5",
    "name": "The cut thread",
    "card": "One thread of the call, snipped by the Fox where it caught on a standing stone. Every flame on the moor has one, pulled tight toward the crag. Even cut, it still twitches that way.",
-   "does": "The Fox's spells cost 5% less MP."
+   "does": "The Fox's spells cost 5% less MP.",
+   "picture": "art/items/cut-thread.png"
   },
   {
    "code": "W6-f",
    "area": "W6",
    "name": "The warm stone",
    "card": "A stone from the edge of the farm lad's fire ring. That fire had someone feeding it all night, and it never once tried to leave. The stone keeps its warmth for hours.",
-   "does": "All four have 5% more HP."
+   "does": "All four have 5% more HP.",
+   "picture": "art/items/warm-stone.png"
   },
   {
    "code": "W7-b",
    "area": "W7",
    "name": "The hollow amulet",
    "card": "It lay on the flat stone in the hollow, where nothing on the moor pulls. Nobody knows who left it there. It is warm the way a hand is warm, not the way a fire is.",
-   "does": "All healing is 5% stronger."
+   "does": "All healing is 5% stronger.",
+   "picture": "art/items/hollow-amulet.png"
   },
   {
    "code": "W9-b",
    "area": "W9",
    "name": "The keeper's charm",
    "card": "A small iron charm, hung from an empty lamp bracket on the side of the tower. Keepers once hung one on every bracket they trimmed, so the flame would know someone was coming back. This is the last one, and nobody came back.",
-   "does": "The Jester takes 5% less damage."
+   "does": "The Jester takes 5% less damage.",
+   "picture": "art/items/keepers-charm.png"
   }
  ],
  "invented": [
@@ -979,5 +1002,13 @@
    "Where the four's power comes from is not answered. The story only shows the four sizes of it."
   ],
   "why_this": "The Jester's power is not light. It is the night sky, and every lamp gutters when she casts. A story about a fire that hoards light is the one story where that power is the answer and not just the biggest hit. Her taunt becomes the story too: she draws the call onto herself. And the four scales you gave them (the moment, nature, chaos, infinity) become the four acts, in the order the evening darkens."
+ },
+ "pictures": {
+  "title": "art/story/T1.png",
+  "lamp": "art/items/ship-lamp.png",
+  "after_the_end": {
+   "W4": "art/world/W4-both-lit.png",
+   "W9": "art/world/W9-thirteen-lights.png"
+  }
  }
 }

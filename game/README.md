@@ -330,6 +330,19 @@ Chris: "If we need extra pictures for like narrative beats, you can make a promp
 - `world/build_pictures_page.py` assembles each prompt (fight places reuse the pilot's F1 wording and `pilot/prompts/standing-rules.txt`), the page and the pack.
 - Read on the way, from other sessions (nothing of theirs is in this branch yet): Chris will trace the walking maps himself in the map editor (`claude/moon-faire-map-editor.md`; none sent yet on November 14); five fight cameras exist as a patch on a copy of the pilot (`claude/pilot-fight-cameras.md`); and his rule for which weight of a witch is used where (`claude/chris-which-weight-where.md`: Lightest for walking and far fights, Light for close-ups, Full only in a view-my-character mode).
 
+## Chris's twelve story pictures are in (November 14, late morning) — next: walk the whole demo
+
+Chris painted all twelve within two hours of the prompts. Pages republished: story pictures https://claude.ai/artifact/UWNhi4oUQieZd5WVLPfVK9, the map https://claude.ai/artifact/Ju2Mo1hEK5jyA3pScXkYXz.
+
+- `tools/take_story_pictures.py <folder>` takes them in:
+  - **Fight places** `art/fights/F2.png` to `F5.png` (1448 x 1086, the same as `art/pilot/F1.png`). Against their guides (`world/pictures/F*_fit.jpg`, made by `world/fit_check.py`): the horizon, the moon and the open ground sit where the guides have them; the painter made some stonework taller than the grey boxes, which harms nothing. **Every fight is now seen level on Moon Faire's own paintings; no Envoi picture is used.** (`world/envoi-fight-backdrops/` is kept only as a record.)
+  - **Story pictures** `art/story/S1.png` to `S4.png` and the title `T1.png` (1774 x 887).
+  - **The item sheet** `art/items/items.png`, cut into six 512 x 512 cards: `cold-lantern-glass`, `cut-thread`, `warm-stone`, `hollow-amulet`, `keepers-charm`, `ship-lamp`.
+  - **The two changed paintings.** They came back redrawn all over (W9 a pixel up and left, small differences everywhere). The game's versions, `art/world/W9-thirteen-lights.png` and `art/world/W4-both-lit.png`, are the ORIGINAL painting with the changed one let through only where the new light is (the glow over the door and the brighter ship; the second post's flame and its glow on the ground). Outside those places they are identical to the original, pixel for pixel, so a fade between the two moves nothing and the traced walking shapes hold. As sent: `art/world/as-sent/`.
+- `world/settle_nov14.py` (run once) writes them into `world/world.json`: each fight place's `own` painting; a `picture` on the five things the story pictures belong to (W4-e, W5-e, W3-e, F5-c, F5-d); a `picture` on each find; `pictures` (title, lamp, after the end). The question about level fights or fights from above is settled by the paintings.
+- The map page now shows the title picture, the five fight places, each story picture under its thing, and each item card with its picture.
+- Note for anything that lists `art/world/W*.png`: there are now two more files there than places. Use `W[0-9].png`.
+
 ## Next
 
 Step 5, and the two-person fair-folk test if Chris wants it: the remaining twelve prompts (with the lane lesson built in), every scene traced, the

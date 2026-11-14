@@ -114,7 +114,8 @@ THE SIX THINGS, left to right, the top row first and then the bottom row:
 
 LEAVE OUT. Hands, people, lettering, numbers, labels, price tags, frames and shadows of anything outside the picture.''' % (STYLE, I['cloth'].strip(), '\n'.join('%d. %s' % (k + 1, c.strip()) for k, c in enumerate(I['cells'])))
     save = {'I1': 'items.png', 'E1': 'W9-thirteen-lights.png', 'E2': 'W4-both-lit.png'}.get(code, code + '.png')
-    items.append(dict(code=code, title=title, serves=serves, must=must, shape=shape, attach=attach, save=save, text=text, show=show))
+    done = {'I1': 'art/items/items.png', 'E1': 'art/world/W9-thirteen-lights.png', 'E2': 'art/world/W4-both-lit.png'}.get(code, ('art/fights/%s.png' if code.startswith('F') else 'art/story/%s.png') % code); done = os.path.join(G, done) if os.path.exists(os.path.join(G, done)) else None
+    items.append(dict(code=code, title=title, serves=serves, must=must, shape=shape, attach=attach, save=save, text=text, show=show, done=done))
 os.makedirs(os.path.join(G, 'out'), exist_ok=True)
 md = ['# Moon Faire: the extra pictures the story needs', '', 'Made on November 14, 2026 for the chosen story, "The fire that would not end". For each picture: attach the files named, in that order, and paste the prompt. Save the result under the name given.', '']
 for it in items: md += ['## %s  %s%s' % (it['code'], it['title'], '' if it['must'] else '  (can wait)'), '', it['serves'], '', 'Attach: ' + ', then '.join(it['attach']) + '.  Shape: ' + it['shape'] + '.  Save as: `' + it['save'] + '`.', '', '```', it['text'], '```', '']
@@ -122,7 +123,16 @@ open(os.path.join(PD, 'prompts.md'), 'w', encoding='utf-8').write('\n'.join(md))
 zp = os.path.join(G, 'out', 'Moon_Faire_Story_Pictures_To_Paint.zip')
 with zipfile.ZipFile(zp, 'w', zipfile.ZIP_STORED) as z:
     for n in sorted(pack): z.writestr(n, pack[n])
+NOTE = {'E1': 'The painter redrew the whole picture a little, so the game uses your original painting with only the new light let through: the glow over the door and the brighter ship. Nothing else moves when one fades into the other.',
+        'E2': 'As with the other changed painting, the game uses your original with only the new flame and its glow on the ground let through.', 'I1': 'Cut into six card pictures: the five finds and the ship\'s lamp for the lamp count.'}
 def card(it):
+    if it['done']:
+        fit = os.path.join(PD, it['code'] + '_fit.jpg')
+        return ('<section class="card" id="%s"><h3>%s &nbsp; %s <span class="kind done">painted</span></h3><img class="pic" loading="lazy" alt="" src="%s"><p>%s%s</p>%s'
+                '<details><summary>The prompt it was painted from</summary><p class="soft">Attached: %s.</p><div class="bar"><span class="soft">The prompt</span><button data-copy>Copy prompt</button></div><textarea readonly rows="9">%s</textarea></details></section>') % (
+            it['code'], it['code'], E(it['title']), jpg(it['done'], 1200, 84), E(it['serves'].split('. ')[0].rstrip('.') + '.'), (' ' + E(NOTE[it['code']])) if it['code'] in NOTE else '',
+            ('<details><summary>Its guide drawn over it</summary><p class="soft">The green lines are the guide. What matters for the game is that the horizon, the moon and the open ground sit where the guide has them, and they do. The painter made some of the stonework taller than the guide, which harms nothing.</p><img class="pic" loading="lazy" alt="" src="%s"></details>' % jpg(fit, 1100, 78)) if os.path.exists(fit) else '',
+            ', then '.join(E(a) for a in it['attach']), E(it['text']))
     return ('<section class="card%s" id="%s"><h3>%s &nbsp; %s <span class="kind%s">%s</span></h3><p>%s</p>%s<p class="soft"><b>Attach, in this order:</b> %s<br><b>Shape:</b> %s<br><b>Save as:</b> %s</p>'
             '<div class="bar"><span class="soft">The prompt</span><button data-copy>Copy prompt</button></div><textarea readonly rows="9">%s</textarea></section>') % (
         ' pick' if it['must'] else '', it['code'], it['code'], E(it['title']), ' must' if it['must'] else '', 'the story needs it' if it['must'] else 'can wait', E(it['serves']),
@@ -130,6 +140,10 @@ def card(it):
         ', then '.join('<b>%s</b>' % E(a) for a in it['attach']), E(it['shape']), E(it['save']), E(it['text']))
 page = open(os.path.join(HERE, 'pictures-page.tpl.html'), encoding='utf-8').read()
 page = page.replace('/*MUST*/', '\n'.join(card(i) for i in items if i['must'])).replace('/*WAIT*/', '\n'.join(card(i) for i in items if not i['must'])).replace('/*NAV*/', ''.join('<a href="#%s">%s %s</a>' % (i['code'], i['code'], E(i['title'])) for i in items))
+alldone = all(i['done'] for i in items)
+page = page.replace('/*INTRO*/', 'All twelve are painted and in the game\'s folders.' if alldone else '%d the story needs, and %d that can wait.' % (sum(1 for i in items if i['must']), sum(1 for i in items if not i['must'])))
+page = page.replace('/*HOW*/', '<li><b>You painted all twelve on November 14.</b> Each is shown here as it now sits in the game\'s folders. The four fight places kept the horizon, the moon and the open ground of their guides. The prompts are kept under each picture.</li>' if alldone else '<li><b>How to use this:</b> unzip <b>Moon_Faire_Story_Pictures_To_Paint.zip</b> from the chat. For each picture, attach the files its card names, in that order, paste its prompt, and save the result under the name on the card.</li>')
+page = page.replace('/*H2A*/', 'The pictures the story needs' if alldone else 'The story needs these').replace('/*H2B*/', 'The other five' if alldone else 'These can wait')
 page = page.replace('/*NMUST*/', str(sum(1 for i in items if i['must']))).replace('/*NWAIT*/', str(sum(1 for i in items if not i['must']))).replace('/*COST*/', '$%.2f' % P['_made']['cost'])
 assert '/*' not in page.split('<style>')[0] + page.split('</style>')[1], 'a placeholder was left in'
 open(os.path.join(G, 'out', 'moon-faire-story-pictures.html'), 'w', encoding='utf-8').write(page)
