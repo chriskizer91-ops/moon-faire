@@ -256,9 +256,11 @@
       fv.set(-0.30, 0.90, -0.32).normalize(); carried('head', 0.126, 1.546, 0.102, tgt).addScaledVector(fv, -0.135);
       reaches.push(['L', tgt.clone(), k, -0.35]); aims.push(['L', fv.clone(), V3(-0.75, 0.1, -0.65), k]); fingers('L', lerp(0.24, 0.55, k)); if (tip > 0.4) mouth = 'smile'; }
     if (N === 'wave') { const k = pulse(T, 0, 0.5, 2.3, 2.9), env = pulse(T, 0.5, 0.8, 2.0, 2.35), ph = (T - 0.5) * 8.5, w1 = Math.sin(ph) * env, w2 = Math.sin(ph - 0.8) * env;
-      add('head', 0, -0.06 * k, 0.07 * k); add('spine3', 0, -0.04 * k, 0);
-      // the wave comes from her elbow: her forearm swings from side to side, and her hand follows a moment behind it
-      reaches.push(['R', V3(-0.275 - 0.075 * w1, 1.40 - 0.012 * Math.abs(w1), 0.13), k, -0.9]); aims.push(['R', V3(-0.07 - 0.24 * w2, 1, 0.08), V3(0, 0, 1), k]); fingers('R', lerp(0.24, 0.05, k)); if (k > 0.5) mouth = 'smile'; }
+      // Chris, November 13: "her hand needs to be maybe mid-chest height, and her elbow needs to be lower, so she's just kind of like
+      // more coyly waving". A small wave close to her body: elbow down by her side, hand at her chest, head tipped toward it.
+      add('head', 0.03 * k, -0.08 * k, 0.10 * k); add('neck', 0, -0.03 * k, 0.03 * k); add('spine3', 0, -0.04 * k, 0); add('clavR', 0, 0, -0.06 * k);
+      reaches.push(['R', V3(-0.205 - 0.038 * w1, 1.165 - 0.006 * Math.abs(w1), 0.175), k, -0.25]); aims.push(['R', V3(-0.05 - 0.20 * w2, 1, 0.10), V3(0.10, 0, 1), k]);
+      fingers('R', lerp(0.24, 0.12, k)); if (k > 0.5) mouth = 'smile'; }
     if (N === 'look') { const yaw = 0.95 * (pulse(T, 1.8, 2.4, 2.9, 3.4) - pulse(T, 0.1, 0.7, 1.2, 1.7));
       add('head', 0.02 * Math.abs(yaw), 0.50 * yaw, 0); add('neck', 0, 0.30 * yaw, 0); add('spine3', 0, 0.12 * yaw, 0); add('spine2', 0, 0.08 * yaw, 0); }
     if (N === 'twirl') { const u = cl((T - 0.35) / 1.55, 0, 1), k = pulse(T, 0.2, 0.6, 1.7, 2.3), up = pulse(T, 0.4, 0.7, 1.7, 2.0);

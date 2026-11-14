@@ -26,6 +26,10 @@ Her ankles and wrists move as real ones do.
   3.0 s now (was 2.6), 1.35 swings a second (was 1.75).
 - **Rule for every witch's moves from here:** never hold a foot level by force; clamp the ankle and let the heel lift. Never turn
   a hand at the wrist alone; give the turn to the forearm. Stiff boots do not fold at the toe.
+- **Second pass on the wave (Chris, the same day):** "her hand needs to be maybe mid-chest height, and her elbow needs to be lower, so
+  she's just kind of like more coyly waving. Rather than that, let's move on." Done: wrist at 1.165 m, 17.5 cm in front of her,
+  elbow down by her side (swivel -0.25), swing 3.8 cm each way, head tipped toward her hand. File `deliver/Io_3D_stage6b.html`.
+  The walk and the other hand moves passed his eye.
 - 234 bones.
 
 ## Stage five (November 13, 2026)
@@ -196,7 +200,7 @@ python3 -I bake_head_io.py         # adds her face, profile, skin tones, hat swa
 python3 -I bake_arms_io.py         # adds her arm skin from D3
 python3 -I bake_hands_io.py        # adds her hands from D1 and D2 (landmarks in hand_marks.json)
 ./build_io.sh                      # tools/tables.py, then out/io.js
-python3 -I build_single_io.py      # deliver/Io_3D_stage6.html, one offline file
+python3 -I build_single_io.py      # deliver/Io_3D_stage6b.html, one offline file
 python3 tools/prof_io.py 8 shots/prof.png             # her profile against the model's, by height
 python3 tools/cmp_head_io.py shots/cmp_head.jpg       # head, hat and hair beside C4 and C5
 python3 tools/cmp_io.py shots/cmp_front.jpg front     # also back, sideR, sideL
