@@ -10,6 +10,35 @@ something or just talks to them", and he gets his own folder because he is a cha
   Project docs `claude/HOW-TO-3d-witch-models.md` and `claude/HOW-TO-3d-witch-faces.md`. Read both before writing any code.
 - Project note for this folder: `claude/grey-hat-3d-reference-prompts.md`.
 
+## Stage 1 of the rebuild: the blank doll under his clothes (November 13, 2026)
+
+Chris, on the build with one clothes-shaped skin: "his ear is printed on his hair and his legs are printed on the surface of his
+pants. I think it would be better to use one of the witches like blank dolls for their body and then adjust from there into a man
+shape, then put the clothes over the doll." The plan: (1) the blank doll, (2) trousers over its legs with real holes, (3) shirt,
+(4) corset, (5) hair over a real ear. **Stage 1 is built. Nothing is published yet.** Report: `/home/claude/builder/stage1_report.md`.
+
+- **The doll** is `src/N45_doll.js`: one skin of 52,832 triangles from the foot of his neck to his feet. Its tables (trunk, neck,
+  leg, arm, foot) are written the way the Ranger's body tables are, and it uses her bone weights, but it is not her tubes pushed
+  together: the tables describe one soft solid and the skin is found on a 9 mm grid (the way the hands are made), so shoulders,
+  armpits, crotch and neck have no joins. The numbers are his, from `tools/doll_measure.py` (B5, B3, D3).
+- **Seeing it:** `api.setDoll(true)` hides the old skin and shows the doll with his head, hair, glasses and hands. `api.doll` reads it.
+  On the page: the "Doll" button in the "Show" row. "Blank doll" (clay look) works in both states. Default is off, and then he
+  looks as he did, but not to the last pixel: in 700 x 900 test pictures 6 to 12 pixels differ from the build before, most near
+  his crotch. The likely cause is that the old trunk is now its own mesh and is drawn in a different order; that was not proved.
+- **Regions, for the next stages:** the old skin is now `projTrunk` (waist up), `projHips` (below 1.06 m), `projLegs`, `projBoots`,
+  `projArm`, `projRuffle`; the doll is drawn as `dollTrunk`, `dollHips`, `dollLegs`, `dollArms` (one shared list of points).
+  `api.setOldSkin({ legs: false, hips: false })` switches regions of the old skin off, and the doll shows only under those.
+  `debug.doll.F(x, y, z)` is the doll's solid (negative inside): a garment can ask it how far it is from the skin.
+- **Checks:** `python3 -I tools/doll_measure.py` (measures the paintings, writes `out/doll_measure.json`), `python3 tools/doll_check.py`
+  (doll against those numbers, room inside the old skin, mesh lists), `python3 tools/doll_cmp.py out.jpg b5front` (outlines laid
+  over each other; also `b5side`, `b5back`, `b3front`, `b3side`, `b1front`).
+- **Decided here, not by Chris:** the scale of B5 (900 px/m; it has no whole figure, see the top of `tools/doll_measure.py`); his
+  chest, back and upper arms (under cloth in every painting: a slim man, kept inside B1 and B3); plain skin, no paint from B5.
+- **Rough:** the tops of the doll's shoulders stand up to 2.4 cm proud of the OLD trunk skin (which dips there), so a doll region
+  must not be drawn with the old skin over it (the code never does). The armpit creases when the arms are straight out. The feet
+  are simple lumps for inside the boots. No chest or belly detail. Motion was checked as stills only.
+- `src_before_doll/` is the source as it was before this stage.
+
 ## Second step: his face on a phone, and his sleeves (November 13, 2026)
 
 What Chris said on seeing the first build on his phone: "I think I don't want you to spend a bunch of time like remaking him
@@ -98,6 +127,7 @@ python3 -I build_single.py                     # deliver/Noiz_3D_stage1.html: pu
 | `references/grey-hat-3d-reference-prompts.md` | Every prompt, the standing rules, the checklist, and what was guessed from the picture. |
 | `references/build_prompts.py`, `page.tpl.html` | Build the prompt list, the page, the starters and the zip. All the words live in `build_prompts.py`. |
 | `references/chatgpt/` | The kept paintings, as webp, named by code: rounds 1 and 2 (A1 to G3). |
+| `src/N45_doll.js`, `tools/doll_measure.py`, `tools/doll_check.py`, `tools/doll_cmp.py` | The blank doll under his clothes, and the tools that measure and check it (stage 1 of the rebuild, above). |
 | `src/`, `tools/`, `bake_*.py`, `build.sh`, `shoot.py`, `viewer_n/`, `viewer/stage.js` | The model, its measuring and baking tools, and his page. `00_util`, `10_geom`, `N20_tex`, `32_hands` and `stage.js` come from the Ranger's folder. |
 
 Rebuild the page and the list after changing any wording (the page and the zip are not committed):

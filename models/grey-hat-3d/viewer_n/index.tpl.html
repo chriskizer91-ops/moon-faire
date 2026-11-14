@@ -43,7 +43,7 @@ canvas#stage{display:block;width:100%;height:100%;touch-action:none;cursor:grab}
   <header>
     <p class="eyebrow">Moon Faire · the man they meet · first build</p>
     <h1>Noiz, <em>the Grey Hat</em></h1>
-    <p class="sub">Where he stands right now, part-way through his first build: no hat, belt or jewellery yet. Drag to turn him, pinch or scroll to zoom. "Blank doll" shows his shape without paint. "Walk" shows the gold dust following his boots.</p>
+    <p class="sub">Where he stands right now, part-way through his first build: no hat, belt or jewellery yet. Drag to turn him, pinch or scroll to zoom. "Doll" shows the body under his clothes. "Blank doll" shows his shape without paint. "Walk" shows the gold dust following his boots.</p>
   </header>
   <div class="stagebox" id="box">
     <canvas id="stage"></canvas>
@@ -56,6 +56,14 @@ canvas#stage{display:block;width:100%;height:100%;touch-action:none;cursor:grab}
   <div><p class="label">Arms</p><div class="chips" id="poses"></div></div>
   <div><p class="label">Show</p><div class="chips" id="shows"></div></div>
   <div class="notes">
+    <div>
+      <h2>New: the doll under his clothes</h2>
+      <ul>
+        <li>You asked for a blank doll like the witches have, made into a man, with the clothes put over it. <b>This is the doll.</b> Press "Doll" to see it. Press it again to put his clothes back.</li>
+        <li>It is one smooth skin from his neck to his feet, shaped from your paintings of him with his outer clothes off. Press "Blank doll" as well to see it as plain clay.</li>
+        <li>His clothes are still the old ones for now. They will be remade one at a time to go over the doll: trousers first, with real holes that show his legs.</li>
+      </ul>
+    </div>
     <div>
       <h2>Changed on November 13</h2>
       <ul>
@@ -140,6 +148,8 @@ canvas#stage{display:block;width:100%;height:100%;touch-action:none;cursor:grab}
   toggle($('shows'), 'spinB', 'Turn slowly', false, (v) => { spin = v; easing = false; });
   toggle($('shows'), 'dustB', 'Gold dust', true, (v) => { R.dust.amount = v ? 1 : 0; });
   toggle($('shows'), 'blankB', 'Blank doll', false, (v) => { R.setBlank(v); });
+  // "Doll": his clothes come off and the body built to go under them shows, with his own head, hair, glasses and hands
+  toggle($('shows'), 'dollB', 'Doll', false, (v) => { R.setDoll(v); });
   setRef();
   // drag to turn, pinch or wheel to zoom
   const pts = new Map(); let pinch0 = 0, dist0 = 0;

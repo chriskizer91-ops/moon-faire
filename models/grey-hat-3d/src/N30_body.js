@@ -10,6 +10,8 @@
     return part;
   };
   const sgnPow = (v, e) => Math.sign(v) * Math.pow(Math.abs(v), e);
+  // The old clothes-shaped skin is kept in one mesh per region (projTrunk, projLegs, projBoots, projArm, projRuffle), all wearing the same
+  // paintings, so each region can be switched off by itself as a real garment over the doll (N45_doll.js) takes its place: api.setOldSkin().
 
   // ---------- the trunk: seat of the trousers, corset, shirt and shoulders, in one skin up to the foot of his neck ----------
   const T_Y0 = N_TRUNK[0][0], T_Y1 = N_TRUNK[N_TRUNK.length - 1][0];
@@ -47,7 +49,7 @@
       for (let j = 0; j < NU; j++) ring.push(trunkPt(j / NU, y));
       rings.push(ring);
     }
-    addPart('proj', projUV(loft(rings, { capA: true, capB: true }), trunkSide), wTrunk, { out: V3(0, 1.2, 0) });
+    addPart('projTrunk', projUV(loft(rings, { capA: true, capB: true }), trunkSide), wTrunk, { out: V3(0, 1.2, 0) });
   })();
 
   // ---------- the legs of the trousers: baggy, gathered at the hem and tucked into the boots ----------
@@ -65,7 +67,7 @@
     const rings = [], NR = Q(56, 28), NU = Q(64, 32), ring = (y, k) => { const r = []; for (let j = 0; j < NU; j++) r.push(legPt(s, y, PI + (j / NU) * TAU, k)); return r; };
     for (let i = 0; i <= NR; i++) rings.push(ring(lerp(L_Y1, L_Y0, i / NR), 1));
     rings.push(ring(L_Y0 - 0.006, 0.93), ring(L_Y0 - 0.014, 0.80), ring(L_Y0 - 0.018, 0.62));      // the gathered hem turns in under the cloth and goes down into the boot
-    addPart('proj', projUV(loft(rings, { capB: true }), 1), (x, y) => wLeg(S, y), { out: V3(s * 0.13, 0.56, -0.01) });
+    addPart('projLegs', projUV(loft(rings, { capB: true }), 1), (x, y) => wLeg(S, y), { out: V3(s * 0.13, 0.56, -0.01) });
   }
 
   // ---------- the boots, as one form each: sole, foot, shaft and cuff are all in the outline; the straps, studs and seams are paint for now ----------
@@ -82,7 +84,7 @@
   for (const [S, s] of SIDES) {
     const rings = [], NR = Q(72, 36), NU = Q(64, 32);
     for (let i = 0; i <= NR; i++) { const t = i / NR, y = t < 0.3 ? lerp(0, 0.14, t / 0.3) : lerp(0.14, B_Y1, (t - 0.3) / 0.7), ring = []; for (let j = 0; j < NU; j++) ring.push(bootPt(s, y, PI + (j / NU) * TAU)); rings.push(ring); }      // closer rows over the sole and foot
-    addPart('proj', projUV(loft(rings, { capA: true, capB: true }), 1), (x, y, z) => wBoot(S, x, y, z), { out: V3(s * 0.16, 0.2, -0.03) });
+    addPart('projBoots', projUV(loft(rings, { capA: true, capB: true }), 1), (x, y, z) => wBoot(S, x, y, z), { out: V3(s * 0.16, 0.2, -0.03) });
   }
 
   // ---------- the arms: the full sleeve, its lace ruffle, the bare forearm and the leather cuff, as one form down to the wrist ----------

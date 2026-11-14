@@ -44,6 +44,7 @@
   };
   // the trunk, legs and boots take their sides from B2 (arms held out of the way); the arms take theirs from A3 (arms hanging)
   MATS.proj = mkProj('sideR', 'sideL'); MATS.projArm = mkProj('armR', 'armL'); MATS.projHair = mkProj('sideR', 'sideL'); MATS.projHair.side = THREE.DoubleSide; MATS.projRuffle = mkProj('armR', 'armL'); MATS.projRuffle.side = THREE.DoubleSide;
+  MATS.projTrunk = MATS.projLegs = MATS.projBoots = MATS.proj;      // one material, three meshes: each region of the old skin can be hidden by itself
   Object.assign(MATS, {
     // the head wears three pictures at once, mixed by which way the skin faces (N40_head.js): the front painting, the profile painting, a plain colour
     face: (() => {
@@ -71,7 +72,14 @@
     })(),
     skin: sheen(std({ color: lin('#b9b2b6').multiply(lin(SKIN_C)), roughness: 0.70, envMapIntensity: 0.2, emissive: lin(SKIN_C), emissiveIntensity: 0.34 }), '#ffb49a', 3.2, 0.06),
     nail: phys({ color: lin('#e3c2b0'), transparent: true, opacity: 0.22, roughness: 0.3, clearcoat: 1, clearcoatRoughness: 0.2, depthWrite: false }),
-    cloth: std({ color: lin('#1a1518'), roughness: 0.9 })
+    cloth: std({ color: lin('#1a1518'), roughness: 0.9 }),
+    // the doll's bare skin: plain and matte, lit like his face and hands. Its colour comes point by point (dollCol, N45_doll.js): the tone of his
+    // neck on the trunk, legs and upper arms, turning to the tone of his hands toward the wrists.
+    doll: (() => {
+      const m = sheen(std({ color: lin('#b9b2b6'), vertexColors: true, roughness: 0.74, envMapIntensity: 0.2, emissive: lin('#ffffff'), emissiveIntensity: 0.34 }), '#ffb49a', 3.2, 0.06), first = m.onBeforeCompile;
+      m.onBeforeCompile = (sh) => { if (first) first(sh); sh.fragmentShader = sh.fragmentShader.replace('#include <emissivemap_fragment>', '#include <emissivemap_fragment>\n totalEmissiveRadiance *= vColor.rgb;'); };
+      return m;
+    })()
   });
 
   // ---------- bind: one skinned mesh per material ----------
@@ -87,6 +95,7 @@
     g.setAttribute('uv', new THREE.Float32BufferAttribute(B.uv, 2));
     g.setAttribute('skinIndex', new THREE.Uint16BufferAttribute(B.si, 4));
     g.setAttribute('skinWeight', new THREE.Float32BufferAttribute(B.sw, 4));
+    if (key === 'doll') g.setAttribute('color', new THREE.Float32BufferAttribute(dollCol, 3));
     if (key === 'face') { g.setAttribute('faceMix', new THREE.Float32BufferAttribute(faceMix, 4)); g.setAttribute('uvSide', new THREE.Float32BufferAttribute(faceUvS, 2)); }
     g.setIndex(B.n > 65535 ? new THREE.Uint32BufferAttribute(B.idx, 1) : new THREE.Uint16BufferAttribute(B.idx, 1));
     const m = new THREE.SkinnedMesh(g, MATS[key] || MATS.cloth);
@@ -148,10 +157,49 @@
   const CLAY = std({ color: lin('#b7a797'), roughness: 0.92, envMapIntensity: 0.15 }), CLAY2 = std({ color: lin('#b7a797'), roughness: 0.92, envMapIntensity: 0.15, side: THREE.DoubleSide });
   let blank = false;
   function setBlank(on) { blank = !!on; for (const k in meshes) { const m = meshes[k]; m.material = !blank ? m.userData.painted : /^(projHair|projRuffle)$/.test(k) ? CLAY2 : /^(lens|nail)$/.test(k) ? m.userData.painted : CLAY; if (k === 'lens' || k === 'nail') m.visible = !blank; } return blank; }
+  // ---------- the doll and the old skin ----------
+  // The old skin is his clothes as one smooth shape with the paintings laid on. It is being replaced, a region at a time, by real garments
+  // over the doll (N45_doll.js). Both are cut into the same regions here, so that a region of the old skin can be switched off and the same
+  // region of the doll shows in its place:
+  //     region    old skin      doll under it
+  //     trunk     projTrunk     dollTrunk      from the waist line (OLD_WAIST) up: shirt and corset; the doll's chest, back, shoulders, neck
+  //     hips      projHips      dollHips       below the waist line: the seat and top of the trousers; the doll's hips and seat
+  //     legs      projLegs      dollLegs       the trouser legs; the doll's whole legs and feet (its feet stay inside the boots)
+  //     boots     projBoots     (none)
+  //     arms      projArm       dollArms       the sleeves; the doll's arms from the shoulder to the wrist
+  //     ruffles   projRuffle    (none)
+  // A cut mesh keeps the very same lists of points (shared, not copied) and gets its own list of triangles, so nothing moves and no seam shows.
+  // setDoll(true) shows the whole bare doll: every region of the old skin is hidden; head, hair, glasses and hands stay.
+  // setOldSkin({ legs: false, hips: false }) switches single regions (for the stages that follow). A region of the doll is drawn only where
+  // the old skin over it is off: under the old skin it could not be seen, and it does not fit inside it everywhere (shoulders, see N45_doll.js).
+  // With nothing switched off (the default) the doll is not drawn at all and he looks as he did before it was built.
+  const OLD_WAIST = 1.06;                           // where B3 has the top of his trousers. Stage two may want this line somewhere else: it is only used here.
+  function cutMesh(key, names, which) {             // which(triangle number, height of its middle at rest) says which of the names it goes to
+    const m = meshes[key], g = m.geometry, ix = g.index.array, P = g.attributes.position, lists = names.map(() => []);
+    for (let t = 0; t < ix.length; t += 3) { const a = ix[t], b = ix[t + 1], c = ix[t + 2]; lists[which(t / 3, (P.getY(a) + P.getY(b) + P.getY(c)) / 3)].push(a, b, c); }
+    root.remove(m); delete meshes[key];
+    names.forEach((name, i) => {
+      const g2 = new THREE.BufferGeometry(); for (const a in g.attributes) g2.setAttribute(a, g.attributes[a]);
+      g2.setIndex(P.count > 65535 ? new THREE.Uint32BufferAttribute(lists[i], 1) : new THREE.Uint16BufferAttribute(lists[i], 1));
+      const m2 = new THREE.SkinnedMesh(g2, m.material); m2.name = name; m2.castShadow = m.castShadow; m2.receiveShadow = m.receiveShadow; m2.frustumCulled = false; m2.userData.painted = m.userData.painted;
+      root.add(m2); m2.bind(skeleton, new THREE.Matrix4()); meshes[name] = m2;
+    });
+  }
+  cutMesh('projTrunk', ['projTrunk', 'projHips'], (t, y) => (y < OLD_WAIST ? 1 : 0));
+  cutMesh('doll', ['dollTrunk', 'dollHips', 'dollLegs', 'dollArms'], (t, y) => (DOLL.reg[t] === 0 ? (y < OLD_WAIST ? 1 : 0) : DOLL.reg[t] + 1));
+  const OLD = { trunk: 'projTrunk', hips: 'projHips', legs: 'projLegs', boots: 'projBoots', arms: 'projArm', ruffles: 'projRuffle' }, UNDER = { dollTrunk: 'trunk', dollHips: 'hips', dollLegs: 'legs', dollArms: 'arms' };
+  const oldOn = { trunk: true, hips: true, legs: true, boots: true, arms: true, ruffles: true };
+  let doll = false;
+  function showSkins() { for (const k in OLD) meshes[OLD[k]].visible = !doll && oldOn[k]; for (const k in UNDER) meshes[k].visible = doll || !oldOn[UNDER[k]]; }
+  function setDoll(on) { doll = !!on; showSkins(); return doll; }
+  function setOldSkin(o) { for (const k in (o || {})) if (k in OLD) oldOn[k] = !!o[k]; showSkins(); return Object.assign({}, oldOn); }
+  showSkins();
   // Every list a mesh carries must be as long as its list of points. A real graphics chip refuses to draw a mesh with a short list, so the
   // whole mesh vanishes (his face did, November 13), while the software renderer the tools here use draws it anyway. So it is caught here.
   for (const k in meshes) { const g = meshes[k].geometry, n = g.attributes.position.count; for (const a in g.attributes) if (g.attributes[a].count !== n) throw new Error('mesh "' + k + '": ' + a + ' has ' + g.attributes[a].count + ' entries for ' + n + ' points'); }
-  const api = { root, fx, skeleton, bones, SK, animate, pose, play, moves: MOVES, meshes, dust: DUST, setBlank, get blank() { return blank; }, walkOnSpot: true, walkSpeed: WALK_SPEED, name: 'Noiz', debug: { SK, meshes, trunkPt, legPt, bootPt, headPoint, hairPt }, get triangles() { return triCount; } };
+  // and no triangle may name a point that is not there (the cut meshes above share their lists of points, so this is checked too)
+  for (const k in meshes) { const g = meshes[k].geometry, n = g.attributes.position.count, ix = g.index.array; if (ix.length % 3) throw new Error('mesh "' + k + '": its list of triangles is not a multiple of three'); for (let i = 0; i < ix.length; i++) if (ix[i] >= n) throw new Error('mesh "' + k + '": a triangle names point ' + ix[i] + ' of ' + n); }
+  const api = { root, fx, skeleton, bones, SK, animate, pose, play, moves: MOVES, meshes, dust: DUST, setBlank, get blank() { return blank; }, setDoll, get doll() { return doll; }, setOldSkin, get oldSkin() { return Object.assign({}, oldOn); }, walkOnSpot: true, walkSpeed: WALK_SPEED, name: 'Noiz', debug: { SK, meshes, trunkPt, legPt, bootPt, headPoint, hairPt, armAt, doll: DOLL }, get triangles() { return triCount; } };
   pose(lastPose);
   return api;
 }

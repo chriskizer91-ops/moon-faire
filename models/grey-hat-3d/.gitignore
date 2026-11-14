@@ -5,3 +5,5 @@ out/noiz.js
 out/noiz_tex.js
 out/tex_*.json
 package-lock.json
+builder/.key
+src_before_doll/
