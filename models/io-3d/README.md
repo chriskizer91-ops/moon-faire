@@ -4,7 +4,29 @@ Started November 13, 2026. Built the way the HD Jester was (`claude/HOW-TO-3d-wi
 the Ranger's stage-one recipe: this folder began as a copy of the Ranger's stage-one code (`claude/ranger-3d-model`, commit
 `1d4c9d6`), with the Jester's platform boot builder (`claude/jester-3d-model`, pass 20) in place of the Ranger's boots.
 
-## Where she stands: stage seven (November 13, 2026)
+## Where she stands: stage eight (November 13, 2026)
+
+The moves the whole party shares, and the book appears only when she reads.
+
+- **Chris (November 13):** "her book should like appear when she does the read her book animation. I don't think she should just be
+  holding it, in the same way that I think her sickle should just appear, which it kind of does. Let's do the party moves and
+  that adjustment."
+- **Rule:** she carries nothing by default. Her book and her sickle appear when a move uses them and go when it ends.
+- **Book:** `BK_FLOAT` is empty and the held state is switched off (`hold = 0`); only the open book is ever shown, while `bkR` is
+  above 0.03, and the `book` bone is scaled from nothing to full size as `bkR` rises (`bookPlace`). The shut book's parts are
+  still built but never shown.
+- **Party moves** (`body()` in `src/I99_static.js`); each slides in and out on its own weight (`jg`, `hSq`, `hKn`, `hHv`):
+  - `jog`: the walk made quick (0.72 s a cycle), a longer stride, knees higher, elbows bent, a little lean. Same ankle rules.
+  - `squat`: hips down 42 cm and back 5, feet planted a little apart, leaning in, hands on her knees. Held until another move.
+  - `kneel`: right knee down, left foot forward, left hand on her raised knee (the herb move's legs). Held.
+  - `hover`: 30 cm up, bobbing; cross-legged with knees wide and each shin folded level across her front, the left over the
+    right; hands open on her knees, eyes shut, a small smile. Held. Her thighs are set by direction and hinge axis directly
+    (a basis, not Euler angles: two tries with angles crossed her legs the wrong way or too far).
+- **Page:** stage eight; Jog, Squat, Kneel and Hover are the last four Moves buttons. One offline file:
+  `deliver/Io_3D_stage8.html`. `deliver/Io_stage8_party_moves.jpg` shows the four and the book appearing.
+- Checked in stills and with the quick page check (loads, plays hover, no errors). The full page test was not run again.
+
+## Stage seven (November 13, 2026)
 
 Her book, her dagger and her sickle.
 
@@ -226,7 +248,7 @@ python3 -I bake_head_io.py         # adds her face, profile, skin tones, hat swa
 python3 -I bake_arms_io.py         # adds her arm skin from D3
 python3 -I bake_hands_io.py        # adds her hands from D1 and D2 (landmarks in hand_marks.json)
 ./build_io.sh                      # tools/tables.py, then out/io.js
-python3 -I build_single_io.py      # deliver/Io_3D_stage7.html, one offline file
+python3 -I build_single_io.py      # deliver/Io_3D_stage8.html, one offline file
 python3 tools/prof_io.py 8 shots/prof.png             # her profile against the model's, by height
 python3 tools/cmp_head_io.py shots/cmp_head.jpg       # head, hat and hair beside C4 and C5
 python3 tools/cmp_io.py shots/cmp_front.jpg front     # also back, sideR, sideL
@@ -478,8 +500,7 @@ They also show her whole look from many sides, with the robe: useful when the ro
 
 ## Next stages, in Chris's order (November 13)
 
-1. **The moves the rest of the party have:** squat, kneel, hover and jog. The hover is a cross-legged magical meditation that
-   all four witches can do. Look at how the Jester's, the Fox's and the Ranger's are built first (their branches and project notes).
+1. His eye on the party moves (jog, squat, kneel, hover) and on the book appearing.
 2. **Her emotions:** the faces in C10.
 3. **Her spells and attacks** (H1 to H18, I1 to I8, and round 4): the pendant becoming the sickle, the dagger drawn with
    witchfire, the book floating with its pages turning.

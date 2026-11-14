@@ -40,9 +40,9 @@ canvas#stage{display:block;width:100%;height:100%;touch-action:none;cursor:grab}
 <body>
 <div class="wrap">
   <header>
-    <p class="eyebrow">Moon Faire · stage seven of her build</p>
+    <p class="eyebrow">Moon Faire · stage eight of her build</p>
     <h1><em>Io</em>, the Herbal Witch</h1>
-    <p class="sub">New: her book, her dagger and her sickle. She carries the book in her left arm; try "Read her book" and "Hold her sickle" under Moves, and watch the book float beside her when she needs both hands. She stays in view while you scroll the buttons. Drag to turn her, pinch or scroll to zoom.</p>
+    <p class="sub">New: the moves the whole party shares (jog, squat, kneel, and the cross-legged hover), and her book now appears only when she reads. Pick a move under Moves. She stays in view while you scroll the buttons. Drag to turn her, pinch or scroll to zoom.</p>
   </header>
   <div class="play">
   <div class="stagebox" id="box">
@@ -60,16 +60,15 @@ canvas#stage{display:block;width:100%;height:100%;touch-action:none;cursor:grab}
   <div class="notes">
     <h2>New in this stage</h2>
     <ul>
-      <li>Her book (G1, G2): dark leather with gold corners and the gold star on its cover. She carries it shut in her left arm, as in G8.</li>
-      <li>"Read her book": she holds it open in front of her, looks down, follows the lines with a finger and turns a leaf now and then.</li>
-      <li>When a move needs her left hand or both hands (talk, tip her hat, curtsey, twirl, pick a herb), she lets go and the book floats open at her left side, as your rules for her say.</li>
-      <li>Her dagger (G6): in its black sheath with gold ends, at her left hip, with the crescent guard. It swings on her belt.</li>
-      <li>Her sickle (G5): "Hold her sickle" lifts it in her right hand: a golden crescent blade on a dark grip.</li>
-      <li>"Book and blades" under Show takes them off. Held still, for checking against the paintings, she carries nothing.</li>
+      <li>Her book appears when she reads, growing out of nothing in front of her, and goes the same way. She no longer carries it, and it no longer floats beside her in other moves.</li>
+      <li>Jog: her walk made quick and light, elbows bent.</li>
+      <li>Squat: down on her heels, leaning in, hands on her knees. She stays there until you pick another move.</li>
+      <li>Kneel: her right knee down, her left foot forward, her left hand on her raised knee. She stays there.</li>
+      <li>Hover: she floats cross-legged with her hands open on her knees and her eyes shut, rising and falling a little. She stays there.</li>
     </ul>
     <h2 style="margin-top:12px">From the earlier stages</h2>
     <ul>
-      <li>Her ankles, her wrists and her coy wave (stage six). Her belt, pouch, crystal, necklaces and bracelets (stage five). Her cloak with the moss, and her painted hands (stage four). Her arms, her moving hair and skirt, and her first moves (stage three). Her face, glasses, hair and hat (stage two). Her body, bodice and skirt (stage one).</li>
+      <li>Her book, dagger and sickle (stage seven). Her ankles, her wrists and her coy wave (stage six). Her belt, pouch, crystal, necklaces and bracelets (stage five). Her cloak with the moss, and her painted hands (stage four). Her arms, her moving hair and skirt, and her first moves (stage three). Her face, glasses, hair and hat (stage two). Her body, bodice and skirt (stage one).</li>
     </ul>
     <h2 style="margin-top:12px">What is rough, and what is not here yet</h2>
     <ul class="m">
@@ -80,7 +79,7 @@ canvas#stage{display:block;width:100%;height:100%;touch-action:none;cursor:grab}
       <li>The thin edge of each hand (thumb side, little-finger side) is soft paint with no detail: the paintings do not show it.</li>
       <li>The new pieces are plain shapes: the belt has no gold vine or holes yet, the pouch has no flap, studs or filigree, and the necklace pendant does not swing.</li>
       <li>Book and blades are a first build: her fingers do not wrap the book or the sickle exactly, the dagger cannot be drawn yet, and the sickle simply appears in her hand.</li>
-      <li>Not here yet: squat, kneel, hover and jog; the faces in C10; her spells and attacks.</li>
+      <li>Not here yet: the faces in C10; her spells and attacks.</li>
     </ul>
   </div>
 </div>
@@ -118,7 +117,7 @@ canvas#stage{display:block;width:100%;height:100%;touch-action:none;cursor:grab}
   const FACES = [['Blinking', null, null, false], ['Talking', null, null, true], ['Eyes shut', 1, null, false], ['Mouth open', null, 'open', false], ['Oo', null, 'oo', false], ['Smile', null, 'smile', false]];
   chips($('faces'), FACES, (f) => { R.talk(f[3]); if (f[1] == null && !f[2]) R.setFace(); else R.setFace(f[1] == null ? undefined : f[1], f[2]); }, 0);
   // her moves: 'pose' holds her still; the short ones end by themselves and she goes back to standing
-  const MOVES = [['Stand still', 'pose'], ['Standing', 'idle'], ['Walk', 'walk'], ['Talk', 'talk'], ['Push up glasses', 'glasses'], ['Tip her hat', 'hat'], ['Curtsey', 'curtsey'], ['Twirl', 'twirl'], ['Pick a herb', 'herb'], ['Wave', 'wave'], ['Look round', 'look'], ['Read her book', 'read'], ['Hold her sickle', 'sickle']];
+  const MOVES = [['Stand still', 'pose'], ['Standing', 'idle'], ['Walk', 'walk'], ['Talk', 'talk'], ['Push up glasses', 'glasses'], ['Tip her hat', 'hat'], ['Curtsey', 'curtsey'], ['Twirl', 'twirl'], ['Pick a herb', 'herb'], ['Wave', 'wave'], ['Look round', 'look'], ['Read her book', 'read'], ['Hold her sickle', 'sickle'], ['Jog', 'jog'], ['Squat', 'squat'], ['Kneel', 'kneel'], ['Hover', 'hover']];
   const press = (host, i) => [...host.children].forEach((c, j) => c.setAttribute('aria-pressed', j === i ? 'true' : 'false'));
   let shown = 'idle';
   chips($('moves'), MOVES, (m) => { if (m[1] === 'pose') { R.pose(POSES[0][1]); shown = 'pose'; press($('poses'), 0); } else { shown = R.play(m[1]); press($('poses'), -1); } }, 1);
@@ -159,7 +158,7 @@ canvas#stage{display:block;width:100%;height:100%;touch-action:none;cursor:grab}
     if (easing) { let d = want.az - orbit.az; d = Math.atan2(Math.sin(d), Math.cos(d)); const k = Math.min(1, dt * 5); orbit.az += d * k; orbit.el += (want.el - orbit.el) * k; orbit.dist += (want.dist - orbit.dist) * k; orbit.target.y += (want.ty - orbit.target.y) * k; }
     stage.render();
   }
-  $('hud').textContent = 'Stage seven · ' + Math.round(R.triangles / 1000) + 'k triangles';
+  $('hud').textContent = 'Stage eight · ' + Math.round(R.triangles / 1000) + 'k triangles';
   window.IO = { stage, R, step() { fit(); stage.render(); } };
   requestAnimationFrame(frame);
 })();

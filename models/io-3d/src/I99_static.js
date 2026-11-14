@@ -210,18 +210,20 @@
 
   let lastPose = { arm: 15, leg: 0 }, mv = { name: 'pose', t: 0 }, wk = 0, gph = 0, spinWas = 0;
   let clock = 0, blinkAt = 1.6, blinkT = -1, mouthAt = 0, mouthNow = 'rest', facePainted = '', talking = false, held = null, blinking = true;
-  const SHOTS = { glasses: 2.4, hat: 2.6, curtsey: 3.0, twirl: 2.6, herb: 5.0, wave: 3.0, look: 3.6, sickle: 3.4 }, MOVES = ['pose', 'idle', 'walk', 'talk', 'read', 'glasses', 'hat', 'curtsey', 'twirl', 'herb', 'wave', 'look', 'sickle'];
+  const SHOTS = { glasses: 2.4, hat: 2.6, curtsey: 3.0, twirl: 2.6, herb: 5.0, wave: 3.0, look: 3.6, sickle: 3.4 }, MOVES = ['pose', 'idle', 'walk', 'jog', 'squat', 'kneel', 'hover', 'talk', 'read', 'glasses', 'hat', 'curtsey', 'twirl', 'herb', 'wave', 'look', 'sickle'];
+  let jg = 0, hSq = 0, hKn = 0, hHv = 0;       // the moves all four witches share (Chris, November 13: "squat ... kneel ... hover, and jog"); each slides in and out
   // Her book (G8, and the rule in her prompts: it is in her LEFT hand; when she lets go of it, it floats open at her left side).
   // bkF: 0 held shut in her left arm .. 1 floating open; bkR: 1 open in front of her to read. Moves that need her left hand let it float.
-  const BK_FLOAT = { talk: 1, hat: 1, curtsey: 1, twirl: 1, herb: 1 }, bkP = V3(), bkQ = new THREE.Quaternion(), bkP2 = V3(), bkQ2 = new THREE.Quaternion(), EU = new THREE.Euler(); let bkF = 0, bkR = 0, showProps = true;
-  const propVis = (on, sick) => { const m = meshes, shut = bkF < 0.5 && bkR < 0.5; for (const [k, v] of [['bookShut', on && shut], ['bookShutPg', on && shut], ['bookRibbon', on && shut], ['bookOpen', on && !shut], ['bookOpenPg', on && !shut], ['sickleGold', on && sick], ['sickleGrip', on && sick]]) if (m[k]) m[k].visible = !!v && showProps; };
+  const BK_FLOAT = {},       // Chris, November 13: "her book should like appear when she does the read her book animation. I don't think she should just be holding it"
+     bkP = V3(), bkQ = new THREE.Quaternion(), bkP2 = V3(), bkQ2 = new THREE.Quaternion(), EU = new THREE.Euler(); let bkF = 0, bkR = 0, showProps = true;
+  const propVis = (on, sick) => { const m = meshes, shut = false, open = bkR > 0.03; for (const [k, v] of [['bookShut', on && shut], ['bookShutPg', on && shut], ['bookRibbon', on && shut], ['bookOpen', on && open], ['bookOpenPg', on && open], ['sickleGold', on && sick], ['sickleGrip', on && sick]]) if (m[k]) m[k].visible = !!v && showProps; };
   function bookPlace(dt, N) {
     if (!SK.book) return 0; const k = Math.min(1, dt * 3.2); bkF += ((BK_FLOAT[N] ? 1 : 0) - bkF) * k; bkR += ((N === 'read' ? 1 : 0) - bkR) * k;
     rootQuat(SK.spine3, _qa); carried('spine3', 0.118, 1.150, 0.122, bkP); bkQ.copy(_qa).multiply(_qb.setFromEuler(EU.set(-0.10, 0.50, 0.07, 'YXZ')));                     // held: against the front of her left side
     rootQuat(SK.hips, _qc); _p.set(0, 0, 1).applyQuaternion(_qc); _qc.setFromAxisAngle(AY, Math.atan2(_p.x, _p.z)); carried('hips', 0, 0.96, 0, bkP2).add(_e.set(0.37, 0.10 + 0.018 * Math.sin(clock * 1.7), 0.15).applyQuaternion(_qc));
     bkQ2.copy(_qc).multiply(_qb.setFromEuler(EU.set(-0.55, -1.05 + 0.10 * Math.sin(clock * 0.8), 0, 'YXZ'))); bkP.lerp(bkP2, bkF); bkQ.slerp(bkQ2, bkF);                           // floating: open at her left side, turned to her
     if (bkR > 0.001) { carried('spine3', 0.035, 1.095, 0.300, bkP2); bkQ2.copy(_qa).multiply(_qb.setFromEuler(EU.set(0.93, PI, 0, 'XYZ'))); bkP.lerp(bkP2, bkR); bkQ.slerp(bkQ2, bkR); }   // reading: open in front of her, tipped up to her face
-    SK.book.position.copy(bkP); SK.book.quaternion.copy(bkQ); return (1 - bkF) * (1 - bkR);
+    SK.book.position.copy(bkP); SK.book.quaternion.copy(bkQ); SK.book.scale.setScalar(Math.max(0.001, sm(0.03, 0.7, bkR))); return 0;       // it grows out of nothing in front of her, and goes the same way
   }
   const bookPt = (x, y, z, out) => out.set(x, y, z).applyQuaternion(bkQ).add(bkP);
   const pulse = (t, a, b, c, d) => sm(a, b, t) * (1 - sm(c, d, t)), ANK = {}; for (const [S] of SIDES) ANK[S] = SK['foot' + S].userData.rest.clone();
@@ -236,25 +238,26 @@
   function body(N, T, dt) {
     restAll(); for (const o of SOFT) o.lift = 0;
     let eyes = 0, mouth = 'rest', plant = 1; const footP = { R: 0, L: 0 }, ank = { R: tgt.clone().copy(ANK.R), L: tgt.clone().copy(ANK.L) };
-    wk += ((N === 'walk' ? 1 : 0) - wk) * Math.min(1, dt * 4.5); const go = wk, still = 1 - go;
+    wk += ((N === 'walk' || N === 'jog' ? 1 : 0) - wk) * Math.min(1, dt * 4.5); jg += ((N === 'jog' ? 1 : 0) - jg) * Math.min(1, dt * 4.5); const go = wk, still = 1 - go;
+    hSq += ((N === 'squat' ? 1 : 0) - hSq) * Math.min(1, dt * 3.2); hKn += ((N === 'kneel' ? 1 : 0) - hKn) * Math.min(1, dt * 2.8); hHv += ((N === 'hover' ? 1 : 0) - hHv) * Math.min(1, dt * 2.2);
     // always: arms hanging easy, fingers a little curled, her breath, and a slow shift of her weight when she stands
     const br = Math.sin(clock * 1.5), sway = Math.sin(clock * 0.62), sw2 = Math.sin(clock * 0.41 + 1.3);
     for (const [S, s] of SIDES) { add('uarm' + S, 0, 0, s * (13 * DEG - A_POSE)); add('farm' + S, -0.10, 0, 0); fingers(S, 0.24); add('clav' + S, 0, 0, s * 0.012 * br); }
     add('spine2', 0.010 * br, 0, 0); add('spine3', 0.009 * br, 0, 0);
     SK.hips.position.x += 0.009 * sway * still; add('hips', 0, 0, 0.014 * sway * still); add('spine1', 0, 0, -0.012 * sway * still); add('head', 0.012 * sw2 * still, 0.03 * sw2 * still, 0.014 * sway * still);
     // walking: an unhurried step; her hips turn a little, her arms swing small
-    if (go > 0.001) { gph += dt * TAU / 1.12; const A = 0.30, sn = Math.sin(gph), cs = Math.cos(gph); plant *= still;
+    if (go > 0.001) { gph += dt * TAU / lerp(1.12, 0.72, jg); const A = lerp(0.30, 0.50, jg), sn = Math.sin(gph), cs = Math.cos(gph); plant *= still;       // jog: the same step made quick and light, elbows bent
       for (const [S, s] of SIDES) { const p = gph + (s < 0 ? 0 : PI), si = Math.sin(p), co = Math.cos(p), sw = Math.max(0, co), st = Math.max(0, -co);
-        const th = -(A * si + 0.04) * go, kn = (0.95 * Math.pow(sw, 1.3) + 0.18 * Math.pow(Math.max(0, Math.sin(p - 0.5)), 3) * st + 0.04) * go;
+        const th = -(A * si + lerp(0.04, 0.13, jg)) * go, kn = (lerp(0.95, 1.55, jg) * Math.pow(sw, 1.3) + 0.18 * Math.pow(Math.max(0, Math.sin(p - 0.5)), 3) * st + lerp(0.04, 0.18, jg)) * go;
         // Her feet (Chris, November 13: her ankles were "not bending the right way at the back of her step"; the Ranger's had the same fault).
         // On the ground her sole lies flat until the leg is too far back for an ankle, then her heel lifts. In the air the foot hangs
         // loose, toes down, and comes up to land on the heel. The ankle is held to 0.26 up and 0.30 down. Her boots are stiff: no toe fold.
         const u = (((p / TAU) % 1) + 1) % 1, onG = sm(0.22, 0.28, u) * (1 - sm(0.72, 0.78, u)), sp = ((((u - 0.75) % 1) + 1) % 1) / 0.5;
         const kn2 = kn + 0.30 * Math.exp(-Math.pow((u - 0.76) / 0.07, 2)) * go;       // her knee is already giving as the foot leaves the ground
         add('thigh' + S, th, 0, 0); add('shin' + S, kn2, 0, 0); add('foot' + S, lerp(lerp(0.24, -0.14, sm(0.55, 1.0, sp)) * go, cl(-(th + kn2), -0.26, 0.30), onG), 0, 0);
-        add('uarm' + S, 0.24 * si * go, 0, 0); add('farm' + S, -(0.16 + 0.14 * Math.max(0, -si)) * go, 0, 0); }
+        add('uarm' + S, lerp(0.24, 0.58, jg) * si * go, 0, 0); add('farm' + S, -(lerp(0.16, 1.30, jg) + 0.14 * Math.max(0, -si)) * go, 0, 0); }
       SK.hips.position.y += -0.035 * sn * sn * go; SK.hips.position.x += 0.011 * cs * go;
-      add('hips', 0.015 * go, 0.08 * sn * go, 0.03 * cs * go); add('spine1', 0.015 * go, -0.04 * sn * go, -0.018 * cs * go); add('spine2', 0, -0.07 * sn * go, -0.016 * cs * go); add('spine3', 0, -0.04 * sn * go, 0);
+      SK.hips.position.y += 0.022 * jg * go; add('hips', lerp(0.015, 0.075, jg) * go, 0.08 * sn * go, 0.03 * cs * go); add('spine1', 0.015 * go, -0.04 * sn * go, -0.018 * cs * go); add('spine2', 0, -0.07 * sn * go, -0.016 * cs * go); add('spine3', 0, -0.04 * sn * go, 0);
       add('neck', -0.02 * go, 0.07 * sn * go, 0); }
     // reaches are gathered here and done after her body is in place: [side, point, weight, swivel], and hands to turn: [side, fingers, palm, weight]
     const reaches = [], aims = [];
@@ -263,6 +266,20 @@
       reaches.push(['L', V3(0.13 + 0.02 * a2, 1.03 + 0.03 * a1, 0.25 + 0.02 * a3), 0.95 * k, 0.5]); aims.push(['L', V3(-0.25, 0.22 + 0.16 * a1, 0.9), V3(0.15, 1, -0.1), 0.95 * k]);
       if (clock > mouthAt) { mouthAt = clock + 0.10 + 0.09 * Math.abs(Math.sin(clock * 37.7)); const r = Math.abs(Math.sin(clock * 91.3)); mouthNow = r < 0.30 ? 'rest' : r < 0.66 ? 'open' : r < 0.92 ? 'oo' : 'smile'; }
       mouth = mouthNow; }
+    const knee = (S) => () => carried('shin' + S, SK['shin' + S].userData.rest.x, IO_KNEE_Y + 0.075, 0.03, V3());
+    if (hSq > 0.001) { const q = hSq;       // squat: down on her heels, leaning in, hands on her knees
+      SK.hips.position.y -= 0.42 * q; SK.hips.position.z -= 0.05 * q; add('hips', 0.10 * q, 0, 0); add('spine1', 0.26 * q, 0, 0); add('spine2', 0.16 * q, 0, 0); add('neck', -0.14 * q, 0, 0); add('head', -0.16 * q, 0, 0);
+      ank.L.x += 0.05 * q; ank.R.x -= 0.05 * q; for (const [S, s] of SIDES) { reaches.push([S, knee(S), q, s * 0.3]); fingers(S, lerp(0.24, 0.55, q)); } }
+    if (hKn > 0.001) { const q = hKn;       // kneel: her right knee down, her left foot forward, her left hand on her raised knee
+      SK.hips.position.y -= 0.47 * q; SK.hips.position.z += 0.05 * q; add('spine1', 0.05 * q, 0, 0); add('head', 0.04 * q, 0, 0);
+      ank.L.set(ank.L.x + 0.01 * q, ank.L.y + 0.05 * Math.sin(PI * q), ank.L.z + 0.36 * q); ank.R.set(ank.R.x - 0.01 * q, ank.R.y - 0.015 * q, ank.R.z - 0.40 * q); footP.R = Math.max(footP.R, 1.25 * q); reaches.push(['L', knee('L'), 0.9 * q, 0.3]); }
+    if (hHv > 0.001) { const q = hHv, bob = 0.022 * Math.sin(clock * 1.3);       // hover: she floats cross-legged, hands open on her knees, eyes shut. All four witches can.
+      SK.hips.position.y += (0.30 + bob) * q; plant *= 1 - q; add('spine1', -0.03 * q, 0, 0); add('head', 0.07 * q, 0, 0);
+      for (const [S, s] of SIDES) {       // knees wide and forward, each shin folded level across her front, the left one over the right
+        const D = V3(s * 0.62, s > 0 ? -0.10 : -0.26, s > 0 ? 0.72 : 0.80).normalize(), H = V3(0, -s, 0).addScaledVector(D, s * D.y).normalize(), nD = D.clone().negate();
+        _qc.setFromRotationMatrix(_mb.makeBasis(H, nD, V3().crossVectors(H, nD))); SK['thigh' + S].quaternion.slerp(_qc, q); add('shin' + S, (s > 0 ? 2.34 : 2.16) * q, 0, 0); add('foot' + S, 0.40 * q, 0, 0);
+        reaches.push([S, knee(S), q, s * 0.2]); aims.push([S, V3(s * 0.45, -0.1, 0.9), V3(0, 1, 0.1), q]); fingers(S, lerp(0.24, 0.40, q)); }
+      if (q > 0.6) { eyes = 1; mouth = 'smile'; } }
     if (N === 'read') { const k = sm(0, 0.7, T), turn = pulse(T % 5.2, 3.6, 4.0, 4.3, 4.7);       // she reads: her head down to the page, a finger following the lines, and now and then she turns a leaf
       add('head', 0.30 * k, 0.05 * Math.sin(T * 0.7) * k, 0); add('neck', 0.12 * k, 0, 0); add('spine3', 0.04 * k, 0, 0); eyes = 0.5 * (k > 0.6 ? 1 : 0); if (T % 9 > 7.6) mouth = 'smile'; }
     if (N === 'sickle') { const k = pulse(T, 0, 0.6, 2.5, 3.3), up = pulse(T, 0.9, 1.4, 1.9, 2.5);       // she lifts her sickle and turns it to the light (the moon pendant will become it when her spells are built)
@@ -308,7 +325,7 @@
     for (const [S] of SIDES) { ik2(SK['thigh' + S], SK['shin' + S], SK['foot' + S], ank[S], plant, 0, 1); flatFoot(S, footP[S], plant); }
     sync();
     // a hand travels from where it hangs to its point, a little forward on the way so it clears her skirt and her hair, with its elbow bending as it goes
-    { const hold = bookPlace(dt, N);
+    { bookPlace(dt, N); const hold = 0;
       if (hold > 0.001) { reaches.push(['L', bookPt(0.060, -0.118, -0.012, V3()), hold, 0.25]); aims.push(['L', V3(-0.55, 0.62, 0.55).applyQuaternion(bkQ), V3(-0.45, 0.15, -0.88).applyQuaternion(bkQ), hold]); SK.farmL.rotation.x *= 1; fingers('L', lerp(0.24, 0.75, hold)); }
       if (bkR > 0.001) { const tn = N === 'read' ? pulse(T % 5.2, 3.6, 4.0, 4.3, 4.7) : 0;
         reaches.push(['L', bookPt(0.0, -0.035, -0.050, V3()), bkR, 0.3]); aims.push(['L', V3(-0.25, 0.75, 0.2).applyQuaternion(bkQ), V3(0, 0, 1).applyQuaternion(bkQ), bkR]);
