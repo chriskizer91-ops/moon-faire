@@ -10,6 +10,74 @@ something or just talks to them", and he gets his own folder because he is a cha
   Project docs `claude/HOW-TO-3d-witch-models.md` and `claude/HOW-TO-3d-witch-faces.md`. Read both before writing any code.
 - Project note for this folder: `claude/grey-hat-3d-reference-prompts.md`.
 
+## Stage 7, second half: going to a point, running, sitting, and the game-code calls (November 14, 2026)
+
+Chris asked for "all of the animations that the NPCs have". The first half (face, talking loops, emotes, fidgets) was built by an
+Opus 5.5 sub-agent after the API key ran out; its section is below and its report is `builder/stage7a_report.md`. Chris then
+asked the session Claude to finish him itself. This half is in `src/N99_static.js`.
+
+**Driving him from game code.** The same calls as a fair folk NPC (`game/people/npc/npc.js` on the starter-world branch):
+
+- `update(dt)` every frame (the same as `animate`).
+- `face(x, z)`, `greet()`, `talk(true/false)`, `emote(name)`.
+- `await walkTo(x, z)`, `await runTo(x, z)` (they give `true` on arrival, `false` if stopped), `stop()`, `moving`.
+- `sit()`, `stand()`, `sitting`, `seated`, and `seat()`: `{ x, z, height, back }`, where the top of his seat must be (0.46 m up,
+  0.34 m behind where he stands).
+- `headTop(vec3)` for a speech mark; `wiring` (his talking loops, hello, fidgets, likes and moods: stand-ins, not lore).
+
+**How it works.**
+
+- The walk's numbers are a set, `GW`, and the run's a second set, `GR`; `G` is the mix in use, so one piece of code plants the feet
+  for both. The run is 1.92 m in 0.74 s (2.6 m/s), each foot down 38% of the stride.
+- **He is moved by the foot he stands on** (`travel`): after each frame's pose, his root is put where it keeps the point of the sole
+  that is on the ground (heel edge, toe joint or toe tip) exactly where it was. Measured: 0.002 mm a frame at full walk or run.
+- He steps off left foot first, and shortens his last strides (`NAV.k`, never longer) to arrive at the moment of his stride that
+  looks like his stance.
+- Sitting (`sk`, `SEAT`, `SEATF`): hips back and down in 1.15 s with a lean forward on the way; feet stay on the floor; hands rest
+  on his thighs. Talking loops and emotes play over it.
+- `tools/seq.py` pictures him at chosen moments of a move from one loading of the test page.
+
+**Rough.** Turning on the spot is a swivel with no steps. He can stop up to about 13 cm short on a short hop (1 to 6 cm on longer
+ones). The run's arms are held a little stiffly forward. Seated, the dagger hangs beside the stool and the scroll lies on his
+thigh. Nothing was watched moving; not seen on a real phone.
+
+## Stage 7, part A: his face moves, three talking loops, the fair folk's fourteen emotes, blinks and fidgets (November 14, 2026)
+
+Chris: "give him his hat, his belt and pouch and scroll and jewelry as well as all of the animations that the NPCs have". Stage 7 is in
+two parts. **Part A (this)**: face, talking loops, emotes, blink and fidgets. **Part B (next)**: facing a point, walking and running to a
+point, the run, sitting, and the game-code calls (`face`, `walkTo`, `sit`, `wiring` ...). Report: `/home/claude/builder/stage7a_report.md`.
+Source before this stage: `src_before_npc_moves/`.
+
+- **His face** (`src/N40_head.js`, `paintFace(eyes, mouth)`; the Ranger's method, her `R40_head.js`). The face picture is kept on a
+  canvas; patches from C2 are drawn over it: eyes `shut` and `half`, mouths `oh` (parted), `oo`, `smile`. `bake_face_parts.py` makes
+  them (`out/tex_faceparts.json`): C2's first cell is settled on C1's face picture by SIFT points (scale 2.51, so the patches are softer
+  than the face), each other cell on the first; each patch is toned to C1 by the ratio of blurred pictures and stored already mixed into
+  the face over its rectangle. **His beard and moustache stay C1's**: inside a mouth patch, wherever both pictures have dark hair the
+  face picture is kept. At rest the canvas is the face picture exactly (front picture before and after: 0 pixels differ).
+- **Moves** (`src/N98_moves.js`, new, joined before `N99_static.js`). `ACTS` holds every move as keys on channels (head, spine,
+  shoulders, hips, each hand, eyes, mouth, talking voice); the comment at the top of the file says how to write one. They play as a
+  layer over whatever the legs do (`body()` in `N99_static.js` reads `actFrame()`): head and spine are added, a hand is mixed in by
+  its weight, and every move ends back at rest. A move cut short melts away over 0.3 s.
+- **Hands are placed, arms worked out** (`reachQuat`): a key gives where the wrist goes on his chest (or head) and which way the elbow
+  points; the arm is solved exactly with his own bone lengths. His elbow hinge is the forearm bone's X, which is not square to his
+  arm as it rests in the A-pose, so the bend is worked out on that cone; the elbow cannot fold closer than about 54 degrees.
+- **Names** (exactly the fair folk's, `witches/people/npc/emotes.js`): talking loops `talk_calm`, `talk_lively` (his stage 5 talk,
+  `talkArms`, on the move's clock), `talk_gruff`; emotes `nod`, `shake_head`, `wave`, `greet_bow`, `shrug`, `laugh`, `point`, `think`,
+  `surprised`, `sad`, `cross`, `beckon`, `refuse`, `thanks`; fidgets `fidget_shift`, `fidget_look`, `fidget_hands`.
+- **API.** `act(name)` starts any of them (returns its length in seconds, or false); `stopAct()` lets it melt away; `acting` (name or
+  ''), `actTime`; `talkLoop(name)` keeps a talking loop going (emotes started meanwhile play out, then the loop comes back),
+  `talkLoop(null)` stops it; `looping`; `acts` = `{ talk, emotes, fidgets, dur(name) }`; `auto` = `{ blink, fidget, fidgets }` (what he
+  does on his own: blinks except in 'stand' and the A-pose; a fidget every 7 to 13 s in 'idle' when nothing else plays);
+  `setFace(eyes, mouth)` holds a face for pictures, `setFace(null)` lets go. `pose()` stops every move. `play('talk')` still works and
+  now moves his mouth.
+- **Page:** a "Talk" row (Calm, Lively, Gruff, Quiet) and an "Emotes" row (fourteen). Pressing either in the A-pose first puts him in Idle.
+- **Checks** (scripts in `/home/claude/builder/work7/scripts/`): every move run end to end, cloth on, for NaN, bones flying off, wrist
+  reach error, and coming back to rest (all 0 / 0 / at most 1.2 mm / 0 mm); how near each hand comes to cloth, belt and gear, hat,
+  face, hair and glasses; the stage 3 ray test of arm inside sleeve at 16 moments (plus a picture with the arms painted red under the
+  cloth); stills at four moments of every move from the front and three-quarter.
+- **Rough:** see the report. Motion was not watched; the bow does not touch the hat (the elbow came out through the sleeve);
+  the smile is small; "think" holds the hand just under the beard; the talking mouth is not matched to words.
+
 ## Stage 6 of the rebuild: his hat, pearls, feather earring, belt, pouch, scroll, charms and dagger (November 14, 2026)
 
 Chris: "he looks good as he is. Let's just go ahead and give him his hat, his belt and pouch and scroll and jewelry". All of it is in

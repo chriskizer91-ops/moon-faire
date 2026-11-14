@@ -98,8 +98,21 @@
       faceMix.push(side, plain, 1 - 0.17 * under, 1 - under); faceUvS.push((sideZ(pz) - Wn[0]) / (Wn[1] - Wn[0]), (py - Wn[2]) / (Wn[3] - Wn[2]));      // under his jaw the plain colour is his beard's, not skin
     }
   })();
-  // His painted face. Its blink and talking mouths (C2) are not baked yet, so for now it is one picture.
-  const faceT = bakedTex('face', 1024, 1024, (BAKED && BAKED.skinCheek) || '#c9815f');
+  // His painted face, kept on a canvas so the painted eyes or mouth of another state can be set into it (stage 7; the Ranger's
+  // paintFace, R40_head.js). The states come from C2 (bake_face_parts.py): eyes 'shut' and 'half'; mouths 'oh' (lips parted), 'oo' and
+  // 'smile'. Each patch is already mixed into his face over its rectangle, so with no state set the canvas is the face picture exactly.
+  const faceC = cvs(Math.round(1024 * TEXS), Math.round(1024 * TEXS)), faceT = ctex(faceC), bakedFace = { base: null, parts: {}, rects: (BAKED && BAKED.faceParts) || {} }, faceNow = { eyes: 0, mouth: 'rest' };
+  { const g0 = faceC.getContext('2d'); g0.fillStyle = (BAKED && BAKED.skinCheek) || '#c9815f'; g0.fillRect(0, 0, faceC.width, faceC.height); }
+  function paintFace(eyes, mouth) {                 // eyes: 0 open .. 1 shut; mouth: 'rest', 'open', 'oo' or 'smile'
+    faceNow.eyes = eyes; faceNow.mouth = mouth; const L = bakedFace; if (!L.base) return;
+    const W = faceC.width, H = faceC.height, g = faceC.getContext('2d'), put = (n) => { const im = L.parts[n], r = L.rects[n]; if (im && r) g.drawImage(im, r.x * W, r.y * H, r.w * W, r.h * H); };
+    g.drawImage(L.base, 0, 0, W, H);
+    if (eyes >= 0.75) put('shut'); else if (eyes >= 0.25) put('half');
+    if (mouth === 'open') put('oh'); else if (mouth === 'oo') put('oo'); else if (mouth === 'smile') put('smile');
+    faceT.needsUpdate = true;
+  }
+  onBaked('face', (im) => { bakedFace.base = im; paintFace(faceNow.eyes, faceNow.mouth); });
+  for (const n in bakedFace.rects) onBaked('facePart_' + n, (im) => { bakedFace.parts[n] = im; paintFace(faceNow.eyes, faceNow.mouth); });
   // ---------- ears: a dished shell standing off the side of the head, wearing the profile painting ----------
   (function buildEars() {
     const NT = Q(72, 30), N1 = Q(16, 8), N2 = Q(7, 4), c0 = Math.cos(EAR.tilt), s0 = Math.sin(EAR.tilt);

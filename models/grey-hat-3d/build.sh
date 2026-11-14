@@ -2,7 +2,7 @@
 # joins his model source into out/noiz.js, and his baked paintings (out/tex_*.json, from bake_proj.py, bake_face.py, bake_cloth.py, bake_shirt.py and bake_gear.py) into out/noiz_tex.js
 cd "$(dirname "$0")"
 python3 -I tools/tables.py >/dev/null || exit 1
-cat src/00_util.js src/N05_tables.js src/10_geom.js src/N20_tex.js src/N30_body.js src/32_hands.js src/N40_head.js src/N41_hair.js src/N42_glasses.js src/N45_doll.js src/N45b_hair.js src/N46_trousers.js src/N47_shirt.js src/N48_gear.js src/N80_dust.js src/N99_static.js > out/noiz.js
+cat src/00_util.js src/N05_tables.js src/10_geom.js src/N20_tex.js src/N30_body.js src/32_hands.js src/N40_head.js src/N41_hair.js src/N42_glasses.js src/N45_doll.js src/N45b_hair.js src/N46_trousers.js src/N47_shirt.js src/N48_gear.js src/N80_dust.js src/N98_moves.js src/N99_static.js > out/noiz.js
 python3 -I -c "
 import json, glob
 o = {}

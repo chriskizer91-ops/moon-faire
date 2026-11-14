@@ -43,7 +43,7 @@ canvas#stage{display:block;width:100%;height:100%;touch-action:none;cursor:grab}
   <header>
     <p class="eyebrow">Moon Faire · the man they meet · first build</p>
     <h1>Noiz, <em>the Grey Hat</em></h1>
-    <p class="sub">Where he stands right now, part-way through his first build. Drag to turn him, pinch or scroll to zoom. New: he has his grey hat, his pearls and feather earring, and his belt with its ring, pouch, scroll, charms and dagger. Press "Hat" and "Belt" under the views to look closely, and "Walk" to see the hanging things swing. "Hat" and "Belt and jewellery" under Show take them off. He stands at rest; "A-pose" puts the arms-out pose back. His hair is real locks, his shirt and trousers are real cloth. "Doll" shows the body under his clothes. "Blank doll" shows his shape without paint.</p>
+    <p class="sub">Where he stands right now, part-way through his first build. Drag to turn him, pinch or scroll to zoom. New: he blinks and talks, and he has the fair folk's fourteen emotes. Press a button under "Talk" or "Emotes".</p>
   </header>
   <div class="stagebox" id="box">
     <canvas id="stage"></canvas>
@@ -53,21 +53,32 @@ canvas#stage{display:block;width:100%;height:100%;touch-action:none;cursor:grab}
   </div>
   <div><p class="label">Look at</p><div class="chips" id="views"></div></div>
   <div><p class="label">Movement</p><div class="chips" id="moves"></div></div>
+  <div><p class="label">Talk</p><div class="chips" id="talks"></div></div>
+  <div><p class="label">Emotes</p><div class="chips" id="emotes"></div></div>
+  <div><p class="label">Go and sit</p><div class="chips" id="goes"></div></div>
   <div><p class="label">Arms, in the A-pose</p><div class="chips" id="poses"></div></div>
   <div><p class="label">Show</p><div class="chips" id="shows"></div></div>
   <div class="notes">
     <div>
-      <h2>New: his hat, belt, pouch, scroll and jewellery</h2>
+      <h2>New: everything the fair folk can do</h2>
       <ul>
-        <li>You said he looks good as he is, and to give him his hat, his belt and pouch and scroll and jewellery.</li>
-        <li><b>The hat.</b> Grey wool felt with a wide drooping brim, a dark band, and a slumped crown whose point falls to his left, as your paintings have it. His hair comes out from under it. Press <b>"Hat"</b> under the views. The point leans a little when his head moves.</li>
-        <li><b>Pearls</b> at the base of his throat, inside the open collar, and <b>the feather earring</b> in his left ear only: a short chain, two small pearls and a black feather. It swings.</li>
-        <li><b>The belt.</b> Black leather over the bottom of the corset, fastened in front by one large steel ring, with a buckle at his left and a second strap dropping to his right hip. Press <b>"Belt"</b>.</li>
-        <li><b>On his right hip:</b> the brown pouch with its flap and brass stud, the rolled scroll in its leather loop under it, and the skull and leaf charms. <b>On his left hip:</b> the dagger in its sheath.</li>
-        <li><b>Press "Walk".</b> The pouch, scroll, charms and dagger hang from the belt and swing and settle as the Ranger's bags do. His thigh pushes them out as it comes forward, so they do not pass through his trousers.</li>
-        <li>Under Show, <b>"Hat"</b> and <b>"Belt and jewellery"</b> take them off and put them back.</li>
-        <li><b>Rough for now:</b> the hat's folds are simpler than the painted ones. The pearls go under the collar at the sides instead of lying over it. The scroll is plain parchment with no writing. The ring is a little bigger than painted. The scroll hangs a few centimetres nearer his middle than painted, and the dagger hangs straight down where the painting slants it. In "Walk" and "Talk" his right hand passes close to the pouch.</li>
-        <li><b>I cannot watch him move from here,</b> only look at stills. Tell me if the hanging things swing too much or too little.</li>
+        <li>You asked for all of the animations the fair folk have. They are all here now, made his own.</li>
+        <li><b>Go and sit</b> is the new row. <b>Walk over</b> and <b>Run over</b> send him round a small loop and back, and he turns to face you. <b>Sit</b> puts a stool behind him and sits him down; <b>Stand</b> gets him up. <b>Face me</b> turns him to where you are looking from.</li>
+        <li><b>His feet do not slide.</b> When he goes somewhere he is moved by the foot he is standing on, so starting, stopping and turning are real steps. He shortens his last strides so that he arrives with his feet together.</li>
+        <li><b>His run</b> is a heavy-booted jog, a little over twice his walking speed, with both feet off the ground twice in each stride.</li>
+        <li><b>Seated,</b> his hands rest on his thighs, and Talk and every emote still work.</li>
+        <li><b>His face moves.</b> He blinks on his own, and his eyes and mouth change using your painting of his six faces. His face at rest is exactly as before.</li>
+        <li><b>Talk:</b> <b>Calm</b>, <b>Lively</b> or <b>Gruff</b>, until you press <b>Quiet</b>. Gruff is his own: left hand on his belt, chin down, a short chop of the right hand.</li>
+        <li><b>Emotes:</b> each plays once and he goes back to what he was doing. His bow is a showman's bow: right arm across his waist, left hand sweeping out low.</li>
+        <li><b>On his own</b> (in "Idle") he now and then shifts his weight, looks about, or rubs his hands.</li>
+        <li><b>Rough for now:</b> when he turns on the spot he swivels without stepping. He can stop up to a hand's width short of the spot he was sent to. The smile is small, because the painting's smile is small. He does not touch his hat in the bow: his elbow came through his sleeve when he did.</li>
+        <li><b>I cannot watch him move from here,</b> only look at stills. Tell me which moves feel too fast, too slow, too big or too small.</li>
+      </ul>
+    </div>
+    <div>
+      <h2>Before that: his hat, belt, pouch, scroll and jewellery</h2>
+      <ul class="m">
+        <li>Grey felt hat with a drooping brim, pearls and a feather earring, and a belt with a steel ring, pouch, scroll, charms and dagger that swing as he walks. "Hat" and "Belt" under the views look closely.</li>
       </ul>
     </div>
     <div>
@@ -173,16 +184,22 @@ canvas#stage{display:block;width:100%;height:100%;touch-action:none;cursor:grab}
   function setRef() { const im = $('ref'), src = REFS[refKey]; im.hidden = !(showRef && src); if (src && im.getAttribute('src') !== src) im.src = src; }
   const press = (host, i) => [...$(host).children].forEach((c, k) => { if (!c.dataset.toggle) c.setAttribute('aria-pressed', k === i ? 'true' : 'false'); });
   // a view with a bone's name at its end looks at where that bone is now (his hand hangs by his thigh in the stance and is out to the side in the A-pose)
-  const pickView = (v) => { want = { az: v[1], el: v[2], dist: v[3], ty: v[4], tx: v[6] || 0, tz: v[7] || 0 }; if (v[8] && R.SK[v[8]]) { R.root.updateMatrixWorld(true); const e = R.SK[v[8]].matrixWorld.elements; want.tx = e[12]; want.ty = e[13] - 0.05; want.tz = e[14]; } easing = true; spin = false; refKey = v[5]; setRef(); const sb = $('spinB'); if (sb) sb.setAttribute('aria-pressed', 'false'); };
+  const pickView = (v) => { want = { az: v[1], el: v[2], dist: v[3], ty: v[4], tx: (v[6] || 0) + R.root.position.x, tz: (v[7] || 0) + R.root.position.z }; if (v[8] && R.SK[v[8]]) { R.root.updateMatrixWorld(true); const e = R.SK[v[8]].matrixWorld.elements; want.tx = e[12]; want.ty = e[13] - 0.05; want.tz = e[14]; } easing = true; spin = false; refKey = v[5]; setRef(); const sb = $('spinB'); if (sb) sb.setAttribute('aria-pressed', 'false'); };
   chips($('views'), VIEWS, pickView, 0);
   // He starts in his resting stance, breathing ("Idle"). "A-pose" (under Show) puts back the pose of his paintings, which is the one he is
   // measured in. The three "Arms" buttons are versions of that pose, so pressing one turns "A-pose" on; pressing a movement turns it off.
   const MOVES = [['Stand still', 'stand'], ['Idle', 'idle'], ['Walk', 'walk'], ['Talk', 'talk']];
   let move = 'idle', aPose = 0;
   const setA = (on) => { const b = $('aposeB'); if (b) b.setAttribute('aria-pressed', on ? 'true' : 'false'); };
-  chips($('moves'), MOVES, (v) => { move = v[1]; R.play(move); press('poses', -1); setA(false); }, 1);
+  chips($('moves'), MOVES, (v) => { R.stop(); move = v[1]; R.play(move); press('poses', -1); press('goes', -1); setA(false); }, 1);
   chips($('poses'), POSES, (p) => { aPose = POSES.indexOf(p); R.pose(p[1]); press('moves', -1); setA(true); }, -1);
   R.play('idle', true);
+  // Talk: one of his three talking loops keeps going until "Quiet" (or another loop). Emotes: each plays once, over whatever his legs are
+  // doing, and he goes back to it. In the A-pose there is nothing for them to play over, so pressing one first puts him back in "Idle".
+  const unA = () => { if (R.debug.ACT && $('aposeB').getAttribute('aria-pressed') === 'true') { move = 'idle'; R.play('idle'); press('poses', -1); press('moves', 1); setA(false); } };
+  chips($('talks'), [['Calm', 'talk_calm'], ['Lively', 'talk_lively'], ['Gruff', 'talk_gruff'], ['Quiet', null]], (v) => { unA(); R.talkLoop(v[1]); if (v[1]) R.act(v[1]); else press('talks', -1); }, -1);
+  const EMOTES = [['Nod', 'nod'], ['Shake head', 'shake_head'], ['Wave', 'wave'], ['Bow', 'greet_bow'], ['Shrug', 'shrug'], ['Laugh', 'laugh'], ['Point', 'point'], ['Think', 'think'], ['Surprised', 'surprised'], ['Sad', 'sad'], ['Cross', 'cross'], ['Beckon', 'beckon'], ['Refuse', 'refuse'], ['Thanks', 'thanks']];
+  EMOTES.forEach((e) => { const b = document.createElement('button'); b.className = 'chip'; b.type = 'button'; b.textContent = e[0]; b.setAttribute('aria-pressed', 'false'); b.addEventListener('click', () => { unA(); R.act(e[1]); }); $('emotes').appendChild(b); });
   const toggle = (host, id, label, on, fn) => { const b = document.createElement('button'); b.className = 'chip'; b.type = 'button'; b.id = id; b.dataset.toggle = '1'; b.textContent = label; b.setAttribute('aria-pressed', on ? 'true' : 'false');
     b.addEventListener('click', () => { const v = b.getAttribute('aria-pressed') !== 'true'; b.setAttribute('aria-pressed', v ? 'true' : 'false'); fn(v); }); host.appendChild(b); };
   toggle($('shows'), 'refB', 'Painting beside him', true, (v) => { showRef = v; setRef(); });
@@ -214,9 +231,30 @@ canvas#stage{display:block;width:100%;height:100%;touch-action:none;cursor:grab}
   let sized = '';
   function fit() { const w = box.clientWidth, h = box.clientHeight, pr = Math.min(window.devicePixelRatio || 1, 2), k = w + 'x' + h + 'x' + pr; if (k !== sized && w > 0 && h > 0) { sized = k; stage.resize(w, h, pr); R.dust.setPixelRatio(pr); } }
   let last = 0;
+  // Go and sit (stage 7): the calls game code makes on him, as it does on the fair folk. "Walk over" and "Run over" send him round a small
+  // loop and back to where he began, to turn and face you. "Sit" puts a stool where he says his seat must be and sits him on it.
+  const stool = new THREE.Group();
+  { const wood = new THREE.MeshStandardMaterial({ color: 0x4a3a2a, roughness: 0.85 }), top = new THREE.Mesh(new THREE.CylinderGeometry(0.19, 0.19, 0.05, 28), wood); top.position.y = -0.025; stool.add(top);
+    for (let i = 0; i < 3; i++) { const a = i * 2.094 + 0.5, leg = new THREE.Mesh(new THREE.CylinderGeometry(0.018, 0.022, 0.42, 10), wood); leg.position.set(Math.sin(a) * 0.13, -0.25, Math.cos(a) * 0.13); leg.rotation.set(Math.cos(a) * 0.12, 0, -Math.sin(a) * 0.12); stool.add(leg); }
+    stool.traverse((o) => { o.castShadow = true; }); stool.visible = false; stage.scene.add(stool); }
+  const camXZ = () => [orbit.target.x + Math.sin(orbit.az) * Math.cos(orbit.el) * orbit.dist, orbit.target.z + Math.cos(orbit.az) * Math.cos(orbit.el) * orbit.dist];
+  const awake = () => { unA(); if (move !== 'idle') { move = 'idle'; R.play('idle'); } press('moves', 1); };
+  async function tour(run) {
+    awake(); R.stop(); const go = run ? R.runTo : R.walkTo, far = run ? 1.7 : 1;
+    if (!(await go(1.5 * far, 1.1 * far))) return; if (!(await go(-1.5 * far, 0.9 * far))) return; if (!(await go(0, 0))) return;
+    R.face(...camXZ()); stool.visible = false; press('goes', -1);
+  }
+  chips($('goes'), [['Walk over', 'walk'], ['Run over', 'run'], ['Sit', 'sit'], ['Stand', 'stand'], ['Face me', 'face']], (v) => {
+    if (v[1] === 'walk' || v[1] === 'run') tour(v[1] === 'run');
+    else if (v[1] === 'sit') { awake(); R.stop(); const st = R.seat(); stool.position.set(st.x, st.height, st.z); stool.visible = true; R.sit(); }
+    else if (v[1] === 'stand') R.stand();
+    else { awake(); R.face(...camXZ()); }
+  }, -1);
+  let rootX = R.root.position.x, rootZ = R.root.position.z;
   function frame(now) {
     requestAnimationFrame(frame); const dt = Math.min(0.05, (now - last) / 1000 || 0.016); last = now; fit();
     R.animate(dt);
+    { const rp = R.root.position, ddx = rp.x - rootX, ddz = rp.z - rootZ; rootX = rp.x; rootZ = rp.z; orbit.target.x += ddx; orbit.target.z += ddz; if (want) { want.tx = (want.tx || 0) + ddx; want.tz = (want.tz || 0) + ddz; } }      // the picture goes with him when he walks off
     if (spin) orbit.az += dt * 0.5;
     if (easing) { let d = want.az - orbit.az; d = Math.atan2(Math.sin(d), Math.cos(d)); const k = Math.min(1, dt * 5); orbit.az += d * k; orbit.el += (want.el - orbit.el) * k; orbit.dist += (want.dist - orbit.dist) * k; orbit.target.y += (want.ty - orbit.target.y) * k; orbit.target.x += ((want.tx || 0) - orbit.target.x) * k; orbit.target.z += ((want.tz || 0) - orbit.target.z) * k; }
     stage.render();
