@@ -43,7 +43,7 @@ canvas#stage{display:block;width:100%;height:100%;touch-action:none;cursor:grab}
   <header>
     <p class="eyebrow">Moon Faire · the man they meet · first build</p>
     <h1>Noiz, <em>the Grey Hat</em></h1>
-    <p class="sub">Where he stands right now, part-way through his first build: no hat, belt or jewellery yet. Drag to turn him, pinch or scroll to zoom. "Doll" shows the body under his clothes. "Blank doll" shows his shape without paint. "Walk" shows the gold dust following his boots.</p>
+    <p class="sub">Where he stands right now, part-way through his first build: no hat, belt or jewellery yet. Drag to turn him, pinch or scroll to zoom. His trousers are new: real cloth with real holes. "Doll" shows the body under his clothes. "Blank doll" shows his shape without paint. "Walk" shows the gold dust following his boots.</p>
   </header>
   <div class="stagebox" id="box">
     <canvas id="stage"></canvas>
@@ -57,11 +57,16 @@ canvas#stage{display:block;width:100%;height:100%;touch-action:none;cursor:grab}
   <div><p class="label">Show</p><div class="chips" id="shows"></div></div>
   <div class="notes">
     <div>
-      <h2>New: the doll under his clothes</h2>
+      <h2>New: real trousers</h2>
       <ul>
-        <li>You asked for a blank doll like the witches have, made into a man, with the clothes put over it. <b>This is the doll.</b> Press "Doll" to see it. Press it again to put his clothes back.</li>
-        <li>It is one smooth skin from his neck to his feet, shaped from your paintings of him with his outer clothes off. Press "Blank doll" as well to see it as plain clay.</li>
-        <li>His clothes are still the old ones for now. They will be remade one at a time to go over the doll: trousers first, with real holes that show his legs.</li>
+        <li>You said his legs were printed on his trousers. <b>They are not any more.</b> His trousers are now their own piece of cloth, hanging over the doll's legs.</li>
+        <li><b>The holes are real holes.</b> Where your paintings show a tear, there is no cloth, and you look through at his leg. Turn him and the leg moves behind the hole. Press "Close on the holes" to go in near.</li>
+        <li>You asked if the doll's skin should be painted first. Yes, and it is: his legs have skin, shading and black fishnet painted on them. Press "Doll" to see the legs with the trousers off.</li>
+        <li>Each leg is torn its own way, as you painted them: six long steep tears on his left leg, five shorter flatter ones on his right.</li>
+        <li>The cloth is your flat pattern from the close painting of the hole, repeated, so it is sharp all the way round.</li>
+        <li>Press "Old trousers" to put the old painted legs back and compare.</li>
+        <li><b>Rough for now:</b> the cloth moves with his legs but does not swing or flap yet. Your front painting and your side painting put the holes in different places, so I set them between the two: they match the front best, and from the side they sit nearer the front edge than you painted.</li>
+        <li>I cannot watch him move from here. If the trousers do something odd when he walks, tell me.</li>
       </ul>
     </div>
     <div>
@@ -129,7 +134,7 @@ canvas#stage{display:block;width:100%;height:100%;touch-action:none;cursor:grab}
   let want = { az: 0.5, el: 0.06, dist: 6.2, ty: 0.90, tx: 0, tz: 0 }, easing = true, spin = false;
   // name, azimuth, elevation, distance, target height, painting, target x, target z
   const VIEWS = [['Three-quarter', 0.5, 0.06, 6.2, 0.90, 'front'], ['Front', 0, 0.05, 6.2, 0.90, 'front'], ['Side', Math.PI / 2, 0.05, 6.2, 0.90, 'side'], ['Back', Math.PI, 0.05, 6.2, 0.90, 'back'],
-    ['Face', 0, 0.03, 2.0, 1.63, 'face'], ['Head, turned', 0.6, 0.05, 2.3, 1.61, 'faceq'], ['Profile', -Math.PI / 2, 0.03, 2.3, 1.61, 'prof'], ['Shirt and corset', 0.3, 0.05, 2.9, 1.24, 'chest'], ['Trousers', 0.3, 0.05, 3.3, 0.70, 'legs'], ['Boots', 0.6, 0.16, 2.3, 0.20, 'boot', 0, 0.03], ['Hands', 0.9, 0.10, 2.0, 0.92, 'hand', 0.44, -0.06]];
+    ['Face', 0, 0.03, 2.0, 1.63, 'face'], ['Head, turned', 0.6, 0.05, 2.3, 1.61, 'faceq'], ['Profile', -Math.PI / 2, 0.03, 2.3, 1.61, 'prof'], ['Shirt and corset', 0.3, 0.05, 2.9, 1.24, 'chest'], ['Trousers', 0.3, 0.05, 3.3, 0.70, 'legs'], ['Close on the holes', 0.55, 0.02, 1.5, 0.66, 'legs', 0.13, 0], ['Boots', 0.6, 0.16, 2.3, 0.20, 'boot', 0, 0.03], ['Hands', 0.9, 0.10, 2.0, 0.92, 'hand', 0.44, -0.06]];
   const POSES = [['As painted', {}], ['Arms down', { arm: 17 }], ['Arms out', { arm: 90 }]];
   let refKey = 'front', showRef = true;
   function chips(host, items, onPick, first) {
@@ -150,6 +155,8 @@ canvas#stage{display:block;width:100%;height:100%;touch-action:none;cursor:grab}
   toggle($('shows'), 'blankB', 'Blank doll', false, (v) => { R.setBlank(v); });
   // "Doll": his clothes come off and the body built to go under them shows, with his own head, hair, glasses and hands
   toggle($('shows'), 'dollB', 'Doll', false, (v) => { R.setDoll(v); });
+  // "Old trousers": the old painted leg skin goes back on in place of the new trousers, for comparing
+  toggle($('shows'), 'oldTB', 'Old trousers', false, (v) => { R.setOldTrousers(v); });
   setRef();
   // drag to turn, pinch or wheel to zoom
   const pts = new Map(); let pinch0 = 0, dist0 = 0;

@@ -1,4 +1,5 @@
   // ---------- materials (stage one) ----------
+  const NET_N = 26, NET_H = 0.024, NET_T = 0.0024;      // the fishnet: diamonds round a leg, how tall one is (metres), how thick the thread is (metres)
   const SKIN_C = (BAKED && BAKED.skinHand) || SKIN || '#c07a54', LEATHER_C = '#211e1f', SKIN_F = (BAKED && BAKED.skinNeck) || '#c5815e';
   // a painting that is laid on by position, not by uv: the canvas takes the picture's own size once it has decoded
   function projTex(key, fill) {
@@ -17,20 +18,21 @@
     proj: null, projArm: null,
   };
   const tFront = projTex('front', '#3a2c36'), tBack = projTex('back', '#3a2c36');
-  const mkProj = (kR, kL) => {
+  const mkProj = (kR, kL, cut) => {
     {
       const tF = tFront, tB = tBack, tR = projTex(kR, '#3a2c36'), tL = projTex(kL, '#3a2c36');
       const m = sheen(std({ map: tF, color: lin('#b9b2b6'), roughness: 0.80, envMapIntensity: 0.18, emissive: lin('#ffffff'), emissiveIntensity: 0.36 }), '#c9b6c4', 3, 0.05), first = m.onBeforeCompile;
       m.onBeforeCompile = (sh) => {
         if (first) first(sh);
-        Object.assign(sh.uniforms, { uPB: { value: tB }, uPR: { value: tR }, uPL: { value: tL }, uWF: { value: v4(WIN.front) }, uWB: { value: v4(WIN.back) }, uWR: { value: v4(WIN[kR] || WIN.sideR) }, uWL: { value: v4(WIN[kL] || WIN.sideL) }, uPPow: { value: 5.0 } });
+        Object.assign(sh.uniforms, { uPB: { value: tB }, uPR: { value: tR }, uPL: { value: tL }, uWF: { value: v4(WIN.front) }, uWB: { value: v4(WIN.back) }, uWR: { value: v4(WIN[kR] || WIN.sideR) }, uWL: { value: v4(WIN[kL] || WIN.sideL) }, uPPow: { value: 5.0 }, uCorsetCut: cut ? CORSET_CUT : { value: 0 } });
         sh.vertexShader = sh.vertexShader.replace('#include <common>', '#include <common>\nvarying vec3 vRest; varying vec3 vRestN;')
           .replace('#include <begin_vertex>', '#include <begin_vertex>\nvRest = position; vRestN = normal;');
-        sh.fragmentShader = sh.fragmentShader.replace('#include <common>', '#include <common>\nuniform sampler2D uPB; uniform sampler2D uPR; uniform sampler2D uPL; uniform vec4 uWF; uniform vec4 uWB; uniform vec4 uWR; uniform vec4 uWL; uniform float uPPow; varying vec3 vRest; varying vec3 vRestN; vec3 gProj;')
+        sh.fragmentShader = sh.fragmentShader.replace('#include <common>', '#include <common>\nuniform sampler2D uPB; uniform sampler2D uPR; uniform sampler2D uPL; uniform vec4 uWF; uniform vec4 uWB; uniform vec4 uWR; uniform vec4 uWL; uniform float uPPow; uniform float uCorsetCut; varying vec3 vRest; varying vec3 vRestN; vec3 gProj;')
           .replace('#include <map_fragment>', [
             'vec3 rn = normalize( vRestN ); float sideK = vUv.x;',
             'float wf = pow( max( 0.0, rn.z ), uPPow ) + 0.02 * step( 0.0, rn.z ), wb = pow( max( 0.0, -rn.z ), uPPow ) + 0.02 * step( rn.z, 0.0 );',
             'float pS = uPPow * ( 1.0 + 3.0 * vUv.y ); float wr = pow( max( 0.0, -rn.x ), pS ) * sideK, wl = pow( max( 0.0, rn.x ), pS ) * sideK;',
+            CUT_GLSL,
             'vec2 uf = vec2( ( vRest.x - uWF.x ) / ( uWF.y - uWF.x ), ( vRest.y - uWF.z ) / ( uWF.w - uWF.z ) );',
             'vec2 ub = vec2( ( -vRest.x - uWB.x ) / ( uWB.y - uWB.x ), ( vRest.y - uWB.z ) / ( uWB.w - uWB.z ) );',
             'vec2 ur = vec2( ( vRest.z - uWR.x ) / ( uWR.y - uWR.x ), ( vRest.y - uWR.z ) / ( uWR.w - uWR.z ) );',
@@ -42,9 +44,19 @@
       return m;
     }
   };
+  // The corset's bottom edge. The old skin's trunk still carries the corset, and the corset comes down in a point at the front, lower than
+  // the top of the new trousers. So the old skin over his hips is not switched off whole: it is drawn down to the corset's painted edge
+  // and thrown away below it (uCorsetCut 1), pixel by pixel, and the new trousers show from there down. The edge is measured off the
+  // paintings (tools/trouser_measure.py): B1's front (a V, 1.00 m at the middle, 1.05 at the sides), B1's back (1.03 to 1.05) and B2's
+  // sides (1.08 at the side seam: B2 has it higher than B1). Each painting's edge is used where that painting is the one that shows.
+  // (Every painted-skin material carries the cut and most have it switched off: materials built by one function share one compiled program.)
+  const CORSET_CUT = { value: 1 };
+  const CUT_GLSL = [
+    'float cutF = 0.997 + 0.051 * pow( min( abs( vRest.x ) / 0.17, 1.0 ), 0.70 ), cutB = 1.027 + 0.020 * min( abs( vRest.x ) / 0.17, 1.0 ), cutS = 1.082 - 1.71 * ( vRest.z + 0.03 ) * ( vRest.z + 0.03 );',
+    'if ( uCorsetCut > 0.5 && vRest.y < ( cutF * wf + cutB * wb + cutS * ( wr + wl ) ) / ( wf + wb + wr + wl ) ) discard;'].join('\n');
   // the trunk, legs and boots take their sides from B2 (arms held out of the way); the arms take theirs from A3 (arms hanging)
   MATS.proj = mkProj('sideR', 'sideL'); MATS.projArm = mkProj('armR', 'armL'); MATS.projHair = mkProj('sideR', 'sideL'); MATS.projHair.side = THREE.DoubleSide; MATS.projRuffle = mkProj('armR', 'armL'); MATS.projRuffle.side = THREE.DoubleSide;
-  MATS.projTrunk = MATS.projLegs = MATS.projBoots = MATS.proj;      // one material, three meshes: each region of the old skin can be hidden by itself
+  MATS.projLegs = MATS.projBoots = MATS.proj; MATS.projTrunk = mkProj('sideR', 'sideL', true);      // one material, three meshes: each region of the old skin can be hidden by itself
   Object.assign(MATS, {
     // the head wears three pictures at once, mixed by which way the skin faces (N40_head.js): the front painting, the profile painting, a plain colour
     face: (() => {
@@ -73,14 +85,79 @@
     skin: sheen(std({ color: lin('#b9b2b6').multiply(lin(SKIN_C)), roughness: 0.70, envMapIntensity: 0.2, emissive: lin(SKIN_C), emissiveIntensity: 0.34 }), '#ffb49a', 3.2, 0.06),
     nail: phys({ color: lin('#e3c2b0'), transparent: true, opacity: 0.22, roughness: 0.3, clearcoat: 1, clearcoatRoughness: 0.2, depthWrite: false }),
     cloth: std({ color: lin('#1a1518'), roughness: 0.9 }),
-    // the doll's bare skin: plain and matte, lit like his face and hands. Its colour comes point by point (dollCol, N45_doll.js): the tone of his
-    // neck on the trunk, legs and upper arms, turning to the tone of his hands toward the wrists.
+    // The doll's skin: matte, lit like his face and hands. Its colour comes point by point (dollCol, N45_doll.js). From the hips down it
+    // also wears black fishnet tights, drawn here and not as a picture, so that the net stays sharp close up and never shimmers far off:
+    //   the net     two sets of slanting threads round each leg, NET_N diamonds round and NET_H metres tall. The paintings do not agree on
+    //               the size (tools/trouser_measure.py): in the holes of B1 a diamond is 1.3 to 1.5 cm wide and 2.1 tall; on the bare legs
+    //               of B5 it is 2.2 to 3.2 cm; in F8, by the scale of its cloth, 2.3 by 2.9. This net is B1's width, because B1 is the
+    //               painting the holes are compared with, and a little taller, toward the other two: about 1.5 cm wide round the knee
+    //               and calf (1.8 at the top of the thigh) and 2.4 tall. Each set is worked out as the share of the pixel that thread
+    //               covers (not as a hard line), so far away it fades evenly into a darker skin and never shimmers.
+    //               It is placed by where a point RESTS on the leg (dollLeg), so it follows the leg when he walks.
+    //   the top     above a line cut like briefs the tights are solid black, as B5's black shorts are; so is the foot, below the ankle
+    // A leg's net runs up its own side of his hips; the two sides meet on his centre line under the solid top.
     doll: (() => {
       const m = sheen(std({ color: lin('#b9b2b6'), vertexColors: true, roughness: 0.74, envMapIntensity: 0.2, emissive: lin('#ffffff'), emissiveIntensity: 0.34 }), '#ffb49a', 3.2, 0.06), first = m.onBeforeCompile;
-      m.onBeforeCompile = (sh) => { if (first) first(sh); sh.fragmentShader = sh.fragmentShader.replace('#include <emissivemap_fragment>', '#include <emissivemap_fragment>\n totalEmissiveRadiance *= vColor.rgb;'); };
+      m.extensions = { derivatives: true };
+      m.onBeforeCompile = (sh) => {
+        if (first) first(sh);
+        Object.assign(sh.uniforms, { uNetC: { value: lin('#19161a') }, uKnitC: { value: lin('#1b181c') }, uNetN: { value: NET_N }, uNetH: { value: NET_H }, uNetT: { value: NET_T } });
+        sh.vertexShader = sh.vertexShader.replace('#include <common>', '#include <common>\nattribute vec3 dollLeg; varying vec3 vLeg; varying vec3 vRest;')
+          .replace('#include <begin_vertex>', '#include <begin_vertex>\nvLeg = dollLeg; vRest = position;');
+        sh.fragmentShader = sh.fragmentShader.replace('#include <common>', ['#include <common>',
+          'uniform vec3 uNetC; uniform vec3 uKnitC; uniform float uNetN; uniform float uNetH; uniform float uNetT; varying vec3 vLeg; varying vec3 vRest; vec3 gDollC;',
+          '// threads d wide at every whole number of x: the share of a stretch w long, centred on x, that they cover',
+          'float netCover( float x, float w, float d ) { float a = x - 0.5 * w + 0.5 * d, b = x + 0.5 * w + 0.5 * d; return ( ( floor( b ) * d + min( fract( b ), d ) ) - ( floor( a ) * d + min( fract( a ), d ) ) ) / w; }'].join('\n'))
+          .replace('#include <color_fragment>', ['gDollC = vColor.rgb;',
+            '{',
+            '  float r = max( length( vLeg.xy ), 0.0005 ), onLeg = step( 0.5, vLeg.z );',
+            '  float hem = 0.925 + 0.075 * vLeg.x / r - 0.10 * ( 1.0 - smoothstep( 0.014, 0.050, abs( vRest.x ) ) );',
+            '  float fy = fwidth( vRest.y ) + 0.00002;',
+            '  float below = 1.0 - smoothstep( -fy, fy, vRest.y - hem ), foot = 1.0 - smoothstep( -fy, fy, vRest.y - 0.185 ), top = smoothstep( -fy, fy, vRest.y - 1.045 );',
+            '  float uN = atan( vLeg.y, vLeg.x ) / 6.2831853 * uNetN, vN = vRest.y / uNetH, kq = uNetN / ( 6.2831853 * r * r );',
+            '  vec2 gx = dFdx( vLeg.xy ), gy = dFdy( vLeg.xy );',
+            '  float ux = ( vLeg.x * gx.y - vLeg.y * gx.x ) * kq, uy = ( vLeg.x * gy.y - vLeg.y * gy.x ) * kq, vx = dFdx( vRest.y ) / uNetH, vy = dFdy( vRest.y ) / uNetH;',
+            '  float a = uN + vN, b = uN - vN, wa = abs( ux + vx ) + abs( uy + vy ) + 0.0001, wb = abs( ux - vx ) + abs( uy - vy ) + 0.0001;',
+            '  float d = clamp( uNetT * sqrt( uNetN * uNetN / ( 39.478418 * r * r ) + 1.0 / ( uNetH * uNetH ) ), 0.03, 0.45 );',
+            '  float ca = netCover( a, wa, d ), cb = netCover( b, wb, d ), net = 1.0 - ( 1.0 - ca ) * ( 1.0 - cb );',
+            '  float da = abs( fract( a + 0.5 ) - 0.5 ), db = abs( fract( b + 0.5 ) - 0.5 ), near = 1.0 - smoothstep( 0.25, 0.9, max( wa, wb ) );',
+            '  net = max( net, near * ( 1.0 - smoothstep( 1.25 * d - 0.7 * max( wa, wb ), 1.25 * d + 0.7 * max( wa, wb ), length( vec2( da, db ) ) ) ) );',
+            '  float sa = netCover( a - 0.6 * d, wa, min( 0.9, 3.2 * d ) ), sb = netCover( b + 0.6 * d, wb, min( 0.9, 3.2 * d ) ), shade = 1.0 - 0.17 * ( 1.0 - ( 1.0 - sa ) * ( 1.0 - sb ) );',
+            '  float cord = 0.82 + 0.36 * near * ( 0.5 + 0.5 * sin( 6.2831853 * 7.0 * ( ca > cb ? b : a ) ) );',
+            '  float solid = max( foot, ( 1.0 - below ) * ( 1.0 - top ) );',
+            '  gDollC = mix( gDollC, mix( gDollC * shade, uNetC * cord, net ), onLeg * below * ( 1.0 - foot ) );',
+            '  gDollC = mix( gDollC, uKnitC, onLeg * solid );',
+            '}',
+            'diffuseColor.rgb *= gDollC;'].join('\n'))
+          .replace('#include <emissivemap_fragment>', '#include <emissivemap_fragment>\n totalEmissiveRadiance *= gDollC;');
+      };
       return m;
     })()
   });
+
+  // His trousers (N46_trousers.js): the printed cloth, repeated, with the map of the holes over it. Lit the way the old painted skin is (most
+  // of what shows is the picture as painted), so they sit beside the painted corset and boots. Drawn from both sides: the inside is the
+  // same cloth, much darker and with the print showing through only faintly, which is what you see past the leg through a hole.
+  // Where the map says "no cloth" the pixel is thrown away (a hard cut). Nothing here is see-through, so nothing has to be sorted.
+  MATS.trousers = (() => {
+    const t = bakedTex('cloth', 512, 512, '#46222a'); t.wrapS = t.wrapT = THREE.RepeatWrapping; t.anisotropy = 8;
+    const TILE = (BAKED && BAKED.clothTile) || 0.115;
+    const m = sheen(std({ map: t, color: lin('#b9b2b6'), roughness: 0.86, envMapIntensity: 0.12, emissive: lin('#ffffff'), emissiveIntensity: 0.36, side: THREE.DoubleSide }), '#c9a6ae', 3, 0.04), first = m.onBeforeCompile;
+    m.onBeforeCompile = (sh) => {
+      if (first) first(sh);
+      Object.assign(sh.uniforms, { uMask: { value: TR_MASK }, uClothK: { value: new THREE.Vector2(2 * TR_PANEL / TILE, TR_PANEL / TILE) }, uFrayC: { value: lin('#141113') }, uThreadC: { value: lin('#4a4046') } });
+      sh.fragmentShader = sh.fragmentShader.replace('#include <common>', '#include <common>\nuniform sampler2D uMask; uniform vec2 uClothK; uniform vec3 uFrayC; uniform vec3 uThreadC; vec3 gCloth;')
+        .replace('#include <map_fragment>', [
+          'vec4 mk = texture2D( uMask, vUv );',
+          'if ( mk.b < 0.5 ) discard;',
+          'gCloth = mapTexelToLinear( texture2D( map, vUv * uClothK ) ).rgb;',
+          'gCloth = mix( gCloth, mix( uFrayC, uThreadC, mk.g ), mk.r * 0.92 );',
+          'if ( ! gl_FrontFacing ) gCloth = mix( gCloth, uFrayC, 0.40 ) * 0.50;',
+          'diffuseColor.rgb *= gCloth;'].join('\n'))
+        .replace('#include <emissivemap_fragment>', 'totalEmissiveRadiance *= gCloth;');
+    };
+    return m;
+  })();
 
   // ---------- bind: one skinned mesh per material ----------
   const root = new THREE.Group(); root.name = 'noiz';
@@ -95,11 +172,12 @@
     g.setAttribute('uv', new THREE.Float32BufferAttribute(B.uv, 2));
     g.setAttribute('skinIndex', new THREE.Uint16BufferAttribute(B.si, 4));
     g.setAttribute('skinWeight', new THREE.Float32BufferAttribute(B.sw, 4));
-    if (key === 'doll') g.setAttribute('color', new THREE.Float32BufferAttribute(dollCol, 3));
+    if (key === 'doll') { g.setAttribute('color', new THREE.Float32BufferAttribute(dollCol, 3)); g.setAttribute('dollLeg', new THREE.Float32BufferAttribute(dollLeg, 3)); }
     if (key === 'face') { g.setAttribute('faceMix', new THREE.Float32BufferAttribute(faceMix, 4)); g.setAttribute('uvSide', new THREE.Float32BufferAttribute(faceUvS, 2)); }
     g.setIndex(B.n > 65535 ? new THREE.Uint32BufferAttribute(B.idx, 1) : new THREE.Uint16BufferAttribute(B.idx, 1));
     const m = new THREE.SkinnedMesh(g, MATS[key] || MATS.cloth);
     m.name = key; m.castShadow = !/^(nail|lens)$/.test(key); m.receiveShadow = true; m.frustumCulled = false; m.userData.painted = m.material;
+    if (key === 'trousers') m.customDepthMaterial = new THREE.MeshDepthMaterial({ depthPacking: THREE.RGBADepthPacking, skinning: true, alphaMap: TR_MASK_G, alphaTest: 0.5, side: THREE.DoubleSide });      // its shadow has the same holes
     root.add(m); m.bind(skeleton, new THREE.Matrix4()); meshes[key] = m; triCount += B.idx.length / 3;
   }
 
@@ -155,8 +233,18 @@
   }
   // the blank doll: every part in one plain clay colour, so his shape can be judged without his paintings on it
   const CLAY = std({ color: lin('#b7a797'), roughness: 0.92, envMapIntensity: 0.15 }), CLAY2 = std({ color: lin('#b7a797'), roughness: 0.92, envMapIntensity: 0.15, side: THREE.DoubleSide });
+  // the blank doll's clay for the old skin's trunk: the same clay, ending at the corset's edge as the painted one does
+  const CLAY_CUT = std({ color: lin('#b7a797'), roughness: 0.92, envMapIntensity: 0.15 });
+  CLAY_CUT.onBeforeCompile = (sh) => {
+    sh.uniforms.uCorsetCut = CORSET_CUT;
+    sh.vertexShader = sh.vertexShader.replace('#include <common>', '#include <common>\nvarying vec3 vRest; varying vec3 vRestN;').replace('#include <begin_vertex>', '#include <begin_vertex>\nvRest = position; vRestN = normal;');
+    sh.fragmentShader = sh.fragmentShader.replace('#include <common>', '#include <common>\nuniform float uCorsetCut; varying vec3 vRest; varying vec3 vRestN;')
+      .replace('#include <map_fragment>', ['vec3 rn = normalize( vRestN );', 'float wf = pow( max( 0.0, rn.z ), 5.0 ) + 0.02 * step( 0.0, rn.z ), wb = pow( max( 0.0, -rn.z ), 5.0 ) + 0.02 * step( rn.z, 0.0 ), wr = pow( max( 0.0, -rn.x ), 5.0 ), wl = pow( max( 0.0, rn.x ), 5.0 );', CUT_GLSL].join('\n'));
+  };
+  // and for the trousers: clay seen from both sides, with the same holes cut in it
+  const CLAY_T = std({ color: lin('#b7a797'), roughness: 0.92, envMapIntensity: 0.15, side: THREE.DoubleSide, alphaMap: TR_MASK_G, alphaTest: 0.5 });
   let blank = false;
-  function setBlank(on) { blank = !!on; for (const k in meshes) { const m = meshes[k]; m.material = !blank ? m.userData.painted : /^(projHair|projRuffle)$/.test(k) ? CLAY2 : /^(lens|nail)$/.test(k) ? m.userData.painted : CLAY; if (k === 'lens' || k === 'nail') m.visible = !blank; } return blank; }
+  function setBlank(on) { blank = !!on; for (const k in meshes) { const m = meshes[k]; m.material = !blank ? m.userData.painted : k === 'trousers' ? CLAY_T : /^(projHair|projRuffle)$/.test(k) ? CLAY2 : /^(lens|nail)$/.test(k) ? m.userData.painted : /^(projTrunk|projHips)$/.test(k) ? CLAY_CUT : CLAY; if (k === 'lens' || k === 'nail') m.visible = !blank; } return blank; }
   // ---------- the doll and the old skin ----------
   // The old skin is his clothes as one smooth shape with the paintings laid on. It is being replaced, a region at a time, by real garments
   // over the doll (N45_doll.js). Both are cut into the same regions here, so that a region of the old skin can be switched off and the same
@@ -190,16 +278,25 @@
   const OLD = { trunk: 'projTrunk', hips: 'projHips', legs: 'projLegs', boots: 'projBoots', arms: 'projArm', ruffles: 'projRuffle' }, UNDER = { dollTrunk: 'trunk', dollHips: 'hips', dollLegs: 'legs', dollArms: 'arms' };
   const oldOn = { trunk: true, hips: true, legs: true, boots: true, arms: true, ruffles: true };
   let doll = false;
-  function showSkins() { for (const k in OLD) meshes[OLD[k]].visible = !doll && oldOn[k]; for (const k in UNDER) meshes[k].visible = doll || !oldOn[UNDER[k]]; }
+  // Stage 2: he now wears the new trousers (N46_trousers.js) over the doll's hips and legs, in place of the old skin's hips and legs.
+  // The trousers are drawn whenever the old leg skin is off and he is not stripped to the doll. setOldTrousers(true) puts the old leg
+  // skin back, for comparing ("Old trousers" on the page).
+  // With the new trousers on, the old skin over his hips is still drawn, but only down to the corset's bottom edge (CORSET_CUT, above).
+  function showSkins() {
+    for (const k in OLD) meshes[OLD[k]].visible = !doll && oldOn[k]; for (const k in UNDER) meshes[k].visible = doll || !oldOn[UNDER[k]];
+    const newT = !doll && !oldOn.legs; meshes.trousers.visible = newT; CORSET_CUT.value = newT && !oldOn.hips ? 1 : 0;
+    if (newT && !oldOn.hips && oldOn.trunk) meshes.projHips.visible = true;
+  }
   function setDoll(on) { doll = !!on; showSkins(); return doll; }
   function setOldSkin(o) { for (const k in (o || {})) if (k in OLD) oldOn[k] = !!o[k]; showSkins(); return Object.assign({}, oldOn); }
-  showSkins();
+  function setOldTrousers(on) { setOldSkin({ legs: !!on, hips: !!on }); return oldOn.legs; }
+  setOldSkin({ legs: false, hips: false });
   // Every list a mesh carries must be as long as its list of points. A real graphics chip refuses to draw a mesh with a short list, so the
   // whole mesh vanishes (his face did, November 13), while the software renderer the tools here use draws it anyway. So it is caught here.
   for (const k in meshes) { const g = meshes[k].geometry, n = g.attributes.position.count; for (const a in g.attributes) if (g.attributes[a].count !== n) throw new Error('mesh "' + k + '": ' + a + ' has ' + g.attributes[a].count + ' entries for ' + n + ' points'); }
   // and no triangle may name a point that is not there (the cut meshes above share their lists of points, so this is checked too)
   for (const k in meshes) { const g = meshes[k].geometry, n = g.attributes.position.count, ix = g.index.array; if (ix.length % 3) throw new Error('mesh "' + k + '": its list of triangles is not a multiple of three'); for (let i = 0; i < ix.length; i++) if (ix[i] >= n) throw new Error('mesh "' + k + '": a triangle names point ' + ix[i] + ' of ' + n); }
-  const api = { root, fx, skeleton, bones, SK, animate, pose, play, moves: MOVES, meshes, dust: DUST, setBlank, get blank() { return blank; }, setDoll, get doll() { return doll; }, setOldSkin, get oldSkin() { return Object.assign({}, oldOn); }, walkOnSpot: true, walkSpeed: WALK_SPEED, name: 'Noiz', debug: { SK, meshes, trunkPt, legPt, bootPt, headPoint, hairPt, armAt, doll: DOLL }, get triangles() { return triCount; } };
+  const api = { root, fx, skeleton, bones, SK, animate, pose, play, moves: MOVES, meshes, dust: DUST, setBlank, get blank() { return blank; }, setDoll, get doll() { return doll; }, setOldSkin, get oldSkin() { return Object.assign({}, oldOn); }, setOldTrousers, get oldTrousers() { return oldOn.legs; }, walkOnSpot: true, walkSpeed: WALK_SPEED, name: 'Noiz', debug: { SK, meshes, trunkPt, legPt, bootPt, headPoint, hairPt, armAt, doll: DOLL, trousers: TROUSERS, holes: TR_HOLES }, get triangles() { return triCount; } };
   pose(lastPose);
   return api;
 }

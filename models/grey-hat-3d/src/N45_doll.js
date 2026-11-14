@@ -283,17 +283,60 @@
       if ((uy * vz - uz * vy) * mx + (uz * vx - ux * vz) * my + (ux * vy - uy * vx) * mz < 0) { const t = b; b = d; d = t; }
       if (d2(a, c) <= d2(b, d)) { tri(a, b, c); tri(a, c, d); } else { tri(a, b, d); tri(b, c, d); }
     }
-    return { F, h, pos, nor, src, uv, idx, reg, wB, tone, fTrunk, fNeck, fLeg, fArm, tables: { trunk: D_TRUNK, neck: D_NECK, leg: D_LEG, arm: D_ARM, foot: D_FOOT } };
+    // wAt(x, y, z): the bone weights the doll's skin would have at any point near it, worked out exactly as in the loop above. The trousers
+    // use it (N46_trousers.js), so cloth next to skin moves as that skin does and the doll cannot come through it.
+    const wAt = (x, y, z) => {
+      const s = x < 0 ? -1 : 1, S = s < 0 ? 'R' : 'L';
+      const ft = fTrunk(x, y, z), fn = fNeck(x, y, z), fa = y > 0.85 ? fArm(s, x, y, z) : FAR, sl = AR.sl, fl = fLeg(s, x, y, z), fo = fLeg(-s, x, y, z), m0 = Math.min(ft, fn, fa, fl, fo);
+      const acc = new Map(), put = (w, m) => { for (let i = 0; i < w.length; i += 2) if (w[i + 1] * m > 1e-4) acc.set(w[i], (acc.get(w[i]) || 0) + w[i + 1] * m); };
+      const mt = Math.exp(-(ft - m0) / KW), mn = Math.exp(-(fn - m0) / KW), ma = Math.exp(-(fa - m0) / KW), ml = Math.exp(-(fl - m0) / KW), mo = Math.exp(-(fo - m0) / KW);
+      if (mt > 1e-3) put(wTrunkD(x, y, z), mt);
+      if (mn > 1e-3) put(wNeckD(y), mn);
+      if (ma > 1e-3) put(wArm(S, sl), ma);
+      if (ml > 1e-3) put(wLegD(S, x, y, z), ml);
+      if (mo > 1e-3) put(wLegD(s < 0 ? 'L' : 'R', x, y, z), mo);
+      const ws = [...acc.entries()].sort((p, q) => q[1] - p[1]).slice(0, 4), flat = []; for (const [b, w] of ws) flat.push(b, w);
+      return flat;
+    };
+    // legAt(y): the middle line of a leg at that height and its half sizes, [out from his centre line, front to back, half width, half depth] (for the paint on the legs and for the trousers)
+    const legAt = (y) => { look(TL, y); return [TL.v[0], TL.v[1], TL.v[2], TL.v[3]]; };
+    return { F, h, pos, nor, src, uv, idx, reg, wB, tone, part, legAt, wAt, fTrunk, fNeck, fLeg, fArm, tables: { trunk: D_TRUNK, neck: D_NECK, leg: D_LEG, arm: D_ARM, foot: D_FOOT } };
   })();
-  // his skin tone runs from the tone of his neck (trunk, legs, upper arms) to the tone of his hands (at the wrists), so neither join shows as a change of colour
-  const dollCol = [];
+  // ---------- the doll's paint ----------
+  // Skin. Stage 1 gave the whole doll the tone of his neck, which B1 paints in the shadow of his beard: darker and more orange than the
+  // rest of him. The body now has its own tone (DOLL_SKIN), set so that in a test picture his chest comes out between his painted face
+  // and his hands (tools/trouser_check.py prints the three). It still runs into the tone of his neck at the foot of the neck and into the
+  // tone of his hands at the wrists, so neither join shows as a change of colour.
+  // Legs. Chris (stage 2): "the pants are going to have actual holes should the skin of the doll be painted before putting clothes over
+  // it". Yes: from the hips down the doll wears painted shading (legShade, below: knee, shin, calf, the hollow behind the knee) and black
+  // fishnet tights, which the doll's material draws (N99_static.js) from where each point sits round its leg (dollLeg, below).
+  const DOLL_SKIN = '#b9735c';
+  const dollCol = [], dollLeg = [];                   // dollLeg, three numbers a point: out from the leg's middle line, forward of it, and 1 on the trunk and legs / 0 on the arms
+  const gauss = (v, w) => Math.exp(-v * v / (w * w));
+  // painted light and dark on a leg, as B5 has it: [brightness, redness] at an angle round the leg (0 outside, a quarter turn the front) and a height
+  const legShade = (ang, y) => {
+    const fr = Math.max(0, Math.sin(ang)), bk = Math.max(0, -Math.sin(ang)), inn = Math.max(0, -Math.cos(ang)), si = Math.abs(Math.cos(ang));
+    let m = 1, r = 0;
+    m += 0.055 * fr * fr * gauss(y - 0.548, 0.026) - 0.075 * fr * gauss(y - 0.497, 0.020) - 0.045 * si * fr * gauss(y - 0.545, 0.035);      // the kneecap, the dip under it, the hollows either side
+    m += 0.050 * Math.pow(fr, 3) * sm(0.50, 0.44, y) * sm(0.20, 0.27, y);                                                                // the shin bone
+    m += -0.085 * bk * bk * gauss(y - 0.535, 0.030) + 0.035 * bk * bk * gauss(y - 0.425, 0.050) - 0.050 * bk * si * 2 * gauss(y - 0.345, 0.035);      // the hollow behind the knee, the calf, where the calf ends
+    m += 0.030 * fr * fr * sm(0.60, 0.68, y) * sm(0.86, 0.78, y) - 0.055 * inn * inn * sm(0.58, 0.72, y) - 0.035 * fr * (1 - si) * gauss(y - 0.615, 0.022);      // the front of the thigh, the inner thigh, the crease above the knee
+    m += -0.06 * sm(0.25, 0.16, y);                                                                                                       // the ankle
+    r += 0.9 * fr * gauss(y - 0.535, 0.045) + 0.5 * sm(0.24, 0.16, y) + 0.35 * inn * sm(0.60, 0.75, y);                                    // knees and ankles are a little redder
+    return [m, r];
+  };
   (function buildDoll() {
     const G = DOLL, n = G.src.length, pos = new Array(n * 3), nor = new Float32Array(n * 3), wts = new Array(n);
-    const cN = lin((BAKED && BAKED.skinNeck) || '#c5815e'), cH = lin((BAKED && BAKED.skinHand) || SKIN || '#c07a54');
+    const cN = lin((BAKED && BAKED.skinNeck) || '#c5815e'), cH = lin((BAKED && BAKED.skinHand) || SKIN || '#c07a54'), cB = lin(DOLL_SKIN);
     for (let i = 0; i < n; i++) {
-      const v = G.src[i], t = G.tone[v];
-      pos[i * 3] = G.pos[v * 3]; pos[i * 3 + 1] = G.pos[v * 3 + 1]; pos[i * 3 + 2] = G.pos[v * 3 + 2]; nor[i * 3] = G.nor[v * 3]; nor[i * 3 + 1] = G.nor[v * 3 + 1]; nor[i * 3 + 2] = G.nor[v * 3 + 2];
-      wts[i] = G.wB[v]; dollCol.push(lerp(cN.r, cH.r, t), lerp(cN.g, cH.g, t), lerp(cN.b, cH.b, t));
+      const v = G.src[i], t = G.tone[v], x = G.pos[v * 3], y = G.pos[v * 3 + 1], z = G.pos[v * 3 + 2], s = x < 0 ? -1 : 1;
+      pos[i * 3] = x; pos[i * 3 + 1] = y; pos[i * 3 + 2] = z; nor[i * 3] = G.nor[v * 3]; nor[i * 3 + 1] = G.nor[v * 3 + 1]; nor[i * 3 + 2] = G.nor[v * 3 + 2];
+      wts[i] = G.wB[v];
+      const nk = sm(1.40, 1.47, y) * (1 - sm(0.07, 0.14, Math.abs(x)));                     // toward the tone of his neck, round its foot
+      let r = lerp(lerp(cB.r, cN.r, nk), cH.r, t), g = lerp(lerp(cB.g, cN.g, nk), cH.g, t), b = lerp(lerp(cB.b, cN.b, nk), cH.b, t);
+      const L = G.legAt(y), dx = s * x - L[0], dz = z - L[1], leg = G.part[v] < 3 ? 1 : 0;
+      if (leg && y < 1.0) { const sh = legShade(Math.atan2(dz, dx), y), k = sm(1.0, 0.90, y); r *= 1 + k * (sh[0] - 1 + 0.020 * sh[1]); g *= 1 + k * (sh[0] - 1 - 0.035 * sh[1]); b *= 1 + k * (sh[0] - 1 - 0.030 * sh[1]); }
+      dollCol.push(r, g, b); dollLeg.push(dx, dz, leg);
     }
     addPart('doll', { pos, uv: G.uv, idx: G.idx }, (x, y, z, i) => wts[i], { nor });
   })();

@@ -10,6 +10,40 @@ something or just talks to them", and he gets his own folder because he is a cha
   Project docs `claude/HOW-TO-3d-witch-models.md` and `claude/HOW-TO-3d-witch-faces.md`. Read both before writing any code.
 - Project note for this folder: `claude/grey-hat-3d-reference-prompts.md`.
 
+## Stage 2 of the rebuild: painted legs and real trousers (November 14, 2026)
+
+Chris: "the pants are going to have actual holes should the skin of the doll be painted before putting clothes over it". Yes.
+**Stage 2 is built. Nothing is published yet.** Report: `/home/claude/builder/stage2_report.md`.
+
+- **What he wears by default now:** old trunk, arms, ruffles and boots as before; **new trousers** (`trousers`) over the doll's
+  hips and legs (`dollHips`, `dollLegs`), in place of the old `projLegs` skin. The old `projHips` skin is still drawn, but only
+  down to the corset's painted bottom edge: below that edge its pixels are thrown away (`CORSET_CUT` in `src/N99_static.js`),
+  because the corset comes down in a point lower than the top of the trousers.
+- **The doll's paint** (`src/N45_doll.js`, and the `doll` material in `src/N99_static.js`): the body's skin tone is now its own
+  colour, `DOLL_SKIN`, less orange than stage 1's (which used the tone of his neck). From the hips down: painted shading
+  (`legShade`) and black fishnet tights. The net is drawn by the material from where each point rests on its leg (`dollLeg`),
+  so it follows the leg, is sharp close up and fades evenly far away. Solid black above a briefs line and below the ankle.
+- **The trousers** are `src/N46_trousers.js`: 31,660 triangles, one cloth, two legs joined on his centre line. The outline is the
+  old skin's (measured off B1 and B2), drawn in under the corset from 0.96 m up, with gathers at hem and waist, soft folds, and
+  a hem that pouches over the boot's rim. Bone weights are the doll's own (`debug.doll.wAt`), so cloth follows the skin under it.
+- **The holes are real.** Eleven (six on his left leg, five on his right), each placed from B1 and B2 (`TR_SEEN`). One picture
+  (`TR_MASK`, drawn in code) says where there is cloth; the material throws away the pixels where there is none (a hard cut, no
+  blending), and paints the frayed edge and loose threads from the same picture. The inside of the cloth is drawn darker. His
+  shadow and the "Blank doll" clay have the same holes. Down the strip of holes the cloth hangs in toward the leg (`slackAt`).
+- **The cloth** is one repeating square taken from F8 by `bake_cloth.py` (11.5 cm a repeat), recoloured to B1's tones. It is laid
+  on by distance round the leg and height, so it is not smeared at the sides. `out/tex_cloth.json` is not committed: run
+  `python3 -I bake_cloth.py` before `./build.sh`.
+- **Switches:** `api.setOldTrousers(true)` puts the old leg skin back (`api.oldTrousers` reads it); on the page, "Old trousers"
+  in the "Show" row. "Doll" takes the trousers off too. "Blank doll" works in every state. New view: "Close on the holes".
+- **Checks:** `python3 -I tools/trouser_measure.py` (holes, net and cloth off the paintings), `python3 tools/trouser_cmp.py out.jpg
+  front` (model beside the painting at one scale with a grid; also `back`, `sideL`, `sideR`), `python3 tools/trouser_walk.py folder`
+  (walk, idle and talk stills, and a count of doll showing through cloth: 0 everywhere), `python3 tools/trouser_check.py` (skin tones).
+- **Decided here, not by Chris:** where each hole sits (B1 and B2 cannot both be right: see the report); the size of the net
+  (the paintings disagree; this is B1's width); solid black briefs at the top of the tights (as B5); 11.5 cm for the cloth's repeat.
+- **Rough:** from straight to the side the holes are thin slivers at the front edge, not the open ovals of B2. The cloth has no
+  thickness and does not swing. Folds are few and soft. The hem's pouch is plain. Motion was checked as stills only.
+- `src_before_trousers/` is the source as it was before this stage.
+
 ## Stage 1 of the rebuild: the blank doll under his clothes (November 13, 2026)
 
 Chris, on the build with one clothes-shaped skin: "his ear is printed on his hair and his legs are printed on the surface of his
@@ -127,6 +161,7 @@ python3 -I build_single.py                     # deliver/Noiz_3D_stage1.html: pu
 | `references/grey-hat-3d-reference-prompts.md` | Every prompt, the standing rules, the checklist, and what was guessed from the picture. |
 | `references/build_prompts.py`, `page.tpl.html` | Build the prompt list, the page, the starters and the zip. All the words live in `build_prompts.py`. |
 | `references/chatgpt/` | The kept paintings, as webp, named by code: rounds 1 and 2 (A1 to G3). |
+| `src/N46_trousers.js`, `bake_cloth.py`, `tools/trouser_measure.py`, `tools/trouser_cmp.py`, `tools/trouser_walk.py`, `tools/trouser_check.py` | His trousers with real holes, the cloth's repeating square, and the tools that measure and check them and the painted legs (stage 2 of the rebuild, above). |
 | `src/N45_doll.js`, `tools/doll_measure.py`, `tools/doll_check.py`, `tools/doll_cmp.py` | The blank doll under his clothes, and the tools that measure and check it (stage 1 of the rebuild, above). |
 | `src/`, `tools/`, `bake_*.py`, `build.sh`, `shoot.py`, `viewer_n/`, `viewer/stage.js` | The model, its measuring and baking tools, and his page. `00_util`, `10_geom`, `N20_tex`, `32_hands` and `stage.js` come from the Ranger's folder. |
 

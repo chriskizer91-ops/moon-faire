@@ -114,6 +114,7 @@ while not done and tot['turns'] < MAX_TURNS:
         a = b['input']; brief_a = (a.get('command') or a.get('path') or '')[:160].replace('\n', ' ')
         log(f"[{tot['turns']}] {b['name']} {brief_a}  -> {(out if isinstance(out, str) else out[0]['text'])[:140]!r}")
         res.append({'type': 'tool_result', 'tool_use_id': b['id'], 'content': out})
+    if tot['turns'] == MAX_TURNS - 18: res.append({'type': 'text', 'text': 'Note from the supervisor: you have 18 steps left. Stop improving now. Run the closing checks, write the report, and call finish.'})
     msgs.append({'role': 'user', 'content': res})
     json.dump(tot, open(STATUS, 'w')); json.dump({'msgs': msgs, 'tot': tot}, open(SAVE, 'w'))
 if tot['state'] == 'running': tot['state'] = 'finished' if done else 'stopped at the turn limit'

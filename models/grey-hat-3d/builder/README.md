@@ -17,3 +17,4 @@ Things learned running it:
   request. `agent.py` does this.
 - Give it a turn limit with room: stage 1 took 176 turns. Tell it early to save its last 15 for the checks and the report.
 - Stage 1 used about 282,000 output tokens, 24.0 million cached-read tokens and 1.0 million cache-write tokens.
+- Stage 2 (painted legs, real trousers): 128 turns, about 243,000 output tokens, 16.5 million cached-read tokens, 0.6 million cache-write tokens. The builder is now warned when 18 steps are left.
