@@ -94,7 +94,7 @@
   // They are her poses and emotes, not her attacks. They are also the test of her hair and skirt: every frame the bones go back to
   // rest, the move is laid on top (restAll, add), her feet and hands are brought to where they should be (ik2, aimHand, flatFoot),
   // and then the soft chains of her hair and skirt are stepped (softTick).
-  const _inv = new THREE.Matrix4(), _m4 = new THREE.Matrix4(), _mb = new THREE.Matrix4(), _p = V3(), _c = V3(), _t = V3(), _t2 = V3(), _n = V3(), _d = V3(), _e = V3();
+  const _inv = new THREE.Matrix4(), _m4 = new THREE.Matrix4(), _mb = new THREE.Matrix4(), _p = V3(), _c = V3(), _t = V3(), _t2 = V3(), _n = V3(), _d = V3(), _e = V3(), _s = V3();
   const _qa = new THREE.Quaternion(), _qb = new THREE.Quaternion(), _qc = new THREE.Quaternion(), AX = V3(1, 0, 0), AY = V3(0, 1, 0);
   const BODY = Object.keys(SK).filter((k) => !/_\d+$/.test(k));               // every bone but the soft chains
   const add = (b, x, y, z) => { const r = SK[b].rotation; r.x += x; r.y += y; r.z += z; };
@@ -103,7 +103,7 @@
   const rootQuat = (bone, out) => out.setFromRotationMatrix(_m4.multiplyMatrices(_inv, bone.matrixWorld));       // a bone's turn, in her own space
   const carried = (bone, x, y, z, out) => (out || V3()).set(x, y, z).sub(SK[bone].userData.rest).applyMatrix4(SK[bone].matrixWorld).applyMatrix4(_inv);   // a point of her rest pose, where its bone has carried it
 
-  // ----- balls her hair ('h') and her skirt ('s') cannot pass into, each carried by a bone -----
+  // ----- balls her hair ('h') and her skirt ('s') cannot pass into, each carried by a bone ('hs': both) -----
   const COL = [];
   const ball = (bone, x, y, z, r, g) => COL.push({ bone: SK[bone], off: V3(x, y, z).sub(SK[bone].userData.rest), rest: V3(x, y, z), r, g, p: V3() });
   ball('neck', 0, 1.385, -0.022, 0.050, 'h'); ball('spine3', 0, 1.300, -0.030, 0.078, 'h'); ball('spine3', -0.058, 1.245, 0.002, 0.086, 'h'); ball('spine3', 0.058, 1.245, 0.002, 0.086, 'h');
@@ -112,8 +112,33 @@
     const sh = restPts['sh' + S], d = armDir[S];
     [['uarm', 0, 0.048], ['uarm', 0.08, 0.043], ['uarm', 0.16, 0.039], ['farm', 0.232, 0.037], ['farm', 0.30, 0.035], ['farm', 0.37, 0.030], ['hand', 0.484, 0.033], ['hand', 0.544, 0.026]].forEach(([b, sl, r]) => { const p = sh.clone().addScaledVector(d, sl); ball(b + S, p.x, p.y, p.z, r, 'hs'); });
     const hip = SK['thigh' + S].userData.rest, kn = SK['shin' + S].userData.rest, an = SK['foot' + S].userData.rest, T = (a, b, t) => a.clone().lerp(b, t);
-    [['thigh', T(hip, kn, 0.06), 0.094], ['thigh', T(hip, kn, 0.18), 0.092], ['thigh', T(hip, kn, 0.31), 0.086], ['thigh', T(hip, kn, 0.46), 0.078], ['thigh', T(hip, kn, 0.64), 0.071], ['thigh', T(hip, kn, 0.82), 0.065], ['shin', kn.clone(), 0.063], ['shin', T(kn, an, 0.22), 0.058], ['shin', T(kn, an, 0.45), 0.055], ['shin', T(kn, an, 0.70), 0.049], ['foot', V3(an.x, 0.08, 0.0), 0.055], ['foot', V3(an.x, 0.05, 0.07), 0.050]].forEach(([b, p, r]) => ball(b + S, p.x, p.y, p.z, r, 's'));
+    [['thigh', T(hip, kn, 0.06), 0.094], ['thigh', T(hip, kn, 0.18), 0.092], ['thigh', T(hip, kn, 0.31), 0.086], ['thigh', T(hip, kn, 0.46), 0.078], ['thigh', T(hip, kn, 0.64), 0.071], ['thigh', T(hip, kn, 0.82), 0.065], ['shin', kn.clone(), 0.063], ['shin', T(kn, an, 0.22), 0.058], ['shin', T(kn, an, 0.45), 0.055], ['shin', T(kn, an, 0.70), 0.049], ['foot', V3(an.x, 0.08, 0.0), 0.055], ['foot', V3(an.x, 0.05, 0.07), 0.050]].forEach(([b, p, r]) => ball(b + S, p.x, p.y, p.z, r, 'g'));       // 'g': her legs, for the things on her belt and her sleeve points; her skirt uses LEGCAP below
   }
+  // ----- her legs as six tapered tubes, for her skirt and her cloak (stage nine) -----
+  // Chris, November 13: "the legs pass through the clothes a lot". Her legs were rows of balls, and only the joints of the skirt's
+  // chains were kept out of them: a thigh could pass between two balls, between two joints, or between two chains. Now each leg is
+  // three tubes with no gaps; every stretch of chain is tested at its end and at two points along it; and the same six tubes are
+  // given to the cloth's own drawing (legPush), which moves any point of cloth that is still inside a leg straight out of it.
+  // A point is never pushed further from a leg than it lies when she stands, so standing she looks as she did.
+  const LEGCAP = [];
+  for (const [S] of SIDES) { const hip = SK['thigh' + S].userData.rest, kn = SK['shin' + S].userData.rest, an = SK['foot' + S].userData.rest;
+    for (const [b, A0, B0, r0, r1] of [['thigh', hip.clone(), kn.clone(), 0.098, 0.070], ['shin', kn.clone(), an.clone(), 0.072, 0.070], ['foot', V3(an.x, 0.072, an.z - 0.008), V3(an.x, 0.052, 0.112), 0.070, 0.058]])
+      LEGCAP.push({ bone: SK[b + S], A0, B0, r0, r1, offA: A0.clone().sub(SK[b + S].userData.rest), offB: B0.clone().sub(SK[b + S].userData.rest), A: A0.clone(), B: B0.clone() }); }
+  const capRest = (c, pt) => { const ab = c.B0.clone().sub(c.A0), t = cl(pt.clone().sub(c.A0).dot(ab) / ab.lengthSq(), 0, 1); return pt.distanceTo(c.A0.clone().addScaledVector(ab, t)); };       // how far a point of her rest pose lies from a tube
+  const CAPF = [1, 0.66, 0.33], CAPN = 6, HIP = V3(), LEGS = []; LEGCAP.forEach((c, ci) => { for (let k = 0; k < CAPN; k++) LEGS.push({ c, ci, t: k / (CAPN - 1), r: lerp(c.r0, c.r1, k / (CAPN - 1)), p: V3() }); });
+  const LEGU = { uCapA: { value: LEGCAP.map((c) => c.A) }, uCapB: { value: LEGCAP.map((c) => c.B) }, uCapA0: { value: LEGCAP.map((c) => c.A0) }, uCapB0: { value: LEGCAP.map((c) => c.B0) }, uCapR: { value: LEGCAP.map((c) => new THREE.Vector2(c.r0, c.r1)) }, uHip: { value: HIP } };
+  // legPush: each layer keeps a little further off her leg than the one under it, so they do not flicker where they are pressed together
+  const LEGPAD = { band: 0.004, tulle: 0.007, skirt: 0.010, robe: 0.015, moss: 0.017, fern: 0.017 };
+  // Her sleeves do not go round her legs, they only meet them (a hand on a knee). A sleeve point inside a leg, or just under one, is
+  // lifted onto it if the leg lies level (a raised thigh), so a sleeve lies on her lap; out of a leg that stands it is moved straight out.
+  for (const key in LEGPAD) { const mesh = meshes[key]; if (!mesh) continue; const g = mesh.geometry, si = g.attributes.skinIndex.array, sw = g.attributes.skinWeight.array, n = g.attributes.position.count, mode = new Float32Array(n);
+    for (let i = 0; i < n; i++) for (let q = 0; q < 4; q++) if (sw[i * 4 + q] > 0.2 && /^(sl[RL]\d_|svt|uarm|farm|hand|clav)/.test(bones[si[i * 4 + q]].name)) mode[i] = 1;
+    g.setAttribute('capMode', new THREE.Float32BufferAttribute(mode, 1)); }
+  for (const key in LEGPAD) { const pad = LEGPAD[key], m = MATS[key]; if (!m) continue; const first = m.onBeforeCompile;
+    m.onBeforeCompile = (sh) => { if (first) first(sh); Object.assign(sh.uniforms, LEGU); sh.uniforms.uCapPad = { value: pad };
+      sh.vertexShader = sh.vertexShader.replace('#include <common>', '#include <common>\nattribute float capMode; uniform vec3 uCapA[6]; uniform vec3 uCapB[6]; uniform vec3 uCapA0[6]; uniform vec3 uCapB0[6]; uniform vec2 uCapR[6]; uniform float uCapPad; uniform vec3 uHip;')
+        .replace('#include <skinning_vertex>', '#include <skinning_vertex>\n#ifdef USE_SKINNING\n{ vec2 hd = transformed.xz - uHip.xz; vec3 rho = vec3(hd.x, 0.0, hd.y) / max(length(hd), 1e-4); float sOut = 0.0; float sUp = 0.0; float sLev = 0.0; vec3 rad = vec3(0.0);\nfor (int ci = 0; ci < 6; ci++) {\n vec3 abp = uCapB[ci] - uCapA[ci]; float lev = step(abs(abp.y), 0.6 * length(abp)); vec3 ab0 = uCapB0[ci] - uCapA0[ci]; float d0 = distance(position, uCapA0[ci] + ab0 * clamp(dot(position - uCapA0[ci], ab0) / dot(ab0, ab0), 0.0, 1.0));\n if (capMode > 0.5) { vec3 ab = uCapB[ci] - uCapA[ci]; float tc = clamp(dot(transformed - uCapA[ci], ab) / dot(ab, ab), 0.0, 1.0); vec3 rv = transformed - (uCapA[ci] + ab * tc); float dd = length(rv); float RR = min(mix(uCapR[ci].x, uCapR[ci].y, tc) + uCapPad, d0 - 0.002); if (dd < RR) rad += rv * ((RR - dd) / max(dd, 1e-5)); }\n for (int k = 0; k < 6; k++) { float tk = float(k) / 5.0; float RR = min(mix(uCapR[ci].x, uCapR[ci].y, tk) + uCapPad, d0 - 0.002); if (RR > 0.0) { vec3 v = transformed - mix(uCapA[ci], uCapB[ci], tk); float cc = dot(v, v) - RR * RR; float b1 = dot(v, rho); float q1 = b1 * b1 - cc; if (q1 > 0.0) sOut = max(sOut, sqrt(q1) - b1); float q2 = v.y * v.y - cc; if (q2 > 0.0) { sUp = max(sUp, sqrt(q2) - v.y); sLev = max(sLev, lev * (sqrt(q2) - v.y)); } } }\n}\nif (capMode > 0.5) { if (sLev > 0.0 && sLev < 0.30) transformed.y += sLev; else transformed += rad; }\nelse if (sOut > 0.0 && sUp > 0.0) { if (sUp < sOut) transformed.y += sUp; else transformed += rho * sOut; } }\n#endif'); };
+    m.customProgramCacheKey = () => 'legPush' + (first ? 1 : 0); m.needsUpdate = true; }
   // ----- the soft chains (made in 10_geom.js, I30_body.js and I41_hair.js) -----
   // Each point of a chain is pulled toward where it would rest: the way it was built, carried by its body bone (her chest for her hair,
   // her hips for her skirt), leaning toward plain hanging the further down the chain it is. It keeps its speed, so it lags behind her and
@@ -122,25 +147,42 @@
   const SOFT = CHAINS.map((ch) => {
     const n = ch.names.length, hair = ch.grp === 'hair', own = ch.soft || null, pad = own ? own.pad : hair ? 0.012 : 0.030, grp = own ? own.col : hair ? 'h' : 's';       // the skirt's inner layers lie inside its chains, so its balls are padded more
     const o = { ch, hair, yb: SK[ch.yaw || ch.parent], par: SK[ch.parent], b: ch.names.map((nm) => SK[nm]), dir: [], len: [], cur: [], prev: [], g: [], k: [], d: [], cols: [], lift: 0, out: ch.a != null ? V3(Math.sin(ch.a), 0, Math.cos(ch.a)) : null, P: V3(), Q: new THREE.Quaternion(), Y: new THREE.Quaternion() };
+    if (ch.grp === 'skirt') { o.caps = []; o.pad = pad; for (let i = 0; i < n; i++) o.caps.push(CAPF.map((f) => { const pt = ch.pts[i].clone().lerp(ch.pts[i + 1], f); return LEGCAP.map((c) => capRest(c, pt)); })); }
     for (let i = 0; i < n; i++) {
       const tip = ch.pts[i + 1], v = tip.clone().sub(ch.pts[i]), t = n > 1 ? i / (n - 1) : 0; o.len.push(v.length()); o.dir.push(v.normalize()); o.cur.push(tip.clone()); o.prev.push(tip.clone());
       if (own) { o.k.push(own.k); o.d.push(own.d); o.g.push(own.g); }
       else if (!hair) { o.k.push(lerp(0.10, 0.05, t)); o.d.push(lerp(0.22, 0.16, t)); o.g.push(lerp(0.05, 0.32, t)); }
       else if (ch.front) { o.k.push(lerp(0.060, 0.026, t)); o.d.push(lerp(0.17, 0.11, t)); o.g.push(lerp(0.30, 0.88, t)); }
       else { o.k.push(lerp(0.060, 0.024, t)); o.d.push(lerp(0.17, 0.11, t)); o.g.push(lerp(0.10, 0.85, t)); }
-      const cs = []; COL.forEach((c, ci) => { if (c.g.indexOf(grp) < 0) return; const r = Math.min(c.r + pad, tip.distanceTo(c.rest) - 0.003); if (r > 0.014) cs.push(ci, r); }); o.cols.push(cs);       // a ball never pushes a point out of its place at rest
+      const cs = []; COL.forEach((c, ci) => { let hit = false; for (let q = 0; q < grp.length; q++) if (c.g.indexOf(grp[q]) >= 0) hit = true; if (!hit) return; const r = Math.min(c.r + pad, tip.distanceTo(c.rest) - 0.003); if (r > 0.014) cs.push(ci, r); }); o.cols.push(cs);       // a ball never pushes a point out of its place at rest
     }
     return o;
   });
   const fitLen = (p, c, L) => { p.sub(c); p.multiplyScalar(L / (p.length() || 1e-6)).add(c); };
   function softFrames() {
     for (const c of COL) c.p.copy(c.off).applyMatrix4(c.bone.matrixWorld).applyMatrix4(_inv);
+    for (const c of LEGCAP) { c.A.copy(c.offA).applyMatrix4(c.bone.matrixWorld).applyMatrix4(_inv); c.B.copy(c.offB).applyMatrix4(c.bone.matrixWorld).applyMatrix4(_inv); }
+    for (const sp of LEGS) sp.p.copy(sp.c.A).lerp(sp.c.B, sp.t); HIP.setFromMatrixPosition(SK.hips.matrixWorld).applyMatrix4(_inv);
     for (const o of SOFT) { _mb.multiplyMatrices(_inv, o.par.matrixWorld); o.Q.setFromRotationMatrix(_mb); o.P.copy(o.b[0].position).applyMatrix4(_mb); if (o.yb === o.par) _p.set(0, 0, 1).applyQuaternion(o.Q); else _p.set(0, 0, 1).applyQuaternion(rootQuat(o.yb, _qa)); o.Y.setFromAxisAngle(AY, Math.atan2(_p.x, _p.z)); }
   }
   function softTarget(o, i, c, out) {                 // where point i of a chain would rest, hanging from c
     const g = o.g[i]; out.copy(o.dir[i]).applyQuaternion(o.Q).multiplyScalar(1 - g); _t2.copy(o.dir[i]).applyQuaternion(o.Y).multiplyScalar(g); out.add(_t2);
     if (o.lift && o.out) { _t2.copy(o.out).applyQuaternion(o.Y).multiplyScalar(o.lift * (0.35 + 0.65 * i / Math.max(1, o.b.length - 1))); out.add(_t2); }
     return out.normalize().multiplyScalar(o.len[i]).add(c);
+  }
+  // _n, a joint of her skirt hanging from _c, is kept out of her legs: its end and two points along its stretch are tested.
+  // The rule (the same one legPush draws with): her skirt goes round her legs, so a point of it may never be where a leg is
+  // both further out from her middle AND overhead. Such a point is moved the shorter way: out past the leg, or up onto it.
+  // So cloth is pushed forward by a knee when she walks, and lies on her lap when she squats, kneels or sits in the air;
+  // it is never pushed under a leg or behind one.
+  function legOut(o, i, L) {
+    for (let it = 0; it < 4; it++) { let moved = false;
+      for (let fi = 0; fi < 3; fi++) { const f = CAPF[fi], rd = o.caps[i][fi]; _s.copy(_c).lerp(_n, f); _e.set(_s.x - HIP.x, 0, _s.z - HIP.z); const rl = _e.length(); if (rl < 1e-4) continue; _e.multiplyScalar(1 / rl);
+        let sOut = 0, sUp = 0;
+        for (let q = 0; q < LEGS.length; q++) { const sp = LEGS[q], R = Math.min(sp.r + o.pad, rd[sp.ci] - 0.003); if (R <= 0) continue; const vx = _s.x - sp.p.x, vy = _s.y - sp.p.y, vz = _s.z - sp.p.z, cc = vx * vx + vy * vy + vz * vz - R * R;
+          const b1 = vx * _e.x + vz * _e.z, q1 = b1 * b1 - cc; if (q1 > 0) sOut = Math.max(sOut, -b1 + Math.sqrt(q1)); const q2 = vy * vy - cc; if (q2 > 0) sUp = Math.max(sUp, -vy + Math.sqrt(q2)); }
+        if (sOut > 1e-4 && sUp > 1e-4) { if (sUp < sOut) _n.y += sUp / f; else _n.addScaledVector(_e, sOut / f); fitLen(_n, _c, L); moved = true; } }
+      if (!moved) break; }
   }
   function softStep(still) {
     for (const o of SOFT) { _c.copy(o.P);
@@ -151,6 +193,7 @@
         const cs = o.cols[i]; let hit = false;
         for (let j = 0; j < cs.length; j += 2) { const c = COL[cs[j]], r = cs[j + 1]; _d.copy(_n).sub(c.p); const dist = _d.length(); if (dist < r) { _n.copy(c.p).addScaledVector(_d, r / (dist || 1e-6)); hit = true; } }
         if (hit) fitLen(_n, _c, L);
+        if (o.caps) legOut(o, i, L);
         if (_n.y < FLOOR) { const dy = cl(FLOOR - _c.y, -L, L), R = Math.sqrt(Math.max(0, L * L - dy * dy)); _d.set(_n.x - _c.x, 0, _n.z - _c.z); if (_d.lengthSq() < 1e-10) { if (o.out) _d.copy(o.out).applyQuaternion(o.Y); else _d.set(0, 0, -1); } _d.normalize(); _n.set(_c.x + _d.x * R, _c.y + dy, _c.z + _d.z * R); }       // it lies on the floor
         if (still) prev.copy(_n); else prev.copy(cur); cur.copy(_n); _c.copy(cur);
       } }
@@ -159,9 +202,47 @@
     for (const o of SOFT) { _c.copy(o.P); _qa.copy(o.Q);
       for (let i = 0; i < o.b.length; i++) { _d.copy(o.cur[i]).sub(_c).normalize(); _qb.copy(_qa).invert(); _d.applyQuaternion(_qb); _qc.setFromUnitVectors(o.dir[i], _d); o.b[i].quaternion.copy(_qc); _qa.multiply(_qc); _c.copy(o.cur[i]); } }
   }
+  // ----- the rings of her sleeves (made in I45_robe.js; stage nine) -----
+  // Each ring is carried along her arm, round the bend of her elbow. Where her arm is not hanging straight down, the ring slides
+  // toward the ground until its top rests on her arm. It follows on a spring, so it sways; it can never slide further than its
+  // own slack, so her arm stays inside the cloth.
+  const SLF = {}, s1 = V3(), s2 = V3(), s3 = V3(), s4 = V3(), sq = new THREE.Quaternion(), SL_E = 0.06;
+  for (const [S, s] of SIDES) SLF[S] = { qU: new THREE.Quaternion(), qF: new THREE.Quaternion(), sh: V3(), el: V3(), wr: V3(), O: V3(s * Math.cos(A_POSE), Math.sin(A_POSE), 0) };
+  const SLV = (typeof SLEEVES !== 'undefined' ? SLEEVES : []).map((st) => Object.assign(st, { bone: SK[st.name], C: V3(), Q: new THREE.Quaternion(), u: V3(), tg: V3(), p: SK[st.name].userData.rest.clone(), pp: SK[st.name].userData.rest.clone(), k: 0.11, d: 0.20, sc: 1 }));
+  function ringAt(st, dir, tab) { sq.copy(st.Q).invert(); s3.copy(dir).applyQuaternion(sq); const O = SLF[st.S].O; let ph = Math.atan2(s3.z, s3.x * O.x + s3.y * O.y); if (ph < 0) ph += TAU; const f = (ph / TAU) * 16, i = Math.floor(f) % 16; return lerp(tab[i], tab[(i + 1) % 16], f - Math.floor(f)); }
+  const slackAt = (st, dir) => ringAt(st, dir, st.slack);
+  function sleeveFrames() {
+    for (const [S] of SIDES) { const F = SLF[S]; rootQuat(SK['uarm' + S], F.qU); rootQuat(SK['farm' + S], F.qF); F.sh.setFromMatrixPosition(SK['uarm' + S].matrixWorld).applyMatrix4(_inv); F.el.setFromMatrixPosition(SK['farm' + S].matrixWorld).applyMatrix4(_inv); F.wr.setFromMatrixPosition(SK['hand' + S].matrixWorld).applyMatrix4(_inv); }
+    for (const st of SLV) { const F = SLF[st.S], sl = st.sl, tau = cl((sl - (L_UARM - SL_E)) / (2 * SL_E), 0, 1);
+      if (tau <= 0) st.C.copy(F.sh).lerp(F.el, sl / L_UARM); else if (tau >= 1) st.C.copy(F.el).lerp(F.wr, (sl - L_UARM) / L_FARM);
+      else { s1.copy(F.sh).lerp(F.el, 1 - SL_E / L_UARM); s2.copy(F.el).lerp(F.wr, SL_E / L_FARM); st.C.copy(s1).multiplyScalar((1 - tau) * (1 - tau)).addScaledVector(F.el, 2 * tau * (1 - tau)).addScaledVector(s2, tau * tau); }       // round the bend of her elbow
+      st.Q.copy(F.qU).slerp(F.qF, tau * tau * (3 - 2 * tau)); st.u.copy(armDir[st.S]).applyQuaternion(st.Q);
+      const uy = st.u.y; s1.set(st.u.x * uy, uy * uy - 1, st.u.z * uy); const m = s1.length(); st.tg.set(0, 0, 0);                    // the pull of the ground, across her arm
+      if (m > 0.05) { s1.multiplyScalar(1 / m); st.tg.copy(s1).multiplyScalar(slackAt(st, s1) * sm(0.25, 0.60, m)); } }
+  }
+  function sleeveStep(still) {
+    for (const st of SLV) { const F = SLF[st.S];
+      if (still) s1.copy(st.tg);
+      else { s1.copy(st.p).sub(st.pp).multiplyScalar(1 - st.d).add(st.p); s2.copy(st.C).add(st.tg).sub(st.p).multiplyScalar(st.k); s1.add(s2).sub(st.C); }
+      // When her elbow folds, the other half of her arm comes through this ring's place too. The ring slides toward it, and if
+      // that is not enough it opens wider, so both halves of her arm are inside the cloth (a sleeve gathering round a bent elbow).
+      let want = 1; { const far = st.sl >= L_UARM, A = far ? F.sh : F.el, B = far ? F.el : F.wr, rf = far ? 0.046 : 0.038;
+        s2.copy(A).sub(st.C).sub(s1); const dA = s2.dot(st.u); s4.copy(B).sub(st.C).sub(s1); const dB = s4.dot(st.u);
+        if (dA * dB < 0) { s2.lerp(s4, dA / (dA - dB)); s2.addScaledVector(st.u, -s2.dot(st.u)); const wl = s2.length(); if (wl > 0.004) { s2.multiplyScalar(1 / wl); const have = ringAt(st, s2, st.rad), short = wl + rf - have; if (short > 0) { s1.addScaledVector(s2, short); want = 0; } } } }
+      s1.addScaledVector(st.u, -s1.dot(st.u)); const len = s1.length(); if (len > 1e-5) { s2.copy(s1).multiplyScalar(1 / len); const lim = slackAt(st, s2); if (len > lim) s1.multiplyScalar(lim / len); }
+      if (!want) { const far = st.sl >= L_UARM, A = far ? F.sh : F.el, B = far ? F.el : F.wr, rf = far ? 0.046 : 0.038; s2.copy(A).sub(st.C).sub(s1); const dA = s2.dot(st.u); s4.copy(B).sub(st.C).sub(s1); const dB = s4.dot(st.u); want = 1;
+        if (dA * dB < 0) { s2.lerp(s4, dA / (dA - dB)); s2.addScaledVector(st.u, -s2.dot(st.u)); const wl = s2.length(); if (wl > 0.004) { s2.multiplyScalar(1 / wl); want = cl((wl + rf) / ringAt(st, s2, st.rad), 1, 1.45); } } }
+      st.sc = still ? want : st.sc + (want - st.sc) * 0.25;
+      st.pp.copy(still ? s2.copy(st.C).add(s1) : st.p); st.p.copy(st.C).add(s1); }
+  }
+  function sleeveApply() {
+    for (const st of SLV) { const par = SK[st.par]; rootQuat(par, sq).invert(); s1.setFromMatrixPosition(par.matrixWorld).applyMatrix4(_inv); st.bone.position.copy(s2.copy(st.p).sub(s1).applyQuaternion(sq)); st.bone.quaternion.copy(sq).multiply(st.Q); st.bone.scale.setScalar(st.sc); }
+    if (SLV.length) sync();       // the long points hang from the cuff rings
+  }
   let softAcc = 0;
-  function softTick(dt) { softFrames(); softAcc += dt; let n = 0; while (softAcc >= SOFT_H && n < 4) { softStep(false); softAcc -= SOFT_H; n++; } if (softAcc > SOFT_H) softAcc = 0; softApply(); }
-  function softSettle() { softFrames(); for (let i = 0; i < 24; i++) softStep(true); softApply(); }       // everything comes to rest at once in the pose she is in
+  function softTick(dt) { softAcc += dt; let n = 0; while (softAcc >= SOFT_H && n < 4) { softAcc -= SOFT_H; n++; } if (softAcc > SOFT_H) softAcc = 0;
+    sleeveFrames(); for (let i = 0; i < n; i++) sleeveStep(false); sleeveApply(); softFrames(); for (let i = 0; i < n; i++) softStep(false); softApply(); }
+  function softSettle() { sleeveFrames(); sleeveStep(true); sleeveApply(); softFrames(); for (let i = 0; i < 24; i++) softStep(true); softApply(); }       // everything comes to rest at once in the pose she is in
 
   // ----- reaching: two bones in a row (upper arm and forearm, or thigh and shin) bring their end to a point of her own space -----
   // bend -1: an elbow (the forearm folds forward of the upper arm); +1: a knee (the shin folds back). swivel turns the elbow or knee about
@@ -213,17 +294,43 @@
   const SHOTS = { glasses: 2.4, hat: 2.6, curtsey: 3.0, twirl: 2.6, herb: 5.0, wave: 3.0, look: 3.6, sickle: 3.4 }, MOVES = ['pose', 'idle', 'walk', 'jog', 'squat', 'kneel', 'hover', 'talk', 'read', 'glasses', 'hat', 'curtsey', 'twirl', 'herb', 'wave', 'look', 'sickle'];
   let jg = 0, hSq = 0, hKn = 0, hHv = 0;       // the moves all four witches share (Chris, November 13: "squat ... kneel ... hover, and jog"); each slides in and out
   // Her book (G8, and the rule in her prompts: it is in her LEFT hand; when she lets go of it, it floats open at her left side).
-  // bkF: 0 held shut in her left arm .. 1 floating open; bkR: 1 open in front of her to read. Moves that need her left hand let it float.
+  // bkR: 1 open on her left palm to read (see readHands). bkF is no longer used: she does not carry it.
   const BK_FLOAT = {},       // Chris, November 13: "her book should like appear when she does the read her book animation. I don't think she should just be holding it"
      bkP = V3(), bkQ = new THREE.Quaternion(), bkP2 = V3(), bkQ2 = new THREE.Quaternion(), EU = new THREE.Euler(); let bkF = 0, bkR = 0, showProps = true;
   const propVis = (on, sick) => { const m = meshes, shut = false, open = bkR > 0.03; for (const [k, v] of [['bookShut', on && shut], ['bookShutPg', on && shut], ['bookRibbon', on && shut], ['bookOpen', on && open], ['bookOpenPg', on && open], ['sickleGold', on && sick], ['sickleGrip', on && sick]]) if (m[k]) m[k].visible = !!v && showProps; };
-  function bookPlace(dt, N) {
-    if (!SK.book) return 0; const k = Math.min(1, dt * 3.2); bkF += ((BK_FLOAT[N] ? 1 : 0) - bkF) * k; bkR += ((N === 'read' ? 1 : 0) - bkR) * k;
-    rootQuat(SK.spine3, _qa); carried('spine3', 0.118, 1.150, 0.122, bkP); bkQ.copy(_qa).multiply(_qb.setFromEuler(EU.set(-0.10, 0.50, 0.07, 'YXZ')));                     // held: against the front of her left side
-    rootQuat(SK.hips, _qc); _p.set(0, 0, 1).applyQuaternion(_qc); _qc.setFromAxisAngle(AY, Math.atan2(_p.x, _p.z)); carried('hips', 0, 0.96, 0, bkP2).add(_e.set(0.37, 0.10 + 0.018 * Math.sin(clock * 1.7), 0.15).applyQuaternion(_qc));
-    bkQ2.copy(_qc).multiply(_qb.setFromEuler(EU.set(-0.55, -1.05 + 0.10 * Math.sin(clock * 0.8), 0, 'YXZ'))); bkP.lerp(bkP2, bkF); bkQ.slerp(bkQ2, bkF);                           // floating: open at her left side, turned to her
-    if (bkR > 0.001) { carried('spine3', 0.035, 1.095, 0.300, bkP2); bkQ2.copy(_qa).multiply(_qb.setFromEuler(EU.set(0.93, PI, 0, 'XYZ'))); bkP.lerp(bkP2, bkR); bkQ.slerp(bkQ2, bkR); }   // reading: open in front of her, tipped up to her face
-    SK.book.position.copy(bkP); SK.book.quaternion.copy(bkQ); SK.book.scale.setScalar(Math.max(0.001, sm(0.03, 0.7, bkR))); return 0;       // it grows out of nothing in front of her, and goes the same way
+  function bookPlace(dt, N) { const k = Math.min(1, dt * 3.2); bkF = 0; bkR += ((N === 'read' ? 1 : 0) - bkR) * k; return 0; }
+  // Reading (stage nine; Chris, November 13: her pointing finger "is phasing through the book", and "the book's hovering above"
+  // the hand that holds it). Her hands used to be sent to places worked out beside a book that was placed from her chest, so
+  // neither truly touched it. Now, in order: her left hand goes to its place, palm up; the book is laid ON that palm, wherever the
+  // palm really ended up; then her right forefinger is brought to a point on the page, and the place of its tip is measured and
+  // corrected until it rests on the paper.
+  const rdP = V3(), rdF = V3(), rdN = V3(), rdX = V3(), rdU = V3(), rdT = V3(), rdW = V3(), rdV = V3(), rdQ = new THREE.Quaternion(), rdB = new THREE.Matrix4(), TIP0 = {};
+  for (const [S, s] of SIDES) { const [, fz, fy, fl, , fa] = FINGERS[0], fd = fingerDir(fa); TIP0[S] = handPt(s, 0, fy + fd[1] * fl, fz + fd[2] * fl).sub(SK['idx2' + S].userData.rest); }       // the tip of a forefinger, from its last joint
+  const pageZ = (x) => { const u = Math.abs(x) / Math.cos(0.17); return u * Math.sin(0.17) + 0.004 + 0.013 * Math.sin(Math.min(1, u / 0.07) * PI / 2) - 0.004 * (u / BOOK.w); };       // how high the paper lies, across the open book
+  function handFrame(S) { rootQuat(SK['hand' + S], rdQ).multiply(_qb.copy(HAND0[S]).invert()); rdF.set(1, 0, 0).applyQuaternion(rdQ); rdN.set(0, 1, 0).applyQuaternion(rdQ); rdX.crossVectors(rdF, rdN); rdW.setFromMatrixPosition(SK['hand' + S].matrixWorld).applyMatrix4(_inv); }
+  function armTo(S, P, k, swivel, f, n, from) { const e = k * k * (3 - 2 * k); rdV.copy(from).lerp(P, e); rdV.z += 0.09 * Math.sin(PI * e); reach(S, rdV, sm(0, 0.15, k), swivel * e); aimHand(S, f, n, k); wristFix(S); }
+  const rdFrom = { L: V3(), R: V3() };
+  function readHands(N, T) {
+    const k = bkR, tn = N === 'read' ? pulse(T % 5.2, 3.6, 4.0, 4.3, 4.7) : 0, ln = (T % 5.2) / 5.2;
+    for (const [S] of SIDES) rdFrom[S].setFromMatrixPosition(SK['hand' + S].matrixWorld).applyMatrix4(_inv);
+    // her left hand: palm up and a little toward her face, at the foot of her ribs
+    fingers('L', lerp(0.24, 0.12, k)); carried('spine3', 0.082, 1.040, 0.215, rdP); armTo('L', rdP, k, 0.3, fv.set(-0.42, 0.30, 0.86), nv.set(-0.06, 0.90, -0.43), rdFrom.L); sync();
+    // the book lies on that palm: its spine along her palm, its pages facing the way her palm faces; it grows out of nothing there once her hand is nearly in place
+    handFrame('L'); const sc = Math.max(0.001, sm(0.45, 0.92, k)); rdU.set(0, 0.35, 1).addScaledVector(rdN, -(0.35 * rdN.y + rdN.z)).normalize(); _d.crossVectors(rdU, rdN);
+    bkQ.setFromRotationMatrix(rdB.makeBasis(_d, rdU, rdN)); bkP.copy(rdW).addScaledVector(rdF, 0.058).addScaledVector(rdN, 0.0245).addScaledVector(rdX, -0.008).sub(_e.set(0, -0.050, -0.0045).multiplyScalar(sc).applyQuaternion(bkQ));
+    SK.book.position.copy(bkP); SK.book.quaternion.copy(bkQ); SK.book.scale.setScalar(sc);
+    // her right forefinger on the right-hand page, following the lines down it; now and then it lifts, goes to the edge and turns a leaf
+    // her hand is held level above the page; her forefinger bends down to the paper, and her other fingers are folded up under her palm, clear of it
+    fingers('R', lerp(0.24, 1.2, k)); for (const fn of ['mid', 'rng', 'pnk']) [0.75, 1.75, 0.90].forEach((a, j) => { SK[fn + j + 'R'].rotation.z = lerp(0.24 * [0.85, 1.1, 0.7][j], a, k); });
+    [0.95, 0.20, 0.15].forEach((a, j) => { SK['idx' + j + 'R'].rotation.z = lerp(0.24 * [0.85, 1.1, 0.7][j], a, k); }); sync();
+    rootQuat(SK.handR, _qa).invert(); rdT.copy(TIP0.R).applyMatrix4(SK.idx2R.matrixWorld).applyMatrix4(_inv).sub(_e.setFromMatrixPosition(SK.handR.matrixWorld).applyMatrix4(_inv)).applyQuaternion(_qa);       // where her fingertip is from her wrist, in her hand's own frame
+    const px = lerp(0.050 + 0.014 * Math.sin(T * 1.9), 0.118 - 0.125 * sm(0.45, 1, tn), sm(0, 0.45, tn)), py = lerp(0.055 - 0.11 * ln, 0.0, tn), tipTo = bookPt(px, py, pageZ(px) + 0.0075 + 0.030 * Math.sin(PI * tn), V3());
+    fv.set(-0.50, 0.85, 0.12).applyQuaternion(bkQ).normalize(); nv.set(0, 0, -1).applyQuaternion(bkQ);
+    _t.copy(fv); _n.copy(nv).addScaledVector(_t, -_t.dot(nv)).normalize(); _d.crossVectors(_t, _n); _qc.setFromRotationMatrix(rdB.makeBasis(_t, _n, _d)).multiply(HAND0.R);       // the turn her hand is asked for
+    rdP.copy(tipTo).sub(_e.copy(rdT).applyQuaternion(_qc)); const want = rdP.clone(), f2 = fv.clone(), n2 = nv.clone();
+    if (k < 1) want.addScaledVector(_e.set(0, 0, 1).applyQuaternion(bkQ), 0.08 * (1 - sm(0.72, 1, k)));       // her right hand comes down onto the page from above, after the book is there
+    armTo('R', want, k, -0.3, f2, n2, rdFrom.R); sync();
+    if (k > 0.98) for (let it = 0; it < 2; it++) { rdV.copy(TIP0.R).applyMatrix4(SK.idx2R.matrixWorld).applyMatrix4(_inv); _e.copy(tipTo).sub(rdV); if (_e.length() < 0.0008) break; want.add(_e); armTo('R', want, 1, -0.3, f2, n2, rdFrom.R); sync(); }       // her wrist only bends so far, so the tip is put right by moving her whole hand
   }
   const bookPt = (x, y, z, out) => out.set(x, y, z).applyQuaternion(bkQ).add(bkP);
   const pulse = (t, a, b, c, d) => sm(a, b, t) * (1 - sm(c, d, t)), ANK = {}; for (const [S] of SIDES) ANK[S] = SK['foot' + S].userData.rest.clone();
@@ -325,16 +432,13 @@
     for (const [S] of SIDES) { ik2(SK['thigh' + S], SK['shin' + S], SK['foot' + S], ank[S], plant, 0, 1); flatFoot(S, footP[S], plant); }
     sync();
     // a hand travels from where it hangs to its point, a little forward on the way so it clears her skirt and her hair, with its elbow bending as it goes
-    { bookPlace(dt, N); const hold = 0;
-      if (hold > 0.001) { reaches.push(['L', bookPt(0.060, -0.118, -0.012, V3()), hold, 0.25]); aims.push(['L', V3(-0.55, 0.62, 0.55).applyQuaternion(bkQ), V3(-0.45, 0.15, -0.88).applyQuaternion(bkQ), hold]); SK.farmL.rotation.x *= 1; fingers('L', lerp(0.24, 0.75, hold)); }
-      if (bkR > 0.001) { const tn = N === 'read' ? pulse(T % 5.2, 3.6, 4.0, 4.3, 4.7) : 0;
-        reaches.push(['L', bookPt(0.0, -0.035, -0.050, V3()), bkR, 0.3]); aims.push(['L', V3(-0.25, 0.75, 0.2).applyQuaternion(bkQ), V3(0, 0, 1).applyQuaternion(bkQ), bkR]);
-        reaches.push(['R', bookPt(0.085 - 0.10 * tn, -0.085 + 0.05 * Math.sin(T * 0.9) * (1 - tn), 0.085 + 0.03 * tn, V3()), bkR, -0.3]); aims.push(['R', V3(-0.15, 0.7, -0.7).applyQuaternion(bkQ), V3(0, 0.25, -1).applyQuaternion(bkQ), bkR]); fingers('R', lerp(0.24, 0.9, bkR), lerp(0.24, 0.10, bkR)); }
-      propVis(true, N === 'sickle' && T > 0.12 && T < 3.25); }
+    bookPlace(dt, N);
     for (const r of reaches) { const k = r[2]; if (k <= 0.0005) continue; const P = typeof r[1] === 'function' ? r[1]() : r[1], e = k * k * (3 - 2 * k);
       SK['hand' + r[0]].getWorldPosition(_p).applyMatrix4(_inv).lerp(P, e); _p.z += 0.09 * Math.sin(PI * e); reach(r[0], tg2.copy(_p), sm(0, 0.15, k), (r[3] || 0) * e); }
     for (const a of aims) aimHand(a[0], a[1], a[2], a[3]);
     for (const [S] of SIDES) wristFix(S);
+    if (bkR > 0.001 && SK.book) { sync(); readHands(N, T); }
+    propVis(true, N === 'sickle' && T > 0.12 && T < 3.25);
     sync(); softTick(dt);
     return { eyes, mouth };
   }
@@ -355,5 +459,5 @@
   const talk = (on) => { talking = !!on; mouthAt = 0; return talking; };
   const setFace = (eyes, mouth) => { held = eyes == null && !mouth ? null : { eyes, mouth }; facePainted = ''; animate(0); };
   return { root, skeleton, bones, SK, animate, pose, play, moves: MOVES, shots: SHOTS, settle: () => { sync(); softSettle(); root.updateMatrixWorld(true); }, meshes, spin: 0, time: 0, stanceProgress: 1, setStance() {}, talk, setFace, setBlink: (on) => { blinking = !!on; }, setProps: (on) => { showProps = !!on; if (mv.name === 'pose') propVis(false, false); }, get move() { return mv.name; },
-    debug: { SK, meshes, cloths: [], headPoint, headHalfW, JH, HC, FC, CHAINS, SOFT, COL }, get triangles() { return triCount; } };
+    debug: { SK, meshes, cloths: [], headPoint, headHalfW, JH, HC, FC, CHAINS, SOFT, COL, LEGCAP, LEGPAD, LEGS, HIP, SLV }, get triangles() { return triCount; } };
 }

@@ -26,7 +26,7 @@
     // ----- the pouch on her right hip -----
     { const a = -0.66, t = [Math.cos(a), 0, -Math.sin(a)], top = V3(...skirtPt(1.040, a, 1.0, 0.030)), bot = V3(...skirtPt(0.925, a, 1.0, 0.036)), ax = bot.clone().sub(top), L = ax.length(); ax.normalize();
       const tv = V3(...t), nv = V3().crossVectors(tv, ax).normalize(); if (nv.x * Math.sin(a) + nv.z * Math.cos(a) < 0) nv.negate();
-      addChain('gear', 'pouch', 'hips', [top.clone().add(V3(0, 0.012, 0)), bot], { yaw: 'hips', soft: { k: 0.10, d: 0.22, g: 0.55, col: 's', pad: 0.030 } }); const wP = () => [BI.pouch_0, 1];
+      addChain('gear', 'pouch', 'hips', [top.clone().add(V3(0, 0.012, 0)), bot], { yaw: 'hips', soft: { k: 0.10, d: 0.22, g: 0.55, col: 'sg', pad: 0.030 } }); const wP = () => [BI.pouch_0, 1];
       const rings = []; for (let i = 0; i <= 12; i++) { const s = i / 12, w = 0.044 * Math.pow(Math.sin(PI * Math.min(1, 0.16 + 0.84 * s) * 0.5 + (s > 0.62 ? (s - 0.62) * 1.9 : 0)), 0.7) * (s > 0.62 ? Math.sqrt(Math.max(0.02, 1 - Math.pow((s - 0.62) / 0.385, 2))) : 1), dp = 0.019 * (0.55 + 0.45 * Math.sin(PI * Math.min(1, s * 1.15))) * (s > 0.85 ? Math.sqrt(Math.max(0.03, 1 - Math.pow((s - 0.85) / 0.155, 2))) : 1), c = top.clone().addScaledVector(ax, L * s), ring = [];
         for (let j = 0; j < 16; j++) { const th = (j / 16) * TAU, e = 2 / 3.2, cx = Math.cos(th), sx = Math.sin(th), px = Math.sign(cx) * Math.pow(Math.abs(cx), e) * w, pz = Math.sign(sx) * Math.pow(Math.abs(sx), e) * dp; ring.push([c.x + tv.x * px + nv.x * (pz + dp * 0.5), c.y + tv.y * px + nv.y * (pz + dp * 0.5), c.z + tv.z * px + nv.z * (pz + dp * 0.5)]); } rings.push(ring); }
       addPart('leather', loft(rings, { capA: true, capB: true }), wP, { out: top.clone().lerp(bot, 0.5) });
@@ -36,7 +36,7 @@
       for (const e of [-1, 1]) tube('leather', [top.clone().addScaledVector(tv, e * 0.022).add(V3(0, 0.034, 0)).addScaledVector(nv, -0.010), top.clone().addScaledVector(tv, e * 0.022).addScaledVector(nv, 0.016)], [0.0075, 0.0016], 6, wP); }      // its two belt loops
     // ----- the crystal on its chain, at the front of her left hip -----
     { const a = 0.36, top = V3(...skirtPt(1.044, a, 1.0, 0.012)), p1 = V3(...skirtPt(0.965, a, 1.0, 0.020)), tip = V3(...skirtPt(0.895, a, 1.0, 0.022));
-      addChain('gear', 'cryst', 'hips', [top, tip], { yaw: 'hips', soft: { k: 0.05, d: 0.09, g: 0.90, col: 's', pad: 0.022 } }); const wC = () => [BI.cryst_0, 1];
+      addChain('gear', 'cryst', 'hips', [top, tip], { yaw: 'hips', soft: { k: 0.05, d: 0.09, g: 0.90, col: 'sg', pad: 0.022 } }); const wC = () => [BI.cryst_0, 1];
       hoop('gearGold', top.clone().add(V3(0, -0.004, 0.002)), 0.0052, 0.0011, wC); tube('gearGold', [top.clone().add(V3(0, -0.009, 0.002)), p1.clone().add(V3(0, 0.006, 0))], 0.0011, 5, wC);
       tube('gearGold', [p1.clone().add(V3(0, 0.006, 0)), p1.clone().add(V3(0, -0.006, 0))], (u) => lerp(0.0045, 0.0088, u), 8, wC);
       for (let j = 0; j < 4; j++) ball('gearGold', p1.clone().add(V3(0.0092 * Math.cos(j * PI / 2 + 0.6), -0.003, 0.0092 * Math.sin(j * PI / 2 + 0.6))), 0.0026, wC);

@@ -6,7 +6,7 @@
   //   body    above her waist it lies on her torso; below, it rides the skirt's chains, a little outside the skirt.
   //   sleeves each hangs from 24 soft points (4 round the arm at 6 heights), each on a bone hung from a point on her arm, so the cloth
   //           hangs below her arm however she holds it.
-  const ROBE = !opts.noRobe;
+  const ROBE = !opts.noRobe, SLEEVES = [];       // SLEEVES: every ring of her sleeves, for sleeveTick
   (function buildRobe() {
     if (!ROBE) return;
     const zig = (x) => Math.abs((((x / TAU) % 1) + 1) % 1 * 2 - 1);          // a zigzag from 0 to 1 and back, once a turn
@@ -50,21 +50,43 @@
       const rIn = (sl) => armRad(sl, PI) + 0.007 + 0.022 * sm(0.30, 0.60, sl);         // toward her body the sleeve stays close to her arm, so it clears her side and her skirt
       const R = (sl, a, ro, rf) => { const ca = Math.cos(a), sa = Math.sin(a), ex = ca >= 0 ? ro : Math.min(ro, rIn(sl)); return Math.max(1 / Math.sqrt((ca * ca) / (ex * ex) + (sa * sa) / (rf * rf)), sl < 0.45 ? armRad(sl, a) + 0.005 : 0); };
       const outS = (a) => [ox * Math.cos(a), oy * Math.cos(a), Math.sin(a)];
-      // the soft points: at each height four round the arm, each hung from a point further up the arm (the lower ones from well up it, so the cloth hangs deep when she lifts her arm)
-      const SLN = [0.15, 0.25, 0.35, 0.46, 0.62, 0.80], SLA = [0.085, 0.11, 0.17, 0.26, 0.40, 0.44], CA = [0, PI / 2, PI, 1.5 * PI];
-      const env = (sl, a) => R(sl, a, lerp(0.060, 0.108, sm(0.10, 0.50, sl)), lerp(0.058, 0.100, sm(0.10, 0.50, sl)));
-      const pts = CA.map((a, j) => SLN.map((sl, k) => addChain('sleeve', 'sv' + S + j + k, (SLA[k] < L_UARM ? 'uarm' : 'farm') + S, [V3(sh.x + d.x * SLA[k], sh.y + d.y * SLA[k], sh.z), V3(...P(sl, a, env(sl, a)))], { yaw: 'spine3', soft: { k: lerp(0.075, 0.045, k / 5), d: lerp(0.20, 0.14, k / 5), g: lerp(0.80, 0.93, k / 5), col: 'h', pad: 0.012 } })));
-      const wSl = (a, sl) => {
-        const fa = ((((a / TAU) % 1) + 1) % 1) * 4, j0 = Math.floor(fa) % 4, j1 = (j0 + 1) % 4, ta = fa - Math.floor(fa);
-        if (sl <= SLN[0]) { const t = sm(0.085, SLN[0], sl); return t <= 0.001 ? [BI['uarm' + S], 1] : mixW([BI['uarm' + S], 1], mixW([BI[pts[j0][0].names[0]], 1], [BI[pts[j1][0].names[0]], 1], ta), t); }
-        let k = 0; while (k < SLN.length - 2 && sl > SLN[k + 1]) k++; const ts = cl((sl - SLN[k]) / (SLN[k + 1] - SLN[k]), 0, 1);
-        return mixW(mixW([BI[pts[j0][k].names[0]], 1], [BI[pts[j0][k + 1].names[0]], 1], ts), mixW([BI[pts[j1][k].names[0]], 1], [BI[pts[j1][k + 1].names[0]], 1], ts), ta);
-      };
-      const AS = []; for (let j = 0; j <= 32; j++) AS.push((j / 32) * TAU);
+      // Stage nine (Chris, November 13: "the arms pass through the sleeves of the cloak"). A sleeve was 24 points that each hung from a
+      // point of her arm, so with her forearm raised the whole sleeve hung under it and her arm came out through the cloth.
+      // Now each tier is a row of rings round her arm (F5: on a raised arm each tier rests on top of the arm and hangs below it).
+      // A ring follows her arm round the bend of her elbow, and slides toward the ground until its top rests on her arm; how far it
+      // may slide each way is measured here, so her arm is always inside it (the sliding is done in I99_static.js, sleeveTick).
+      // The long point of the last tier, past her wrist, hangs from the cuff ring as a soft chain.
+      const TIERS = [[0.085, 0.255, 0.035, 0.052, 0.085, 0.080, 0.012], [0.20, 0.385, 0.045, 0.058, 0.105, 0.098, 0.014], [0.33, 0.398, 0.462, 0.062, 0.120, 0.112, 0.016]];
+      const axisPt = (sl) => V3(sh.x + d.x * sl, sh.y + d.y * sl, sh.z);
       const wl = (a) => Math.pow(0.5 + 0.5 * Math.cos(a - 3.9), 2.2);                  // the long point hangs at the back of her arm, on the side toward her body
+      const hemOf = (ti, a) => TIERS[ti][1] + TIERS[ti][2] * wl(a) + TIERS[ti][6] * zig(a * 6 + ti);
+      const tierRad = (ti, sl, a) => { const T = TIERS[ti], hm = hemOf(ti, a), t = cl((sl - T[0]) / (hm - T[0]), 0, 1), k = Math.pow(t, 0.8); return R(Math.min(sl, hm), a, lerp(T[3], T[4], k), lerp(T[3], T[5], k)); };
+      const ST_SL = [[0.17, 0.26], [0.20, 0.29, 0.39], [0.33, 0.40]], NB = 48, ND = 16;
+      const st = ST_SL.map((row, ti) => row.map((sl, k) => {
+        const nm = 'sl' + S + ti + '_' + k, c = axisPt(sl), par = (sl < L_UARM ? 'uarm' : 'farm') + S; addBone(nm, par, c.x, c.y, c.z);
+        const ring = []; for (let j = 0; j < NB; j++) { const a = (j / NB) * TAU, r = tierRad(ti, sl, a), ra = armRad(Math.min(sl, 0.44), a); ring.push([r * Math.cos(a), r * Math.sin(a), ra + Math.min(0.006, r - ra - 0.0005)]); }
+        const slack = [];                                                             // slack[j]: how far the ring may slide toward angle j before her arm touches it
+        for (let j = 0; j < ND; j++) { const ph = (j / ND) * TAU, ux = Math.cos(ph), uz = Math.sin(ph); let lo = 0, hi = 0.2;
+          for (let it = 0; it < 14; it++) { const m = (lo + hi) / 2, qx = -ux * m, qz = -uz * m; let ok = Math.hypot(qx, qz) < tierRad(ti, sl, Math.atan2(qz, qx)); if (ok) for (const [bx, bz, need] of ring) if (Math.hypot(bx - qx, bz - qz) < need) { ok = false; break; } if (ok) lo = m; else hi = m; }
+          slack.push(lo); }
+        const rad = []; for (let j = 0; j < ND; j++) rad.push(tierRad(ti, sl, (j / ND) * TAU));
+        return { name: nm, S, sl, ti, par, slack, rad };
+      }));
+      const tailN = [0.40, 0.52, 0.64, 0.76, 0.88], cuff = st[2][1].name;
+      const tail = addChain('sleeve', 'svt' + S, cuff, tailN.map(axisPt), { yaw: 'spine3', soft: { k: 0.05, d: 0.15, g: 0.92, col: 'hg', pad: 0.020 } });
+      SLEEVES.push(...st[0], ...st[1], ...st[2]);
+      const wA = (nm) => [BI[nm], 1];
+      const tailW = (sl) => { const n = tail.names.length; let k = 0; while (k < n - 1 && sl > tailN[k + 1]) k++; const t = cl((sl - tailN[k]) / (tailN[k + 1] - tailN[k]), 0, 1), bn = (i) => wA(tail.names[i]);
+        if (t < 0.5) return k > 0 ? mixW(bn(k - 1), bn(k), 0.5 + t) : mixW(wA(cuff), bn(0), 2 * t);
+        return k === n - 1 ? bn(k) : mixW(bn(k), bn(k + 1), t - 0.5); };
+      const wSl = (ti) => (a, sl) => { const row = st[ti], n = row.length;
+        if (sl <= row[0].sl) return ti === 0 ? mixW(wA('uarm' + S), wA(row[0].name), cl((sl - 0.085) / (row[0].sl - 0.085), 0, 1)) : wA(row[0].name);
+        for (let k = 0; k < n - 1; k++) if (sl <= row[k + 1].sl) return mixW(wA(row[k].name), wA(row[k + 1].name), (sl - row[k].sl) / (row[k + 1].sl - row[k].sl));
+        return ti === 2 ? tailW(sl) : wA(row[n - 1].name); };
+      const AS = []; for (let j = 0; j <= 32; j++) AS.push((j / 32) * TAU);
       // the lower two tiers stop short of her wrist on the outside, so her bracelets show
-      [[0.085, 0.255, 0.035, 0.052, 0.085, 0.080, 0.012], [0.20, 0.385, 0.045, 0.058, 0.105, 0.098, 0.014], [0.33, 0.398, 0.462, 0.062, 0.120, 0.112, 0.016]].forEach(([s0, s1, lng, r0, ro, rf, zz], ti) => {
-        tier((a, sl, t) => { const k = Math.pow(t, 0.8); return P(sl, a, R(sl, a, lerp(r0, ro, k), lerp(r0, rf, k))); }, AS, () => s0, (a) => s1 + lng * wl(a) + zz * zig(a * 6 + ti), 14, (a, sl) => wSl(a, sl), outS, { uS: 5, fernEvery: ti === 2 ? 5 : 6, mossU: 3 });
+      TIERS.forEach(([s0, s1, lng, r0, ro, rf, zz], ti) => {
+        tier((a, sl, t) => { const k = Math.pow(t, 0.8); return P(sl, a, R(sl, a, lerp(r0, ro, k), lerp(r0, rf, k))); }, AS, () => s0, (a) => hemOf(ti, a), 14, wSl(ti), outS, { uS: 5, fernEvery: ti === 2 ? 5 : 6, mossU: 3 });
       });
       // the gathered band round her upper arm, and the cloth in front of and behind her bare shoulder that joins the sleeve to the body
       const wUp = () => [BI['uarm' + S], 1], skinP = (a, sl, off) => { const q = armPt(S, sl, a), oo = outS(a); return [q[0] + oo[0] * off, q[1] + oo[1] * off, q[2] + oo[2] * off]; };

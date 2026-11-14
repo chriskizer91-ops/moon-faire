@@ -4,7 +4,56 @@ Started November 13, 2026. Built the way the HD Jester was (`claude/HOW-TO-3d-wi
 the Ranger's stage-one recipe: this folder began as a copy of the Ranger's stage-one code (`claude/ranger-3d-model`, commit
 `1d4c9d6`), with the Jester's platform boot builder (`claude/jester-3d-model`, pass 20) in place of the Ranger's boots.
 
-## Where she stands: stage eight (November 13, 2026)
+## Where she stands: stage nine (November 13, 2026)
+
+One pass on things passing through each other: her hands and her book, her legs and her skirt and cloak, her arms and her sleeves.
+
+- **Chris (November 13):** "When she reads her book, the finger that she's using to like point at the book is phasing through
+  the book. The hand that's holding the book is the book's hovering above that hand ... the legs pass through the clothes a
+  lot, and the arms pass through the sleeves of the cloak. If we can do a one pass of fixing all of those elements, then move
+  on to the emotions, then spells and attacks."
+- **A meter, so this is measured and not only looked at:** `tools/pen.py` (with `tools/pen.js`) plays every move and counts
+  points of cloth inside her legs, points of sleeve inside her arms, and points of her hands inside her book, with the deepest
+  of each in millimetres. It applies the same push the cloth is drawn with, so it measures what is on screen. Standing still
+  she scores 99 leg points at 10 mm (cloth that lies close at her hips as built); that is the floor.
+  - Before: legs 7,499 points over the sixteen moves, up to 74 mm deep; book 4,675 points.
+  - After: legs 1,529 (every move at the standing floor, 12 mm at most); book 0 in every move.
+  - Sleeves: 1,189 before, 906 after by this count, but the count misses the real change (below): her arm used to leave the
+    sleeve altogether. What is left is cloth pinched in the crook of a folded elbow and between a forearm and a thigh.
+- **Reading** (`readHands` in `src/I99_static.js`). The order is the fix: her left hand goes to its place, palm up; the book is
+  laid on that palm wherever the palm really ended up (`handFrame`); then her right forefinger is brought to a point on the
+  page, its tip is measured, and her hand is moved until the tip rests on the paper. Her hand is held level above the page with
+  her other fingers folded under her palm. The book grows on her palm once her hand is nearly there, and her right hand comes
+  down from above after it.
+- **Legs and cloth.** Her legs are six tapered tubes (`LEGCAP`) with six balls along each (`LEGS`). The rule, in the chains
+  (`legOut`) and again in the cloth's own drawing (`legPush`, a vertex-shader step on `band`, `tulle`, `skirt`, `robe`, `moss`,
+  `fern`): a point of skirt or cloak may never be where a leg is both further out from her middle AND overhead. Such a point
+  moves the shorter way, out past the leg or up onto it. Each stretch of chain is tested at its end and at two points along it.
+  A point is never pushed further from a leg than it lies when she stands, so standing she looks as she did.
+  - Sleeve cloth (`capMode` 1, set from the bones a point follows) only meets her legs: it is lifted onto a leg that lies
+    level, and moved straight out of one that stands.
+  - Each layer keeps a little further off than the one under it (`LEGPAD`), so pressed layers do not flicker.
+  - Tried and dropped: (1) cloth keeps to the side of each leg it was on at rest, turned with the leg's bone: fails when a
+    thigh rolls (the hover). (2) Straight out from the leg, leaning up for a level leg, plus a rule tying neighbouring chains
+    together: the whole skirt climbed into her lap. (3) For sleeves, "lift onto any leg overhead": standing, sleeve tails
+    jumped up her arm; it must be a level leg only.
+- **Sleeves** (`src/I45_robe.js`, `sleeveTick` in `src/I99_static.js`). A sleeve was 24 points each hung from a point of her
+  arm, so on a raised forearm the whole sleeve hung under it and her arm came out through the cloth. Now each tier is a row of
+  rings round her arm (bones `sl<side><tier>_<n>`, eleven a sleeve with the tail; 210 bones in all, down from 236).
+  - A ring is carried along her arm and round the bend of her elbow (its place and turn are blended across the joint).
+  - Off the vertical, it slides toward the ground until its top rests on her arm (painting F5). How far each ring may slide
+    each way is measured when she is built (`slack`), so her arm is always inside it. It follows on a spring.
+  - When her elbow folds, the other half of her arm passes through the ring's place: the ring slides toward it and, if that is
+    not enough, opens up to 45% wider.
+  - The long point of the last tier hangs from the cuff ring as a soft chain (`svt<side>`).
+  - Hanging at her side a sleeve does not slide at all, so standing she looks as she did.
+- **Page:** stage nine. One offline file: `deliver/Io_3D_stage9.html`. `deliver/Io_stage9_pass_through_fixes.jpg`.
+- Still passing through: hair and sleeves at her shoulders; a sleeve and her skirt or side when her arm is close to her body;
+  cloth pinched in the crook of a folded elbow; in the hover a boot can show through the thin edge of the skirt.
+- Checked: the meter, stills of every move from two sides, the quick page check and the full page test. Not watched playing,
+  not on a real phone.
+
+## Stage eight (November 13, 2026)
 
 The moves the whole party shares, and the book appears only when she reads.
 
@@ -25,6 +74,7 @@ The moves the whole party shares, and the book appears only when she reads.
 - **Page:** stage eight; Jog, Squat, Kneel and Hover are the last four Moves buttons. One offline file:
   `deliver/Io_3D_stage8.html`. `deliver/Io_stage8_party_moves.jpg` shows the four and the book appearing.
 - Checked in stills and with the quick page check (loads, plays hover, no errors). The full page test was not run again.
+- Stage nine changed how the book is placed: see `readHands` above; `bookPlace` now only slides `bkR`.
 
 ## Stage seven (November 13, 2026)
 
@@ -233,6 +283,9 @@ stays where her whole-figure paintings put it (1.408 m), so her **eye line is 1.
   Stills from the front, both three-quarters, both sides, behind, above and below.
 - The page ran at phone size in a headless browser: no errors, nothing off the side, every button, and a drag. Not checked on a
   real phone.
+- **Stage nine:** `python3 tools/pen.py [move ...]` prints, for each move, the worst pass-through seen while it plays (cloth
+  in her legs, sleeve in her arms, hands in her book). `tools/s9.sh <tag> [move ...]` takes stills of the moves where cloth
+  and limbs meet, each from two sides. Run both after any change to her moves, her cloth or her sleeves.
 
 ## Building
 
@@ -500,9 +553,10 @@ They also show her whole look from many sides, with the robe: useful when the ro
 
 ## Next stages, in Chris's order (November 13)
 
-1. His eye on the party moves (jog, squat, kneel, hover) and on the book appearing.
+1. His eye on the pass-through fixes of stage nine.
 2. **Her emotions:** the faces in C10.
 3. **Her spells and attacks** (H1 to H18, I1 to I8, and round 4): the pendant becoming the sickle, the dagger drawn with
    witchfire, the book floating with its pages turning.
 4. Not wanted: more work on her boots; more detail on belt, pouch and necklace.
-5. Still open if he asks: the cloak nearer to M1; hair on top of her head.
+5. Still open if he asks: the cloak nearer to M1; hair on top of her head; bringing her jog, squat, kneel and hover into line
+   with the other witches' versions.

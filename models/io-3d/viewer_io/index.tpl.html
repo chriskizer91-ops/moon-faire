@@ -40,9 +40,9 @@ canvas#stage{display:block;width:100%;height:100%;touch-action:none;cursor:grab}
 <body>
 <div class="wrap">
   <header>
-    <p class="eyebrow">Moon Faire · stage eight of her build</p>
+    <p class="eyebrow">Moon Faire · stage nine of her build</p>
     <h1><em>Io</em>, the Herbal Witch</h1>
-    <p class="sub">New: the moves the whole party shares (jog, squat, kneel, and the cross-legged hover), and her book now appears only when she reads. Pick a move under Moves. She stays in view while you scroll the buttons. Drag to turn her, pinch or scroll to zoom.</p>
+    <p class="sub">New: one pass on things passing through each other. Her book rests on her hand and her finger rests on the page, her skirt and cloak go over her legs, and her arms stay inside her sleeves. Pick a move under Moves. She stays in view while you scroll the buttons. Drag to turn her, pinch or scroll to zoom.</p>
   </header>
   <div class="play">
   <div class="stagebox" id="box">
@@ -60,25 +60,23 @@ canvas#stage{display:block;width:100%;height:100%;touch-action:none;cursor:grab}
   <div class="notes">
     <h2>New in this stage</h2>
     <ul>
-      <li>Her book appears when she reads, growing out of nothing in front of her, and goes the same way. She no longer carries it, and it no longer floats beside her in other moves.</li>
-      <li>Jog: her walk made quick and light, elbows bent.</li>
-      <li>Squat: down on her heels, leaning in, hands on her knees. She stays there until you pick another move.</li>
-      <li>Kneel: her right knee down, her left foot forward, her left hand on her raised knee. She stays there.</li>
-      <li>Hover: she floats cross-legged with her hands open on her knees and her eyes shut, rising and falling a little. She stays there.</li>
+      <li>Read her book: the book now lies on her left palm, and her right forefinger rests on the page. Her other fingers are folded up clear of it.</li>
+      <li>Skirt and cloak: the cloth is kept outside her legs. A knee pushes it forward when she walks or jogs, and it lies over her lap when she squats, kneels or hovers. Her left leg still shows through the slit in the skirt, as it is painted.</li>
+      <li>Sleeves: each tier is now a ring of cloth round her arm. It follows her arm round her elbow, and on a raised arm it rests on top of the arm and hangs below it, as in painting F5. The long point hangs from the cuff.</li>
     </ul>
     <h2 style="margin-top:12px">From the earlier stages</h2>
     <ul>
-      <li>Her book, dagger and sickle (stage seven). Her ankles, her wrists and her coy wave (stage six). Her belt, pouch, crystal, necklaces and bracelets (stage five). Her cloak with the moss, and her painted hands (stage four). Her arms, her moving hair and skirt, and her first moves (stage three). Her face, glasses, hair and hat (stage two). Her body, bodice and skirt (stage one).</li>
+      <li>The party's moves, and the book that appears when she reads (stage eight). Her book, dagger and sickle (stage seven). Her ankles, her wrists and her coy wave (stage six). Her belt, pouch, crystal, necklaces and bracelets (stage five). Her cloak with the moss, and her painted hands (stage four). Her arms, her moving hair and skirt, and her first moves (stage three). Her face, glasses, hair and hat (stage two). Her body, bodice and skirt (stage one).</li>
     </ul>
     <h2 style="margin-top:12px">What is rough, and what is not here yet</h2>
     <ul class="m">
       <li>The cloak is a first build. Its cloth and trim are drawn by code in F6's colours, not cut from your swatches yet. It is not see-through.</li>
       <li>Its body is fuller and rounder than in your picture, because it rides on the skirt. Its sleeves are narrower than the wide wings in your picture.</li>
-      <li>Hair and sleeves can pass through each other at her shoulders. A forearm can show through a sleeve when her elbow bends.</li>
+      <li>Still passing through: her hair and her sleeves at her shoulders; a sleeve and her skirt or her side when her arm is close to her body; a little sleeve cloth pinched in the crook of a tightly folded elbow; and in the hover a boot can show through the thin edge of the skirt.</li>
       <li>I tuned the moves from still pictures and cannot watch them play.</li>
       <li>The thin edge of each hand (thumb side, little-finger side) is soft paint with no detail: the paintings do not show it.</li>
       <li>The new pieces are plain shapes: the belt has no gold vine or holes yet, the pouch has no flap, studs or filigree, and the necklace pendant does not swing.</li>
-      <li>Book and blades are a first build: her fingers do not wrap the book or the sickle exactly, the dagger cannot be drawn yet, and the sickle simply appears in her hand.</li>
+      <li>Her fingers do not wrap the sickle exactly, the dagger cannot be drawn yet, and the sickle simply appears in her hand.</li>
       <li>Not here yet: the faces in C10; her spells and attacks.</li>
     </ul>
   </div>
@@ -158,7 +156,7 @@ canvas#stage{display:block;width:100%;height:100%;touch-action:none;cursor:grab}
     if (easing) { let d = want.az - orbit.az; d = Math.atan2(Math.sin(d), Math.cos(d)); const k = Math.min(1, dt * 5); orbit.az += d * k; orbit.el += (want.el - orbit.el) * k; orbit.dist += (want.dist - orbit.dist) * k; orbit.target.y += (want.ty - orbit.target.y) * k; }
     stage.render();
   }
-  $('hud').textContent = 'Stage eight · ' + Math.round(R.triangles / 1000) + 'k triangles';
+  $('hud').textContent = 'Stage nine · ' + Math.round(R.triangles / 1000) + 'k triangles';
   window.IO = { stage, R, step() { fit(); stage.render(); } };
   requestAnimationFrame(frame);
 })();
