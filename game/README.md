@@ -355,6 +355,10 @@ Chris said yes to walking the whole demo next, and that he is tracing the walkin
 - **Checked** in a headless browser: all nine places open with their people; walking out of the fair square into the stall row; walking up to someone and talking through their lines; a route past a person standing in a narrow way; the flight and its picture; the map; the phone layout. **Not checked:** how it feels in the hand, and real speed. The test machine has no graphics card (10 pictures a second there means nothing); the line under the picture on Chris's own screen is the number that counts.
 - Not in yet: fights, the things that can happen, the lamp count, the gates (every way out is open), the other three witches, the pilot's fight cameras.
 
+## The map changes: a 3D open world for walking, painted fights kept (November 14, afternoon) — handed over
+
+Chris decided on November 14 that walking and exploring happen in a 3D open world built by another session (`claude/moon-faire-open-world-map.md`), with fights still painted. **`HANDOFF-to-the-open-world.md`** in this folder is the index of everything this branch holds and what it is good for now: the story and `world/world.json`, the fair folk, the five fight places and their camera, the story pictures and item cards, the world map, the places laid out in metres, and what the painted walk-through can lend (talking, the flight picture, light by zone). The painted walking places stop being the game's map: the traced walking shapes and the map editor's tracing are set aside, and nothing was ever sent from the editor.
+
 ## Next
 
 Step 5, and the two-person fair-folk test if Chris wants it: the remaining twelve prompts (with the lane lesson built in), every scene traced, the
