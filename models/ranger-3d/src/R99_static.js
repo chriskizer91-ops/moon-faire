@@ -144,7 +144,7 @@
   const HOOK = [0.30, 1.30, 0.70];
   const FP = { relax: [0.30, 0.26, 0.32, 0.38, 0.44, 0.15], soft: [0.14, 0.12, 0.17, 0.22, 0.28, 0.55], open: [0.04, 0.03, 0.02, 0.05, 0.09, 0.95], fist: [0.72, 0.95, 0.96, 0.96, 0.95, 0],
     two: [0.62, 0.04, 0.07, 0.92, 0.94, 0.12], flat: [0.10, 0.02, 0.02, 0.04, 0.08, 0.50],
-    grip: [0.62, 0.72, 0.76, 0.79, 0.80, 0.05], hold: [0.58, 0.76, 0.80, 0.83, 0.84, 0], hook: [0.50, HOOK, HOOK, HOOK, 0.84, 0] };
+    grip: [0.62, 0.72, 0.76, 0.79, 0.80, 0.05], hold: [0.58, 0.76, 0.80, 0.83, 0.84, 0], hook: [0.50, HOOK, HOOK, HOOK, 0.84, 0], mudra: [0.46, 0.56, 0.08, 0.10, 0.14, 0.45] };
   const handAxes = {}, _qa = new THREE.Quaternion(), _qb = new THREE.Quaternion(), SPREAD = [0, 1, 0.3, -0.45, -1.0];
   for (const [S, s] of SIDES) {
     const c = Math.cos(s * A_POSE), sn = Math.sin(s * A_POSE), palm = V3(-s * c, -s * sn, 0), along = V3(sn, -c, 0), td = V3(-s * THUMB.dir[0], THUMB.dir[1], THUMB.dir[2]).normalize();
@@ -239,7 +239,7 @@
   const TR = 2.45;                                       // the moment she lets go, in the move's own seconds
   const K1 = V3(-0.40, 1.17, -0.04), K2 = V3(0.07, 1.20, 0.31);      // the bow's way round her: out past her right side, then in front of her chest
   const D = { pBack: V3(), qBack: Qn(), p: V3(), q: Qn(), qS: Qn(), qt: Qn(), a: V3(), b: V3(), c: V3(), K3: V3(), shL: V3(), anch: V3(), F: V3(), P: V3(), Th: V3(), W: V3(), g: V3(), qH: Qn(), qG: Qn(), qFK: Qn(), pFK: V3(), hint: V3(),
-    missL: 0, missR: 0, missLeg: 0, tU: V3(), tD: V3(), nock: V3(), nock0: V3(), pass: V3(), dir: V3(), tail: V3(), tip: V3(), rel: V3(), relDir: V3(), e1: V3(), e2: V3() };
+    missL: 0, missR: 0, missLeg: 0, clip: 0, clipLeft: 0, clipLeg: 0, clipAt: '', tU: V3(), tD: V3(), nock: V3(), nock0: V3(), pass: V3(), dir: V3(), tail: V3(), tip: V3(), rel: V3(), relDir: V3(), e1: V3(), e2: V3() };
   const bez = (a, b, c, u, out) => out.copy(a).multiplyScalar((1 - u) * (1 - u)).addScaledVector(b, 2 * u * (1 - u)).addScaledVector(c, u * u);
   // the wrist that puts point g of the bow at the place GP of her hand, the hand turned by yaw about the bow's length
   const onBow = (S, a, f, yaw, GP, outW, outQ) => { const s = S === 'L' ? 1 : -1, cy = Math.cos(yaw), sy = Math.sin(yaw);
@@ -379,7 +379,7 @@
     const wLs = o.tilt, wLb = o.free * (1 - o.tilt), kLh = Math.max(wLs, wLb);
     if (kLh > 0) { rp(SK.handL, W.fk); rp(SK.uarmL, W.shL); W.b.set(lerp(-0.18, -0.40, o.lun), lerp(-0.30, -0.10, o.lun), -0.10).add(W.shL);
       rpt(SK.scab, W.v1.copy(SWK.Pm).addScaledVector(SWK.ns, 0.034).addScaledVector(SWK.ds, -0.02), W.g); W.g.y += 0.05;
-      W.W.copy(W.fk).lerp(W.b, wLb).lerp(W.g, wLs); const miss = reach('L', W.W, null, W.hint.set(0.3, -0.5, -1), sm(0, 0.25, kLh)); if (miss > D.missL) D.missL = miss; }
+      W.W.copy(W.fk).lerp(W.b, wLb).lerp(W.g, wLs); { const bell = 4 * wLs * (1 - wLs), ar = W.arc || (W.arc = V3()); rp(SK.hips, ar); ar.subVectors(W.W, ar); ar.y = 0; if (bell > 0.001 && ar.lengthSq() > 1e-6) W.W.addScaledVector(ar.normalize(), 0.17 * bell); } const miss = reach('L', W.W, null, W.hint.set(0.3, -0.5, -1), sm(0, 0.25, kLh)); if (miss > D.missL) D.missL = miss; }
     fWant.R = o.wR > 0.75 ? FP.hold : FP.relax; fWant.L = o.tilt > 0.6 ? FP.hold : o.free > 0.5 ? (o.lun > 0.5 ? FP.open : FP.soft) : FP.relax;
     // --- light: the blade shines as she cuts, and leaves its crescent
     const glow = sm(1.20, 1.30, T) * (1 - sm(1.45, 1.80, T)); W.foot.copy(W.p).addScaledVector(a, SWK.Y0); W.tip.copy(W.p).addScaledVector(a, SWK.Y1);
@@ -544,6 +544,44 @@
       m.quaternion.copy(PQ).multiply(MW.q2.setFromAxisAngle(MW.v.set(rndK(i, 13) - 0.5, rndK(i, 14) - 0.5, 0.6).normalize(), a + T * (loose ? 0.6 : 0.3) + 5 * e * (rndK(i, 15) - 0.5))); m.scale.setScalar(sz); m.material.opacity = op; }
     return true;
   }
+  // ---------- nothing passes through anything: her hands and forearms are kept out of her bags and her legs ----------
+  // Each thing to keep out of is a simple shape that rides on a bone. A thigh or a shin is a rod with round ends, thicker at one end.
+  // A bag is a dome on her hip: an egg shape whose middle is 5 cm inside her, a little wider and taller than the bag and as deep,
+  // so an arm swinging by slides up over its face and down again without a jump. Each hand is six balls (wrist, palm, knuckles, fingers) and
+  // its forearm two more. After everything else has placed her arms, any ball found inside a shape is pushed out the short way, her
+  // wrist is moved by the worst push, and her arm is worked out again; a few rounds settle it. Moves that hold a weapon place her
+  // hands exactly, so there a hand is only moved while it holds nothing (CLR.free eases between the two). D.clip is the deepest a
+  // ball was this frame before the fix (metres), D.clipAt which hand and shape, D.clipLeg the deepest into a leg, D.clipLeft what was
+  // left after the fix. D.clearOff = true turns the fix off. "Stand still" is left as posed, to compare with the paintings.
+  const CLR = { balls: {}, rods: [], bags: [], free: { R: 1, L: 1 }, hit: '', n: V3(), p: V3(), q: V3(), c: V3(), ab: V3(), l: V3(), push: V3(), best: V3(), W: V3(), E: V3(), S0: V3(), hint: V3(), qH: Qn() };
+  for (const [S, s] of SIDES) { const H = SK['hand' + S], Fa = SK['farm' + S], fr = Fa.userData.rest, hr = H.userData.rest;
+    CLR.balls[S] = [[H, handPt(s, 0, 0, 0), 0.021], [H, handPt(s, 0, -0.045, 0.020), 0.017], [H, handPt(s, 0, -0.045, -0.020), 0.017], [H, handPt(s, 0, -0.088, 0.020), 0.014], [H, handPt(s, 0, -0.088, -0.022), 0.014], [H, handPt(s, 0, -0.125, 0), 0.011],
+      [Fa, fr.clone().lerp(hr, 0.55), 0.030], [Fa, fr.clone().lerp(hr, 0.80), 0.026]]; }
+  { const rad = (y) => { const p = prof(R_LEG, y, true); return Math.max(p[0], (p[1] + p[2]) / 2); };
+    for (const [S] of SIDES) { CLR.rods.push({ name: 'thigh' + S, A: SK['thigh' + S], B: SK['shin' + S], rA: rad(0.775), rB: rad(0.525), a: V3(), b: V3() }); CLR.rods.push({ name: 'shin' + S, A: SK['shin' + S], B: SK['foot' + S], rA: rad(0.50), rB: 0.052, a: V3(), b: V3() }); } }
+  for (const bn in BAGBOX) if (SK[bn]) { const B = BAGBOX[bn]; CLR.bags.push(Object.assign({ name: bn, bone: SK[bn], rest: SK[bn].userData.rest, bp: V3(), qn: Qn(), qi: Qn(), C: B.O.clone().addScaledVector(B.ey, (B.drop - B.H) / 2).addScaledVector(B.ez, -0.05), a: B.W / 2 + 0.05, b: (B.H + B.drop) / 2 + 0.03, c: B.D + 0.05 }, B)); }
+  const legRod = (S) => CLR.rods.find((R) => R.name === 'thigh' + S);
+  // The way out of a shape is straight through its skin when a ball is only just inside. The deeper it is, the more the way out leans
+  // toward one fixed side (out from her hip for a bag; out to that hand's own side and up for a leg), so a ball that goes right
+  // through the middle is still carried out the same side and never flips across.
+  function clrPush(p, r, out, legsOnly, s) { let dep = 0; out.set(0, 0, 0);
+    for (const R of CLR.rods) { const ab = CLR.ab.copy(R.b).sub(R.a), L2 = ab.lengthSq(), t = cl(CLR.q.copy(p).sub(R.a).dot(ab) / L2, 0, 1), c = CLR.c.copy(R.a).addScaledVector(ab, t), rr = lerp(R.rA, R.rB, t) + r, v = CLR.q.copy(p).sub(c), d0 = v.length(); if (d0 >= rr) continue;
+      const k = 1 - d0 / rr, pref = CLR.n.set(s * 0.6, 0.8, 0.15); pref.addScaledVector(ab, -pref.dot(ab) / L2).normalize(); if (d0 > 1e-6) pref.multiplyScalar(k).addScaledVector(v, (1 - k) / d0).normalize();
+      const b = v.dot(pref), d = -b + Math.sqrt(Math.max(0, b * b - (d0 * d0 - rr * rr))); if (d > dep) { dep = d; out.copy(pref).multiplyScalar(d); CLR.hit = R.name; } }
+    if (!legsOnly) for (const B of CLR.bags) { const l = CLR.l.copy(p).sub(B.bp).applyQuaternion(B.qi).add(B.rest).sub(B.C), a = B.a + r, b = B.b + r, c = B.c + r, x = l.dot(B.ex), y = l.dot(B.ey), z = l.dot(B.ez), F = x * x / (a * a) + y * y / (b * b) + z * z / (c * c); if (F >= 1) continue;
+      let ux = x / (a * a), uy = y / (b * b), uz = z / (c * c); const g = Math.hypot(ux, uy, uz), k = 1 - Math.sqrt(F); if (g > 1e-6) { ux *= (1 - k) / g; uy *= (1 - k) / g; uz = uz * (1 - k) / g + k; } else { ux = uy = 0; uz = 1; } const gn = Math.hypot(ux, uy, uz); ux /= gn; uy /= gn; uz /= gn;
+      const qa = ux * ux / (a * a) + uy * uy / (b * b) + uz * uz / (c * c), qb = 2 * (x * ux / (a * a) + y * uy / (b * b) + z * uz / (c * c)), d = (-qb + Math.sqrt(Math.max(0, qb * qb - 4 * qa * (F - 1)))) / (2 * qa);
+      if (d > dep) { dep = d; out.set(0, 0, 0).addScaledVector(B.ex, ux).addScaledVector(B.ey, uy).addScaledVector(B.ez, uz).applyQuaternion(B.qn).multiplyScalar(d); CLR.hit = B.name; } }
+    return dep; }
+  function clrDepth(S, legsOnly) { let dep = 0; const s = S === 'R' ? -1 : 1; CLR.best.set(0, 0, 0); for (const [bone, pt, r] of CLR.balls[S]) { rpt(bone, pt, CLR.p); const d = clrPush(CLR.p, r, CLR.push, legsOnly, s); if (d > dep) { dep = d; CLR.best.copy(CLR.push); CLR.at = CLR.hit; } } return dep; }
+  const HOLDS = [FP.hook, FP.hold, FP.grip, FP.fist];
+  function clearHands(N, dt, snap) { D.clip = 0; D.clipLeft = 0; D.clipLeg = 0; D.clipAt = ''; inRoot(); const weapon = /^(draw|sword|knives)$/.test(N);
+    for (const R of CLR.rods) { rp(R.A, R.a); rp(R.B, R.b); } for (const B of CLR.bags) { rp(B.bone, B.bp); rq(B.bone, B.qn); B.qi.copy(B.qn).invert(); }
+    for (const [S] of SIDES) { const want = weapon && HOLDS.includes(fWant[S]) ? 0 : 1; CLR.free[S] = snap ? want : CLR.free[S] + (want - CLR.free[S]) * Math.min(1, dt * 7);
+      const leg = clrDepth(S, true); if (leg > D.clipLeg) D.clipLeg = leg; let dep = clrDepth(S); if (dep > D.clip) { D.clip = dep; D.clipAt = S + ' ' + CLR.at; } const kf = D.clearOff ? 0 : sm(0, 0.006, dep) * CLR.free[S];
+      for (let it = 0; it < 4 && dep > 0.0008 && kf > 0.001; it++) { rp(SK['hand' + S], CLR.W); rq(SK['hand' + S], CLR.qH); rp(SK['farm' + S], CLR.E); rp(SK['uarm' + S], CLR.S0); CLR.hint.copy(CLR.E).sub(CLR.S0.lerp(CLR.W, 0.5)); CLR.W.add(CLR.best);
+        reach(S, CLR.W, CLR.qH, CLR.hint, kf); inRoot(); dep = clrDepth(S); }
+      if (dep > D.clipLeft) D.clipLeft = dep; } }
   // ---------- postures she holds, and her short fight moves and emotes ----------
   // Postures (kneel, squat, sit, hover, down) each have a weight that eases to 1 while that posture is chosen and back to 0 when it is
   // not, so she slides in and out of them and from one to another. A posture is a place for her hips (set in animate), a place and
@@ -557,7 +595,7 @@
     hover: { R: [0.13, -0.08, 0.36, 0, 0, -1, -0.25, 0.35], L: [-0.11, -0.10, 0.30, 0, 0, 1, -0.25, 0.35] },
     down: { R: [-0.10, 0.075, -0.205, 0, 170, -0.15, -0.6, 1], L: [0.10, 0.075, -0.205, 0, 170, 0.15, -0.6, 1] } };
   const OS = { R: V3(), L: V3(), yawR: 0, yawL: 0, plant: 0 };       // what a short move asks of her feet: how far each is from its resting spot, its turn, and how firmly both are planted
-  const EW = { ft: V3(), hint: V3(), q: Qn(), qk: Qn(), qx: Qn(), qy: Qn(), qfol: Qn(), W: V3(), fk: V3(), qfk: Qn(), kn: V3(), v: V3(), sh: V3(), F: V3(), P: V3(), qG: Qn(), qH: Qn(), hp: V3() };
+  const EW = { hv: V3(), ft: V3(), hint: V3(), q: Qn(), qk: Qn(), qx: Qn(), qy: Qn(), qfol: Qn(), W: V3(), fk: V3(), qfk: Qn(), kn: V3(), v: V3(), sh: V3(), F: V3(), P: V3(), qG: Qn(), qH: Qn(), hp: V3() };
   const hardBeats = (T, o) => { o.j = sm(0, 0.08, T) * (1 - sm(0.15, 0.6, T)); o.back = sm(0.04, 0.46, T) * (1 - sm(1.18, 1.68, T)); o.fold = sm(0.05, 0.30, T) * (1 - sm(0.85, 1.25, T)); o.sR = sm(0.05, 0.26, T); o.sL = sm(0.24, 0.46, T); o.rL = sm(1.18, 1.44, T); o.rR = sm(1.40, 1.66, T); return o; }, HDB = {};
   function emoteStage(N, T) {
     const a = PE, any = a.all > 0.001 || OS.plant > 0.001; if (!any && !/^(hard|win|bow|wave)$/.test(N)) return;
@@ -573,15 +611,17 @@
         if (a.hover > 0.001) { plant(Sd, EW.ft, null, EW.hint, 1); rq(SK['foot' + Sd], EW.qfol); EW.q.slerp(EW.qfol, a.hover / Math.max(a.all, 1e-4)); }       // floating, her feet go where her shins point
         const miss = plant(Sd, EW.ft, EW.q, EW.hint, kL); if (miss > D.missLeg) D.missLeg = miss; } }
     // --- her hands in a posture: on a knee, on her thigh, or limp on the ground
-    if (a.all > 0.001) for (const [Sd, s] of SIDES) { rp(SK['hand' + Sd], EW.fk); rp(SK['shin' + Sd], EW.kn); let w = 0; EW.W.set(0, 0, 0);
+    if (a.all > 0.001) for (const [Sd, s] of SIDES) { rp(SK['hand' + Sd], EW.fk); rp(SK['shin' + Sd], EW.kn); let w = 0, ay = 0.05, az = 0.06; EW.W.set(0, 0, 0);
       const onKnee = a.squat + (Sd === 'L' ? a.kneel + a.sit : 0); if (onKnee > 0) { EW.W.addScaledVector(EW.v.copy(EW.kn).add(EW.sh.set(-s * 0.01, 0.048, 0.04)), onKnee); w += onKnee; }
-      if (a.hover > 0) { rp(SK['thigh' + Sd], EW.v).lerp(EW.kn, 0.52); EW.v.y += 0.062; EW.W.addScaledVector(EW.v, a.hover); w += a.hover; }       // floating, they lie open on her thighs
-      if (Sd === 'R' && a.sit > 0) { rp(SK.thighR, EW.v).lerp(EW.kn, 0.55); EW.v.y += 0.078; EW.W.addScaledVector(EW.v, a.sit); w += a.sit; }
+      if (a.hover > 0) { const R = legRod(Sd), A = ARM[Sd]; rp(SK['thigh' + Sd], EW.v); EW.F.copy(EW.kn).sub(EW.v); const Lt = EW.F.length(); EW.F.multiplyScalar(1 / Lt); EW.P.set(0, 1, 0).addScaledVector(EW.F, -EW.F.y).normalize(); rp(SK['uarm' + Sd], EW.sh);       // floating, the backs of her hands rest on her thighs just above her knees, palms up
+        let t = 0.82; for (let i = 0; i < 9; i++) { EW.hv.copy(EW.v).addScaledVector(EW.F, Lt * t).addScaledVector(EW.P, lerp(R.rA, R.rB, t) + 0.024); if (EW.hv.distanceTo(EW.sh) < A.l1 + A.l2 - 0.012) break; t -= 0.05; }
+        EW.W.addScaledVector(EW.hv, a.hover); w += a.hover; EW.F.y -= 0.10; handQ(Sd, EW.F.normalize(), EW.P, EW.qG); }
+      if (Sd === 'R' && a.sit > 0) { rp(SK.shinL, EW.v).lerp(rp(SK.footL, EW.hv), 0.22); EW.v.z += 0.062; EW.v.x -= 0.035; EW.W.addScaledVector(EW.v, a.sit); w += a.sit; ay += 0.27 * a.sit; az += 0.12 * a.sit; }       // sitting, her right hand comes across to the shin of her raised knee
       if (a.down > 0) { EW.W.addScaledVector(EW.v.set(s * 0.21, 0.150, SK.hips.position.z + 0.31), a.down); w += a.down; }
-      if (w > 0.001) { EW.W.multiplyScalar(1 / w).lerp(EW.fk, 1 - Math.min(1, w)); const miss = reach(Sd, EW.W, null, EW.hint.set(s * 0.8, -0.5, -0.4), sm(0, 0.25, w)); if (Sd === 'L') { if (miss > D.missL) D.missL = miss; } else if (miss > D.missR) D.missR = miss; }
-      if (a.hover > 0.5) fWant[Sd] = FP.soft; }
+      if (w > 0.001) { const wc = Math.min(1, w), bell = 4 * wc * (1 - wc); EW.W.multiplyScalar(1 / w).lerp(EW.fk, 1 - wc); EW.W.x += s * 0.07 * bell; EW.W.y += ay * bell; EW.W.z += az * bell; let q = null; /* on its way to its resting place a hand goes round, not through: a small arc out, up and forward */ if (a.hover > 0.001) { rq(SK['hand' + Sd], EW.qfk); q = EW.qH.copy(EW.qfk).slerp(EW.qG, sm(0.15, 0.85, a.hover)); } const miss = reach(Sd, EW.W, q, EW.hint.set(s * 0.8, -0.5, -0.4), sm(0, 0.12, w)); if (Sd === 'L') { if (miss > D.missL) D.missL = miss; } else if (miss > D.missR) D.missR = miss; }
+      if (a.hover > 0.5) fWant[Sd] = FP.mudra; }
     // --- her hands in the short moves
-    const hand = (Sd, W, w, hint, F, P) => { if (w <= 0.001) return; rp(SK['hand' + Sd], EW.fk); EW.W.copy(W).lerp(EW.fk, 1 - w); let q = null; if (F) { rq(SK['hand' + Sd], EW.qfk); handQ(Sd, F, P, EW.qG); q = EW.qH.copy(EW.qfk).slerp(EW.qG, w); }
+    const hand = (Sd, W, w, hint, F, P) => { if (w <= 0.001) return; const bell = 4 * w * (1 - w); rp(SK['hand' + Sd], EW.fk); EW.W.copy(W).lerp(EW.fk, 1 - w); EW.W.x += (Sd === 'R' ? -1 : 1) * 0.05 * bell; EW.W.z += 0.13 * bell; /* out and forward on the way, round her hip and bag */ let q = null; if (F) { rq(SK['hand' + Sd], EW.qfk); handQ(Sd, F, P, EW.qG); q = EW.qH.copy(EW.qfk).slerp(EW.qG, w); }
       const miss = reach(Sd, EW.W, q, hint, sm(0, 0.25, w)); if (Sd === 'L') { if (miss > D.missL) D.missL = miss; } else if (miss > D.missR) D.missR = miss; };
     if (N === 'hard') { const o = hardBeats(T, HDB); rpt(SK.spine1, EW.v.set(0.03, 1.06, 0.135), EW.kn); hand('R', EW.kn, o.fold, EW.hint.set(-0.9, -0.5, 0.1), EW.F.set(0.9, -0.2, 0.3).normalize(), EW.P.set(0, 0, -1)); if (o.fold > 0.5) fWant.R = FP.soft; }
     if (N === 'win') { const p = sm(1.0, 1.35, T) * (1 - sm(2.5, 2.9, T)), sl = sm(1.42, 1.62, T); rpt(SK.hips, EW.v.set(0.172, 0.975, 0.02), EW.kn); hand('L', EW.kn, p, EW.hint.set(1, -0.2, -0.7));
@@ -715,8 +755,8 @@
     // ---- postures: where her hips go and how her back and head are held. Her feet and hands are in emoteStage ----
     if (PE.all > 0.001) { const a = PE, bob = 0.025 * Math.sin(clock * 1.5), stag = N === 'fall' ? sm(0, 0.08, T) * (1 - sm(0.15, 0.5, T)) : 0;
       SK.hips.position.y += -0.43 * a.kneel - 0.535 * a.squat - 0.745 * a.sit + (-0.38 + bob) * a.hover - 0.595 * a.down; SK.hips.position.z += 0.02 * a.kneel - 0.20 * a.squat - 0.05 * a.sit - 0.10 * a.down; SK.hips.position.x -= 0.05 * stag;
-      add('hips', 0.30 * a.squat + 0.25 * a.down, 0, 0.05 * stag); add('spine1', 0.04 * a.kneel + 0.25 * a.squat + 0.10 * a.sit + 0.35 * a.down - 0.10 * stag, 0, 0.10 * stag); add('spine2', 0.15 * a.squat + 0.08 * a.sit + 0.30 * a.down, 0.15 * stag, 0.08 * stag); add('spine3', 0.15 * a.down - 0.03 * a.hover, 0, 0);
-      add('neck', -0.20 * a.squat - 0.06 * a.sit + 0.30 * a.down - 0.15 * stag, 0, 0); add('head', -0.15 * a.squat - 0.06 * a.sit + 0.20 * a.down, 0, 0.08 * a.down);
+      add('hips', 0.30 * a.squat + 0.25 * a.down, 0, 0.05 * stag); add('spine1', 0.04 * a.kneel + 0.25 * a.squat + 0.16 * a.sit + 0.35 * a.down - 0.10 * stag, 0, 0.10 * stag); add('spine2', 0.15 * a.squat + 0.14 * a.sit + 0.30 * a.down, 0.15 * stag + 0.10 * a.sit, 0.08 * stag); add('spine3', 0.15 * a.down - 0.03 * a.hover, 0, 0);
+      add('neck', -0.20 * a.squat - 0.10 * a.sit + 0.30 * a.down - 0.15 * stag, 0, 0); add('head', -0.15 * a.squat - 0.10 * a.sit + 0.20 * a.down, -0.08 * a.sit, 0.08 * a.down);
       if (a.hover > 0.5 || a.down > 0.4) squint = 1; if (a.hover > 0.5) mouthNow = 'smile'; if (stag > 0.3) mouthNow = 'oo'; }
     // ---- a blow from screen right: she rocks away from it, flinches, then rolls her shoulder and is ready again ----
     if (N === 'hit') { const j = sm(0, 0.07, T) * (1 - sm(0.13, 0.58, T)), j2 = sm(0.02, 0.12, T) * (1 - sm(0.20, 0.62, T)), sh = sm(0.60, 0.74, T) * (1 - sm(0.86, 1.04, T));
@@ -756,7 +796,7 @@
     if (N === 'limber') { const k = sm(0, 0.3, T) * (1 - sm(2.2, 2.6, T));
       bounce(0.020 * Math.abs(Math.sin(T * 9.5)) * k); for (const [S, s] of SIDES) { add('clav' + S, 0, 0, s * 0.16 * Math.sin(T * 5 + (s > 0 ? 1.6 : 0)) * k); add('uarm' + S, 0.14 * Math.sin(T * 9 + s) * k, 0, s * 0.06 * k); add('farm' + S, -(0.5 + 0.2 * Math.sin(T * 11 + s)) * k, 0, 0); add('shin' + S, 0.10 * k, 0, 0); add('thigh' + S, -0.05 * k, 0, 0); }
       add('head', 0, 0, 0.22 * Math.sin(T * 2.4) * k); add('neck', 0.04 * k, 0, 0.08 * Math.sin(T * 2.4) * k); }
-    armsAndBow(N === 'draw' ? T : -1, dt); swordStage(N === 'sword' ? T : -1, dt * (1 - stillK), snapNow); knifeStage(N === 'knives' ? T : -1); { const g1 = gemStage(N === 'gem' ? T : -1), g2 = glassStage(N === 'glass' ? T : -1); if (!g1 && !g2) magicOff(); else { if (!g1) { for (const k of ['gGlow', 'gStar', 'gRing']) MG[k].visible = false; for (const m of MG.sparks) m.visible = false; if (meshes.veins) meshes.veins.visible = false; MATS.gem.emissiveIntensity = 0; MATS.lens.emissiveIntensity = 0; } if (!g2) { MG.pane.visible = false; MG.flash.visible = false; for (const a of [MG.rim, MG.shards]) for (const m of a) m.visible = false; } } } emoteStage(N, T); hoverLight(); fingersTick(dt, snapNow);
+    armsAndBow(N === 'draw' ? T : -1, dt); swordStage(N === 'sword' ? T : -1, dt * (1 - stillK), snapNow); knifeStage(N === 'knives' ? T : -1); { const g1 = gemStage(N === 'gem' ? T : -1), g2 = glassStage(N === 'glass' ? T : -1); if (!g1 && !g2) magicOff(); else { if (!g1) { for (const k of ['gGlow', 'gStar', 'gRing']) MG[k].visible = false; for (const m of MG.sparks) m.visible = false; if (meshes.veins) meshes.veins.visible = false; MATS.gem.emissiveIntensity = 0; MATS.lens.emissiveIntensity = 0; } if (!g2) { MG.pane.visible = false; MG.flash.visible = false; for (const a of [MG.rim, MG.shards]) for (const m of a) m.visible = false; } } } emoteStage(N, T); hoverLight(); clearHands(N, dt, snapNow); fingersTick(dt, snapNow);
     // her face: she blinks; her mouth moves when she talks
     if (clock > blinkAt) { blinkT = clock; blinkAt = clock + 2.2 + 2.6 * Math.abs(Math.sin(clock * 12.9)); }
     const bt = clock - blinkT, eyes = Math.max(squint, bt < 0.05 ? 0.5 : bt < 0.10 ? 1 : bt < 0.15 ? 0.5 : 0), key = eyes + '|' + mouthNow;

@@ -290,12 +290,39 @@ four strap hooks as real objects, standing still. About 355,000 triangles.
     out; `tools/seq.sh` jumps straight to the finished posture.
   - Rough: her feet slide to their places rather than step when she goes down; the fall ends on her knees, not flat; bags
     and charms can sink a little into the ground when she sits; all timing is from stills.
+- **Stage 13b: nothing passes through anything, and the hover as meditation.** Chris: "The fall is good as it is. the two
+  strong shots should be arrows of light. Also her hands pass through her bag and her legs and the hover animation should
+  look like meditation it is close but her hands are inside her thighs basically just stop the body part clipping."
+  - **Measured first** (`tools/clip_audit.sh off`): standing in "Ready" her right hand was 48 mm inside the satchel; walking
+    45 mm; hands went up to 103 mm into a thigh on the way down to sit, 79 mm in the squat, 73 mm in the hover.
+  - **`clearHands(N, dt, snap)`**, run after every other step has placed her arms. Each hand is six balls and its forearm two
+    more (`CLR.balls`). Each thigh and shin is a rod with round ends (`CLR.rods`, widths from the leg table). Each bag is a
+    dome on its own bone (`CLR.bags`, from `BAGBOX`, which `R45_gear.js` now fills in): an egg shape whose middle is 5 cm
+    inside her hip. A ball inside a shape is pushed out (`clrPush`), her wrist is moved by the worst push and her arm worked
+    out again with `reach`, up to four rounds. The way out is straight through the skin when a ball is only just inside,
+    and leans toward one fixed side the deeper it is (out from her hip for a bag; out to that hand's side and up for a leg),
+    so a hand never flips across. In `draw`, `sword` and `knives` a hand is only moved while it holds nothing (`CLR.free`).
+    "Stand still" is left as posed. `D.clearOff = true` turns it off; `D.clip`, `D.clipAt`, `D.clipLeg`, `D.clipLeft` report.
+  - **Paths, not only the fix.** A hand whose own path went deep through her could not be pushed out smoothly, so those
+    paths were changed: hands going to a resting place in a posture take a small arc out, up and forward; `hand()` in
+    `emoteStage` sends a travelling hand out and forward round her hip; in the sword move her left hand goes round her hip
+    between its balance place and the scabbard; sitting, her right hand now comes across to the shin of her raised knee
+    (it used to lie where the satchel is).
+  - **Hover.** The backs of her hands rest on her thighs just above her knees, palms up (`handQ`), placed on the thigh's
+    skin and moved toward her hip until her arm reaches; fingers in the new shape `FP.mudra`.
+  - Her arms hang and swing wider now (15 degrees from her side where they were 9), because the bags are where her hands used
+    to hang.
+  - `tools/clip_audit.sh` prints, for every move, how deep her hands went before the fix and what is left after it.
+    `tools/pop_audit.sh` prints the furthest a wrist moves in one frame with the fix off and on, to catch a fix that makes a
+    hand jump.
+  - Decided by Chris: the fall stays as it is; the gem's two strong shots are to be arrows of light (not built yet).
+  - Not covered: elbows and upper arms, weapons, charms, hair, and her body itself (there is no shape for her torso).
 - Waiting for his notes: the moves again; stage two (head), stage three (hands and arms) and stage five.
 
 Rough or not built yet: her face does not move (no blink, no expressions); the hair has a smooth edge with none of the painted
 flyaway wisps, and the loose locks are simple; earrings and necklaces; bracelets; each charm is one stiff piece on a hinge (its chain does not bend, charms can
 pass through each other); the caps on the stones are plain cones; with her arms straight out the iron curls bend with her skin;
-the gem's two shots; jewellery.
+the gem's two shots (to be arrows of light); jewellery.
 
 ## What is here
 
@@ -466,6 +493,11 @@ take the lean out. Her arms keep the Jester's bone lengths (0.63 m; the painting
 
 ## Checking
 
+- Stage 13b: `tools/clip_audit.sh` over all 22 moves: 1 mm or less left after the fix in every move where her hands are free
+  (while she holds the sword the number reads higher; her hand is on the hilt and is left alone). `tools/pop_audit.sh`: the
+  fix adds no jump (the furthest a wrist moves in one frame is within 10 mm of the same move with the fix off). Stills of
+  standing, walking, the five postures, the hard hit, the bow and the sword. Page test at phone size, three parts: no errors.
+
 - Stage thirteen: stills of each posture from the front quarter, the side and close up; of her sliding from standing to
   kneeling, from kneeling to sitting and through the fall (`tools/run_seq.sh`); and through the hit, hard hit, dodge, win,
   court bow and wave. Feet reached where they were wanted at every still; her hands fall short only while she is on the way
@@ -562,7 +594,7 @@ Python that reads them with `-I`.
 Done at stage nine: fingers, the bow, Moonsteel Draw. Done at stage ten: the sword, its guard and a full cut (G4, H7).
 Done at stage eleven: the knives and their throw (G5, H8). Done at stage twelve: the gem (H9) and Silverglass (H6).
 Done at stage thirteen: hit reactions, a dodge, a win, a fall, and the emotes (court bow, wave, kneel, squat, sit, hover).
-Next: jewellery, and the gem's two shots once Chris says how they should look.
+Next: the gem's two shots as arrows of light (Chris's choice, November 13), then jewellery.
 Next, in the order Chris agreed (the first item below is now done): Silverglass (H6) and the gem (H9); then hit reactions, a dodge, a win and
 a fall. The older list below is kept for what is still open in it.
 

@@ -1,4 +1,5 @@
   // ---------- her belts, satchel, pouch and strap hooks as real objects (stage five) ----------
+  const BAGBOX = {};       // each bag as a plain box in its own frame, for keeping her hands out of it (R99, clearHands)
   // Sizes and places are read off A1 (front, 898 px a metre), A2 (back) and A3 (sides); the leather is cut from F6 (bake_gear_r.py).
   //   Belts: two, 2.2 cm wide. Each lies in a tilted plane round her hips. A (ring buckle, front right) is high on her right hip and low on
   //   her left; B (square buckle, front left) is the other way. They cross at the middle, front and back, 96 cm up. In A1 they run from
@@ -93,7 +94,7 @@
         hinge.addScaledVector(ez0, push); }
       const ey = UP.clone().multiplyScalar(Math.cos(th)).addScaledVector(ez0, -Math.sin(th)), ez = ez0.clone().multiplyScalar(Math.cos(th)).addScaledVector(UP, Math.sin(th));
       const O = hinge.clone().addScaledVector(ey, -drop);
-      const bn = 'bag' + S.name; addBone(bn, 'hips', hinge.x, hinge.y, hinge.z); const wB = () => [BI[bn], 1];       // its own bone, at the hinge, so it can swing and be pushed out by her thigh
+      const bn = 'bag' + S.name; addBone(bn, 'hips', hinge.x, hinge.y, hinge.z); const wB = () => [BI[bn], 1]; BAGBOX[bn] = { O: O.clone(), ex: ex.clone(), ey: ey.clone(), ez: ez.clone(), H, W: S.W, D: Math.max(S.D[0], S.D[1]), drop };       // its own bone, at the hinge, so it can swing and be pushed out by her thigh
       { const sd = hinge.x < 0 ? 'R' : 'L', inFoot = (p) => { const d = p.clone().sub(hinge); return Math.abs(d.dot(ex)) < hw0 * 0.94 && d.y < -drop - 0.004 && d.y > -drop - H - 0.01; }, ang = (p) => Math.atan2(p.clone().sub(hinge).dot(ez0), hinge.y - p.y);
         let needT = -1; for (const p of body) if (inFoot(p)) needT = Math.max(needT, ang(p));
         const pts = []; for (let j = 0; j <= 18; j++) { const y = lerp(0.87, 0.69, j / 18); for (const q of legRing(sd === 'R' ? -1 : 1, y, 1.04, 30)) { const p = P3(q); if (inFoot(p)) pts.push({ p, w: 1 - sm(0.78, 0.87, y) }); } }

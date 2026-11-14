@@ -3,7 +3,7 @@ import sys, os
 PART = os.environ.get('PART', '')       # the whole test is slow without a graphics card: PART=1 is the bow, the sword, the knives, the gem and Silverglass, PART=2 the older buttons, PART=3 the fight moves and emotes
 from playwright.sync_api import sync_playwright
 from PIL import Image
-PAGE = sys.argv[1] if len(sys.argv) > 1 else '/home/claude/ranger/deliver/Ranger_3D_stage13.html'
+PAGE = sys.argv[1] if len(sys.argv) > 1 else '/home/claude/ranger/deliver/Ranger_3D_stage13b.html'
 ARGS = ['--use-angle=swiftshader', '--enable-unsafe-swiftshader', '--ignore-gpu-blocklist', '--allow-file-access-from-files']
 with sync_playwright() as p:
     b = p.chromium.launch(executable_path='/usr/bin/google-chrome', args=ARGS)
