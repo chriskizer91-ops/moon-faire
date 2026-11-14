@@ -321,7 +321,7 @@ Chris: "I want you to think about the witches and choose." Same page, republishe
 
 ## The extra pictures the story needs: prompts and fight-place guides (November 14) — waiting for Chris to paint
 
-Chris: "If we need extra pictures for like narrative beats, you can make a prompt for that now that we know the story." Page: "Moon Faire: story pictures to paint" (file: `out/moon-faire-story-pictures.html`; pack: `out/Moon_Faire_Story_Pictures_To_Paint.zip`; prompts as text: `world/pictures/prompts.md`).
+Chris: "If we need extra pictures for like narrative beats, you can make a prompt for that now that we know the story." Page: "Moon Faire: story pictures to paint", https://claude.ai/artifact/UWNhi4oUQieZd5WVLPfVK9 (file: `out/moon-faire-story-pictures.html`; pack: `out/Moon_Faire_Story_Pictures_To_Paint.zip`; prompts as text: `world/pictures/prompts.md`).
 
 - **No witches in any picture.** The game stages its 3D witches, fair folk and foes on paintings, so they always look like themselves. The one exception is a pair of hands (Io's, from `art-pipeline/smoothing-pack/reference/herbal_witch_portrait_ref.png`).
 - **Twelve pictures, seven the story needs.** Needed: F5 the lamp room (a fight place; there was no picture of it at all), S1 "Warm in her hands", S2 "The threads", S3 "The flight to the crag", S4 "The lights go home", E1 "Thirteen lights" (a change to the W9 painting), I1 the item sheet (the five finds and a ship's lamp, to be cut into six card pictures). Can wait: F2 the fair, F4 the beacon stair and F3 the standing stones as fight places of Moon Faire's own, E2 the dead post lit (a change to W4), T1 the title picture.
