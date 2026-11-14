@@ -20,3 +20,4 @@ Things learned running it:
 - Stage 2 (painted legs, real trousers): 128 turns, about 243,000 output tokens, 16.5 million cached-read tokens, 0.6 million cache-write tokens. The builder is now warned when 18 steps are left.
 - Stage 3 (painted arms and chest, a shirt of real cloth): 206 turns, about 379,000 output tokens, 28.5 million cached-read tokens, 2.6 million cache-write tokens.
 - The finished witches' folders were fetched from their branches into `/home/claude/witches/` (read-only) so the builder can take their methods. `common_brief.md` is the part every stage brief shares.
+- Stage 4 (hair over real ears): 166 turns, about 202,000 output tokens, 20.0 million cached-read tokens, 0.7 million cache-write tokens.

@@ -66,6 +66,17 @@
   // the trunk, legs and boots take their sides from B2 (arms held out of the way); the arms take theirs from A3 (arms hanging)
   MATS.proj = mkProj('sideR', 'sideL'); MATS.projArm = mkProj('armR', 'armL'); MATS.projHair = mkProj('sideR', 'sideL'); MATS.projHair.side = THREE.DoubleSide; MATS.projRuffle = mkProj('armR', 'armL'); MATS.projRuffle.side = THREE.DoubleSide; MATS.projCuff = mkProj('armR', 'armL', false, true);
   MATS.projLegs = MATS.projBoots = MATS.proj; MATS.projTrunk = mkProj('sideR', 'sideL', true);      // one material, three meshes: each region of the old skin can be hidden by itself
+  const tHairN = hairTexN(HAIR.COLS, false), tHairBumpN = hairTexN(HAIR.COLS, true), tHairAlphaN = hairAlphaN();
+  function hairMat(k, cut, rep) {
+    const mk = (t) => { if (!rep) return t; const c = t.clone(); c.repeat.set(1, rep); c.needsUpdate = true; return c; };
+    const m = std({ map: tHairN, bumpMap: tHairBumpN, bumpScale: 0.0006, color: lin('#cba585').multiplyScalar(k), roughness: 0.58, envMapIntensity: 0.12, side: THREE.DoubleSide, emissive: lin('#ffdcc0').multiplyScalar(k), emissiveMap: tHairN, emissiveIntensity: 0.26 });      // the warm tint undoes the cool cast of the stage lights: measured against C4's hair at one scale (tools/hair_cmp.py)
+    if (cut) { m.alphaMap = tHairAlphaN; m.alphaTest = 0.5; }
+    m.onBeforeCompile = (sh) => {
+      sh.vertexShader = sh.vertexShader.replace('#include <common>', '#include <common>\nattribute float hshade; varying float vHs;').replace('#include <begin_vertex>', '#include <begin_vertex>\n vHs = hshade;');
+      sh.fragmentShader = sh.fragmentShader.replace('#include <common>', '#include <common>\nvarying float vHs;').replace('#include <color_fragment>', '#include <color_fragment>\n diffuseColor.rgb *= vHs;').replace('#include <emissivemap_fragment>', '#include <emissivemap_fragment>\n totalEmissiveRadiance *= vHs;');
+    };
+    return m;
+  }
   Object.assign(MATS, {
     // the head wears three pictures at once, mixed by which way the skin faces (N40_head.js): the front painting, the profile painting, a plain colour
     face: (() => {
@@ -84,6 +95,10 @@
       return m;
     })(),
     frame: std({ color: lin('#0d0d10'), roughness: 0.28, envMapIntensity: 1.1 }),
+    // his hair (N45b_hair.js): pictures of strands and nothing else. Each point carries its own shade ('hshade': darker at the edges and the
+    // underside of a lock, at its root, and in the layers underneath). Tips are a hard cut-out; nothing is blended.
+    hair: hairMat(1.0, true), hairIn: hairMat(0.86, true), hairCap: hairMat(0.80, true), hairMass: hairMat(0.48, true),
+    steel: std({ color: lin('#b9bcc2'), roughness: 0.30, metalness: 0.9, envMapIntensity: 1.2 }),      // the rims of the plugs in his ears
     lens: phys({ color: lin('#dfe6ee'), transparent: true, opacity: 0.10, roughness: 0.04, metalness: 0, envMapIntensity: 1.6, depthWrite: false, side: THREE.DoubleSide }),
     // the hand model in two plain colours until his hand paintings are baked on: uv.x 1 is glove leather, 0 is skin
     glove: (() => {
@@ -285,6 +300,7 @@
     g.setAttribute('skinIndex', new THREE.Uint16BufferAttribute(B.si, 4));
     g.setAttribute('skinWeight', new THREE.Float32BufferAttribute(B.sw, 4));
     if (key === 'doll') { g.setAttribute('color', new THREE.Float32BufferAttribute(dollCol, 3)); g.setAttribute('dollLeg', new THREE.Float32BufferAttribute(dollLeg, 3)); g.setAttribute('dollArm', new THREE.Float32BufferAttribute(dollArm, 3)); }
+    if (HAIR.SHADE[key]) { if (HAIR.SHADE[key].length !== B.n) throw new Error('hair shade list for ' + key + ' has ' + HAIR.SHADE[key].length + ' entries for ' + B.n + ' points'); g.setAttribute('hshade', new THREE.Float32BufferAttribute(HAIR.SHADE[key], 1)); }
     if (key === 'face') { g.setAttribute('faceMix', new THREE.Float32BufferAttribute(faceMix, 4)); g.setAttribute('uvSide', new THREE.Float32BufferAttribute(faceUvS, 2)); }
     g.setIndex(B.n > 65535 ? new THREE.Uint32BufferAttribute(B.idx, 1) : new THREE.Uint16BufferAttribute(B.idx, 1));
     const m = new THREE.SkinnedMesh(g, MATS[key] || MATS.cloth);
@@ -318,7 +334,7 @@
     const arm = lastPose.arm * DEG - A_POSE, leg = lastPose.leg * DEG;
     restAll(); for (const [S, s] of SIDES) { SK['uarm' + S].rotation.z = s * arm; SK['thigh' + S].rotation.z = s * leg; SK['foot' + S].rotation.z = -s * leg; }
     root.updateMatrixWorld(true);
-    CLOTH.step(0, true); TR_SWAY.step(0, true);     // the cloth is laid on him in the new pose and left to settle, so a still picture is right at once
+    HAIRSIM.step(0, true); CLOTH.step(0, true); TR_SWAY.step(0, true);     // the cloth is laid on him in the new pose and left to settle, so a still picture is right at once
   }
   function play(name) { if (!MOVES.includes(name) || name === 'pose') { pose(lastPose); return 'pose'; } mv = { name, t: 0 }; return name; }
   const WALK_SPEED = 1.15;                          // metres a second his stride would cover; the page tells the dust the ground is passing at this speed
@@ -352,7 +368,7 @@
       }
       root.updateMatrixWorld(true);
     }
-    root.updateMatrixWorld(true); CLOTH.step(dt, false); TR_SWAY.step(dt, false);
+    HAIRSIM.step(dt, false); root.updateMatrixWorld(true); CLOTH.step(dt, false); TR_SWAY.step(dt, false);
     DUST.ground.set(-Math.sin(root.rotation.y), 0, -Math.cos(root.rotation.y)).multiplyScalar(api.walkOnSpot ? WALK_SPEED * wk : 0);
     DUST.update(dt);
   }
@@ -370,7 +386,7 @@
   const CLAY_T = std({ color: lin('#b7a797'), roughness: 0.92, envMapIntensity: 0.15, side: THREE.DoubleSide, alphaMap: TR_MASK_G, alphaTest: 0.5 });
   const CLAY_S = new THREE.MeshStandardMaterial({ color: lin('#b7a797'), roughness: 0.92, envMapIntensity: 0.15, side: THREE.DoubleSide });      // and for the shirt's cloth, which is not moved by bones
   let blank = false;
-  function setBlank(on) { blank = !!on; for (const k in meshes) { const m = meshes[k]; m.material = !blank ? m.userData.painted : k === 'trousers' ? CLAY_T : /^(projHair|projRuffle)$/.test(k) ? CLAY2 : /^(lens|nail)$/.test(k) ? m.userData.painted : /^(projTrunk|projHips)$/.test(k) ? CLAY_CUT : CLAY; if (k === 'lens' || k === 'nail') m.visible = !blank; } for (const k in shirtMeshes) shirtMeshes[k].material = blank ? CLAY_S : shirtMeshes[k].userData.painted; return blank; }
+  function setBlank(on) { blank = !!on; for (const k in meshes) { const m = meshes[k]; m.material = !blank ? m.userData.painted : k === 'trousers' ? CLAY_T : /^(projHair|projRuffle|hair|hairIn|hairCap|hairMass)$/.test(k) ? CLAY2 : /^(lens|nail)$/.test(k) ? m.userData.painted : /^(projTrunk|projHips)$/.test(k) ? CLAY_CUT : CLAY; if (k === 'lens' || k === 'nail') m.visible = !blank; } for (const k in shirtMeshes) shirtMeshes[k].material = blank ? CLAY_S : shirtMeshes[k].userData.painted; return blank; }
   // ---------- the doll and the old skin ----------
   // The old skin is his clothes as one smooth shape with the paintings laid on. It is being replaced, a region at a time, by real garments
   // over the doll (N45_doll.js). Both are cut into the same regions here, so that a region of the old skin can be switched off and the same
@@ -427,14 +443,21 @@
   function setOldSkin(o) { for (const k in (o || {})) if (k in OLD) oldOn[k] = !!o[k]; showSkins(); return Object.assign({}, oldOn); }
   function setOldTrousers(on) { setOldSkin({ legs: !!on, hips: !!on }); return oldOn.legs; }
   function setOldShirt(on) { setOldSkin({ arms: !!on, ruffles: !!on }); return oldOn.arms; }      // "Old shirt" on the page: the old painted shirt skin goes back on in place of the new shirt, for comparing
-  function setCloth(on) { CLOTH.on = !!on; CLOTH.settle(); CLOTH.step(0, true); TR_SWAY.step(0, true); return CLOTH.on; }      // off: the cloth is frozen, carried on his bones
+  function setCloth(on) { CLOTH.on = !!on; HAIRSIM.on = !!on; root.updateMatrixWorld(true); HAIRSIM.step(0, true); CLOTH.settle(); CLOTH.step(0, true); TR_SWAY.step(0, true); return CLOTH.on; }      // off: the cloth is frozen, carried on his bones
+  // Stage 4: his hair. New hair (N45b_hair.js) by default; setOldHair(true) puts the old painted shell back to compare ("Old hair" on the
+  // page); setHair(false) hides whichever is worn.
+  const HAIR_KEYS = ['hair', 'hairIn', 'hairCap', 'hairMass']; let oldHair = false, hairOn = true;
+  function showHair() { for (const k of HAIR_KEYS) if (meshes[k]) meshes[k].visible = hairOn && !oldHair; meshes.projHair.visible = hairOn && oldHair; }
+  function setOldHair(on) { oldHair = !!on; showHair(); return oldHair; }
+  function setHair(on) { hairOn = !!on; showHair(); return hairOn; }
+  showHair();
   setOldSkin({ legs: false, hips: false, arms: false, ruffles: false });
   // Every list a mesh carries must be as long as its list of points. A real graphics chip refuses to draw a mesh with a short list, so the
   // whole mesh vanishes (his face did, November 13), while the software renderer the tools here use draws it anyway. So it is caught here.
   for (const M of [meshes, shirtMeshes]) for (const k in M) { const g = M[k].geometry, n = g.attributes.position.count; for (const a in g.attributes) if (g.attributes[a].count !== n) throw new Error('mesh "' + k + '": ' + a + ' has ' + g.attributes[a].count + ' entries for ' + n + ' points'); }
   // and no triangle may name a point that is not there (the cut meshes above share their lists of points, so this is checked too)
   for (const M of [meshes, shirtMeshes]) for (const k in M) { const g = M[k].geometry, n = g.attributes.position.count, ix = g.index.array; if (ix.length % 3) throw new Error('mesh "' + k + '": its list of triangles is not a multiple of three'); for (let i = 0; i < ix.length; i++) if (ix[i] >= n) throw new Error('mesh "' + k + '": a triangle names point ' + ix[i] + ' of ' + n); }
-  const api = { root, fx, skeleton, bones, SK, animate, pose, play, moves: MOVES, meshes, dust: DUST, setBlank, get blank() { return blank; }, setDoll, get doll() { return doll; }, setOldSkin, get oldSkin() { return Object.assign({}, oldOn); }, setOldTrousers, get oldTrousers() { return oldOn.legs; }, setOldShirt, get oldShirt() { return oldOn.arms; }, setCloth, get cloth() { return CLOTH.on; }, shirtMeshes, walkOnSpot: true, walkSpeed: WALK_SPEED, name: 'Noiz', debug: { SK, meshes, trunkPt, legPt, bootPt, headPoint, hairPt, armAt, doll: DOLL, trousers: TROUSERS, holes: TR_HOLES, cloth: CLOTH, shirt: SHIRT, sway: TR_SWAY }, get triangles() { return triCount; } };
+  const api = { root, fx, skeleton, bones, SK, animate, pose, play, moves: MOVES, meshes, dust: DUST, setBlank, get blank() { return blank; }, setDoll, get doll() { return doll; }, setOldSkin, get oldSkin() { return Object.assign({}, oldOn); }, setOldTrousers, get oldTrousers() { return oldOn.legs; }, setOldShirt, get oldShirt() { return oldOn.arms; }, setCloth, get cloth() { return CLOTH.on; }, setOldHair, get oldHair() { return oldHair; }, setHair, get hair() { return hairOn; }, shirtMeshes, walkOnSpot: true, walkSpeed: WALK_SPEED, name: 'Noiz', debug: { SK, meshes, trunkPt, legPt, bootPt, headPoint, hairPt, armAt, doll: DOLL, trousers: TROUSERS, holes: TR_HOLES, cloth: CLOTH, shirt: SHIRT, sway: TR_SWAY, hair: HAIR, hairSim: HAIRSIM }, get triangles() { return triCount; } };
   pose(lastPose);
   return api;
 }

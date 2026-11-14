@@ -13,7 +13,7 @@
       addPart('lens', loft(lr, { capA: true }), wHead, { out: V3(sg * G.cx, G.cy, G.z - 0.05), flip: true });
       // the arm: from the hinge at the outer top corner straight back over his ear, then down behind it
       const xo = G.cx + G.hw + 0.0015, yo = G.cy + G.hh * 0.62, xe = headHalfW(EAR.y + 0.02) + 0.0045;
-      tube('frame', curvePts([V3(sg * xo, yo, zAt(xo) - 0.001), V3(sg * (xo + 0.004), yo, zAt(xo) - 0.012), V3(sg * (xe + 0.002), yo - 0.001, 0.020), V3(sg * xe, EAR.y + 0.026, EAR.z + 0.012), V3(sg * (xe - 0.001), EAR.y + 0.022, EAR.z - 0.004)], Q(36, 18)), (t) => [lerp(0.0030, 0.0018, sm(0.1, 0.8, t)), 0.0012], Q(8, 6), V3(0, 1, 0));      // it ends over his ear, under his hair
+      tube('frame', curvePts([V3(sg * xo, yo, zAt(xo) - 0.001), V3(sg * (xo + 0.004), yo, zAt(xo) - 0.012), V3(sg * (xe + 0.002), yo - 0.001, 0.020), V3(sg * xe, EAR.y + 0.0285, EAR.z + 0.014), V3(sg * (xe - 0.001), EAR.y + 0.0295, EAR.z - 0.003), V3(sg * (xe - 0.0035), EAR.y + 0.0215, EAR.z - 0.0125), V3(sg * (xe - 0.005), EAR.y + 0.010, EAR.z - 0.0150)], Q(44, 22)), (t) => [lerp(0.0030, 0.0018, sm(0.1, 0.8, t)), 0.0012], Q(8, 6), V3(0, 1, 0));      // over the top of his ear where it joins his head, then hooked down behind it (stage 4: his ears are bare now, so the arm has to be seen to rest on one)
     }
     const bx = G.cx - G.hw * 0.96, by = G.cy + G.hh * 0.42;                                    // the bridge
     tube('frame', curvePts([V3(-bx, by, zAt(bx)), V3(-bx * 0.5, by + 0.0015, G.z + 0.0008), V3(0, by + 0.0020, G.z + 0.0012), V3(bx * 0.5, by + 0.0015, G.z + 0.0008), V3(bx, by, zAt(bx))], 14), [0.0030, 0.0021], Q(10, 6), V3(0, 0, 1));

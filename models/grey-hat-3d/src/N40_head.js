@@ -63,8 +63,16 @@
   function headPoint(a, ph, grow) { const p = JH.headPoint(a, ph, (grow || 0) / HS); return [p[0] * HS, jy(p[1]), jz(p[2])]; }
   const headHalfW = (y) => JH.halfW(toJy(y)) * HS;        // half the width of his head at a height
   const wHead = wOne('head'), faceMix = [], faceUvS = [];
-  // his ear, read off the profile in C3: its middle, half its width and height, and how far its top leans back
-  const EAR = { z: R_TIP - 0.1366, y: R_EYE - 0.0263, a: 0.0150, b: 0.0285, tilt: 11 * DEG, texK: 1.0 };
+  // His ear: its middle, half its width and height, and how far its top leans back.
+  // Stage 4 (his hair, over real ears): the ear stands where C4 has it, the painting of his hair as he wears it: its middle 0.119 m behind
+  // the tip of his nose (tools/hair_measure.py; it was 0.1366, read off C3 at another scale). The profile painting on his head has its
+  // own painted ear 0.108 m behind the tip, because that painting is scaled by his face. EAR_TEX says where the painted ear is in the
+  // profile picture and how big it is beside the built one, so the built ear wears the painted ear and nothing else (no hair), and
+  // sideZ slides the profile picture back under it, so the painted ear is not seen a second time on his cheek.
+  const EAR = { z: R_TIP - 0.119, y: R_EYE - 0.0263, a: 0.0150, b: 0.0285, tilt: 11 * DEG, texK: 1.0 };
+  const EAR_TEX = { z: R_TIP - 0.1078, y: R_EYE - 0.0242, k: 0.90, lobe: 0.0068 };      // lobe: the painted lobe hangs further forward than the built one, so the picture is slid back toward the lobe
+  const sideZ = (z) => z + (EAR_TEX.z - EAR.z) * sm(0.045, EAR.z + EAR.a - 0.004, z);      // from the middle of his beard back to the front of his ear the picture is drawn out by up to a third
+  const SKIN_UV = [0.5 + 0.050 / (0.2 * HS), (R_EYE - 0.030 - jy(1.385)) / (0.2 * HS)];      // a spot of plain cheek in the front painting, for points that must never show a piece of his face
   const earR = (z, y) => { const c = Math.cos(EAR.tilt), sn = Math.sin(EAR.tilt), dz = z - EAR.z, dy = y - EAR.y, lz = dz * c + dy * sn, ly = dy * c - dz * sn; return Math.sqrt(lz * lz / (EAR.a * EAR.a) + ly * ly / (EAR.b * EAR.b)); };
   const SIDE_WIN = (BAKED && BAKED.faceSideWin) || [jz(-0.075), jz(0.125), jy(1.385), jy(1.585)];      // the side painting covers this window: forward from, to; height from, to
   (function buildHead() {
@@ -87,7 +95,7 @@
       const nx = FB.nor[i * 3], ny = FB.nor[i * 3 + 1], px = FB.pos[i * 3], py = FB.pos[i * 3 + 1], pz = FB.pos[i * 3 + 2], pyJ = toJy(py), pzJ = toJz(pz), pxJ = Math.abs(px) / HS;
       const under = sm(-0.22, -0.66, ny) * sm(1.444, 1.428, pyJ), plain = Math.max(under, sm(0.010, -0.006, pzJ - JH.HC.z), pxJ > 0.03 ? sm(1.12, 0.92, earR(pz, py)) : 0);
       const side = sm(0.70, 0.93, Math.abs(nx)) * sm(0.034, 0.050, pxJ) * sm(Wn[2] + 0.002, Wn[2] + 0.014, py) * sm(Wn[3] - 0.002, Wn[3] - 0.014, py) * (1 - plain);
-      faceMix.push(side, plain, 1 - 0.17 * under, 1 - under); faceUvS.push((pz - Wn[0]) / (Wn[1] - Wn[0]), (py - Wn[2]) / (Wn[3] - Wn[2]));      // under his jaw the plain colour is his beard's, not skin
+      faceMix.push(side, plain, 1 - 0.17 * under, 1 - under); faceUvS.push((sideZ(pz) - Wn[0]) / (Wn[1] - Wn[0]), (py - Wn[2]) / (Wn[3] - Wn[2]));      // under his jaw the plain colour is his beard's, not skin
     }
   })();
   // His painted face. Its blink and talking mouths (C2) are not baked yet, so for now it is one picture.
@@ -124,7 +132,14 @@
       for (let i = info.start; i < info.start + info.count; i++) {
         const k = kind[Math.min(kind.length - 1, Math.floor((i - info.start) / cols))] || 0, py = FB.pos[i * 3 + 1], pz = FB.pos[i * 3 + 2];
         if ((i - info.start) >= rings.length * cols || k === 0) faceMix.push(1, 0, 1, 1); else if (k === 1) faceMix.push(0.5, 0.5, 0.97, 1); else faceMix.push(0, 1, 0.92, 1);
-        faceUvS.push((EAR.z + (pz - EAR.z) * EAR.texK - Wn[0]) / (Wn[1] - Wn[0]), (EAR.y + (py - EAR.y) * EAR.texK - Wn[2]) / (Wn[3] - Wn[2]));
+        faceUvS.push((EAR_TEX.z + (pz - EAR.z) * EAR_TEX.k + EAR_TEX.lobe * sm(-0.004, -0.019, py - EAR.y) - Wn[0]) / (Wn[1] - Wn[0]), (EAR_TEX.y + (py - EAR.y) * EAR_TEX.k - Wn[2]) / (Wn[3] - Wn[2])); FB.uv[i * 2] = SKIN_UV[0]; FB.uv[i * 2 + 1] = SKIN_UV[1];
+      }
+      // the black plug in his lobe, as its own small object (the feather earring of a later stage hangs from the left one). It sits
+      // exactly over the painted plug, a little larger, so the painted one never shows beside it: a steel rim and a black face.
+      { const pz = EAR.z + (0.0124 - EAR_TEX.lobe) / EAR_TEX.k, py = EAR.y - 0.019 / EAR_TEX.k, q = cl((zF - pz) / (zF - zB), 0, 1), xs = headHalfW(py) + 0.0020 + 0.0165 * Math.pow(q, 0.9) * (0.50 + 0.50 * sm(EAR.y - 0.025, EAR.y + 0.002, py));
+        const ringAt = (x, r) => { const ring = []; for (let j = 0; j < 20; j++) { const an = (j / 20) * TAU; ring.push([sg * x, py + r * Math.sin(an), pz + r * Math.cos(an)]); } return ring; };
+        addPart('steel', loft([ringAt(xs - 0.0020, 0.0072), ringAt(xs + 0.0026, 0.0072), ringAt(xs + 0.0031, 0.0067), ringAt(xs + 0.0028, 0.0060)]), wHead, { out: V3(sg * (xs - 0.02), py, pz) });
+        addPart('frame', loft([ringAt(xs + 0.0027, 0.0061), ringAt(xs + 0.0025, 0.0030)], { capB: true }), wHead, { out: V3(sg * (xs - 0.02), py, pz) });
       }
     }
   })();
@@ -137,6 +152,6 @@
     const info = addPart('face', loft(nr), wNeck, { out: V3(0, 1.53, -0.025) }), FB = buckets.face, Wn = SIDE_WIN;
     for (let i = info.start; i < info.start + info.count; i++) {
       const nx = FB.nor[i * 3], py = FB.pos[i * 3 + 1], pz = FB.pos[i * 3 + 2], sd = sm(0.50, 0.85, Math.abs(nx)) * sm(Wn[2] + 0.004, Wn[2] + 0.028, py);
-      faceMix.push(sd, 1 - sd, (0.70 + 0.30 * sm(1.575, 1.47, py)) * (1 - 0.10 * sm(0.2, 0.9, Math.abs(nx))), 1); faceUvS.push((pz - Wn[0]) / (Wn[1] - Wn[0]), (py - Wn[2]) / (Wn[3] - Wn[2]));      // his beard and jaw shade the top of his neck
+      faceMix.push(sd, 1 - sd, (0.70 + 0.30 * sm(1.575, 1.47, py)) * (1 - 0.10 * sm(0.2, 0.9, Math.abs(nx))), 1); faceUvS.push((pz - Wn[0]) / (Wn[1] - Wn[0]), (py - Wn[2]) / (Wn[3] - Wn[2])); FB.uv[i * 2] = SKIN_UV[0]; FB.uv[i * 2 + 1] = SKIN_UV[1];      // his beard and jaw shade the top of his neck
     }
   })();

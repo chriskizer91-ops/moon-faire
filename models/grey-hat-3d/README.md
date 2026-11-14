@@ -10,6 +10,54 @@ something or just talks to them", and he gets his own folder because he is a cha
   Project docs `claude/HOW-TO-3d-witch-models.md` and `claude/HOW-TO-3d-witch-faces.md`. Read both before writing any code.
 - Project note for this folder: `claude/grey-hat-3d-reference-prompts.md`.
 
+## Stage 4 of the rebuild: his hair, remade over real ears (November 14, 2026)
+
+Chris: "his ear is printed on his hair", "the hair is one piece and has clothing and face printed on it", "The hair's bad,
+really bad." And: "the face straight on is good", so the face was left alone. Report: `builder/stage4_report.md`.
+Before this stage: `src_before_hair/`.
+
+- **The hair is `src/N45b_hair.js`** (`HAIR` builds it, `HAIRSIM` moves it; pictures `hairTexN`, `hairAlphaN` at the foot of the
+  first half). Four meshes: `hairCap` (a thin shell on his scalp from the crown to the hairline), `hairMass` (a plain dark sheet
+  inside the hanging hair), `hair` (the locks you see) and `hairIn` (two layers of locks underneath, darker). 131 locks, 74,868
+  triangles with the two plugs in his ears. The old shell (`N41_hair.js`, mesh `projHair`) is still built, hidden, for the
+  "Old hair" button.
+- **Whose method.** Io's hair (`witches/io/src/I41_hair.js`): a lock is her `tress` (a flat wavy ribbon of strands along a
+  middle line, each taking its own narrow strip of one strand picture, tips cut out hard), her plain sheet under the locks, her
+  soft chains (`softStep` in `I99_static.js`) and her strand pictures (`I21_tex.js`). The Fox's plan (`45_foxhead.js`): a cap,
+  a body of hair, many separate locks over it, its own dice so nothing else reshuffles. His own: locks rooted on a middle
+  parting and led round his ears, and a shade stored point by point (`hshade`).
+- **Where a lock goes.** `lockLine(f, lam, ...)`: `f` is its place round him (-1 the front edge on his right, 0 the middle of
+  his back, 1 the front edge on his left), `lam` its layer (0 next to him, 1 outside). On his head it runs over his skull from
+  a root on the parting; below `Y_REL` it hangs between two surfaces: `rIn` (his head, neck, collar band and the doll's
+  shoulders with 24 mm for the shirt, sampled once into a table) and `rOut` (the outline measured from C4, `H_ENV`). `H_OPEN`
+  says how far round the hair reaches at each height: that is what tucks it behind his ears. Locks of the middle of his back
+  run straight down the back of his head from roots at different heights.
+- **Measured** with `tools/hair_measure.py` (C4 is 2000 px to the metre by his pupils and by eye to lip): top of his hair
+  1.78 m, hairline 1.733 m, outline by height, hair colours from C12, crest to crest of his waves about 0.10 m. And
+  `tools/hair_cmp.py` puts the model beside C4 at one scale and prints both outlines.
+- **A trap that cost time:** `addPart`'s `out` test (a point inside the head) gets a closed ribbon's facing wrong about half
+  the time, because the seam's doubled points outweigh the rest. Half his locks were lit from underneath and the two halves of
+  his head were two colours, split at the parting. `lock()` now works the facing out itself from every triangle. Do not go
+  back to `out` for ribbons.
+- **How it moves** (`HAIRSIM`): nine chains of five bones hang from his head bone, round him from one front edge to the other.
+  Each joint is pulled toward where it would rest (the built shape turned with his head, leaning toward plain hanging further
+  down), keeps most of its speed, is put back at its length, pushed out of thirteen balls on his head, neck, shoulders, chest
+  and back, and held within a leash (2 to 6 cm). The speed a joint keeps from one step to the next is capped at 12 mm. Sixty steps a second, at most four a
+  frame; `pose()` and jumps settle it at once. A ball never pushes a joint out of its resting place, so at rest he is exactly
+  as built. `api.setCloth(false)` freezes it. Cost: 0.02 ms a frame. `tools/hair_walk.py` prints the numbers.
+- **His ears** (`N40_head.js`, `EAR`, `EAR_TEX`, `sideZ`): the built ear moved 18 mm forward to where C4 has it and wears only
+  the painted ear from the profile picture; the profile picture is slid back under it so the painted ear is not seen twice.
+  Points of the ear that the front painting would have covered take a plain skin spot (`SKIN_UV`). Each lobe has a plug as
+  its own small object (material `steel` and `frame`); the feather earring of a later stage hangs from his left one.
+- **Glasses** (`N42_glasses.js`): each arm now runs over the top of the ear and hooks down behind it.
+- **Switches:** `api.setOldHair(true)` (page button "Old hair") puts the old shell back; `api.setHair(false)` hides whichever
+  is worn. In "Blank doll" the hair is clay. `api.debug.hair` and `api.debug.hairSim` are for the tools.
+- **Rough:** the top of his head reads as combed flat and the hairline is a hard edge (a lock's side, not strand tips). The
+  waves are thinner and tidier than painted and there are no curls at the ends. B1 paints his hair 3 cm wider each side and
+  6 cm longer than C4 does; the model follows C4 and goes a third of the way toward B1 below his ears (`B1_WIDE`, `endY`).
+  With the hair hidden, the profile painting's own hair still shows on his temples (it is under the hair). Movement was
+  checked by stepping the clock and looking at stills, not watched.
+
 ## Stage 3 of the rebuild: painted arms and chest, and a real shirt that moves (November 14, 2026)
 
 Chris: "now we need to paint onto his at least his lower arms and his upper chest so that we can then put the shirt on top of
@@ -208,6 +256,7 @@ python3 -I build_single.py                     # deliver/Noiz_3D_stage1.html: pu
 | `references/build_prompts.py`, `page.tpl.html` | Build the prompt list, the page, the starters and the zip. All the words live in `build_prompts.py`. |
 | `references/chatgpt/` | The kept paintings, as webp, named by code: rounds 1 and 2 (A1 to G3). |
 | `src/N46_trousers.js`, `bake_cloth.py`, `tools/trouser_measure.py`, `tools/trouser_cmp.py`, `tools/trouser_walk.py`, `tools/trouser_check.py` | His trousers with real holes, the cloth's repeating square, and the tools that measure and check them and the painted legs (stage 2 of the rebuild, above). |
+| `src/N45b_hair.js`, `tools/hair_measure.py`, `tools/hair_cmp.py`, `tools/hair_walk.py` | His hair (cap, locks, the chains that move it) and the tools that measure the paintings, compare him with C4 and step the hair through a walk (stage 4, above) |
 | `src/N45_doll.js`, `tools/doll_measure.py`, `tools/doll_check.py`, `tools/doll_cmp.py` | The blank doll under his clothes, and the tools that measure and check it (stage 1 of the rebuild, above). |
 | `src/`, `tools/`, `bake_*.py`, `build.sh`, `shoot.py`, `viewer_n/`, `viewer/stage.js` | The model, its measuring and baking tools, and his page. `00_util`, `10_geom`, `N20_tex`, `32_hands` and `stage.js` come from the Ranger's folder. |
 
