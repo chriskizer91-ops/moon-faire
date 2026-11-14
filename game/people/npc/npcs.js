@@ -1,6 +1,6 @@
 // Made by people/kit/build_npcs.py. The people are stand-ins, not Moon Faire lore: names and words are Chris's to change.
 window.MF_NPCS = { people: {
-  "old-lamp-seller": { name: "Old lamp-seller", who: "An old woman who has sold oil lamps and wicks at the fair for forty years.", shapes: "made by hand", skin: "lampseller-A", fit: {"front": [0.99383, 1.01175, 0.00309, -0.00156], "back": [0.99383, 1.01175, 0.00309, -0.00156]}, faceFit: [1, 0, 0], skinColour: "#bd7c67", scale: {"height": 0.91, "build": [1.08, 1.06], "head": [1.04, 0.99, 1]},
+  "old-lamp-seller": { name: "Old lamp-seller", who: "An old woman who has sold oil lamps and wicks at the fair for forty years.", shapes: "made by hand", shapeId: "lampseller", skin: "lampseller-A", fit: {"front": [0.99383, 1.01175, 0.00309, -0.00156], "back": [0.99383, 1.01175, 0.00309, -0.00156]}, faceFit: [1, 0, 0], skinColour: "#bd7c67", scale: {"height": 0.91, "build": [1.08, 1.06], "head": [1.04, 0.99, 1]},
     wiring: {"talk": ["talk_calm"], "greet": "beckon", "fidgets": ["fidget_hands"], "pace": 0.83, "likes": ["nod", "beckon", "think"], "moods": {"yes": "nod", "no": "shake_head", "happy": "laugh", "unsure": "think", "upset": "sad", "thanks": "greet_bow", "bye": "nod"}},
     SKIN: (function () {
 const SKIN = {
@@ -47,7 +47,7 @@ const PERSON = {
   },
 };
       return PERSON; } },
-  "pie-seller": { name: "Pie seller", who: "A sturdy middle-aged woman who sells hot meat pies from a cart by the gate.", shapes: "made by hand", skin: "lampseller-B", fit: {"front": [1.00617, 1.01058, -0.00309, -0.00053], "back": [1.00309, 1.01058, -0.00219, -0.00053]}, faceFit: [1, 0, 0], skinColour: "#78412d", scale: {"height": 0.95, "build": [1.15, 1.12], "head": [0.98, 0.99, 0.96]},
+  "pie-seller": { name: "Pie seller", who: "A sturdy middle-aged woman who sells hot meat pies from a cart by the gate.", shapes: "made by hand", shapeId: "lampseller", skin: "lampseller-B", fit: {"front": [1.00617, 1.01058, -0.00309, -0.00053], "back": [1.00309, 1.01058, -0.00219, -0.00053]}, faceFit: [1, 0, 0], skinColour: "#78412d", scale: {"height": 0.95, "build": [1.15, 1.12], "head": [0.98, 0.99, 0.96]},
     wiring: {"talk": ["talk_lively", "talk_calm"], "greet": "wave", "fidgets": ["fidget_shift", "fidget_hands"], "pace": 1, "likes": ["beckon", "laugh", "point"], "moods": {"yes": "nod", "no": "shake_head", "happy": "laugh", "unsure": "shrug", "upset": "cross", "thanks": "thanks", "bye": "wave"}},
     SKIN: (function () {
 const SKIN = {
@@ -86,7 +86,7 @@ const PERSON = {
   },
 };
       return PERSON; } },
-  "ballad-singer": { name: "Ballad singer", who: "A young woman who sings old songs on a small stage between the stalls each night.", shapes: "made by hand", skin: "lampseller-C", fit: {"front": [1.00926, 1.01998, -0.00528, -0.00295], "back": [1.00617, 1.0188, -0.00309, -0.00289]}, faceFit: [1, 0, 0], skinColour: "#e5b8ae", scale: {"height": 0.98, "build": [0.98, 0.97], "head": [1.04, 1, 1.03]},
+  "ballad-singer": { name: "Ballad singer", who: "A young woman who sings old songs on a small stage between the stalls each night.", shapes: "made by hand", shapeId: "lampseller", skin: "lampseller-C", fit: {"front": [1.00926, 1.01998, -0.00528, -0.00295], "back": [1.00617, 1.0188, -0.00309, -0.00289]}, faceFit: [1, 0, 0], skinColour: "#e5b8ae", scale: {"height": 0.98, "build": [0.98, 0.97], "head": [1.04, 1, 1.03]},
     wiring: {"talk": ["talk_calm", "talk_lively"], "greet": "greet_bow", "fidgets": ["fidget_look", "fidget_hands"], "pace": 1.08, "likes": ["greet_bow", "think", "sad"], "moods": {"yes": "nod", "no": "shake_head", "happy": "laugh", "unsure": "think", "upset": "sad", "thanks": "greet_bow", "bye": "wave"}},
     SKIN: (function () {
 const SKIN = {
@@ -122,7 +122,7 @@ const PERSON = {
   },
 };
       return PERSON; } },
-  "fortune-teller": { name: "Fortune-teller", who: "A tall, thin fortune-teller who reads palms and cards in a dim tent at the edge of the fair.", shapes: "shapes by Fable 5.2", skin: "fortune-A", fit: {"front": [1.02023, 1.00467, -0.01077, -0.00121], "back": [1.02023, 1.0035, -0.01077, -0.00115]}, faceFit: [1, 0, 0], skinColour: "#c7b0b2", scale: {"height": 1.05, "build": [0.93, 0.94], "head": [1, 1, 1]},
+  "fortune-teller": { name: "Fortune-teller", who: "A tall, thin fortune-teller who reads palms and cards in a dim tent at the edge of the fair.", shapes: "shapes by Fable 5.2", shapeId: "fortune-fable", skin: "fortune-A", fit: {"front": [1.02023, 1.00467, -0.01077, -0.00121], "back": [1.02023, 1.0035, -0.01077, -0.00115]}, faceFit: [1, 0, 0], skinColour: "#c7b0b2", scale: {"height": 1.05, "build": [0.93, 0.94], "head": [1, 1, 1]},
     wiring: {"talk": ["talk_calm"], "greet": "beckon", "fidgets": ["fidget_hands"], "pace": 0.94, "likes": ["think", "beckon", "point"], "moods": {"yes": "nod", "no": "refuse", "happy": "nod", "unsure": "think", "upset": "cross", "thanks": "greet_bow", "bye": "greet_bow"}},
     SKIN: (function () {
 const SKIN = {
@@ -223,7 +223,7 @@ const PERSON = {
   },
 };
       return PERSON; } },
-  "old-lamplighter": { name: "Old lamplighter", who: "An elderly man who walks the fair at dusk, lighting and trimming the lanterns along the stalls.", shapes: "shapes by Fable 5.2", skin: "fortune-B", fit: {"front": [1.01734, 1.00701, -0.00997, -0.00133], "back": [1.02023, 1.00701, -0.01077, -0.00133]}, faceFit: [1, 0, 0], skinColour: "#af7353", scale: {"height": 1.02, "build": [0.96, 0.96], "head": [1, 1, 1]},
+  "old-lamplighter": { name: "Old lamplighter", who: "An elderly man who walks the fair at dusk, lighting and trimming the lanterns along the stalls.", shapes: "shapes by Fable 5.2", shapeId: "fortune-fable", skin: "fortune-B", fit: {"front": [1.01734, 1.00701, -0.00997, -0.00133], "back": [1.02023, 1.00701, -0.01077, -0.00133]}, faceFit: [1, 0, 0], skinColour: "#af7353", scale: {"height": 1.02, "build": [0.96, 0.96], "head": [1, 1, 1]},
     wiring: {"talk": ["talk_calm"], "greet": "wave", "fidgets": ["fidget_look", "fidget_shift"], "pace": 0.85, "likes": ["point", "nod", "wave"], "moods": {"yes": "nod", "no": "shake_head", "happy": "laugh", "unsure": "shrug", "upset": "sad", "thanks": "thanks", "bye": "wave"}},
     SKIN: (function () {
 const SKIN = {
@@ -301,7 +301,7 @@ const PERSON = {
   },
 };
       return PERSON; } },
-  "old-night-watchman": { name: "Old night-watchman", who: "An old night-watchman who walks the fair rows after dark, checking stall shutters and lamps.", shapes: "shapes by Fable 5.2", skin: "watchman-A", fit: {"front": [1.01852, 1.01302, -0.01056, -0.00553], "back": [1.01543, 1.01302, -0.00707, -0.00553]}, faceFit: [1, 0, 0], skinColour: "#4f2a1d", scale: {"height": 1.01, "build": [1.1, 1.08], "head": [1, 1, 1]},
+  "old-night-watchman": { name: "Old night-watchman", who: "An old night-watchman who walks the fair rows after dark, checking stall shutters and lamps.", shapes: "shapes by Fable 5.2", shapeId: "watchman-fable", skin: "watchman-A", fit: {"front": [1.01852, 1.01302, -0.01056, -0.00553], "back": [1.01543, 1.01302, -0.00707, -0.00553]}, faceFit: [1, 0, 0], skinColour: "#4f2a1d", scale: {"height": 1.01, "build": [1.1, 1.08], "head": [1, 1, 1]},
     wiring: {"talk": ["talk_calm", "talk_gruff"], "greet": "nod", "fidgets": ["fidget_look"], "pace": 0.88, "likes": ["point", "nod", "cross"], "moods": {"yes": "nod", "no": "shake_head", "happy": "nod", "unsure": "think", "upset": "cross", "thanks": "nod", "bye": "wave"}},
     SKIN: (function () {
 const SKIN = {
@@ -373,7 +373,7 @@ const PERSON = {
   },
 };
       return PERSON; } },
-  "chestnut-roaster": { name: "Chestnut roaster", who: "A cheerful middle-aged man who roasts chestnuts over a brazier at the fair gate.", shapes: "shapes by Fable 5.2", skin: "watchman-B", fit: {"front": [1.01543, 1.04013, -0.00837, -0.01274], "back": [1.01235, 1.04013, -0.00747, -0.01274]}, faceFit: [1, 0, 0], skinColour: "#d99c8d", scale: {"height": 1.04, "build": [1.1, 1.08], "head": [1, 1, 1]},
+  "chestnut-roaster": { name: "Chestnut roaster", who: "A cheerful middle-aged man who roasts chestnuts over a brazier at the fair gate.", shapes: "shapes by Fable 5.2", shapeId: "watchman-fable", skin: "watchman-B", fit: {"front": [1.01543, 1.04013, -0.00837, -0.01274], "back": [1.01235, 1.04013, -0.00747, -0.01274]}, faceFit: [1, 0, 0], skinColour: "#d99c8d", scale: {"height": 1.04, "build": [1.1, 1.08], "head": [1, 1, 1]},
     wiring: {"talk": ["talk_lively"], "greet": "beckon", "fidgets": ["fidget_hands", "fidget_shift"], "pace": 1.05, "likes": ["laugh", "beckon", "wave"], "moods": {"yes": "nod", "no": "shake_head", "happy": "laugh", "unsure": "shrug", "upset": "sad", "thanks": "thanks", "bye": "wave"}},
     SKIN: (function () {
 const SKIN = {
@@ -447,7 +447,7 @@ const PERSON = {
   },
 };
       return PERSON; } },
-  "fair-baker": { name: "Fair Baker", who: "A stout, cheerful baker who sells warm loaves and buns from his oven cart at the night fair.", shapes: "shapes by Fable 5.2", skin: "baker-A", fit: {"front": [1.10494, 1.0412, -0.05247, -0.00596], "back": [1.11111, 1.0412, -0.05556, -0.00596]}, faceFit: [1, 0, 0], skinColour: "#d0826c", scale: {},
+  "fair-baker": { name: "Fair Baker", who: "A stout, cheerful baker who sells warm loaves and buns from his oven cart at the night fair.", shapes: "shapes by Fable 5.2", shapeId: "baker-fable", skin: "baker-A", fit: {"front": [1.10494, 1.0412, -0.05247, -0.00596], "back": [1.11111, 1.0412, -0.05556, -0.00596]}, faceFit: [1, 0, 0], skinColour: "#d0826c", scale: {},
     wiring: {"talk": ["talk_lively", "talk_calm"], "greet": "wave", "fidgets": ["fidget_shift"], "pace": 0.96, "likes": ["laugh", "thanks", "beckon"], "moods": {"yes": "nod", "no": "shake_head", "happy": "laugh", "unsure": "think", "upset": "sad", "thanks": "thanks", "bye": "wave"}},
     SKIN: (function () {
 const SKIN = {
@@ -536,7 +536,7 @@ const PERSON = {
   },
 };
       return PERSON; } },
-  "ribbon-dyer": { name: "Ribbon Dyer", who: "An old, quiet dyer who boils and sells dyed ribbons and cloth lengths from a steaming stall at the fair.", shapes: "shapes by Fable 5.2", skin: "baker-B", fit: {"front": [1.0216, 1.0078, -0.01145, -0.00039], "back": [1.0216, 1.0078, -0.01015, -0.00039]}, faceFit: [1, 0, 0], skinColour: "#af9f83", scale: {"height": 0.97, "build": [1.12, 1.12], "head": [1.06, 1, 1.04]},
+  "ribbon-dyer": { name: "Ribbon Dyer", who: "An old, quiet dyer who boils and sells dyed ribbons and cloth lengths from a steaming stall at the fair.", shapes: "shapes by Fable 5.2", shapeId: "baker-fable", skin: "baker-B", fit: {"front": [1.0216, 1.0078, -0.01145, -0.00039], "back": [1.0216, 1.0078, -0.01015, -0.00039]}, faceFit: [1, 0, 0], skinColour: "#af9f83", scale: {"height": 0.97, "build": [1.12, 1.12], "head": [1.06, 1, 1.04]},
     wiring: {"talk": ["talk_calm"], "greet": "greet_bow", "fidgets": ["fidget_hands", "fidget_shift"], "pace": 0.8, "likes": ["think", "shrug", "nod"], "moods": {"yes": "nod", "no": "shake_head", "happy": "nod", "unsure": "shrug", "upset": "sad", "thanks": "greet_bow", "bye": "nod"}},
     SKIN: (function () {
 const SKIN = {
@@ -646,7 +646,7 @@ const PERSON = {
   },
 };
       return PERSON; } },
-  "farm-lad": { name: "Farm lad", who: "A cheerful young farmhand who carts hay and feed for the fair's ponies and stays on at night to help.", shapes: "shapes by Fable 5.2", skin: "farmhand-A", fit: {"front": [1.00617, 1.01945, -0.00309, -0.00195], "back": [1.00309, 1.01945, -0.00089, -0.00195]}, faceFit: [1, 0, 0], skinColour: "#d99789", scale: {"height": 1.01, "build": [1, 0.98], "head": [1.02, 1, 1]},
+  "farm-lad": { name: "Farm lad", who: "A cheerful young farmhand who carts hay and feed for the fair's ponies and stays on at night to help.", shapes: "shapes by Fable 5.2", shapeId: "farmhand-fable", skin: "farmhand-A", fit: {"front": [1.00617, 1.01945, -0.00309, -0.00195], "back": [1.00309, 1.01945, -0.00089, -0.00195]}, faceFit: [1, 0, 0], skinColour: "#d99789", scale: {"height": 1.01, "build": [1, 0.98], "head": [1.02, 1, 1]},
     wiring: {"talk": ["talk_lively"], "greet": "wave", "fidgets": ["fidget_shift", "fidget_look", "fidget_hands"], "pace": 1.15, "likes": ["wave", "laugh", "surprised"], "moods": {"yes": "nod", "no": "shake_head", "happy": "laugh", "unsure": "shrug", "upset": "sad", "thanks": "thanks", "bye": "wave"}},
     SKIN: (function () {
 const SKIN = {
@@ -721,7 +721,7 @@ const PERSON = {
   },
 };
       return PERSON; } },
-  "gate-keeper": { name: "Gate keeper", who: "A stern middle-aged woman who takes the coins at the fair gate and watches who comes and goes after dark.", shapes: "shapes by Fable 5.2", skin: "farmhand-B", fit: {"front": [1.00926, 1.00801, -0.00528, -0.00138], "back": [1.00926, 1.00801, -0.00528, -0.00138]}, faceFit: [1, 0, 0], skinColour: "#4e291c", scale: {},
+  "gate-keeper": { name: "Gate keeper", who: "A stern middle-aged woman who takes the coins at the fair gate and watches who comes and goes after dark.", shapes: "shapes by Fable 5.2", shapeId: "farmhand-fable", skin: "farmhand-B", fit: {"front": [1.00926, 1.00801, -0.00528, -0.00138], "back": [1.00926, 1.00801, -0.00528, -0.00138]}, faceFit: [1, 0, 0], skinColour: "#4e291c", scale: {},
     wiring: {"talk": ["talk_gruff"], "greet": "beckon", "fidgets": ["fidget_look"], "pace": 1, "likes": ["cross", "refuse", "point"], "moods": {"yes": "nod", "no": "refuse", "happy": "nod", "unsure": "think", "upset": "cross", "thanks": "nod", "bye": "point"}},
     SKIN: (function () {
 const SKIN = {
@@ -796,7 +796,7 @@ const PERSON = {
   },
 };
       return PERSON; } },
-  "fortune-teller-opus": { name: "Fortune-teller", who: "A tall, thin fortune-teller who reads palms and cards in a dim tent at the edge of the fair.", shapes: "shapes by Opus 5.5", skin: "fortune-A", fit: {"front": [1.02023, 1.00467, -0.01077, -0.00121], "back": [1.02023, 1.0035, -0.01077, -0.00115]}, faceFit: [1, 0, 0], skinColour: "#c7b0b2", scale: {"height": 1.05, "build": [0.92, 0.95], "head": [1, 1, 1]},
+  "fortune-teller-opus": { name: "Fortune-teller", who: "A tall, thin fortune-teller who reads palms and cards in a dim tent at the edge of the fair.", shapes: "shapes by Opus 5.5", shapeId: "fortune-opus", skin: "fortune-A", fit: {"front": [1.02023, 1.00467, -0.01077, -0.00121], "back": [1.02023, 1.0035, -0.01077, -0.00115]}, faceFit: [1, 0, 0], skinColour: "#c7b0b2", scale: {"height": 1.05, "build": [0.92, 0.95], "head": [1, 1, 1]},
     wiring: {"talk": ["talk_calm"], "greet": "beckon", "fidgets": ["fidget_hands"], "pace": 0.94, "likes": ["think", "beckon", "point"], "moods": {"yes": "nod", "no": "refuse", "happy": "nod", "unsure": "think", "upset": "cross", "thanks": "greet_bow", "bye": "greet_bow"}},
     SKIN: (function () {
 const SKIN = {
@@ -881,7 +881,7 @@ const PERSON = {
   },
 };
       return PERSON; } },
-  "old-lamplighter-opus": { name: "Old lamplighter", who: "An elderly man who walks the fair at dusk, lighting and trimming the lanterns along the stalls.", shapes: "shapes by Opus 5.5", skin: "fortune-B", fit: {"front": [1.01734, 1.00701, -0.00997, -0.00133], "back": [1.02023, 1.00701, -0.01077, -0.00133]}, faceFit: [1, 0, 0], skinColour: "#af7353", scale: {"height": 1.02, "build": [0.96, 0.96], "head": [1, 1, 1]},
+  "old-lamplighter-opus": { name: "Old lamplighter", who: "An elderly man who walks the fair at dusk, lighting and trimming the lanterns along the stalls.", shapes: "shapes by Opus 5.5", shapeId: "fortune-opus", skin: "fortune-B", fit: {"front": [1.01734, 1.00701, -0.00997, -0.00133], "back": [1.02023, 1.00701, -0.01077, -0.00133]}, faceFit: [1, 0, 0], skinColour: "#af7353", scale: {"height": 1.02, "build": [0.96, 0.96], "head": [1, 1, 1]},
     wiring: {"talk": ["talk_calm"], "greet": "wave", "fidgets": ["fidget_look", "fidget_shift"], "pace": 0.85, "likes": ["point", "nod", "wave"], "moods": {"yes": "nod", "no": "shake_head", "happy": "laugh", "unsure": "shrug", "upset": "sad", "thanks": "thanks", "bye": "wave"}},
     SKIN: (function () {
 const SKIN = {
@@ -961,7 +961,7 @@ const PERSON = {
   },
 };
       return PERSON; } },
-  "old-night-watchman-opus": { name: "Old night-watchman", who: "An old night-watchman who walks the fair rows after dark, checking stall shutters and lamps.", shapes: "shapes by Opus 5.5", skin: "watchman-A", fit: {"front": [1.01852, 1.01302, -0.01056, -0.00553], "back": [1.01543, 1.01302, -0.00707, -0.00553]}, faceFit: [1, 0, 0], skinColour: "#4f2a1d", scale: {"height": 1.01, "build": [1.1, 1.08], "head": [1, 1, 1]},
+  "old-night-watchman-opus": { name: "Old night-watchman", who: "An old night-watchman who walks the fair rows after dark, checking stall shutters and lamps.", shapes: "shapes by Opus 5.5", shapeId: "watchman-opus", skin: "watchman-A", fit: {"front": [1.01852, 1.01302, -0.01056, -0.00553], "back": [1.01543, 1.01302, -0.00707, -0.00553]}, faceFit: [1, 0, 0], skinColour: "#4f2a1d", scale: {"height": 1.01, "build": [1.1, 1.08], "head": [1, 1, 1]},
     wiring: {"talk": ["talk_calm", "talk_gruff"], "greet": "nod", "fidgets": ["fidget_look"], "pace": 0.88, "likes": ["point", "nod", "cross"], "moods": {"yes": "nod", "no": "shake_head", "happy": "nod", "unsure": "think", "upset": "cross", "thanks": "nod", "bye": "wave"}},
     SKIN: (function () {
 const SKIN = {
@@ -1033,7 +1033,7 @@ const PERSON = {
   },
 };
       return PERSON; } },
-  "chestnut-roaster-opus": { name: "Chestnut roaster", who: "A cheerful middle-aged man who roasts chestnuts over a brazier at the fair gate.", shapes: "shapes by Opus 5.5", skin: "watchman-B", fit: {"front": [1.01543, 1.04013, -0.00837, -0.01274], "back": [1.01235, 1.04013, -0.00747, -0.01274]}, faceFit: [1, 0, 0], skinColour: "#d99c8d", scale: {"height": 1.04, "build": [1.1, 1.08], "head": [1, 1, 1]},
+  "chestnut-roaster-opus": { name: "Chestnut roaster", who: "A cheerful middle-aged man who roasts chestnuts over a brazier at the fair gate.", shapes: "shapes by Opus 5.5", shapeId: "watchman-opus", skin: "watchman-B", fit: {"front": [1.01543, 1.04013, -0.00837, -0.01274], "back": [1.01235, 1.04013, -0.00747, -0.01274]}, faceFit: [1, 0, 0], skinColour: "#d99c8d", scale: {"height": 1.04, "build": [1.1, 1.08], "head": [1, 1, 1]},
     wiring: {"talk": ["talk_lively"], "greet": "beckon", "fidgets": ["fidget_hands", "fidget_shift"], "pace": 1.05, "likes": ["laugh", "beckon", "wave"], "moods": {"yes": "nod", "no": "shake_head", "happy": "laugh", "unsure": "shrug", "upset": "sad", "thanks": "thanks", "bye": "wave"}},
     SKIN: (function () {
 const SKIN = {
@@ -1105,7 +1105,7 @@ const PERSON = {
   },
 };
       return PERSON; } },
-  "fair-baker-opus": { name: "Fair Baker", who: "A stout, cheerful baker who sells warm loaves and buns from his oven cart at the night fair.", shapes: "shapes by Opus 5.5", skin: "baker-A", fit: {"front": [1.10494, 1.0412, -0.05247, -0.00596], "back": [1.11111, 1.0412, -0.05556, -0.00596]}, faceFit: [1, 0, 0], skinColour: "#d0826c", scale: {},
+  "fair-baker-opus": { name: "Fair Baker", who: "A stout, cheerful baker who sells warm loaves and buns from his oven cart at the night fair.", shapes: "shapes by Opus 5.5", shapeId: "baker-opus", skin: "baker-A", fit: {"front": [1.10494, 1.0412, -0.05247, -0.00596], "back": [1.11111, 1.0412, -0.05556, -0.00596]}, faceFit: [1, 0, 0], skinColour: "#d0826c", scale: {},
     wiring: {"talk": ["talk_lively", "talk_calm"], "greet": "wave", "fidgets": ["fidget_shift"], "pace": 0.96, "likes": ["laugh", "thanks", "beckon"], "moods": {"yes": "nod", "no": "shake_head", "happy": "laugh", "unsure": "think", "upset": "sad", "thanks": "thanks", "bye": "wave"}},
     SKIN: (function () {
 const SKIN = {
@@ -1164,7 +1164,7 @@ const PERSON = {
   },
 };
       return PERSON; } },
-  "ribbon-dyer-opus": { name: "Ribbon Dyer", who: "An old, quiet dyer who boils and sells dyed ribbons and cloth lengths from a steaming stall at the fair.", shapes: "shapes by Opus 5.5", skin: "baker-B", fit: {"front": [1.0216, 1.0078, -0.01145, -0.00039], "back": [1.0216, 1.0078, -0.01015, -0.00039]}, faceFit: [1, 0, 0], skinColour: "#af9f83", scale: {"height": 0.97, "build": [1.12, 1.1], "head": [1.06, 1, 1.04]},
+  "ribbon-dyer-opus": { name: "Ribbon Dyer", who: "An old, quiet dyer who boils and sells dyed ribbons and cloth lengths from a steaming stall at the fair.", shapes: "shapes by Opus 5.5", shapeId: "baker-opus", skin: "baker-B", fit: {"front": [1.0216, 1.0078, -0.01145, -0.00039], "back": [1.0216, 1.0078, -0.01015, -0.00039]}, faceFit: [1, 0, 0], skinColour: "#af9f83", scale: {"height": 0.97, "build": [1.12, 1.1], "head": [1.06, 1, 1.04]},
     wiring: {"talk": ["talk_calm"], "greet": "greet_bow", "fidgets": ["fidget_hands", "fidget_shift"], "pace": 0.8, "likes": ["think", "shrug", "nod"], "moods": {"yes": "nod", "no": "shake_head", "happy": "nod", "unsure": "shrug", "upset": "sad", "thanks": "greet_bow", "bye": "nod"}},
     SKIN: (function () {
 const SKIN = {
@@ -1266,7 +1266,7 @@ const PERSON = {
   },
 };
       return PERSON; } },
-  "farm-lad-opus": { name: "Farm lad", who: "A cheerful young farmhand who carts hay and feed for the fair's ponies and stays on at night to help.", shapes: "shapes by Opus 5.5", skin: "farmhand-A", fit: {"front": [1.00617, 1.01945, -0.00309, -0.00195], "back": [1.00309, 1.01945, -0.00089, -0.00195]}, faceFit: [1, 0, 0], skinColour: "#d99789", scale: {"height": 1.01, "build": [1.03, 1], "head": [1.04, 1, 1]},
+  "farm-lad-opus": { name: "Farm lad", who: "A cheerful young farmhand who carts hay and feed for the fair's ponies and stays on at night to help.", shapes: "shapes by Opus 5.5", shapeId: "farmhand-opus", skin: "farmhand-A", fit: {"front": [1.00617, 1.01945, -0.00309, -0.00195], "back": [1.00309, 1.01945, -0.00089, -0.00195]}, faceFit: [1, 0, 0], skinColour: "#d99789", scale: {"height": 1.01, "build": [1.03, 1], "head": [1.04, 1, 1]},
     wiring: {"talk": ["talk_lively"], "greet": "wave", "fidgets": ["fidget_shift", "fidget_look", "fidget_hands"], "pace": 1.15, "likes": ["wave", "laugh", "surprised"], "moods": {"yes": "nod", "no": "shake_head", "happy": "laugh", "unsure": "shrug", "upset": "sad", "thanks": "thanks", "bye": "wave"}},
     SKIN: (function () {
 const SKIN = {
@@ -1350,7 +1350,7 @@ const PERSON = {
   },
 };
       return PERSON; } },
-  "gate-keeper-opus": { name: "Gate keeper", who: "A stern middle-aged woman who takes the coins at the fair gate and watches who comes and goes after dark.", shapes: "shapes by Opus 5.5", skin: "farmhand-B", fit: {"front": [1.00926, 1.00801, -0.00528, -0.00138], "back": [1.00926, 1.00801, -0.00528, -0.00138]}, faceFit: [1, 0, 0], skinColour: "#4e291c", scale: {},
+  "gate-keeper-opus": { name: "Gate keeper", who: "A stern middle-aged woman who takes the coins at the fair gate and watches who comes and goes after dark.", shapes: "shapes by Opus 5.5", shapeId: "farmhand-opus", skin: "farmhand-B", fit: {"front": [1.00926, 1.00801, -0.00528, -0.00138], "back": [1.00926, 1.00801, -0.00528, -0.00138]}, faceFit: [1, 0, 0], skinColour: "#4e291c", scale: {},
     wiring: {"talk": ["talk_gruff"], "greet": "beckon", "fidgets": ["fidget_look"], "pace": 1, "likes": ["cross", "refuse", "point"], "moods": {"yes": "nod", "no": "refuse", "happy": "nod", "unsure": "think", "upset": "cross", "thanks": "nod", "bye": "point"}},
     SKIN: (function () {
 const SKIN = {
@@ -1433,4 +1433,6 @@ const PERSON = {
   },
 };
       return PERSON; } }
-} };
+},
+  // lighter builds of each set of shapes (people/kit/make_weights.py): parts left off and the share of each part kept
+  weights: {"baker-fable": {"full": {"triangles": 10821}, "half": {"weight": {"drop": [], "keep": {"head": 0.85, "hands": 0.4, "boots": 0.22, "soles": 0.12, "torso": 0.25, "legs": 0.5, "sleeve": 0.7, "forearm": 0.7, "shirt": 0.7, "apron": 0.9, "tie": 0.3, "towel": 1.0, "roll": 0.6, "hair": 1.0, "beard": 0.9, "cap": 1.0, "capband": 1.0}, "rest": 0.6, "scale": 0.9964563592521561}, "triangles": 5506}, "quarter": {"weight": {"drop": [], "keep": {"head": 0.54, "hands": 0.2, "boots": 0.13, "soles": 0.05, "torso": 0.11, "legs": 0.33, "sleeve": 0.4, "forearm": 0.45, "shirt": 0.35, "apron": 0.6, "tie": 0.11, "towel": 0.6, "roll": 0.35, "hair": 0.8, "beard": 0.6, "cap": 0.8, "capband": 0.9}, "rest": 0.3, "scale": 0.8264950668043511}, "triangles": 2741}}, "baker-opus": {"full": {"triangles": 10909}, "half": {"weight": {"drop": [], "keep": {"head": 0.85, "hands": 0.4, "boots": 0.25, "soles": 0.12, "torso": 0.3, "legs": 0.6, "trousers": 0.7, "apron": 0.7, "shirt": 0.8, "sleeve": 0.7, "forearm": 0.8, "cap": 0.9, "hair": 0.9, "beard": 1.0, "roll": 0.6, "pocket": 0.6}, "rest": 0.6, "scale": 0.9246365914286316}, "triangles": 5451}, "quarter": {"weight": {"drop": [], "keep": {"head": 0.48, "hands": 0.2, "boots": 0.15, "soles": 0.07, "torso": 0.11, "legs": 0.3, "trousers": 0.38, "apron": 0.34, "shirt": 0.42, "sleeve": 0.33, "forearm": 0.45, "cap": 0.58, "hair": 0.55, "beard": 0.8, "roll": 0.28, "pocket": 0.25}, "rest": 0.3, "scale": 0.8579932460367892}, "triangles": 2701}}, "farmhand-fable": {"full": {"triangles": 11335}, "half": {"weight": {"drop": [], "keep": {"head": 0.85, "hands": 0.48, "boots": 0.28, "soles": 0.14, "torso": 0.3, "legs": 0.78, "sleeve": 0.78, "forearm": 0.78, "shirt": 0.58, "waistcoat": 0.68, "button": 0.18, "kerchief": 0.68, "patch": 0.28, "hair": 0.9, "straw": 0.95, "band": 0.8}, "rest": 0.6, "scale": 0.9246365914286316}, "triangles": 5618}, "quarter": {"weight": {"drop": [], "keep": {"head": 0.56, "hands": 0.2, "boots": 0.12, "soles": 0.06, "torso": 0.16, "legs": 0.45, "sleeve": 0.45, "forearm": 0.45, "shirt": 0.28, "waistcoat": 0.36, "button": 0.09, "kerchief": 0.38, "patch": 0.14, "hair": 0.6, "straw": 0.8, "band": 0.5}, "rest": 0.35, "scale": 0.8264950668043511}, "triangles": 2872}}, "farmhand-opus": {"full": {"triangles": 11117}, "half": {"weight": {"drop": ["torso"], "keep": {"head": 0.9, "hands": 0.45, "boots": 0.3, "soles": 0.15, "sleeve": 0.7, "forearm": 0.7, "legs": 0.7, "shirt": 0.75, "belt": 1.0, "vest": 0.7, "brass": 0.25, "kerchief": 0.6, "patch": 0.4, "hair": 1.0, "straw": 1.0, "band": 1.0}, "rest": 0.6, "scale": 0.9246365914286316}, "triangles": 5456}, "quarter": {"weight": {"drop": ["torso"], "keep": {"head": 0.43, "hands": 0.2, "boots": 0.15, "soles": 0.07, "sleeve": 0.4, "forearm": 0.4, "legs": 0.4, "shirt": 0.55, "belt": 0.8, "vest": 0.4, "brass": 0.08, "kerchief": 0.3, "patch": 0.2, "hair": 0.7, "straw": 0.65, "band": 1.0}, "rest": 0.35, "scale": 0.8906918381147568}, "triangles": 2784}}, "fortune-fable": {"full": {"triangles": 11133}, "half": {"weight": {"drop": ["legs"], "keep": {"head": 0.95, "hands": 0.45, "boots": 0.32, "soles": 0.12, "torso": 0.72, "sleeve": 0.8, "forearm": 0.8, "robe": 0.68, "hem": 1.0, "sash": 0.6, "hair": 0.7, "scarf": 0.68, "gold": 0.6}, "rest": 0.6, "scale": 0.8906918381147568}, "triangles": 5645}, "quarter": {"weight": {"drop": ["legs"], "keep": {"head": 0.68, "hands": 0.22, "boots": 0.16, "soles": 0.07, "torso": 0.38, "sleeve": 0.5, "forearm": 0.5, "robe": 0.38, "hem": 0.8, "sash": 0.3, "hair": 0.4, "scarf": 0.43, "gold": 0.3}, "rest": 0.35, "scale": 0.7387703469494953}, "triangles": 2819}}, "fortune-opus": {"full": {"triangles": 10885}, "half": {"weight": {"drop": ["legs"], "keep": {"head": 0.9, "hands": 0.5, "boots": 0.3, "soles": 0.15, "torso": 0.6, "sleeve": 0.7, "forearm": 0.7, "robe": 0.7, "sash": 0.6, "gold": 0.5, "hair": 0.6, "scarf": 0.6}, "rest": 0.6, "scale": 0.9246365914286316}, "triangles": 5363}, "quarter": {"weight": {"drop": ["legs"], "keep": {"head": 0.6, "hands": 0.22, "boots": 0.12, "soles": 0.08, "torso": 0.3, "sleeve": 0.4, "forearm": 0.4, "robe": 0.4, "sash": 0.35, "gold": 0.25, "hair": 0.35, "scarf": 0.35}, "rest": 0.35, "scale": 0.8264950668043511}, "triangles": 2672}}, "lampseller": {"full": {"triangles": 9769}, "half": {"weight": {"drop": ["legs"], "keep": {"head": 0.95, "hands": 0.4, "boots": 0.25, "soles": 0.15, "torso": 0.6, "sleeve": 0.9, "forearm": 0.9, "skirt": 1.0, "apron": 1.0, "belt": 1.0, "hair": 0.9, "kerchief": 0.9}, "rest": 0.6, "scale": 0.8906918381147568}, "triangles": 4863}, "quarter": {"weight": {"drop": ["legs"], "keep": {"head": 0.65, "hands": 0.18, "boots": 0.12, "soles": 0.06, "torso": 0.3, "sleeve": 0.6, "forearm": 0.6, "skirt": 0.8, "apron": 0.8, "belt": 0.7, "hair": 0.6, "kerchief": 0.6}, "rest": 0.4, "scale": 0.7387703469494953}, "triangles": 2483}}, "watchman-fable": {"full": {"triangles": 11093}, "half": {"weight": {"drop": ["torso"], "keep": {"head": 1.0, "hands": 0.5, "hat": 0.9, "band": 0.8, "coat": 0.8, "scarf": 0.7, "beard": 0.8, "hair": 0.7, "brass": 0.5, "belt": 0.7, "sleeve": 0.75, "forearm": 0.75, "legs": 0.5, "boots": 0.3, "boot": 0.5, "soles": 0.15}, "rest": 0.6, "scale": 0.8906918381147568}, "triangles": 5549}, "quarter": {"weight": {"drop": ["torso"], "keep": {"head": 0.6, "hands": 0.22, "hat": 0.7, "band": 0.6, "coat": 0.55, "scarf": 0.45, "beard": 0.5, "hair": 0.5, "brass": 0.25, "belt": 0.5, "sleeve": 0.5, "forearm": 0.5, "legs": 0.35, "boots": 0.15, "boot": 0.35, "soles": 0.07}, "rest": 0.4, "scale": 0.7387703469494953}, "triangles": 2762}}, "watchman-opus": {"full": {"triangles": 10817}, "half": {"weight": {"drop": [], "keep": {"head": 0.9, "hands": 0.45, "boots": 0.3, "soles": 0.15, "torso": 0.45, "sleeve": 0.8, "forearm": 0.8, "legs": 0.4, "coat": 0.8, "coatTrim": 0.8, "belt": 0.7, "brass": 0.4, "scarf": 0.8, "hat": 0.95, "hatband": 0.8, "hair": 0.8, "beard": 1.0}, "rest": 0.6, "scale": 0.8906918381147568}, "triangles": 5491}, "quarter": {"weight": {"drop": [], "keep": {"head": 0.52, "hands": 0.21, "boots": 0.23, "soles": 0.07, "torso": 0.2, "sleeve": 0.45, "forearm": 0.45, "legs": 0.22, "coat": 0.45, "coatTrim": 0.5, "belt": 0.4, "brass": 0.2, "scarf": 0.45, "hat": 0.75, "hatband": 0.5, "hair": 0.5, "beard": 0.7}, "rest": 0.4, "scale": 0.7669252891075882}, "triangles": 2725}}} };

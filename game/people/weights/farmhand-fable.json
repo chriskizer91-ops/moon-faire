@@ -1,0 +1,137 @@
+{
+ "shapes": "farmhand-fable",
+ "person": "runs/farmhand__claude-fable-5-2@high/v2.js",
+ "full": {
+  "triangles": 11335,
+  "parts": {
+   "torso": 1032,
+   "sleeve": 364,
+   "forearm": 230,
+   "legs": 666,
+   "boots": 1754,
+   "soles": 650,
+   "hands": 1829,
+   "head": 2192,
+   "shirt": 512,
+   "waistcoat": 448,
+   "button": 576,
+   "kerchief": 332,
+   "patch": 192,
+   "hair": 132,
+   "straw": 374,
+   "band": 52
+  }
+ },
+ "model": "claude-fable-5-2",
+ "effort": "high",
+ "rounds": [
+  {
+   "n": 1,
+   "seconds": 25.1,
+   "cost": 0.1191126,
+   "said": "file"
+  },
+  {
+   "n": 2,
+   "seconds": 8.8,
+   "cost": 0.0878086,
+   "said": "file"
+  },
+  {
+   "n": 3,
+   "seconds": 1.9,
+   "cost": 0.07791260000000001,
+   "said": "DONE"
+  }
+ ],
+ "cost": 0.2848338,
+ "seconds": 35.8,
+ "half": {
+  "weight": {
+   "drop": [],
+   "keep": {
+    "head": 0.85,
+    "hands": 0.48,
+    "boots": 0.28,
+    "soles": 0.14,
+    "torso": 0.3,
+    "legs": 0.78,
+    "sleeve": 0.78,
+    "forearm": 0.78,
+    "shirt": 0.58,
+    "waistcoat": 0.68,
+    "button": 0.18,
+    "kerchief": 0.68,
+    "patch": 0.28,
+    "hair": 0.9,
+    "straw": 0.95,
+    "band": 0.8
+   },
+   "rest": 0.6,
+   "scale": 0.9246365914286316
+  },
+  "triangles": 5618,
+  "parts": {
+   "torso": 285,
+   "sleeve": 262,
+   "forearm": 164,
+   "legs": 480,
+   "boots": 440,
+   "soles": 78,
+   "hands": 811,
+   "head": 1722,
+   "shirt": 274,
+   "waistcoat": 280,
+   "button": 94,
+   "kerchief": 208,
+   "patch": 46,
+   "hair": 108,
+   "straw": 328,
+   "band": 38
+  }
+ },
+ "quarter": {
+  "weight": {
+   "drop": [],
+   "keep": {
+    "head": 0.56,
+    "hands": 0.2,
+    "boots": 0.12,
+    "soles": 0.06,
+    "torso": 0.16,
+    "legs": 0.45,
+    "sleeve": 0.45,
+    "forearm": 0.45,
+    "shirt": 0.28,
+    "waistcoat": 0.36,
+    "button": 0.09,
+    "kerchief": 0.38,
+    "patch": 0.14,
+    "hair": 0.6,
+    "straw": 0.8,
+    "band": 0.5
+   },
+   "rest": 0.35,
+   "scale": 0.8264950668043511
+  },
+  "triangles": 2872,
+  "parts": {
+   "torso": 136,
+   "sleeve": 134,
+   "forearm": 84,
+   "legs": 246,
+   "boots": 172,
+   "soles": 32,
+   "hands": 302,
+   "head": 1014,
+   "shirt": 118,
+   "waistcoat": 133,
+   "button": 42,
+   "kerchief": 104,
+   "patch": 22,
+   "hair": 65,
+   "straw": 247,
+   "band": 21
+  }
+ }
+}

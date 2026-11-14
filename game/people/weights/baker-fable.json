@@ -1,0 +1,142 @@
+{
+ "shapes": "baker-fable",
+ "person": "runs/baker__claude-fable-5-2@high/v3.js",
+ "full": {
+  "triangles": 10821,
+  "parts": {
+   "torso": 1032,
+   "sleeve": 364,
+   "forearm": 230,
+   "legs": 666,
+   "boots": 1754,
+   "soles": 650,
+   "hands": 1829,
+   "head": 2192,
+   "shirt": 392,
+   "apron": 356,
+   "tie": 548,
+   "towel": 40,
+   "roll": 120,
+   "hair": 120,
+   "beard": 264,
+   "cap": 216,
+   "capband": 48
+  }
+ },
+ "model": "claude-fable-5-2",
+ "effort": "high",
+ "rounds": [
+  {
+   "n": 1,
+   "seconds": 20.7,
+   "cost": 0.10084860000000001,
+   "said": "file"
+  },
+  {
+   "n": 2,
+   "seconds": 7.4,
+   "cost": 0.08060060000000001,
+   "said": "file"
+  },
+  {
+   "n": 3,
+   "seconds": 1.0,
+   "cost": 0.07179260000000001,
+   "said": "DONE"
+  }
+ ],
+ "cost": 0.2532418,
+ "seconds": 29.1,
+ "half": {
+  "weight": {
+   "drop": [],
+   "keep": {
+    "head": 0.85,
+    "hands": 0.4,
+    "boots": 0.22,
+    "soles": 0.12,
+    "torso": 0.25,
+    "legs": 0.5,
+    "sleeve": 0.7,
+    "forearm": 0.7,
+    "shirt": 0.7,
+    "apron": 0.9,
+    "tie": 0.3,
+    "towel": 1.0,
+    "roll": 0.6,
+    "hair": 1.0,
+    "beard": 0.9,
+    "cap": 1.0,
+    "capband": 1.0
+   },
+   "rest": 0.6,
+   "scale": 0.9964563592521561
+  },
+  "triangles": 5506,
+  "parts": {
+   "torso": 257,
+   "sleeve": 252,
+   "forearm": 160,
+   "legs": 330,
+   "boots": 369,
+   "soles": 74,
+   "hands": 729,
+   "head": 1856,
+   "shirt": 272,
+   "apron": 318,
+   "tie": 161,
+   "towel": 40,
+   "roll": 70,
+   "hair": 120,
+   "beard": 234,
+   "cap": 216,
+   "capband": 48
+  }
+ },
+ "quarter": {
+  "weight": {
+   "drop": [],
+   "keep": {
+    "head": 0.54,
+    "hands": 0.2,
+    "boots": 0.13,
+    "soles": 0.05,
+    "torso": 0.11,
+    "legs": 0.33,
+    "sleeve": 0.4,
+    "forearm": 0.45,
+    "shirt": 0.35,
+    "apron": 0.6,
+    "tie": 0.11,
+    "towel": 0.6,
+    "roll": 0.35,
+    "hair": 0.8,
+    "beard": 0.6,
+    "cap": 0.8,
+    "capband": 0.9
+   },
+   "rest": 0.3,
+   "scale": 0.8264950668043511
+  },
+  "triangles": 2741,
+  "parts": {
+   "torso": 92,
+   "sleeve": 120,
+   "forearm": 84,
+   "legs": 180,
+   "boots": 187,
+   "soles": 26,
+   "hands": 302,
+   "head": 978,
+   "shirt": 113,
+   "apron": 176,
+   "tie": 45,
+   "towel": 18,
+   "roll": 34,
+   "hair": 79,
+   "beard": 130,
+   "cap": 142,
+   "capband": 35
+  }
+ }
+}

@@ -23,6 +23,12 @@
 <div id="stagebox"><canvas id="stage"></canvas><div id="who"></div><div id="doing"></div></div>
 <div class="bar"><select id="pick" aria-label="Person"></select><button id="bTalk">Talk</button><button id="bGreet">Say hello</button><button id="bL">Face left</button><button id="bF">Face you</button><button id="bR">Face right</button></div>
 <div class="bar" id="emotes"></div>
+<div class="bar">
+  <select id="weight" aria-label="Weight"><option value="full">Full weight</option><option value="half">Half the triangles</option><option value="quarter">A quarter of the triangles</option></select>
+  <button id="bFlip" aria-pressed="false">Flipbook look</button>
+  <select id="pix" hidden aria-label="Pixel size"><option value="1.2">1.2 mm of them to a pixel</option><option value="2.2">2.2 mm</option><option value="4.75">4.75 mm (the sprites' size)</option></select>
+  <select id="cols" hidden aria-label="Colours"><option value="own">Their own colours</option><option value="witch">The witches' colours</option></select>
+</div>
 <p class="soft small" id="facts"></p>
 <div class="card"><b>What is wired</b>
 <ul>
@@ -30,6 +36,8 @@
   <li><b>Emotes.</b> Every person can play every emote. The gold-edged buttons are the ones chosen as most like that person.</li>
   <li><b>On their own.</b> They blink, shift and look about when left alone, each at their own pace.</li>
   <li><b>Facing.</b> They turn to face a point, as they will turn to the party.</li>
+  <li><b>Lighter weights.</b> Each person can be built with half or a quarter of the triangles. The painted skin lies on the lighter build as it is.</li>
+  <li><b>Flipbook look.</b> The switch the witches have: flipbook colours and an inked outline. It starts off.</li>
 </ul>
 <p class="soft small">The moves were written by Claude Fable 5.2 through your key. The people, their names and their ways are stand-ins, not Moon Faire lore. No Claude session can measure speed on your laptop.</p></div>
 </main>
@@ -39,21 +47,35 @@
   'use strict';
   const $ = (id) => document.getElementById(id), canvas = $('stage'), ids = MF_NPC.list();
   let stage, npc = null, last = performance.now(), yaw = 0.35, busy = false;
-  try { stage = makeMFStage(canvas, { preserve: true, shadow: 1024, maxPixelRatio: 2 }); stage.painting = false; } catch (e) { $('who').textContent = 'This page needs WebGL to draw.'; return; }
+  // the look's colours: the 56 every witch shares, the wisp's three greens and the Fox's three blouse colours (the game's shared list), filled out to the 64 the look holds
+  const SHARED = (window.JESTER_PALETTE || []).concat([[176, 250, 170], [140, 214, 132], [84, 150, 96], [84, 122, 116], [51, 82, 82], [22, 45, 47]]), LIST = SHARED.concat(SHARED.slice(0, Math.max(0, 64 - SHARED.length)));
+  const own = {}; let need = 2.1;
+  try { stage = makeMFStage(canvas, { preserve: true, shadow: 1024, maxPixelRatio: 2, palette: LIST }); stage.painting = false; } catch (e) { $('who').textContent = 'This page needs WebGL to draw.'; return; }
   for (const id of ids) { const o = document.createElement('option'), d = MF_NPC.info(id); o.value = id; o.textContent = d.name + ' (' + d.shapes + ')'; $('pick').appendChild(o); }
   const label = (n) => n.replace(/_/g, ' ');
   async function choose(id) {
     busy = true; $('who').textContent = 'Building…';
     try {
-      const next = await MF_NPC.make(id); if (npc) { stage.cast.remove(npc.root, npc.fx); npc.dispose(); }
+      const next = await MF_NPC.make(id, { weight: $('weight').value }); if (npc) { stage.cast.remove(npc.root, npc.fx); npc.dispose(); }
       npc = next; stage.cast.add(npc.root, npc.fx); npc.model.camera = stage.camera; stage.follow(0, 0); $('who').textContent = npc.name + '. ' + npc.who; $('bTalk').classList.remove('on');
       const W = npc.wiring, box = $('emotes'); box.innerHTML = '';
       for (const n of npc.emotes) { const b = document.createElement('button'); b.textContent = label(n); if ((W.likes || []).indexOf(n) >= 0) b.className = 'like'; b.onclick = () => npc.emote(n); box.appendChild(b); }
-      $('facts').textContent = 'Talks: ' + (W.talk || []).map((n) => label(n).replace('talk ', '')).join(', then ') + '. Says hello with: ' + label(W.greet || 'nod') + '. Pace: ' + (W.pace || 1) + '.';
+      const ws = (MF_NPCS.weights || {})[MF_NPC.info(id).shapeId]; for (const o of $('weight').options) o.hidden = o.value !== 'full' && !ws;
+      look();
+      $('facts').textContent = Math.round(npc.triangles).toLocaleString() + ' triangles' + (ws ? ' (full ' + ws.full.triangles.toLocaleString() + ', half ' + ws.half.triangles.toLocaleString() + ', quarter ' + ws.quarter.triangles.toLocaleString() + ')' : '') + '. Talks: ' + (W.talk || []).map((n) => label(n).replace('talk ', '')).join(', then ') + '. Says hello with: ' + label(W.greet || 'nod') + '. Pace: ' + (W.pace || 1) + '.';
       setTimeout(() => { if (npc && npc.id === id) npc.greet(); }, 900);
     } catch (e) { $('who').textContent = 'This one did not build: ' + e.message; }
     busy = false;
   }
+  // the Flipbook look: a pixel is so many millimetres of the person, never finer than the screen; colours from the witches' shared list or from the person's own painting
+  function look() {
+    const on = $('bFlip').getAttribute('aria-pressed') === 'true'; stage.flip.on = on; stage.flip.snap = 1; $('pix').hidden = $('cols').hidden = !on; if (!on || !npc) return;
+    const skin = MF_NPC.info(npc.id).skin;
+    if ($('cols').value === 'own') { if (own[skin]) stage.flipColours(own[skin]); else { const im = new Image(); im.onload = () => { own[skin] = stage.ownColours(im); look(); }; im.src = MF_NPC_TEX[skin].body; } }
+    else stage.flipColours(null);
+  }
+  $('bFlip').onclick = () => { const b = $('bFlip'), on = b.getAttribute('aria-pressed') !== 'true'; b.setAttribute('aria-pressed', on); b.classList.toggle('on', on); look(); };
+  $('pix').onchange = look; $('cols').onchange = look; $('weight').onchange = () => choose($('pick').value);
   $('pick').onchange = () => choose($('pick').value);
   $('bTalk').onclick = () => { if (!npc) return; npc.talk(!npc.talking); $('bTalk').classList.toggle('on', npc.talking); };
   $('bGreet').onclick = () => npc && npc.greet();
@@ -64,7 +86,7 @@
   const manual = /[?&]shot=1/.test(location.search);
   function draw(dt) {
     if (!npc || busy) return; npc.update(dt);
-    stage.resize(); const w = canvas.clientWidth, h = canvas.clientHeight, need = Math.max(2.1, 1.5 * h / w), d = need / 2 / Math.tan(5.5 * Math.PI / 180);
+    stage.resize(); const w = canvas.clientWidth, h = canvas.clientHeight; need = Math.max(2.1, 1.5 * h / w); const d = need / 2 / Math.tan(5.5 * Math.PI / 180); stage.flip.rows = need / (+$('pix').value / 1000);
     stage.setScene({ kind: 'fight', frame: [w, h], camera: { fov: 11, h: 1, z: 10, pitch: 0 } });
     stage.camera.position.set(Math.sin(yaw) * d, 1.0, Math.cos(yaw) * d); stage.camera.lookAt(0, 0.98, 0); stage.camera.updateMatrixWorld(); stage.render();
     $('doing').textContent = npc.doing ? label(npc.doing) : '';

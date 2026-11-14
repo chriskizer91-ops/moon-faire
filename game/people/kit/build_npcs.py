@@ -18,16 +18,19 @@ for tag in ['hand', 'fable', 'opus']:
             lg = json.load(open(d + '/log.json')); j = json.load(open(os.path.join(P, 'skins', pid, L + '.json'))); nid = slug(k['name']) + ('-opus' if tag == 'opus' else '')
             tex[key] = {'body': webp(os.path.join(P, 'skins', pid, L + '-body.webp')), 'face': webp(os.path.join(P, 'skins', pid, L + '-face.webp'))}
             sc = json.load(open(d + '/person-scale.json')) if os.path.exists(d + '/person-scale.json') else {}
-            people.append('  %s: { name: %s, who: %s, shapes: %s, skin: %s, fit: %s, faceFit: %s, skinColour: %s, scale: %s,\n    wiring: %s,\n    SKIN: (function () {\n%s\n      return SKIN; })(),\n    person: function () {\n%s\n      return PERSON; } }' % (
-                json.dumps(nid), json.dumps(k['name'][0].upper() + k['name'][1:]), json.dumps(k['who']), json.dumps(MAKER[tag]), json.dumps(key), json.dumps(j['fit']), json.dumps(j.get('faceFit', [1, 0, 0])), json.dumps(j['skin']), json.dumps(sc),
+            people.append('  %s: { name: %s, who: %s, shapes: %s, shapeId: %s, skin: %s, fit: %s, faceFit: %s, skinColour: %s, scale: %s,\n    wiring: %s,\n    SKIN: (function () {\n%s\n      return SKIN; })(),\n    person: function () {\n%s\n      return PERSON; } }' % (
+                json.dumps(nid), json.dumps(k['name'][0].upper() + k['name'][1:]), json.dumps(k['who']), json.dumps(MAKER[tag]), json.dumps(pid if tag == 'hand' else pid + '-' + tag), json.dumps(key), json.dumps(j['fit']), json.dumps(j.get('faceFit', [1, 0, 0])), json.dumps(j['skin']), json.dumps(sc),
                 json.dumps(wiring.get(key, {})), open(d + '/skin.js').read().strip(), open(os.path.join(P, lg['person'])).read().strip()))
             order.append(nid)
-npcs = '// Made by people/kit/build_npcs.py. The people are stand-ins, not Moon Faire lore: names and words are Chris\'s to change.\nwindow.MF_NPCS = { people: {\n' + ',\n'.join(people) + '\n} };\n'
+weights = {}
+for f in sorted(glob.glob(os.path.join(P, 'weights', '*.json'))):
+    w = json.load(open(f)); weights[w['shapes']] = {'full': {'triangles': w['full']['triangles']}, 'half': {'weight': w['half']['weight'], 'triangles': w['half']['triangles']}, 'quarter': {'weight': w['quarter']['weight'], 'triangles': w['quarter']['triangles']}}
+npcs = '// Made by people/kit/build_npcs.py. The people are stand-ins, not Moon Faire lore: names and words are Chris\'s to change.\nwindow.MF_NPCS = { people: {\n' + ',\n'.join(people) + '\n},\n  // lighter builds of each set of shapes (people/kit/make_weights.py): parts left off and the share of each part kept\n  weights: ' + json.dumps(weights) + ' };\n'
 open(os.path.join(NPC, 'npcs.js'), 'w', encoding='utf-8').write(npcs)
 textures = '// Made by people/kit/build_npcs.py: each skin\'s body sheet and face picture.\nwindow.MF_NPC_TEX = ' + json.dumps(tex) + ';\n'; open(os.path.join(NPC, 'npc_tex.js'), 'w', encoding='utf-8').write(textures)
 emotes = '// Made by people/kit/build_npcs.py from emotes.src.js, which Claude Fable 5.2 wrote through the API (people/kit/make_emotes.py).\nwindow.MF_EMOTES = function (FP) {\n' + open(os.path.join(NPC, 'emotes.src.js'), encoding='utf-8').read().strip() + '\nreturn EMOTES; };\n'
 open(os.path.join(NPC, 'emotes.js'), 'w', encoding='utf-8').write(emotes)
-parts = scripts() + [emotes, npcs, textures, rd('people/npc/npc.js')]
+parts = scripts() + [rd('models/jester/palette.js'), emotes, npcs, textures, rd('people/npc/npc.js')]
 for p in parts: assert '</script' not in p.lower()
 page = rd('people/npc/npc-demo.tpl.html').replace('/*SCRIPTS*/', '\n'.join('<script>\n%s\n</script>' % p for p in parts))
 open(os.path.join(P, 'out', 'moon-faire-npcs.html'), 'w', encoding='utf-8').write(page)

@@ -149,9 +149,14 @@
   function make(person, prepared, extra) {
     const WL = window.WITCH_LOD, L = WL.LEVELS.find((x) => x.id === 'lightest'), errors = [];
     const skip = Object.assign({}, HERS); for (const k of person.keep || []) delete skip[BODY[k] || k];
+    // a lighter weight of the same person: parts left off (hidden ones), and a share of each part's triangles kept. The painted skin is read by
+    // where a point stands, so it lies on a thinned part as it did on the whole one, with nothing to bake again.
+    const WT = person.weight || null, partName = (key) => key === 'face' ? 'head' : key === 'hand' ? 'hands' : key.slice(0, 2) === 'p_' ? key.slice(2) : (WORD[key] || key);
+    if (WT) for (const n of WT.drop || []) if (n !== 'head' && n !== 'hands') skip[BODY[n] || 'p_' + n] = 1;
     const lod = WL.hooks(Object.assign({}, L.lod, { merge: null, shadowOnly: null, clothShadow: 0, skip, simplify: Object.assign({}, L.lod.simplify, { torso: 0.9, wine: 0.8, cloth: 0.8, leggings: 0.7 }) }));
     const thin = lod.onGeometry, own = lod.material, colors = person.colors || {}, parts = person.parts || {}, skinHex = person.skin || '#d99f91';
-    lod.onGeometry = (key, g, B, K) => { if (key.slice(0, 2) !== 'p_') thin(key, g, B, K); };            // a person's own parts are already light
+    lod.onGeometry = (key, g, B, K) => { if (key.slice(0, 2) !== 'p_') thin(key, g, B, K);            // a person's own parts are already light
+      if (WT) { const k = WT.keep && WT.keep[partName(key)], r = (k == null ? (WT.rest == null ? 1 : WT.rest) : k) * (WT.scale || 1); if (r < 0.995) WL.simplify(g, Math.max(0.02, r), 0.3, true); } };
     lod.material = (key, B, K) => {
       if (prepared.bodyTex && key !== 'face' && key !== 'hand' && key !== 'skin') { const nm = key.slice(0, 2) === 'p_' ? key.slice(2) : (WORD[key] || key), S = prepared.S, fl = S.flat && S.flat[nm], ro = S.rough && S.rough[nm];
         const mt = fl ? material({ color: fl, rough: ro == null ? 0.8 : ro, sheen: fl, sheenK: 0.05 }, K) : painted(K, prepared, ro), mv = S.move && S.move[nm], sz = S.size && S.size[nm];
@@ -202,6 +207,7 @@
     const J = window.makeJester(o);
     const h = person.height || 1, b = person.build || [1, 1]; J.root.scale.set(h * (b[0] || 1), h, h * (b[1] || 1));
     if (person.head) { const q = person.head, hs = J.debug.SK.head.scale; hs.set(hs.x * (q[0] || 1), hs.y * (q[1] || 1), hs.z * (q[2] || 1)); }
+    J.partTris = {}; for (const k in J.debug.meshes) { const ix = J.debug.meshes[k].geometry.index; J.partTris[partName(k)] = (J.partTris[partName(k)] || 0) + (ix ? ix.count / 3 : 0); }
     J.partNames = Object.keys(J.debug.meshes).filter((k) => k !== 'face' && k !== 'hand' && k !== 'skin').map((k) => k.slice(0, 2) === 'p_' ? k.slice(2) : (WORD[k] || k));
     J.person = person; J.personErrors = errors.concat(prepared.faceError ? ['face: ' + prepared.faceError] : []);
     return J;

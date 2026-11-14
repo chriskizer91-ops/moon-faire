@@ -1,0 +1,136 @@
+{
+ "shapes": "watchman-fable",
+ "person": "runs/watchman__claude-fable-5-2@high/v3.js",
+ "full": {
+  "triangles": 11093,
+  "parts": {
+   "torso": 1032,
+   "sleeve": 364,
+   "forearm": 230,
+   "legs": 666,
+   "boots": 1754,
+   "soles": 650,
+   "hands": 1829,
+   "head": 2192,
+   "coat": 700,
+   "belt": 56,
+   "brass": 292,
+   "scarf": 372,
+   "hair": 120,
+   "beard": 240,
+   "hat": 420,
+   "band": 56,
+   "boot": 120
+  }
+ },
+ "model": "claude-fable-5-2",
+ "effort": "high",
+ "rounds": [
+  {
+   "n": 1,
+   "seconds": 20.1,
+   "cost": 0.0946486,
+   "said": "file"
+  },
+  {
+   "n": 2,
+   "seconds": 5.4,
+   "cost": 0.062264599999999996,
+   "said": "DONE"
+  }
+ ],
+ "cost": 0.1569132,
+ "seconds": 25.5,
+ "half": {
+  "weight": {
+   "drop": [
+    "torso"
+   ],
+   "keep": {
+    "head": 1.0,
+    "hands": 0.5,
+    "hat": 0.9,
+    "band": 0.8,
+    "coat": 0.8,
+    "scarf": 0.7,
+    "beard": 0.8,
+    "hair": 0.7,
+    "brass": 0.5,
+    "belt": 0.7,
+    "sleeve": 0.75,
+    "forearm": 0.75,
+    "legs": 0.5,
+    "boots": 0.3,
+    "boot": 0.5,
+    "soles": 0.15
+   },
+   "rest": 0.6,
+   "scale": 0.8906918381147568
+  },
+  "triangles": 5549,
+  "parts": {
+   "sleeve": 242,
+   "forearm": 152,
+   "legs": 296,
+   "boots": 450,
+   "soles": 80,
+   "hands": 814,
+   "head": 1952,
+   "coat": 498,
+   "belt": 34,
+   "brass": 130,
+   "scarf": 231,
+   "hair": 74,
+   "beard": 169,
+   "hat": 336,
+   "band": 39,
+   "boot": 52
+  }
+ },
+ "quarter": {
+  "weight": {
+   "drop": [
+    "torso"
+   ],
+   "keep": {
+    "head": 0.6,
+    "hands": 0.22,
+    "hat": 0.7,
+    "band": 0.6,
+    "coat": 0.55,
+    "scarf": 0.45,
+    "beard": 0.5,
+    "hair": 0.5,
+    "brass": 0.25,
+    "belt": 0.5,
+    "sleeve": 0.5,
+    "forearm": 0.5,
+    "legs": 0.35,
+    "boots": 0.15,
+    "boot": 0.35,
+    "soles": 0.07
+   },
+   "rest": 0.4,
+   "scale": 0.7387703469494953
+  },
+  "triangles": 2762,
+  "parts": {
+   "sleeve": 134,
+   "forearm": 84,
+   "legs": 172,
+   "boots": 194,
+   "soles": 32,
+   "hands": 296,
+   "head": 970,
+   "coat": 284,
+   "belt": 20,
+   "brass": 52,
+   "scarf": 122,
+   "hair": 44,
+   "beard": 88,
+   "hat": 216,
+   "band": 24,
+   "boot": 30
+  }
+ }
+}

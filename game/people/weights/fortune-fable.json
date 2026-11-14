@@ -1,0 +1,127 @@
+{
+ "shapes": "fortune-fable",
+ "person": "runs/fortune__claude-fable-5-2@high/v2.js",
+ "full": {
+  "triangles": 11133,
+  "parts": {
+   "torso": 1032,
+   "sleeve": 364,
+   "forearm": 230,
+   "legs": 666,
+   "boots": 1754,
+   "soles": 650,
+   "hands": 1829,
+   "head": 2192,
+   "robe": 708,
+   "hem": 60,
+   "sash": 352,
+   "hair": 256,
+   "scarf": 692,
+   "gold": 348
+  }
+ },
+ "model": "claude-fable-5-2",
+ "effort": "high",
+ "rounds": [
+  {
+   "n": 1,
+   "seconds": 11.4,
+   "cost": 0.06856860000000001,
+   "said": "file"
+  },
+  {
+   "n": 2,
+   "seconds": 6.6,
+   "cost": 0.0679526,
+   "said": "file"
+  },
+  {
+   "n": 3,
+   "seconds": 1.1,
+   "cost": 0.0634086,
+   "said": "DONE"
+  }
+ ],
+ "cost": 0.1999298,
+ "seconds": 19.1,
+ "half": {
+  "weight": {
+   "drop": [
+    "legs"
+   ],
+   "keep": {
+    "head": 0.95,
+    "hands": 0.45,
+    "boots": 0.32,
+    "soles": 0.12,
+    "torso": 0.72,
+    "sleeve": 0.8,
+    "forearm": 0.8,
+    "robe": 0.68,
+    "hem": 1.0,
+    "sash": 0.6,
+    "hair": 0.7,
+    "scarf": 0.68,
+    "gold": 0.6
+   },
+   "rest": 0.6,
+   "scale": 0.8906918381147568
+  },
+  "triangles": 5645,
+  "parts": {
+   "torso": 660,
+   "sleeve": 258,
+   "forearm": 162,
+   "boots": 481,
+   "soles": 68,
+   "hands": 733,
+   "head": 1854,
+   "robe": 428,
+   "hem": 53,
+   "sash": 187,
+   "hair": 158,
+   "scarf": 419,
+   "gold": 184
+  }
+ },
+ "quarter": {
+  "weight": {
+   "drop": [
+    "legs"
+   ],
+   "keep": {
+    "head": 0.68,
+    "hands": 0.22,
+    "boots": 0.16,
+    "soles": 0.07,
+    "torso": 0.38,
+    "sleeve": 0.5,
+    "forearm": 0.5,
+    "robe": 0.38,
+    "hem": 0.8,
+    "sash": 0.3,
+    "hair": 0.4,
+    "scarf": 0.43,
+    "gold": 0.3
+   },
+   "rest": 0.35,
+   "scale": 0.7387703469494953
+  },
+  "triangles": 2819,
+  "parts": {
+   "torso": 289,
+   "sleeve": 134,
+   "forearm": 84,
+   "boots": 206,
+   "soles": 32,
+   "hands": 296,
+   "head": 1100,
+   "robe": 198,
+   "hem": 35,
+   "sash": 78,
+   "hair": 75,
+   "scarf": 218,
+   "gold": 74
+  }
+ }
+}

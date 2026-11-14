@@ -32,7 +32,7 @@
       const c = performance.now(); t = 0; PV.step(1 / 30, 45);
       let tris = 0, parts = 0; J.root.traverse((m) => { if (m.isMesh && m.visible && m.geometry && m.geometry.index) { tris += m.geometry.index.count / 3; parts++; } });
       const own = {}; for (const k in J.debug.meshes) if (k.slice(0, 2) === 'p_') own[k.slice(2)] = J.debug.meshes[k].geometry.index.count / 3;
-      return { scale: { height: person.height || 1, build: person.build || [1, 1], head: person.head || [1, 1, 1] }, partNames: J.partNames, errors: J.personErrors, prepareMs: Math.round(b - a), buildMs: Math.round(c - b), triangles: Math.round(tris), parts, own };
+      return { scale: { height: person.height || 1, build: person.build || [1, 1], head: person.head || [1, 1, 1] }, partNames: J.partNames, partTris: J.partTris, errors: J.personErrors, prepareMs: Math.round(b - a), buildMs: Math.round(c - b), triangles: Math.round(tris), parts, own };
     },
     // walking: phase runs with the steps; standing: phase 0
     step(dt, n, walk) { for (let i = 0; i < (n || 1); i++) { t += dt; J.animate(walk ? t * 1.9 : 0, walk ? 1 : 0, t, dt, 0); } },

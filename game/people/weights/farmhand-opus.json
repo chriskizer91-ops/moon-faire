@@ -1,0 +1,142 @@
+{
+ "shapes": "farmhand-opus",
+ "person": "runs/farmhand__claude-opus-5-5@high/v2.js",
+ "full": {
+  "triangles": 11117,
+  "parts": {
+   "torso": 1032,
+   "sleeve": 364,
+   "forearm": 230,
+   "legs": 666,
+   "boots": 1754,
+   "soles": 650,
+   "hands": 1829,
+   "head": 2192,
+   "shirt": 416,
+   "belt": 56,
+   "vest": 336,
+   "brass": 384,
+   "kerchief": 396,
+   "patch": 192,
+   "hair": 120,
+   "straw": 444,
+   "band": 56
+  }
+ },
+ "model": "claude-fable-5-2",
+ "effort": "high",
+ "rounds": [
+  {
+   "n": 1,
+   "seconds": 17.0,
+   "cost": 0.08587260000000001,
+   "said": "file"
+  },
+  {
+   "n": 2,
+   "seconds": 12.9,
+   "cost": 0.09918460000000001,
+   "said": "file"
+  },
+  {
+   "n": 3,
+   "seconds": 21.6,
+   "cost": 0.1540966,
+   "said": "file"
+  }
+ ],
+ "cost": 0.3391538,
+ "seconds": 51.5,
+ "half": {
+  "weight": {
+   "drop": [
+    "torso"
+   ],
+   "keep": {
+    "head": 0.9,
+    "hands": 0.45,
+    "boots": 0.3,
+    "soles": 0.15,
+    "sleeve": 0.7,
+    "forearm": 0.7,
+    "legs": 0.7,
+    "shirt": 0.75,
+    "belt": 1.0,
+    "vest": 0.7,
+    "brass": 0.25,
+    "kerchief": 0.6,
+    "patch": 0.4,
+    "hair": 1.0,
+    "straw": 1.0,
+    "band": 1.0
+   },
+   "rest": 0.6,
+   "scale": 0.9246365914286316
+  },
+  "triangles": 5456,
+  "parts": {
+   "sleeve": 234,
+   "forearm": 148,
+   "legs": 430,
+   "boots": 470,
+   "soles": 88,
+   "hands": 761,
+   "head": 1824,
+   "shirt": 288,
+   "belt": 51,
+   "vest": 216,
+   "brass": 88,
+   "kerchief": 218,
+   "patch": 70,
+   "hair": 109,
+   "straw": 410,
+   "band": 51
+  }
+ },
+ "quarter": {
+  "weight": {
+   "drop": [
+    "torso"
+   ],
+   "keep": {
+    "head": 0.43,
+    "hands": 0.2,
+    "boots": 0.15,
+    "soles": 0.07,
+    "sleeve": 0.4,
+    "forearm": 0.4,
+    "legs": 0.4,
+    "shirt": 0.55,
+    "belt": 0.8,
+    "vest": 0.4,
+    "brass": 0.08,
+    "kerchief": 0.3,
+    "patch": 0.2,
+    "hair": 0.7,
+    "straw": 0.65,
+    "band": 1.0
+   },
+   "rest": 0.35,
+   "scale": 0.8906918381147568
+  },
+  "triangles": 2784,
+  "parts": {
+   "sleeve": 128,
+   "forearm": 80,
+   "legs": 236,
+   "boots": 234,
+   "soles": 40,
+   "hands": 324,
+   "head": 838,
+   "shirt": 203,
+   "belt": 39,
+   "vest": 119,
+   "brass": 26,
+   "kerchief": 104,
+   "patch": 34,
+   "hair": 74,
+   "straw": 256,
+   "band": 49
+  }
+ }
+}

@@ -23,6 +23,12 @@
 <div id="stagebox"><canvas id="stage"></canvas><div id="who"></div><div id="doing"></div></div>
 <div class="bar"><select id="pick" aria-label="Person"></select><button id="bTalk">Talk</button><button id="bGreet">Say hello</button><button id="bL">Face left</button><button id="bF">Face you</button><button id="bR">Face right</button></div>
 <div class="bar" id="emotes"></div>
+<div class="bar">
+  <select id="weight" aria-label="Weight"><option value="full">Full weight</option><option value="half">Half the triangles</option><option value="quarter">A quarter of the triangles</option></select>
+  <button id="bFlip" aria-pressed="false">Flipbook look</button>
+  <select id="pix" hidden aria-label="Pixel size"><option value="1.2">1.2 mm of them to a pixel</option><option value="2.2">2.2 mm</option><option value="4.75">4.75 mm (the sprites' size)</option></select>
+  <select id="cols" hidden aria-label="Colours"><option value="own">Their own colours</option><option value="witch">The witches' colours</option></select>
+</div>
 <p class="soft small" id="facts"></p>
 <div class="card"><b>What is wired</b>
 <ul>
@@ -30,6 +36,8 @@
   <li><b>Emotes.</b> Every person can play every emote. The gold-edged buttons are the ones chosen as most like that person.</li>
   <li><b>On their own.</b> They blink, shift and look about when left alone, each at their own pace.</li>
   <li><b>Facing.</b> They turn to face a point, as they will turn to the party.</li>
+  <li><b>Lighter weights.</b> Each person can be built with half or a quarter of the triangles. The painted skin lies on the lighter build as it is.</li>
+  <li><b>Flipbook look.</b> The switch the witches have: flipbook colours and an inked outline. It starts off.</li>
 </ul>
 <p class="soft small">The moves were written by Claude Fable 5.2 through your key. The people, their names and their ways are stand-ins, not Moon Faire lore. No Claude session can measure speed on your laptop.</p></div>
 </main>
@@ -4834,9 +4842,14 @@ window.MF_FACE_PLAIN = "data:image/webp;base64,UklGRpqSAQBXRUJQVlA4II6SAQDQPQWdA
   function make(person, prepared, extra) {
     const WL = window.WITCH_LOD, L = WL.LEVELS.find((x) => x.id === 'lightest'), errors = [];
     const skip = Object.assign({}, HERS); for (const k of person.keep || []) delete skip[BODY[k] || k];
+    // a lighter weight of the same person: parts left off (hidden ones), and a share of each part's triangles kept. The painted skin is read by
+    // where a point stands, so it lies on a thinned part as it did on the whole one, with nothing to bake again.
+    const WT = person.weight || null, partName = (key) => key === 'face' ? 'head' : key === 'hand' ? 'hands' : key.slice(0, 2) === 'p_' ? key.slice(2) : (WORD[key] || key);
+    if (WT) for (const n of WT.drop || []) if (n !== 'head' && n !== 'hands') skip[BODY[n] || 'p_' + n] = 1;
     const lod = WL.hooks(Object.assign({}, L.lod, { merge: null, shadowOnly: null, clothShadow: 0, skip, simplify: Object.assign({}, L.lod.simplify, { torso: 0.9, wine: 0.8, cloth: 0.8, leggings: 0.7 }) }));
     const thin = lod.onGeometry, own = lod.material, colors = person.colors || {}, parts = person.parts || {}, skinHex = person.skin || '#d99f91';
-    lod.onGeometry = (key, g, B, K) => { if (key.slice(0, 2) !== 'p_') thin(key, g, B, K); };            // a person's own parts are already light
+    lod.onGeometry = (key, g, B, K) => { if (key.slice(0, 2) !== 'p_') thin(key, g, B, K);            // a person's own parts are already light
+      if (WT) { const k = WT.keep && WT.keep[partName(key)], r = (k == null ? (WT.rest == null ? 1 : WT.rest) : k) * (WT.scale || 1); if (r < 0.995) WL.simplify(g, Math.max(0.02, r), 0.3, true); } };
     lod.material = (key, B, K) => {
       if (prepared.bodyTex && key !== 'face' && key !== 'hand' && key !== 'skin') { const nm = key.slice(0, 2) === 'p_' ? key.slice(2) : (WORD[key] || key), S = prepared.S, fl = S.flat && S.flat[nm], ro = S.rough && S.rough[nm];
         const mt = fl ? material({ color: fl, rough: ro == null ? 0.8 : ro, sheen: fl, sheenK: 0.05 }, K) : painted(K, prepared, ro), mv = S.move && S.move[nm], sz = S.size && S.size[nm];
@@ -4887,6 +4900,7 @@ window.MF_FACE_PLAIN = "data:image/webp;base64,UklGRpqSAQBXRUJQVlA4II6SAQDQPQWdA
     const J = window.makeJester(o);
     const h = person.height || 1, b = person.build || [1, 1]; J.root.scale.set(h * (b[0] || 1), h, h * (b[1] || 1));
     if (person.head) { const q = person.head, hs = J.debug.SK.head.scale; hs.set(hs.x * (q[0] || 1), hs.y * (q[1] || 1), hs.z * (q[2] || 1)); }
+    J.partTris = {}; for (const k in J.debug.meshes) { const ix = J.debug.meshes[k].geometry.index; J.partTris[partName(k)] = (J.partTris[partName(k)] || 0) + (ix ? ix.count / 3 : 0); }
     J.partNames = Object.keys(J.debug.meshes).filter((k) => k !== 'face' && k !== 'hand' && k !== 'skin').map((k) => k.slice(0, 2) === 'p_' ? k.slice(2) : (WORD[k] || k));
     J.person = person; J.personErrors = errors.concat(prepared.faceError ? ['face: ' + prepared.faceError] : []);
     return J;
@@ -4938,22 +4952,109 @@ function makeMFStage(canvas, o) {
   catcher.rotation.x = -Math.PI / 2; catcher.position.y = 0.004; catcher.receiveShadow = true; catcher.renderOrder = 1; cast.add(catcher);
   const pc = document.createElement('canvas'); pc.width = pc.height = 128; { const g = pc.getContext('2d'), gr = g.createRadialGradient(64, 64, 4, 64, 64, 62); gr.addColorStop(0, 'rgba(14,8,18,0.55)'); gr.addColorStop(0.55, 'rgba(14,8,18,0.22)'); gr.addColorStop(1, 'rgba(14,8,18,0)'); g.fillStyle = gr; g.fillRect(0, 0, 128, 128); }
   const patchTex = new THREE.CanvasTexture(pc);
-  function footPatch(r) { const m = new THREE.Mesh(new THREE.PlaneGeometry(1, 1), new THREE.MeshBasicMaterial({ map: patchTex, transparent: true, depthWrite: false, toneMapped: false })); m.rotation.x = -Math.PI / 2; m.scale.set(r * 2, r * 1.5, 1); m.position.y = 0.006; m.renderOrder = 1; cast.add(m); return m; }
+  const patches = [];
+  function footPatch(r) { const m = new THREE.Mesh(new THREE.PlaneGeometry(1, 1), new THREE.MeshBasicMaterial({ map: patchTex, transparent: true, depthWrite: false, toneMapped: false })); patches.push(m.material); m.rotation.x = -Math.PI / 2; m.scale.set(r * 2, r * 1.5, 1); m.position.y = 0.006; m.renderOrder = 1; cast.add(m); return m; }
 
   // the painting: one flat picture behind everything
   const bgScene = new THREE.Scene(), bgCam = new THREE.OrthographicCamera(-1, 1, 1, -1, 0, 1);
   const bgMat = new THREE.MeshBasicMaterial({ color: 0xffffff, depthTest: false, depthWrite: false, toneMapped: false });
   const bgQuad = new THREE.Mesh(new THREE.PlaneGeometry(2, 2), bgMat); bgQuad.frustumCulled = false; bgScene.add(bgQuad);
   const THEATRE = new THREE.Color('#383043');
+  // ---- the Flipbook look (the same technique as on the witches' own stages, models/jester-3d/viewer/stage.js) ----
+  // The cast is drawn small into a picture of its own, every solid pixel takes the nearest of the flipbook's colours, and the figure
+  // gets an inked outline. Then it is laid over the painting. Four things are this stage's own:
+  //  - the pixel grid is a number of rows down the screen (flip.rows), any number: a slider. On the witches' stages a pixel is 4.75 mm of
+  //    her, which at this game's distances is smaller than a pixel of the screen, so nothing would show;
+  //  - the small picture is enlarged with hard pixels whose edges are one screen pixel soft, so any size of pixel is clean, not only whole ones;
+  //  - flip.snap goes from 1 (every pixel one of the flipbook's colours) to 0 (the smooth colours, still pixelled and inked);
+  //  - the painting is put on the same grid, in its own colours (worked out once from the painting), in the witches' colours, or left smooth;
+  //  - the window of the painting moves a whole pixel of the grid at a time, so the painting's pixels do not swim as she walks.
+  const WITCH_PAL = (o.palette || window.JESTER_PALETTE || []).slice(0, 64), NPW = Math.max(1, WITCH_PAL.length);
+  const toV = (list) => { const v = [], n = Math.max(1, list.length); for (let i = 0; i < 64; i++) { const p = list[i % n] || [0, 0, 0]; v.push(new THREE.Vector3(p[0] / 255, p[1] / 255, p[2] / 255)); } return v; };
+  const rt = new THREE.WebGLRenderTarget(4, 4, { minFilter: THREE.NearestFilter, magFilter: THREE.NearestFilter, format: THREE.RGBAFormat }); rt.texture.encoding = THREE.sRGBEncoding;
+  const postMat = new THREE.ShaderMaterial({ depthTest: false, depthWrite: false, toneMapped: false, transparent: true,
+    blending: THREE.CustomBlending, blendSrc: THREE.OneFactor, blendDst: THREE.OneMinusSrcAlphaFactor, blendSrcAlpha: THREE.OneFactor, blendDstAlpha: THREE.OneMinusSrcAlphaFactor,
+    uniforms: { tD: { value: rt.texture }, uRes: { value: new THREE.Vector2(4, 4) }, uPal: { value: toV(WITCH_PAL) }, uBg: { value: new THREE.Vector3(0.10, 0.075, 0.13) }, uSnap: { value: 1 } },
+    vertexShader: 'varying vec2 vUv; void main(){ vUv = uv; gl_Position = vec4(position.xy, 0.0, 1.0); }',
+    fragmentShader: 'precision highp float; uniform sampler2D tD; uniform vec2 uRes; uniform vec3 uPal[64]; uniform vec3 uBg; uniform float uSnap; varying vec2 vUv;\n' +
+      'void main(){ vec2 px = 1.0 / uRes; vec2 uv = (floor(vUv * uRes) + 0.5) * px; vec4 c = texture2D(tD, uv);\n' +
+      ' float n = max(max(texture2D(tD, uv + vec2(px.x, 0.0)).a, texture2D(tD, uv - vec2(px.x, 0.0)).a), max(texture2D(tD, uv + vec2(0.0, px.y)).a, texture2D(tD, uv - vec2(0.0, px.y)).a));\n' +
+      ' float m = min(min(texture2D(tD, uv + vec2(px.x, 0.0)).a, texture2D(tD, uv - vec2(px.x, 0.0)).a), min(texture2D(tD, uv + vec2(0.0, px.y)).a, texture2D(tD, uv - vec2(0.0, px.y)).a));\n' +
+      ' if (c.a < 0.5) { if (n > 0.6) gl_FragColor = vec4(0.075, 0.05, 0.065, 1.0); else gl_FragColor = vec4(c.rgb, c.a); return; }\n' +                          // the inked outline; elsewhere only shadow, and what light the cast and its spells add
+      ' vec3 col = c.rgb + uBg * (1.0 - c.a); float l = dot(col, vec3(0.30, 0.59, 0.11)); col = clamp(l + (col - l) * (1.0 + 0.4 * uSnap), 0.0, 1.0); col = clamp((col - 0.42) * (1.0 + 0.14 * uSnap) + 0.42, 0.0, 1.0); if (m < 0.4) col *= 0.45;\n' +                       // colours pushed toward painted pixels (less so as the snap is turned down); the rim of the figure, inked
+      ' float best = 1e9; vec3 pick = col; for (int i = 0; i < ' + NPW + '; i++) { vec3 d = col - uPal[i]; float e = dot(d * d, vec3(0.30, 0.59, 0.11)); if (e < best) { best = e; pick = uPal[i]; } }\n' +
+      ' gl_FragColor = vec4(mix(col, pick, uSnap), 1.0); }' });
+  const postScene = new THREE.Scene(), postQuad = new THREE.Mesh(new THREE.PlaneGeometry(2, 2), postMat); postQuad.frustumCulled = false; postScene.add(postQuad);
+  // the painting on the same grid: each pixel of the grid is the average of the painting under it, then takes the nearest colour of its list
+  const paintMat = new THREE.ShaderMaterial({ depthTest: false, depthWrite: false, toneMapped: false,
+    uniforms: { tP: { value: null }, uRes: { value: new THREE.Vector2(4, 4) }, uWin: { value: new THREE.Vector4(0, 0, 1, 1) }, uPal: { value: toV([]) }, uN: { value: 1 }, uSnap: { value: 1 }, uDim: { value: 1 } },
+    vertexShader: 'varying vec2 vUv; void main(){ vUv = uv; gl_Position = vec4(position.xy, 0.0, 1.0); }',
+    fragmentShader: 'precision highp float; uniform sampler2D tP; uniform vec2 uRes; uniform vec4 uWin; uniform vec3 uPal[64]; uniform float uN; uniform float uSnap; uniform float uDim; varying vec2 vUv;\n' +
+      'void main(){ vec2 px = 1.0 / uRes; vec2 c0 = vUv; vec3 col = vec3(0.0);\n' +
+      ' for (int j = 0; j < 2; j++) for (int i = 0; i < 2; i++) { vec2 q = c0 + (vec2(float(i), float(j)) - 0.5) * 0.5 * px; col += texture2D(tP, uWin.xy + q * uWin.zw).rgb; }\n' +
+      ' col *= 0.25; float best = 1e9; vec3 pick = col;\n' +
+      ' for (int i = 0; i < 64; i++) { if (float(i) >= uN) break; vec3 d = col - uPal[i]; float e = dot(d, d); if (e < best) { best = e; pick = uPal[i]; } }\n' +
+      ' gl_FragColor = vec4(mix(col, pick, uSnap) * uDim, 1.0); }' });      // darkening comes after the colours are chosen, so a spell dims the pixels without making them change colour
+  // the finished small picture (painting and cast together, or the cast alone), and the pass that enlarges it onto the screen
+  const rt2 = new THREE.WebGLRenderTarget(4, 4, { minFilter: THREE.LinearFilter, magFilter: THREE.LinearFilter, format: THREE.RGBAFormat, depthBuffer: false });
+  const upMat = new THREE.ShaderMaterial({ depthTest: false, depthWrite: false, toneMapped: false, transparent: true,
+    blending: THREE.CustomBlending, blendSrc: THREE.OneFactor, blendDst: THREE.OneMinusSrcAlphaFactor, blendSrcAlpha: THREE.OneFactor, blendDstAlpha: THREE.OneMinusSrcAlphaFactor,
+    uniforms: { tU: { value: rt2.texture }, uRes: { value: new THREE.Vector2(4, 4) }, uScale: { value: new THREE.Vector2(1, 1) } },
+    vertexShader: 'varying vec2 vUv; void main(){ vUv = uv; gl_Position = vec4(position.xy, 0.0, 1.0); }',
+    fragmentShader: 'precision highp float; uniform sampler2D tU; uniform vec2 uRes; uniform vec2 uScale; varying vec2 vUv;\n' +
+      'void main(){ vec2 p = vUv * uRes; vec2 i = floor(p); vec2 x = (p - i) * uScale;\n' +                 // x: where this screen pixel sits inside its pixel of the grid, in screen pixels
+      ' vec2 sh = clamp(x - (uScale - 0.5), 0.0, 0.5) - clamp(0.5 - x, 0.0, 0.5);\n' +                        // within half a screen pixel of an edge, lean toward the neighbour
+      ' gl_FragColor = texture2D(tU, (i + 0.5 + sh) / uRes); }' });
+  const upScene = new THREE.Scene(), upQuad = new THREE.Mesh(new THREE.PlaneGeometry(2, 2), upMat); upQuad.frustumCulled = false; upScene.add(upQuad);
+  const paintScene = new THREE.Scene(), paintQuad = new THREE.Mesh(new THREE.PlaneGeometry(2, 2), paintMat); paintQuad.frustumCulled = false; paintScene.add(paintQuad);
+  // A painting's own colours, worked out once when it loads: 64 of them. Each colour counts for far less than its share of the picture, so
+  // small bright things (a lamp, a flag) keep a place. Counting plain pixels gives a washed-out list: the big dull areas take every slot.
+  function ownColours(im) {
+    const k = document.createElement('canvas'), W = 192, Hh = Math.max(1, Math.round(W * im.height / im.width)); k.width = W; k.height = Hh;
+    const g = k.getContext('2d'); g.drawImage(im, 0, 0, W, Hh); const d = g.getImageData(0, 0, W, Hh).data, seen = new Map();
+    for (let i = 0; i < d.length; i += 4) { const key = (d[i] >> 3) << 10 | (d[i + 1] >> 3) << 5 | (d[i + 2] >> 3); seen.set(key, (seen.get(key) || 0) + 1); }
+    const pts = []; seen.forEach((n, key) => { const r = ((key >> 10) & 31) * 8 + 4, gr = ((key >> 5) & 31) * 8 + 4, b = (key & 31) * 8 + 4; pts.push([r, gr, b, Math.pow(n, 0.6) * (1 + (Math.max(r, gr, b) - Math.min(r, gr, b)) / 255)]); });      // strong colours count a little more
+    let boxes = [pts];
+    const span = (b) => { let best = 0, ax = 0, wsum = 0; for (let a = 0; a < 3; a++) { let lo = 255, hi = 0; for (const p of b) { if (p[a] < lo) lo = p[a]; if (p[a] > hi) hi = p[a]; } if (hi - lo > best) { best = hi - lo; ax = a; } } for (const p of b) wsum += p[3]; return [best * Math.sqrt(wsum), ax]; };
+    while (boxes.length < 64) {
+      let bi = -1, bs = 0, bax = 0; boxes.forEach((b, i) => { if (b.length < 2) return; const [s, ax] = span(b); if (s > bs) { bs = s; bi = i; bax = ax; } });
+      if (bi < 0) break;
+      const b = boxes[bi].sort((p, q) => p[bax] - q[bax]); let half = 0, tot = 0, cut = 1; for (const p of b) tot += p[3]; for (let i = 0; i < b.length - 1; i++) { half += b[i][3]; if (half >= tot / 2) { cut = i + 1; break; } }
+      boxes.splice(bi, 1, b.slice(0, cut), b.slice(cut));
+    }
+    const pal = boxes.map((b) => { let r = 0, gg = 0, bl = 0, w = 0; for (const p of b) { r += p[0] * p[3]; gg += p[1] * p[3]; bl += p[2] * p[3]; w += p[3]; } return [r / w, gg / w, bl / w]; });
+    for (let round = 0; round < 4; round++) {            // then each colour moves to the middle of the pixels nearest it, four times over
+      const sum = pal.map(() => [0, 0, 0, 0]);
+      for (const p of pts) { let best = 1e9, bi = 0; for (let i = 0; i < pal.length; i++) { const q = pal[i], e = (p[0] - q[0]) * (p[0] - q[0]) + (p[1] - q[1]) * (p[1] - q[1]) + (p[2] - q[2]) * (p[2] - q[2]); if (e < best) { best = e; bi = i; } } const a = sum[bi]; a[0] += p[0] * p[3]; a[1] += p[1] * p[3]; a[2] += p[2] * p[3]; a[3] += p[3]; }
+      sum.forEach((a, i) => { if (a[3] > 0) pal[i] = [a[0] / a[3], a[1] / a[3], a[2] / a[3]]; });
+    }
+    return pal;
+  }
+  // Light that is added (lamp glow, moths, a wisp) must leave the picture's see-through channel alone, or the look takes the air round it for
+  // something solid and inks it. On the screen the two ways of adding look the same, so a material is changed once and stays changed.
+  const _pts = [];
+  function tameGlows() {
+    _pts.length = 0;
+    cast.traverse((ob) => {
+      const ms = ob.material ? (Array.isArray(ob.material) ? ob.material : [ob.material]) : [];
+      for (const m of ms) {
+        if (m.blending === THREE.AdditiveBlending) { m.blending = THREE.CustomBlending; m.blendEquation = THREE.AddEquation; m.blendSrc = m.premultipliedAlpha ? THREE.OneFactor : THREE.SrcAlphaFactor; m.blendDst = THREE.OneFactor; m.blendSrcAlpha = THREE.ZeroFactor; m.blendDstAlpha = THREE.OneFactor; }
+        if (ob.isPoints && m.isPointsMaterial && !m.sizeAttenuation) { if (m.userData.mfSize == null) m.userData.mfSize = m.size; _pts.push(m); }      // specks sized in screen pixels shrink with the grid
+      }
+    });
+  }
+  const _buf = new THREE.Vector2(), _cc = new THREE.Color(); let glowT = 0;
+
   const camera = new THREE.PerspectiveCamera(22, 1, 0.1, 400);
   const api = {
     renderer, cast, camera, near, catcher, footPatch, key,
     frame: [1, 1], win: { x: 0, y: 0, w: 1, h: 1 }, dim: 0, dark: 0, painting: true, shakeX: 0, shakeY: 0, rigK: { key: 1, rim: 1 },
-    textures: {},
+    textures: {}, ownPal: {},
+    flip: { on: false, rows: 540, snap: 1, painting: 'own' },      // the Flipbook look: on or off; rows of pixels down the screen; how far colours go to the flipbook's (0 to 1); the painting 'own' (its own colours), 'witch' (the witches' colours) or 'smooth'
     // load a painting once; cb when it is ready to draw
     loadArt(id, src, cb) {
       if (api.textures[id]) return cb && cb(api.textures[id]);
-      const im = new Image(); im.onload = () => { const t = new THREE.Texture(im); t.encoding = THREE.sRGBEncoding; t.minFilter = THREE.LinearFilter; t.magFilter = THREE.LinearFilter; t.generateMipmaps = false; t.needsUpdate = true; api.textures[id] = t; if (cb) cb(t); }; im.src = src;
+      const im = new Image(); im.onload = () => { const t = new THREE.Texture(im); t.encoding = THREE.sRGBEncoding; t.minFilter = THREE.LinearFilter; t.magFilter = THREE.LinearFilter; t.generateMipmaps = false; t.needsUpdate = true; api.textures[id] = t; try { api.ownPal[id] = toV(ownColours(im)); } catch (e) { api.ownPal[id] = null; } if (cb) cb(t); }; im.src = src;
     },
     // fit the hidden camera to a scene's painting
     setScene(S) {
@@ -4995,23 +5096,49 @@ function makeMFStage(canvas, o) {
       for (const [l, base, k] of LIT) l.intensity = base * (1 - k * api.dim) * (l === key ? api.rigK.key : 1);
       rim.intensity = 0.30 * api.rigK.rim;
       const FW = api.frame[0], FH = api.frame[1], sx = api.shakeX, sy = api.shakeY;
-      const W = api.win, wx = Math.max(0, Math.min(FW - W.w, W.x + sx)), wy = Math.max(0, Math.min(FH - W.h, W.y + sy));
+      const W = api.win, F = api.flip; let wx = Math.max(0, Math.min(FW - W.w, W.x + sx)), wy = Math.max(0, Math.min(FH - W.h, W.y + sy)), gw = 0, gh = 0;
+      if (F.on) {                                        // the grid: whole screen pixels to each of its pixels, and the window on a whole step of it
+        renderer.getDrawingBufferSize(_buf); gh = Math.max(48, Math.min(_buf.y, Math.round(F.rows))); gw = Math.max(16, Math.round(_buf.x * gh / _buf.y));
+        const cx = W.w / gw, cy = W.h / gh; wx = Math.min(FW - W.w, Math.round(wx / cx) * cx); wy = Math.min(FH - W.h, Math.round(wy / cy) * cy);
+      }
+      for (const m of patches) m.opacity = F.on ? 0.85 : 1;      // the soft patch at her feet stays under half strength in the look, so it is shadow and not a solid thing to ink
       renderer.setRenderTarget(null); renderer.setClearColor(THEATRE, 1); renderer.clear();
-      if (api.painting && bgMat.map) {
+      const pixPaint = F.on && F.painting !== 'smooth' && api.painting && bgMat.map;
+      if (F.on) {                                        // the small finished picture starts clear, or as the painting on the grid
+        if (rt.width !== gw || rt.height !== gh) { rt.setSize(gw, gh); rt2.setSize(gw, gh); postMat.uniforms.uRes.value.set(gw, gh); upMat.uniforms.uRes.value.set(gw, gh); }
+        upMat.uniforms.uScale.value.set(_buf.x / gw, _buf.y / gh); postMat.uniforms.uSnap.value = F.snap;
+        renderer.getClearColor(_cc); const oc = renderer.getClearAlpha(); renderer.setClearColor(0x000000, 0); renderer.setRenderTarget(rt2); renderer.clear(); renderer.setClearColor(_cc, oc);
+      }
+      if (pixPaint) {
+        const u = paintMat.uniforms, own = F.painting === 'own' && api.ownPal[S.art]; u.tP.value = bgMat.map; u.uRes.value.set(gw, gh); bgMat.map.repeat.set(1, 1); bgMat.map.offset.set(0, 0);
+        u.uWin.value.set(wx / FW, 1 - (wy + W.h) / FH, W.w / FW, W.h / FH); u.uPal.value = own || postMat.uniforms.uPal.value; u.uN.value = own ? 64 : NPW; u.uSnap.value = F.snap; u.uDim.value = 1 - 0.93 * Math.min(1, Math.max(0, api.dark));
+        renderer.render(paintScene, bgCam); renderer.setRenderTarget(null);
+      } else if (api.painting && bgMat.map) {
+        renderer.setRenderTarget(null);
         const t = bgMat.map; t.repeat.set(W.w / FW, W.h / FH); t.offset.set(wx / FW, 1 - (wy + W.h) / FH);
         const d = Math.min(1, Math.max(0, api.dark)); bgMat.color.setScalar(1 - 0.93 * d);
         renderer.render(bgScene, bgCam);
       }
       renderer.clearDepth();
       camera.setViewOffset(FW, FH, wx, wy, W.w, W.h);
-      renderer.render(cast, camera);
+      if (!F.on) { for (const m of _pts) m.size = m.userData.mfSize; _pts.length = 0; renderer.render(cast, camera); api.last = { triangles: renderer.info.render.triangles, calls: renderer.info.render.calls }; return; }
+      if (--glowT <= 0) { tameGlows(); glowT = 20; }
+      for (const m of _pts) m.size = Math.max(1, m.userData.mfSize * gh / _buf.y);
+      const oc = renderer.getClearAlpha(); renderer.getClearColor(_cc); renderer.setClearColor(0x000000, 0);
+      renderer.setRenderTarget(rt); renderer.clear(); renderer.render(cast, camera); renderer.setClearColor(_cc, oc); api.last = { triangles: renderer.info.render.triangles, calls: renderer.info.render.calls + 3 };
+      renderer.setRenderTarget(rt2); renderer.render(postScene, bgCam);             // the cast as inked pixels, over the painting's pixels or over nothing
+      renderer.setRenderTarget(null); renderer.render(upScene, bgCam);              // and the small picture onto the screen
     },
-    info() { const i = renderer.info.render; return { triangles: i.triangles, calls: i.calls }; },
+    info() { return api.last || { triangles: 0, calls: 0 }; },      // the cast's own count (the look adds three small passes)
+    flipColours(list) { postMat.uniforms.uPal.value = toV((list || WITCH_PAL).slice(0, NPW)); }, ownColours,      // the look's list of colours can be swapped (never more than the stage was made with)
   };
   const _v = new THREE.Vector3();
   return api;
 }
 
+</script>
+<script>
+window.JESTER_PALETTE=[[93, 18, 32], [145, 62, 40], [54, 105, 202], [53, 99, 105], [13, 7, 10], [195, 106, 200], [144, 113, 110], [126, 57, 54], [85, 31, 62], [70, 12, 32], [216, 44, 38], [160, 24, 59], [237, 136, 86], [33, 23, 40], [33, 64, 155], [125, 70, 38], [128, 44, 143], [224, 97, 53], [51, 20, 52], [140, 127, 57], [170, 40, 36], [184, 108, 144], [23, 64, 205], [251, 199, 156], [193, 93, 63], [46, 52, 97], [174, 65, 188], [86, 62, 59], [111, 82, 52], [55, 40, 42], [75, 29, 83], [195, 36, 61], [218, 198, 79], [213, 206, 228], [55, 45, 66], [93, 49, 30], [130, 40, 93], [183, 81, 83], [165, 52, 91], [32, 19, 21], [247, 170, 122], [124, 183, 239], [72, 35, 27], [162, 96, 40], [87, 98, 137], [46, 11, 24], [87, 139, 220], [189, 121, 94], [136, 68, 143], [105, 26, 56], [49, 26, 20], [40, 58, 123], [91, 31, 105], [126, 23, 52], [216, 145, 50], [128, 25, 34]];
 </script>
 <script>
 // Made by people/kit/build_npcs.py from emotes.src.js, which Claude Fable 5.2 wrote through the API (people/kit/make_emotes.py).
@@ -5247,7 +5374,7 @@ return EMOTES; };
 <script>
 // Made by people/kit/build_npcs.py. The people are stand-ins, not Moon Faire lore: names and words are Chris's to change.
 window.MF_NPCS = { people: {
-  "old-lamp-seller": { name: "Old lamp-seller", who: "An old woman who has sold oil lamps and wicks at the fair for forty years.", shapes: "made by hand", skin: "lampseller-A", fit: {"front": [0.99383, 1.01175, 0.00309, -0.00156], "back": [0.99383, 1.01175, 0.00309, -0.00156]}, faceFit: [1, 0, 0], skinColour: "#bd7c67", scale: {"height": 0.91, "build": [1.08, 1.06], "head": [1.04, 0.99, 1]},
+  "old-lamp-seller": { name: "Old lamp-seller", who: "An old woman who has sold oil lamps and wicks at the fair for forty years.", shapes: "made by hand", shapeId: "lampseller", skin: "lampseller-A", fit: {"front": [0.99383, 1.01175, 0.00309, -0.00156], "back": [0.99383, 1.01175, 0.00309, -0.00156]}, faceFit: [1, 0, 0], skinColour: "#bd7c67", scale: {"height": 0.91, "build": [1.08, 1.06], "head": [1.04, 0.99, 1]},
     wiring: {"talk": ["talk_calm"], "greet": "beckon", "fidgets": ["fidget_hands"], "pace": 0.83, "likes": ["nod", "beckon", "think"], "moods": {"yes": "nod", "no": "shake_head", "happy": "laugh", "unsure": "think", "upset": "sad", "thanks": "greet_bow", "bye": "nod"}},
     SKIN: (function () {
 const SKIN = {
@@ -5294,7 +5421,7 @@ const PERSON = {
   },
 };
       return PERSON; } },
-  "pie-seller": { name: "Pie seller", who: "A sturdy middle-aged woman who sells hot meat pies from a cart by the gate.", shapes: "made by hand", skin: "lampseller-B", fit: {"front": [1.00617, 1.01058, -0.00309, -0.00053], "back": [1.00309, 1.01058, -0.00219, -0.00053]}, faceFit: [1, 0, 0], skinColour: "#78412d", scale: {"height": 0.95, "build": [1.15, 1.12], "head": [0.98, 0.99, 0.96]},
+  "pie-seller": { name: "Pie seller", who: "A sturdy middle-aged woman who sells hot meat pies from a cart by the gate.", shapes: "made by hand", shapeId: "lampseller", skin: "lampseller-B", fit: {"front": [1.00617, 1.01058, -0.00309, -0.00053], "back": [1.00309, 1.01058, -0.00219, -0.00053]}, faceFit: [1, 0, 0], skinColour: "#78412d", scale: {"height": 0.95, "build": [1.15, 1.12], "head": [0.98, 0.99, 0.96]},
     wiring: {"talk": ["talk_lively", "talk_calm"], "greet": "wave", "fidgets": ["fidget_shift", "fidget_hands"], "pace": 1, "likes": ["beckon", "laugh", "point"], "moods": {"yes": "nod", "no": "shake_head", "happy": "laugh", "unsure": "shrug", "upset": "cross", "thanks": "thanks", "bye": "wave"}},
     SKIN: (function () {
 const SKIN = {
@@ -5333,7 +5460,7 @@ const PERSON = {
   },
 };
       return PERSON; } },
-  "ballad-singer": { name: "Ballad singer", who: "A young woman who sings old songs on a small stage between the stalls each night.", shapes: "made by hand", skin: "lampseller-C", fit: {"front": [1.00926, 1.01998, -0.00528, -0.00295], "back": [1.00617, 1.0188, -0.00309, -0.00289]}, faceFit: [1, 0, 0], skinColour: "#e5b8ae", scale: {"height": 0.98, "build": [0.98, 0.97], "head": [1.04, 1, 1.03]},
+  "ballad-singer": { name: "Ballad singer", who: "A young woman who sings old songs on a small stage between the stalls each night.", shapes: "made by hand", shapeId: "lampseller", skin: "lampseller-C", fit: {"front": [1.00926, 1.01998, -0.00528, -0.00295], "back": [1.00617, 1.0188, -0.00309, -0.00289]}, faceFit: [1, 0, 0], skinColour: "#e5b8ae", scale: {"height": 0.98, "build": [0.98, 0.97], "head": [1.04, 1, 1.03]},
     wiring: {"talk": ["talk_calm", "talk_lively"], "greet": "greet_bow", "fidgets": ["fidget_look", "fidget_hands"], "pace": 1.08, "likes": ["greet_bow", "think", "sad"], "moods": {"yes": "nod", "no": "shake_head", "happy": "laugh", "unsure": "think", "upset": "sad", "thanks": "greet_bow", "bye": "wave"}},
     SKIN: (function () {
 const SKIN = {
@@ -5369,7 +5496,7 @@ const PERSON = {
   },
 };
       return PERSON; } },
-  "fortune-teller": { name: "Fortune-teller", who: "A tall, thin fortune-teller who reads palms and cards in a dim tent at the edge of the fair.", shapes: "shapes by Fable 5.2", skin: "fortune-A", fit: {"front": [1.02023, 1.00467, -0.01077, -0.00121], "back": [1.02023, 1.0035, -0.01077, -0.00115]}, faceFit: [1, 0, 0], skinColour: "#c7b0b2", scale: {"height": 1.05, "build": [0.93, 0.94], "head": [1, 1, 1]},
+  "fortune-teller": { name: "Fortune-teller", who: "A tall, thin fortune-teller who reads palms and cards in a dim tent at the edge of the fair.", shapes: "shapes by Fable 5.2", shapeId: "fortune-fable", skin: "fortune-A", fit: {"front": [1.02023, 1.00467, -0.01077, -0.00121], "back": [1.02023, 1.0035, -0.01077, -0.00115]}, faceFit: [1, 0, 0], skinColour: "#c7b0b2", scale: {"height": 1.05, "build": [0.93, 0.94], "head": [1, 1, 1]},
     wiring: {"talk": ["talk_calm"], "greet": "beckon", "fidgets": ["fidget_hands"], "pace": 0.94, "likes": ["think", "beckon", "point"], "moods": {"yes": "nod", "no": "refuse", "happy": "nod", "unsure": "think", "upset": "cross", "thanks": "greet_bow", "bye": "greet_bow"}},
     SKIN: (function () {
 const SKIN = {
@@ -5470,7 +5597,7 @@ const PERSON = {
   },
 };
       return PERSON; } },
-  "old-lamplighter": { name: "Old lamplighter", who: "An elderly man who walks the fair at dusk, lighting and trimming the lanterns along the stalls.", shapes: "shapes by Fable 5.2", skin: "fortune-B", fit: {"front": [1.01734, 1.00701, -0.00997, -0.00133], "back": [1.02023, 1.00701, -0.01077, -0.00133]}, faceFit: [1, 0, 0], skinColour: "#af7353", scale: {"height": 1.02, "build": [0.96, 0.96], "head": [1, 1, 1]},
+  "old-lamplighter": { name: "Old lamplighter", who: "An elderly man who walks the fair at dusk, lighting and trimming the lanterns along the stalls.", shapes: "shapes by Fable 5.2", shapeId: "fortune-fable", skin: "fortune-B", fit: {"front": [1.01734, 1.00701, -0.00997, -0.00133], "back": [1.02023, 1.00701, -0.01077, -0.00133]}, faceFit: [1, 0, 0], skinColour: "#af7353", scale: {"height": 1.02, "build": [0.96, 0.96], "head": [1, 1, 1]},
     wiring: {"talk": ["talk_calm"], "greet": "wave", "fidgets": ["fidget_look", "fidget_shift"], "pace": 0.85, "likes": ["point", "nod", "wave"], "moods": {"yes": "nod", "no": "shake_head", "happy": "laugh", "unsure": "shrug", "upset": "sad", "thanks": "thanks", "bye": "wave"}},
     SKIN: (function () {
 const SKIN = {
@@ -5548,7 +5675,7 @@ const PERSON = {
   },
 };
       return PERSON; } },
-  "old-night-watchman": { name: "Old night-watchman", who: "An old night-watchman who walks the fair rows after dark, checking stall shutters and lamps.", shapes: "shapes by Fable 5.2", skin: "watchman-A", fit: {"front": [1.01852, 1.01302, -0.01056, -0.00553], "back": [1.01543, 1.01302, -0.00707, -0.00553]}, faceFit: [1, 0, 0], skinColour: "#4f2a1d", scale: {"height": 1.01, "build": [1.1, 1.08], "head": [1, 1, 1]},
+  "old-night-watchman": { name: "Old night-watchman", who: "An old night-watchman who walks the fair rows after dark, checking stall shutters and lamps.", shapes: "shapes by Fable 5.2", shapeId: "watchman-fable", skin: "watchman-A", fit: {"front": [1.01852, 1.01302, -0.01056, -0.00553], "back": [1.01543, 1.01302, -0.00707, -0.00553]}, faceFit: [1, 0, 0], skinColour: "#4f2a1d", scale: {"height": 1.01, "build": [1.1, 1.08], "head": [1, 1, 1]},
     wiring: {"talk": ["talk_calm", "talk_gruff"], "greet": "nod", "fidgets": ["fidget_look"], "pace": 0.88, "likes": ["point", "nod", "cross"], "moods": {"yes": "nod", "no": "shake_head", "happy": "nod", "unsure": "think", "upset": "cross", "thanks": "nod", "bye": "wave"}},
     SKIN: (function () {
 const SKIN = {
@@ -5620,7 +5747,7 @@ const PERSON = {
   },
 };
       return PERSON; } },
-  "chestnut-roaster": { name: "Chestnut roaster", who: "A cheerful middle-aged man who roasts chestnuts over a brazier at the fair gate.", shapes: "shapes by Fable 5.2", skin: "watchman-B", fit: {"front": [1.01543, 1.04013, -0.00837, -0.01274], "back": [1.01235, 1.04013, -0.00747, -0.01274]}, faceFit: [1, 0, 0], skinColour: "#d99c8d", scale: {"height": 1.04, "build": [1.1, 1.08], "head": [1, 1, 1]},
+  "chestnut-roaster": { name: "Chestnut roaster", who: "A cheerful middle-aged man who roasts chestnuts over a brazier at the fair gate.", shapes: "shapes by Fable 5.2", shapeId: "watchman-fable", skin: "watchman-B", fit: {"front": [1.01543, 1.04013, -0.00837, -0.01274], "back": [1.01235, 1.04013, -0.00747, -0.01274]}, faceFit: [1, 0, 0], skinColour: "#d99c8d", scale: {"height": 1.04, "build": [1.1, 1.08], "head": [1, 1, 1]},
     wiring: {"talk": ["talk_lively"], "greet": "beckon", "fidgets": ["fidget_hands", "fidget_shift"], "pace": 1.05, "likes": ["laugh", "beckon", "wave"], "moods": {"yes": "nod", "no": "shake_head", "happy": "laugh", "unsure": "shrug", "upset": "sad", "thanks": "thanks", "bye": "wave"}},
     SKIN: (function () {
 const SKIN = {
@@ -5694,7 +5821,7 @@ const PERSON = {
   },
 };
       return PERSON; } },
-  "fair-baker": { name: "Fair Baker", who: "A stout, cheerful baker who sells warm loaves and buns from his oven cart at the night fair.", shapes: "shapes by Fable 5.2", skin: "baker-A", fit: {"front": [1.10494, 1.0412, -0.05247, -0.00596], "back": [1.11111, 1.0412, -0.05556, -0.00596]}, faceFit: [1, 0, 0], skinColour: "#d0826c", scale: {},
+  "fair-baker": { name: "Fair Baker", who: "A stout, cheerful baker who sells warm loaves and buns from his oven cart at the night fair.", shapes: "shapes by Fable 5.2", shapeId: "baker-fable", skin: "baker-A", fit: {"front": [1.10494, 1.0412, -0.05247, -0.00596], "back": [1.11111, 1.0412, -0.05556, -0.00596]}, faceFit: [1, 0, 0], skinColour: "#d0826c", scale: {},
     wiring: {"talk": ["talk_lively", "talk_calm"], "greet": "wave", "fidgets": ["fidget_shift"], "pace": 0.96, "likes": ["laugh", "thanks", "beckon"], "moods": {"yes": "nod", "no": "shake_head", "happy": "laugh", "unsure": "think", "upset": "sad", "thanks": "thanks", "bye": "wave"}},
     SKIN: (function () {
 const SKIN = {
@@ -5783,7 +5910,7 @@ const PERSON = {
   },
 };
       return PERSON; } },
-  "ribbon-dyer": { name: "Ribbon Dyer", who: "An old, quiet dyer who boils and sells dyed ribbons and cloth lengths from a steaming stall at the fair.", shapes: "shapes by Fable 5.2", skin: "baker-B", fit: {"front": [1.0216, 1.0078, -0.01145, -0.00039], "back": [1.0216, 1.0078, -0.01015, -0.00039]}, faceFit: [1, 0, 0], skinColour: "#af9f83", scale: {"height": 0.97, "build": [1.12, 1.12], "head": [1.06, 1, 1.04]},
+  "ribbon-dyer": { name: "Ribbon Dyer", who: "An old, quiet dyer who boils and sells dyed ribbons and cloth lengths from a steaming stall at the fair.", shapes: "shapes by Fable 5.2", shapeId: "baker-fable", skin: "baker-B", fit: {"front": [1.0216, 1.0078, -0.01145, -0.00039], "back": [1.0216, 1.0078, -0.01015, -0.00039]}, faceFit: [1, 0, 0], skinColour: "#af9f83", scale: {"height": 0.97, "build": [1.12, 1.12], "head": [1.06, 1, 1.04]},
     wiring: {"talk": ["talk_calm"], "greet": "greet_bow", "fidgets": ["fidget_hands", "fidget_shift"], "pace": 0.8, "likes": ["think", "shrug", "nod"], "moods": {"yes": "nod", "no": "shake_head", "happy": "nod", "unsure": "shrug", "upset": "sad", "thanks": "greet_bow", "bye": "nod"}},
     SKIN: (function () {
 const SKIN = {
@@ -5893,7 +6020,7 @@ const PERSON = {
   },
 };
       return PERSON; } },
-  "farm-lad": { name: "Farm lad", who: "A cheerful young farmhand who carts hay and feed for the fair's ponies and stays on at night to help.", shapes: "shapes by Fable 5.2", skin: "farmhand-A", fit: {"front": [1.00617, 1.01945, -0.00309, -0.00195], "back": [1.00309, 1.01945, -0.00089, -0.00195]}, faceFit: [1, 0, 0], skinColour: "#d99789", scale: {"height": 1.01, "build": [1, 0.98], "head": [1.02, 1, 1]},
+  "farm-lad": { name: "Farm lad", who: "A cheerful young farmhand who carts hay and feed for the fair's ponies and stays on at night to help.", shapes: "shapes by Fable 5.2", shapeId: "farmhand-fable", skin: "farmhand-A", fit: {"front": [1.00617, 1.01945, -0.00309, -0.00195], "back": [1.00309, 1.01945, -0.00089, -0.00195]}, faceFit: [1, 0, 0], skinColour: "#d99789", scale: {"height": 1.01, "build": [1, 0.98], "head": [1.02, 1, 1]},
     wiring: {"talk": ["talk_lively"], "greet": "wave", "fidgets": ["fidget_shift", "fidget_look", "fidget_hands"], "pace": 1.15, "likes": ["wave", "laugh", "surprised"], "moods": {"yes": "nod", "no": "shake_head", "happy": "laugh", "unsure": "shrug", "upset": "sad", "thanks": "thanks", "bye": "wave"}},
     SKIN: (function () {
 const SKIN = {
@@ -5968,7 +6095,7 @@ const PERSON = {
   },
 };
       return PERSON; } },
-  "gate-keeper": { name: "Gate keeper", who: "A stern middle-aged woman who takes the coins at the fair gate and watches who comes and goes after dark.", shapes: "shapes by Fable 5.2", skin: "farmhand-B", fit: {"front": [1.00926, 1.00801, -0.00528, -0.00138], "back": [1.00926, 1.00801, -0.00528, -0.00138]}, faceFit: [1, 0, 0], skinColour: "#4e291c", scale: {},
+  "gate-keeper": { name: "Gate keeper", who: "A stern middle-aged woman who takes the coins at the fair gate and watches who comes and goes after dark.", shapes: "shapes by Fable 5.2", shapeId: "farmhand-fable", skin: "farmhand-B", fit: {"front": [1.00926, 1.00801, -0.00528, -0.00138], "back": [1.00926, 1.00801, -0.00528, -0.00138]}, faceFit: [1, 0, 0], skinColour: "#4e291c", scale: {},
     wiring: {"talk": ["talk_gruff"], "greet": "beckon", "fidgets": ["fidget_look"], "pace": 1, "likes": ["cross", "refuse", "point"], "moods": {"yes": "nod", "no": "refuse", "happy": "nod", "unsure": "think", "upset": "cross", "thanks": "nod", "bye": "point"}},
     SKIN: (function () {
 const SKIN = {
@@ -6043,7 +6170,7 @@ const PERSON = {
   },
 };
       return PERSON; } },
-  "fortune-teller-opus": { name: "Fortune-teller", who: "A tall, thin fortune-teller who reads palms and cards in a dim tent at the edge of the fair.", shapes: "shapes by Opus 5.5", skin: "fortune-A", fit: {"front": [1.02023, 1.00467, -0.01077, -0.00121], "back": [1.02023, 1.0035, -0.01077, -0.00115]}, faceFit: [1, 0, 0], skinColour: "#c7b0b2", scale: {"height": 1.05, "build": [0.92, 0.95], "head": [1, 1, 1]},
+  "fortune-teller-opus": { name: "Fortune-teller", who: "A tall, thin fortune-teller who reads palms and cards in a dim tent at the edge of the fair.", shapes: "shapes by Opus 5.5", shapeId: "fortune-opus", skin: "fortune-A", fit: {"front": [1.02023, 1.00467, -0.01077, -0.00121], "back": [1.02023, 1.0035, -0.01077, -0.00115]}, faceFit: [1, 0, 0], skinColour: "#c7b0b2", scale: {"height": 1.05, "build": [0.92, 0.95], "head": [1, 1, 1]},
     wiring: {"talk": ["talk_calm"], "greet": "beckon", "fidgets": ["fidget_hands"], "pace": 0.94, "likes": ["think", "beckon", "point"], "moods": {"yes": "nod", "no": "refuse", "happy": "nod", "unsure": "think", "upset": "cross", "thanks": "greet_bow", "bye": "greet_bow"}},
     SKIN: (function () {
 const SKIN = {
@@ -6128,7 +6255,7 @@ const PERSON = {
   },
 };
       return PERSON; } },
-  "old-lamplighter-opus": { name: "Old lamplighter", who: "An elderly man who walks the fair at dusk, lighting and trimming the lanterns along the stalls.", shapes: "shapes by Opus 5.5", skin: "fortune-B", fit: {"front": [1.01734, 1.00701, -0.00997, -0.00133], "back": [1.02023, 1.00701, -0.01077, -0.00133]}, faceFit: [1, 0, 0], skinColour: "#af7353", scale: {"height": 1.02, "build": [0.96, 0.96], "head": [1, 1, 1]},
+  "old-lamplighter-opus": { name: "Old lamplighter", who: "An elderly man who walks the fair at dusk, lighting and trimming the lanterns along the stalls.", shapes: "shapes by Opus 5.5", shapeId: "fortune-opus", skin: "fortune-B", fit: {"front": [1.01734, 1.00701, -0.00997, -0.00133], "back": [1.02023, 1.00701, -0.01077, -0.00133]}, faceFit: [1, 0, 0], skinColour: "#af7353", scale: {"height": 1.02, "build": [0.96, 0.96], "head": [1, 1, 1]},
     wiring: {"talk": ["talk_calm"], "greet": "wave", "fidgets": ["fidget_look", "fidget_shift"], "pace": 0.85, "likes": ["point", "nod", "wave"], "moods": {"yes": "nod", "no": "shake_head", "happy": "laugh", "unsure": "shrug", "upset": "sad", "thanks": "thanks", "bye": "wave"}},
     SKIN: (function () {
 const SKIN = {
@@ -6208,7 +6335,7 @@ const PERSON = {
   },
 };
       return PERSON; } },
-  "old-night-watchman-opus": { name: "Old night-watchman", who: "An old night-watchman who walks the fair rows after dark, checking stall shutters and lamps.", shapes: "shapes by Opus 5.5", skin: "watchman-A", fit: {"front": [1.01852, 1.01302, -0.01056, -0.00553], "back": [1.01543, 1.01302, -0.00707, -0.00553]}, faceFit: [1, 0, 0], skinColour: "#4f2a1d", scale: {"height": 1.01, "build": [1.1, 1.08], "head": [1, 1, 1]},
+  "old-night-watchman-opus": { name: "Old night-watchman", who: "An old night-watchman who walks the fair rows after dark, checking stall shutters and lamps.", shapes: "shapes by Opus 5.5", shapeId: "watchman-opus", skin: "watchman-A", fit: {"front": [1.01852, 1.01302, -0.01056, -0.00553], "back": [1.01543, 1.01302, -0.00707, -0.00553]}, faceFit: [1, 0, 0], skinColour: "#4f2a1d", scale: {"height": 1.01, "build": [1.1, 1.08], "head": [1, 1, 1]},
     wiring: {"talk": ["talk_calm", "talk_gruff"], "greet": "nod", "fidgets": ["fidget_look"], "pace": 0.88, "likes": ["point", "nod", "cross"], "moods": {"yes": "nod", "no": "shake_head", "happy": "nod", "unsure": "think", "upset": "cross", "thanks": "nod", "bye": "wave"}},
     SKIN: (function () {
 const SKIN = {
@@ -6280,7 +6407,7 @@ const PERSON = {
   },
 };
       return PERSON; } },
-  "chestnut-roaster-opus": { name: "Chestnut roaster", who: "A cheerful middle-aged man who roasts chestnuts over a brazier at the fair gate.", shapes: "shapes by Opus 5.5", skin: "watchman-B", fit: {"front": [1.01543, 1.04013, -0.00837, -0.01274], "back": [1.01235, 1.04013, -0.00747, -0.01274]}, faceFit: [1, 0, 0], skinColour: "#d99c8d", scale: {"height": 1.04, "build": [1.1, 1.08], "head": [1, 1, 1]},
+  "chestnut-roaster-opus": { name: "Chestnut roaster", who: "A cheerful middle-aged man who roasts chestnuts over a brazier at the fair gate.", shapes: "shapes by Opus 5.5", shapeId: "watchman-opus", skin: "watchman-B", fit: {"front": [1.01543, 1.04013, -0.00837, -0.01274], "back": [1.01235, 1.04013, -0.00747, -0.01274]}, faceFit: [1, 0, 0], skinColour: "#d99c8d", scale: {"height": 1.04, "build": [1.1, 1.08], "head": [1, 1, 1]},
     wiring: {"talk": ["talk_lively"], "greet": "beckon", "fidgets": ["fidget_hands", "fidget_shift"], "pace": 1.05, "likes": ["laugh", "beckon", "wave"], "moods": {"yes": "nod", "no": "shake_head", "happy": "laugh", "unsure": "shrug", "upset": "sad", "thanks": "thanks", "bye": "wave"}},
     SKIN: (function () {
 const SKIN = {
@@ -6352,7 +6479,7 @@ const PERSON = {
   },
 };
       return PERSON; } },
-  "fair-baker-opus": { name: "Fair Baker", who: "A stout, cheerful baker who sells warm loaves and buns from his oven cart at the night fair.", shapes: "shapes by Opus 5.5", skin: "baker-A", fit: {"front": [1.10494, 1.0412, -0.05247, -0.00596], "back": [1.11111, 1.0412, -0.05556, -0.00596]}, faceFit: [1, 0, 0], skinColour: "#d0826c", scale: {},
+  "fair-baker-opus": { name: "Fair Baker", who: "A stout, cheerful baker who sells warm loaves and buns from his oven cart at the night fair.", shapes: "shapes by Opus 5.5", shapeId: "baker-opus", skin: "baker-A", fit: {"front": [1.10494, 1.0412, -0.05247, -0.00596], "back": [1.11111, 1.0412, -0.05556, -0.00596]}, faceFit: [1, 0, 0], skinColour: "#d0826c", scale: {},
     wiring: {"talk": ["talk_lively", "talk_calm"], "greet": "wave", "fidgets": ["fidget_shift"], "pace": 0.96, "likes": ["laugh", "thanks", "beckon"], "moods": {"yes": "nod", "no": "shake_head", "happy": "laugh", "unsure": "think", "upset": "sad", "thanks": "thanks", "bye": "wave"}},
     SKIN: (function () {
 const SKIN = {
@@ -6411,7 +6538,7 @@ const PERSON = {
   },
 };
       return PERSON; } },
-  "ribbon-dyer-opus": { name: "Ribbon Dyer", who: "An old, quiet dyer who boils and sells dyed ribbons and cloth lengths from a steaming stall at the fair.", shapes: "shapes by Opus 5.5", skin: "baker-B", fit: {"front": [1.0216, 1.0078, -0.01145, -0.00039], "back": [1.0216, 1.0078, -0.01015, -0.00039]}, faceFit: [1, 0, 0], skinColour: "#af9f83", scale: {"height": 0.97, "build": [1.12, 1.1], "head": [1.06, 1, 1.04]},
+  "ribbon-dyer-opus": { name: "Ribbon Dyer", who: "An old, quiet dyer who boils and sells dyed ribbons and cloth lengths from a steaming stall at the fair.", shapes: "shapes by Opus 5.5", shapeId: "baker-opus", skin: "baker-B", fit: {"front": [1.0216, 1.0078, -0.01145, -0.00039], "back": [1.0216, 1.0078, -0.01015, -0.00039]}, faceFit: [1, 0, 0], skinColour: "#af9f83", scale: {"height": 0.97, "build": [1.12, 1.1], "head": [1.06, 1, 1.04]},
     wiring: {"talk": ["talk_calm"], "greet": "greet_bow", "fidgets": ["fidget_hands", "fidget_shift"], "pace": 0.8, "likes": ["think", "shrug", "nod"], "moods": {"yes": "nod", "no": "shake_head", "happy": "nod", "unsure": "shrug", "upset": "sad", "thanks": "greet_bow", "bye": "nod"}},
     SKIN: (function () {
 const SKIN = {
@@ -6513,7 +6640,7 @@ const PERSON = {
   },
 };
       return PERSON; } },
-  "farm-lad-opus": { name: "Farm lad", who: "A cheerful young farmhand who carts hay and feed for the fair's ponies and stays on at night to help.", shapes: "shapes by Opus 5.5", skin: "farmhand-A", fit: {"front": [1.00617, 1.01945, -0.00309, -0.00195], "back": [1.00309, 1.01945, -0.00089, -0.00195]}, faceFit: [1, 0, 0], skinColour: "#d99789", scale: {"height": 1.01, "build": [1.03, 1], "head": [1.04, 1, 1]},
+  "farm-lad-opus": { name: "Farm lad", who: "A cheerful young farmhand who carts hay and feed for the fair's ponies and stays on at night to help.", shapes: "shapes by Opus 5.5", shapeId: "farmhand-opus", skin: "farmhand-A", fit: {"front": [1.00617, 1.01945, -0.00309, -0.00195], "back": [1.00309, 1.01945, -0.00089, -0.00195]}, faceFit: [1, 0, 0], skinColour: "#d99789", scale: {"height": 1.01, "build": [1.03, 1], "head": [1.04, 1, 1]},
     wiring: {"talk": ["talk_lively"], "greet": "wave", "fidgets": ["fidget_shift", "fidget_look", "fidget_hands"], "pace": 1.15, "likes": ["wave", "laugh", "surprised"], "moods": {"yes": "nod", "no": "shake_head", "happy": "laugh", "unsure": "shrug", "upset": "sad", "thanks": "thanks", "bye": "wave"}},
     SKIN: (function () {
 const SKIN = {
@@ -6597,7 +6724,7 @@ const PERSON = {
   },
 };
       return PERSON; } },
-  "gate-keeper-opus": { name: "Gate keeper", who: "A stern middle-aged woman who takes the coins at the fair gate and watches who comes and goes after dark.", shapes: "shapes by Opus 5.5", skin: "farmhand-B", fit: {"front": [1.00926, 1.00801, -0.00528, -0.00138], "back": [1.00926, 1.00801, -0.00528, -0.00138]}, faceFit: [1, 0, 0], skinColour: "#4e291c", scale: {},
+  "gate-keeper-opus": { name: "Gate keeper", who: "A stern middle-aged woman who takes the coins at the fair gate and watches who comes and goes after dark.", shapes: "shapes by Opus 5.5", shapeId: "farmhand-opus", skin: "farmhand-B", fit: {"front": [1.00926, 1.00801, -0.00528, -0.00138], "back": [1.00926, 1.00801, -0.00528, -0.00138]}, faceFit: [1, 0, 0], skinColour: "#4e291c", scale: {},
     wiring: {"talk": ["talk_gruff"], "greet": "beckon", "fidgets": ["fidget_look"], "pace": 1, "likes": ["cross", "refuse", "point"], "moods": {"yes": "nod", "no": "refuse", "happy": "nod", "unsure": "think", "upset": "cross", "thanks": "nod", "bye": "point"}},
     SKIN: (function () {
 const SKIN = {
@@ -6680,7 +6807,9 @@ const PERSON = {
   },
 };
       return PERSON; } }
-} };
+},
+  // lighter builds of each set of shapes (people/kit/make_weights.py): parts left off and the share of each part kept
+  weights: {"baker-fable": {"full": {"triangles": 10821}, "half": {"weight": {"drop": [], "keep": {"head": 0.85, "hands": 0.4, "boots": 0.22, "soles": 0.12, "torso": 0.25, "legs": 0.5, "sleeve": 0.7, "forearm": 0.7, "shirt": 0.7, "apron": 0.9, "tie": 0.3, "towel": 1.0, "roll": 0.6, "hair": 1.0, "beard": 0.9, "cap": 1.0, "capband": 1.0}, "rest": 0.6, "scale": 0.9964563592521561}, "triangles": 5506}, "quarter": {"weight": {"drop": [], "keep": {"head": 0.54, "hands": 0.2, "boots": 0.13, "soles": 0.05, "torso": 0.11, "legs": 0.33, "sleeve": 0.4, "forearm": 0.45, "shirt": 0.35, "apron": 0.6, "tie": 0.11, "towel": 0.6, "roll": 0.35, "hair": 0.8, "beard": 0.6, "cap": 0.8, "capband": 0.9}, "rest": 0.3, "scale": 0.8264950668043511}, "triangles": 2741}}, "baker-opus": {"full": {"triangles": 10909}, "half": {"weight": {"drop": [], "keep": {"head": 0.85, "hands": 0.4, "boots": 0.25, "soles": 0.12, "torso": 0.3, "legs": 0.6, "trousers": 0.7, "apron": 0.7, "shirt": 0.8, "sleeve": 0.7, "forearm": 0.8, "cap": 0.9, "hair": 0.9, "beard": 1.0, "roll": 0.6, "pocket": 0.6}, "rest": 0.6, "scale": 0.9246365914286316}, "triangles": 5451}, "quarter": {"weight": {"drop": [], "keep": {"head": 0.48, "hands": 0.2, "boots": 0.15, "soles": 0.07, "torso": 0.11, "legs": 0.3, "trousers": 0.38, "apron": 0.34, "shirt": 0.42, "sleeve": 0.33, "forearm": 0.45, "cap": 0.58, "hair": 0.55, "beard": 0.8, "roll": 0.28, "pocket": 0.25}, "rest": 0.3, "scale": 0.8579932460367892}, "triangles": 2701}}, "farmhand-fable": {"full": {"triangles": 11335}, "half": {"weight": {"drop": [], "keep": {"head": 0.85, "hands": 0.48, "boots": 0.28, "soles": 0.14, "torso": 0.3, "legs": 0.78, "sleeve": 0.78, "forearm": 0.78, "shirt": 0.58, "waistcoat": 0.68, "button": 0.18, "kerchief": 0.68, "patch": 0.28, "hair": 0.9, "straw": 0.95, "band": 0.8}, "rest": 0.6, "scale": 0.9246365914286316}, "triangles": 5618}, "quarter": {"weight": {"drop": [], "keep": {"head": 0.56, "hands": 0.2, "boots": 0.12, "soles": 0.06, "torso": 0.16, "legs": 0.45, "sleeve": 0.45, "forearm": 0.45, "shirt": 0.28, "waistcoat": 0.36, "button": 0.09, "kerchief": 0.38, "patch": 0.14, "hair": 0.6, "straw": 0.8, "band": 0.5}, "rest": 0.35, "scale": 0.8264950668043511}, "triangles": 2872}}, "farmhand-opus": {"full": {"triangles": 11117}, "half": {"weight": {"drop": ["torso"], "keep": {"head": 0.9, "hands": 0.45, "boots": 0.3, "soles": 0.15, "sleeve": 0.7, "forearm": 0.7, "legs": 0.7, "shirt": 0.75, "belt": 1.0, "vest": 0.7, "brass": 0.25, "kerchief": 0.6, "patch": 0.4, "hair": 1.0, "straw": 1.0, "band": 1.0}, "rest": 0.6, "scale": 0.9246365914286316}, "triangles": 5456}, "quarter": {"weight": {"drop": ["torso"], "keep": {"head": 0.43, "hands": 0.2, "boots": 0.15, "soles": 0.07, "sleeve": 0.4, "forearm": 0.4, "legs": 0.4, "shirt": 0.55, "belt": 0.8, "vest": 0.4, "brass": 0.08, "kerchief": 0.3, "patch": 0.2, "hair": 0.7, "straw": 0.65, "band": 1.0}, "rest": 0.35, "scale": 0.8906918381147568}, "triangles": 2784}}, "fortune-fable": {"full": {"triangles": 11133}, "half": {"weight": {"drop": ["legs"], "keep": {"head": 0.95, "hands": 0.45, "boots": 0.32, "soles": 0.12, "torso": 0.72, "sleeve": 0.8, "forearm": 0.8, "robe": 0.68, "hem": 1.0, "sash": 0.6, "hair": 0.7, "scarf": 0.68, "gold": 0.6}, "rest": 0.6, "scale": 0.8906918381147568}, "triangles": 5645}, "quarter": {"weight": {"drop": ["legs"], "keep": {"head": 0.68, "hands": 0.22, "boots": 0.16, "soles": 0.07, "torso": 0.38, "sleeve": 0.5, "forearm": 0.5, "robe": 0.38, "hem": 0.8, "sash": 0.3, "hair": 0.4, "scarf": 0.43, "gold": 0.3}, "rest": 0.35, "scale": 0.7387703469494953}, "triangles": 2819}}, "fortune-opus": {"full": {"triangles": 10885}, "half": {"weight": {"drop": ["legs"], "keep": {"head": 0.9, "hands": 0.5, "boots": 0.3, "soles": 0.15, "torso": 0.6, "sleeve": 0.7, "forearm": 0.7, "robe": 0.7, "sash": 0.6, "gold": 0.5, "hair": 0.6, "scarf": 0.6}, "rest": 0.6, "scale": 0.9246365914286316}, "triangles": 5363}, "quarter": {"weight": {"drop": ["legs"], "keep": {"head": 0.6, "hands": 0.22, "boots": 0.12, "soles": 0.08, "torso": 0.3, "sleeve": 0.4, "forearm": 0.4, "robe": 0.4, "sash": 0.35, "gold": 0.25, "hair": 0.35, "scarf": 0.35}, "rest": 0.35, "scale": 0.8264950668043511}, "triangles": 2672}}, "lampseller": {"full": {"triangles": 9769}, "half": {"weight": {"drop": ["legs"], "keep": {"head": 0.95, "hands": 0.4, "boots": 0.25, "soles": 0.15, "torso": 0.6, "sleeve": 0.9, "forearm": 0.9, "skirt": 1.0, "apron": 1.0, "belt": 1.0, "hair": 0.9, "kerchief": 0.9}, "rest": 0.6, "scale": 0.8906918381147568}, "triangles": 4863}, "quarter": {"weight": {"drop": ["legs"], "keep": {"head": 0.65, "hands": 0.18, "boots": 0.12, "soles": 0.06, "torso": 0.3, "sleeve": 0.6, "forearm": 0.6, "skirt": 0.8, "apron": 0.8, "belt": 0.7, "hair": 0.6, "kerchief": 0.6}, "rest": 0.4, "scale": 0.7387703469494953}, "triangles": 2483}}, "watchman-fable": {"full": {"triangles": 11093}, "half": {"weight": {"drop": ["torso"], "keep": {"head": 1.0, "hands": 0.5, "hat": 0.9, "band": 0.8, "coat": 0.8, "scarf": 0.7, "beard": 0.8, "hair": 0.7, "brass": 0.5, "belt": 0.7, "sleeve": 0.75, "forearm": 0.75, "legs": 0.5, "boots": 0.3, "boot": 0.5, "soles": 0.15}, "rest": 0.6, "scale": 0.8906918381147568}, "triangles": 5549}, "quarter": {"weight": {"drop": ["torso"], "keep": {"head": 0.6, "hands": 0.22, "hat": 0.7, "band": 0.6, "coat": 0.55, "scarf": 0.45, "beard": 0.5, "hair": 0.5, "brass": 0.25, "belt": 0.5, "sleeve": 0.5, "forearm": 0.5, "legs": 0.35, "boots": 0.15, "boot": 0.35, "soles": 0.07}, "rest": 0.4, "scale": 0.7387703469494953}, "triangles": 2762}}, "watchman-opus": {"full": {"triangles": 10817}, "half": {"weight": {"drop": [], "keep": {"head": 0.9, "hands": 0.45, "boots": 0.3, "soles": 0.15, "torso": 0.45, "sleeve": 0.8, "forearm": 0.8, "legs": 0.4, "coat": 0.8, "coatTrim": 0.8, "belt": 0.7, "brass": 0.4, "scarf": 0.8, "hat": 0.95, "hatband": 0.8, "hair": 0.8, "beard": 1.0}, "rest": 0.6, "scale": 0.8906918381147568}, "triangles": 5491}, "quarter": {"weight": {"drop": [], "keep": {"head": 0.52, "hands": 0.21, "boots": 0.23, "soles": 0.07, "torso": 0.2, "sleeve": 0.45, "forearm": 0.45, "legs": 0.22, "coat": 0.45, "coatTrim": 0.5, "belt": 0.4, "brass": 0.2, "scarf": 0.45, "hat": 0.75, "hatband": 0.5, "hair": 0.5, "beard": 0.7}, "rest": 0.4, "scale": 0.7669252891075882}, "triangles": 2725}}} };
 
 </script>
 <script>
@@ -6701,12 +6830,14 @@ window.MF_NPC_TEX = {"lampseller-A": {"body": "data:image/webp;base64,UklGRsAkAQ
 //   npc.talk(true); ... npc.talk(false);                  // while their words are on screen
 //   npc.emote('laugh');                                   // any name in npc.emotes
 //   npc.headTop(vec3);                                    // a point just above the head, for a speech mark
+//   MF_NPC.make('old-lamp-seller', { weight: 'half' })    // or 'quarter': the same person with half or a quarter of the triangles
 (function () {
   'use strict';
   const hash = (s) => { let h = 2166136261; for (let i = 0; i < s.length; i++) { h ^= s.charCodeAt(i); h = Math.imul(h, 16777619); } return h >>> 0; };
   async function make(id, o) {
     o = o || {}; const D = window.MF_NPCS.people[id]; if (!D) throw new Error('no person called ' + id);
-    const T = window.MF_NPC_TEX[D.skin], person = Object.assign(D.person(), D.scale || {}), W = D.wiring || {};
+    const T = window.MF_NPC_TEX[D.skin], WS = (window.MF_NPCS.weights || {})[D.shapeId] || {}, wt = o.weight && WS[o.weight] ? WS[o.weight].weight : null;      // o.weight: 'half' or 'quarter' for a lighter build of the same person
+    const person = Object.assign(D.person(), D.scale || {}, wt ? { weight: wt } : null), W = D.wiring || {};
     const prepared = await window.MF_PERSON.prepare(person, { body: T.body, face: T.face, fit: D.fit, faceFit: D.faceFit, skin: D.skinColour, SKIN: D.SKIN });
     const J = window.MF_PERSON.make(person, prepared, o.opts); J.fx.remove(J.spellLight);
     const E = window.MF_EMOTES(J.FP), all = Object.keys(E);
@@ -6717,7 +6848,7 @@ window.MF_NPC_TEX = {"lampseller-A": {"body": "data:image/webp;base64,UklGRsAkAQ
     const cut = () => { J.bones.forEach((b, i) => st.from[i].copy(b.quaternion)); st.fade = 1; };          // remember the pose, so a move that is cut short melts into the next
     const start = (n) => { if (J.busy) cut(); return J.play('e_' + n, true); };
     const npc = {
-      id, name: D.name, who: D.who, root: J.root, fx: J.fx, model: J, wiring: W,
+      id, name: D.name, who: D.who, root: J.root, fx: J.fx, model: J, wiring: W, weight: wt ? o.weight : 'full', triangles: Object.values(J.partTris).reduce((a, b) => a + b, 0),
       emotes: all.filter((n) => !/^(talk|fidget)_/.test(n)),
       update(dt) {
         dt = Math.min(dt || 0, 0.05); st.t += dt * pace;
@@ -6746,21 +6877,35 @@ window.MF_NPC_TEX = {"lampseller-A": {"body": "data:image/webp;base64,UklGRsAkAQ
   'use strict';
   const $ = (id) => document.getElementById(id), canvas = $('stage'), ids = MF_NPC.list();
   let stage, npc = null, last = performance.now(), yaw = 0.35, busy = false;
-  try { stage = makeMFStage(canvas, { preserve: true, shadow: 1024, maxPixelRatio: 2 }); stage.painting = false; } catch (e) { $('who').textContent = 'This page needs WebGL to draw.'; return; }
+  // the look's colours: the 56 every witch shares, the wisp's three greens and the Fox's three blouse colours (the game's shared list), filled out to the 64 the look holds
+  const SHARED = (window.JESTER_PALETTE || []).concat([[176, 250, 170], [140, 214, 132], [84, 150, 96], [84, 122, 116], [51, 82, 82], [22, 45, 47]]), LIST = SHARED.concat(SHARED.slice(0, Math.max(0, 64 - SHARED.length)));
+  const own = {}; let need = 2.1;
+  try { stage = makeMFStage(canvas, { preserve: true, shadow: 1024, maxPixelRatio: 2, palette: LIST }); stage.painting = false; } catch (e) { $('who').textContent = 'This page needs WebGL to draw.'; return; }
   for (const id of ids) { const o = document.createElement('option'), d = MF_NPC.info(id); o.value = id; o.textContent = d.name + ' (' + d.shapes + ')'; $('pick').appendChild(o); }
   const label = (n) => n.replace(/_/g, ' ');
   async function choose(id) {
     busy = true; $('who').textContent = 'Building…';
     try {
-      const next = await MF_NPC.make(id); if (npc) { stage.cast.remove(npc.root, npc.fx); npc.dispose(); }
+      const next = await MF_NPC.make(id, { weight: $('weight').value }); if (npc) { stage.cast.remove(npc.root, npc.fx); npc.dispose(); }
       npc = next; stage.cast.add(npc.root, npc.fx); npc.model.camera = stage.camera; stage.follow(0, 0); $('who').textContent = npc.name + '. ' + npc.who; $('bTalk').classList.remove('on');
       const W = npc.wiring, box = $('emotes'); box.innerHTML = '';
       for (const n of npc.emotes) { const b = document.createElement('button'); b.textContent = label(n); if ((W.likes || []).indexOf(n) >= 0) b.className = 'like'; b.onclick = () => npc.emote(n); box.appendChild(b); }
-      $('facts').textContent = 'Talks: ' + (W.talk || []).map((n) => label(n).replace('talk ', '')).join(', then ') + '. Says hello with: ' + label(W.greet || 'nod') + '. Pace: ' + (W.pace || 1) + '.';
+      const ws = (MF_NPCS.weights || {})[MF_NPC.info(id).shapeId]; for (const o of $('weight').options) o.hidden = o.value !== 'full' && !ws;
+      look();
+      $('facts').textContent = Math.round(npc.triangles).toLocaleString() + ' triangles' + (ws ? ' (full ' + ws.full.triangles.toLocaleString() + ', half ' + ws.half.triangles.toLocaleString() + ', quarter ' + ws.quarter.triangles.toLocaleString() + ')' : '') + '. Talks: ' + (W.talk || []).map((n) => label(n).replace('talk ', '')).join(', then ') + '. Says hello with: ' + label(W.greet || 'nod') + '. Pace: ' + (W.pace || 1) + '.';
       setTimeout(() => { if (npc && npc.id === id) npc.greet(); }, 900);
     } catch (e) { $('who').textContent = 'This one did not build: ' + e.message; }
     busy = false;
   }
+  // the Flipbook look: a pixel is so many millimetres of the person, never finer than the screen; colours from the witches' shared list or from the person's own painting
+  function look() {
+    const on = $('bFlip').getAttribute('aria-pressed') === 'true'; stage.flip.on = on; stage.flip.snap = 1; $('pix').hidden = $('cols').hidden = !on; if (!on || !npc) return;
+    const skin = MF_NPC.info(npc.id).skin;
+    if ($('cols').value === 'own') { if (own[skin]) stage.flipColours(own[skin]); else { const im = new Image(); im.onload = () => { own[skin] = stage.ownColours(im); look(); }; im.src = MF_NPC_TEX[skin].body; } }
+    else stage.flipColours(null);
+  }
+  $('bFlip').onclick = () => { const b = $('bFlip'), on = b.getAttribute('aria-pressed') !== 'true'; b.setAttribute('aria-pressed', on); b.classList.toggle('on', on); look(); };
+  $('pix').onchange = look; $('cols').onchange = look; $('weight').onchange = () => choose($('pick').value);
   $('pick').onchange = () => choose($('pick').value);
   $('bTalk').onclick = () => { if (!npc) return; npc.talk(!npc.talking); $('bTalk').classList.toggle('on', npc.talking); };
   $('bGreet').onclick = () => npc && npc.greet();
@@ -6771,7 +6916,7 @@ window.MF_NPC_TEX = {"lampseller-A": {"body": "data:image/webp;base64,UklGRsAkAQ
   const manual = /[?&]shot=1/.test(location.search);
   function draw(dt) {
     if (!npc || busy) return; npc.update(dt);
-    stage.resize(); const w = canvas.clientWidth, h = canvas.clientHeight, need = Math.max(2.1, 1.5 * h / w), d = need / 2 / Math.tan(5.5 * Math.PI / 180);
+    stage.resize(); const w = canvas.clientWidth, h = canvas.clientHeight; need = Math.max(2.1, 1.5 * h / w); const d = need / 2 / Math.tan(5.5 * Math.PI / 180); stage.flip.rows = need / (+$('pix').value / 1000);
     stage.setScene({ kind: 'fight', frame: [w, h], camera: { fov: 11, h: 1, z: 10, pitch: 0 } });
     stage.camera.position.set(Math.sin(yaw) * d, 1.0, Math.cos(yaw) * d); stage.camera.lookAt(0, 0.98, 0); stage.camera.updateMatrixWorld(); stage.render();
     $('doing').textContent = npc.doing ? label(npc.doing) : '';

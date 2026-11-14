@@ -1,0 +1,137 @@
+{
+ "shapes": "baker-opus",
+ "person": "runs/baker__claude-opus-5-5@high/v2.js",
+ "full": {
+  "triangles": 10909,
+  "parts": {
+   "torso": 1032,
+   "sleeve": 364,
+   "forearm": 230,
+   "legs": 666,
+   "boots": 1754,
+   "soles": 650,
+   "hands": 1829,
+   "head": 2192,
+   "shirt": 392,
+   "trousers": 224,
+   "apron": 876,
+   "pocket": 40,
+   "roll": 128,
+   "hair": 120,
+   "beard": 48,
+   "cap": 364
+  }
+ },
+ "model": "claude-fable-5-2",
+ "effort": "high",
+ "rounds": [
+  {
+   "n": 1,
+   "seconds": 14.9,
+   "cost": 0.0805686,
+   "said": "file"
+  },
+  {
+   "n": 2,
+   "seconds": 6.6,
+   "cost": 0.0720726,
+   "said": "file"
+  },
+  {
+   "n": 3,
+   "seconds": 1.4,
+   "cost": 0.06664060000000001,
+   "said": "DONE"
+  }
+ ],
+ "cost": 0.21928180000000003,
+ "seconds": 22.9,
+ "half": {
+  "weight": {
+   "drop": [],
+   "keep": {
+    "head": 0.85,
+    "hands": 0.4,
+    "boots": 0.25,
+    "soles": 0.12,
+    "torso": 0.3,
+    "legs": 0.6,
+    "trousers": 0.7,
+    "apron": 0.7,
+    "shirt": 0.8,
+    "sleeve": 0.7,
+    "forearm": 0.8,
+    "cap": 0.9,
+    "hair": 0.9,
+    "beard": 1.0,
+    "roll": 0.6,
+    "pocket": 0.6
+   },
+   "rest": 0.6,
+   "scale": 0.9246365914286316
+  },
+  "triangles": 5451,
+  "parts": {
+   "torso": 285,
+   "sleeve": 234,
+   "forearm": 170,
+   "legs": 368,
+   "boots": 389,
+   "soles": 72,
+   "hands": 676,
+   "head": 1722,
+   "shirt": 289,
+   "trousers": 144,
+   "apron": 565,
+   "pocket": 22,
+   "roll": 71,
+   "hair": 98,
+   "beard": 44,
+   "cap": 302
+  }
+ },
+ "quarter": {
+  "weight": {
+   "drop": [],
+   "keep": {
+    "head": 0.48,
+    "hands": 0.2,
+    "boots": 0.15,
+    "soles": 0.07,
+    "torso": 0.11,
+    "legs": 0.3,
+    "trousers": 0.38,
+    "apron": 0.34,
+    "shirt": 0.42,
+    "sleeve": 0.33,
+    "forearm": 0.45,
+    "cap": 0.58,
+    "hair": 0.55,
+    "beard": 0.8,
+    "roll": 0.28,
+    "pocket": 0.25
+   },
+   "rest": 0.3,
+   "scale": 0.8579932460367892
+  },
+  "triangles": 2701,
+  "parts": {
+   "torso": 96,
+   "sleeve": 102,
+   "forearm": 88,
+   "legs": 170,
+   "boots": 225,
+   "soles": 38,
+   "hands": 312,
+   "head": 902,
+   "shirt": 141,
+   "trousers": 72,
+   "apron": 252,
+   "pocket": 8,
+   "roll": 29,
+   "hair": 55,
+   "beard": 31,
+   "cap": 180
+  }
+ }
+}

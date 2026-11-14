@@ -1,0 +1,116 @@
+{
+ "shapes": "fortune-opus",
+ "person": "runs/fortune__claude-opus-5-5@high/v3.js",
+ "full": {
+  "triangles": 10885,
+  "parts": {
+   "torso": 1032,
+   "sleeve": 364,
+   "forearm": 230,
+   "legs": 666,
+   "boots": 1754,
+   "soles": 650,
+   "hands": 1829,
+   "head": 2192,
+   "robe": 480,
+   "sash": 172,
+   "gold": 620,
+   "hair": 256,
+   "scarf": 640
+  }
+ },
+ "model": "claude-fable-5-2",
+ "effort": "high",
+ "rounds": [
+  {
+   "n": 1,
+   "seconds": 12.3,
+   "cost": 0.0620326,
+   "said": "file"
+  },
+  {
+   "n": 2,
+   "seconds": 3.2,
+   "cost": 0.0431926,
+   "said": "DONE"
+  }
+ ],
+ "cost": 0.10522519999999999,
+ "seconds": 15.5,
+ "half": {
+  "weight": {
+   "drop": [
+    "legs"
+   ],
+   "keep": {
+    "head": 0.9,
+    "hands": 0.5,
+    "boots": 0.3,
+    "soles": 0.15,
+    "torso": 0.6,
+    "sleeve": 0.7,
+    "forearm": 0.7,
+    "robe": 0.7,
+    "sash": 0.6,
+    "gold": 0.5,
+    "hair": 0.6,
+    "scarf": 0.6
+   },
+   "rest": 0.6,
+   "scale": 0.9246365914286316
+  },
+  "triangles": 5363,
+  "parts": {
+   "torso": 572,
+   "sleeve": 234,
+   "forearm": 148,
+   "boots": 470,
+   "soles": 88,
+   "hands": 844,
+   "head": 1824,
+   "robe": 310,
+   "sash": 94,
+   "gold": 282,
+   "hair": 142,
+   "scarf": 355
+  }
+ },
+ "quarter": {
+  "weight": {
+   "drop": [
+    "legs"
+   ],
+   "keep": {
+    "head": 0.6,
+    "hands": 0.22,
+    "boots": 0.12,
+    "soles": 0.08,
+    "torso": 0.3,
+    "sleeve": 0.4,
+    "forearm": 0.4,
+    "robe": 0.4,
+    "sash": 0.35,
+    "gold": 0.25,
+    "hair": 0.35,
+    "scarf": 0.35
+   },
+   "rest": 0.35,
+   "scale": 0.8264950668043511
+  },
+  "triangles": 2672,
+  "parts": {
+   "torso": 255,
+   "sleeve": 120,
+   "forearm": 76,
+   "boots": 172,
+   "soles": 42,
+   "hands": 332,
+   "head": 1086,
+   "robe": 158,
+   "sash": 48,
+   "gold": 128,
+   "hair": 73,
+   "scarf": 182
+  }
+ }
+}

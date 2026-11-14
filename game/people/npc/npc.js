@@ -10,12 +10,14 @@
 //   npc.talk(true); ... npc.talk(false);                  // while their words are on screen
 //   npc.emote('laugh');                                   // any name in npc.emotes
 //   npc.headTop(vec3);                                    // a point just above the head, for a speech mark
+//   MF_NPC.make('old-lamp-seller', { weight: 'half' })    // or 'quarter': the same person with half or a quarter of the triangles
 (function () {
   'use strict';
   const hash = (s) => { let h = 2166136261; for (let i = 0; i < s.length; i++) { h ^= s.charCodeAt(i); h = Math.imul(h, 16777619); } return h >>> 0; };
   async function make(id, o) {
     o = o || {}; const D = window.MF_NPCS.people[id]; if (!D) throw new Error('no person called ' + id);
-    const T = window.MF_NPC_TEX[D.skin], person = Object.assign(D.person(), D.scale || {}), W = D.wiring || {};
+    const T = window.MF_NPC_TEX[D.skin], WS = (window.MF_NPCS.weights || {})[D.shapeId] || {}, wt = o.weight && WS[o.weight] ? WS[o.weight].weight : null;      // o.weight: 'half' or 'quarter' for a lighter build of the same person
+    const person = Object.assign(D.person(), D.scale || {}, wt ? { weight: wt } : null), W = D.wiring || {};
     const prepared = await window.MF_PERSON.prepare(person, { body: T.body, face: T.face, fit: D.fit, faceFit: D.faceFit, skin: D.skinColour, SKIN: D.SKIN });
     const J = window.MF_PERSON.make(person, prepared, o.opts); J.fx.remove(J.spellLight);
     const E = window.MF_EMOTES(J.FP), all = Object.keys(E);
@@ -26,7 +28,7 @@
     const cut = () => { J.bones.forEach((b, i) => st.from[i].copy(b.quaternion)); st.fade = 1; };          // remember the pose, so a move that is cut short melts into the next
     const start = (n) => { if (J.busy) cut(); return J.play('e_' + n, true); };
     const npc = {
-      id, name: D.name, who: D.who, root: J.root, fx: J.fx, model: J, wiring: W,
+      id, name: D.name, who: D.who, root: J.root, fx: J.fx, model: J, wiring: W, weight: wt ? o.weight : 'full', triangles: Object.values(J.partTris).reduce((a, b) => a + b, 0),
       emotes: all.filter((n) => !/^(talk|fidget)_/.test(n)),
       update(dt) {
         dt = Math.min(dt || 0, 0.05); st.t += dt * pace;

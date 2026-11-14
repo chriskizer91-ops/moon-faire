@@ -1,0 +1,116 @@
+{
+ "shapes": "lampseller",
+ "person": "lampseller.js",
+ "full": {
+  "triangles": 9769,
+  "parts": {
+   "torso": 1032,
+   "sleeve": 364,
+   "forearm": 230,
+   "legs": 666,
+   "boots": 1754,
+   "soles": 650,
+   "hands": 1829,
+   "head": 2192,
+   "skirt": 280,
+   "apron": 84,
+   "belt": 48,
+   "hair": 368,
+   "kerchief": 272
+  }
+ },
+ "model": "claude-fable-5-2",
+ "effort": "high",
+ "rounds": [
+  {
+   "n": 1,
+   "seconds": 11.1,
+   "cost": 0.075262,
+   "said": "file"
+  },
+  {
+   "n": 2,
+   "seconds": 1.9,
+   "cost": 0.0445286,
+   "said": "DONE"
+  }
+ ],
+ "cost": 0.1197906,
+ "seconds": 13.0,
+ "half": {
+  "weight": {
+   "drop": [
+    "legs"
+   ],
+   "keep": {
+    "head": 0.95,
+    "hands": 0.4,
+    "boots": 0.25,
+    "soles": 0.15,
+    "torso": 0.6,
+    "sleeve": 0.9,
+    "forearm": 0.9,
+    "skirt": 1.0,
+    "apron": 1.0,
+    "belt": 1.0,
+    "hair": 0.9,
+    "kerchief": 0.9
+   },
+   "rest": 0.6,
+   "scale": 0.8906918381147568
+  },
+  "triangles": 4863,
+  "parts": {
+   "torso": 550,
+   "sleeve": 290,
+   "forearm": 184,
+   "boots": 379,
+   "soles": 80,
+   "hands": 650,
+   "head": 1854,
+   "skirt": 248,
+   "apron": 74,
+   "belt": 42,
+   "hair": 294,
+   "kerchief": 218
+  }
+ },
+ "quarter": {
+  "weight": {
+   "drop": [
+    "legs"
+   ],
+   "keep": {
+    "head": 0.65,
+    "hands": 0.18,
+    "boots": 0.12,
+    "soles": 0.06,
+    "torso": 0.3,
+    "sleeve": 0.6,
+    "forearm": 0.6,
+    "skirt": 0.8,
+    "apron": 0.8,
+    "belt": 0.7,
+    "hair": 0.6,
+    "kerchief": 0.6
+   },
+   "rest": 0.4,
+   "scale": 0.7387703469494953
+  },
+  "triangles": 2483,
+  "parts": {
+   "torso": 227,
+   "sleeve": 160,
+   "forearm": 100,
+   "boots": 155,
+   "soles": 28,
+   "hands": 242,
+   "head": 1052,
+   "skirt": 165,
+   "apron": 48,
+   "belt": 24,
+   "hair": 163,
+   "kerchief": 119
+  }
+ }
+}

@@ -1,0 +1,142 @@
+{
+ "shapes": "watchman-opus",
+ "person": "runs/watchman__claude-opus-5-5@high/v2.js",
+ "full": {
+  "triangles": 10817,
+  "parts": {
+   "torso": 1032,
+   "sleeve": 364,
+   "forearm": 230,
+   "legs": 666,
+   "boots": 1754,
+   "soles": 650,
+   "hands": 1829,
+   "head": 2192,
+   "coat": 696,
+   "coatTrim": 140,
+   "belt": 56,
+   "brass": 384,
+   "scarf": 236,
+   "hat": 364,
+   "hatband": 56,
+   "hair": 120,
+   "beard": 48
+  }
+ },
+ "model": "claude-fable-5-2",
+ "effort": "high",
+ "rounds": [
+  {
+   "n": 1,
+   "seconds": 17.6,
+   "cost": 0.08752860000000001,
+   "said": "file"
+  },
+  {
+   "n": 2,
+   "seconds": 6.7,
+   "cost": 0.0755126,
+   "said": "file"
+  },
+  {
+   "n": 3,
+   "seconds": 7.5,
+   "cost": 0.10036060000000001,
+   "said": "file"
+  }
+ ],
+ "cost": 0.2634018,
+ "seconds": 31.8,
+ "half": {
+  "weight": {
+   "drop": [],
+   "keep": {
+    "head": 0.9,
+    "hands": 0.45,
+    "boots": 0.3,
+    "soles": 0.15,
+    "torso": 0.45,
+    "sleeve": 0.8,
+    "forearm": 0.8,
+    "legs": 0.4,
+    "coat": 0.8,
+    "coatTrim": 0.8,
+    "belt": 0.7,
+    "brass": 0.4,
+    "scarf": 0.8,
+    "hat": 0.95,
+    "hatband": 0.8,
+    "hair": 0.8,
+    "beard": 1.0
+   },
+   "rest": 0.6,
+   "scale": 0.8906918381147568
+  },
+  "triangles": 5491,
+  "parts": {
+   "torso": 412,
+   "sleeve": 258,
+   "forearm": 162,
+   "legs": 236,
+   "boots": 450,
+   "soles": 80,
+   "hands": 733,
+   "head": 1756,
+   "coat": 495,
+   "coatTrim": 99,
+   "belt": 34,
+   "brass": 134,
+   "scarf": 168,
+   "hat": 308,
+   "hatband": 39,
+   "hair": 85,
+   "beard": 42
+  }
+ },
+ "quarter": {
+  "weight": {
+   "drop": [],
+   "keep": {
+    "head": 0.52,
+    "hands": 0.21,
+    "boots": 0.23,
+    "soles": 0.07,
+    "torso": 0.2,
+    "sleeve": 0.45,
+    "forearm": 0.45,
+    "legs": 0.22,
+    "coat": 0.45,
+    "coatTrim": 0.5,
+    "belt": 0.4,
+    "brass": 0.2,
+    "scarf": 0.45,
+    "hat": 0.75,
+    "hatband": 0.5,
+    "hair": 0.5,
+    "beard": 0.7
+   },
+   "rest": 0.4,
+   "scale": 0.7669252891075882
+  },
+  "triangles": 2725,
+  "parts": {
+   "torso": 157,
+   "sleeve": 124,
+   "forearm": 78,
+   "legs": 111,
+   "boots": 308,
+   "soles": 34,
+   "hands": 294,
+   "head": 874,
+   "coat": 239,
+   "coatTrim": 52,
+   "belt": 17,
+   "brass": 58,
+   "scarf": 80,
+   "hat": 208,
+   "hatband": 21,
+   "hair": 45,
+   "beard": 25
+  }
+ }
+}
