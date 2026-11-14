@@ -133,7 +133,8 @@
   // that is not built yet), 'cheer' (a jump with an arm thrown up) and 'limber' (she shakes out and bounces). Every frame the bones
   // are set back to rest and the layers are added on top. The Jester's moves are the reference for what a full set holds, not copied.
   let lastPose = { arm: 15, leg: 0 }, mv = { name: 'pose', t: 0 }, wk = 0, jg = 0, gph = 0, clock = 0, blinkAt = 2.4, blinkT = -1, mouthAt = 0, mouthNow = 'rest', facePainted = '';
-  const SHOTS = { draw: 5.5, sword: 4.5, knives: 3.2, gem: 3.4, glass: 3.9, cheer: 1.5, limber: 3.9 }, SLOW = { draw: 1.22, sword: 1.25, knives: 1.3, gem: 1.3, glass: 1.3, limber: 1.5 }, MOVES = ['pose', 'idle', 'walk', 'jog', 'talk', 'draw', 'sword', 'knives', 'gem', 'glass', 'cheer', 'limber'];
+  const SHOTS = { draw: 5.5, sword: 4.5, knives: 3.2, gem: 3.4, glass: 3.9, cheer: 1.5, limber: 3.9, hit: 1.3, hard: 2.4, dodge: 1.3, win: 3.6, bow: 3.2, wave: 2.7 }, SLOW = { draw: 1.22, sword: 1.25, knives: 1.3, gem: 1.3, glass: 1.3, limber: 1.5, hit: 1.25, hard: 1.2, dodge: 1.2, win: 1.2, bow: 1.2, wave: 1.2 },
+    MOVES = ['pose', 'idle', 'walk', 'jog', 'talk', 'draw', 'sword', 'knives', 'gem', 'glass', 'cheer', 'limber', 'hit', 'hard', 'dodge', 'win', 'fall', 'bow', 'wave', 'kneel', 'squat', 'sit', 'hover'];
   const add = (b, x, y, z) => { const r = SK[b].rotation; r.x += x; r.y += y; r.z += z; };
   function restAll() { for (const k in SK) if (!/^(bag|charm|slv|tail|lock)/.test(k)) SK[k].rotation.set(0, 0, 0); SK.hips.position.copy(SK.hips.userData.home); }
   // ---------- fingers ----------
@@ -325,7 +326,8 @@
     if (Math.acos(c) > 0.45) { dir.addScaledVector(rest, -c).normalize().multiplyScalar(Math.sin(0.45)).addScaledVector(rest, Math.cos(0.45)); SC.vel.multiplyScalar(0.6); }
     SC.tip.copy(dir).multiplyScalar(SC.L).add(W.piv);
     W.qi.copy(W.qh).invert(); dir.applyQuaternion(W.qi);                                           // into her hips' own space
-    const tl = W.tl.copy(rp(SK.shinL, W.a)).sub(rp(SK.thighL, W.b)).normalize().applyQuaternion(W.qi), need = tl.x + 0.035; if (dir.x < need) { dir.x = need; dir.normalize(); }      // her thigh pushes it out, never through it
+    const tl = W.tl.copy(rp(SK.shinL, W.a)).sub(rp(SK.thighL, W.b)).normalize().applyQuaternion(W.qi), need = tl.x + 0.035; if (dir.x < need) { dir.x = need; dir.normalize(); }
+    { const low = (0.03 - W.piv.y) / (SWK.LEN + 0.05); dir.applyQuaternion(W.qh); if (dir.y < low && low < 1) { const hz = Math.hypot(dir.x, dir.z), k = Math.sqrt(Math.max(0, 1 - low * low)); if (hz > 1e-4) { dir.x *= k / hz; dir.z *= k / hz; } else { dir.x = 0.3 * k; dir.z = -0.95 * k; } dir.y = low; dir.normalize(); } dir.applyQuaternion(W.qi); }       // nor the floor: when she is low it lies back along the ground      // her thigh pushes it out, never through it
     B.quaternion.setFromUnitVectors(SWK.ds, dir); if (tilt) B.quaternion.multiply(W.qr.setFromAxisAngle(SWK.ds, 0.70 * tilt)).premultiply(W.qt.setFromAxisAngle(SC.axis, 0.40 * tilt));
     B.updateMatrixWorld(true);
   }
@@ -478,6 +480,12 @@
     const GS = [dia(0.34), cres, dia(0.15)]; for (let i = 0; i < 20; i++) MG.shards.push(lightMesh(GS[i % 3], i % 4 === 0 ? '#eaf2ff' : i % 2 ? '#a9c8ff' : '#b9b0ff')); }
   const magicOff = () => { for (const k of ['gGlow', 'gStar', 'gRing', 'flash']) MG[k].visible = false; for (const a of [MG.sparks, MG.rim, MG.shards]) for (const m of a) m.visible = false; MG.pane.visible = false; if (meshes.veins) meshes.veins.visible = false; MATS.gem.emissiveIntensity = 0; MATS.lens.emissiveIntensity = 0; };
   MATS.gem.emissive = lin('#7fc4ff'); MATS.gem.emissiveIntensity = 0; MATS.lens.emissive = lin('#9fc8ff'); MATS.lens.emissiveIntensity = 0; if (meshes.veins) { meshes.veins.visible = false; meshes.veins.castShadow = false; meshes.veins.renderOrder = 7; }
+  // The hover: a round of pale light on the ground under her that turns slowly, a soft glow at her gem, and a few sparks that hang round her.
+  const HV = { p: V3(), g: V3(), s: V3(), q: Qn(), q2: Qn() };
+  function hoverLight() { const a = PE.hover; if (a <= 0.01) return; inRoot(); rp(SK.hips, HV.p); rpt(SK.head, GEMP, HV.g);
+    MG.pane.visible = true; MG.pane.position.set(HV.p.x, 0.014, HV.p.z + 0.14); MG.pane.quaternion.copy(HV.q.setFromAxisAngle(XAX, -PI / 2)).multiply(HV.q2.setFromAxisAngle(ZAX, clock * 0.22)); MG.pane.scale.setScalar(0.5 + 0.55 * a); MG.pane.material.opacity = 0.50 * a;
+    setSprite(MG.gGlow, HV.g, 0.15 + 0.02 * Math.sin(clock * 1.5), 0.55 * a); MATS.gem.emissiveIntensity = 0.9 * a;
+    for (let i = 0; i < 10; i++) { const an = i * TAU / 10 + clock * 0.22 + 2 * rndK(i, 1), r = 0.40 + 0.16 * rndK(i, 2); HV.s.set(HV.p.x + r * Math.cos(an), HV.p.y - 0.12 + 0.75 * rndK(i, 3) + 0.035 * Math.sin(clock * 1.3 + i), HV.p.z + 0.12 + r * Math.sin(an)); setSprite(MG.sparks[i], HV.s, 0.022 + 0.022 * rndK(i, 4), a * (0.35 + 0.45 * (0.5 + 0.5 * Math.sin(clock * 2.1 + i * 1.7)))); } }
   const GEMP = (() => { const O = bandPt(0, bandPh(0), 0.0036); return V3(O[0], O[1], O[2] + 0.012); })();       // just in front of the gem on her headband (it rides on her head)
   const MW = { gw: V3(), F: V3(), P: V3(), W: V3(), qG: Qn(), qH: Qn(), fk: V3(), qfk: Qn(), hint: V3(), sh: V3(), n: V3(), side: V3(), C: V3(), v: V3(), palm: V3(), ft: V3(), qf: Qn(), q: Qn(), q2: Qn() };
   // The gem, in its own seconds: her right hand rises and two fingers touch the gem (0.45); it flares, a ring of light opens from it, and
@@ -536,6 +544,54 @@
       m.quaternion.copy(PQ).multiply(MW.q2.setFromAxisAngle(MW.v.set(rndK(i, 13) - 0.5, rndK(i, 14) - 0.5, 0.6).normalize(), a + T * (loose ? 0.6 : 0.3) + 5 * e * (rndK(i, 15) - 0.5))); m.scale.setScalar(sz); m.material.opacity = op; }
     return true;
   }
+  // ---------- postures she holds, and her short fight moves and emotes ----------
+  // Postures (kneel, squat, sit, hover, down) each have a weight that eases to 1 while that posture is chosen and back to 0 when it is
+  // not, so she slides in and out of them and from one to another. A posture is a place for her hips (set in animate), a place and
+  // turn for each foot, and somewhere for each hand to rest. Her legs and arms are then worked out from those, as in the weapon moves.
+  // Each foot: [x, y, z, turn out (degrees), toes down (degrees), then the way her knee points]. The hover's feet are measured from
+  // her hips, and follow her shins.
+  const PW = { kneel: 0, squat: 0, sit: 0, hover: 0, down: 0 }, PE = { kneel: 0, squat: 0, sit: 0, hover: 0, down: 0, all: 0 };
+  const PST = { kneel: { R: [-0.09, 0.075, -0.40, 0, 165, 0, -1, 0.3], L: [0.10, FOOT_Y, 0.36, 5, 0, 0.1, 0.5, 1] },
+    squat: { R: [-0.15, FOOT_Y, 0.0, -22, 0, -0.45, 0.3, 1], L: [0.15, FOOT_Y, 0.0, 22, 0, 0.45, 0.3, 1] },
+    sit: { R: [-0.18, 0.075, 0.66, -15, -70, -0.2, 1, 0.3], L: [0.13, FOOT_Y, 0.37, 8, 0, 0.15, 1, 0.5] },
+    hover: { R: [0.13, -0.08, 0.36, 0, 0, -1, -0.25, 0.35], L: [-0.11, -0.10, 0.30, 0, 0, 1, -0.25, 0.35] },
+    down: { R: [-0.10, 0.075, -0.205, 0, 170, -0.15, -0.6, 1], L: [0.10, 0.075, -0.205, 0, 170, 0.15, -0.6, 1] } };
+  const OS = { R: V3(), L: V3(), yawR: 0, yawL: 0, plant: 0 };       // what a short move asks of her feet: how far each is from its resting spot, its turn, and how firmly both are planted
+  const EW = { ft: V3(), hint: V3(), q: Qn(), qk: Qn(), qx: Qn(), qy: Qn(), qfol: Qn(), W: V3(), fk: V3(), qfk: Qn(), kn: V3(), v: V3(), sh: V3(), F: V3(), P: V3(), qG: Qn(), qH: Qn(), hp: V3() };
+  const hardBeats = (T, o) => { o.j = sm(0, 0.08, T) * (1 - sm(0.15, 0.6, T)); o.back = sm(0.04, 0.46, T) * (1 - sm(1.18, 1.68, T)); o.fold = sm(0.05, 0.30, T) * (1 - sm(0.85, 1.25, T)); o.sR = sm(0.05, 0.26, T); o.sL = sm(0.24, 0.46, T); o.rL = sm(1.18, 1.44, T); o.rR = sm(1.40, 1.66, T); return o; }, HDB = {};
+  function emoteStage(N, T) {
+    const a = PE, any = a.all > 0.001 || OS.plant > 0.001; if (!any && !/^(hard|win|bow|wave)$/.test(N)) return;
+    inRoot();
+    // --- her feet
+    if (any) { rp(SK.hips, EW.hp);
+      for (const [Sd] of SIDES) { const rest = SK['foot' + Sd].userData.rest, off = OS[Sd]; EW.ft.copy(rest).multiplyScalar(1 - a.all); EW.hint.set(0, 0.25, 1).multiplyScalar(1 - a.all); EW.q.identity(); let wAcc = 0;
+        for (const k in PST) { const w = a[k]; if (w <= 0) continue; const f = PST[k][Sd]; if (k === 'hover') EW.ft.x += w * (EW.hp.x + f[0]), EW.ft.y += w * (EW.hp.y + f[1]), EW.ft.z += w * (EW.hp.z + f[2]); else EW.ft.x += w * f[0], EW.ft.y += w * f[1], EW.ft.z += w * f[2];
+          EW.hint.x += w * f[5]; EW.hint.y += w * f[6]; EW.hint.z += w * f[7];
+          if (k !== 'hover') { EW.qk.copy(EW.qy.setFromAxisAngle(YAX, f[3] * DEG)).multiply(EW.qx.setFromAxisAngle(XAX, f[4] * DEG)); wAcc += w; EW.q.slerp(EW.qk, w / wAcc); } }
+        EW.q.copy(EW.qk.identity().slerp(EW.q, Math.min(1, wAcc))); EW.ft.add(off); if (Sd === 'R' ? OS.yawR : OS.yawL) EW.q.premultiply(EW.qy.setFromAxisAngle(YAX, Sd === 'R' ? OS.yawR : OS.yawL));
+        const kL = Math.max(sm(0, 0.15, a.all), OS.plant);
+        if (a.hover > 0.001) { plant(Sd, EW.ft, null, EW.hint, 1); rq(SK['foot' + Sd], EW.qfol); EW.q.slerp(EW.qfol, a.hover / Math.max(a.all, 1e-4)); }       // floating, her feet go where her shins point
+        const miss = plant(Sd, EW.ft, EW.q, EW.hint, kL); if (miss > D.missLeg) D.missLeg = miss; } }
+    // --- her hands in a posture: on a knee, on her thigh, or limp on the ground
+    if (a.all > 0.001) for (const [Sd, s] of SIDES) { rp(SK['hand' + Sd], EW.fk); rp(SK['shin' + Sd], EW.kn); let w = 0; EW.W.set(0, 0, 0);
+      const onKnee = a.squat + (Sd === 'L' ? a.kneel + a.sit : 0); if (onKnee > 0) { EW.W.addScaledVector(EW.v.copy(EW.kn).add(EW.sh.set(-s * 0.01, 0.048, 0.04)), onKnee); w += onKnee; }
+      if (a.hover > 0) { rp(SK['thigh' + Sd], EW.v).lerp(EW.kn, 0.52); EW.v.y += 0.062; EW.W.addScaledVector(EW.v, a.hover); w += a.hover; }       // floating, they lie open on her thighs
+      if (Sd === 'R' && a.sit > 0) { rp(SK.thighR, EW.v).lerp(EW.kn, 0.55); EW.v.y += 0.078; EW.W.addScaledVector(EW.v, a.sit); w += a.sit; }
+      if (a.down > 0) { EW.W.addScaledVector(EW.v.set(s * 0.21, 0.150, SK.hips.position.z + 0.31), a.down); w += a.down; }
+      if (w > 0.001) { EW.W.multiplyScalar(1 / w).lerp(EW.fk, 1 - Math.min(1, w)); const miss = reach(Sd, EW.W, null, EW.hint.set(s * 0.8, -0.5, -0.4), sm(0, 0.25, w)); if (Sd === 'L') { if (miss > D.missL) D.missL = miss; } else if (miss > D.missR) D.missR = miss; }
+      if (a.hover > 0.5) fWant[Sd] = FP.soft; }
+    // --- her hands in the short moves
+    const hand = (Sd, W, w, hint, F, P) => { if (w <= 0.001) return; rp(SK['hand' + Sd], EW.fk); EW.W.copy(W).lerp(EW.fk, 1 - w); let q = null; if (F) { rq(SK['hand' + Sd], EW.qfk); handQ(Sd, F, P, EW.qG); q = EW.qH.copy(EW.qfk).slerp(EW.qG, w); }
+      const miss = reach(Sd, EW.W, q, hint, sm(0, 0.25, w)); if (Sd === 'L') { if (miss > D.missL) D.missL = miss; } else if (miss > D.missR) D.missR = miss; };
+    if (N === 'hard') { const o = hardBeats(T, HDB); rpt(SK.spine1, EW.v.set(0.03, 1.06, 0.135), EW.kn); hand('R', EW.kn, o.fold, EW.hint.set(-0.9, -0.5, 0.1), EW.F.set(0.9, -0.2, 0.3).normalize(), EW.P.set(0, 0, -1)); if (o.fold > 0.5) fWant.R = FP.soft; }
+    if (N === 'win') { const p = sm(1.0, 1.35, T) * (1 - sm(2.5, 2.9, T)), sl = sm(1.42, 1.62, T); rpt(SK.hips, EW.v.set(0.172, 0.975, 0.02), EW.kn); hand('L', EW.kn, p, EW.hint.set(1, -0.2, -0.7));
+      rpt(SK.head, EW.v.set(-0.075, 1.580, 0.095), EW.kn); rp(SK.uarmR, EW.sh); EW.sh.x += 0.04; EW.sh.y += 0.34; EW.sh.z += 0.28; EW.kn.lerp(EW.sh, sl);
+      EW.F.set(0.50, 0.82, -0.20).lerp(EW.v.set(0.30, 0.70, 0.60), sl).normalize(); EW.P.set(0.25, -0.55, 0.80); EW.W.copy(EW.kn).addScaledVector(EW.F, -0.150); hand('R', EW.W, p, EW.hint.set(-0.9, -0.2, 0.4), EW.F, EW.P); if (p > 0.5) { fWant.R = FP.two; fWant.L = FP.soft; } }
+    if (N === 'bow') { const b = sm(0.10, 0.90, T) * (1 - sm(1.50, 2.30, T)); rpt(SK.spine3, EW.v.set(0.035, 1.235, 0.128), EW.kn); EW.F.set(0.85, 0.45, -0.2).normalize(); EW.P.set(0, -0.2, -1); EW.W.copy(EW.kn).addScaledVector(EW.F, -0.085); hand('R', EW.W, b, EW.hint.set(-0.8, -0.6, 0.2), EW.F, EW.P);
+      rp(SK.uarmL, EW.sh); EW.sh.x += 0.30; EW.sh.y -= 0.16; EW.sh.z -= 0.14; hand('L', EW.sh, b, EW.hint.set(0.4, -0.3, -1)); if (b > 0.4) { fWant.R = FP.flat; fWant.L = FP.soft; } }
+    if (N === 'wave') { const k = sm(0, 0.35, T) * (1 - sm(1.7, 2.1, T)), sw = Math.sin(T * 11), sw2 = Math.sin(T * 11 - 0.7); rpt(SK.hips, EW.v.set(0.172, 0.975, 0.02), EW.kn); hand('L', EW.kn, k, EW.hint.set(1, -0.2, -0.7));
+      rp(SK.uarmR, EW.sh); EW.sh.x += -0.20 - 0.12 * sw; EW.sh.y += 0.33 - 0.03 * Math.abs(sw); EW.sh.z += 0.10; EW.F.set(-0.12 - 0.50 * sw2, 1, 0.05).normalize(); EW.P.set(0, 0.05, 1); hand('R', EW.sh, k, EW.hint.set(-0.7, -1, 0.1), EW.F, EW.P); if (k > 0.4) { fWant.R = FP.open; fWant.L = FP.soft; } }
+  }
   // Soft things (SOFT): each hangs from its root and its tip is a weight on a spring. It is pulled to where it would rest (its built
   // direction, bent toward straight down), it lags when its root moves, and it cannot swing past a set angle. A sleeve may hang
   // further the more her elbow folds, so her forearm does not pass through it.
@@ -572,11 +628,11 @@
   function pose(o) {
     o = o || {}; mv = { name: 'pose', t: 0 }; wk = 0; jg = 0; lastPose = { arm: o.arm == null ? 15 : o.arm, leg: o.leg || 0 }; const arm = lastPose.arm * DEG - A_POSE, leg = lastPose.leg * DEG;
     restAll(); for (const [S, s] of SIDES) { SK['uarm' + S].rotation.z = s * arm; SK['thigh' + S].rotation.z = s * leg; SK['foot' + S].rotation.z = -s * leg; }
-    armsAndBow(-1, 0); swordStage(-1, 0, true); knifeStage(-1); magicOff(); stillK = 0; root.updateMatrixWorld(true);
+    armsAndBow(-1, 0); swordStage(-1, 0, true); knifeStage(-1); magicOff(); stillK = 0; for (const k in PW) PW[k] = PE[k] = 0; PE.all = 0; root.updateMatrixWorld(true);
     if (gearSettle) { gearSettle(); root.updateMatrixWorld(true); }       // the bags come to rest against her in the new pose
     softTick(0, true); root.updateMatrixWorld(true);
   }
-  function play(name) { if (name === 'aim') name = 'draw'; if (!MOVES.includes(name) || name === 'pose') { pose(lastPose); return 'pose'; } mv = { name, t: 0 }; return name; }
+  function play(name) { if (name === 'aim') name = 'draw'; if (name === 'down') name = 'fall'; if (!MOVES.includes(name) || name === 'pose') { pose(lastPose); return 'pose'; } mv = { name, t: 0 }; return name; }
   // for checking a move in stills: put her at one moment of it, with her hands and soft things settled
   function seek(name, t) { play(name); mv.t = t * (SLOW[mv.name] || 1); snapNow = true; animate(0); snapNow = false; root.updateMatrixWorld(true); if (gearSettle) { gearSettle(); root.updateMatrixWorld(true); } softTick(0, true); root.updateMatrixWorld(true); return mv.t; }
   function walk(on) { return play(on ? 'walk' : 'pose') === 'walk'; }
@@ -587,6 +643,8 @@
     const N = SHOTS[mv.name] && mv.t >= SHOTS[mv.name] ? 'idle' : mv.name, T = mv.t / (SLOW[N] || 1); restAll();
     fWant.R = N === 'talk' ? FP.soft : N === 'cheer' && T > 0.25 && T < 1.2 ? FP.fist : FP.relax; fWant.L = FP.relax;
     wk += ((N === 'walk' ? 1 : 0) - wk) * Math.min(1, dt * 4.5); jg += ((N === 'jog' ? 1 : 0) - jg) * Math.min(1, dt * 4.5);
+    { const P = N === 'fall' ? 'down' : N; let Wt = 0; for (const k in PW) { PW[k] = snapNow ? (P === k ? 1 : 0) : PW[k] + ((P === k ? 1 : 0) - PW[k]) * Math.min(1, dt * (k === 'down' ? 2.0 : 3.4)); PE[k] = sm(0, 1, PW[k]); Wt += PE[k]; } if (Wt > 1) for (const k in PW) PE[k] /= Wt; PE.all = Math.min(1, Wt); }
+    OS.R.set(0, 0, 0); OS.L.set(0, 0, 0); OS.yawR = OS.yawL = 0; OS.plant = 0;
     const go = Math.min(1, wk + jg), g = wk + jg > 1e-4 ? jg / (wk + jg) : 0, L = (a, b) => a + (b - a) * g, still = 1 - go;
     for (const [S, s] of SIDES) SK['uarm' + S].rotation.z = s * (9 * DEG - A_POSE);       // arms hang close
     const bounce = (h) => { if (h <= 0) return; const a = h / 0.10; SK.hips.position.y += h; for (const [S] of SIDES) { add('foot' + S, a, 0, 0); add('toe' + S, -a, 0, 0); } };       // up on the balls of her feet
@@ -654,6 +712,41 @@
     if (N === 'glass') { const o = glassBeats(T, GLB), easeIn = 1 - sm(0, 0.15, T) + sm(2.6, 2.9, T);
       add('hips', 0, 8 * DEG * o.st, 0); add('spine1', 0.05 * o.push, 0, -0.03 * o.push); add('spine2', 0, (12 * o.st + 6 * o.push - 8 * o.back) * DEG, 0); add('neck', 0, 0.20 * o.st, 0); add('head', 0, 0.26 * o.st, 0);
       SK.hips.position.x += 0.03 * o.push * o.st; SK.hips.position.y += 0.04 * o.hop - 0.06 * o.st; for (const [S] of SIDES) add('farm' + S, -0.10 * easeIn, 0, 0); }
+    // ---- postures: where her hips go and how her back and head are held. Her feet and hands are in emoteStage ----
+    if (PE.all > 0.001) { const a = PE, bob = 0.025 * Math.sin(clock * 1.5), stag = N === 'fall' ? sm(0, 0.08, T) * (1 - sm(0.15, 0.5, T)) : 0;
+      SK.hips.position.y += -0.43 * a.kneel - 0.535 * a.squat - 0.745 * a.sit + (-0.38 + bob) * a.hover - 0.595 * a.down; SK.hips.position.z += 0.02 * a.kneel - 0.20 * a.squat - 0.05 * a.sit - 0.10 * a.down; SK.hips.position.x -= 0.05 * stag;
+      add('hips', 0.30 * a.squat + 0.25 * a.down, 0, 0.05 * stag); add('spine1', 0.04 * a.kneel + 0.25 * a.squat + 0.10 * a.sit + 0.35 * a.down - 0.10 * stag, 0, 0.10 * stag); add('spine2', 0.15 * a.squat + 0.08 * a.sit + 0.30 * a.down, 0.15 * stag, 0.08 * stag); add('spine3', 0.15 * a.down - 0.03 * a.hover, 0, 0);
+      add('neck', -0.20 * a.squat - 0.06 * a.sit + 0.30 * a.down - 0.15 * stag, 0, 0); add('head', -0.15 * a.squat - 0.06 * a.sit + 0.20 * a.down, 0, 0.08 * a.down);
+      if (a.hover > 0.5 || a.down > 0.4) squint = 1; if (a.hover > 0.5) mouthNow = 'smile'; if (stag > 0.3) mouthNow = 'oo'; }
+    // ---- a blow from screen right: she rocks away from it, flinches, then rolls her shoulder and is ready again ----
+    if (N === 'hit') { const j = sm(0, 0.07, T) * (1 - sm(0.13, 0.58, T)), j2 = sm(0.02, 0.12, T) * (1 - sm(0.20, 0.62, T)), sh = sm(0.60, 0.74, T) * (1 - sm(0.86, 1.04, T));
+      SK.hips.position.x -= 0.085 * j2; SK.hips.position.y -= 0.035 * j2; add('hips', 0, -0.10 * j2, 0.07 * j2); add('spine1', -0.05 * j, 0, 0.15 * j2); add('spine2', -0.06 * j, -0.14 * j2, 0.17 * j2); add('spine3', 0, 0, 0.06 * j2); add('neck', -0.10 * j, 0, -0.12 * j); add('head', -0.10 * j, -0.16 * j2, -0.20 * j);
+      add('clavL', 0, 0, 0.22 * j); add('uarmL', -0.35 * j2, 0, 0.42 * j2); add('farmL', -1.25 * j2, 0, 0); add('uarmR', 0.20 * j2, 0, -0.50 * j2); add('farmR', -0.45 * j2, 0, 0);
+      add('clavR', 0, 0, -0.16 * sh); add('clavL', 0, 0, 0.10 * sh); add('head', 0, 0, 0.10 * sh); add('spine2', 0, 0.08 * sh, 0); bounce(0.012 * sh);
+      for (const [S] of SIDES) add('farm' + S, -0.10, 0, 0); if (j > 0.3 || j2 > 0.45) { squint = 1; mouthNow = 'oo'; } fWant.L = j2 > 0.3 ? FP.fist : FP.relax; OS.plant = sm(0, 0.03, T) * (1 - sm(0.62, 0.8, T)); }
+    // ---- a hard blow: knocked two steps back, turned from it and folded over, an arm across her middle; she straightens and steps back in ----
+    if (N === 'hard') { const o = hardBeats(T, HDB); SK.hips.position.x -= 0.30 * o.back + 0.03 * o.j; SK.hips.position.y -= 0.09 * o.fold + 0.02 * o.back; SK.hips.position.z += 0.03 * o.fold; add('hips', 0.14 * o.fold, -0.30 * o.fold + 0.10 * o.j, 0.05 * o.fold);
+      add('spine1', 0.30 * o.fold - 0.08 * o.j, -0.08 * o.fold, 0.12 * o.fold + 0.08 * o.j); add('spine2', 0.24 * o.fold, -0.08 * o.fold, 0.10 * o.fold + 0.06 * o.j); add('neck', 0.14 * o.fold - 0.12 * o.j, 0, 0); add('head', 0.12 * o.fold, 0.12 * o.fold, -0.14 * o.j); add('uarmL', -0.15 * o.fold, 0, 0.50 * o.fold); add('farmL', -0.7 * o.fold, 0, 0);
+      OS.R.set(-0.34 * (o.sR - o.rR), 0.05 * (Math.sin(PI * o.sR) + Math.sin(PI * o.rR)), -0.05 * (o.sR - o.rR)); OS.L.set(-0.27 * (o.sL - o.rL), 0.05 * (Math.sin(PI * o.sL) + Math.sin(PI * o.rL)), 0.03 * (o.sL - o.rL)); OS.yawR = -0.38 * (o.sR - o.rR); OS.yawL = -0.20 * (o.sL - o.rL); OS.plant = sm(0, 0.06, T) * (1 - sm(1.66, 1.9, T));
+      for (const [S] of SIDES) add('farm' + S, -0.10, 0, 0); if (o.fold > 0.3) { squint = Math.max(squint, T < 0.55 ? 1 : 0.5); mouthNow = 'oo'; } }
+    // ---- a dodge: she drops and slips away from screen right on a bent right leg, one arm up as a guard, and springs back ----
+    if (N === 'dodge') { const d = sm(0, 0.16, T) * (1 - sm(0.42, 0.85, T)), stepK = Math.sin(PI * sm(0, 0.16, T)) + Math.sin(PI * sm(0.42, 0.85, T));
+      SK.hips.position.x -= 0.36 * d; SK.hips.position.y -= 0.23 * d; add('hips', 0, 0.14 * d, 0.10 * d); add('spine1', 0.06 * d, 0, 0.26 * d); add('spine2', 0.08 * d, 0.12 * d, 0.22 * d); add('neck', 0, 0.16 * d, -0.16 * d); add('head', 0, 0.22 * d, -0.20 * d);
+      add('uarmL', -0.6 * d, 0, 0.20 * d); add('farmL', -1.7 * d, 0, 0); add('uarmR', 0, 0, -0.85 * d); add('farmR', -0.25 * d, 0, 0); OS.R.set(-0.52 * d, 0.05 * stepK, -0.03 * d); OS.yawR = -0.45 * d; OS.yawL = 0.15 * d; OS.plant = sm(0, 0.05, T) * (1 - sm(0.85, 1.0, T));
+      for (const [S] of SIDES) add('farm' + S, -0.10, 0, 0); fWant.L = d > 0.3 ? FP.fist : FP.relax; if (d > 0.4) squint = Math.max(squint, 0.5); }
+    // ---- a win: a low pump of both fists, a hop with one thrown up, then her weight on one hip, a hand on it, and a two-finger salute from her brow ----
+    if (N === 'win') { const c = sm(0, 0.25, T) * (1 - sm(0.42, 0.55, T)), u = cl((T - 0.5) / 0.45, 0, 1), air = 4 * u * (1 - u), c2 = sm(0.93, 1.0, T) * (1 - sm(1.0, 1.3, T)), cc = c + 0.7 * c2, jk = sm(0.45, 0.60, T) * (1 - sm(0.88, 1.05, T)), p = sm(1.0, 1.35, T) * (1 - sm(2.5, 2.9, T));
+      for (const [S] of SIDES) { add('thigh' + S, -0.42 * cc - 0.2 * air, 0, 0); add('shin' + S, 0.84 * cc + 0.4 * air, 0, 0); add('foot' + S, -0.42 * cc + 0.25 * air, 0, 0); add('uarm' + S, 0.45 * c, 0, 0); add('farm' + S, -1.7 * c - 0.10, 0, 0); }
+      SK.hips.position.y += -0.07 * cc + 0.18 * air; add('uarmR', -2.6 * jk, 0, 0); add('farmR', -0.5 * jk, 0, 0); add('spine2', -0.06 * jk, 0, 0); add('head', -0.12 * jk, 0, 0);
+      SK.hips.position.x -= 0.025 * p; add('hips', 0, 0, -0.06 * p); add('spine1', 0, 0, 0.07 * p); add('head', 0, 0.12 * p, 0.05 * p); if (c > 0.3 || jk > 0.3) fWant.R = fWant.L = FP.fist; if (T > 0.45 && T < 2.7) mouthNow = 'smile'; }
+    // ---- a court bow: her right foot drawn back, her right hand to her heart, her left arm swept out, and she bends from the hips ----
+    if (N === 'bow') { const b = sm(0.10, 0.90, T) * (1 - sm(1.50, 2.30, T)), st = Math.sin(PI * sm(0.10, 0.50, T)) + Math.sin(PI * sm(1.75, 2.25, T));
+      SK.hips.position.z -= 0.10 * b; SK.hips.position.y -= 0.05 * b; add('hips', 0.28 * b, 0, 0); add('spine1', 0.26 * b, 0, 0); add('spine2', 0.16 * b, 0, 0); add('neck', 0.14 * b, 0, 0); add('head', 0.10 * b, 0, 0);
+      OS.R.set(-0.03 * b, 0.035 * st, -0.27 * b); OS.yawR = -0.5 * b; OS.plant = sm(0, 0.1, T) * (1 - sm(2.3, 2.6, T)); for (const [S] of SIDES) add('farm' + S, -0.10, 0, 0); if (b > 0.7) squint = Math.max(squint, 0.5); if (T > 1.6 && T < 2.5) mouthNow = 'smile'; }
+    // ---- a wave: up on her toes, her right hand high and going from side to side (emoteStage), her left hand on her hip ----
+    if (N === 'wave') { const k = sm(0, 0.35, T) * (1 - sm(1.7, 2.1, T)), sw = Math.sin(T * 11);
+      add('clavR', 0, 0, -0.16 * k); add('spine2', 0, 0, 0.05 * k + 0.02 * sw * k); add('head', 0, 0, -0.08 * k); bounce(0.022 * Math.abs(Math.sin(T * 5.5)) * k);
+      for (const [S] of SIDES) add('farm' + S, -0.10 * (1 - k), 0, 0); if (k > 0.3) mouthNow = 'smile'; }
     // a cheer: she dips, jumps, throws an arm up, lands soft
     if (N === 'cheer') { const c1 = sm(0, 0.22, T) * (1 - sm(0.22, 0.36, T)), u = cl((T - 0.36) / 0.5, 0, 1), air = Math.sin(PI * u), c2 = sm(0.84, 0.94, T) * (1 - sm(0.94, 1.3, T)), c = c1 + 0.8 * c2, k = sm(0.2, 0.45, T) * (1 - sm(1.0, 1.45, T));
       for (const [S] of SIDES) { add('thigh' + S, -0.45 * c - 0.25 * air, 0, 0); add('shin' + S, 0.9 * c + 0.5 * air, 0, 0); add('foot' + S, -0.45 * c + 0.2 * air, 0, 0); }
@@ -663,7 +756,7 @@
     if (N === 'limber') { const k = sm(0, 0.3, T) * (1 - sm(2.2, 2.6, T));
       bounce(0.020 * Math.abs(Math.sin(T * 9.5)) * k); for (const [S, s] of SIDES) { add('clav' + S, 0, 0, s * 0.16 * Math.sin(T * 5 + (s > 0 ? 1.6 : 0)) * k); add('uarm' + S, 0.14 * Math.sin(T * 9 + s) * k, 0, s * 0.06 * k); add('farm' + S, -(0.5 + 0.2 * Math.sin(T * 11 + s)) * k, 0, 0); add('shin' + S, 0.10 * k, 0, 0); add('thigh' + S, -0.05 * k, 0, 0); }
       add('head', 0, 0, 0.22 * Math.sin(T * 2.4) * k); add('neck', 0.04 * k, 0, 0.08 * Math.sin(T * 2.4) * k); }
-    armsAndBow(N === 'draw' ? T : -1, dt); swordStage(N === 'sword' ? T : -1, dt * (1 - stillK), snapNow); knifeStage(N === 'knives' ? T : -1); { const g1 = gemStage(N === 'gem' ? T : -1), g2 = glassStage(N === 'glass' ? T : -1); if (!g1 && !g2) magicOff(); else { if (!g1) { for (const k of ['gGlow', 'gStar', 'gRing']) MG[k].visible = false; for (const m of MG.sparks) m.visible = false; if (meshes.veins) meshes.veins.visible = false; MATS.gem.emissiveIntensity = 0; MATS.lens.emissiveIntensity = 0; } if (!g2) { MG.pane.visible = false; MG.flash.visible = false; for (const a of [MG.rim, MG.shards]) for (const m of a) m.visible = false; } } } fingersTick(dt, snapNow);
+    armsAndBow(N === 'draw' ? T : -1, dt); swordStage(N === 'sword' ? T : -1, dt * (1 - stillK), snapNow); knifeStage(N === 'knives' ? T : -1); { const g1 = gemStage(N === 'gem' ? T : -1), g2 = glassStage(N === 'glass' ? T : -1); if (!g1 && !g2) magicOff(); else { if (!g1) { for (const k of ['gGlow', 'gStar', 'gRing']) MG[k].visible = false; for (const m of MG.sparks) m.visible = false; if (meshes.veins) meshes.veins.visible = false; MATS.gem.emissiveIntensity = 0; MATS.lens.emissiveIntensity = 0; } if (!g2) { MG.pane.visible = false; MG.flash.visible = false; for (const a of [MG.rim, MG.shards]) for (const m of a) m.visible = false; } } } emoteStage(N, T); hoverLight(); fingersTick(dt, snapNow);
     // her face: she blinks; her mouth moves when she talks
     if (clock > blinkAt) { blinkT = clock; blinkAt = clock + 2.2 + 2.6 * Math.abs(Math.sin(clock * 12.9)); }
     const bt = clock - blinkT, eyes = Math.max(squint, bt < 0.05 ? 0.5 : bt < 0.10 ? 1 : bt < 0.15 ? 0.5 : 0), key = eyes + '|' + mouthNow;

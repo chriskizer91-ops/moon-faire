@@ -52,7 +52,10 @@ details.more>div{margin-top:10px}
     <img id="ref" alt="The painting for this view" hidden><span class="reftag">Painting</span>
     <div class="err" id="err" hidden></div>
   </div>
-  <div><p class="label">Her moves</p><div class="chips" id="moves"></div><div class="chips" id="extra" style="margin-top:6px"></div></div>
+  <div><p class="label">Her moves</p><div class="chips" id="moves"></div>
+    <p class="label" style="margin-top:8px">In a fight</p><div class="chips" id="fight"></div>
+    <p class="label" style="margin-top:8px">Emotes</p><div class="chips" id="emotes"></div>
+    <div class="chips" id="extra" style="margin-top:8px"></div></div>
   <div><p class="label">Camera</p><div class="chips" id="cam"></div></div>
   <details class="more"><summary>More views and switches (for checking her against the paintings)</summary>
   <div><p class="label">Belts, bags and hooks</p><div class="chips" id="gear"></div></div>
@@ -68,6 +71,21 @@ details.more>div{margin-top:10px}
   <details class="more"><summary>Notes on this build</summary>
   <div class="notes">
     <h2>Changed in this pass</h2>
+    <ul>
+      <li>Her moves are now in three rows: everyday moves, "In a fight", and "Emotes". Picking one move lets go of the others.</li>
+      <li>"Hit": a blow from screen right. She rocks away from it with her eyes shut, her left arm comes up, and she rolls her shoulder and is ready again. Her feet stay where they are.</li>
+      <li>"Hard hit": she is knocked two steps back, turns from the blow and folds over it with an arm across her middle. Then she straightens and steps back into place.</li>
+      <li>"Dodge": she drops low and slips away from screen right on a bent leg, one fist up as a guard, and springs back.</li>
+      <li>"Win": a low pump of both fists, a hop with one fist thrown up, then her weight on one hip, a hand on it, and a two-finger salute flicked from her brow.</li>
+      <li>"Fall": she staggers, drops to her knees and slumps forward with her head and arms hanging. She stays down until you pick another move, and then gets up.</li>
+      <li>"Court bow": her right foot drawn back, her right hand to her heart, her left arm swept out, and she bends from the hips.</li>
+      <li>"Wave": up on her toes, her right hand high and going from side to side, her left hand on her hip.</li>
+      <li>"Kneel", "Squat" and "Sit": she slides down into each and stays there. On one knee her hand rests on the raised knee. In the squat her heels stay down and her hands are on her knees. Sitting, one leg is out straight and one knee is up.</li>
+      <li>"Hover": she floats cross-legged with her eyes shut and her hands open on her thighs. A round of pale light turns on the ground under her, her gem glows, and a few sparks hang round her. You told Io's page that all four witches hover this way, so she has it too.</li>
+      <li>She slides from any of these to any other, and back up to standing, without a jump.</li>
+      <li>When she is low her scabbard lies back along the ground instead of going through it.</li>
+    </ul>
+    <h2 style="margin-top:12px">Earlier: her wrists, the gem, Silverglass</h2>
     <ul>
       <li>Her wrists in "Knives". Her hand now keeps to her forearm: cocked back a little in the wind-up, snapped forward at the throw, and after the knife has gone her open hand points where it went. The knife turns with her hand.</li>
       <li>New move, "The gem". Two fingers of her right hand touch the gem on her headband. It flares, a ring of light opens from it, and light runs down both her arms to her knuckles. Her eyes close and she smiles. For one breath the sparks round her, her sleeves, her hair and her charms all hang still. Then everything lets go at once.</li>
@@ -195,7 +213,12 @@ details.more>div{margin-top:10px}
       <li>In your combat notes the gem is two strong shots. This move is the touch that powers her up. The two shots after it are not built yet.</li>
       <li>Silverglass only stands and breaks. What it does to a blow, or to her next attacks, is not shown.</li>
       <li>The light on her arms runs down the front of each arm. It does not branch over her neck or face as in your painting.</li>
-      <li>Still to come: hit reactions, a dodge, a win and a fall.</li>
+      <li>The new fight moves and emotes are first drafts made from still pictures. Their timing needs your eye.</li>
+      <li>Going down to kneel, squat or sit, her feet slide along the ground to their new places. They do not step.</li>
+      <li>"Fall" ends on her knees, slumped. She does not go flat on the ground. Say if you want that instead.</li>
+      <li>Sitting or down, her bags and charms can sink a little into the ground.</li>
+      <li>The hard hit and the dodge both go toward screen left, away from where her foes stand.</li>
+      <li>Still to come: jewellery, and the gem's two strong shots.</li>
     </ul>
   </div>
   </details>
@@ -262,9 +285,16 @@ details.more>div{margin-top:10px}
   const applyVis = () => { for (const k in R.meshes) { let v = true; if (['wire', 'lens', 'pad'].includes(k)) v = vis.glasses; if (['lacesl', 'laceband'].includes(k)) v = vis.sleeves; if (GEARK.includes(k)) v = vis.gear; if (HOOKK.includes(k)) v = vis.hooks; if (CHARMK.includes(k)) v = vis.charms; if (BOWKEYS.includes(k)) v = vis.bow; if (SWORDKEYS.includes(k)) v = vis.sword; if (KNIFEKEYS.includes(k)) v = vis.knives; if (vis.boots && !BOOTK.includes(k)) v = false; R.meshes[k].visible = v; } if (R.light) R.light.visible = vis.bow && !vis.boots; };
   toggle($('shows'), 'glassB', 'Glasses', true, (v) => { vis.glasses = v; applyVis(); });
   toggle($('shows'), 'sleeveB', 'Lace sleeves', true, (v) => { vis.sleeves = v; applyVis(); });
-  chips($('moves'), [['Stand still', 'pose'], ['Ready', 'idle'], ['Walk', 'walk'], ['Jog', 'jog'], ['Talk', 'talk'], ['Moonsteel Draw', 'draw'], ['Sword', 'sword'], ['Knives', 'knives'], ['The gem', 'gem'], ['Silverglass', 'glass'], ['Cheer', 'cheer'], ['Limber up', 'limber']], (v) => { if (v[1] === 'pose') setPose(1); else R.play(v[1]);
-    const CAMS = { draw: { az: 0.1, el: 0.05, dist: 5.9, ty: 0.98, tx: 0.2, tz: 0 }, sword: { az: 0.1, el: 0.06, dist: 7.4, ty: 0.95, tx: 0.5, tz: 0 }, knives: { az: 0.1, el: 0.06, dist: 6.2, ty: 0.95, tx: 0.25, tz: 0 }, gem: { az: 0.2, el: 0.04, dist: 5.2, ty: 0.98, tx: 0, tz: 0 }, glass: { az: 0.1, el: 0.05, dist: 6.4, ty: 0.98, tx: 0.3, tz: 0 } };
-    if (CAMS[v[1]]) { want = CAMS[v[1]]; easing = true; spin = false; $('spinB').setAttribute('aria-pressed', 'false'); [...$('cam').children].forEach((c) => c.setAttribute('aria-pressed', 'false')); } }, 1);       // the draw and the sword are shown from the front, with room at screen right
+  // Her moves are in three rows that act as one set: picking one unpresses the others. Fight moves and emotes bring the camera in closer.
+  const CAMS = { draw: { az: 0.1, el: 0.05, dist: 5.9, ty: 0.98, tx: 0.2, tz: 0 }, sword: { az: 0.1, el: 0.06, dist: 7.4, ty: 0.95, tx: 0.5, tz: 0 }, knives: { az: 0.1, el: 0.06, dist: 6.2, ty: 0.95, tx: 0.25, tz: 0 }, gem: { az: 0.2, el: 0.04, dist: 5.2, ty: 0.98, tx: 0, tz: 0 }, glass: { az: 0.1, el: 0.05, dist: 6.4, ty: 0.98, tx: 0.3, tz: 0 },
+    hit: { az: 0.1, el: 0.05, dist: 5.0, ty: 0.95, tx: -0.03, tz: 0 }, hard: { az: 0.1, el: 0.05, dist: 5.6, ty: 0.90, tx: -0.15, tz: 0 }, dodge: { az: 0.1, el: 0.05, dist: 5.6, ty: 0.86, tx: -0.18, tz: 0 }, win: { az: 0.15, el: 0.05, dist: 6.1, ty: 1.10, tx: 0, tz: 0 }, fall: { az: 0.7, el: 0.10, dist: 5.2, ty: 0.62, tx: 0, tz: 0 },
+    bow: { az: 0.55, el: 0.06, dist: 5.2, ty: 0.86, tx: 0, tz: 0 }, wave: { az: 0.1, el: 0.05, dist: 5.2, ty: 1.02, tx: -0.05, tz: 0 }, kneel: { az: 0.7, el: 0.10, dist: 4.9, ty: 0.62, tx: 0, tz: 0 }, squat: { az: 0.6, el: 0.10, dist: 4.7, ty: 0.50, tx: 0, tz: 0 }, sit: { az: 0.7, el: 0.12, dist: 4.9, ty: 0.42, tx: 0, tz: 0.15 }, hover: { az: 0.45, el: 0.08, dist: 5.2, ty: 0.72, tx: 0, tz: 0.05 } };
+  const MOVEHOSTS = ['moves', 'fight', 'emotes'];
+  const pickMove = (host) => (v) => { for (const id of MOVEHOSTS) if (id !== host) [...$(id).children].forEach((c) => c.setAttribute('aria-pressed', 'false')); if (v[1] === 'pose') setPose(1); else R.play(v[1]);
+    if (CAMS[v[1]]) { want = CAMS[v[1]]; easing = true; spin = false; $('spinB').setAttribute('aria-pressed', 'false'); [...$('cam').children].forEach((c) => c.setAttribute('aria-pressed', 'false')); } };
+  chips($('moves'), [['Stand still', 'pose'], ['Ready', 'idle'], ['Walk', 'walk'], ['Jog', 'jog'], ['Talk', 'talk'], ['Cheer', 'cheer'], ['Limber up', 'limber']], pickMove('moves'), 1);
+  chips($('fight'), [['Moonsteel Draw', 'draw'], ['Sword', 'sword'], ['Knives', 'knives'], ['The gem', 'gem'], ['Silverglass', 'glass'], ['Hit', 'hit'], ['Hard hit', 'hard'], ['Dodge', 'dodge'], ['Win', 'win'], ['Fall', 'fall']], pickMove('fight'), -1);
+  chips($('emotes'), [['Court bow', 'bow'], ['Wave', 'wave'], ['Kneel', 'kneel'], ['Squat', 'squat'], ['Sit', 'sit'], ['Hover', 'hover']], pickMove('emotes'), -1);
   toggle($('extra'), 'slowB', 'Half speed', false, (v) => { speed = v ? 0.45 : 1; });
   toggle($('extra'), 'flipB', 'Flipbook look', false, (v) => { stage.look = v ? 'flipbook' : 'smooth'; });       // claude/HOW-TO-flipbook-look.md: a switch, off when the page opens
   toggle($('shows'), 'gearB', 'Belts and bags', true, (v) => { vis.gear = v; applyVis(); });

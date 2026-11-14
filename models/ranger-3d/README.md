@@ -260,12 +260,42 @@ four strap hooks as real objects, standing still. About 355,000 triangles.
     turn, slow and fade by 2.95. `SHOTS.glass` 3.9 s. What the glass does to a blow or to her next attacks is not shown.
   - All of it is light only (`glowOnly`), sprites and flat shapes under `R.light`.
   - `tools/hand_seq.sh` takes close stills of one hand through a move.
+- **Stage thirteen: hit reactions, a dodge, a win, a fall, and her emotes.** Chris: "let's move on to the hit reactions,
+  dodge, a win, and a fall. Adding the emotions from the other characters like bow, wave, kneel, squat, sit." The other
+  witches were only the list; each move is her own. The hover was added because he told Io's session that all four witches
+  hover in a cross-legged meditation and that the party shares jog, squat, kneel and hover
+  (`claude/io-3d-stage8-party-moves-book-appears.md`).
+  - **Postures she holds** (moves `kneel`, `squat`, `sit`, `hover`, and `fall`, whose posture is called `down`). Each has a
+    weight (`PW`, eased; `PE` is the smoothed weight, kept to a sum of 1) that goes to 1 while it is chosen and back to 0
+    when it is not, so she slides in and out and from one posture to another. A posture is a place for her hips and a bend
+    for her back (the "postures" block in `animate`), and in `PST` a place and turn for each foot and the way each knee
+    points. `emoteStage(N, T)` blends the feet, plants them with `plant`, and puts her hands on a knee, a thigh or near the
+    ground with `reach`. Kneel: right knee down, instep on the ground, left hand on the raised knee. Squat: heels down,
+    hands on knees. Sit: right leg out straight, left knee up. Hover: hips 48 cm up and bobbing, ankles crossed (measured
+    from her hips, feet following her shins), eyes shut, hands open on her thighs; `hoverLight()` turns the Silverglass
+    picture on the ground under her, glows the gem and hangs 10 sparks. Fall: a stagger, then on her knees, sitting back on
+    her heels, slumped, until another move is chosen. "Stand still" (`pose`) clears the weights at once.
+  - **Short moves** (`hit`, `hard`, `dodge`, `win`, `bow`, `wave`; in `SHOTS` and `SLOW`). Blows come from screen right.
+    `OS` is what a short move asks of her feet (how far each is from its resting spot, its turn, how firmly both are
+    planted), so her feet stay put or step while her hips move. Hit: she rocks 8 cm away, flinches, her left fist comes up,
+    then a shoulder roll. Hard hit (`hardBeats`): two steps back (34 and 27 cm), turned from the blow and folded over it,
+    right hand across her middle; she straightens and steps back in. Dodge: hips 36 cm away and 23 cm down on a bent right
+    leg stepped out 52 cm, left fist up, then back. Win: a low pump, a hop with a fist up, then a hand on her hip and a
+    two-finger salute from her brow. Court bow: right foot drawn back 27 cm, right hand to her heart, left arm swept out,
+    bent from the hips. Wave: right hand high, placed by `reach` so the elbow bends properly, left hand on her hip.
+  - The scabbard (`scabTick`) now also keeps its tip above the ground: when she is low it lies back along the floor.
+  - Page: the moves are in three rows that act as one set ("Her moves", "In a fight", "Emotes"); each new move has its own
+    closer camera, because Chris said the fight camera was too far away.
+  - `tools/run_seq.sh` takes stills of a move as it really plays, stepped from another move (`FROM`), for the slides in and
+    out; `tools/seq.sh` jumps straight to the finished posture.
+  - Rough: her feet slide to their places rather than step when she goes down; the fall ends on her knees, not flat; bags
+    and charms can sink a little into the ground when she sits; all timing is from stills.
 - Waiting for his notes: the moves again; stage two (head), stage three (hands and arms) and stage five.
 
 Rough or not built yet: her face does not move (no blink, no expressions); the hair has a smooth edge with none of the painted
 flyaway wisps, and the loose locks are simple; earrings and necklaces; bracelets; each charm is one stiff piece on a hinge (its chain does not bend, charms can
 pass through each other); the caps on the stones are plain cones; with her arms straight out the iron curls bend with her skin;
-the gem's two shots; hit reactions, a dodge, a win and a fall.
+the gem's two shots; jewellery.
 
 ## What is here
 
@@ -284,7 +314,7 @@ the gem's two shots; hit reactions, a dodge, a win and a fall.
   - `R47_sword.js`: her sword, and its scabbard at her left hip (stage ten).
   - `R48_knives.js`: her two throwing knives and their sheath at the small of her back (stage eleven).
   - `R49_veins.js`: the lines of light on her arms for the gem (stage twelve).
-  - `R99_static.js`: materials, binding, `pose({arm, leg})`, her moves, her fingers, the solver for arms and legs, the bow, the sword and the knives at work, the gem and Silverglass, and their light.
+  - `R99_static.js`: materials, binding, `pose({arm, leg})`, her moves, her fingers, the solver for arms and legs, the bow, the sword and the knives at work, the gem and Silverglass, and their light, and her postures, fight reactions and emotes (stage thirteen).
 - `tools/tables.py`: the one place her body tables live. The model and the body bake both read them.
 - `tools/sil.py`: lifts a figure off a painting's flat background. `tools/measure.py` and `tools/more.py` print widths and depths
   by height. `tools/cmp_r.py` puts the model beside a painting at one scale with the two outlines laid over each other.
@@ -436,6 +466,11 @@ take the lean out. Her arms keep the Jester's bone lengths (0.63 m; the painting
 
 ## Checking
 
+- Stage thirteen: stills of each posture from the front quarter, the side and close up; of her sliding from standing to
+  kneeling, from kneeling to sitting and through the fall (`tools/run_seq.sh`); and through the hit, hard hit, dodge, win,
+  court bow and wave. Feet reached where they were wanted at every still; her hands fall short only while she is on the way
+  down. Page test at phone size, now in three parts (`PART=3` presses every new button and stands her up again): no errors.
+
 - Stage twelve: close stills of each hand through its throw and wider stills of both releases (the hand keeps to the
   forearm); stills at 7 moments of the gem and 8 of Silverglass; both in the Flipbook look. Hands and feet reached where
   they were wanted at every still. Page test at phone size, both halves: no errors; a drag turns her (0.64 rad).
@@ -526,6 +561,8 @@ Python that reads them with `-I`.
 
 Done at stage nine: fingers, the bow, Moonsteel Draw. Done at stage ten: the sword, its guard and a full cut (G4, H7).
 Done at stage eleven: the knives and their throw (G5, H8). Done at stage twelve: the gem (H9) and Silverglass (H6).
+Done at stage thirteen: hit reactions, a dodge, a win, a fall, and the emotes (court bow, wave, kneel, squat, sit, hover).
+Next: jewellery, and the gem's two shots once Chris says how they should look.
 Next, in the order Chris agreed (the first item below is now done): Silverglass (H6) and the gem (H9); then hit reactions, a dodge, a win and
 a fall. The older list below is kept for what is still open in it.
 
