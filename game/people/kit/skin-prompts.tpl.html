@@ -1,0 +1,35 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Moon Faire: skin prompts</title>
+<style>
+  :root { --bg: #1d1826; --panel: #2a2336; --line: #43395a; --ink: #efe8f6; --soft: #b9aecb; --gold: #e7b867; }
+  * { box-sizing: border-box; }
+  html, body { margin: 0; background: var(--bg); color: var(--ink); font: 16px/1.5 Georgia, 'Times New Roman', serif; }
+  main { max-width: 900px; margin: 0 auto; padding: 18px 14px 60px; }
+  h1 { font-size: 1.7rem; margin: 6px 0 4px; color: var(--gold); font-weight: normal; } h2 { font-size: 1.25rem; margin: 34px 0 6px; color: var(--gold); font-weight: normal; } h3 { font-size: 1.05rem; margin: 0 0 4px; font-weight: normal; color: var(--gold); }
+  p { margin: 8px 0; } .soft { color: var(--soft); } ol, ul { margin: 6px 0; padding-left: 22px; } li { margin: 5px 0; }
+  .card { background: var(--panel); border: 1px solid var(--line); border-radius: 10px; padding: 12px 14px; margin: 12px 0; }
+  .bar { display: flex; flex-wrap: wrap; gap: 10px; align-items: center; margin: 12px 0 6px; } .bar button { margin-left: auto; }
+  button { font: inherit; color: var(--ink); background: #3a3049; border: 1px solid var(--line); border-radius: 8px; padding: 7px 12px; cursor: pointer; }
+  textarea { width: 100%; font: 0.86rem/1.45 ui-monospace, Menlo, Consolas, monospace; color: var(--ink); background: #17131f; border: 1px solid var(--line); border-radius: 8px; padding: 10px; resize: vertical; }
+  img.guide { width: 100%; border-radius: 8px; display: block; } img.face { width: 104px; border-radius: 8px; float: right; margin: 0 0 8px 12px; } @media (min-width: 640px) { img.face { width: 180px; } }
+</style></head>
+<body><main>
+<h1>Skin prompts</h1>
+<p class="soft">Moon Faire, November 13. One simple 3D person, several painted skins. /*COUNT*/.</p>
+<div class="card">
+  <img class="face" alt="" src="/*FACE*/">
+  <b>How to use these</b>
+  <ol>
+    <li>Unzip <b>Moon_Faire_Skin_Starters.zip</b> from the chat. It holds each model's grey guide, <b>face-guide.png</b> and <b>style-reference.jpg</b>.</li>
+    <li>Each skin is two pictures. For the body sheet, start a new ChatGPT chat, attach the model's guide and the style reference, and paste the prompt. For the face, attach the face guide and paste the face prompt.</li>
+    <li>Save each picture under the name shown and send them back in the chat. One skin is enough to start.</li>
+  </ol>
+  <p class="soft">Start with the lamp-seller's own skin (lampseller-A): two pictures. If those two lay onto the model well, the rest are worth making. The people here are stand-ins written by Claude Opus 5.5 through your key, not Moon Faire lore; change any of them.</p>
+</div>
+/*ROWS*/
+</main>
+<script>
+document.querySelectorAll('[data-copy]').forEach(function (b) { b.onclick = function () { var t = b.parentNode.nextElementSibling; t.focus(); t.select(); var ok = false; try { ok = document.execCommand('copy'); } catch (e) {} if (navigator.clipboard) navigator.clipboard.writeText(t.value).then(function () { ok = true; }, function () {}); b.textContent = 'Copied (or select and copy)'; setTimeout(function () { b.textContent = 'Copy prompt'; }, 2500); }; });
+</script>
+</body></html>

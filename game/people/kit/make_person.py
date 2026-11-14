@@ -6,7 +6,7 @@ import requests
 HERE = os.path.dirname(os.path.abspath(__file__)); sys.path.insert(0, HERE)
 from shoot import Shooter
 # US dollars per million tokens: input, output, 5-minute cache write, cache read (platform.claude.com/docs/en/about-claude/pricing, read November 13 2026)
-PRICES = {'claude-haiku-5-5': (0.10, 0.50, 0.125, 0.01), 'claude-sonnet-5-5': (2.0, 10.0, 2.50, 0.10), 'claude-opus-5-5': (4.0, 20.0, 5.0, 0.20)}
+PRICES = {'claude-haiku-5-5': (0.10, 0.50, 0.125, 0.01), 'claude-sonnet-5-5': (2.0, 10.0, 2.50, 0.10), 'claude-opus-5-5': (4.0, 20.0, 5.0, 0.20), 'claude-fable-5-2': (8.0, 40.0, 10.0, 0.20)}
 BANNED = ['fetch(', 'XMLHttpRequest', 'document.', 'window.', 'eval(', 'Function(', 'import(', 'import ', 'localStorage', 'location', 'navigator', 'WebSocket', 'require(', 'globalThis', 'setTimeout', 'setInterval', 'while (true', 'while(true']
 KIT = open(os.path.join(HERE, 'PERSON-KIT.md'), encoding='utf-8').read()
 def key(): return open(os.path.expanduser(os.environ.get('MF_KEY_FILE', '~/.mf/key'))).read().strip()

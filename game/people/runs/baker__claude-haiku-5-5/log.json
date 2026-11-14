@@ -59,8 +59,8 @@
  "cache_read_input_tokens": 4920,
  "final_facts": {
   "errors": [],
-  "prepareMs": 282,
-  "buildMs": 412,
+  "prepareMs": 239,
+  "buildMs": 373,
   "triangles": 12113,
   "parts": 25,
   "own": {

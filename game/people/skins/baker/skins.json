@@ -1,0 +1,44 @@
+{
+ "id": "baker",
+ "desc": "A stout, cheerful baker: red cheeks, a brown beard, a white cap, a cream apron over a tan shirt with the sleeves rolled to the elbow, brown trousers.",
+ "file": "runs/baker__claude-fable-5-2@high/v3.js",
+ "frame": {
+  "size": [
+   1536,
+   1024
+  ],
+  "half": [
+   768,
+   1024
+  ],
+  "x": [
+   -0.75,
+   0.75
+  ],
+  "y": [
+   -0.1,
+   1.9
+  ],
+  "front": "left half",
+  "back": "right half, seen from behind"
+ },
+ "skins": [
+  {
+   "key": "baker",
+   "name": "Fair Baker",
+   "who": "A stout, cheerful baker who sells warm loaves and buns from his oven cart at the night fair.",
+   "body": "The tall puffed cap is clean white linen with a slightly greyer band at the brow, and the short hair showing beneath it is warm brown. The shirt is soft tan cotton with the sleeves rolled into thick paler tan rolls at the elbow, and the forearms below are bare, ruddy and lightly freckled with a dusting of flour. Over it hangs a long cream bib apron with a pale tie around the neck and a matching waist tie knotted at the back with two hanging ends; it is smudged with flour on the bib and the lap, with a faint brown oven scorch near the hem. Tucked at the hip is a cream kitchen towel with five rust-red hoops. Below are plain brown wool trousers, a little dusty at the knees, and sturdy dark brown boots with near-black soles, creased and floured at the toes.",
+   "face": "A man of about forty with warm ruddy skin, round red cheeks and a red-tipped nose, framed by a full, thick brown beard. His eyes are warm brown with deep laugh lines at the corners beneath thick, slightly raised brown brows. His lips are a soft rose and closed, his expression calm but kindly, as if he is about to smile."
+  },
+  {
+   "key": "dyer",
+   "name": "Ribbon Dyer",
+   "who": "An old, quiet dyer who boils and sells dyed ribbons and cloth lengths from a steaming stall at the fair.",
+   "body": "The tall puffed cap is deep indigo cloth, faded and streaky from many washings, with a darker navy band at the brow, and the short hair beneath it is iron grey. The shirt is slate blue linen, thin at the shoulders, with the sleeves rolled into darker blue rolls at the elbow; the bare forearms and hands below are stained a patchy blue from the fingertips to above the wrist. The long bib apron is heavy oiled canvas in dark olive brown, splashed and blotched with madder red, indigo blue and weld yellow, with a mended square patch on the lap in plain grey, and its neck strap and the waist tie knotted at the back are dull charcoal cord. Tucked at the hip is a grey rag towel striped in faded crimson, its edge dipped blue. Below are charcoal black trousers spotted with old dye, and worn black boots with cracked toes and grey soles.",
+   "face": "An old man near seventy with weathered, pale olive skin, sunken cheeks and a full grey beard going white at the chin. His eyes are pale grey-green, heavy-lidded and deeply lined, under sparse, bushy grey brows, with a small old burn mark on one cheekbone. His thin lips are pale and closed, and his expression is calm and patient, a little tired."
+  }
+ ],
+ "written_by": "claude-opus-5-5@high",
+ "cost": 0.055714599999999996,
+ "seconds": 23.8
+}

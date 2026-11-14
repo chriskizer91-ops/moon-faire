@@ -1,0 +1,156 @@
+{
+ "model": "claude-fable-5-2",
+ "effort": "high",
+ "id": "baker",
+ "desc": "A stout, cheerful baker: red cheeks, a brown beard, a white cap, a cream apron over a tan shirt with the sleeves rolled to the elbow, brown trousers.",
+ "rounds": [
+  {
+   "n": 1,
+   "seconds": 112.1,
+   "usage": {
+    "input_tokens": 70,
+    "output_tokens": 10856,
+    "cache_creation_input_tokens": 0,
+    "cache_read_input_tokens": 5077
+   },
+   "cost": 0.4358154,
+   "thought": true,
+   "thinking_tokens": 8776,
+   "stop": "end_turn",
+   "facts": {
+    "errors": [],
+    "prepareMs": 276,
+    "buildMs": 401,
+    "triangles": 13153,
+    "parts": 28,
+    "own": {
+     "shirt": 336,
+     "apron": 356,
+     "tie": 548,
+     "towel": 40,
+     "roll": 120,
+     "hair": 120,
+     "beard": 72,
+     "cap": 216,
+     "capband": 48
+    },
+    "draws": 19,
+    "drawn_triangles": 10613
+   },
+   "said": "file"
+  },
+  {
+   "n": 2,
+   "seconds": 58.5,
+   "usage": {
+    "input_tokens": 12251,
+    "output_tokens": 5964,
+    "cache_creation_input_tokens": 0,
+    "cache_read_input_tokens": 5077
+   },
+   "cost": 0.33758340000000003,
+   "thought": true,
+   "thinking_tokens": 3820,
+   "stop": "end_turn",
+   "facts": {
+    "errors": [],
+    "prepareMs": 243,
+    "buildMs": 360,
+    "triangles": 13401,
+    "parts": 28,
+    "own": {
+     "shirt": 392,
+     "apron": 356,
+     "tie": 548,
+     "towel": 40,
+     "roll": 120,
+     "hair": 120,
+     "beard": 264,
+     "cap": 216,
+     "capband": 48
+    },
+    "draws": 19,
+    "drawn_triangles": 10861
+   },
+   "said": "file"
+  },
+  {
+   "n": 3,
+   "seconds": 18.6,
+   "usage": {
+    "input_tokens": 19540,
+    "output_tokens": 2413,
+    "cache_creation_input_tokens": 0,
+    "cache_read_input_tokens": 5077
+   },
+   "cost": 0.2538554,
+   "thought": true,
+   "thinking_tokens": 269,
+   "stop": "end_turn",
+   "facts": {
+    "errors": [],
+    "prepareMs": 257,
+    "buildMs": 290,
+    "triangles": 13401,
+    "parts": 28,
+    "own": {
+     "shirt": 392,
+     "apron": 356,
+     "tie": 548,
+     "towel": 40,
+     "roll": 120,
+     "hair": 120,
+     "beard": 264,
+     "cap": 216,
+     "capband": 48
+    },
+    "draws": 19,
+    "drawn_triangles": 10861
+   },
+   "said": "file"
+  },
+  {
+   "n": 4,
+   "seconds": 0.9,
+   "usage": {
+    "input_tokens": 23278,
+    "output_tokens": 5,
+    "cache_creation_input_tokens": 0,
+    "cache_read_input_tokens": 5077
+   },
+   "cost": 0.1874394,
+   "thought": false,
+   "thinking_tokens": 0,
+   "stop": "end_turn",
+   "said": "DONE"
+  }
+ ],
+ "kit_chars": 11171,
+ "final": 3,
+ "cost": 1.2146936000000002,
+ "seconds": 190.1,
+ "input_tokens": 55139,
+ "output_tokens": 19238,
+ "cache_creation_input_tokens": 0,
+ "cache_read_input_tokens": 20308,
+ "final_facts": {
+  "errors": [],
+  "prepareMs": 240,
+  "buildMs": 437,
+  "triangles": 13401,
+  "parts": 28,
+  "own": {
+   "shirt": 392,
+   "apron": 356,
+   "tie": 548,
+   "towel": 40,
+   "roll": 120,
+   "hair": 120,
+   "beard": 264,
+   "cap": 216,
+   "capband": 48
+  },
+  "draws": 19,
+  "drawn_triangles": 10861
+ }
+}

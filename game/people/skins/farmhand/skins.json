@@ -1,0 +1,44 @@
+{
+ "id": "farmhand",
+ "desc": "A farm lad with freckles and sandy hair under a wide straw hat: a mustard shirt with bare forearms, a green waistcoat, brown trousers and muddy boots.",
+ "file": "runs/farmhand__claude-fable-5-2@high/v2.js",
+ "frame": {
+  "size": [
+   1536,
+   1024
+  ],
+  "half": [
+   768,
+   1024
+  ],
+  "x": [
+   -0.75,
+   0.75
+  ],
+  "y": [
+   -0.1,
+   1.9
+  ],
+  "front": "left half",
+  "back": "right half, seen from behind"
+ },
+ "skins": [
+  {
+   "key": "farmlad",
+   "name": "Farm lad",
+   "who": "A cheerful young farmhand who carts hay and feed for the fair's ponies and stays on at night to help.",
+   "body": "A wide straw hat in warm golden straw with darker woven rings running round the crown and brim, and a plain brown band; under it, short sandy hair shows at the sides and back of the neck. A rust red kerchief is knotted at the throat, its tail hanging down the chest. A mustard shirt of coarse cotton with three small dark brown buttons down the front, the sleeves rolled into thick cuffs above the elbow and the hem hanging loose below a moss green wool waistcoat that is faded at the edges and a little frayed at the hem. Brown work trousers, dusty at the knees, with a lighter tan square patch stitched on the left thigh; dark brown boots spattered with dried mud. The bare forearms and hands are lightly tanned and freckled, with dirt in the creases of the knuckles.",
+   "face": "A boy of about sixteen with fair, sun-pinked skin and a thick scatter of brown freckles over the nose and cheeks. Blue-grey eyes, light sandy brows, soft pink lips and a ruddy flush on the cheeks. A calm, open face with the mouth closed and a hint of easy good humour."
+  },
+  {
+   "key": "gatekeeper",
+   "name": "Gate keeper",
+   "who": "A stern middle-aged woman who takes the coins at the fair gate and watches who comes and goes after dark.",
+   "body": "A wide felt hat in charcoal grey, worn soft and dusty along the brim, with a deep plum band; beneath it, short black hair streaked with grey is cropped close at the nape. A teal kerchief with a small cream dot pattern is knotted at the throat. A cream linen shirt with thin faded blue stripes and three dull brass buttons, the sleeves rolled into cuffs above the elbow and the hem showing below a plum wool waistcoat edged with a narrow black braid, its lower corners rubbed shiny. Charcoal trousers with a dark green patch stitched neatly on the left thigh, and black boots that are scuffed grey at the toes. The bare forearms are deep brown and strong, with a thin pale scar across the back of one hand.",
+   "face": "A woman of about fifty with deep brown skin, fine lines at the corners of the eyes and two firm creases beside the mouth. Dark brown eyes under straight black brows touched with grey, full dusky lips and a small dark mole high on the left cheek. Her expression is calm and watchful, mouth closed, giving nothing away."
+  }
+ ],
+ "written_by": "claude-opus-5-5@high",
+ "cost": 0.0437906,
+ "seconds": 16.5
+}

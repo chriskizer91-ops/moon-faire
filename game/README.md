@@ -183,7 +183,20 @@ A second test followed Chris's ruling and his word to use Opus 5.5 only, at high
 | high effort | 38 cents | 123 s |
 | extra-high effort | $1.33 | 423 s |
 
-High effort is the setting to use; extra-high adds little for three to five times the price. The fortune-teller at high effort stands beside the hand-made lamp-seller. The men do not, because of the template body and face. Both tests together cost $8.02. Limits found: every person has the Jester's body and face shape (men and stout people only pass under a coat or apron, at a distance); shapes are stiff, so nothing sways; the painted beard only reaches round the mouth. Not measured: speed on Chris's laptop with several people in a scene.
+A third test gave the same four lines to Fable 5.2 through the key, at high effort (`people/runs/<person>__claude-fable-5-2@high/`): $1.08 each, about 3 minutes, about level with Opus at high effort.
+
+High effort is the setting to use; extra-high adds little for three to five times the price. The fortune-teller at high effort stands beside the hand-made lamp-seller. The men do not, because of the template body and face. All three tests cost $12.34. Limits found: every person has the Jester's body and face shape (men and stout people only pass under a coat or apron, at a distance); shapes are stiff, so nothing sways; the painted beard only reaches round the mouth. Not measured: speed on Chris's laptop with several people in a scene.
+
+## Skins: one person model, several painted people (November 13) — prompts ready, waiting for Chris's pictures
+
+Chris's idea: paint a simple person model with images, so one model carries two or three different skins.
+
+- Prompts page: https://claude.ai/artifact/8BgZ19cqFPZvpJGBeqEQ2v (file: `people/out/moon-faire-skin-prompts.html`). Starter pack: `people/out/Moon_Faire_Skin_Starters.zip`. All prompts as text: `people/skins/prompts.md`.
+- Five models: the lamp-seller (three skins) and the four Fable 5.2 people (two each). Eleven skins, two pictures each.
+- `people/kit/guides.py` draws a model's painting guide: the standing pose in plain greys, flat from the front (left half) and from behind (right half), 1536 x 1024, each half 1.5 m wide (x -0.75 to 0.75) and 2 m tall (y -0.1 to 1.9), 512 pixels to the metre. A painting made over it can be laid back onto the model by position.
+- The face is a second picture painted over `people/skins/face-guide.png` (her face with the make-up painted out), so the eyes, nose and mouth stay where the head expects them.
+- `people/kit/make_skins.py` has Opus 5.5 (high effort, through the key) look at the guide and the model's file and write the skins (`people/skins/<id>/skins.json`): about 5 cents a model. They are stand-ins, not lore. `people/kit/build_skin_prompts.py` builds the page, the text and the pack.
+- Not built yet: laying the pictures onto the model (front and back by position, the face onto the face painting) and using the key to check and nudge the fit. That waits for the first pair of pictures (lampseller-A), which is the pilot.
 
 ## Next
 

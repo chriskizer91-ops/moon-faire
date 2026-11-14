@@ -1,0 +1,44 @@
+{
+ "id": "watchman",
+ "desc": "An old night-watchman with dark brown skin and a short white beard: a long grey coat to the knees, a red scarf, a tall dark felt hat and heavy black boots.",
+ "file": "runs/watchman__claude-fable-5-2@high/v3.js",
+ "frame": {
+  "size": [
+   1536,
+   1024
+  ],
+  "half": [
+   768,
+   1024
+  ],
+  "x": [
+   -0.75,
+   0.75
+  ],
+  "y": [
+   -0.1,
+   1.9
+  ],
+  "front": "left half",
+  "back": "right half, seen from behind"
+ },
+ "skins": [
+  {
+   "key": "watchman",
+   "name": "Old night-watchman",
+   "who": "An old night-watchman who walks the fair rows after dark, checking stall shutters and lamps.",
+   "body": "A tall dark charcoal felt hat, worn soft and slightly dusty at the crown, with a deep oxblood band; short cropped white-grey hair shows at the back of the neck below the brim. A thick red wool scarf wraps the neck, its tails hanging down the chest and back, with a few loose threads and a faded patch where it rubs. A long heavy grey wool coat runs to the knees, darker and scuffed at the hem and cuffs, its seams lightly picked out, with a small neat darn on the left breast. A worn dark brown leather belt with a round brass buckle sits at the waist, and a small dented brass flask hangs at the right hip; dark charcoal trousers show below. Heavy black boots with folded cuffs, creased and dull at the toes, and the hands are dark brown, knuckly and lined.",
+   "face": "An old man in his late sixties with dark brown skin, deep forehead lines and creases around the eyes, soft bags beneath them, and a small dark mole on one cheek. Dark brown eyes under heavy lids, thick white brows, full muted lips, and a short neat white beard. The expression is calm and watchful, the mouth closed."
+  },
+  {
+   "key": "roaster",
+   "name": "Chestnut roaster",
+   "who": "A cheerful middle-aged man who roasts chestnuts over a brazier at the fair gate.",
+   "body": "A tall tan felt hat, faded lighter on the crown and smudged with soot near the brim, with a moss green band; short copper-red hair shows at the back of the neck. A cream wool scarf with wide mustard stripes wraps the neck, its tails hanging front and back, flecked with small scorch marks. A long moss green coat to the knees, its hem and cuffs darkened with soot and ash, with a brown corduroy patch on the right elbow and a row of small dark horn buttons painted down the chest. A mid-brown leather belt with a round brass buckle, a small brass flask at the right hip polished bright from handling, and dark brown trousers below. Brown leather boots with folded cuffs, ash-grey at the toes, and the hands are pale, freckled and pink at the knuckles from the heat.",
+   "face": "A man in his late thirties with pale, ruddy skin, rosy cheeks and nose, and a scatter of freckles across both. Bright green eyes, thick copper brows, thin lips, faint laugh lines at the eye corners, and a short trimmed copper-red beard. The expression is calm and friendly, the mouth closed."
+  }
+ ],
+ "written_by": "claude-opus-5-5@high",
+ "cost": 0.0482666,
+ "seconds": 18.9
+}

@@ -1,0 +1,51 @@
+{
+ "id": "lampseller",
+ "desc": "An old woman who sells lamps: grey hair in a bun under an ochre kerchief, a moss-green bodice, a long rust skirt and a cream apron.",
+ "file": "lampseller.js",
+ "frame": {
+  "size": [
+   1536,
+   1024
+  ],
+  "half": [
+   768,
+   1024
+  ],
+  "x": [
+   -0.75,
+   0.75
+  ],
+  "y": [
+   -0.1,
+   1.9
+  ],
+  "front": "left half",
+  "back": "right half, seen from behind"
+ },
+ "skins": [
+  {
+   "key": "lamps",
+   "name": "Old lamp-seller",
+   "who": "An old woman who has sold oil lamps and wicks at the fair for forty years.",
+   "body": "An ochre kerchief covers the top of her head, dotted with small pale cream spots and faded along the folds, and her grey hair shows below it at the sides and in a neat bun at the back. Her bodice and upper sleeves are moss green wool, worn shiny at the shoulders, and the lower sleeves are cream linen with faint soot smudges near the wrists. A narrow dark brown leather belt sits at the waist above a long rust skirt of heavy rough cloth with a darker scorched patch near one knee and a frayed hem. The cream apron over the front has a few small oil stains and one neat darned square, and her boots are dark brown and scuffed. Her hands are weathered and pinkish brown, with blackened fingertips from trimming wicks.",
+   "face": "An old woman with warm pinkish brown skin, deep lines across the forehead and around the eyes, soft shadows under them, and a small mole on one cheek. Her eyes are dark hazel under thin grey brows, and her lips are pale and thin with a faint rosy flush on the cheeks. Her expression is calm and patient, the mouth closed."
+  },
+  {
+   "key": "pies",
+   "name": "Pie seller",
+   "who": "A sturdy middle-aged woman who sells hot meat pies from a cart by the gate.",
+   "body": "A deep indigo kerchief with thin white stripes covers her head, and her black hair, with one grey streak at the temple, shows at the sides and in a tight bun at the back. Her bodice and upper sleeves are mustard yellow cotton with a small brown check, and the lower sleeves are plain white, dusted with flour at the cuffs. A tan leather belt circles the waist above a long navy blue skirt with a single brick red band painted near the hem and a mended tear on one side. The apron is cream ticking with fine blue stripes, marked with grease spots and a pale floury handprint. Her boots are black and well kept, and her hands are dark brown and strong, with a small pale burn scar on one wrist.",
+   "face": "A woman of about forty-five with deep brown skin, round full cheeks and faint laugh lines at the corners of her eyes. Her eyes are dark brown under thick black brows, and her lips are full and warm brown. Her expression is calm and good-humoured, the mouth closed."
+  },
+  {
+   "key": "ballad",
+   "name": "Ballad singer",
+   "who": "A young woman who sings old songs on a small stage between the stalls each night.",
+   "body": "A cream kerchief covers her head, embroidered with a border of small plum and gold flowers, and copper red hair shows at the sides and in a soft bun at the back. Her bodice and upper sleeves are plum velvet, rubbed bare at the elbows, with a row of small painted brass buttons down the front, and the lower sleeves are pale lilac. A thin black belt with a small brass buckle sits at the waist above a long black skirt with a narrow gold braid painted around the hem, a little dusty at the bottom. The apron is faded rose pink with a band of white lace painted along its lower edge and one neat patch near the corner. Her boots are worn grey-brown, and her hands are pale and freckled, with a thin silver ring on one finger.",
+   "face": "A young woman of about twenty with pale skin and a light spray of freckles over her nose and cheeks. Her eyes are clear grey-green under fine copper brows, and her lips are soft pink. Her expression is calm and a little dreamy, the mouth closed."
+  }
+ ],
+ "written_by": "claude-opus-5-5@high",
+ "cost": 0.050041,
+ "seconds": 34.0
+}

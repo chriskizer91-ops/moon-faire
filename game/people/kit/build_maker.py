@@ -5,10 +5,11 @@ HERE = os.path.dirname(os.path.abspath(__file__)); GAME = os.path.join(HERE, '..
 from build_viewer import scripts, rd
 RUNS = os.path.join(GAME, 'people', 'runs')
 ORDER = ['fortune', 'watchman', 'baker', 'farmhand']
-VARIANTS = [('claude-opus-5-5@high', 'Opus 5.5, high effort'), ('claude-opus-5-5@xhigh', 'Opus 5.5, extra-high effort'), ('claude-opus-5-5', 'Opus 5.5, default effort'), ('claude-sonnet-5-5', 'Sonnet 5.5'), ('claude-haiku-5-5', 'Haiku 5.5')]
-NEW = 2          # the first two variants are the second test (written for a person seen up close, up to three fixes)
+VARIANTS = [('claude-fable-5-2@high', 'Fable 5.2, high effort'), ('claude-opus-5-5@high', 'Opus 5.5, high effort'), ('claude-opus-5-5@xhigh', 'Opus 5.5, extra-high effort'), ('claude-opus-5-5', 'Opus 5.5, default effort'), ('claude-sonnet-5-5', 'Sonnet 5.5'), ('claude-haiku-5-5', 'Haiku 5.5')]
+NEW = 3          # the first two variants are the second test (written for a person seen up close, up to three fixes)
 NAMES = {'fortune': 'Fortune-teller', 'watchman': 'Night-watchman', 'baker': 'Baker', 'farmhand': 'Farm lad'}; MN = dict(VARIANTS)
-NOTES = {'claude-opus-5-5@high': 'A clear step up: pockets, apron ties, a neckerchief, trim on the sleeves, belts with buckles. The fortune-teller stands beside the lamp-seller. The men are still held back by the template body and face.',
+NOTES = {'claude-fable-5-2@high': 'Third test, made by Fable 5.2 through the key. About level with Opus at high effort, a little neater in places (bell sleeves, a hat band, a towel at the belt), for nearly three times the price.',
+         'claude-opus-5-5@high': 'A clear step up: pockets, apron ties, a neckerchief, trim on the sleeves, belts with buckles. The fortune-teller stands beside the lamp-seller. The men are still held back by the template body and face.',
          'claude-opus-5-5@xhigh': 'A few more touches (a lantern in the hand, a feather in the hat, a dotted scarf) for three to five times the price and the wait. Not worth it over high.',
          'claude-opus-5-5': 'First test. Readable from a distance, plain up close.', 'claude-sonnet-5-5': 'First test. Much like Opus at its default.', 'claude-haiku-5-5': 'First test. Recognisable but rough.'}
 uri = lambda p: 'data:image/jpeg;base64,' + base64.b64encode(open(p, 'rb').read()).decode()

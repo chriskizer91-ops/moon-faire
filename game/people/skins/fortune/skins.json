@@ -1,0 +1,44 @@
+{
+ "id": "fortune",
+ "desc": "A tall, thin fortune-teller: pale, with dark eye make-up and long black hair, a deep blue robe to the ankles with a gold-striped sash, and a plum headscarf.",
+ "file": "runs/fortune__claude-fable-5-2@high/v2.js",
+ "frame": {
+  "size": [
+   1536,
+   1024
+  ],
+  "half": [
+   768,
+   1024
+  ],
+  "x": [
+   -0.75,
+   0.75
+  ],
+  "y": [
+   -0.1,
+   1.9
+  ],
+  "front": "left half",
+  "back": "right half, seen from behind"
+ },
+ "skins": [
+  {
+   "key": "seer",
+   "name": "Fortune-teller",
+   "who": "A tall, thin fortune-teller who reads palms and cards in a dim tent at the edge of the fair.",
+   "body": "A plum headscarf fits close over the crown with a thin bright gold band at the brow; its cloth falls behind the ears to the shoulders and is tied at the back of the head in a small knot with a short tail, all in soft matte plum with faint darker folds. Long straight black hair shows at the sides, lies in two locks over the upper chest and runs down the back. A fine gold chain with a small oval pendant lies flat on the chest. The deep blue wool robe runs to the ankles with wide flared cuffs on the forearms; it is slightly faded at the shoulders, and its hem ends in a band of dull gold cloth worn and scuffed at the bottom edge. At the waist sits a dark plum sash with a round knot at her left hip and a long tail hanging down the front, crossed by three thin gold stripes. Below are worn black-purple boots with darker soles, and the hands are long, slender and pale.",
+   "face": "A woman of about thirty with pale, cool skin, a long narrow face, and fine faint lines at the eyes. Her grey-green eyes sit in heavy smoky dark plum shadow with black liner swept out to sharp wings, under thin dark arched brows. Her lips are deep wine-coloured and closed in a calm, knowing stillness, with a small mole on the lower right cheek."
+  },
+  {
+   "key": "lamplighter",
+   "name": "Old lamplighter",
+   "who": "An elderly man who walks the fair at dusk, lighting and trimming the lanterns along the stalls.",
+   "body": "A saffron-yellow headcloth wraps the crown with a thin dull copper band at the brow; its cloth hangs behind the ears to the shoulders and is knotted at the back with a short tail, smudged grey with soot along the edges. Long thin hair the colour of ash and white shows at the sides, falls in two loose locks over the chest and hangs down the back. A plain copper chain with a small round pendant lies on the chest. The heavy rust-red robe reaches the ankles, with wide cuffs on the forearms singed brown at their edges and darker soot marks on the front; its hem band is moss green and frayed, with a square patch in faded brown on one side. A cream sash with three thin moss-green stripes ties in a round knot at his left hip, its long tail stained with lamp oil. His boots are scuffed dark brown with worn soles, and his hands are knotted and tan with grey soot in the creases.",
+   "face": "A man near seventy with weathered, warm olive-brown skin, hollow cheeks, deep lines across the brow, and crow's feet. He has kind hazel-brown eyes under bushy white brows, a long nose, and a short grey stubble on the jaw. His thin pale lips are closed in a quiet, patient calm, with a faint dark smudge of soot on one cheekbone."
+  }
+ ],
+ "written_by": "claude-opus-5-5@high",
+ "cost": 0.049273,
+ "seconds": 18.5
+}
