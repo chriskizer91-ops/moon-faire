@@ -299,6 +299,15 @@ Chris asked for one map of the whole game: all the scenes set on a grid with a f
 - **The land around the places is a stand-in, not lore:** the settled country and its river and bridge, wooded hills, the moor's edge, the open moor with a high tor, the cliff coast, the dark sea, the beacon crag, a ruined beacon road with two broken pier stumps facing the crag, and a river marsh along the south. `map.json` lists each made-up thing under `invented`.
 - Not done: no painted map yet, and nothing in the game shows a map screen.
 
+## Chris's painted world map is in (November 13, late) — waiting for Chris on the story
+
+Same page, republished: https://claude.ai/artifact/Ju2Mo1hEK5jyA3pScXkYXz.
+
+- `world/map/map.png` (1536 x 1024): Chris's painting from `map_guide.png` and the prompt. It kept the layout: the coast, the roads and all ten places sit where the reference put them (`map_fit.jpg` draws the reference over it), so the squares in `map.json` hold without any change and every pin lands on its place.
+- `map_pins.jpg`: the painting with the grid, a pin per place, the stand-in names and the airship's dotted line drawn on top, as the game will draw them. `map_painted_scenes.jpg`: the scene paintings on their squares over it. Both are rebuilt by `build_world_page.py`.
+- The painting is seen from a little to the south of straight above, which suits it; pins are placed on each place's ground, not its rooftop.
+- Not done: the game has no map screen yet. The pins and names are pictures for now.
+
 ## Next
 
 Step 5, and the two-person fair-folk test if Chris wants it: the remaining twelve prompts (with the lane lesson built in), every scene traced, the

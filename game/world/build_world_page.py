@@ -88,13 +88,26 @@ if os.path.exists(MJ):
     import sys; sys.path.insert(0, HERE); import build_map as BM
     J = BM.load(); nm = {a['id']: a['name'] for a in W['areas']}; map_cost = json.load(open(os.path.join(HERE, 'map', 'log.json')))['cost']; BM.scenes_picture(J, nm).save(os.path.join(HERE, 'map', 'map_scenes.jpg'), quality=86)
     open(os.path.join(HERE, 'map', 'map-prompt.md'), 'w', encoding='utf-8').write('# Moon Faire: the world map prompt\n\nAttach `map_guide.png` and `style-fair-square.jpg`. Save the result as `map.png`.\n\n```\n%s\n```\n' % BM.prompt(J, nm))
-    top += ('<h2 id="map">The world map: every place on a grid</h2><div class="card"><p>All ten places set down on one map, twelve squares across and eight down, with north at the top. Each place has a square (W1 is at C6). The gold lines are the ways you walk; the dotted line is the airship. Claude Fable 5.2 drew the reference through your key and made up the land around the places as stand-ins.</p>'
-            '<img class="pic" loading="lazy" alt="" src="%s"><p class="soft">Your paintings on their squares, over the reference drawing.</p>'
-            '<img class="pic" loading="lazy" alt="" src="%s"><p class="soft">The reference drawing with its labels. The file to give the painter is <b>map_guide.png</b> from the chat: the same drawing with no words, no pins and no grid.</p>'
-            '<details open><summary>The painting prompt for the map</summary><div class="bar"><span class="soft">Attach map_guide.png and style-fair-square.jpg. Save the result as map.png.</span><button data-copy>Copy prompt</button></div><textarea readonly rows="12">%s</textarea></details>'
-            '<details><summary>The land around the places (stand-ins: cut or change any)</summary><ul>%s</ul><p><b>Made up for the map, not from your lore:</b></p><ul>%s</ul></details></div>') % (
-            jpg(os.path.join(HERE, 'map', 'map_scenes.jpg'), 1300, q=80), jpg(os.path.join(HERE, 'map', 'map_key.jpg'), 1300, q=80), E(BM.prompt(J, nm)),
-            ''.join('<li><b>%s</b> (%s). %s</li>' % (E(L['name'][0].upper() + L['name'][1:]), E(L['where'].rstrip('.')), E(L['paint'])) for L in J['land']), ''.join('<li>%s</li>' % E(x) for x in J.get('invented', [])))
+    MP_ = lambda n: os.path.join(HERE, 'map', n); done = os.path.exists(MP_('map.png'))
+    if done:   # Chris's painted map: pins, grid and names are drawn on top of it here, as the game will
+        import make_map_picture as MM
+        from PIL import Image as _I
+        MM.key(_I.open(MP_('map.png')), J, nm).save(MP_('map_pins.jpg'), quality=88); BM.scenes_picture(J, nm, MP_('map.png')).save(MP_('map_painted_scenes.jpg'), quality=86)
+    land = ''.join('<li><b>%s</b> (%s). %s</li>' % (E(L['name'][0].upper() + L['name'][1:]), E(L['where'].rstrip('.')), E(L['paint'])) for L in J['land']); inv = ''.join('<li>%s</li>' % E(x) for x in J.get('invented', []))
+    intro = 'All ten places set down on one map, twelve squares across and eight down, with north at the top. Each place has a square (W1 is at C6). The dotted line is the airship.'
+    tail = '<details><summary>The land around the places (stand-ins: cut or change any)</summary><ul>%s</ul><p><b>Made up for the map, not from your lore:</b></p><ul>%s</ul></details>' % (land, inv)
+    promptbox = '<div class="bar"><span class="soft">Attach map_guide.png and style-fair-square.jpg. Save the result as map.png.</span><button data-copy>Copy prompt</button></div><textarea readonly rows="12">%s</textarea>' % E(BM.prompt(J, nm))
+    if done:
+        top += ('<h2 id="map">The world map: every place on a grid</h2><div class="card"><p>%s</p><img class="pic" loading="lazy" alt="" src="%s"><p class="tag ok">In use: your painted map (November 13)</p>'
+                '<img class="pic" loading="lazy" alt="" src="%s"><p class="soft">The same painting with the grid, a pin on each place and the stand-in names, drawn on top as the game will draw them. Every pin lands on its place.</p>'
+                '<img class="pic" loading="lazy" alt="" src="%s"><p class="soft">Your scene paintings on their squares. The gold lines are the ways you walk.</p>'
+                '<details><summary>How the reference sits on your painting</summary><p class="soft">The green lines are the reference drawing. The painting kept the coast, the roads and all ten places where the reference put them.</p><img class="pic" loading="lazy" alt="" src="%s"></details>'
+                '<details><summary>The prompt this was painted from</summary>%s</details>%s</div>') % (intro, jpg(MP_('map.png'), 1400, q=84), jpg(MP_('map_pins.jpg'), 1400, q=82), jpg(MP_('map_painted_scenes.jpg'), 1300, q=80), jpg(MP_('map_fit.jpg'), 1200, q=76), promptbox, tail)
+    else:
+        top += ('<h2 id="map">The world map: every place on a grid</h2><div class="card"><p>%s The gold lines are the ways you walk. Claude Fable 5.2 drew the reference through your key and made up the land around the places as stand-ins.</p>'
+                '<img class="pic" loading="lazy" alt="" src="%s"><p class="soft">Your paintings on their squares, over the reference drawing.</p>'
+                '<img class="pic" loading="lazy" alt="" src="%s"><p class="soft">The reference drawing with its labels. The file to give the painter is <b>map_guide.png</b> from the chat: the same drawing with no words, no pins and no grid.</p>'
+                '<details open><summary>The painting prompt for the map</summary>%s</details>%s</div>') % (intro, jpg(MP_('map_scenes.jpg'), 1300, q=80), jpg(MP_('map_key.jpg'), 1300, q=80), promptbox, tail)
 SP = os.path.join(HERE, 'story-options.json'); story_cost = 0
 if os.path.exists(SP):
     ST = json.load(open(SP)); story_cost = ST['_made']['cost'] + ST['_made'].get('lost', 0); ROWS = [('start', 'At the fair'), ('counted', 'What you count in the wilds'), ('wraith', 'The great wraith'), ('why_go', 'Why the four go'), ('ending', 'The ending'), ('shows', 'What it shows off'), ('leans_on', 'Leans on'), ('weak', 'Its weakest point')]
