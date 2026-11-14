@@ -4,7 +4,7 @@ import sys, json
 from playwright.sync_api import sync_playwright
 MOVES = {'idle': [0.5, 2.0], 'walk': [0.6, 0.9, 1.2, 1.5, 1.8, 2.1], 'jog': [0.6, 0.8, 1.0, 1.2, 1.4, 1.6], 'squat': [0.4, 0.8, 1.5, 3.0], 'kneel': [0.4, 0.8, 1.5, 3.0], 'hover': [0.5, 1.0, 2.0, 4.0],
          'talk': [0.6, 1.8, 3.0], 'read': [0.4, 1.0, 2.0, 4.0, 6.0, 8.0, 9.0, 9.6, 10.2, 10.9, 11.5], 'glasses': [0.5, 0.9, 1.3, 2.0], 'hat': [0.5, 1.0, 1.4, 2.2], 'curtsey': [0.5, 1.0, 1.5, 2.0, 2.6], 'twirl': [0.5, 1.0, 1.4, 1.8, 2.4],
-         'herb': [0.6, 1.2, 1.8, 2.6, 3.4, 4.4], 'wave': [0.5, 1.0, 1.6, 2.6], 'look': [0.7, 2.4], 'sickle': [0.6, 1.4, 2.2, 3.0]}
+         'herb': [0.6, 1.2, 1.8, 2.6, 3.4, 4.4], 'wave': [0.5, 1.0, 1.6, 2.6], 'look': [0.7, 2.4], 'sickle': [0.6, 1.4, 2.2, 3.0], 'crescent': [0.6, 1.0, 1.6, 2.0, 2.15, 2.3, 2.6, 3.0, 3.6, 4.2], 'salve': [0.8, 1.5, 2.0, 2.6, 3.3, 4.0, 4.6, 5.4, 6.2, 6.9]}
 want = sys.argv[1:] or list(MOVES)
 with sync_playwright() as p:
     b = p.chromium.launch(executable_path='/usr/bin/google-chrome', args=['--use-angle=swiftshader', '--enable-unsafe-swiftshader', '--ignore-gpu-blocklist', '--allow-file-access-from-files'])

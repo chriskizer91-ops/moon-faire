@@ -40,9 +40,9 @@ canvas#stage{display:block;width:100%;height:100%;touch-action:none;cursor:grab}
 <body>
 <div class="wrap">
   <header>
-    <p class="eyebrow">Moon Faire · stage ten of her build</p>
+    <p class="eyebrow">Moon Faire · stage eleven of her build</p>
     <h1><em>Io</em>, the Herbal Witch</h1>
-    <p class="sub">New: her six feelings from painting C10, under Her feelings, and a slower, smoother hand when she reads. Pick View, then Face, to see them close. She stays in view while you scroll the buttons. Drag to turn her, pinch or scroll to zoom.</p>
+    <p class="sub">New: her first two spells, under Her spells. Harvest Crescent is her attack and Silverleaf Salve heals a friend. Picking one turns the camera to her side. She stays in view while you scroll the buttons. Drag to turn her, pinch or scroll to zoom.</p>
   </header>
   <div class="play">
   <div class="stagebox" id="box">
@@ -52,6 +52,7 @@ canvas#stage{display:block;width:100%;height:100%;touch-action:none;cursor:grab}
     <div class="err" id="err" hidden></div>
   </div>
   <div><p class="label">Moves</p><div class="chips" id="moves"></div></div>
+  <div><p class="label">Her spells</p><div class="chips" id="spells"></div></div>
   <div><p class="label">View</p><div class="chips" id="views"></div></div>
   <div><p class="label">Her feelings</p><div class="chips" id="feels"></div></div>
   <div><p class="label">Her face</p><div class="chips" id="faces"></div></div>
@@ -61,13 +62,14 @@ canvas#stage{display:block;width:100%;height:100%;touch-action:none;cursor:grab}
   <div class="notes">
     <h2>New in this stage</h2>
     <ul>
-      <li>Her feelings: Reading (eyes lowered, a small smile), Concentrating, Surprised, Hit (a wince), Stern and Delighted. Each is her whole painted face from C10, with a small turn of her head and shoulders. She keeps the one you pick while she does any move; None takes it off.</li>
-      <li>Some moves now use them by themselves: her reading face when she reads and at the bottom of her curtsey, her concentrating face when she lifts her sickle, her delighted face in the twirl and when she smells the herb.</li>
-      <li>Reading: her finger now takes twelve seconds to go down the page and turn the leaf, and its speed never jumps. Before, it jumped back to the top of the page in a single frame every five seconds, and turned the leaf in under half a second. That was my timing, not your screen.</li>
+      <li>Harvest Crescent, her plain attack (paintings H3, H4, I3). Her hand closes on the moon pendant and gold light leaks out; it unfolds into the sickle; she sets her feet, lifts it behind her shoulder and makes one wide cut that leaves a crescent of gold light. The light flies to the training dummy and bursts into sparks. The sickle folds back into the pendant.</li>
+      <li>Silverleaf Salve, her heal for one friend (H5, H6, I1). She lifts a pressed leaf from the page; it turns fresh and silver-green and stands in the air over her open palm, glowing; then it breaks into a ribbon of gold-green light and small leaves that goes to her friend and winds once round them from feet to shoulders, and soft light rises.</li>
+      <li>In both she holds her open book in her left hand, as painted. The dummy and the grey friend appear only while a spell needs them.</li>
+      <li>She wears her feelings from stage ten as she casts: her reading face over the pendant and the page, her concentrating face for the cut.</li>
     </ul>
     <h2 style="margin-top:12px">From the earlier stages</h2>
     <ul>
-      <li>The pass on things passing through each other: book and hands, legs and cloth, arms and sleeves (stage nine). The party's moves, and the book that appears when she reads (stage eight). Her book, dagger and sickle (stage seven). Her ankles, her wrists and her coy wave (stage six). Her belt, pouch, crystal, necklaces and bracelets (stage five). Her cloak with the moss, and her painted hands (stage four). Her arms, her moving hair and skirt, and her first moves (stage three). Her face, glasses, hair and hat (stage two). Her body, bodice and skirt (stage one).</li>
+      <li>Her six feelings from C10, and the slower reading hand (stage ten). The pass on things passing through each other: book and hands, legs and cloth, arms and sleeves (stage nine). The party's moves, and the book that appears when she reads (stage eight). Her book, dagger and sickle (stage seven). Her ankles, her wrists and her coy wave (stage six). Her belt, pouch, crystal, necklaces and bracelets (stage five). Her cloak with the moss, and her painted hands (stage four). Her arms, her moving hair and skirt, and her first moves (stage three). Her face, glasses, hair and hat (stage two). Her body, bodice and skirt (stage one).</li>
     </ul>
     <h2 style="margin-top:12px">What is rough, and what is not here yet</h2>
     <ul class="m">
@@ -79,7 +81,8 @@ canvas#stage{display:block;width:100%;height:100%;touch-action:none;cursor:grab}
       <li>The new pieces are plain shapes: the belt has no gold vine or holes yet, the pouch has no flap, studs or filigree, and the necklace pendant does not swing.</li>
       <li>Her fingers do not wrap the sickle exactly, the dagger cannot be drawn yet, and the sickle simply appears in her hand.</li>
       <li>Her feelings are painted on: the shape of her head does not change, so from the side they show less than from the front. She blinks only in Concentrating and Stern; the others hold their own eyes.</li>
-      <li>Not here yet: her spells and attacks.</li>
+      <li>The spells are first builds, timed from still pictures. The sickle appears and goes in a flash of light; it does not unfold piece by piece. The crescent of light flying to the dummy is my addition, so the attack reaches a foe who is not beside her.</li>
+      <li>Not here yet: Elderwood Guardian (her stag of living wood), Moonflower Garden, Rootbound Return, Thornwake, Bramble Cradle; being hit, falling and winning.</li>
     </ul>
   </div>
 </div>
@@ -123,8 +126,12 @@ canvas#stage{display:block;width:100%;height:100%;touch-action:none;cursor:grab}
   const MOVES = [['Stand still', 'pose'], ['Standing', 'idle'], ['Walk', 'walk'], ['Talk', 'talk'], ['Push up glasses', 'glasses'], ['Tip her hat', 'hat'], ['Curtsey', 'curtsey'], ['Twirl', 'twirl'], ['Pick a herb', 'herb'], ['Wave', 'wave'], ['Look round', 'look'], ['Read her book', 'read'], ['Hold her sickle', 'sickle'], ['Jog', 'jog'], ['Squat', 'squat'], ['Kneel', 'kneel'], ['Hover', 'hover']];
   const press = (host, i) => [...host.children].forEach((c, j) => c.setAttribute('aria-pressed', j === i ? 'true' : 'false'));
   let shown = 'idle';
-  chips($('moves'), MOVES, (m) => { if (m[1] === 'pose') { R.pose(POSES[0][1]); shown = 'pose'; press($('poses'), 0); } else { shown = R.play(m[1]); press($('poses'), -1); } }, 1);
-  chips($('poses'), POSES, (p) => { R.pose(p[1]); shown = 'pose'; press($('moves'), 0); }, -1);
+  chips($('moves'), MOVES, (m) => { press($('spells'), -1); if (m[1] === 'pose') { R.pose(POSES[0][1]); shown = 'pose'; press($('poses'), 0); } else { shown = R.play(m[1]); press($('poses'), -1); } }, 1);
+  chips($('poses'), POSES, (p) => { R.pose(p[1]); shown = 'pose'; press($('moves'), 0); press($('spells'), -1); }, -1);
+  // her spells (stage eleven): each brings what it is cast at (a training dummy, or a friend to heal) and turns the camera to her side,
+  // pulled back, so she casts toward the right as in her paintings and the whole spell is in view
+  const SPELLS = [['Harvest Crescent', 'crescent'], ['Silverleaf Salve', 'salve']], SPELL_VIEW = { az: -1.02, el: 0.07, dist: 8.3, ty: 0.92, tz: 0.60 };
+  chips($('spells'), SPELLS, (m) => { shown = R.play(m[1]); press($('moves'), -1); press($('poses'), -1); want = Object.assign({}, SPELL_VIEW); easing = true; spin = false; refKey = ''; setRef(); $('spinB').setAttribute('aria-pressed', 'false'); [...$('views').children].forEach((c) => c.setAttribute('aria-pressed', 'false')); }, -1);
   R.pose(POSES[0][1]); R.play('idle');
   const toggle = (host, id, label, on, fn) => { const b = document.createElement('button'); b.className = 'chip'; b.type = 'button'; b.id = id; b.textContent = label; b.setAttribute('aria-pressed', on ? 'true' : 'false');
     b.addEventListener('click', () => { const v = b.getAttribute('aria-pressed') !== 'true'; b.setAttribute('aria-pressed', v ? 'true' : 'false'); fn(v); }); host.appendChild(b); };
@@ -156,12 +163,12 @@ canvas#stage{display:block;width:100%;height:100%;touch-action:none;cursor:grab}
   function frame(now) {
     requestAnimationFrame(frame); const dt = Math.min(0.05, (now - last) / 1000 || 0.016); last = now; fit();
     R.animate(dt);
-    if (R.move !== shown) { shown = R.move; press($('moves'), MOVES.findIndex((m) => m[1] === shown)); }       // a short move has ended
+    if (R.move !== shown) { shown = R.move; press($('moves'), MOVES.findIndex((m) => m[1] === shown)); press($('spells'), SPELLS.findIndex((m) => m[1] === shown)); }       // a short move or a spell has ended
     if (spin) orbit.az += dt * 0.5;
-    if (easing) { let d = want.az - orbit.az; d = Math.atan2(Math.sin(d), Math.cos(d)); const k = Math.min(1, dt * 5); orbit.az += d * k; orbit.el += (want.el - orbit.el) * k; orbit.dist += (want.dist - orbit.dist) * k; orbit.target.y += (want.ty - orbit.target.y) * k; }
+    if (easing) { let d = want.az - orbit.az; d = Math.atan2(Math.sin(d), Math.cos(d)); const k = Math.min(1, dt * 5); orbit.az += d * k; orbit.el += (want.el - orbit.el) * k; orbit.dist += (want.dist - orbit.dist) * k; orbit.target.y += (want.ty - orbit.target.y) * k; orbit.target.z += ((want.tz || 0) - orbit.target.z) * k; }
     stage.render();
   }
-  $('hud').textContent = 'Stage ten · ' + Math.round(R.triangles / 1000) + 'k triangles';
+  $('hud').textContent = 'Stage eleven · ' + Math.round(R.triangles / 1000) + 'k triangles';
   window.IO = { stage, R, step() { fit(); stage.render(); } };
   requestAnimationFrame(frame);
 })();

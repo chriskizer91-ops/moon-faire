@@ -69,7 +69,7 @@
   MATS.crystal = phys({ color: lin('#eef4fb'), roughness: 0.06, transparent: true, opacity: 0.66, envMapIntensity: 1.6, emissive: lin('#cfe0f5'), emissiveIntensity: 0.20 });
   // ---------- bind: one skinned mesh per material ----------
   const root = new THREE.Group(); root.name = 'io';
-  root.add(SK.hips); if (SK.book) root.add(SK.book); root.updateMatrixWorld(true);       // her book is not carried by her body: it has its own place every frame
+  root.add(SK.hips); if (SK.book) root.add(SK.book); root.add(fxG); root.updateMatrixWorld(true);       // her book is not carried by her body: it has its own place every frame
   const skeleton = new THREE.Skeleton(bones);
   const meshes = {};
   let triCount = 0;
@@ -291,7 +291,7 @@
 
   let lastPose = { arm: 15, leg: 0 }, mv = { name: 'pose', t: 0 }, wk = 0, gph = 0, spinWas = 0;
   let clock = 0, blinkAt = 1.6, blinkT = -1, mouthAt = 0, mouthNow = 'rest', facePainted = '', talking = false, held = null, blinking = true;
-  const SHOTS = { glasses: 2.4, hat: 2.6, curtsey: 3.0, twirl: 2.6, herb: 5.0, wave: 3.0, look: 3.6, sickle: 3.4 }, MOVES = ['pose', 'idle', 'walk', 'jog', 'squat', 'kneel', 'hover', 'talk', 'read', 'glasses', 'hat', 'curtsey', 'twirl', 'herb', 'wave', 'look', 'sickle'];
+  const SHOTS = { glasses: 2.4, hat: 2.6, curtsey: 3.0, twirl: 2.6, herb: 5.0, wave: 3.0, look: 3.6, sickle: 3.4, crescent: 4.7, salve: 7.2 }, MOVES = ['pose', 'idle', 'walk', 'jog', 'squat', 'kneel', 'hover', 'talk', 'read', 'glasses', 'hat', 'curtsey', 'twirl', 'herb', 'wave', 'look', 'sickle', 'crescent', 'salve'], SPELLS = ['crescent', 'salve'];
   let jg = 0, hSq = 0, hKn = 0, hHv = 0;
   // Her emotions (C10; stage ten). feel: the one she is asked to hold (the page's Feelings buttons, setFeel); FW: how far she is into each,
   // for the small turn of her head and shoulders that goes with it. A move can also ask for one for a moment (her reading face when she reads).
@@ -299,9 +299,11 @@
   // Her book (G8, and the rule in her prompts: it is in her LEFT hand; when she lets go of it, it floats open at her left side).
   // bkR: 1 open on her left palm to read (see readHands). bkF is no longer used: she does not carry it.
   const BK_FLOAT = {},       // Chris, November 13: "her book should like appear when she does the read her book animation. I don't think she should just be holding it"
-     bkP = V3(), bkQ = new THREE.Quaternion(), bkP2 = V3(), bkQ2 = new THREE.Quaternion(), EU = new THREE.Euler(); let bkF = 0, bkR = 0, showProps = true;
-  const propVis = (on, sick) => { const m = meshes, shut = false, open = bkR > 0.03; for (const [k, v] of [['bookShut', on && shut], ['bookShutPg', on && shut], ['bookRibbon', on && shut], ['bookOpen', on && open], ['bookOpenPg', on && open], ['sickleGold', on && sick], ['sickleGrip', on && sick]]) if (m[k]) m[k].visible = !!v && showProps; };
-  function bookPlace(dt, N) { const k = Math.min(1, dt * 3.2); bkF = 0; bkR += ((N === 'read' ? 1 : 0) - bkR) * k; return 0; }
+     bkP = V3(), bkQ = new THREE.Quaternion(), bkP2 = V3(), bkQ2 = new THREE.Quaternion(), EU = new THREE.Euler(); let bkF = 0, bkR = 0, bkS = 0, showProps = true;
+  // SPB: where her left hand holds the open book for a spell (the paintings H3 to H6 show it in her left hand); FXWANT: what the spell being cast needs standing in front of her
+  const SPB = { P: V3(0.10, 1.03, 0.22), f: V3(-0.42, 0.30, 0.86), n: V3(-0.06, 0.90, -0.43), want: false }, FXWANT = { dummy: false, ally: false }; let afterHands = null, sickNow = false;
+  const propVis = (on, sick) => { const m = meshes, shut = false, open = Math.max(bkR, bkS) > 0.03; for (const [k, v] of [['bookShut', on && shut], ['bookShutPg', on && shut], ['bookRibbon', on && shut], ['bookOpen', on && open], ['bookOpenPg', on && open], ['sickleGold', on && sick], ['sickleGrip', on && sick]]) if (m[k]) m[k].visible = !!v && showProps; };
+  function bookPlace(dt, N) { const k = Math.min(1, dt * 3.2); bkF = 0; bkR += ((N === 'read' ? 1 : 0) - bkR) * k; bkS += ((SPB.want && N !== 'read' ? 1 : 0) - bkS) * k; return 0; }
   // Reading (stage nine; Chris, November 13: her pointing finger "is phasing through the book", and "the book's hovering above"
   // the hand that holds it). Her hands used to be sent to places worked out beside a book that was placed from her chest, so
   // neither truly touched it. Now, in order: her left hand goes to its place, palm up; the book is laid ON that palm, wherever the
@@ -313,28 +315,20 @@
   function handFrame(S) { rootQuat(SK['hand' + S], rdQ).multiply(_qb.copy(HAND0[S]).invert()); rdF.set(1, 0, 0).applyQuaternion(rdQ); rdN.set(0, 1, 0).applyQuaternion(rdQ); rdX.crossVectors(rdF, rdN); rdW.setFromMatrixPosition(SK['hand' + S].matrixWorld).applyMatrix4(_inv); }
   function armTo(S, P, k, swivel, f, n, from) { const e = k * k * (3 - 2 * k); rdV.copy(from).lerp(P, e); rdV.z += 0.09 * Math.sin(PI * e); reach(S, rdV, sm(0, 0.15, k), swivel * e); aimHand(S, f, n, k); wristFix(S); }
   const rdFrom = { L: V3(), R: V3() };
-  function readHands(N, T) {
-    const k = bkR;
-    for (const [S] of SIDES) rdFrom[S].setFromMatrixPosition(SK['hand' + S].matrixWorld).applyMatrix4(_inv);
-    // her left hand: palm up and a little toward her face, at the foot of her ribs
-    fingers('L', lerp(0.24, 0.12, k)); carried('spine3', 0.082, 1.040, 0.215, rdP); armTo('L', rdP, k, 0.3, fv.set(-0.42, 0.30, 0.86), nv.set(-0.06, 0.90, -0.43), rdFrom.L); sync();
-    // the book lies on that palm: its spine along her palm, its pages facing the way her palm faces; it grows out of nothing there once her hand is nearly in place
+  // The open book on her left palm: her hand goes to P, palm facing n, fingers along f, and the book is laid on that palm wherever
+  // the palm really ended up; it grows out of nothing there once her hand is nearly in place.
+  function bookOnPalm(k, P, f, n) {
+    rdFrom.L.setFromMatrixPosition(SK.handL.matrixWorld).applyMatrix4(_inv); fingers('L', lerp(0.24, 0.12, k)); armTo('L', P, k, 0.3, f, n, rdFrom.L); sync();
     handFrame('L'); const sc = Math.max(0.001, sm(0.45, 0.92, k)); rdU.set(0, 0.35, 1).addScaledVector(rdN, -(0.35 * rdN.y + rdN.z)).normalize(); _d.crossVectors(rdU, rdN);
     bkQ.setFromRotationMatrix(rdB.makeBasis(_d, rdU, rdN)); bkP.copy(rdW).addScaledVector(rdF, 0.058).addScaledVector(rdN, 0.0245).addScaledVector(rdX, -0.008).sub(_e.set(0, -0.050, -0.0045).multiplyScalar(sc).applyQuaternion(bkQ));
     SK.book.position.copy(bkP); SK.book.quaternion.copy(bkQ); SK.book.scale.setScalar(sc);
-    // her right forefinger on the right-hand page, following the lines down it; now and then it lifts, goes to the edge and turns a leaf
-    // her hand is held level above the page; her forefinger bends down to the paper, and her other fingers are folded up under her palm, clear of it
+  }
+  // Her right forefinger is brought to tipTo: her hand held level above the page with her other fingers folded up under her palm,
+  // the forefinger bent down; the place of its tip is measured and her whole hand moved until it is right.
+  function fingerTo(tipTo, k) {
     fingers('R', lerp(0.24, 1.2, k)); for (const fn of ['mid', 'rng', 'pnk']) [0.75, 1.75, 0.90].forEach((a, j) => { SK[fn + j + 'R'].rotation.z = lerp(0.24 * [0.85, 1.1, 0.7][j], a, k); });
     [0.95, 0.20, 0.15].forEach((a, j) => { SK['idx' + j + 'R'].rotation.z = lerp(0.24 * [0.85, 1.1, 0.7][j], a, k); }); sync();
     rootQuat(SK.handR, _qa).invert(); rdT.copy(TIP0.R).applyMatrix4(SK.idx2R.matrixWorld).applyMatrix4(_inv).sub(_e.setFromMatrixPosition(SK.handR.matrixWorld).applyMatrix4(_inv)).applyQuaternion(_qa);       // where her fingertip is from her wrist, in her hand's own frame
-    // Where her fingertip goes (Chris, November 13: the reading hand was "kind of jerky moving fast": it jumped back to the top of
-    // the page in one frame every 5.2 s, and turned a leaf in under half a second). One slow round now takes 12 s: 8.4 s down the
-    // page at about 1.5 cm a second with a slow drift along the lines, then it lifts, goes to the edge, turns the leaf across, and
-    // comes back to the top. Every stretch eases in and out, so its speed never jumps.
-    const RD = [[0, 0.055, 0.050, 0], [8.4, 0.055, -0.040, 0], [9.5, 0.110, -0.010, 0.026], [10.9, 0.000, 0.004, 0.034], [12.0, 0.055, 0.050, 0]], tc = N === 'read' ? T % 12 : 0;
-    let px = RD[0][1], py = RD[0][2], pz = 0; for (let i = 0; i < RD.length - 1; i++) if (tc >= RD[i][0] && tc <= RD[i + 1][0]) { const e = sm(RD[i][0], RD[i + 1][0], tc); px = lerp(RD[i][1], RD[i + 1][1], e); py = lerp(RD[i][2], RD[i + 1][2], e); pz = lerp(RD[i][3], RD[i + 1][3], e); }
-    px += 0.014 * Math.sin(tc * TAU / 4.2) * sm(0, 1.2, tc) * (1 - sm(7.2, 8.4, tc));
-    const tipTo = bookPt(px, py, pageZ(px) + 0.0075 + pz, V3());
     fv.set(-0.50, 0.85, 0.12).applyQuaternion(bkQ).normalize(); nv.set(0, 0, -1).applyQuaternion(bkQ);
     _t.copy(fv); _n.copy(nv).addScaledVector(_t, -_t.dot(nv)).normalize(); _d.crossVectors(_t, _n); _qc.setFromRotationMatrix(rdB.makeBasis(_t, _n, _d)).multiply(HAND0.R);       // the turn her hand is asked for
     rdP.copy(tipTo).sub(_e.copy(rdT).applyQuaternion(_qc)); const want = rdP.clone(), f2 = fv.clone(), n2 = nv.clone();
@@ -342,18 +336,49 @@
     armTo('R', want, k, -0.3, f2, n2, rdFrom.R); sync();
     if (k > 0.98) for (let it = 0; it < 2; it++) { rdV.copy(TIP0.R).applyMatrix4(SK.idx2R.matrixWorld).applyMatrix4(_inv); _e.copy(tipTo).sub(rdV); if (_e.length() < 0.0008) break; want.add(_e); armTo('R', want, 1, -0.3, f2, n2, rdFrom.R); sync(); }       // her wrist only bends so far, so the tip is put right by moving her whole hand
   }
+  const tipNow = (out) => out.copy(TIP0.R).applyMatrix4(SK.idx2R.matrixWorld).applyMatrix4(_inv);
+  function readHands(N, T) {
+    const k = bkR; rdFrom.R.setFromMatrixPosition(SK.handR.matrixWorld).applyMatrix4(_inv);
+    // her left hand: palm up and a little toward her face, at the foot of her ribs
+    carried('spine3', 0.082, 1.040, 0.215, rdP); bookOnPalm(k, rdP.clone(), fv.set(-0.42, 0.30, 0.86).clone(), nv.set(-0.06, 0.90, -0.43).clone());
+    // Where her fingertip goes (Chris, November 13: the reading hand was "kind of jerky moving fast": it jumped back to the top of
+    // the page in one frame every 5.2 s, and turned a leaf in under half a second). One slow round now takes 12 s: 8.4 s down the
+    // page at about 1.5 cm a second with a slow drift along the lines, then it lifts, goes to the edge, turns the leaf across, and
+    // comes back to the top. Every stretch eases in and out, so its speed never jumps.
+    const RD = [[0, 0.055, 0.050, 0], [8.4, 0.055, -0.040, 0], [9.5, 0.110, -0.010, 0.026], [10.9, 0.000, 0.004, 0.034], [12.0, 0.055, 0.050, 0]], tc = N === 'read' ? T % 12 : 0;
+    let px = RD[0][1], py = RD[0][2], pz = 0; for (let i = 0; i < RD.length - 1; i++) if (tc >= RD[i][0] && tc <= RD[i + 1][0]) { const e = sm(RD[i][0], RD[i + 1][0], tc); px = lerp(RD[i][1], RD[i + 1][1], e); py = lerp(RD[i][2], RD[i + 1][2], e); pz = lerp(RD[i][3], RD[i + 1][3], e); }
+    px += 0.014 * Math.sin(tc * TAU / 4.2) * sm(0, 1.2, tc) * (1 - sm(7.2, 8.4, tc));
+    fingerTo(bookPt(px, py, pageZ(px) + 0.0075 + pz, V3()), k);
+  }
   const bookPt = (x, y, z, out) => out.set(x, y, z).applyQuaternion(bkQ).add(bkP);
   const pulse = (t, a, b, c, d) => sm(a, b, t) * (1 - sm(c, d, t)), ANK = {}; for (const [S] of SIDES) ANK[S] = SK['foot' + S].userData.rest.clone();
   const tgt = V3(), tg2 = V3(), fv = V3(), nv = V3();
+  // ----- for her spells (stage eleven) -----
+  const cromP = (K, u, out) => { const n = K.length - 1, x = cl(u, 0, 1) * n, i = Math.min(n - 1, Math.floor(x)), t = x - i, p0 = K[Math.max(0, i - 1)], p1 = K[i], p2 = K[i + 1], p3 = K[Math.min(n, i + 2)], t2 = t * t, t3 = t2 * t;       // a smooth path through points
+    return out.set(0, 0, 0).addScaledVector(p0, -0.5 * t3 + t2 - 0.5 * t).addScaledVector(p1, 1.5 * t3 - 2.5 * t2 + 1).addScaledVector(p2, -1.5 * t3 + 2 * t2 + 0.5 * t).addScaledVector(p3, 0.5 * t3 - 0.5 * t2); };
+  // a hand closed on a handle: h the way the handle points (toward the blade), f the way her knuckles face
+  const gripAim = (list, S, h, f, w) => { const hh = h.clone().normalize(), ff = f.clone().addScaledVector(hh, -f.dot(hh)).normalize(); list.push([S, ff, V3().crossVectors(hh, ff), w]); };
+  // her sickle's blade, in her right hand at rest: where it leaves the handle, its far edge, and how far the light of a cut reaches
+  const SKL = (() => { const wr = restPts.wrR, d0 = armDir.R, p0 = V3(Math.cos(A_POSE), -Math.sin(A_POSE), 0), Pc = wr.clone().addScaledVector(d0, 0.073).addScaledVector(p0, 0.024); return { inner: V3(Pc.x, Pc.y, Pc.z + 0.088), outer: Pc.clone().addScaledVector(d0, 0.105).add(V3(0, 0, 0.176)), far: Pc.clone().addScaledVector(d0, 0.15).add(V3(0, 0, 0.36)), mid: Pc.clone().addScaledVector(d0, 0.088).add(V3(0, 0, 0.13)) }; })();
+  const CUT = [V3(-0.40, 1.50, -0.20), V3(-0.52, 1.36, 0.14), V3(-0.26, 1.12, 0.50), V3(0.14, 0.86, 0.52), V3(0.30, 0.60, 0.38)], GRIP = V3(-0.060, 1.135, 0.175), PEND = V3(0, 1.2035, 0.125);
+  const sp1 = V3(), sp2 = V3(), sp3 = V3(), sp4 = V3(), sp5 = V3(), spq = new THREE.Quaternion(), spq2 = new THREE.Quaternion(), UP = V3(0, 1, 0);
+  const yawOf = (bone) => { rootQuat(bone, spq); sp5.set(0, 0, 1).applyQuaternion(spq); return Math.atan2(sp5.x, sp5.z); };
+  // the path the Salve's ribbon takes: out from her hand, down to her friend's feet, then once round them up to their shoulders (H6)
+  const SALVE_A = V3();
+  function salvePath(u, out) { const AX = ALLY.position.x, AZ = ALLY.position.z, th0 = -PI / 2 - 0.55;
+    if (u < 0.36) { const t = u / 0.36, a = (1 - t) * (1 - t), b = 2 * t * (1 - t), c = t * t; sp4.set(AX + 0.30 * Math.cos(th0), 0.12, AZ + 0.30 * Math.sin(th0)); return out.set(0, 0, 0).addScaledVector(SALVE_A, a).addScaledVector(sp5.copy(SALVE_A).add(sp3.set(0.16, 0.20, 0.50)), b).addScaledVector(sp4, c); }
+    const v = (u - 0.36) / 0.64, th = th0 + TAU * 1.22 * v, r = lerp(0.30, 0.215, v); return out.set(AX + r * Math.cos(th), lerp(0.12, 1.44, Math.pow(v, 0.9)), AZ + r * Math.sin(th)); }
+
   function pose(o) {
     o = o || {}; mv = { name: 'pose', t: 0 }; wk = 0; lastPose = { arm: o.arm == null ? 15 : o.arm, leg: o.leg || 0 }; const arm = lastPose.arm * DEG - A_POSE, leg = lastPose.leg * DEG;
     restAll(); for (const [S, s] of SIDES) { SK['uarm' + S].rotation.z = s * arm; SK['thigh' + S].rotation.z = s * leg; SK['foot' + S].rotation.z = -s * leg; }
-    for (const o2 of SOFT) o2.lift = 0; sync(); softSettle(); root.updateMatrixWorld(true); bkF = 0; bkR = 0; propVis(false, false);       // held still she carries nothing, as in the paintings she is checked against
+    for (const o2 of SOFT) o2.lift = 0; sync(); softSettle(); root.updateMatrixWorld(true); bkF = 0; bkR = 0; bkS = 0; propVis(false, false);       // held still she carries nothing, as in the paintings she is checked against
   }
-  function play(name) { if (!MOVES.includes(name) || name === 'pose') { pose(lastPose); return 'pose'; } mv = { name, t: 0 }; return name; }
+  function play(name) { if (!MOVES.includes(name) || name === 'pose') { pose(lastPose); return 'pose'; } if (SPELLS.includes(name)) fxClear(); mv = { name, t: 0 }; return name; }
   // one frame of a move: returns her face { eyes, mouth }
   function body(N, T, dt) {
     restAll(); for (const o of SOFT) o.lift = 0;
+    afterHands = null; sickNow = false; SPB.want = false; FXWANT.dummy = false; FXWANT.ally = false;
     let eyes = 0, mouth = 'rest', emo = null, plant = 1; const footP = { R: 0, L: 0 }, ank = { R: tgt.clone().copy(ANK.R), L: tgt.clone().copy(ANK.L) };
     wk += ((N === 'walk' || N === 'jog' ? 1 : 0) - wk) * Math.min(1, dt * 4.5); jg += ((N === 'jog' ? 1 : 0) - jg) * Math.min(1, dt * 4.5); const go = wk, still = 1 - go;
     hSq += ((N === 'squat' ? 1 : 0) - hSq) * Math.min(1, dt * 3.2); hKn += ((N === 'kneel' ? 1 : 0) - hKn) * Math.min(1, dt * 2.8); hHv += ((N === 'hover' ? 1 : 0) - hHv) * Math.min(1, dt * 2.2);
@@ -410,6 +435,75 @@
     if (N === 'sickle') { const k = pulse(T, 0, 0.6, 2.5, 3.3), up = pulse(T, 0.9, 1.4, 1.9, 2.5);       // she lifts her sickle and turns it to the light (the moon pendant will become it when her spells are built)
       add('head', -0.05 * up, -0.14 * k, 0); add('spine3', 0, -0.05 * k, 0);
       reaches.push(['R', V3(-0.21 - 0.03 * up, 1.14 + 0.14 * up, 0.27), k, -0.3]); aims.push(['R', V3(0.10 * up, 0.25 + 0.45 * up, 1), V3(1, 0.1 * Math.sin(T * 3) * up, 0), k]); fingers('R', lerp(0.24, 1.35, sm(0, 0.25, k))); if (up > 0.35) emo = 'casting'; }
+    // ----- Harvest Crescent (H3, H4, I3): her plain attack. Her hand closes on the moon pendant, it unfolds into the gold sickle,
+    // and she makes one wide cut that leaves a crescent of gold light; the light flies to the foe. The sickle folds back into the pendant.
+    if (N === 'crescent') {
+      const arm = pulse(T, 0.15, 0.62, 3.75, 4.3), grip = pulse(T, 0.2, 0.65, 1.02, 1.3), draw = sm(1.05, 1.55, T), cut = sm(1.86, 2.26, T), low = pulse(T, 1.95, 2.28, 2.8, 3.3), back = sm(2.9, 3.5, T), st = pulse(T, 0.95, 1.5, 2.95, 3.65), wind = draw * (1 - cut), sw = cut * (1 - back);
+      FXWANT.dummy = T < 4.35; SPB.want = T > 0.05 && T < 3.9; sickNow = T > 1.12 && T < 3.48;
+      // her stance: left foot forward, feet wide, knees bent; she sinks onto her front knee as the cut comes round
+      const dy = -(0.07 * st + 0.21 * low), dz = 0.03 * st + 0.13 * low; SK.hips.position.y += dy; SK.hips.position.z += dz;
+      ank.L.x += 0.07 * st; ank.L.z += (0.12 + 0.14 * low) * st; ank.R.x -= 0.10 * st; ank.R.z -= 0.17 * st; footP.R = Math.max(footP.R, 0.6 * low);
+      const tw = -0.48 * wind + 0.55 * sw; add('hips', 0, 0.35 * tw, 0); add('spine1', 0.30 * low, 0.25 * tw, 0); add('spine2', 0.16 * low, 0.25 * tw, 0); add('spine3', 0.02 * st, 0.22 * tw, 0);
+      add('neck', -0.18 * low + 0.10 * grip, -0.30 * tw, 0); add('head', -0.16 * low + 0.20 * grip, -0.38 * tw, 0);
+      // her right hand: to the pendant, up and back behind her shoulder, round in the cut, and back to her chest
+      const P = V3(); if (T < 1.86) P.copy(GRIP).lerp(CUT[0], draw * draw * (3 - 2 * draw)); else if (T < 2.9) cromP(CUT, cut, P); else P.copy(CUT[4]).lerp(GRIP, back * back * (3 - 2 * back));
+      const fol = 1 - sm(0, 1, grip + (1 - draw) * (T < 1.3 ? 1 : 0)) * (T < 1.3 ? 1 : 0), body = (T < 1.3 ? draw : 1 - back); P.y += dy * 0.85 * body; P.z += dz * 0.85 * body;
+      reaches.push(['R', P.clone(), arm, -0.35 + 0.5 * sw]); fingers('R', lerp(0.24, 1.35, sm(0.3, 0.6, T) * (1 - sm(3.6, 4.0, T))));
+      if (T < 1.12 || T > 3.4) aims.push(['R', V3(0.55, 0.80, 0.05), V3(0.10, 0.10, -1), arm]);
+      else { cromP(CUT, cut + 0.03, sp1).sub(cromP(CUT, cut - 0.03, sp2)); if (cut <= 0 || cut >= 1) sp1.set(0.6, -0.5, 0.6); const e = sm(0, 0.22, cut), q = 1 - sm(0, 1, back);
+        carried('uarmR', restPts.shR.x, restPts.shR.y, restPts.shR.z, sp2); sp3.copy(P).sub(sp2).normalize().addScaledVector(UP, 0.18); const h = V3(-0.25, 0.85, -0.45).lerp(sp3, e).lerp(V3(0.1, 1, 0.2), 1 - q), f = V3(-0.55, 0, -0.83).lerp(sp1.normalize(), e).lerp(V3(0.6, 0.1, 0.5), 1 - q); gripAim(aims, 'R', h, f, arm); }
+      // her left hand keeps the open book out of the way of the blade
+      const by = yawOf(SK.spine3); carried('spine3', 0.19 + 0.07 * (wind + low), 1.02, 0.17 - 0.13 * (wind + low), SPB.P); SPB.f.set(-0.25, 0.25, 0.93).applyAxisAngle(UP, by); SPB.n.set(-0.05, 0.93, -0.36).applyAxisAngle(UP, by);
+      if (T < 1.0) emo = 'reading'; else if (T < 2.9) emo = 'casting'; else if (T > 3.3) mouth = 'smile';
+      afterHands = () => {
+        const hp = carried('handR', SKL.mid.x, SKL.mid.y, SKL.mid.z, sp1);
+        if (grip > 0.02) { carried('spine3', PEND.x, PEND.y, PEND.z, sp2); glow(sp2, 0.20 * grip, FXC.gold, 0.9 * grip); glow(sp2, 0.07, FXC.pearl, grip); if (frnd() < 0.5 * grip) emit(sp2.x + frs(0.02), sp2.y + frs(0.02), sp2.z + 0.02, frs(0.10), 0.05 + frnd() * 0.16, 0.05 + frnd() * 0.12, 0.7 + frnd() * 0.5, 0.020, FXC.gold, frnd() < 0.3 ? 1 : 0, 1.5, -0.05); }
+        const pop = pulse(T, 1.08, 1.16, 1.2, 1.5) + pulse(T, 3.36, 3.46, 3.5, 3.8); if (pop > 0.01) { glow(hp, 0.55 * pop, FXC.gold, 0.8 * pop); glow(hp, 0.22 * pop, FXC.pearl, pop, 1); }       // the pendant unfolds into the sickle, and the sickle folds back, in a flash of gold
+        if (T > 1.14 && T < 2.8) { const wide = sm(1.80, 1.96, T); carried('handR', SKL.inner.x, SKL.inner.y, SKL.inner.z, sp2); sp4.copy(SKL.outer).lerp(SKL.far, wide); carried('handR', sp4.x, sp4.y, sp4.z, sp3); RIB_CUT.push(sp2, sp3, (0.30 + 0.70 * wide) * (1 - sm(2.45, 2.8, T))); }       // the light the blade leaves
+        if (T > 2.2 && T < 2.95 && RIB_CUT.pts.length > 4) for (let i = 0; i < 3; i++) { const t = RIB_CUT.pts[Math.floor(frnd() * RIB_CUT.pts.length)], u = frnd(); emit(lerp(t.p.x, t.q.x, u), lerp(t.p.y, t.q.y, u), lerp(t.p.z, t.q.z, u), frs(0.25), 0.1 + frnd() * 0.3, frs(0.25), 0.5 + frnd() * 0.5, 0.030 + frnd() * 0.02, frnd() < 0.7 ? FXC.gold : FXC.pearl, 1, 1.4, 0.5); }       // the crescent breaks up into sparks
+        // the crescent of light flies to the foe, and strikes
+        const fly = (T - 2.06) / 0.32, DZ = DUMMY.position.z; WAVE.visible = fly > 0 && fly < 1.12;
+        if (WAVE.visible) { const e = Math.min(1, fly); WAVE.position.set(0.03 * (1 - e), 1.02 + 0.05 * e, lerp(0.50, DZ - 0.15, e)); WAVE.rotation.set(0, 0, -0.62); WAVE.scale.setScalar(lerp(0.72, 1.15, e)); WAVE.material.uniforms.uK.value = Math.min(1, fly * 6) * (1 - sm(0.92, 1.12, fly)) * 1.25; if (frnd() < 0.8) emit(WAVE.position.x + frs(0.3), WAVE.position.y + frs(0.25), WAVE.position.z - 0.1, frs(0.1), frs(0.1), -0.3, 0.35, 0.025, FXC.gold, 1, 2, 0); }
+        const hitT = 2.06 + 0.32; if (T >= hitT && T - dt < hitT) { dummyHit(2.6); for (let i = 0; i < 60; i++) { const a = frnd() * TAU, v = 0.5 + frnd() * 1.6, up = frs(1); emit(frs(0.12), 1.05 + frs(0.2), DZ - 0.17, Math.cos(a) * v * 0.9, up * v * 0.8 + 0.3, -Math.abs(Math.sin(a)) * v * 0.6 + 0.25, 0.45 + frnd() * 0.6, 0.028 + frnd() * 0.03, i % 4 === 0 ? FXC.pearl : FXC.gold, i % 3 === 0 ? 0 : 1, 2.2, 1.4); } }
+        const fl = pulse(T, hitT - 0.01, hitT + 0.03, hitT + 0.08, hitT + 0.4); if (fl > 0.01) { sp2.set(0, 1.05, DZ - 0.2); glow(sp2, 1.2 * fl, FXC.gold, 0.55 * fl); glow(sp2, 0.5 * fl, FXC.pearl, fl, 1, 0.4); }
+      };
+    }
+    // ----- Silverleaf Salve (H5, H6, I1): she heals one friend. She lifts a pressed leaf from the page; it turns fresh and silver-green,
+    // floats over her palm, and breaks into a ribbon of light and leaves that winds once round her friend.
+    if (N === 'salve') {
+      const look = pulse(T, 0.3, 0.9, 3.35, 3.9), pick = sm(0.85, 1.5, T), lift = sm(1.7, 2.4, T), open = sm(2.4, 3.0, T), give = sm(3.55, 4.15, T), down = sm(5.9, 6.6, T), fresh = sm(1.55, 2.5, T), lit = sm(2.3, 3.0, T) * (1 - sm(4.0, 4.3, T)), head = cl((T - 4.15) / 1.35, 0, 1);
+      FXWANT.ally = T < 6.85; SPB.want = T > 0.05 && T < 6.25; carried('spine3', 0.10, 1.03, 0.22, SPB.P); SPB.f.set(-0.42, 0.30, 0.86); SPB.n.set(-0.06, 0.90, -0.43);
+      add('head', 0.26 * look - 0.03 * give, -0.05 * look, 0); add('neck', 0.06 * look, 0, 0); add('spine3', 0.05 * give * (1 - down), 0.10 * give * (1 - down), 0); add('spine2', 0.03 * give * (1 - down), 0, 0);
+      if (look > 0.5 && T < 3.4) emo = 'reading'; else if (T > 3.4 && T < 6.6) mouth = 'smile';
+      afterHands = () => { if (bkS < 0.02) { LEAF.visible = false; return; }
+        const hang = rdFrom.R.setFromMatrixPosition(SK.handR.matrixWorld).applyMatrix4(_inv).clone(), page = bookPt(0.058, -0.012, pageZ(0.058) + 0.002, V3()), bn = V3(0, 0, 1).applyQuaternion(bkQ), bsc = SK.book.scale.x;
+        // her right hand: forefinger and thumb to the pressed leaf, lifting it; then her palm opens under it; then her arm goes out to her friend
+        const tipTo = page.clone().addScaledVector(bn, 0.006 + 0.10 * lift).add(V3(-0.035 * lift, 0.035 * lift, -0.02 * lift));
+        if (open < 1) { fingerTo(tipTo, pick); SK.thb1R.rotation.z = lerp(SK.thb1R.rotation.z, 0.55, pick); SK.thb2R.rotation.z = lerp(SK.thb2R.rotation.z, 0.5, pick); sync(); }
+        const tip = tipNow(V3());
+        if (open > 0) { const from = SK.handR.getWorldPosition(V3()).applyMatrix4(_inv), k = 1 - down;
+          for (const fn of ['idx', 'mid', 'rng', 'pnk']) for (let j = 0; j < 3; j++) SK[fn + j + 'R'].rotation.z = lerp(SK[fn + j + 'R'].rotation.z, (0.10 + 0.10 * give) * [0.85, 1.1, 0.7][j] * (fn === 'idx' ? 0.6 : 1), open); SK.thb1R.rotation.z = lerp(SK.thb1R.rotation.z, 0.05, open); SK.thb2R.rotation.z = lerp(SK.thb2R.rotation.z, 0.05, open);
+          const Pp = carried('spine3', -0.215, 1.085, 0.30, V3()).lerp(carried('spine3', -0.15, 1.27, 0.50, V3()), give), f = V3(-0.22, 0.12, 0.95).lerp(V3(0.02, 0.50, 0.86), give).normalize(), n = V3(0.05, 1, 0.10).lerp(V3(0, 0.80, -0.55), give).normalize();
+          if (open < 1) armTo('R', Pp, open, -0.25, f, n, from); else armTo('R', Pp, k, -0.25, f, n, hang); sync(); }
+        // the leaf: pressed flat on the page, lifted between her finger and thumb, then standing in the air a hand's width over her open palm
+        handFrame('R'); const palm = rdW.clone().addScaledVector(rdF, 0.062).addScaledVector(rdN, 0.02), flt = palm.clone().add(V3(0, 0.105 + 0.006 * Math.sin(T * 2.2), 0)).addScaledVector(V3(0, 0.05, 0.16), sm(3.9, 4.25, T));
+        const qPage = spq.copy(bkQ).multiply(spq2.setFromAxisAngle(V3(0, 0, 1), 0.5)).clone(), qUp = new THREE.Quaternion().setFromAxisAngle(UP, T * 1.5), lp = page.clone().lerp(tip.clone().addScaledVector(bn, -0.004), sm(1.45, 1.7, T)).lerp(flt, open), lq = qPage.slerp(qUp, sm(1.8, 2.7, T));
+        const gone = sm(4.02, 4.28, T); leafSet(lp, lq, fresh, lit, bsc * (1 - gone)); if (T > 4.02) SALVE_A.copy(flt); else SALVE_A.copy(flt);
+        if (lit > 0.02) { glow(lp, 0.26 * lit, FXC.gold, 0.55 * lit); glow(sp1.copy(lp).add(V3(0, -0.05, 0)), 0.16 * lit, FXC.pearl, 0.5 * lit); if (frnd() < 0.35 * lit) emit(palm.x + frs(0.03), palm.y + 0.02, palm.z + frs(0.03), frs(0.03), 0.10 + frnd() * 0.12, frs(0.03), 0.9, 0.016, mote(), 0, 0.6, -0.02); }
+        // warm light and motes rise from the open pages while the spell is worked
+        const pg = sm(2.1, 2.8, T) * (1 - sm(5.6, 6.2, T)); if (pg > 0.02) { const c = bookPt(0, 0, 0.03, sp2); glow(c, 0.34 * pg, FXC.gold, 0.22 * pg); if (frnd() < 0.5 * pg) { const q = bookPt(frs(0.11), frs(0.08), 0.02, sp3); emit(q.x, q.y, q.z, frs(0.02), 0.10 + frnd() * 0.14, frs(0.02), 1.1 + frnd() * 0.6, 0.014 + frnd() * 0.01, mote(), 0, 0.4, -0.03); } }
+        // the leaf breaks into a ribbon of motes and small silver leaves
+        if (T >= 4.02 && T - dt < 4.02) for (let i = 0; i < 26; i++) emit(flt.x + frs(0.03), flt.y + frs(0.04), flt.z + frs(0.03), frs(0.35), frs(0.35), frs(0.35) + 0.15, 0.5 + frnd() * 0.5, 0.022 + frnd() * 0.02, mote(), i % 3 === 0 ? 2 : i % 3 === 1 ? 1 : 0, 2.2, 0);
+        if (T > 4.15 && head < 1) { for (let sub = 0; sub < 2; sub++) { const u = cl(head - (1 - sub) * dt / 1.35 * 0.5, 0, 1), p = salvePath(u, sp1), tg = salvePath(Math.min(1, u + 0.01), sp2).sub(p).normalize(), sd = sp3.crossVectors(tg, UP).normalize(), w = 0.042 + 0.014 * Math.sin(u * 40), up2 = sp4.crossVectors(sd, tg);
+            RIB_SALVE.push(sp5.copy(p).addScaledVector(sd, w), V3().copy(p).addScaledVector(sd, -w), 1); RIB_SALVE2.push(sp5.copy(p).addScaledVector(up2, w), V3().copy(p).addScaledVector(up2, -w), 0.8);
+            for (let i = 0; i < 2; i++) emit(p.x + frs(0.03), p.y + frs(0.03), p.z + frs(0.03), frs(0.10), 0.04 + frnd() * 0.22 * (u > 0.36 ? 1 : 0.3), frs(0.10), 0.7 + frnd() * 0.8, 0.018 + frnd() * 0.016, mote(), 0, 1.0, -0.04);
+            if (frnd() < 0.55) emit(p.x + frs(0.04), p.y + frs(0.04), p.z + frs(0.04), frs(0.16), frs(0.10), frs(0.16), 0.9 + frnd() * 0.7, 0.045 + frnd() * 0.02, FXC.leaf, 2, 0.9, 0.12, frs(3)); if (frnd() < 0.3) emit(p.x, p.y, p.z, frs(0.2), frs(0.2), frs(0.2), 0.5, 0.03, FXC.gold, 1, 1.5, 0); }
+          glow(salvePath(head, sp1), 0.20, FXC.pearl, 0.9); glow(sp1, 0.42, FXC.green, 0.35); }
+        // where it has wound round them, soft light rises
+        const heal = pulse(T, 5.2, 5.6, 6.0, 6.7); if (heal > 0.02) { const AX = ALLY.position.x, AZ = ALLY.position.z; glow(sp1.set(AX, 1.05, AZ), 1.5 * heal, FXC.gold, 0.30 * heal); glow(sp1.set(AX, 1.25, AZ), 0.7 * heal, FXC.pearl, 0.35 * heal);
+          for (let i = 0; i < 3; i++) if (frnd() < heal) { const a = frnd() * TAU, r = 0.16 + frnd() * 0.16; emit(AX + r * Math.cos(a), 0.1 + frnd() * 1.4, AZ + r * Math.sin(a), 0, 0.28 + frnd() * 0.3, 0, 0.9 + frnd() * 0.6, 0.016 + frnd() * 0.014, mote(), frnd() < 0.15 ? 1 : 0, 0.3, -0.05); } }
+      };
+    }
     if (N === 'glasses') { const k = pulse(T, 0, 0.55, 1.5, 2.25), push = pulse(T, 0.62, 0.9, 1.05, 1.4);
       add('head', 0.09 * k - 0.07 * push, -0.04 * k, 0); add('neck', 0.03 * k, 0, 0); sync();
       fv.set(0.16, 0.93, -0.30).normalize(); carried('head', -0.003, 1.497 + 0.010 * push, 0.108, tgt).addScaledVector(fv, -0.150);
@@ -456,7 +550,9 @@
     for (const a of aims) aimHand(a[0], a[1], a[2], a[3]);
     for (const [S] of SIDES) wristFix(S);
     if (bkR > 0.001 && SK.book) { sync(); readHands(N, T); }
-    propVis(true, N === 'sickle' && T > 0.12 && T < 3.25);
+    else if (bkS > 0.001 && SK.book) { sync(); bookOnPalm(bkS, SPB.P, SPB.f, SPB.n); }
+    if (afterHands) { sync(); afterHands(); }       // what a spell does once her hands are where they will be drawn: fine finger work, and the lights that start from them
+    propVis(true, (N === 'sickle' && T > 0.12 && T < 3.25) || sickNow);
     sync(); softTick(dt);
     return { eyes, mouth, emo };
   }
@@ -471,12 +567,14 @@
       mouth = mouthNow;
       if (mv.name === 'pose') { SK.head.rotation.set(0.030 * Math.sin(clock * 4.4) + 0.015, 0.045 * Math.sin(clock * 2.3 + 1), 0.020 * Math.sin(clock * 1.3)); SK.neck.rotation.set(0, 0.025 * Math.sin(clock * 2.3 + 1), 0); }
     } else if (mv.name === 'pose' && (SK.head.rotation.x || SK.head.rotation.y)) { SK.head.rotation.set(0, 0, 0); SK.neck.rotation.set(0, 0, 0); }
+    if (mv.name === 'pose') { FXWANT.dummy = FXWANT.ally = false; LEAF.visible = false; WAVE.visible = false; } else if (!SPELLS.includes(mv.name)) { LEAF.visible = false; WAVE.visible = false; }
+    fxTick(dt, FXWANT.dummy, FXWANT.ally);
     if (feel) emo = feel; if (held) { if (held.eyes != null) eyes = held.eyes; if (held.mouth) mouth = held.mouth; }
     const key = eyes + '|' + mouth + '|' + emo; if (key !== facePainted) { paintFace(eyes, mouth, emo); facePainted = key; }
   }
   const talk = (on) => { talking = !!on; mouthAt = 0; return talking; };
   const setFace = (eyes, mouth) => { held = eyes == null && !mouth ? null : { eyes, mouth }; facePainted = ''; animate(0); };
   const setFeel = (name) => { feel = FEELS.includes(name) ? name : null; facePainted = ''; animate(0); return feel; };       // hold one of her emotions (or none)
-  return { root, skeleton, bones, SK, animate, pose, play, moves: MOVES, shots: SHOTS, settle: () => { sync(); softSettle(); root.updateMatrixWorld(true); }, meshes, spin: 0, time: 0, stanceProgress: 1, setStance() {}, talk, setFace, setFeel, feels: FEELS, get feel() { return feel; }, setBlink: (on) => { blinking = !!on; }, setProps: (on) => { showProps = !!on; if (mv.name === 'pose') propVis(false, false); }, get move() { return mv.name; },
+  return { root, skeleton, bones, SK, animate, pose, play, moves: MOVES, shots: SHOTS, settle: () => { sync(); softSettle(); root.updateMatrixWorld(true); }, meshes, spin: 0, time: 0, stanceProgress: 1, setStance() {}, talk, setFace, setFeel, feels: FEELS, spells: SPELLS, spellFx: { group: fxG, dummy: DUMMY, ally: ALLY, leaf: LEAF, parts: PT }, get feel() { return feel; }, setBlink: (on) => { blinking = !!on; }, setProps: (on) => { showProps = !!on; if (mv.name === 'pose') propVis(false, false); }, get move() { return mv.name; },
     debug: { SK, meshes, cloths: [], headPoint, headHalfW, JH, HC, FC, CHAINS, SOFT, COL, LEGCAP, LEGPAD, LEGS, HIP, SLV }, get triangles() { return triCount; } };
 }

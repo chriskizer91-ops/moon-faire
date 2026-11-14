@@ -4,7 +4,48 @@ Started November 13, 2026. Built the way the HD Jester was (`claude/HOW-TO-3d-wi
 the Ranger's stage-one recipe: this folder began as a copy of the Ranger's stage-one code (`claude/ranger-3d-model`, commit
 `1d4c9d6`), with the Jester's platform boot builder (`claude/jester-3d-model`, pass 20) in place of the Ranger's boots.
 
-## Where she stands: stage ten (November 13, 2026)
+## Where she stands: stage eleven (November 14, 2026)
+
+Her first two spells: Harvest Crescent (her plain attack) and Silverleaf Salve (her heal for one friend).
+
+- **Chris (November 14):** stage ten is "Quite good. Let's move on to the rest of her animations, like her spells."
+- **Her magic** follows the rules given with paintings H1 on (`references/prompts/io-3d-reference-prompts.md`): growing light in
+  soft gold with a fresh green edge and pearl-white where brightest, drifting as motes; sparks that are small four-pointed
+  stars; silverleaf. It never looks like fire. She casts toward +z; the page turns the camera to her side so that is to the right.
+- **`src/I98_fx.js`** (new; built before `I99_static.js`): everything a spell shows that is not her.
+  - `glowOnly`: every light is added without counting as solid, so the Flipbook look gives it no ink outline.
+  - Specks (`emit`, `glow`): one instanced mesh of up to 900 camera-facing specks: motes, four-pointed stars, small glowing
+    leaves. Sizes are in metres, so they shrink with her when the Flipbook look draws her small. `glow` is a light for one frame.
+  - Ribbons (`makeRibbon`): a strip laid between pairs of points that fades as it ages. The sickle's light is the strip its
+    blade really sweeps. The Salve's ribbon is two crossed strips along `salvePath`.
+  - Things: the training dummy (`DUMMY`, rocks on its post when struck), the grey friend (`ALLY`), the silverleaf (`LEAF`), the
+    flying crescent (`WAVE`). They appear only while a spell asks for them (`FXWANT`) and are children of her root, so the
+    Flipbook look inks them with her.
+- **In `src/I99_static.js`:**
+  - `readHands` was split into `bookOnPalm` (the open book laid on her left palm at any place) and `fingerTo` (her right
+    forefinger brought to a point, measured and corrected). Reading uses both; the spells use them too. `bkS` is the book held for
+    a spell; `SPB` says where.
+  - `afterHands`: a spell's hook that runs once her hands are where they will be drawn. Fine finger work and every light that
+    starts from a hand or a blade goes there, so lights never lag a frame behind her.
+  - `gripAim`: aims a hand closed on a handle by the way the handle points and the way her knuckles face.
+- **Harvest Crescent** (`crescent`, 4.7 s; H3, H4, I3). Hand to the moon pendant, gold light leaking out, reading face. The
+  sickle appears in a flash; left foot forward, knees bent, sickle up and back behind her right shoulder. One wide cut along
+  `CUT`, torso unwinding, sinking onto her front knee; the blade leaves a crescent of light that breaks into sparks. A crescent
+  of light flies to the dummy and bursts (0.32 s flight; the dummy rocks). Back to her chest; the sickle folds away in a flash.
+- **Silverleaf Salve** (`salve`, 7.2 s; H5, H6, I1). Open book on her left palm; her forefinger and thumb lift a pressed leaf
+  from the page; it turns from dry brown to silver-green; her palm opens under it and it stands in the air a hand's width above,
+  glowing, while motes rise from the pages. Her arm goes out, the leaf breaks into a ribbon of gold-green light and small leaves
+  that drops to her friend's feet and winds once round them to their shoulders, and soft light rises.
+- **Page:** stage eleven; a new row, Her spells. Picking one turns the camera to her side and pulls it back (`SPELL_VIEW`).
+  One offline file: `deliver/Io_3D_stage11.html` (3.2 MB). `deliver/Io_stage11_first_spells.jpg`.
+- **My additions, to tell Chris:** the crescent of light flying to the foe (the paintings show the light round her only), so the
+  attack reaches a foe who is not beside her. The sickle appears and goes in a flash; it does not unfold piece by piece.
+- Checked: stills of both spells from her side, from the front and close on her hands; the pass-through meter (legs at the
+  standing floor in both; book 0 in the Salve, and 147 points up to 6 mm in the cut, all under the book on her left palm); the
+  full page test before the last change of distances, and both spells on the phone-size page after it (no errors, the dummy
+  and the friend in frame). Not watched playing, not on a real phone, not looked at in the Flipbook look.
+
+## Stage ten (November 13, 2026)
 
 Her emotions (the faces in C10), and a slower, smoother hand when she reads.
 
@@ -590,9 +631,10 @@ They also show her whole look from many sides, with the robe: useful when the ro
 
 ## Next stages, in Chris's order (November 13)
 
-1. His eye on her feelings and on the slower reading hand (stage ten).
-2. **Her spells and attacks** (H1 to H18, I1 to I8, and round 4): the pendant becoming the sickle, the dagger drawn with
-   witchfire, the book floating with its pages turning.
+1. His eye on Harvest Crescent and Silverleaf Salve (stage eleven).
+2. **The rest of her spells:** Elderwood Guardian (H7 to H10, I4: the seed, the sapling, the fawn, the stag of living wood and
+   its charge; the stag is a creature to build), Moonflower Garden (H11, H12, I6), Rootbound Return (H13), Thornwake (H14, H15,
+   I7, I8: the dagger and witchfire), Bramble Cradle (H16); then being hit, falling and winning (H17, H18).
 3. Not wanted: more work on her boots; more detail on belt, pouch and necklace.
 4. Still open if he asks: the cloak nearer to M1; hair on top of her head; bringing her jog, squat, kneel and hover into line
    with the other witches' versions.

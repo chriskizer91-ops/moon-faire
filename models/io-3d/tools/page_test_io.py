@@ -9,7 +9,7 @@ with sync_playwright() as p:
     pg.set_default_timeout(150000)
     pg.on('console', lambda m: logs.append(m.type + ': ' + m.text[:300]) if m.type == 'error' else None)
     pg.on('pageerror', lambda e: logs.append('PAGEERR: ' + str(e)[:500]))
-    pg.goto('file:///home/claude/io/deliver/' + (sys.argv[1] if len(sys.argv) > 1 else 'Io_3D_stage10.html')); pg.wait_for_function('window.IO || !document.getElementById("err").hidden')
+    pg.goto('file:///home/claude/io/deliver/' + (sys.argv[1] if len(sys.argv) > 1 else 'Io_3D_stage11.html')); pg.wait_for_function('window.IO || !document.getElementById("err").hidden')
     pg.wait_for_timeout(3000)
     print('hud:', pg.inner_text('#hud'), '| err hidden:', pg.evaluate('document.getElementById("err").hidden'), '| scrollW', pg.evaluate('document.documentElement.scrollWidth'), 'clientW', pg.evaluate('document.documentElement.clientWidth'))
     print('buttons:', pg.evaluate('[...document.querySelectorAll(".chip")].map(b => b.textContent)'))
@@ -28,6 +28,9 @@ with sync_playwright() as p:
     pg.evaluate('document.querySelector("#faces").children[2].click()'); still('shut')
     print('faces painted:', pg.evaluate('Object.keys(IO.R.debug.JH ? {a:1} : {}).length'), '| talk on then held:', pg.evaluate('typeof IO.R.talk'))
     pg.evaluate('document.querySelector("#faces").children[0].click()')
+    sp = []
+    for i in range(2): pg.evaluate('document.querySelector("#spells").children[%d].click()' % i); pg.wait_for_timeout(2600); sp.append((pg.evaluate('IO.R.move'), pg.evaluate('IO.R.spellFx.parts.n'), pg.evaluate('IO.R.spellFx.dummy.visible || IO.R.spellFx.ally.visible'))); still('spell_%d' % i)
+    pg.evaluate('document.querySelector("#moves").children[1].click()'); pg.wait_for_timeout(600); print('spells (move, specks of light alive, target standing):', sp, '| back to:', pg.evaluate('IO.R.move'))
     fl = []
     for i in range(1, 7): pg.evaluate('document.querySelector("#feels").children[%d].click()' % i); pg.wait_for_timeout(700); fl.append(pg.evaluate('IO.R.feel')); still('feel_%d' % i)
     pg.evaluate('document.querySelector("#feels").children[0].click()'); print('feelings held in turn:', fl, '| after None:', pg.evaluate('IO.R.feel'))
