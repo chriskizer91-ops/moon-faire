@@ -1,0 +1,641 @@
+{
+ "story": [
+  "At dusk the four witches are at home in the fair square, due on stage that night, and every flame in the square leans the same way with no wind.",
+  "Wisps pass through the fair without attacking, all going east, and the Ranger is the first to see it.",
+  "At the mooring field the captain's twelve lamps tear off their hooks and fly east over the gate, and he will not fly his ship dark.",
+  "At the Last Lantern on the moor they win back the first lamps, and Io warms a beaten wisp until it drifts home: wisps are lost flames, not thieves.",
+  "A Shadow Wraith bars the road at the standing stones, and past it the Fox sees the call as threads pulling every flame on the moor toward the crag.",
+  "At the pool they rest by a fire that stayed and win the last lamps, and Io knows the fire on the crag cannot be healed and will call again tomorrow.",
+  "A hidden hollow below the stones, where nothing pulls, holds a healing amulet.",
+  "Back at the field the Fox sews the twelve flames to their posts with cold blue thread, and the captain flies the four to the dark beacon on the crag.",
+  "In deep night they climb the beacon stair, and only the Jester laughs.",
+  "In the lamp room the Jester draws the old fire's hunger onto herself and gives it the Curtain Call, and when the lights it took have gone home, one small new flame burns in the beacon and the twelve lamps answer it."
+ ],
+ "areas": {
+  "W1": {
+   "people": {
+    "old-lamp-seller": {
+     "doing": "sits on a stool behind the counter trimming wicks, glancing at her flames; beckons when the party comes near",
+     "says": [
+      "Evening, you four. Come and look. Every flame on my counter is leaning the same way.",
+      "There's no wind. I licked my finger twice to be sure.",
+      "Take this wick out to the lamplighter at the Last Lantern? It's for her dead post. She never gives up on that post."
+     ]
+    },
+    "ribbon-dyer": {
+     "doing": "stands stirring a dye pot, watching its steam lean toward the gate; greets with a bow, thinks before answering",
+     "says": [
+      "The one with the fox ears bought all my blue. She said she felt a lot of sewing coming on.",
+      "My steam goes straight up every night. Tonight it leans toward the gate."
+     ]
+    },
+    "fortune-teller": {
+     "doing": "stands in the doorway turning one card over and over; beckons",
+     "says": [
+      "One coin, one card. You travel with us and you've never once sat down.",
+      "A fire with nobody sitting by it. It's a bad card. It's always been a bad card."
+     ]
+    },
+    "ballad-singer": {
+     "doing": "stands on the rug singing among the leaning candles; stops and bows when spoken to",
+     "says": [
+      "You four are on after me. I'll keep the long one short.",
+      "The candles keep leaning. There's no wind.",
+      "The oldest song I know is about a light on the crag. It has no last verse. Nobody ever wrote one."
+     ]
+    }
+   },
+   "happens": [
+    {
+     "code": "W1-a",
+     "title": "A wisp passing through",
+     "what": "As the walking witch heads for the right-hand path, a single wisp drifts over the well on its way east, and the rug candles dip as it passes. The Jester steps into its way. This is the first set fight: one wisp, to teach turns. Jester: 'You're not even looking at me. Rude.' Once beaten, it shrinks and slips off between the tents, still going east.",
+     "kind": "fight",
+     "needs": "nothing new beyond the F2 backdrop"
+    },
+    {
+     "code": "W1-b",
+     "title": "The blue wagon",
+     "what": "The moon-painted wagon is the party's own and the first rest spot. They wake here after any loss at the fair.",
+     "kind": "rest",
+     "needs": "nothing new"
+    },
+    {
+     "code": "W1-c",
+     "title": "One coin, one card",
+     "what": "The Jester pays the coin. The fortune-teller turns a card that shows a fire with nobody by it. Jester: 'It says that for everyone.' Io: 'Then everyone should mind their fires.'",
+     "kind": "talk",
+     "witch": "Jester",
+     "needs": "nothing new"
+    },
+    {
+     "code": "W1-d",
+     "title": "A wick for the lamplighter",
+     "what": "The lamp-seller asks Io to carry a new wick to the lamplighter's dead post at the Last Lantern. The errand ends at W4.",
+     "kind": "errand",
+     "witch": "Io",
+     "needs": "nothing new (a yes/no flag)"
+    },
+    {
+     "code": "W1-e",
+     "title": "Every flame leans",
+     "what": "When the walking witch first crosses the ring, the rug candles and the lamp flames lean toward the gate, all the same way. Ranger: 'Every flame here leans right. The rug. The posts. There's no wind.' Fox: 'Maybe they've somewhere better to be.'",
+     "kind": "scene",
+     "witch": "Ranger",
+     "needs": "leaning flame overlays if wanted; the lines carry it without them"
+    }
+   ]
+  },
+  "W2": {
+   "people": {
+    "fair-baker": {
+     "doing": "stands at the oven door, frowning at the fire pulling up the flue; waves a floury hand, laughs easily",
+     "says": [
+      "Buns are just out. Mind, they're hot.",
+      "My oven's drawing like it wants to leave. It's never done that before.",
+      "If they come for my oven they'll get the peel across the nose. Do they have noses?"
+     ]
+    },
+    "old-night-watchman": {
+     "doing": "stands at a corner post of the ring watching its four lamps; nods, points at the ring",
+     "says": [
+      "Shutters first, then lamps. Tonight the lamps keep going out behind me.",
+      "They don't come for you. They stop at the ring lamps on their way somewhere. You're just standing in it.",
+      "Knocked flat? You'll wake up by your wagon. No shame in it. Go again."
+     ]
+    },
+    "pie-seller": {
+     "doing": "stands behind the cart; waves, points at the pies, then at the gate",
+     "says": [
+      "Hot pies! Mutton, and the other one's mutton too.",
+      "Something cold went past my cart and my lamp went out. Like a draught with nobody in it.",
+      "That captain's had nothing since noon. Take him one, he's good for the coin."
+     ]
+    }
+   },
+   "happens": [
+    {
+     "code": "W2-a",
+     "title": "Wisps at the ring lamps",
+     "what": "Two wisps have stopped at the ring lamps on their way east, drinking the warmth. Passing the ring mouth starts the second set fight. Fox: 'Two! One each and two to share.'",
+     "kind": "fight",
+     "needs": "nothing new beyond the F2 backdrop"
+    },
+    {
+     "code": "W2-b",
+     "title": "Practice bouts in the ring",
+     "what": "After W2-a the watchman waves the party into the ring whenever they like. The ring lamps are the brightest thing on the row, so stray wisps keep stopping there. Bouts repeat, give no lamps and cost nothing to lose. After the Last Lantern, wisps beaten here drift home as they do on the moor.",
+     "kind": "fight",
+     "needs": "nothing new"
+    },
+    {
+     "code": "W2-c",
+     "title": "A pie for the captain",
+     "what": "The pie-seller sends a pie to the mooring field, and the captain's thanks ends the errand. Ranger: 'I'm carrying it. You three would eat it.'",
+     "kind": "errand",
+     "witch": "Ranger",
+     "needs": "nothing new (a flag)"
+    },
+    {
+     "code": "W2-d",
+     "title": "The watchman's advice",
+     "what": "Talking to the watchman after a first loss or a first bout gives his line about waking by the wagon. A person tells the party the rule, not a screen.",
+     "kind": "talk",
+     "needs": "nothing new"
+    },
+    {
+     "code": "W2-e",
+     "title": "Not after us",
+     "what": "After W2-a, two more wisps pass high over the row without stopping. Ranger: 'Those two didn't even look at us. Nothing here is attacking. It's all going one way. East.' Jester: 'Shame. I had a whole bit ready.'",
+     "kind": "scene",
+     "witch": "Ranger",
+     "needs": "two wisps that can fly a path across the sky band"
+    }
+   ]
+  },
+  "W3": {
+   "people": {
+    "gate-keeper": {
+     "doing": "stands with arms folded watching the moor road; points east, looks cross",
+     "says": [
+      "Out is free. Back in after dark, I look at your face first.",
+      "Twelve lights went over my gate and not one paid. I counted.",
+      "They went up the road toward the crag. Nobody goes up that road at night. Not even lights, till tonight."
+     ]
+    },
+    "chestnut-roaster": {
+     "doing": "stands turning chestnuts over the brazier; beckons and laughs",
+     "says": [
+      "Here, a handful for the road. No, put your purse away.",
+      "Went straight over my head, the lot of them. Nearly had my hat.",
+      "My coals went grey as they passed. Then they came back. Like they'd been asked and said no."
+     ]
+    },
+    "the captain": {
+     "doing": "walks from post to post looking up at the empty brackets on the hull; turns to the party when spoken to",
+     "says": [
+      "Twelve lamps. They tore off their hooks and went east like geese.",
+      "I don't take her up dark. Bring my lamps home and I'll fly you wherever you point.",
+      "They all went one way. Toward the old beacon on the crag. That fire's been out longer than I've been flying."
+     ]
+    }
+   },
+   "happens": [
+    {
+     "code": "W3-a",
+     "title": "Twelve lamps go",
+     "what": "On first entering, the party sees the captain's twelve lamps tear off their hull brackets with nobody holding them and stream east over the gate, wisps going with them. The captain runs to the ladder too late. Ranger: 'Twelve. Off the hooks, over the gate, east. Nobody's carrying them. They're being pulled.'",
+     "kind": "scene",
+     "witch": "Ranger",
+     "needs": "the captain's model; twelve lamp props that pull off the hull and fly right (the painted brackets stay empty after)"
+    },
+    {
+     "code": "W3-b",
+     "title": "Wisps at the brazier",
+     "what": "Three wisps hang over the chestnut-roaster's brazier, warming themselves before they follow. This is the third set fight. Io: 'Keep them off the brazier.' Jester: 'Keep them on me.'",
+     "kind": "fight",
+     "needs": "nothing new beyond the F2 backdrop"
+    },
+    {
+     "code": "W3-c",
+     "title": "Only tonight",
+     "what": "After W3-b the captain says his lamps went east over the moor and he will not fly dark. Ranger: 'The fair stands here one night. Tomorrow it's on the road. If anything gets done, it's done tonight.' Nothing bars the gate.",
+     "kind": "talk",
+     "witch": "Ranger",
+     "needs": "the captain's model and picture card"
+    },
+    {
+     "code": "W3-d",
+     "title": "The lamps come home",
+     "what": "Each time the party comes back with lamps, the captain carries them up the ladder and stands them on their posts on deck, and he has a new line. The hull brackets stay empty, because they are only for mooring.",
+     "kind": "scene",
+     "needs": "a warm glow over the rail that grows with each lamp, or only the captain's count; the maker's choice"
+    },
+    {
+     "code": "W3-e",
+     "title": "Twelve stitches",
+     "what": "When the twelfth lamp is home the Fox says they will only go again. Then she sews each flame to its post: twelve quick stitches of cold blue thread run up over the rail, and she rings her bell once. Fox: 'There. Now they're not going anywhere I haven't said.' The captain waves them up the ladder, and talking to him flies the party to the landing ledge. This is the gate to zone 3.",
+     "kind": "gate",
+     "witch": "Fox",
+     "needs": "a blue thread effect, a bell sound, and a short flight cut or a fade"
+    }
+   ],
+   "fights": "One set fight (three wisps at the chestnut-roaster's brazier); no walking fights."
+  },
+  "W4": {
+   "people": {
+    "old-lamplighter": {
+     "doing": "stands with one hand on the lit post, glancing at the dead one; waves, points out into the heather. She is met beyond the fair because this lantern is the end of her nightly round and she will not leave it to the wisps.",
+     "says": [
+      "This is the last lamp on my round. I'm not walking off and leaving it to them.",
+      "That other post hasn't held a flame in years. I light it every night. It's gone before I've put my pole down.",
+      "There are lights out in the heather I never lit. Three, by my count. They're not moving."
+     ]
+    }
+   },
+   "happens": [
+    {
+     "code": "W4-a",
+     "title": "The lamp by the lantern",
+     "what": "A ship's lamp lies in the heather near the lit post, with cold wisps clinging to its warmth. This is the set fight. Winning lets the wisps go and brings back the first lamp.",
+     "kind": "fight",
+     "needs": "a fallen ship's lamp prop"
+    },
+    {
+     "code": "W4-b",
+     "title": "Two more in the heather",
+     "what": "Walking fights along the track. Each of the first two wins after the set fight finds a lamp with wisps clinging to it, making this area's three.",
+     "kind": "fight",
+     "needs": "a short 'lamp home' line and sound"
+    },
+    {
+     "code": "W4-c",
+     "title": "The wick delivered",
+     "what": "Io hands over the lamp-seller's wick. The lamplighter fits it to the dead post and lights it. The flame leans right and goes out. Lamplighter: 'Tell her it's the right size for once. It's never the wick.' Io: 'Then it isn't the post either.'",
+     "kind": "errand",
+     "witch": "Io",
+     "needs": "a flame that lights on the dead post and goes out (optional; the words carry it)"
+    },
+    {
+     "code": "W4-e",
+     "title": "Warm in her hands",
+     "what": "After the set fight Io kneels and holds a beaten wisp in her cupped hands until it turns warm. It lifts and drifts back toward the fair's glow on the left. Io: 'It wasn't stealing. It was cold. It's a flame that got lost on the way.' Fox: 'So we're not fighting them. We're walking them home.' From now on every beaten wisp drifts home the same way.",
+     "kind": "scene",
+     "witch": "Io",
+     "needs": "a wisp that warms in colour and drifts off toward the fair"
+    },
+    {
+     "code": "W4-f",
+     "title": "Glass in the heather",
+     "what": "By the thorn, the Ranger spots a shimmer and picks up a piece of lantern glass. Ranger: 'Glass. No post for a long way. It's cold as the pool.'",
+     "kind": "find",
+     "witch": "Ranger",
+     "needs": "a shimmer to walk to, and the item card"
+    }
+   ]
+  },
+  "W5": {
+   "people": {},
+   "happens": [
+    {
+     "code": "W5-a",
+     "title": "A word before the stones",
+     "what": "On arriving the party sees a shape standing in the road between the two tallest stones, with a ship's lamp at its feet, turned toward the crag. Io: 'That's no wisp. It doesn't even want to be warm any more.' Jester: 'No. That one's mine.'",
+     "kind": "scene",
+     "witch": "Io",
+     "needs": "nothing new beyond the fallen lamp prop"
+    },
+    {
+     "code": "W5-b",
+     "title": "The wraith on the road",
+     "what": "A Shadow Wraith stands between the two tallest stones, keeping a lamp for the tower. The road beyond stays shut until it is beaten. This is the set fight. Winning frees the lamp and opens the road.",
+     "kind": "fight",
+     "needs": "the F3 backdrop"
+    },
+    {
+     "code": "W5-c",
+     "title": "Lamps among the stones",
+     "what": "Walking fights round the ring against wisps clinging to fallen lamps, later with a Shadow Wraith among them. Three wins bring back this area's other three lamps.",
+     "kind": "fight",
+     "needs": "nothing new"
+    },
+    {
+     "code": "W5-d",
+     "title": "The gap behind the fallen stone",
+     "what": "A narrow way down through the gorse behind the flat fallen stone leads to the hollow. Ranger: 'Something shines down there. Behind the flat stone.'",
+     "kind": "scene",
+     "witch": "Ranger",
+     "needs": "a small glow at the gap"
+    },
+    {
+     "code": "W5-e",
+     "title": "The cut thread",
+     "what": "Between the stones the Fox stops and stares at nothing. She sees the call as thread: one from every flame on the moor, pulled tight toward the crag. One has caught on the tallest stone. She snips it with her shears and keeps the cut end. Fox: 'Something is tacking the whole moor to that hill.' Ranger: 'Can you stop it?' Fox: 'Not the pull. One thread at a time, though. I'm very quick.'",
+     "kind": "find",
+     "witch": "Fox",
+     "needs": "a shimmer to walk to and the item card; faint threads toward the crag if wanted"
+    }
+   ]
+  },
+  "W6": {
+   "people": {
+    "farm-lad": {
+     "doing": "sits on the log feeding the fire a stick at a time; jumps up and waves. He is met beyond the fair because he came out by day to cut rushes for the ponies' bedding and would not walk back past the wraith on the road.",
+     "says": [
+      "You came past the stones? Past that thing? I've been sat here since it sat there.",
+      "My lantern got up and left me. Went off up the hill on its own. So I kept this fire fed, and I never took my eyes off it.",
+      "There's a dip back by the stones, behind the one that's fallen. Something shines down there. I didn't go and look."
+     ]
+    }
+   },
+   "happens": [
+    {
+     "code": "W6-a",
+     "title": "The camp by the pool",
+     "what": "The farm lad's fire and the log are the rest spot. The party rests here and wakes here after a loss on the moor. Fox: 'A fire that stayed. Lovely.'",
+     "kind": "rest",
+     "needs": "nothing new"
+    },
+    {
+     "code": "W6-b",
+     "title": "Under the broken arch",
+     "what": "A Shadow Wraith and two wisps keep a lamp under the arch on the far bank for the tower. This is the set fight. Winning lets the wisps go and brings back a lamp.",
+     "kind": "fight",
+     "needs": "nothing new"
+    },
+    {
+     "code": "W6-c",
+     "title": "The last lamps",
+     "what": "Walking fights round the bank. Four wins bring back this area's other four lamps.",
+     "kind": "fight",
+     "needs": "nothing new"
+    },
+    {
+     "code": "W6-e",
+     "title": "Twelve in hand",
+     "what": "When the twelfth lamp is won, most likely here, Io looks toward the crag. Io: 'I can warm a wisp and send it home. I can't heal what's calling them. Nothing's wrong with it. It's a fire nobody minds.' Ranger: 'That's twelve. Back to the ship.' Io: 'And it calls again tomorrow. And every night after.' Jester: 'Then somebody had better go and mind it.'",
+     "kind": "scene",
+     "witch": "Io",
+     "needs": "nothing new"
+    },
+    {
+     "code": "W6-f",
+     "title": "A stone from the fire ring",
+     "what": "With the lad's leave, Io takes a stone from the edge of his fire ring. It glows at the heart like a coal. Io: 'Now that's a fire someone sat with.'",
+     "kind": "find",
+     "witch": "Io",
+     "needs": "a shimmer at the fire ring, and the item card"
+    }
+   ]
+  },
+  "W7": {
+   "people": {},
+   "happens": [
+    {
+     "code": "W7-a",
+     "title": "Down out of the pull",
+     "what": "On entering, the Fox stops and listens. Fox: 'Oh, I like it down here. No threads. Nothing pulling. Nobody tell anybody.'",
+     "kind": "scene",
+     "witch": "Fox",
+     "needs": "nothing new"
+    },
+    {
+     "code": "W7-b",
+     "title": "The amulet on the flat stone",
+     "what": "The healing amulet lies on the flat stone, giving off the shine seen from above. Io: 'It's warm. Not fire warm. Hand warm. I'll carry it.'",
+     "kind": "find",
+     "witch": "Io",
+     "needs": "a shimmer on the stone, and the item card"
+    },
+    {
+     "code": "W7-c",
+     "title": "Wisps follow them down",
+     "what": "Wisps drift down after the party's warmth. Walking fights here bring no lamps, only practice, and the beaten wisps drift home.",
+     "kind": "fight",
+     "needs": "nothing new"
+    }
+   ]
+  },
+  "W8": {
+   "people": {
+    "the captain": {
+     "doing": "stands at the ladder with one hand on the rail, watching the twelve flames on deck lean toward the tower; turns to the party when spoken to",
+     "says": [
+      "Your stitches hold. The flames lean up the hill all the same. I can feel it through the deck.",
+      "I'll stand her off the crag while you climb, and come back in when you're down. Look out to sea if you lose heart.",
+      "Rest aboard whenever you like. I'm going nowhere without you."
+     ]
+    }
+   },
+   "happens": [
+    {
+     "code": "W8-a",
+     "title": "Setting down on the ledge",
+     "what": "The ship comes alongside and the four step off into the dark. The twelve flames on deck lean toward the tower and hold on their blue stitches. Io: 'No light at the top. None at all.' Jester: 'Good. Light was never my side of the act.' Fox: 'Stand away from the deck lamps when she starts. They hate her.'",
+     "kind": "scene",
+     "witch": "Jester",
+     "needs": "the captain's model; blue thread glints on the deck lamps if wanted"
+    },
+    {
+     "code": "W8-b",
+     "title": "Rest aboard",
+     "what": "A rest spot at the ladder. A loss on the stair or in the lamp room wakes the party here, not back at the pool.",
+     "kind": "rest",
+     "needs": "nothing new"
+    },
+    {
+     "code": "W8-c",
+     "title": "Back to the fair",
+     "what": "Talking to the captain flies the party back to the mooring field, for the ring or anything left undone.",
+     "kind": "talk",
+     "needs": "nothing new beyond the flight cut or fade"
+    },
+    {
+     "code": "W8-d",
+     "title": "The first step",
+     "what": "At the foot of the stair the Ranger says: 'I'll count the steps.' Fox: 'Count them on the way down. It's more cheerful.'",
+     "kind": "scene",
+     "witch": "Ranger",
+     "needs": "nothing new"
+    }
+   ]
+  },
+  "W9": {
+   "people": {},
+   "happens": [
+    {
+     "code": "W9-a",
+     "title": "Wraiths on the stair",
+     "what": "Walking fights on the steps and landings against Shadow Wraiths with wisps, all of them carrying light up to the tower.",
+     "kind": "fight",
+     "needs": "the F4 backdrop"
+    },
+    {
+     "code": "W9-b",
+     "title": "The charm round the side",
+     "what": "Round the side of the tower, the Ranger finds a charm hanging from an empty lamp bracket. Ranger: 'Somebody climbed all this way to hang that up.' She hands it to the Jester. Ranger: 'Here. You're the one they hit.'",
+     "kind": "find",
+     "witch": "Ranger",
+     "needs": "a shimmer on the bracket, and the item card"
+    },
+    {
+     "code": "W9-c",
+     "title": "The door at the top",
+     "what": "The lamp-room door stays shut until the party is level 5. Before then the Ranger says: 'Not yet. We're not ready.' Jester: 'It'll wait. Waiting is the one thing it's good at.'",
+     "kind": "gate",
+     "witch": "Jester",
+     "needs": "nothing new"
+    },
+    {
+     "code": "W9-d",
+     "title": "The only one laughing",
+     "what": "On the top landing the ship hangs far off in the sky, twelve small lights. Io: 'He kept them lit.' The Jester laughs. Ranger: 'What's funny?' Jester: 'It's hungry for ever. I'm for ever. It's like meeting a bad copy of yourself at a party.' Then, quieter: 'Poor thing. Nobody ever came to end it.'",
+     "kind": "scene",
+     "witch": "Jester",
+     "needs": "nothing new"
+    }
+   ]
+  },
+  "F5": {
+   "people": {},
+   "happens": [
+    {
+     "code": "F5-a",
+     "title": "A word at the door",
+     "what": "Before the fight the Jester says: 'When it pulls, let it pull on me. Not on you. Not on the ship.' Io: 'It'll pour everything it has into you.' Jester: 'Good. I've got room. I've got all the room there is.' Fox: 'Show-off.'",
+     "kind": "scene",
+     "witch": "Jester",
+     "needs": "nothing new"
+    },
+    {
+     "code": "F5-b",
+     "title": "The old fire",
+     "what": "The last set fight: the great wraith, which is the old fire itself, wearing every light it has pulled in, with flames in its ribs and lanterns on its chain. Two Shadow Wraiths and two wisps fight beside it. The Jester's taunt works as it always does; in the story, it is her calling the hunger onto herself. Losing wakes the party aboard the ship.",
+     "kind": "fight",
+     "needs": "the F5 backdrop"
+    },
+    {
+     "code": "F5-c",
+     "title": "Curtain Call",
+     "what": "However the fight is won, the scene after it is the Jester's. Jester: 'Curtain call.' Every lamp gutters, curtains of night close across the room, and the old fire gets the ending it never had. When the curtains part, the lights it took fall as star dust and go home every way at once, over the sea and the moor. One of them goes back to the dead post at the Last Lantern. In the cradle one small ordinary flame is left burning. Io: 'That one's new. It'll want minding.' Jester: 'Then it'll get some.'",
+     "kind": "scene",
+     "witch": "Jester",
+     "needs": "the Curtain Call ending effect"
+    },
+    {
+     "code": "F5-d",
+     "title": "Thirteen",
+     "what": "The demo's last moment. Back on the landing, a small warm light shows at the top of the tower, and far off the ship's twelve lamps brighten to answer it. Ranger: 'Thirteen lights. I counted.' Fox: 'Race you down.' Ranger: 'No.'",
+     "kind": "scene",
+     "witch": "Ranger",
+     "needs": "a glow above the tower door, the far ship's lamps brightening, and an end card or fade"
+    }
+   ]
+  }
+ },
+ "captain": {
+  "W3": [
+   "Twelve lamps. They tore off their hooks and went east like geese.",
+   "I don't take her up dark. Bring my lamps home and I'll fly you wherever you point.",
+   "They all went one way. Toward the old beacon on the crag. That fire's been out longer than I've been flying.",
+   "Mutton. Good woman.",
+   "Up the ladder they go, back on their posts. Keep them coming.",
+   "Blue thread on my lamps. Fine. Whatever holds them. Up you come."
+  ],
+  "W8": [
+   "This ledge is as near as I can lay her. The rest is stairs.",
+   "Your stitches hold. The flames lean up the hill all the same. I can feel it through the deck.",
+   "I'll stand her off the crag while you climb, and come back in when you're down. Look out to sea if you lose heart.",
+   "Rest aboard whenever you like. I'm going nowhere without you."
+  ]
+ },
+ "finds": [
+  {
+   "code": "W4-f",
+   "area": "W4",
+   "name": "Cold lantern glass",
+   "card": "A lantern's glass, found in the heather a long way from any post. The flame behind it answered the call one night and pulled the glass halfway after it. It is still cold to hold.",
+   "does": "All four have 5% more MP."
+  },
+  {
+   "code": "W5-e",
+   "area": "W5",
+   "name": "The cut thread",
+   "card": "One thread of the call, snipped by the Fox where it caught on a standing stone. Every flame on the moor has one, pulled tight toward the crag. Even cut, it still twitches that way.",
+   "does": "The Fox's spells cost 5% less MP."
+  },
+  {
+   "code": "W6-f",
+   "area": "W6",
+   "name": "The warm stone",
+   "card": "A stone from the edge of the farm lad's fire ring. That fire had someone feeding it all night, and it never once tried to leave. The stone keeps its warmth for hours.",
+   "does": "All four have 5% more HP."
+  },
+  {
+   "code": "W7-b",
+   "area": "W7",
+   "name": "The hollow amulet",
+   "card": "It lay on the flat stone in the hollow, where nothing on the moor pulls. Nobody knows who left it there. It is warm the way a hand is warm, not the way a fire is.",
+   "does": "All healing is 5% stronger."
+  },
+  {
+   "code": "W9-b",
+   "area": "W9",
+   "name": "The keeper's charm",
+   "card": "A small iron charm, hung from an empty lamp bracket on the side of the tower. Keepers once hung one on every bracket they trimmed, so the flame would know someone was coming back. This is the last one, and nobody came back.",
+   "does": "The Jester takes 5% less damage."
+  }
+ ],
+ "needs": [
+  {
+   "what": "The captain's 3D model and picture card",
+   "why": "He speaks in two areas and opens the way to zone 3.",
+   "for": "W3, W8"
+  },
+  {
+   "what": "A ship's lamp prop, flying and fallen, with a short 'lamp home' sound",
+   "why": "Twelve lamps tear off the hull and fly east, then lie on the moor with wisps clinging to them until they are won back.",
+   "for": "W3, W4, W5, W6"
+  },
+  {
+   "what": "A beaten wisp that warms in colour and drifts home",
+   "why": "This is the heart of Io's act: beating a wisp lets it go.",
+   "for": "W2, W4, W5, W6, W7"
+  },
+  {
+   "what": "Cold blue thread and a single bell ring",
+   "why": "The Fox sews the twelve flames down so the ship can fly. Threads at the stones and glints on deck are optional.",
+   "for": "W3, W5, W8"
+  },
+  {
+   "what": "The Curtain Call ending: curtains of night closing and parting, star dust going every way, one small flame in the cradle, then a glow above the tower door and the far ship's lamps brightening",
+   "why": "The end of the story is seen, not told.",
+   "for": "F5, W9"
+  },
+  {
+   "what": "One item card screen and a shimmer to walk to for each find (no item models)",
+   "why": "Chris's finds are shown as cards with lore and one measurable effect.",
+   "for": "W4, W5, W6, W7, W9"
+  },
+  {
+   "what": "Leaning flame overlays (optional)",
+   "why": "The first sign of the call is every flame leaning one way; the lines carry it if the painted flames stay still.",
+   "for": "W1, W2, W3"
+  },
+  {
+   "what": "A short sung tune for the ballad-singer",
+   "why": "She sings on the rug until spoken to.",
+   "for": "W1"
+  }
+ ],
+ "questions": [
+  "After the end, can the player still walk the map? If so, the dead post at the Last Lantern could show its new flame, and the folk could each have a last line. Or does the demo stop at the end card?",
+  "The W3 painting shows empty brackets on the hull, and the W8 painting shows the lamps on posts on deck. I wrote that the lamps hang on the hull when moored and stand on deck posts in flight, so the hull brackets stay empty all evening. Is that right, or should the hull brackets light up as the lamps come home?",
+  "The four are a troupe, so I had the ballad-singer say they are on after her, and their show never happens except as the Curtain Call. Do you want that, or should their stage stay off-screen?"
+ ],
+ "invented": [
+  "The four are due to perform at the fair tonight, after the ballad-singer.",
+  "The Fox bought all the dyer's blue thread this evening.",
+  "The fortune-teller has a card showing a fire with nobody by it.",
+  "There is an old song about a light on the crag that has no last verse.",
+  "The baker's oven draws up the flue tonight as if it wants to leave.",
+  "The chestnut-roaster's coals go grey as the lamps pass, then come back.",
+  "Wisps beaten at the fair before Io warms one just slip away east; after that, every beaten wisp drifts home.",
+  "The ring lamps are the brightest thing on the row, so stray wisps stop there.",
+  "The ship's lamps hang on hull brackets when moored and stand on deck posts in flight.",
+  "People think the beacon fire is simply out; the captain says it has been out longer than he has flown.",
+  "The dead post at the Last Lantern has held no flame for years, and the lamplighter lights it every night anyway.",
+  "A flame that answers the call can drag its lantern glass part of the way.",
+  "Shadow Wraiths keep fallen lamps for the tower, and a beaten one leaves its lamp behind.",
+  "The call does not reach the hollow; nothing pulls there.",
+  "The amulet in the hollow is warm without fire, and nobody knows who left it.",
+  "The farm lad's own lantern left him on the moor, and the fire he fed all night never tried to leave.",
+  "The beacon once had keepers, who hung an iron charm on each bracket they trimmed.",
+  "The captain stands his ship off the crag while the four climb, and comes back in to the ledge when they return."
+ ],
+ "_made": {
+  "by": "claude-opus-5-5@high",
+  "cost": 1.044011,
+  "seconds": 453.8
+ }
+}

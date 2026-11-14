@@ -308,6 +308,17 @@ Same page, republished: https://claude.ai/artifact/Ju2Mo1hEK5jyA3pScXkYXz.
 - The painting is seen from a little to the south of straight above, which suits it; pins are placed on each place's ground, not its rooftop.
 - Not done: the game has no map screen yet. The pins and names are pictures for now.
 
+## The story chosen: "The fire that would not end" (November 13, midnight) — Chris's to overrule
+
+Chris: "I want you to think about the witches and choose." Same page, republished: https://claude.ai/artifact/Ju2Mo1hEK5jyA3pScXkYXz.
+
+- `world/story-chosen.json`: the choice, made in the session. The dead beacon's fire never died; it went cold and hungry and calls every flame. Wisps are flames that answered and went cold; a Shadow Wraith is a wisp that has forgotten it was a flame; the great wraith is the old fire itself. Four acts in the order the evening darkens, one per witch and per size of power: **the Ranger, the moment** (the fair at dusk: she sees it happen); **Io, nature** (the moor: she warms a beaten wisp and it goes home, and finds the one thing she cannot heal); **the Fox, chaos** (the stones: she sees the call as thread and sews the lamps' flames down so the ship can fly); **the Jester, infinity** (the crag: she draws the hunger onto herself and her Curtain Call gives the fire its ending). The count stays twelve lamps, so no painting changes. Ending: the taken lights go home as star dust and one small new flame is left in the beacon.
+- Why: the Jester's power is the night sky, and lamps gutter when she casts (`claude/jester-game-model.md`), so a fire that hoards light is the story where her power is the answer; her taunt is the story too. The four scales Chris gave (the moment, nature, chaos, infinity) become the acts.
+- `world/make_story_rewrite.py` with `world/STORY-REWRITE-KIT.md`: Opus 5.5 (high effort, through the key, $1.04) rewrote what carries story in `world/world.json`: the evening's ten beats, every person's lines, the things that can happen (45 now; 26 belong to a witch and each area has at least one outside a fight), the captain's lines, what is still needed, and three questions. Its raw answer is `world/story-rewrite.json`; `--merge-only` re-merges it. Areas, looks, ways out, people's places, lamp counts, rest spots and gates did not change. The earlier map is in git (commit 3aad562).
+- **Finds** (`world.json` `finds`): five item cards with lore and one measurable effect each (5% more MP, the Fox's spells 5% cheaper, 5% more HP, healing 5% stronger, the Jester takes 5% less damage), as Chris asked for: a shimmer to walk to and a card, no item model.
+- `world.json` `invented` lists every new fact the rewrite made up. What wisps and wraiths are is a stand-in until Chris says.
+- Not done: nothing is walkable or playable from this yet. The numbers on the finds are not in the combat rules (`lore/combat-balance.md` is unchanged).
+
 ## Next
 
 Step 5, and the two-person fair-folk test if Chris wants it: the remaining twelve prompts (with the lane lesson built in), every scene traced, the

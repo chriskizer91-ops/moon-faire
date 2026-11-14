@@ -1,0 +1,37 @@
+{
+ "by": "Claude Fable 5.2, in the session, at Chris's request on November 13 (\"I want you to think about the witches and choose\"). Chris's to overrule, in whole or in part.",
+ "title": "The fire that would not end",
+ "about": "An ending that never happened, and four witches who are four sizes of answer to it: the moment, nature, chaos and infinity. It is one evening, told as a show in four acts that ends in a curtain call.",
+ "premise": [
+  "Long ago the airship beacon on the crag was left untended. Its fire did not die. It went cold and hungry, and it has been calling every flame within reach ever since.",
+  "A flame that answers the call goes cold on the way. That is what a wisp is: a small light that left its lamp and never arrived. It is sad, not wicked, but it puts out what it touches.",
+  "A Shadow Wraith is a wisp that has been cold so long it has forgotten it was a flame. It no longer answers the call. It serves it, and takes light for the tower.",
+  "The great wraith in the tower is the old fire itself, wearing every light it has ever pulled in: the flames in its ribs, the lanterns on its chain.",
+  "Tonight the Moon Faire, the brightest thing this moor will see in a lifetime, has come within reach of the call."
+ ],
+ "acts": [
+  {"witch": "The Ranger", "scale": "The moment", "where": "The fair at dusk (the fair square, the stall row, the mooring field)",
+   "beat": "She is the one who sees it happen. The candles lean with no wind. The wisps are not attacking, they are passing through, all going the same way. The captain's twelve lamps tear off their hooks and go east. She names what is in front of them, now, while the others are still guessing. She is also the one who says what this night is: the only night this fair will ever stand here."},
+  {"witch": "Io", "scale": "Nature", "where": "The open moor at night (the Last Lantern, the camp by the pool)",
+   "beat": "She finds out what a wisp is. After the first win she holds the beaten wisp in her hands until it is warm, and it lifts and drifts home toward the fair's glow. Healing is not mending here. It is giving a thing back to its nature. She also finds the limit of her power: the fire in the tower cannot be healed, because nothing is wrong with it. It is a fire with no keeper, doing what fire does."},
+  {"witch": "The Fox", "scale": "Chaos", "where": "The standing stones and the hollow, then the mooring field again",
+   "beat": "She sees the call as thread. Every flame on the moor has a stitch pulling it toward the crag. She cannot stop the pull, but she can cut one thread, or sew one down. When the twelfth lamp is home she sews each lamp's flame down with cold blue thread, twelve quick stitches and a ring of her bell, and that is why the captain can fly them. She is the one who shows that the way things are is not the only way they can be."},
+  {"witch": "The Jester", "scale": "Infinity: life and death", "where": "The crag in deep night (the landing ledge, the beacon stair, the lamp room)",
+   "beat": "The fire's hunger has no end, which makes it a small, sad copy of what she is. On the stair she is the only one laughing. In the lamp room she calls the hunger to herself, so that it pulls on her and not on every lamp for miles, and it pours everything it has into her. Then the Curtain Call: every lamp gutters, curtains of night close across the room, and the fire gets the ending it never had."}
+ ],
+ "count": "Twelve lamps, as the paintings show. Each lamp lies on the moor with cold wisps clinging to its warmth. Win the fight, the wisps are let go and drift home, and the lamp comes back: three at the Last Lantern, four at the stones, five at the pool. Zone 3 opens when the twelfth is home and the Fox has sewn the flames down.",
+ "why_go": "Twelve lamps home changes nothing at the tower. The call will pull again tomorrow night, at the fair's candles and the captain's lamps, and a fair that follows the moon cannot outrun it.",
+ "ending": "When the curtains of night part, the lights the fire had taken fall as star dust and go home across the sea and the moor, every way at once. One goes back to the dead post at the Last Lantern. In the cradle, where the hunger was, one small ordinary flame is left burning: an end and a beginning in the same place. The beacon shows a light again, small and warm, and the twelve lamps on the airship answer it.",
+ "answers": [
+  ["Are the wisps villains, or sad lights that can be set free?", "Sad lights that can be set free. Beating one lets it go."],
+  ["Does the beacon burn at the end, or stay dark?", "It burns again, but small and new. The old fire ends. No painting is redone: the stair is climbed while it is still dark."],
+  ["Does the demo show crystal power at work?", "No. It stays in the background, for you to tell when you are ready."],
+  ["Is it the captain's problem, or something that reaches the four?", "It reaches the four. Each act belongs to one witch, and only the Jester can end it."],
+  ["Does it have to be lamps?", "The count stays twelve lamps, because your paintings are built for it. The story under them is no longer theft."]
+ ],
+ "leans_on": [
+  "What wisps and wraiths are in this world. This story says: flames that went cold. That is a stand-in until you say.",
+  "Where the four's power comes from is not answered. The story only shows the four sizes of it."
+ ],
+ "why_this": "The Jester's power is not light. It is the night sky, and every lamp gutters when she casts. A story about a fire that hoards light is the one story where that power is the answer and not just the biggest hit. Her taunt becomes the story too: she draws the call onto herself. And the four scales you gave them (the moment, nature, chaos, infinity) become the four acts, in the order the evening darkens."
+}
