@@ -4,7 +4,33 @@ Started November 13, 2026. Built the way the HD Jester was (`claude/HOW-TO-3d-wi
 the Ranger's stage-one recipe: this folder began as a copy of the Ranger's stage-one code (`claude/ranger-3d-model`, commit
 `1d4c9d6`), with the Jester's platform boot builder (`claude/jester-3d-model`, pass 20) in place of the Ranger's boots.
 
-## Where she stands: stage six (November 13, 2026)
+## Where she stands: stage seven (November 13, 2026)
+
+Her book, her dagger and her sickle.
+
+- **Chris (November 13):** "Yes, let's continue on to the books and blades. This looks good. I don't think we need to do detail to
+  her boots. Her boots can be the same as the other, which they already look really good. Some more detail on the belt, pouches,
+  and necklace. Not necessary considering how small they already are. But we do need to work on her emotions, the faces in C10,
+  and her spells and attacks." Then: "We also need to do the motions that the rest of the party do, like there's squat, there's
+  kneel, there's hover, and jog. And I like the idea that they all can hover, and it's like a crisscross magical meditation."
+- **Settled:** the coy wave looks good. Her boots stay as they are. Belt, pouch and necklace need no more detail.
+- **Page:** the same link. One offline file: `deliver/Io_3D_stage7.html`. `deliver/Io_stage7_book_blades.jpg` shows her holding
+  the book, reading, holding the sickle, the book floating in a curtsey, and her hip from the side.
+- **Book (`src/I47_props.js`, G1 and G2).** One bone, `book`, a child of the model's root and not of her body; `bookPlace` in
+  `src/I99_static.js` sets where it is every frame from three places: held shut against the front of her left side (carried by her
+  chest), floating open at her left side (by her hips' heading, bobbing), and open in front of her to read. `bkF` and `bkR` slide
+  between them. Moves in `BK_FLOAT` (talk, hat, curtsey, twirl, herb) let it float. Her left hand reaches for the held book; both
+  hands reach for the open one. Shut and open are two sets of parts swapped at the halfway point. Cover and page pictures are
+  drawn by code (`bookCoverTexIo`, `bookPageTexIo`).
+- **Dagger (G6):** sheath, gold throat and tip, turned grip, pommel and crescent guard, at her left hip on one soft bone (`dagger_0`).
+- **Sickle (G5):** a dark grip and a golden crescent blade built in her right hand, shown only during the `sickle` move.
+- **New moves:** `read` (a loop) and `sickle` (3.4 s). Held still (`pose`) she carries nothing.
+- `opts.noProps` builds her without them. 236 bones.
+
+Limits: her fingers do not wrap the book or the grip exactly; the dagger cannot be drawn; the sickle appears in her hand with no
+change from the pendant yet; the book swaps from shut to open in one frame.
+
+## Stage six (November 13, 2026)
 
 Her ankles and wrists move as real ones do.
 
@@ -200,7 +226,7 @@ python3 -I bake_head_io.py         # adds her face, profile, skin tones, hat swa
 python3 -I bake_arms_io.py         # adds her arm skin from D3
 python3 -I bake_hands_io.py        # adds her hands from D1 and D2 (landmarks in hand_marks.json)
 ./build_io.sh                      # tools/tables.py, then out/io.js
-python3 -I build_single_io.py      # deliver/Io_3D_stage6b.html, one offline file
+python3 -I build_single_io.py      # deliver/Io_3D_stage7.html, one offline file
 python3 tools/prof_io.py 8 shots/prof.png             # her profile against the model's, by height
 python3 tools/cmp_head_io.py shots/cmp_head.jpg       # head, hat and hair beside C4 and C5
 python3 tools/cmp_io.py shots/cmp_front.jpg front     # also back, sideR, sideL
@@ -450,11 +476,12 @@ All 26 arrived and match their index. Nothing is built from them yet.
 
 They also show her whole look from many sides, with the robe: useful when the robe and the cloth are built.
 
-## Next stages
+## Next stages, in Chris's order (November 13)
 
-1. **Chris's eye on the walk and the hand moves again.** If more is wanted: the Ranger's other cures for stiffness (spine, neck
-   and head each a beat behind the part below; forearm and hand trailing the upper arm), slower short moves, a half-speed switch.
-2. Detail on the belt, pouch and necklaces; the cloak nearer to M1 (wider sleeve wings, a narrower pointed back, sheer cloth).
-3. Her own boots (E1 to E8); legs from B5; the emotions in C10; hair on top of her head.
-4. Book and blades (G1 to G6, held as in G9).
-5. Her spells and attacks (H1 to H18, I1 to I8, and round 4).
+1. **The moves the rest of the party have:** squat, kneel, hover and jog. The hover is a cross-legged magical meditation that
+   all four witches can do. Look at how the Jester's, the Fox's and the Ranger's are built first (their branches and project notes).
+2. **Her emotions:** the faces in C10.
+3. **Her spells and attacks** (H1 to H18, I1 to I8, and round 4): the pendant becoming the sickle, the dagger drawn with
+   witchfire, the book floating with its pages turning.
+4. Not wanted: more work on her boots; more detail on belt, pouch and necklace.
+5. Still open if he asks: the cloak nearer to M1; hair on top of her head.

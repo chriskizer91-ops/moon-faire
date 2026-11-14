@@ -61,12 +61,15 @@
     cloth: std({ color: lin('#1a1518'), roughness: 0.9 })
   };
 
+  MATS.propGold = MATS.gold; MATS.sickleGold = MATS.gold; MATS.propLeather = std({ color: lin('#1c1614'), roughness: 0.6, envMapIntensity: 0.3 }); MATS.propWood = std({ color: lin('#2a1c16'), roughness: 0.5, envMapIntensity: 0.4 }); MATS.sickleGrip = MATS.propWood;
+  { const tc = bookCoverTexIo(), tp = bookPageTexIo(), cov = () => std({ map: tc, color: lin('#c8c0bc'), roughness: 0.62, envMapIntensity: 0.25, side: THREE.DoubleSide, emissive: lin('#ffffff'), emissiveMap: tc, emissiveIntensity: 0.22 }), pg = () => std({ map: tp, color: lin('#cfc8c0'), roughness: 0.9, side: THREE.DoubleSide, emissive: lin('#ffffff'), emissiveMap: tp, emissiveIntensity: 0.30 });
+    MATS.bookShut = cov(); MATS.bookOpen = cov(); MATS.bookShutPg = pg(); MATS.bookOpenPg = pg(); MATS.bookRibbon = std({ color: lin('#8a1f2c'), roughness: 0.8, side: THREE.DoubleSide }); }
   MATS.gearGold = MATS.gold; MATS.gearSilver = MATS.silver;       // the same metals as her hat's, kept as their own parts so the page can hide them
   MATS.leather = std({ color: lin('#2e221d'), roughness: 0.62, envMapIntensity: 0.3 }); MATS.bead = std({ color: lin('#151211'), roughness: 0.28, envMapIntensity: 0.9 }); MATS.wood = std({ color: lin('#5b3320'), roughness: 0.5, envMapIntensity: 0.4 });
   MATS.crystal = phys({ color: lin('#eef4fb'), roughness: 0.06, transparent: true, opacity: 0.66, envMapIntensity: 1.6, emissive: lin('#cfe0f5'), emissiveIntensity: 0.20 });
   // ---------- bind: one skinned mesh per material ----------
   const root = new THREE.Group(); root.name = 'io';
-  root.add(SK.hips); root.updateMatrixWorld(true);
+  root.add(SK.hips); if (SK.book) root.add(SK.book); root.updateMatrixWorld(true);       // her book is not carried by her body: it has its own place every frame
   const skeleton = new THREE.Skeleton(bones);
   const meshes = {};
   let triCount = 0;
@@ -207,13 +210,26 @@
 
   let lastPose = { arm: 15, leg: 0 }, mv = { name: 'pose', t: 0 }, wk = 0, gph = 0, spinWas = 0;
   let clock = 0, blinkAt = 1.6, blinkT = -1, mouthAt = 0, mouthNow = 'rest', facePainted = '', talking = false, held = null, blinking = true;
-  const SHOTS = { glasses: 2.4, hat: 2.6, curtsey: 3.0, twirl: 2.6, herb: 5.0, wave: 3.0, look: 3.6 }, MOVES = ['pose', 'idle', 'walk', 'talk', 'glasses', 'hat', 'curtsey', 'twirl', 'herb', 'wave', 'look'];
+  const SHOTS = { glasses: 2.4, hat: 2.6, curtsey: 3.0, twirl: 2.6, herb: 5.0, wave: 3.0, look: 3.6, sickle: 3.4 }, MOVES = ['pose', 'idle', 'walk', 'talk', 'read', 'glasses', 'hat', 'curtsey', 'twirl', 'herb', 'wave', 'look', 'sickle'];
+  // Her book (G8, and the rule in her prompts: it is in her LEFT hand; when she lets go of it, it floats open at her left side).
+  // bkF: 0 held shut in her left arm .. 1 floating open; bkR: 1 open in front of her to read. Moves that need her left hand let it float.
+  const BK_FLOAT = { talk: 1, hat: 1, curtsey: 1, twirl: 1, herb: 1 }, bkP = V3(), bkQ = new THREE.Quaternion(), bkP2 = V3(), bkQ2 = new THREE.Quaternion(), EU = new THREE.Euler(); let bkF = 0, bkR = 0, showProps = true;
+  const propVis = (on, sick) => { const m = meshes, shut = bkF < 0.5 && bkR < 0.5; for (const [k, v] of [['bookShut', on && shut], ['bookShutPg', on && shut], ['bookRibbon', on && shut], ['bookOpen', on && !shut], ['bookOpenPg', on && !shut], ['sickleGold', on && sick], ['sickleGrip', on && sick]]) if (m[k]) m[k].visible = !!v && showProps; };
+  function bookPlace(dt, N) {
+    if (!SK.book) return 0; const k = Math.min(1, dt * 3.2); bkF += ((BK_FLOAT[N] ? 1 : 0) - bkF) * k; bkR += ((N === 'read' ? 1 : 0) - bkR) * k;
+    rootQuat(SK.spine3, _qa); carried('spine3', 0.118, 1.150, 0.122, bkP); bkQ.copy(_qa).multiply(_qb.setFromEuler(EU.set(-0.10, 0.50, 0.07, 'YXZ')));                     // held: against the front of her left side
+    rootQuat(SK.hips, _qc); _p.set(0, 0, 1).applyQuaternion(_qc); _qc.setFromAxisAngle(AY, Math.atan2(_p.x, _p.z)); carried('hips', 0, 0.96, 0, bkP2).add(_e.set(0.37, 0.10 + 0.018 * Math.sin(clock * 1.7), 0.15).applyQuaternion(_qc));
+    bkQ2.copy(_qc).multiply(_qb.setFromEuler(EU.set(-0.55, -1.05 + 0.10 * Math.sin(clock * 0.8), 0, 'YXZ'))); bkP.lerp(bkP2, bkF); bkQ.slerp(bkQ2, bkF);                           // floating: open at her left side, turned to her
+    if (bkR > 0.001) { carried('spine3', 0.035, 1.095, 0.300, bkP2); bkQ2.copy(_qa).multiply(_qb.setFromEuler(EU.set(0.93, PI, 0, 'XYZ'))); bkP.lerp(bkP2, bkR); bkQ.slerp(bkQ2, bkR); }   // reading: open in front of her, tipped up to her face
+    SK.book.position.copy(bkP); SK.book.quaternion.copy(bkQ); return (1 - bkF) * (1 - bkR);
+  }
+  const bookPt = (x, y, z, out) => out.set(x, y, z).applyQuaternion(bkQ).add(bkP);
   const pulse = (t, a, b, c, d) => sm(a, b, t) * (1 - sm(c, d, t)), ANK = {}; for (const [S] of SIDES) ANK[S] = SK['foot' + S].userData.rest.clone();
   const tgt = V3(), tg2 = V3(), fv = V3(), nv = V3();
   function pose(o) {
     o = o || {}; mv = { name: 'pose', t: 0 }; wk = 0; lastPose = { arm: o.arm == null ? 15 : o.arm, leg: o.leg || 0 }; const arm = lastPose.arm * DEG - A_POSE, leg = lastPose.leg * DEG;
     restAll(); for (const [S, s] of SIDES) { SK['uarm' + S].rotation.z = s * arm; SK['thigh' + S].rotation.z = s * leg; SK['foot' + S].rotation.z = -s * leg; }
-    for (const o2 of SOFT) o2.lift = 0; sync(); softSettle(); root.updateMatrixWorld(true);
+    for (const o2 of SOFT) o2.lift = 0; sync(); softSettle(); root.updateMatrixWorld(true); bkF = 0; bkR = 0; propVis(false, false);       // held still she carries nothing, as in the paintings she is checked against
   }
   function play(name) { if (!MOVES.includes(name) || name === 'pose') { pose(lastPose); return 'pose'; } mv = { name, t: 0 }; return name; }
   // one frame of a move: returns her face { eyes, mouth }
@@ -247,6 +263,11 @@
       reaches.push(['L', V3(0.13 + 0.02 * a2, 1.03 + 0.03 * a1, 0.25 + 0.02 * a3), 0.95 * k, 0.5]); aims.push(['L', V3(-0.25, 0.22 + 0.16 * a1, 0.9), V3(0.15, 1, -0.1), 0.95 * k]);
       if (clock > mouthAt) { mouthAt = clock + 0.10 + 0.09 * Math.abs(Math.sin(clock * 37.7)); const r = Math.abs(Math.sin(clock * 91.3)); mouthNow = r < 0.30 ? 'rest' : r < 0.66 ? 'open' : r < 0.92 ? 'oo' : 'smile'; }
       mouth = mouthNow; }
+    if (N === 'read') { const k = sm(0, 0.7, T), turn = pulse(T % 5.2, 3.6, 4.0, 4.3, 4.7);       // she reads: her head down to the page, a finger following the lines, and now and then she turns a leaf
+      add('head', 0.30 * k, 0.05 * Math.sin(T * 0.7) * k, 0); add('neck', 0.12 * k, 0, 0); add('spine3', 0.04 * k, 0, 0); eyes = 0.5 * (k > 0.6 ? 1 : 0); if (T % 9 > 7.6) mouth = 'smile'; }
+    if (N === 'sickle') { const k = pulse(T, 0, 0.6, 2.5, 3.3), up = pulse(T, 0.9, 1.4, 1.9, 2.5);       // she lifts her sickle and turns it to the light (the moon pendant will become it when her spells are built)
+      add('head', -0.05 * up, -0.14 * k, 0); add('spine3', 0, -0.05 * k, 0);
+      reaches.push(['R', V3(-0.21 - 0.03 * up, 1.14 + 0.14 * up, 0.27), k, -0.3]); aims.push(['R', V3(0.10 * up, 0.25 + 0.45 * up, 1), V3(1, 0.1 * Math.sin(T * 3) * up, 0), k]); fingers('R', lerp(0.24, 1.35, sm(0, 0.25, k))); }
     if (N === 'glasses') { const k = pulse(T, 0, 0.55, 1.5, 2.25), push = pulse(T, 0.62, 0.9, 1.05, 1.4);
       add('head', 0.09 * k - 0.07 * push, -0.04 * k, 0); add('neck', 0.03 * k, 0, 0); sync();
       fv.set(0.16, 0.93, -0.30).normalize(); carried('head', -0.003, 1.497 + 0.010 * push, 0.108, tgt).addScaledVector(fv, -0.150);
@@ -287,6 +308,12 @@
     for (const [S] of SIDES) { ik2(SK['thigh' + S], SK['shin' + S], SK['foot' + S], ank[S], plant, 0, 1); flatFoot(S, footP[S], plant); }
     sync();
     // a hand travels from where it hangs to its point, a little forward on the way so it clears her skirt and her hair, with its elbow bending as it goes
+    { const hold = bookPlace(dt, N);
+      if (hold > 0.001) { reaches.push(['L', bookPt(0.060, -0.118, -0.012, V3()), hold, 0.25]); aims.push(['L', V3(-0.55, 0.62, 0.55).applyQuaternion(bkQ), V3(-0.45, 0.15, -0.88).applyQuaternion(bkQ), hold]); SK.farmL.rotation.x *= 1; fingers('L', lerp(0.24, 0.75, hold)); }
+      if (bkR > 0.001) { const tn = N === 'read' ? pulse(T % 5.2, 3.6, 4.0, 4.3, 4.7) : 0;
+        reaches.push(['L', bookPt(0.0, -0.035, -0.050, V3()), bkR, 0.3]); aims.push(['L', V3(-0.25, 0.75, 0.2).applyQuaternion(bkQ), V3(0, 0, 1).applyQuaternion(bkQ), bkR]);
+        reaches.push(['R', bookPt(0.085 - 0.10 * tn, -0.085 + 0.05 * Math.sin(T * 0.9) * (1 - tn), 0.085 + 0.03 * tn, V3()), bkR, -0.3]); aims.push(['R', V3(-0.15, 0.7, -0.7).applyQuaternion(bkQ), V3(0, 0.25, -1).applyQuaternion(bkQ), bkR]); fingers('R', lerp(0.24, 0.9, bkR), lerp(0.24, 0.10, bkR)); }
+      propVis(true, N === 'sickle' && T > 0.12 && T < 3.25); }
     for (const r of reaches) { const k = r[2]; if (k <= 0.0005) continue; const P = typeof r[1] === 'function' ? r[1]() : r[1], e = k * k * (3 - 2 * k);
       SK['hand' + r[0]].getWorldPosition(_p).applyMatrix4(_inv).lerp(P, e); _p.z += 0.09 * Math.sin(PI * e); reach(r[0], tg2.copy(_p), sm(0, 0.15, k), (r[3] || 0) * e); }
     for (const a of aims) aimHand(a[0], a[1], a[2], a[3]);
@@ -310,6 +337,6 @@
   }
   const talk = (on) => { talking = !!on; mouthAt = 0; return talking; };
   const setFace = (eyes, mouth) => { held = eyes == null && !mouth ? null : { eyes, mouth }; facePainted = ''; animate(0); };
-  return { root, skeleton, bones, SK, animate, pose, play, moves: MOVES, shots: SHOTS, settle: () => { sync(); softSettle(); root.updateMatrixWorld(true); }, meshes, spin: 0, time: 0, stanceProgress: 1, setStance() {}, talk, setFace, setBlink: (on) => { blinking = !!on; }, get move() { return mv.name; },
+  return { root, skeleton, bones, SK, animate, pose, play, moves: MOVES, shots: SHOTS, settle: () => { sync(); softSettle(); root.updateMatrixWorld(true); }, meshes, spin: 0, time: 0, stanceProgress: 1, setStance() {}, talk, setFace, setBlink: (on) => { blinking = !!on; }, setProps: (on) => { showProps = !!on; if (mv.name === 'pose') propVis(false, false); }, get move() { return mv.name; },
     debug: { SK, meshes, cloths: [], headPoint, headHalfW, JH, HC, FC, CHAINS, SOFT, COL }, get triangles() { return triCount; } };
 }
