@@ -40,9 +40,9 @@ canvas#stage{display:block;width:100%;height:100%;touch-action:none;cursor:grab}
 <body>
 <div class="wrap">
   <header>
-    <p class="eyebrow">Moon Faire · stage twelve of her build</p>
+    <p class="eyebrow">Moon Faire · stage thirteen of her build</p>
     <h1><em>Io</em>, the Herbal Witch</h1>
-    <p class="sub">New under Her spells: Elderwood Guardian, her stag of living wood, and Moonflower Garden, her heal for the whole party. The camera moves by itself during a spell; drag to take it over, pinch to zoom.</p>
+    <p class="sub">New under Her spells: Thornwake, her one spell that harms; Rootbound Return, which brings a fallen friend back; and Bramble Cradle, her guard. The camera moves by itself during a spell; drag to take it over, pinch to zoom.</p>
   </header>
   <div class="play">
   <div class="stagebox" id="box">
@@ -130,12 +130,12 @@ canvas#stage{display:block;width:100%;height:100%;touch-action:none;cursor:grab}
   chips($('poses'), POSES, (p) => { R.pose(p[1]); shown = 'pose'; press($('moves'), 0); press($('spells'), -1); }, -1);
   // her spells (stage eleven): each brings what it is cast at (a training dummy, or a friend to heal) and turns the camera to her side,
   // pulled back, so she casts toward the right as in her paintings and the whole spell is in view
-  const SPELLS = [['Harvest Crescent', 'crescent'], ['Silverleaf Salve', 'salve'], ['Elderwood Guardian', 'guardian'], ['Moonflower Garden', 'garden']], SPELL_VIEW = { az: -1.02, el: 0.07, dist: 8.3, ty: 0.92, tz: 0.60 };
+  const SPELLS = [['Harvest Crescent', 'crescent'], ['Silverleaf Salve', 'salve'], ['Elderwood Guardian', 'guardian'], ['Moonflower Garden', 'garden'], ['Thornwake', 'thorn'], ['Rootbound Return', 'revive'], ['Bramble Cradle', 'cradle']], SPELL_VIEW = { az: -1.02, el: 0.07, dist: 8.3, ty: 0.92, tz: 0.60 };
   // stage twelve: a long spell has more than one camera place, each taken at a given second of the spell: the Guardian is planted at
   // her side, stands behind her, and leaps past her at the foe, and a phone is too narrow to hold all three at once. A drag or a
   // pinch takes the camera away from the spell until another spell is picked.
   const SPELL_CAM = { guardian: [[0, { az: -1.02, el: 0.07, dist: 8.3, ty: 0.92, tz: -0.39 }], [8.3, { az: -1.02, el: 0.07, dist: 11.3, ty: 1.15, tz: -1.03 }], [12.05, { az: -1.02, el: 0.07, dist: 10.0, ty: 0.97, tz: 0.74 }]],
-    garden: [[0, { az: 0.10, el: 0.20, dist: 11.2, ty: 0.76 }]] };
+    garden: [[0, { az: 0.10, el: 0.20, dist: 11.2, ty: 0.76 }]], revive: [[0, { az: -1.02, el: 0.14, dist: 8.2, ty: 0.62, tz: -0.42 }]], cradle: [[0, { az: -0.6, el: 0.08, dist: 9.4, ty: 1.12 }]] };
   let camSpell = null, camKey = -1, camFree = false;
   chips($('spells'), SPELLS, (m) => { shown = R.play(m[1]); press($('moves'), -1); press($('poses'), -1); camSpell = m[1]; camKey = 0; camFree = false; want = Object.assign({}, SPELL_CAM[m[1]] ? SPELL_CAM[m[1]][0][1] : SPELL_VIEW); easing = true; spin = false; refKey = ''; setRef(); $('spinB').setAttribute('aria-pressed', 'false'); [...$('views').children].forEach((c) => c.setAttribute('aria-pressed', 'false')); }, -1);
   R.pose(POSES[0][1]); R.play('idle');
@@ -176,7 +176,7 @@ canvas#stage{display:block;width:100%;height:100%;touch-action:none;cursor:grab}
     if (easing) { let d = want.az - orbit.az; d = Math.atan2(Math.sin(d), Math.cos(d)); const k = Math.min(1, dt * 5); orbit.az += d * k; orbit.el += (want.el - orbit.el) * k; orbit.dist += (want.dist - orbit.dist) * k; orbit.target.y += (want.ty - orbit.target.y) * k; orbit.target.z += ((want.tz || 0) - orbit.target.z) * k; orbit.target.x += ((want.tx || 0) - orbit.target.x) * k; }
     stage.render();
   }
-  $('hud').textContent = 'Stage twelve · ' + Math.round(R.triangles / 1000) + 'k triangles';
+  $('hud').textContent = 'Stage thirteen · ' + Math.round(R.triangles / 1000) + 'k triangles';
   window.IO = { stage, R, step() { fit(); stage.render(); } };
   requestAnimationFrame(frame);
 })();

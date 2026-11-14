@@ -93,4 +93,4 @@
     dumV += (-dumA * 95 - dumV * 6.5) * dt; dumA += dumV * dt; dummyTilt.rotation.x = dumA;                     // the dummy rocks on its post when it is struck, and settles
     RIB_CUT.tick(dt); RIB_SALVE.tick(dt); RIB_SALVE2.tick(dt); for (const v of VINES) v.tick(dt); fxParticles(dt);
   }
-  function fxClear() { PT.n = 0; IM.length = 0; RIB_CUT.pts.length = 0; RIB_SALVE.pts.length = 0; RIB_SALVE2.pts.length = 0; WAVE.visible = false; LEAF.visible = false; fxSeed = 20261114; woodClear(); GARDEN.hide(); PAGES.visible = false; }
+  function fxClear() { PT.n = 0; IM.length = 0; RIB_CUT.pts.length = 0; RIB_SALVE.pts.length = 0; RIB_SALVE2.pts.length = 0; WAVE.visible = false; LEAF.visible = false; fxSeed = 20261114; woodClear(); GARDEN.hide(); PAGES.visible = false; thornHide(); }

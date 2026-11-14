@@ -4,7 +4,41 @@ Started November 13, 2026. Built the way the HD Jester was (`claude/HOW-TO-3d-wi
 the Ranger's stage-one recipe: this folder began as a copy of the Ranger's stage-one code (`claude/ranger-3d-model`, commit
 `1d4c9d6`), with the Jester's platform boot builder (`claude/jester-3d-model`, pass 20) in place of the Ranger's boots.
 
-## Where she stands: stage twelve (November 14, 2026)
+## Where she stands: stage thirteen (November 14, 2026)
+
+Her last three spells: Thornwake (her one spell that harms), Rootbound Return (she brings a fallen friend back) and Bramble
+Cradle (her guard). With these all seven of her spells have a first build.
+
+- **Chris (November 14):** stage twelve is "beautiful". He asked whether there would be a second, higher-detail pass of the
+  spells; I said yes, as one pass over all of them. "Let's do her next set of spells and her reactions first then we'll come
+  back to it."
+- **Thornwake** (`thorn`, 7.6 s; H14, H15, I7, I8). The closed book hugged to her chest in her left arm, she draws her dagger
+  and holds it point-down; violet witchfire wakes along the blade. She drops to her right knee and drives it into the ground. A
+  jagged crack of violet light runs to the foe with small thorned roots pushing up along it, and six dark thorned roots burst
+  out under the dummy, close round it like fingers and lift it. Wine-red roses open on the briar. Then it sinks back.
+- **Rootbound Return** (`revive`, 9.8 s; H13). A grey friend lies on their back beside her, head toward the foe. She kneels on
+  her right knee, her book floating open beside her, a glowing seed on her open palm over their chest, her head bowed. The seed
+  falls and sinks in; roots of light trace the friend's outline on the ground and small white flowers open along them; the
+  friend sits up and she takes their hand.
+- **Bramble Cradle** (`cradle`, 6.4 s; H16). The closed book hugged to her chest, her right hand raised palm outward. A dome of
+  woven branches grows up round her from the ground, taller than her hat, with gold-green leaves all over it and thorns
+  pointing out. Three blows bounce off it as sparks and it shivers. Then it sinks back.
+- **`src/I98d_thorn.js`** (new): witchfire colours; `DAGGER` (drawn; laid in her closed right hand by `daggerInHand`);
+  `CRACK`; `BRIAR` and its roses; `CRADLE`; `FALLEN` (the grey friend lying down, who can sit up and lift a hand) and `TRACE`
+  (the outline of light and its flowers). All grow by showing more of a mesh whose triangles are sorted (`wRange`).
+- **In `src/I99_static.js`:** the three spell blocks; `bookHug` and `hugArm` (the closed book held to her chest: `HUG`, `bkH`).
+- **Page:** stage thirteen; three more buttons under Her spells.
+- **Checked:** `tools/pen.py thorn revive cradle`: legs at the standing floor in all three, both kneels included. Sleeves: 38
+  points (Thornwake), 52 (Cradle), and 179 points at most 30 mm in Rootbound Return while she reaches down to take the friend's
+  hand, which is more than her other spells. Full page test at phone size: no errors, all seven spells play.
+- **Mine, for Chris to keep or drop:** the briar lifts the dummy and then sinks back into the ground; the friend lies at her
+  right side with their head toward the foe; three blows land on the Cradle to show it holding.
+- **Limits:** first builds, timed from stills; not watched playing; not on a real phone; not looked at in the Flipbook look.
+  The dagger she draws is a second dagger: the one in the sheath on her hip stays where it is. Witchfire is made of the same
+  small specks as her other lights, coloured violet, so it reads as sparks more than as tongues of flame (I7). The closed
+  book against her chest is not measured by the meter.
+
+## Stage twelve (November 14, 2026)
 
 Two more spells: Elderwood Guardian (her one-time summon) and Moonflower Garden (her heal for the whole party).
 
@@ -681,9 +715,13 @@ They also show her whole look from many sides, with the robe: useful when the ro
 
 ## Next stages, in Chris's order (November 14)
 
-1. His eye on Elderwood Guardian and Moonflower Garden (stage twelve).
-2. **The rest, in the order he gave on November 14:** Thornwake (H14, H15, I7, I8: the dagger and witchfire, the briar),
-   Rootbound Return (H13), Bramble Cradle (H16); then being hit, falling and winning (H17, H18).
-3. Not wanted: more work on her boots; more detail on belt, pouch and necklace.
-4. Still open if he asks: the cloak nearer to M1; hair on top of her head; bringing her jog, squat, kneel and hover into line
+1. His eye on Thornwake, Rootbound Return and Bramble Cradle (stage thirteen).
+2. **Her reactions:** being hit, falling and winning (H17, H18). She holds her hat on when she is hit, loses it when she falls,
+   and tips its brim when she wins.
+3. **Then the higher-detail pass over all her spells** (Chris, November 14: "then we'll come back to it"): the Guardian's face,
+   finer roots and planted feet; the sapling truly twisting into the fawn; the stag peeling apart strand by strand; the
+   flowers' star crease and stamens; the sickle unfolding from the pendant; real tongues of witchfire; her magic's light on her
+   face and clothes; her hair and cloak stirring as she casts; greens that survive the Flipbook look.
+4. Not wanted: more work on her boots; more detail on belt, pouch and necklace.
+5. Still open if he asks: the cloak nearer to M1; hair on top of her head; bringing her jog, squat, kneel and hover into line
    with the other witches' versions.
