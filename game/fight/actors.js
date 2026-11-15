@@ -60,7 +60,8 @@
         if (id === 'io' && m.spellFx) { m.spellFx.dummy.visible = false; m.spellFx.ally.visible = false; m.spellFx.ally2.visible = false; if (m.wood && m.wood.FALLEN && m.wood.FALLEN.isObject3D) m.wood.FALLEN.visible = false; }      // her practice targets: the fight has real ones
       }
       // she turns to her target while she casts at it, then back to how she rests; a blow rocks her back a little
-      const to = A.aim != null ? A.aim : A.rest;      // rest: the way she stands between moves (the fight turns her to the foes) let df = to - A.face; df = Math.atan2(Math.sin(df), Math.cos(df)); A.face += df * Math.min(1, dt * 8);
+      // rest: the way she stands between moves (the fight turns her to the foes)
+      const to = A.aim != null ? A.aim : A.rest; let df = to - A.face; df = Math.atan2(Math.sin(df), Math.cos(df)); A.face += df * Math.min(1, dt * 8);
       A.flinch = Math.max(0, A.flinch - dt * 3.2); A.root.rotation.y = A.face + A.spin; A.lean += ((A.aim != null ? A.leanTo : 0) - A.lean) * Math.min(1, dt * 5); A.root.rotation.z = (id === 'fox' ? 0.09 : 0) * Math.sin(A.flinch * Math.PI) - A.lean;      // lean: the Ranger tips her bow arm down a little to a low target (her arrow leaves level)
     };
     A.reset();

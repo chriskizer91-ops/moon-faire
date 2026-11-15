@@ -197,7 +197,7 @@ function makeMFFight(stage, H) {
   // ---------- the end ----------
   function finish() {
     act = { ev: [] }; syncAll(); act = null; phase = 'over'; cur = null;
-    for (const P of Object.values(party)) if (P.e) { P.a.aim = null; if (B.over === 'won') { if (CAMNOW() === 'behind') P.a.rest = Math.atan2(GEO.ux * 6 + SIDE(GEO.ux, GEO.uz)[0] * 2.2 + GEO.pcx - P.x, GEO.uz * 6 + SIDE(GEO.ux, GEO.uz)[1] * 2.2 + GEO.pcz - P.z); P.a.win(); } }
+    for (const P of Object.values(party)) if (P.e) { P.a.aim = null; if (B.over === 'won') { P.a.rest = CAMNOW() === 'behind' ? Math.atan2(GEO.ux * 6 + SIDE(GEO.ux, GEO.uz)[0] * 2.2 + GEO.pcx - P.x, GEO.uz * 6 + SIDE(GEO.ux, GEO.uz)[1] * 2.2 + GEO.pcz - P.z) : 0; P.a.win(); } }
     const won = B.over === 'won', lvl = O.foeLevel || 1;
     const xp = won ? Math.round(foesE().reduce((s, f) => s + XP[f.tier] * Math.pow(XP_SLOPE, lvl - 1), 0)) : 0;
     const out = { result: B.over, won, xp, turns: B.heroTurns, foeTurns: B.foeTurns, fainted: B.kos, place: S.id, foes: O.foes.slice(), tag: O.tag == null ? null : O.tag, party: {} };
@@ -250,7 +250,7 @@ function makeMFFight(stage, H) {
   // 'behind' (Chris, November 14: "the camera is from behind their heads ... swing around and look at each move but cut back to the whole
   // group in between"): at rest the camera stands behind the party and looks over their heads at the foes. For each move it cuts to a
   // camera that swings round whoever is moving, then cuts back. It is a camera that really moves, so the painting behind is out of focus.
-  const CAMNOW = () => (H.cam ? H.cam() : 'behind'), SIDE = (ux, uz) => (ux >= 0 ? [-uz, ux] : [uz, -ux]);      // SIDE: the way across a line, on the audience's side of it
+  const CAMNOW = () => (H.cam ? H.cam() : 'side'), SIDE = (ux, uz) => (ux >= 0 ? [-uz, ux] : [uz, -ux]);      // SIDE: the way across a line, on the audience's side of it
   const ease = (k) => { k = Math.max(0, Math.min(1, k)); return k * k * (3 - 2 * k); }, mix = (p, q, k) => p + (q - p) * k, DEG = Math.PI / 180;
   const swing = (cx, cz, ux, uz, phi, R) => { const sd = SIDE(ux, uz), c = Math.cos(phi), n = Math.sin(phi); return [cx - ux * R * c + sd[0] * R * n, cz - uz * R * c + sd[1] * R * n]; };
   function behindShot(a, playing, asp) {
@@ -288,8 +288,9 @@ function makeMFFight(stage, H) {
     else if (CAM !== 'wide') {
       const all = []; for (const id in party) if (party[id].e) heroPts(party[id], all); for (const f of foes) if (f.up) foePts(f, all);
       frame(all, 1.08, 1.16, 0.4, 0.1);                    // at rest: everyone still standing, and no more of the place than that
-      if (phase === 'menu' && cur && CAM !== 'near') { const pts = []; heroPts(cur, pts); const f = foes[selFoe]; if (f && f.up) foePts(f, pts); frame(pts, 1.12, 1.25, 0.34, 0.12); }
-      if (playing) {
+      if (CAM === 'side') { if (playing && a.kind === 'hero') { all.push([a.P.x, 3.3, a.P.z]); frame(all, 1.08, 1.12, 0.4, 0.1); } }      // 'side' (Chris, November 14, 6:38 pm): the whole party and every foe, from the side, in front of the sharp painting, for the whole fight; a little room above whoever is casting
+      else if (phase === 'menu' && cur && CAM !== 'near') { const pts = []; heroPts(cur, pts); const f = foes[selFoe]; if (f && f.up) foePts(f, pts); frame(pts, 1.12, 1.25, 0.34, 0.12); }
+      if (playing && CAM !== 'side') {
         const pts = [], who = a.kind === 'hero' ? a.P : null, landed = a.kind === 'hero' ? a.hitK > 0 || a.landed : a.done;
         if (CAM === 'near' || a.all || (a.kind === 'hero' && !a.T)) {                       // the one who moves and whoever it is aimed at; a move at everyone keeps everyone
           if (a.kind === 'hero' && a.T) { heroPts(who, pts); if (a.tf) foePts(a.tf, pts); if (a.th) heroPts(a.th, pts); frame(pts, 1.1, 1.22, 0.3, 0.12); }

@@ -18862,7 +18862,8 @@ function makeMFStage(canvas, o) {
         if (id === 'io' && m.spellFx) { m.spellFx.dummy.visible = false; m.spellFx.ally.visible = false; m.spellFx.ally2.visible = false; if (m.wood && m.wood.FALLEN && m.wood.FALLEN.isObject3D) m.wood.FALLEN.visible = false; }      // her practice targets: the fight has real ones
       }
       // she turns to her target while she casts at it, then back to how she rests; a blow rocks her back a little
-      const to = A.aim != null ? A.aim : A.rest;      // rest: the way she stands between moves (the fight turns her to the foes) let df = to - A.face; df = Math.atan2(Math.sin(df), Math.cos(df)); A.face += df * Math.min(1, dt * 8);
+      // rest: the way she stands between moves (the fight turns her to the foes)
+      const to = A.aim != null ? A.aim : A.rest; let df = to - A.face; df = Math.atan2(Math.sin(df), Math.cos(df)); A.face += df * Math.min(1, dt * 8);
       A.flinch = Math.max(0, A.flinch - dt * 3.2); A.root.rotation.y = A.face + A.spin; A.lean += ((A.aim != null ? A.leanTo : 0) - A.lean) * Math.min(1, dt * 5); A.root.rotation.z = (id === 'fox' ? 0.09 : 0) * Math.sin(A.flinch * Math.PI) - A.lean;      // lean: the Ranger tips her bow arm down a little to a low target (her arrow leaves level)
     };
     A.reset();
@@ -19072,7 +19073,7 @@ function makeMFFight(stage, H) {
   // ---------- the end ----------
   function finish() {
     act = { ev: [] }; syncAll(); act = null; phase = 'over'; cur = null;
-    for (const P of Object.values(party)) if (P.e) { P.a.aim = null; if (B.over === 'won') { if (CAMNOW() === 'behind') P.a.rest = Math.atan2(GEO.ux * 6 + SIDE(GEO.ux, GEO.uz)[0] * 2.2 + GEO.pcx - P.x, GEO.uz * 6 + SIDE(GEO.ux, GEO.uz)[1] * 2.2 + GEO.pcz - P.z); P.a.win(); } }
+    for (const P of Object.values(party)) if (P.e) { P.a.aim = null; if (B.over === 'won') { P.a.rest = CAMNOW() === 'behind' ? Math.atan2(GEO.ux * 6 + SIDE(GEO.ux, GEO.uz)[0] * 2.2 + GEO.pcx - P.x, GEO.uz * 6 + SIDE(GEO.ux, GEO.uz)[1] * 2.2 + GEO.pcz - P.z) : 0; P.a.win(); } }
     const won = B.over === 'won', lvl = O.foeLevel || 1;
     const xp = won ? Math.round(foesE().reduce((s, f) => s + XP[f.tier] * Math.pow(XP_SLOPE, lvl - 1), 0)) : 0;
     const out = { result: B.over, won, xp, turns: B.heroTurns, foeTurns: B.foeTurns, fainted: B.kos, place: S.id, foes: O.foes.slice(), tag: O.tag == null ? null : O.tag, party: {} };
@@ -19125,7 +19126,7 @@ function makeMFFight(stage, H) {
   // 'behind' (Chris, November 14: "the camera is from behind their heads ... swing around and look at each move but cut back to the whole
   // group in between"): at rest the camera stands behind the party and looks over their heads at the foes. For each move it cuts to a
   // camera that swings round whoever is moving, then cuts back. It is a camera that really moves, so the painting behind is out of focus.
-  const CAMNOW = () => (H.cam ? H.cam() : 'behind'), SIDE = (ux, uz) => (ux >= 0 ? [-uz, ux] : [uz, -ux]);      // SIDE: the way across a line, on the audience's side of it
+  const CAMNOW = () => (H.cam ? H.cam() : 'side'), SIDE = (ux, uz) => (ux >= 0 ? [-uz, ux] : [uz, -ux]);      // SIDE: the way across a line, on the audience's side of it
   const ease = (k) => { k = Math.max(0, Math.min(1, k)); return k * k * (3 - 2 * k); }, mix = (p, q, k) => p + (q - p) * k, DEG = Math.PI / 180;
   const swing = (cx, cz, ux, uz, phi, R) => { const sd = SIDE(ux, uz), c = Math.cos(phi), n = Math.sin(phi); return [cx - ux * R * c + sd[0] * R * n, cz - uz * R * c + sd[1] * R * n]; };
   function behindShot(a, playing, asp) {
@@ -19163,8 +19164,9 @@ function makeMFFight(stage, H) {
     else if (CAM !== 'wide') {
       const all = []; for (const id in party) if (party[id].e) heroPts(party[id], all); for (const f of foes) if (f.up) foePts(f, all);
       frame(all, 1.08, 1.16, 0.4, 0.1);                    // at rest: everyone still standing, and no more of the place than that
-      if (phase === 'menu' && cur && CAM !== 'near') { const pts = []; heroPts(cur, pts); const f = foes[selFoe]; if (f && f.up) foePts(f, pts); frame(pts, 1.12, 1.25, 0.34, 0.12); }
-      if (playing) {
+      if (CAM === 'side') { if (playing && a.kind === 'hero') { all.push([a.P.x, 3.3, a.P.z]); frame(all, 1.08, 1.12, 0.4, 0.1); } }      // 'side' (Chris, November 14, 6:38 pm): the whole party and every foe, from the side, in front of the sharp painting, for the whole fight; a little room above whoever is casting
+      else if (phase === 'menu' && cur && CAM !== 'near') { const pts = []; heroPts(cur, pts); const f = foes[selFoe]; if (f && f.up) foePts(f, pts); frame(pts, 1.12, 1.25, 0.34, 0.12); }
+      if (playing && CAM !== 'side') {
         const pts = [], who = a.kind === 'hero' ? a.P : null, landed = a.kind === 'hero' ? a.hitK > 0 || a.landed : a.done;
         if (CAM === 'near' || a.all || (a.kind === 'hero' && !a.T)) {                       // the one who moves and whoever it is aimed at; a move at everyone keeps everyone
           if (a.kind === 'hero' && a.T) { heroPts(who, pts); if (a.tf) foePts(a.tf, pts); if (a.th) heroPts(a.th, pts); frame(pts, 1.1, 1.22, 0.3, 0.12); }
@@ -19311,14 +19313,14 @@ function makeMFFight(stage, H) {
   const CODE = { w: 'wisp', K: 'wraith', B: 'great' };
   function lineUp(v) { if (Array.isArray(v)) return v.slice(); const out = []; String(v || 'w').replace(/(\d*)([wKB])/g, (_, n, k) => { for (let i = 0; i < (+n || 1); i++) out.push(CODE[k]); }); return out.length ? out : ['wisp']; }
   function label(list) { const n = {}; for (const k of list) n[k] = (n[k] || 0) + 1; const W = window.MF_FOES.KINDS, part = (k) => (n[k] === 1 ? 'a ' : n[k] + ' ') + W[k].name.toLowerCase() + (n[k] > 1 ? 's' : ''); const s = ['great', 'wraith', 'wisp'].filter((k) => n[k]).map(part).join(', '); return s.charAt(0).toUpperCase() + s.slice(1); }
-  const set = { camera: 'behind', speed: 1, flipbook: false, weight: 'lightest', foeWeight: 'light', rows: 540 };
+  const set = { camera: 'side', speed: 1, flipbook: false, weight: 'lightest', foeWeight: 'light', rows: 540 };
   let root = null, canvas = null, stage = null, fight = null, running = false, last = 0, clock = 0, manual = /[?&]shot/.test(location.search), el = {};
   function build() {
     if (root) return;
     const st = document.createElement('style'); st.textContent = CSS; document.head.appendChild(st);
     root = document.createElement('div'); root.className = 'mff'; root.hidden = true;
     root.innerHTML = '<div class="box"><canvas></canvas><div class="ui"></div><div class="wait">Setting the stage…</div></div><div class="panel"><div class="fp"></div><div class="set">' +
-      '<label>Camera <select class="cam"><option value="behind">Behind the party</option><option value="near">Side on, closer</option><option value="actor">On whoever acts</option><option value="shoulder">Over the shoulder</option><option value="low">Low and close</option><option value="wide">Side on, wide</option></select></label>' +
+      '<label>Camera <select class="cam"><option value="side">Side on, everyone</option><option value="near">Side on, closer on a move</option><option value="actor">On whoever acts</option><option value="shoulder">Over the shoulder</option><option value="low">Low and close</option><option value="wide">Side on, wide</option><option value="behind">Behind the party</option></select></label>' +
       '<label>Speed <select class="spd"><option value="1">1×</option><option value="1.5">1.5×</option><option value="2">2×</option><option value="3">3×</option></select></label>' +
       '<label><input type="checkbox" class="flip"> Flipbook look</label><span class="meter"></span></div></div>';
     document.body.appendChild(root);
@@ -19382,7 +19384,7 @@ function makeMFFight(stage, H) {
   $('go').addEventListener('click', () => go());
   $('rest').addEventListener('click', () => { party = null; $('out').textContent = 'Everyone is rested.'; });
   window.MF_PAGE = { go };
-  if (QS.get('start')) go({ seed: +QS.get('seed') || 977, auto: QS.get('auto') || null, camera: QS.get('cam') || 'behind' });
+  if (QS.get('start')) go({ seed: +QS.get('seed') || 977, auto: QS.get('auto') || null, camera: QS.get('cam') || 'side' });
 })();
 </script>
 </body>

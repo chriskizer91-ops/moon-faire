@@ -7,9 +7,9 @@ PLAY = '''() => { const f = MF_FIGHT.debug.fight; let n = 0; while (n < 6000 && 
   const tHit = a.kind === 'hero' ? (a.hitsAt && a.hitsAt.length ? a.hitsAt[0] : a.P.a.dur(a.anim) * 0.5) : a.hitAt; return [(a.P ? a.P.id : a.f.e.name) + ' ' + a.anim, tHit]; }'''
 FWD = '''(t) => { MF_FIGHT.debug.step(1/15, Math.max(1, Math.round(t * 15)), true); MF_FIGHT.debug.step(1/60, 1); }'''
 async def main():
-    a = sys.argv[1:] + [None] * 5; place = a[0] or 'F1'; foes = a[1] or 'K2w'; many = int(a[2] or 4); w = int(a[3] or 1366); h = int(a[4] or 768)
+    a = sys.argv[1:] + [None] * 6; place = a[0] or 'F1'; foes = a[1] or 'K2w'; many = int(a[2] or 4); w = int(a[3] or 1366); h = int(a[4] or 768); cam = a[5] or 'behind'
     async with async_playwright() as p:
-        b, pg, errs = await open_fight(p, {'place': place, 'foes': foes, 'seed': 977, 'auto': 'attentive', 'camera': 'behind'}, w=w, h=h); tag = 'behind_%s_%s_%d' % (place, foes, w)
+        b, pg, errs = await open_fight(p, {'place': place, 'foes': foes, 'seed': 977, 'auto': 'attentive', 'camera': cam}, w=w, h=h); tag = '%s_%s_%s_%d' % (cam, place, foes, w)
         await pg.evaluate(UNTIL, [['menu', 'over'], 900]); await pg.evaluate(FWD, 0.2); await shot(pg, tag + '_group.png')
         for k in range(many):
             r = await pg.evaluate(PLAY)

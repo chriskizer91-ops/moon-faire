@@ -84,7 +84,7 @@
   $('go').addEventListener('click', () => go());
   $('rest').addEventListener('click', () => { party = null; $('out').textContent = 'Everyone is rested.'; });
   window.MF_PAGE = { go };
-  if (QS.get('start')) go({ seed: +QS.get('seed') || 977, auto: QS.get('auto') || null, camera: QS.get('cam') || 'behind' });
+  if (QS.get('start')) go({ seed: +QS.get('seed') || 977, auto: QS.get('auto') || null, camera: QS.get('cam') || 'side' });
 })();
 </script>
 </body>
