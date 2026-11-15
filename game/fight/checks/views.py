@@ -9,9 +9,10 @@ async def main():
     async with async_playwright() as p:
         # 1. a phone, held upright: two witches already fainted; play by tapping
         b, pg, errs = await open_fight(p, {'place': 'F4', 'foes': 'K2w', 'seed': 5, 'party': {'ranger': {'hp': 0}, 'io': {'hp': 0}}}, w=390, h=844)
+        if __import__('sys').argv[1:] == ['ui']: pass
         await pg.evaluate(UNTIL, [['menu', 'over'], 900]); await pg.evaluate('MF_FIGHT.debug.step(1/15, 60, true); MF_FIGHT.debug.step(1/15, 1)'); await shot(pg, 'view_phone_menu.png')
         print('phone:', json.dumps(await pg.evaluate(STATE))[:260])
-        btn = await pg.query_selector('.mff .moves button:not([disabled])'); print('tapping', await btn.text_content()); await btn.click(); print('after the tap:', (await pg.evaluate(STATE))['act'])
+        btn = await pg.query_selector('.mff .moves .tile:not(.off)'); print('tapping', await btn.text_content()); await btn.click(); await pg.evaluate('MF_FIGHT.debug.step(1/30, 1)'); await shot(pg, 'view_phone_picked.png'); print('help:', await pg.evaluate('document.querySelector(".mff .help").textContent'), '| cast bar:', await pg.evaluate('document.querySelector(".mff .cast").textContent')); await pg.click('.mff .cast'); print('after Cast:', (await pg.evaluate(STATE))['act'])
         bars = await pg.query_selector_all('.mff .foebar:not([hidden])'); print('foe bars shown:', len(bars)); print('errors:', errs[:6]); await b.close()
         # 2. the cameras that move, and the Flipbook look
         for cam in ['shoulder', 'low']:

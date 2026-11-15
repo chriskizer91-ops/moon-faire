@@ -48,7 +48,7 @@
   <div id="out">Nothing yet. Start a fight.</div>
 
   <h2>How to play</h2>
-  <p>When it is a witch's turn, her moves are the buttons under the picture. A move aimed at a foe goes to the foe whose bar is lit: tap another foe's bar to aim there. Mend and Revive ask which friend. The strip along the top is who acts next; a foe's Heavy, Crush or Eclipse is named there before it comes. The camera, the speed and the Flipbook look can be changed during the fight.</p>
+  <p>When it is a witch's turn, tap one of her moves. The line above the moves says exactly what it does, or why it cannot be used yet. Then tap who it is for (a foe's bar in the picture, or a friend's box) if you want someone other than the one already lit. Then tap the green bar, which says the move and the target. Tapping the same move or the same target twice also casts. The strip along the top is who acts next; a foe's Heavy, Crush or Eclipse is named there, with a triangle, before it comes. The gear in the corner of the picture holds the camera, the speed and the Flipbook look. On a laptop: 1 to 7 pick a move, Tab or the arrows change the target, Enter casts, Esc goes back.</p>
 
   <h2>For another page</h2>
 <pre>const result = await MF_FIGHT.start({
@@ -84,7 +84,7 @@
   $('go').addEventListener('click', () => go());
   $('rest').addEventListener('click', () => { party = null; $('out').textContent = 'Everyone is rested.'; });
   window.MF_PAGE = { go };
-  if (QS.get('start')) go({ seed: +QS.get('seed') || 977, auto: QS.get('auto') || null, camera: QS.get('cam') || 'directed' });
+  if (QS.get('start')) go({ seed: +QS.get('seed') || 977, auto: QS.get('auto') || null, camera: QS.get('cam') || 'auto' });
 })();
 </script>
 </body>

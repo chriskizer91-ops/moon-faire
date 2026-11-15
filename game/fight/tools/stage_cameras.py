@@ -1,6 +1,7 @@
 # stage_cameras.py: gives src/stage.js a camera that can really move (stage.free), for the fight's close shots.
 # The stage's half of patch_pilot_cameras.py from the project note claude/pilot-fight-cameras.md, with one change: a lens wide enough to ask
-# for more than the painting's width takes the whole width and no more (so a second moon never shows in a mirror). src/stage.js is only read:
+# for more than the painting's width takes the whole width and no more (so a second moon never shows in a mirror), and a camera that looks
+# down may run past the painting's bottom edge but never so far that the mirror there shows the horizon again. src/stage.js is only read:
 # patched(text) returns the changed text, and the fight's build uses that. Every replacement must be found exactly once.
 def patched(s):
     def one(a, b):
@@ -36,7 +37,7 @@ def patched(s):
         "        const d = _v.copy(FR.look).sub(FR.pos), yaw = Math.atan2(d.x, -d.z), pit = Math.atan2(d.y, Math.hypot(d.x, d.z)), tf = Math.tan(FR.fov / 2 * RAD), fpx = (FH / 2) / Math.tan(api.fixed.fov / 2 * RAD);\n"
         "        camera.clearViewOffset(); camera.fov = FR.fov; camera.aspect = canvas.clientWidth / Math.max(1, canvas.clientHeight); camera.near = 0.1; camera.far = 400;\n"
         "        camera.position.copy(FR.pos); camera.lookAt(_v.copy(FR.look).add(_v2.set(sx * 0.003, sy * 0.003, 0))); camera.updateMatrixWorld(); camera.updateProjectionMatrix(); api._free = true;\n"
-        "        let bh = 2 * fpx * tf, bwid = bh * camera.aspect; if (bwid > FW) { bh *= FW / bwid; bwid = FW; } const t = 0.5 + 0.5 * Math.tan(pit) / tf, by = api.fixed.hy - t * bh; let bx = FW / 2 + fpx * yaw - bwid / 2; if (bwid <= FW) bx = Math.max(0, Math.min(FW - bwid, bx));      // as large as the lens asks, its horizon on the camera's horizon, slid sideways by the camera's turn but kept inside the painting when it fits\n"
+        "        let bh = 2 * fpx * tf, bwid = bh * camera.aspect; if (bwid > FW) { bh *= FW / bwid; bwid = FW; } const t = 0.5 + 0.5 * Math.tan(pit) / tf, by = Math.min(api.fixed.hy - t * bh, 2 * FH - api.fixed.hy - 24 - bh); let bx = FW / 2 + fpx * yaw - bwid / 2; if (bwid <= FW) bx = Math.max(0, Math.min(FW - bwid, bx));      // as large as the lens asks, its horizon on the camera's horizon, slid sideways by the camera's turn but kept inside the painting when it fits\n"
         "        bw = [bx / FW, 1 - (by + bh) / FH, bwid / FW, bh / FH];\n"
         "      } else if (api._free) { const X = api.fixed; camera.position.copy(X.pos); camera.quaternion.copy(X.quat); camera.fov = X.fov; camera.aspect = X.aspect; camera.near = X.near; camera.far = X.far; camera.updateMatrixWorld(); api._free = false; }\n"
         "      const pixPaint = F.on && F.painting !== 'smooth' && api.painting && bgMat.map;")

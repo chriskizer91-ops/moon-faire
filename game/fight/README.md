@@ -111,3 +111,24 @@ Claude's and Chris's to overrule:
 5. A won fight ends on the party's bow, seen from the foes' side.
 
 The painting is out of focus in every shot but the opening: that is what a camera behind the party costs with one painting a place.
+
+## The director camera, and the new move-picking screen (Chris, November 14, 7:48 pm)
+
+"I think the UI for selecting moves could be better and needs to be maybe brainstormed by tossing it towards a couple of Opus 5.5 sub
+agents. And then I think a combination: directed wide behind the party and behind their heads, swing on every move ... maybe throw in
+some other good angles, but it should be switching between those intelligently as the fight takes place."
+
+**The camera** (`auto`, "Director: mixes the views", the default; `directorShot` in `fight.js`, where the rules are written out):
+the fight opens on the sharp painting; a witch's turn is seen over her shoulder at the foe she aims at; crossing the ground is the
+wide view; every move gets a shot, chosen by what kind of move it is and never the same twice running (the swing, both of them from
+the side, low in front of the caster, from behind the target, from above for a move at everyone); between moves the last shot holds;
+a won fight ends on the bow. The earlier cameras are all still in the menu.
+
+**The move-picking screen** (two Opus 5.5 sub-agents brainstormed it; both came to the same shape): pick a move, then who, then Cast.
+The first tap never acts. The help line is always shown and says what the move does, or why it cannot be used. Moves are large
+tiles. The green Cast bar says the move and the target ("Stitch → Shadow Wraith"). Targets start on whoever she aimed at last (heals
+start on whoever is hurt most); tap a foe's bar or a friend's box to change it; tapping the same move or target twice also casts. The
+party is one slim strip of four. The log line is a caption on the picture. Camera, speed and look are behind a gear. A Heavy, Crush
+or Eclipse on the turn bar is marked with a triangle and its name. Keys: 1 to 7, Tab or arrows, Enter, Esc.
+Not built from the brainstorm: the damage shown as a ghost on the target's bar before casting, and tapping a foe's body in the picture.
+`checks/ui.py` plays it by taps and keys on a phone and a laptop.

@@ -48,7 +48,7 @@
   <div id="out">Nothing yet. Start a fight.</div>
 
   <h2>How to play</h2>
-  <p>When it is a witch's turn, her moves are the buttons under the picture. A move aimed at a foe goes to the foe whose bar is lit: tap another foe's bar to aim there. Mend and Revive ask which friend. The strip along the top is who acts next; a foe's Heavy, Crush or Eclipse is named there before it comes. The camera, the speed and the Flipbook look can be changed during the fight.</p>
+  <p>When it is a witch's turn, tap one of her moves. The line above the moves says exactly what it does, or why it cannot be used yet. Then tap who it is for (a foe's bar in the picture, or a friend's box) if you want someone other than the one already lit. Then tap the green bar, which says the move and the target. Tapping the same move or the same target twice also casts. The strip along the top is who acts next; a foe's Heavy, Crush or Eclipse is named there, with a triangle, before it comes. The gear in the corner of the picture holds the camera, the speed and the Flipbook look. On a laptop: 1 to 7 pick a move, Tab or the arrows change the target, Enter casts, Esc goes back.</p>
 
   <h2>For another page</h2>
 <pre>const result = await MF_FIGHT.start({
@@ -18757,7 +18757,7 @@ function makeMFStage(canvas, o) {
         const d = _v.copy(FR.look).sub(FR.pos), yaw = Math.atan2(d.x, -d.z), pit = Math.atan2(d.y, Math.hypot(d.x, d.z)), tf = Math.tan(FR.fov / 2 * RAD), fpx = (FH / 2) / Math.tan(api.fixed.fov / 2 * RAD);
         camera.clearViewOffset(); camera.fov = FR.fov; camera.aspect = canvas.clientWidth / Math.max(1, canvas.clientHeight); camera.near = 0.1; camera.far = 400;
         camera.position.copy(FR.pos); camera.lookAt(_v.copy(FR.look).add(_v2.set(sx * 0.003, sy * 0.003, 0))); camera.updateMatrixWorld(); camera.updateProjectionMatrix(); api._free = true;
-        let bh = 2 * fpx * tf, bwid = bh * camera.aspect; if (bwid > FW) { bh *= FW / bwid; bwid = FW; } const t = 0.5 + 0.5 * Math.tan(pit) / tf, by = api.fixed.hy - t * bh; let bx = FW / 2 + fpx * yaw - bwid / 2; if (bwid <= FW) bx = Math.max(0, Math.min(FW - bwid, bx));      // as large as the lens asks, its horizon on the camera's horizon, slid sideways by the camera's turn but kept inside the painting when it fits
+        let bh = 2 * fpx * tf, bwid = bh * camera.aspect; if (bwid > FW) { bh *= FW / bwid; bwid = FW; } const t = 0.5 + 0.5 * Math.tan(pit) / tf, by = Math.min(api.fixed.hy - t * bh, 2 * FH - api.fixed.hy - 24 - bh); let bx = FW / 2 + fpx * yaw - bwid / 2; if (bwid <= FW) bx = Math.max(0, Math.min(FW - bwid, bx));      // as large as the lens asks, its horizon on the camera's horizon, slid sideways by the camera's turn but kept inside the painting when it fits
         bw = [bx / FW, 1 - (by + bh) / FH, bwid / FW, bh / FH];
       } else if (api._free) { const X = api.fixed; camera.position.copy(X.pos); camera.quaternion.copy(X.quat); camera.fov = X.fov; camera.aspect = X.aspect; camera.near = X.near; camera.far = X.far; camera.updateMatrixWorld(); api._free = false; }
       const pixPaint = F.on && F.painting !== 'smooth' && api.painting && bgMat.map;
@@ -18885,7 +18885,7 @@ function makeMFFight(stage, H) {
   const E = window.MF_ENGINE, AC = window.MF_ACTORS, FO = window.MF_FOES, ui = H.ui, panel = H.panel;
   const group = new THREE.Group(); group.visible = false; stage.cast.add(group);
   const WORDS = H.words || { sealed: 'sealed', ended: 'Ended', fate: 'Fate', won: 'The show is over', lost: 'The party has fainted', fled: 'The party slipped away', xp: 'XP', turn: 'turn', turns: 'turns',
-    yourTurn: 'to move', acts: 'acts', up: 'Up', full: 'Full', miss: 'Nobody is hurt', done: 'Carry on', deity: 'The deity arrives', bloom: 'The bloom opens' };
+    yourTurn: 'to move', pickMove: 'Pick a move.', cast: 'Cast', everyFoe: 'every foe', acts: 'acts', up: 'Up', full: 'Full', miss: 'Nobody is hurt', done: 'Carry on', deity: 'The deity arrives', bloom: 'The bloom opens' };
   const XP = { normal: 10, difficult: 40, boss: 400 }, XP_SLOPE = 1.2;                       // game/plan/sim/plan.js
   const ORDER = ['jester', 'ranger', 'fox', 'io'];
   const _v = new THREE.Vector3(), _w = new THREE.Vector3(), num = (n) => Math.round(n).toLocaleString('en-US');
@@ -18906,9 +18906,12 @@ function makeMFFight(stage, H) {
   }
 
   // ---------- the words and bars over the picture ----------
-  ui.innerHTML = '<div class="turnbar" aria-label="The next turns"></div><div class="title" hidden></div><div class="banner" hidden></div><div class="floats"></div><div class="bars"></div>';
-  panel.innerHTML = '<p class="log" aria-live="polite"></p><div class="party"></div><div class="moves"></div><p class="help"></p>';
-  const $ = (q) => ui.querySelector(q) || panel.querySelector(q), elBar = $('.turnbar'), elBanner = $('.banner'), elTitle = $('.title'), elFloats = $('.floats'), elBars = $('.bars'), elMoves = $('.moves'), elHelp = $('.help'), elLog = $('.log'), elParty = $('.party');
+  // The move-picking screen (reworked November 14 after two Opus 5.5 brainstorms; Chris: "the UI for selecting moves could be better").
+  // Pick a move, then who, then Cast: the first tap never acts. The help line is always there. The Cast bar says the move and the target.
+  ui.innerHTML = '<div class="turnbar" aria-label="The next turns"></div><div class="title" hidden></div><div class="banner" hidden></div><div class="floats"></div><div class="bars"></div><p class="log" aria-live="polite"></p>';
+  panel.innerHTML = '<div class="party"></div><p class="help"></p><div class="moves"></div><div class="castrow" hidden><button type="button" class="back" hidden></button><button type="button" class="cast" disabled></button></div>';
+  const $ = (q) => ui.querySelector(q) || panel.querySelector(q), elBar = $('.turnbar'), elBanner = $('.banner'), elTitle = $('.title'), elFloats = $('.floats'), elBars = $('.bars'), elMoves = $('.moves'), elHelp = $('.help'), elLog = $('.log'), elParty = $('.party'), elCast = $('.cast'), elBack = $('.back'), elCastRow = $('.castrow');
+  elBack.textContent = 'Back'; elBack.addEventListener('click', () => { sel = null; paint(); }); elCast.addEventListener('click', () => cast());
   function float(v, text, cls) { const p = stage.toScreen(v); if (p[0] < -999) return; const d = document.createElement('span'); d.className = 'float ' + (cls || ''); d.textContent = text; d.style.left = p[0].toFixed(0) + 'px'; d.style.top = p[1].toFixed(0) + 'px'; elFloats.appendChild(d); setTimeout(() => d.remove(), 1500); }
   function title(text) { elTitle.textContent = text; elTitle.hidden = false; clearTimeout(title.t); title.t = setTimeout(() => { elTitle.hidden = true; }, 2200); }
   const say = (t) => { elLog.textContent = t; };
@@ -18916,7 +18919,7 @@ function makeMFFight(stage, H) {
   // ---------- the fight ----------
   const GEO = { pcx: 0, pcz: 0, fcx: 1, fcz: 0, ux: 1, uz: 0, D: 1, tall: 1 };
   let intro = 0;      // seconds left of a fight's opening
-  let B = null, phase = 'off', act = null, cur = null, selFoe = 0, selHero = 'jester', time = 0, shake = 0, win = null, auto = null, wait = 0, O = null, onDone = null, pick = null;
+  let B = null, phase = 'off', act = null, cur = null, selFoe = 0, selHero = 'jester', time = 0, shake = 0, win = null, auto = null, wait = 0, O = null, onDone = null, sel = null;
   const J = () => party.jester && party.jester.a.m;
   const heroesE = () => B.fighters.filter((f) => f.side === 'hero'), foesE = () => B.fighters.filter((f) => f.side === 'foe');
   const upFoes = () => foes.filter((f) => f.up), foeOf = (id) => foes.find((f) => f.e.id === id);
@@ -18949,12 +18952,12 @@ function makeMFFight(stage, H) {
       G.D = Math.hypot(G.fcx - G.pcx, G.fcz - G.pcz) || 1; G.ux = (G.fcx - G.pcx) / G.D; G.uz = (G.fcz - G.pcz) / G.D; G.tall = foes.reduce((q, f) => Math.max(q, f.K.h), 0);
       for (const P of hs) { P.a.rest = Math.atan2(G.fcx - P.x, G.fcz - P.z); P.a.face = P.a.rest; } }
     if (J()) { J().arena = 9; J().game.fates = foes.map(() => null); }
-    selFoe = 0; selHero = heroesE()[0].id; act = null; cur = null; pick = null; shake = 0; intro = 2.2; wait = CAMNOW() === 'directed' ? 2.5 : 1.4; phase = 'wait'; elBanner.hidden = true; elTitle.hidden = true;
+    selFoe = 0; selHero = heroesE()[0].id; act = null; cur = null; sel = null; shake = 0; intro = 2.2; lastShot = null; wait = CAMNOW() === 'directed' || CAMNOW() === 'auto' ? 2.5 : 1.4; phase = 'wait'; elBanner.hidden = true; elTitle.hidden = true;
     partyRows(); say((opts.label || 'A fight') + '.'); paint();
   }
   function partyRows() {
     elParty.innerHTML = '';
-    for (const id of ORDER) { const P = party[id]; if (!P || !P.e) continue; const d = document.createElement('button'); d.type = 'button'; d.className = 'who'; d.innerHTML = '<b></b><span class="hpn"></span><div class="hp"><i></i></div><span class="mpn"></span>'; d.addEventListener('click', () => tapHero(P)); elParty.appendChild(d); P.row = d; }
+    for (const id of ORDER) { const P = party[id]; if (!P || !P.e) continue; const d = document.createElement('button'); d.type = 'button'; d.className = 'who'; d.innerHTML = '<b></b><div class="hp"><i></i></div><span class="hpn"></span><div class="mp"><i></i></div><span class="mpn"></span>'; d.addEventListener('click', () => tapHero(P)); elParty.appendChild(d); P.row = d; }
   }
 
   // ---------- showing what the engine did ----------
@@ -18993,7 +18996,7 @@ function makeMFFight(stage, H) {
     toMenu();
   }
   function toMenu() {
-    phase = 'menu'; pick = null; wait = 0.7; say(cur.a.name + ' ' + WORDS.yourTurn + '.');
+    phase = 'menu'; sel = null; wait = 0.7; say(cur.a.name + ' ' + WORDS.yourTurn + '.');
     if (!foes[selFoe] || !foes[selFoe].up) { const k = foes.findIndex((f) => f.up); if (k >= 0) selFoe = k; }
     paint();
   }
@@ -19087,25 +19090,36 @@ function makeMFFight(stage, H) {
   }
 
   // ---------- what is on screen ----------
-  function tapFoe(f) { if (phase !== 'menu' || !f.up) return; selFoe = f.i; if (pick && pick.kind === 'foe' && pick.ok.indexOf(f) >= 0) { const id = pick.id; pick = null; choose(id, f.e.id); } else paint(); }
-  function tapHero(P) { if (phase !== 'menu') return; selHero = P.id; if (pick && pick.kind === 'hero' && pick.ok.indexOf(P.id) >= 0) { const id = pick.id; pick = null; choose(id, P.id); } else paint(); }
-  function press(m) {                                      // a move button: moves aimed at a friend ask who; moves aimed at a foe use the foe that is marked (tap a foe's bar to mark another)
-    if (!m.ok) return;
-    if (m.target === 'hero' || m.target === 'fallen') { const ok = E.targetsFor(B, cur.e, m.id).map((e) => e.id); if (ok.length > 1) { pick = { id: m.id, kind: 'hero', ok }; elHelp.textContent = m.label + ': choose a friend above.'; paint(true); return; } }
-    if (m.target === 'marked' || m.target === 'sealed') { const ok = E.targetsFor(B, cur.e, m.id).map((e) => foeOf(e.id)); if (ok.length > 1 && ok.indexOf(foes[selFoe]) < 0) { pick = { id: m.id, kind: 'foe', ok }; elHelp.textContent = m.label + ': choose one of the lit foes.'; paint(true); return; } }
-    choose(m.id);
+  // sel: the move that is picked and who it is aimed at. kind: 'foe', 'hero' (a friend), 'none', or 'off' (it cannot be used now; the help line says why)
+  function select(id) {
+    if (phase !== 'menu' || !cur) return false;
+    const m = E.heroMoves(B, cur.e).find((x) => x.id === id); if (!m) return false;
+    if (sel && sel.id === id && m.ok) return cast();                                   // the same move a second time: cast it
+    if (!m.ok) { sel = { id, m, kind: 'off', ok: [], t: null }; paint(); return false; }
+    let kind = 'none', ok = [], t = null;
+    if (/^(foe|foe2|sealed|marked)$/.test(m.target)) { kind = 'foe'; ok = E.targetsFor(B, cur.e, id).map((e) => foeOf(e.id)).filter((f) => f && f.up); t = ok.indexOf(cur.lastFoe) >= 0 ? cur.lastFoe : ok.indexOf(foes[selFoe]) >= 0 ? foes[selFoe] : ok[0]; if (t) selFoe = t.i; }      // she aims where she aimed last, if she still can
+    else if (m.target === 'hero' || m.target === 'fallen') { kind = 'hero'; const es = E.targetsFor(B, cur.e, id); ok = es.map((e) => e.id); t = m.target === 'hero' ? es.slice().sort((a, b) => a.hp / a.max - b.hp / b.max)[0].id : ok[0]; }      // a heal starts on whoever is hurt most
+    sel = { id, m, kind, ok, t }; paint(); return true;
   }
-  function paint(keepHelp) {
-    if (!B) return;
-    for (const e of heroesE()) { const P = party[e.id], d = P.row; if (!d) continue; d.children[0].textContent = P.a.name; d.children[1].textContent = num(P.shown.hp) + ' / ' + num(e.max); d.children[2].firstChild.style.width = (100 * P.shown.hp / e.max).toFixed(1) + '%';
-      d.children[3].textContent = e.mpMax ? P.shown.mp + ' MP' : (e.id === 'ranger' && B.gem > 0 ? 'gem in ' + B.gem : ''); if (e.id === 'jester' && B.taunt > 0) d.children[3].textContent += ' · catching ' + B.taunt;
-      d.classList.toggle('now', phase === 'menu' && cur === P); d.classList.toggle('down', P.shown.hp <= 0.5); d.classList.toggle('pick', !!(pick && pick.kind === 'hero' && pick.ok.indexOf(e.id) >= 0)); }
-    elBar.innerHTML = ''; if (phase !== 'over') for (const b of E.bar(B)) { const c = document.createElement('span'); c.className = 'chip ' + b.u.side + (b.move && b.move !== 'blow' ? ' marked' : ''); c.textContent = b.u.name + (b.move && b.move !== 'blow' ? ' · ' + b.move : ''); elBar.appendChild(c); }
-    if (elBar.firstChild && phase === 'menu') elBar.firstChild.classList.add('now');
-    elMoves.innerHTML = ''; if (!keepHelp) elHelp.textContent = '';
-    if (phase === 'menu' && cur) for (const m of E.heroMoves(B, cur.e)) { const b = document.createElement('button'); b.type = 'button'; b.textContent = m.label + (m.mp ? ' · ' + m.mp + ' MP' : ''); b.disabled = !m.ok; b.title = m.ok ? m.help : m.why; b.dataset.id = m.id; if (pick && pick.id === m.id) b.className = 'on';
-      b.addEventListener('click', () => press(m)); const tip = () => { if (!pick) elHelp.textContent = m.ok ? m.help : m.why + '. ' + m.help; }; b.addEventListener('pointerenter', tip); b.addEventListener('focus', tip); elMoves.appendChild(b); }
-    ui.classList.toggle('picking', phase === 'menu' && upFoes().length > 1);
+  function cast() { if (phase !== 'menu' || !sel || sel.kind === 'off') return false; const q = sel; if (q.kind === 'foe') cur.lastFoe = q.t; sel = null; return choose(q.id, q.kind === 'foe' ? q.t.e.id : q.kind === 'hero' ? q.t : undefined); }
+  function tapFoe(f) { if (phase !== 'menu' || !f.up) return; if (sel && sel.kind === 'foe') { if (sel.ok.indexOf(f) < 0) return; if (sel.t === f) { cast(); return; } sel.t = f; } selFoe = f.i; paint(); }
+  function tapHero(P) { if (phase !== 'menu' || !sel || sel.kind !== 'hero' || sel.ok.indexOf(P.id) < 0) return; if (sel.t === P.id) { cast(); return; } sel.t = P.id; paint(); }
+  function paint() {
+    if (!B) return; const menu = phase === 'menu' && !!cur, pct = (k) => (100 * Math.max(0, Math.min(1, k))).toFixed(1) + '%';
+    for (const e of heroesE()) { const P = party[e.id], d = P.row; if (!d) continue; const c = d.children;
+      c[0].textContent = P.a.name; c[1].firstChild.style.width = pct(P.shown.hp / e.max); c[2].textContent = num(P.shown.hp) + ' HP'; c[3].style.visibility = e.mpMax ? '' : 'hidden'; if (e.mpMax) c[3].firstChild.style.width = pct(P.shown.mp / e.mpMax);
+      c[4].textContent = e.id === 'jester' && B.taunt > 0 ? 'catching ' + B.taunt : e.mpMax ? P.shown.mp + ' MP' : (e.id === 'ranger' && B.gem > 0 ? 'gem in ' + B.gem : '\u00a0');
+      d.classList.toggle('now', menu && cur === P); d.classList.toggle('down', P.shown.hp <= 0.5); d.classList.toggle('pick', !!(sel && sel.kind === 'hero' && sel.ok.indexOf(e.id) >= 0)); d.classList.toggle('tgt', !!(sel && sel.kind === 'hero' && sel.t === e.id)); }
+    elBar.innerHTML = ''; if (phase !== 'over') for (const b of E.bar(B)) { const big = b.move && b.move !== 'blow', c = document.createElement('span'); c.className = 'chip ' + b.u.side + (big ? ' marked' : ''); c.textContent = (big ? '\u25b2 ' : '') + b.u.name + (big ? ': ' + b.move.charAt(0).toUpperCase() + b.move.slice(1) : ''); elBar.appendChild(c); }      // a Heavy, Crush or Eclipse that is coming is named, with a mark that does not rely on colour
+    if (elBar.firstChild && menu) elBar.firstChild.classList.add('now');
+    elMoves.innerHTML = ''; elCastRow.hidden = !menu;
+    if (!menu) { elHelp.textContent = ''; ui.classList.remove('picking'); return; }
+    for (const m of E.heroMoves(B, cur.e)) { const b = document.createElement('button'); b.type = 'button'; b.className = 'tile' + (m.ok ? '' : ' off') + (sel && sel.id === m.id ? ' on' : ''); b.dataset.id = m.id;
+      const n = document.createElement('b'), x = document.createElement('span'); n.textContent = m.label; x.textContent = m.ok ? (m.mp ? m.mp + ' MP' : '\u00a0') : m.why; b.append(n, x); b.addEventListener('click', () => select(m.id)); elMoves.appendChild(b); }
+    elHelp.textContent = !sel ? cur.a.name + ': ' + WORDS.pickMove : sel.kind === 'off' ? sel.m.why + '. ' + sel.m.help : sel.m.help;
+    const can = !!sel && sel.kind !== 'off'; elCast.disabled = !can; elBack.hidden = !sel;
+    elCast.textContent = !can ? WORDS.cast : sel.m.label + (sel.kind === 'foe' ? ' \u2192 ' + sel.t.e.name : sel.kind === 'hero' ? ' \u2192 ' + party[sel.t].a.name : sel.m.target === 'allfoes' ? ' \u2192 ' + WORDS.everyFoe : '');
+    ui.classList.toggle('picking', upFoes().length > 1);
   }
   function bars() {
     const m = J(), put = [];
@@ -19113,7 +19127,7 @@ function makeMFFight(stage, H) {
       const p = stage.toScreen(_v.set(f.m.root.position.x, f.K.bar, f.m.root.position.z)); let y = p[1]; for (let k = 0; k < 6 && put.some((q) => Math.abs(q[0] - p[0]) < 96 && Math.abs(q[1] - y) < 30); k++) y -= 30;      // two bars never sit on each other
       put.push([p[0], y]); d.style.left = p[0].toFixed(0) + 'px'; d.style.top = y.toFixed(0) + 'px';
       const life = f.shown.life, Lk = life / f.shown.max, Fk = Math.min(Lk, f.shown.fate / f.shown.max), sealedNow = life > 0 && f.shown.fate > 0 && f.shown.fate >= life;
-      d.classList.toggle('sealed', sealedNow); d.classList.toggle('tgt', phase === 'menu' && f.i === selFoe); d.classList.toggle('pick', !!(pick && pick.kind === 'foe' && pick.ok.indexOf(f) >= 0));
+      d.classList.toggle('sealed', sealedNow); { const aim = sel && sel.kind === 'foe'; d.classList.toggle('tgt', phase === 'menu' && (aim ? sel.t === f : f.i === selFoe)); d.classList.toggle('pick', !!(aim && sel.t !== f && sel.ok.indexOf(f) >= 0)); d.classList.toggle('dim', !!(aim && sel.ok.indexOf(f) < 0)); }
       d.firstChild.textContent = f.e.name + (sealedNow ? ' · ' + WORDS.sealed : '') + (f.e.conf > 0 ? ' · lost' : '') + (f.e.cloth ? ' · cut' : ''); d.lastChild.children[0].style.width = (100 * Lk).toFixed(1) + '%'; d.lastChild.children[1].style.width = (100 * Fk).toFixed(1) + '%';
       // what the Jester's model is told: Fate on each foe, shown as dust falling round it
       if (m) { const k = f.mark; k.x = f.m.root.position.x; k.y = 0; k.z = f.m.root.position.z; k.r = f.K.r; k.h = f.K.h; k.k = life > 0 ? Math.min(1, f.shown.fate / life) : 0; k.sealed = sealedNow; m.game.fates[f.i] = life > 0 ? k : null; } }
@@ -19127,7 +19141,7 @@ function makeMFFight(stage, H) {
   // 'behind' (Chris, November 14: "the camera is from behind their heads ... swing around and look at each move but cut back to the whole
   // group in between"): at rest the camera stands behind the party and looks over their heads at the foes. For each move it cuts to a
   // camera that swings round whoever is moving, then cuts back. It is a camera that really moves, so the painting behind is out of focus.
-  const CAMNOW = () => (H.cam ? H.cam() : 'directed'), SIDE = (ux, uz) => (ux >= 0 ? [-uz, ux] : [uz, -ux]);      // SIDE: the way across a line, on the audience's side of it
+  const CAMNOW = () => (H.cam ? H.cam() : 'auto'), SIDE = (ux, uz) => (ux >= 0 ? [-uz, ux] : [uz, -ux]);      // SIDE: the way across a line, on the audience's side of it
   const ease = (k) => { k = Math.max(0, Math.min(1, k)); return k * k * (3 - 2 * k); }, mix = (p, q, k) => p + (q - p) * k, DEG = Math.PI / 180;
   const swing = (cx, cz, ux, uz, phi, R) => { const sd = SIDE(ux, uz), c = Math.cos(phi), n = Math.sin(phi); return [cx - ux * R * c + sd[0] * R * n, cz - uz * R * c + sd[1] * R * n]; };
   // 'directed' (Chris, November 14, 7:26 pm: "behind the party with a wider angle ... director decisions"). The decisions:
@@ -19137,7 +19151,7 @@ function makeMFFight(stage, H) {
   //   4. A big move earns its own shot, the swing: a witch's spells that are named in BIG, and a foe's Heavy, Crush or Eclipse.
   //   5. A won fight ends on the party's bow, seen from the foes' side.
   const BIG = { g_seal: 1, g_curtain: 1, taunt_heal: 1, shots: 1, moons_little_lie: 1, crazy_quilt: 1, same_cloth: 1, borrowed_face: 1, guardian: 1, revive: 1, garden: 1 };
-  const REAR = (c) => c === 'behind' || c === 'directed';
+  const REAR = (c) => c === 'behind' || c === 'directed' || c === 'auto';
   function behindShot(a, playing, asp) {
     const G = GEO, sd = SIDE(G.ux, G.uz), WIDE = CAMNOW() === 'directed';
     if (WIDE && intro > 0 && phase !== 'over') return null;
@@ -19166,6 +19180,64 @@ function makeMFFight(stage, H) {
     { const dx = fp.x - G.pcx, dz = fp.z - G.pcz, L = Math.hypot(dx, dz) || 1, phi = mix(-16, 32, ease(a.t / a.hitAt)) * DEG, q = swing(fp.x, fp.z, dx / L, dz / L, phi, 4.5 + 1.3 * tall);      // a foe on its own, or striking another foe: from the party's side, drifting round it
       return { p: [q[0], 1.6 + 0.3 * tall, q[1]], l: [fp.x, 0.55 * tall, fp.z], fov: 34 }; }
   }
+  // 'auto', the director (Chris, November 14, 7:48 pm: "a combination: directed wide behind the party and behind their heads, a swing on
+  // every move ... maybe some other good angles ... switching between those intelligently as the fight takes place").
+  // The shots it can call:  WIDE the rear three-quarter view of everyone;  HEADS close behind the party's heads;  TURN over the shoulder of
+  // the witch whose turn it is, at the foe she is aiming at;  SWING from over the mover's shoulder round to her side, then to whoever it
+  // landed on;  PROFILE both of them from the side, pushing in;  LOW low in front of the mover, drifting;  REVERSE from behind the target,
+  // looking back at who is coming;  HIGH from above, over whoever a move at everyone lands on;  FOE round a foe that acts on its own.
+  // How it chooses:
+  //   - the fight opens on the sharp painting; a witch's turn is TURN; crossing the ground to a target is WIDE; between moves it holds the last shot
+  //   - a move at one foe from where she stands takes SWING, PROFILE and LOW in turn (never the same twice running); Sealed Fate, Curtain
+  //     Call and the gem's two shots are always SWING
+  //   - a move she walks up for (Io's, the Fox's fangs) takes REVERSE and SWING in turn; a move on a friend is PROFILE, close
+  //   - a move at everyone or on herself is LOW until it lands, then HIGH over the foes, or HEADS when it is the party that feels it
+  //   - a foe's strike at a witch takes "behind her head" and REVERSE in turn; its Eclipse is FOE, then HEADS as it falls on the party
+  //   - a won fight ends on the bow
+  let shotN = 0, lastShot = null;
+  function directorShot(a, playing, asp) {
+    const G = GEO, sd = SIDE(G.ux, G.uz), keep = (q) => (lastShot = q);
+    if (intro > 0 && phase !== 'over') return null;
+    if (phase === 'over' && B.over === 'won') return { p: [G.pcx + G.ux * 6 + sd[0] * 2.2, 1.5, G.pcz + G.uz * 6 + sd[1] * 2.2], l: [G.pcx, 1.15, G.pcz], fov: 34, blur: 2.4, dim: 0.9, group: true };
+    const WIDE = (push) => { const th = 55 * DEG, R = 6.0 * (1 - 0.12 * push), q = [G.pcx - G.ux * R * Math.cos(th) + sd[0] * R * Math.sin(th), G.pcz - G.uz * R * Math.cos(th) + sd[1] * R * Math.sin(th)];
+      return { p: [q[0], 2.9 + 0.08 * G.tall - 0.2 * push, q[1]], l: [G.pcx + G.ux * 0.42 * G.D, 1.0 + 0.1 * G.tall, G.pcz + G.uz * 0.42 * G.D], fov: Math.min(64, 46 * Math.max(1, 1.45 / asp)), blur: 1.7, dim: 0.92, group: true }; };
+    const HEADS = () => { const back = 4.7 * Math.max(1, Math.min(2.3, 1.5 / asp)); return { p: [G.pcx - G.ux * back + sd[0] * 0.7, 2.7 + 0.1 * G.tall, G.pcz - G.uz * back + sd[1] * 0.7], l: [G.pcx + G.ux * 0.8 * G.D, 0.8 + 0.08 * G.tall, G.pcz + G.uz * 0.8 * G.D], fov: 36 + Math.max(0, G.tall - 2), blur: 2.0, dim: 0.9, group: true }; };
+    const dirTo = (x0, z0, x1, z1) => { const dx = x1 - x0, dz = z1 - z0, L = Math.hypot(dx, dz) || 1; return [dx / L, dz / L, L]; };
+    if (phase === 'menu' && cur) {                           // TURN: over her shoulder, at the foe she is aiming at
+      const f = foes[selFoe] && foes[selFoe].up ? foes[selFoe] : upFoes()[0], tx = f ? f.x : G.fcx, tz = f ? f.z : G.fcz, th = f ? f.K.h : 2, d = dirTo(cur.x, cur.z, tx, tz), ps = SIDE(d[0], d[1]), k = Math.max(1, Math.min(1.5, 1.2 / asp));
+      return keep({ p: [cur.x - d[0] * 2.9 * k + ps[0] * 0.95, 2.05 + 0.05 * th, cur.z - d[1] * 2.9 * k + ps[1] * 0.95], l: [cur.x + d[0] * 0.72 * d[2], 0.7 + 0.13 * th, cur.z + d[1] * 0.72 * d[2]], fov: Math.min(56, 42 * k), blur: 2.2, dim: 0.9, group: true }); }
+    if (!a) return lastShot || WIDE(0);                      // between moves: hold
+    if (a.kind === 'hero' && a.anim === 'g_curtain' && a.stage === 'play' && a.P.a.time > 5.2) return keep(WIDE(1));
+    if (!playing || a.stage !== 'play') return keep(WIDE(a.stage === 'in' ? ease(a.g) * 0.6 : 0));      // crossing the ground
+    if (a.shotK == null) a.shotK = shotN++;
+    const n = a.shotK;
+    if (a.kind === 'hero') { const P = a.P, landed = a.hitK > 0 || a.landed; if (landed && a.landT == null) a.landT = a.t; const after = a.landT == null ? 0 : ease((a.t - a.landT) / 0.7), dur = P.a.dur(a.anim), tHit = a.tags ? 0.5 * dur : (a.hitsAt[0] || 0.6 * dur);
+      if (a.T && a.th !== P) { const d = dirTo(P.x, P.z, a.T.x, a.T.z), ux = d[0], uz = d[1], L = d[2], ps = SIDE(ux, uz), th = a.tf ? a.tf.K.h : 1.7, always = { g_seal: 1, g_curtain: 1, shots: 1, guardian: 1 }[a.anim];
+        const kind = always ? 'swing' : a.th ? 'profile' : a.from ? ['reverse', 'swing'][n % 2] : ['swing', 'profile', 'low'][n % 3];
+        if (kind === 'profile') { const c = a.th ? 0.5 : 0.3, R = Math.max(3.4, Math.min(6.0, 2.2 + 0.5 * L)) * (1 - 0.1 * ease(a.t / tHit)), k = mix(c, 0.72, after);      // both of them, side on, pushing in; when it lands the picture slides to the one it landed on
+          return keep({ p: [P.x + ux * k * L + ps[0] * R, 1.45, P.z + uz * k * L + ps[1] * R], l: [P.x + ux * k * L, 1.1 + 0.15 * Math.max(0, th - 2) * after, P.z + uz * k * L], fov: 34 }); }
+        if (kind === 'low') { const phi = mix(105, 150, ease(a.t / Math.max(tHit, 1))) * DEG, q = swing(P.x, P.z, ux, uz, phi, 3.3);                                 // low in front of her as she casts; then to her target
+          if (!after) return keep({ p: [q[0], 0.6, q[1]], l: [P.x, 1.25, P.z], fov: 32 });
+          const q2 = swing(a.T.x, a.T.z, ux, uz, 35 * DEG, 3.0 + 0.9 * th); return keep({ p: [q2[0], 0.9 + 0.3 * th, q2[1]], l: [a.T.x, 0.55 * th, a.T.z], fov: 34 }); }
+        if (kind === 'reverse') { const R = 2.3 + 0.7 * th, k = mix(0.25, 0.85, after);                                                                               // from behind her target, looking back at her
+          return keep({ p: [a.T.x + ux * R + ps[0] * (0.9 + 0.2 * th), 0.9 + 0.55 * th, a.T.z + uz * R + ps[1] * (0.9 + 0.2 * th)], l: [P.x + ux * k * L, mix(1.15, 0.5 * th, after), P.z + uz * k * L], fov: 36 }); }
+        const phi = (mix(24, 80, ease(a.t / tHit)) + 12 * after) * DEG, R = Math.max(4, Math.min(6.5, 3.6 + 0.3 * L)) + 0.25 * Math.max(0, th - 2) * after, q = swing(P.x + ux * 0.3 * L * after, P.z + uz * 0.3 * L * after, ux, uz, phi, R), k = mix(0.3, 0.8, after);      // the swing
+        return keep({ p: [q[0], 1.75 + 0.12 * Math.max(0, th - 2) * after, q[1]], l: [P.x + ux * k * L, mix(1.15, 0.3 + 0.5 * th, after), P.z + uz * k * L], fov: 30 }); }
+      if (landed) { const hitsFoes = AC.MOVES[a.id] && /needles|quilt/.test(a.id);                                                                                    // a move at everyone, or on herself, once it lands
+        if (hitsFoes) { const h = 4.2 + 0.2 * G.tall - 0.4 * after; return keep({ p: [G.fcx - G.ux * 8.6 + sd[0] * 4.6, h, G.fcz - G.uz * 8.6 + sd[1] * 4.6], l: [G.fcx, 1.2, G.fcz], fov: 34, blur: 2.4, group: true }); }      // HIGH: not so high that the camera looks down past the painting
+        return keep(a.id === 'i_bloom' || a.id === 'j_heal' ? HEADS() : WIDE(1)); }
+      const phi = mix(100, 150, ease(a.t / Math.max(1.5, 0.8 * dur))) * DEG, q = swing(P.x, P.z, G.ux, G.uz, phi, 3.5);
+      return keep({ p: [q[0], 0.65, q[1]], l: [P.x, 1.25, P.z], fov: 32 }); }
+    const f = a.f, fp = f.m.root.position, tall = f.K.h, after = a.done ? ease((a.t - a.hitAt) / 0.7) : 0;
+    if (a.tp && !a.all) { const P = a.tp, d = dirTo(P.x, P.z, fp.x, fp.z), ux = d[0], uz = d[1], L = d[2], ps = SIDE(ux, uz);
+      if (n % 2) { const R = 2.4 + 0.75 * tall, k = mix(0.3, 0.9, after);                                                                                           // from behind the foe, down at the witch it strikes
+        return keep({ p: [fp.x + ux * R + ps[0] * (1.0 + 0.3 * tall), 1.0 + 0.6 * tall, fp.z + uz * R + ps[1] * (1.0 + 0.3 * tall)], l: [fp.x - ux * k * L, 1.1, fp.z - uz * k * L], fov: 38 }); }
+      const phi = mix(12, 64, ease(a.t / a.hitAt)) * DEG, q = swing(P.x, P.z, ux, uz, phi, 3.3 + 0.45 * tall), k = mix(0.6, 0.12, after);                             // from behind her head as it comes, round to her side as it lands
+      return keep({ p: [q[0], 1.9 + 0.2 * tall, q[1]], l: [P.x + ux * k * L, mix(0.3 + 0.5 * tall, 1.15, after), P.z + uz * k * L], fov: 34 }); }
+    if (a.all && a.done) return keep(HEADS());
+    { const d = dirTo(G.pcx, G.pcz, fp.x, fp.z), phi = mix(-16, 32, ease(a.t / a.hitAt)) * DEG, q = swing(fp.x, fp.z, d[0], d[1], phi, 4.5 + 1.3 * tall);              // FOE: a foe on its own, from the party's side, drifting round it
+      return keep({ p: [q[0], 1.6 + 0.3 * tall, q[1]], l: [fp.x, 0.55 * tall, fp.z], fov: 34 }); }
+  }
   // the older cameras: a window on the painting, or (for 'shoulder' and 'low') a camera that really moves, with the painting out of focus behind
   const heroPts = (P, out) => { out.push([P.x - 0.75, 0, P.z], [P.x, P.id === 'io' ? 2.25 : 2.0, P.z], [P.x + 0.75, 0, P.z + 0.9]); };
   const foePts = (f, out) => { const p = f.m.root.position, r = f.K.r + 0.35; out.push([p.x - r, 0, p.z], [p.x + r, 0, p.z + 0.5], [p.x, f.K.h + 0.25, p.z]); };
@@ -19176,7 +19248,7 @@ function makeMFFight(stage, H) {
     const CAM = CAMNOW(), a = act && act.kind ? act : null, playing = a && phase === 'act' && !(a.kind === 'hero' && a.anim === 'g_curtain' && a.P.a.time > 5.2);
     const frame = (pts, kx, ky, least, foot) => { let x0 = 1e9, x1 = -1e9, y0 = 1e9, y1 = -1e9; for (const p of pts) { const q = stage.toFrame(_w.set(p[0], p[1], p[2])); x0 = Math.min(x0, q[0]); x1 = Math.max(x1, q[0]); y0 = Math.min(y0, q[1]); y1 = Math.max(y1, q[1]); }
       let cw = Math.max((x1 - x0) * kx, (y1 - y0) * ky * asp, FW * least); cw = Math.min(cw, ww); const ch = cw / asp; ww = cw; wh = ch; wx = (x0 + x1) / 2 - cw / 2; wy = y1 + ch * foot - ch; };
-    if (REAR(CAM)) { shot = behindShot(a, playing, asp); if (!shot) { const all = []; for (const id in party) if (party[id].e) heroPts(party[id], all); for (const f of foes) if (f.vis) foePts(f, all); frame(all, 1.08, 1.16, 0.4, 0.1); } }      // no shot: the fight's opening, on the sharp painting
+    if (REAR(CAM)) { shot = CAM === 'auto' ? directorShot(a, playing, asp) : behindShot(a, playing, asp); if (!shot) { const all = []; for (const id in party) if (party[id].e) heroPts(party[id], all); for (const f of foes) if (f.vis) foePts(f, all); frame(all, 1.08, 1.16, 0.4, 0.1); } }      // no shot: the fight's opening, on the sharp painting
     else if (CAM !== 'wide') {
       const all = []; for (const id in party) if (party[id].e) heroPts(party[id], all); for (const f of foes) if (f.up) foePts(f, all);
       frame(all, 1.08, 1.16, 0.4, 0.1);                    // at rest: everyone still standing, and no more of the place than that
@@ -19210,7 +19282,16 @@ function makeMFFight(stage, H) {
   const api = {
     group, party, get foes() { return foes; }, get phase() { return phase; }, get battle() { return B; }, get current() { return cur ? cur.id : null; }, get act() { return act; }, result: null, choose, hero,
     setAuto(style) { auto = style || null; },
-    key(k) { if (phase !== 'menu') return false; if (k === 'Tab') { const up = upFoes().map((f) => f.i); if (up.length) { selFoe = up[(up.indexOf(selFoe) + 1) % up.length]; paint(); } return true; } const b = elMoves.children[+k - 1]; if (b && !b.disabled) { b.click(); return true; } return false; },
+    // keys: 1 to 7 pick a move, Tab or the arrows change who it is aimed at, Enter casts, Esc goes back
+    key(k) { if (phase !== 'menu' || !cur) return false;
+      if (k === 'Tab' || k === 'ArrowRight' || k === 'ArrowLeft') { const step = k === 'ArrowLeft' ? -1 : 1;
+        if (sel && sel.kind === 'hero') { const L = sel.ok; sel.t = L[(L.indexOf(sel.t) + step + L.length) % L.length]; }
+        else { const L = sel && sel.kind === 'foe' ? sel.ok : upFoes(); if (L.length) { const f = L[(L.indexOf(foes[selFoe]) + step + L.length) % L.length]; selFoe = f.i; if (sel && sel.kind === 'foe') sel.t = f; } }
+        paint(); return true; }
+      if (k === 'Enter') { cast(); return true; }
+      if (k === 'Escape') { sel = null; paint(); return true; }
+      const n = +k, ms = n >= 1 && n <= 9 ? E.heroMoves(B, cur.e) : null; if (ms && ms[n - 1]) { select(ms[n - 1].id); return true; } return false; },
+    select, cast,
     // start a fight: { place (one of MF_PLACES), foes: ['wisp', 'wraith', 'great', ...], gap, foeLevel, seed, party: { jester: { hp, mp }, ... }, label, tag }; done(result) is called when the player leaves the result
     enter(opts, done) { onDone = done || null; api.result = null; group.visible = true; ui.hidden = false; panel.hidden = false; begin(opts); },
     leave() { group.visible = false; ui.hidden = true; panel.hidden = true; phase = 'off'; act = null; stage.free.on = false; for (const l of stage.near) l.intensity = 0; stage.dark = stage.dim = 0; stage.shakeX = stage.shakeY = 0; stage.catcher.scale.set(1, 1, 1);
@@ -19252,7 +19333,7 @@ function makeMFFight(stage, H) {
       camera(dt);
       // when the camera has moved in for a move, anyone standing on the line from it to what it looks at steps out of the picture, and stays out for that shot
       { const fr = stage.free.on && !stage.free.group ? stage.free : null, a = act && act.kind ? act : null, hid = a ? (a.hid || (a.hid = new Set())) : null; if (a && !fr) hid.clear();
-        const inWay = (x, z, r) => { const ax = fr.pos.x, az = fr.pos.z, bx = fr.look.x - ax, bz = fr.look.z - az, L2 = bx * bx + bz * bz || 1, k = Math.max(0, Math.min(1, ((x - ax) * bx + (z - az) * bz) / L2)); return Math.hypot(x - ax - bx * k, z - az - bz * k) < r || Math.hypot(x - ax, z - az) < 1.5; };
+        const inWay = (x, z, r) => { const ax = fr.pos.x, az = fr.pos.z, bx = fr.look.x - ax, bz = fr.look.z - az, L2 = bx * bx + bz * bz || 1, k = Math.max(0, Math.min(1, ((x - ax) * bx + (z - az) * bz) / L2)); return Math.hypot(x - ax - bx * k, z - az - bz * k) < r || Math.hypot(x - ax, z - az) < 2.2; };
         for (const id in party) { const P = party[id]; if (!P.e) continue; if (fr && a && P !== a.P && P !== a.th && P !== a.tp && inWay(P.x, P.z, 0.85)) hid.add(P); const hide = !!(fr && a && hid.has(P)); P.a.root.visible = !hide; if (P.a.fx) P.a.fx.visible = !hide; P.patch.visible = !hide; }
         for (const f of foes) { if (!f.vis) continue; if (fr && a && f !== a.f && f !== a.tf && f !== a.tfo && inWay(f.x, f.z, 0.5 + f.K.r)) hid.add(f); const hide = !!(fr && a && hid.has(f)); f.m.root.visible = f.m.fx.visible = !hide; f.m.patch.visible = !hide; } }
       // the place answers a spell: it darkens, the picture shakes, and one shared light carries the spell
@@ -19324,23 +19405,48 @@ function makeMFFight(stage, H) {
 .mff .wait{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;background:#0d0a12;color:#d9cdbd}
 .mff .wait[hidden],.mff [hidden]{display:none}
 .mff .set label{display:flex;gap:6px;align-items:center}
-@media (max-width:640px){.mff{font-size:14px}.mff .party{grid-template-columns:repeat(2,1fr)}.mff .box{flex:0 0 46vh}.mff .panel{flex:1 1 auto;max-height:none}.mff .title{font-size:24px}.mff .chip{font-size:11px;padding:1px 6px}}
+.mff .log{position:absolute;left:10px;right:54px;bottom:8px;margin:0;min-height:0;text-align:left;color:#f3ead9;font-size:14px;text-shadow:0 1px 0 #000,0 0 6px #000,0 0 12px #000}
+.mff .gear{position:absolute;right:8px;bottom:6px;width:40px;height:40px;border-radius:50%;background:rgba(18,12,26,.78);border:1px solid rgba(255,255,255,.25);color:#efe6da;font-size:20px;line-height:1;pointer-events:auto;cursor:pointer}
+.mff .panel{padding:8px 10px 10px;max-height:50vh}
+.mff .party{grid-template-columns:repeat(4,1fr);gap:6px}
+.mff .who{padding:5px 7px 4px;border-radius:9px;transition:transform .12s}
+.mff .who b{font-size:14px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.mff .who .hp{height:7px;margin:3px 0 2px}.mff .who .mp{height:4px;background:#2f2439;border-radius:2px;overflow:hidden;margin:3px 0 1px}.mff .who .mp i{display:block;height:100%;background:#6f9be8}
+.mff .who span{font-size:11.5px}
+.mff .who.now{transform:translateY(-3px);border-color:#f3dfae;background:#2e2338;box-shadow:0 3px 0 #f3dfae}
+.mff .who.pick{box-shadow:0 0 0 2px #7fd6ff}.mff .who.tgt{box-shadow:0 0 0 3px #7fd6ff;background:#1f3140}
+.mff .help{margin:8px 2px 6px;min-height:2.7em;font-size:13.5px;color:#e4d9c8}
+.mff .moves{display:grid;grid-template-columns:repeat(4,1fr);gap:7px;margin-top:0;min-height:0}
+.mff .tile{display:block;text-align:left;min-height:50px;padding:7px 10px;background:#2a1f36;color:#efe6da;border:1px solid #6a557e;border-radius:10px;cursor:pointer}
+.mff .tile b{display:block;font-weight:600;font-size:14.5px}.mff .tile span{display:block;font-size:12px;color:#b9c9f2}
+.mff .tile.off{opacity:.5;border-style:dashed}.mff .tile.off span{color:#e0b9a8}
+.mff .tile.on{background:#f3dfae;color:#20150c;border-color:#f3dfae}.mff .tile.on span{color:#4a3a22}.mff .tile.on.off{background:#4a3d2f;color:#efe6da;opacity:.8}
+.mff .castrow{display:flex;gap:8px;margin-top:9px;position:sticky;bottom:0;padding:6px 0 2px;background:linear-gradient(to bottom,rgba(23,17,31,0),#17111f 30%)}
+.mff .cast{flex:1 1 auto;min-height:52px;border-radius:12px;border:0;background:#58c98e;color:#0c2015;font-weight:700;font-size:16px;cursor:pointer}
+.mff .cast:disabled{background:#2a2433;color:#8d8398;cursor:default}
+.mff .back{flex:0 0 auto;min-height:52px;padding:0 16px;border-radius:12px;background:#2a1f36;color:#efe6da;border:1px solid #6a557e;cursor:pointer}
+.mff .foebar{min-width:92px;padding:5px 8px 6px;font-size:12px}.mff .foebar div{height:7px}
+.mff .foebar.tgt{border-color:#f3dfae;box-shadow:0 0 0 3px rgba(243,223,174,.75)}.mff .foebar.pick{box-shadow:0 0 0 2px #7fd6ff}.mff .foebar.dim{opacity:.35}
+.mff .chip.marked{font-weight:700}
+.mff .set{margin-top:10px;padding-top:8px;border-top:1px solid #33283f}
+@media (max-width:640px){.mff{font-size:14px}.mff .box{flex:0 0 46vh}.mff .tile{min-height:44px;padding:5px 9px}.mff .help{min-height:2.5em;margin:6px 2px 5px}.mff .panel{padding-bottom:4px}.mff .panel{flex:1 1 auto;max-height:none}.mff .title{font-size:24px}.mff .chip{font-size:11px;padding:1px 6px}.mff .moves{grid-template-columns:repeat(2,1fr)}.mff .who{padding:4px 5px 3px}.mff .who b{font-size:13px}.mff .who span{font-size:10.5px}.mff .party{gap:4px}}
 `;
   const CODE = { w: 'wisp', K: 'wraith', B: 'great' };
   function lineUp(v) { if (Array.isArray(v)) return v.slice(); const out = []; String(v || 'w').replace(/(\d*)([wKB])/g, (_, n, k) => { for (let i = 0; i < (+n || 1); i++) out.push(CODE[k]); }); return out.length ? out : ['wisp']; }
   function label(list) { const n = {}; for (const k of list) n[k] = (n[k] || 0) + 1; const W = window.MF_FOES.KINDS, part = (k) => (n[k] === 1 ? 'a ' : n[k] + ' ') + W[k].name.toLowerCase() + (n[k] > 1 ? 's' : ''); const s = ['great', 'wraith', 'wisp'].filter((k) => n[k]).map(part).join(', '); return s.charAt(0).toUpperCase() + s.slice(1); }
-  const set = { camera: 'directed', speed: 1, flipbook: false, weight: 'lightest', foeWeight: 'light', rows: 540 };
+  const set = { camera: 'auto', speed: 1, flipbook: false, weight: 'lightest', foeWeight: 'light', rows: 540 };
   let root = null, canvas = null, stage = null, fight = null, running = false, last = 0, clock = 0, manual = /[?&]shot/.test(location.search), el = {};
   function build() {
     if (root) return;
     const st = document.createElement('style'); st.textContent = CSS; document.head.appendChild(st);
     root = document.createElement('div'); root.className = 'mff'; root.hidden = true;
-    root.innerHTML = '<div class="box"><canvas></canvas><div class="ui"></div><div class="wait">Setting the stage…</div></div><div class="panel"><div class="fp"></div><div class="set">' +
-      '<label>Camera <select class="cam"><option value="directed">Directed: wide, behind the party</option><option value="side">Side on, everyone</option><option value="near">Side on, closer on a move</option><option value="actor">On whoever acts</option><option value="shoulder">Over the shoulder</option><option value="low">Low and close</option><option value="wide">Side on, wide</option><option value="behind">Behind their heads, a swing on every move</option></select></label>' +
+    root.innerHTML = '<div class="box"><canvas></canvas><div class="ui"></div><button type="button" class="gear" aria-label="Settings">\u2699</button><div class="wait">Setting the stage…</div></div><div class="panel"><div class="fp"></div><div class="set" hidden>' +
+      '<label>Camera <select class="cam"><option value="auto">Director: mixes the views</option><option value="directed">Wide behind the party, swing on big moves</option><option value="side">Side on, everyone</option><option value="near">Side on, closer on a move</option><option value="actor">On whoever acts</option><option value="shoulder">Over the shoulder</option><option value="low">Low and close</option><option value="wide">Side on, wide</option><option value="behind">Behind their heads, a swing on every move</option></select></label>' +
       '<label>Speed <select class="spd"><option value="1">1×</option><option value="1.5">1.5×</option><option value="2">2×</option><option value="3">3×</option></select></label>' +
       '<label><input type="checkbox" class="flip"> Flipbook look</label><span class="meter"></span></div></div>';
     document.body.appendChild(root);
     canvas = root.querySelector('canvas'); el = { ui: root.querySelector('.ui'), fp: root.querySelector('.fp'), cam: root.querySelector('.cam'), spd: root.querySelector('.spd'), flip: root.querySelector('.flip'), wait: root.querySelector('.wait'), meter: root.querySelector('.meter'), box: root.querySelector('.box') };
+    root.querySelector('.gear').addEventListener('click', () => { const x = root.querySelector('.set'); x.hidden = !x.hidden; });
     el.cam.addEventListener('change', () => { set.camera = el.cam.value; }); el.spd.addEventListener('change', () => { set.speed = +el.spd.value || 1; }); el.flip.addEventListener('change', () => { set.flipbook = el.flip.checked; });
     stage = window.makeMFStage(canvas, { preserve: manual, shadow: 2048, maxPixelRatio: 2 });
     fight = window.makeMFFight(stage, { ui: el.ui, panel: el.fp, aspect: () => canvas.clientWidth / Math.max(1, canvas.clientHeight), width: () => canvas.clientWidth, cam: () => set.camera, weight: () => set.weight, foeWeight: () => set.foeWeight });
@@ -19400,7 +19506,7 @@ function makeMFFight(stage, H) {
   $('go').addEventListener('click', () => go());
   $('rest').addEventListener('click', () => { party = null; $('out').textContent = 'Everyone is rested.'; });
   window.MF_PAGE = { go };
-  if (QS.get('start')) go({ seed: +QS.get('seed') || 977, auto: QS.get('auto') || null, camera: QS.get('cam') || 'directed' });
+  if (QS.get('start')) go({ seed: +QS.get('seed') || 977, auto: QS.get('auto') || null, camera: QS.get('cam') || 'auto' });
 })();
 </script>
 </body>

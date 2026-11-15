@@ -53,23 +53,48 @@
 .mff .wait{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;background:#0d0a12;color:#d9cdbd}
 .mff .wait[hidden],.mff [hidden]{display:none}
 .mff .set label{display:flex;gap:6px;align-items:center}
-@media (max-width:640px){.mff{font-size:14px}.mff .party{grid-template-columns:repeat(2,1fr)}.mff .box{flex:0 0 46vh}.mff .panel{flex:1 1 auto;max-height:none}.mff .title{font-size:24px}.mff .chip{font-size:11px;padding:1px 6px}}
+.mff .log{position:absolute;left:10px;right:54px;bottom:8px;margin:0;min-height:0;text-align:left;color:#f3ead9;font-size:14px;text-shadow:0 1px 0 #000,0 0 6px #000,0 0 12px #000}
+.mff .gear{position:absolute;right:8px;bottom:6px;width:40px;height:40px;border-radius:50%;background:rgba(18,12,26,.78);border:1px solid rgba(255,255,255,.25);color:#efe6da;font-size:20px;line-height:1;pointer-events:auto;cursor:pointer}
+.mff .panel{padding:8px 10px 10px;max-height:50vh}
+.mff .party{grid-template-columns:repeat(4,1fr);gap:6px}
+.mff .who{padding:5px 7px 4px;border-radius:9px;transition:transform .12s}
+.mff .who b{font-size:14px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.mff .who .hp{height:7px;margin:3px 0 2px}.mff .who .mp{height:4px;background:#2f2439;border-radius:2px;overflow:hidden;margin:3px 0 1px}.mff .who .mp i{display:block;height:100%;background:#6f9be8}
+.mff .who span{font-size:11.5px}
+.mff .who.now{transform:translateY(-3px);border-color:#f3dfae;background:#2e2338;box-shadow:0 3px 0 #f3dfae}
+.mff .who.pick{box-shadow:0 0 0 2px #7fd6ff}.mff .who.tgt{box-shadow:0 0 0 3px #7fd6ff;background:#1f3140}
+.mff .help{margin:8px 2px 6px;min-height:2.7em;font-size:13.5px;color:#e4d9c8}
+.mff .moves{display:grid;grid-template-columns:repeat(4,1fr);gap:7px;margin-top:0;min-height:0}
+.mff .tile{display:block;text-align:left;min-height:50px;padding:7px 10px;background:#2a1f36;color:#efe6da;border:1px solid #6a557e;border-radius:10px;cursor:pointer}
+.mff .tile b{display:block;font-weight:600;font-size:14.5px}.mff .tile span{display:block;font-size:12px;color:#b9c9f2}
+.mff .tile.off{opacity:.5;border-style:dashed}.mff .tile.off span{color:#e0b9a8}
+.mff .tile.on{background:#f3dfae;color:#20150c;border-color:#f3dfae}.mff .tile.on span{color:#4a3a22}.mff .tile.on.off{background:#4a3d2f;color:#efe6da;opacity:.8}
+.mff .castrow{display:flex;gap:8px;margin-top:9px;position:sticky;bottom:0;padding:6px 0 2px;background:linear-gradient(to bottom,rgba(23,17,31,0),#17111f 30%)}
+.mff .cast{flex:1 1 auto;min-height:52px;border-radius:12px;border:0;background:#58c98e;color:#0c2015;font-weight:700;font-size:16px;cursor:pointer}
+.mff .cast:disabled{background:#2a2433;color:#8d8398;cursor:default}
+.mff .back{flex:0 0 auto;min-height:52px;padding:0 16px;border-radius:12px;background:#2a1f36;color:#efe6da;border:1px solid #6a557e;cursor:pointer}
+.mff .foebar{min-width:92px;padding:5px 8px 6px;font-size:12px}.mff .foebar div{height:7px}
+.mff .foebar.tgt{border-color:#f3dfae;box-shadow:0 0 0 3px rgba(243,223,174,.75)}.mff .foebar.pick{box-shadow:0 0 0 2px #7fd6ff}.mff .foebar.dim{opacity:.35}
+.mff .chip.marked{font-weight:700}
+.mff .set{margin-top:10px;padding-top:8px;border-top:1px solid #33283f}
+@media (max-width:640px){.mff{font-size:14px}.mff .box{flex:0 0 46vh}.mff .tile{min-height:44px;padding:5px 9px}.mff .help{min-height:2.5em;margin:6px 2px 5px}.mff .panel{padding-bottom:4px}.mff .panel{flex:1 1 auto;max-height:none}.mff .title{font-size:24px}.mff .chip{font-size:11px;padding:1px 6px}.mff .moves{grid-template-columns:repeat(2,1fr)}.mff .who{padding:4px 5px 3px}.mff .who b{font-size:13px}.mff .who span{font-size:10.5px}.mff .party{gap:4px}}
 `;
   const CODE = { w: 'wisp', K: 'wraith', B: 'great' };
   function lineUp(v) { if (Array.isArray(v)) return v.slice(); const out = []; String(v || 'w').replace(/(\d*)([wKB])/g, (_, n, k) => { for (let i = 0; i < (+n || 1); i++) out.push(CODE[k]); }); return out.length ? out : ['wisp']; }
   function label(list) { const n = {}; for (const k of list) n[k] = (n[k] || 0) + 1; const W = window.MF_FOES.KINDS, part = (k) => (n[k] === 1 ? 'a ' : n[k] + ' ') + W[k].name.toLowerCase() + (n[k] > 1 ? 's' : ''); const s = ['great', 'wraith', 'wisp'].filter((k) => n[k]).map(part).join(', '); return s.charAt(0).toUpperCase() + s.slice(1); }
-  const set = { camera: 'directed', speed: 1, flipbook: false, weight: 'lightest', foeWeight: 'light', rows: 540 };
+  const set = { camera: 'auto', speed: 1, flipbook: false, weight: 'lightest', foeWeight: 'light', rows: 540 };
   let root = null, canvas = null, stage = null, fight = null, running = false, last = 0, clock = 0, manual = /[?&]shot/.test(location.search), el = {};
   function build() {
     if (root) return;
     const st = document.createElement('style'); st.textContent = CSS; document.head.appendChild(st);
     root = document.createElement('div'); root.className = 'mff'; root.hidden = true;
-    root.innerHTML = '<div class="box"><canvas></canvas><div class="ui"></div><div class="wait">Setting the stage…</div></div><div class="panel"><div class="fp"></div><div class="set">' +
-      '<label>Camera <select class="cam"><option value="directed">Directed: wide, behind the party</option><option value="side">Side on, everyone</option><option value="near">Side on, closer on a move</option><option value="actor">On whoever acts</option><option value="shoulder">Over the shoulder</option><option value="low">Low and close</option><option value="wide">Side on, wide</option><option value="behind">Behind their heads, a swing on every move</option></select></label>' +
+    root.innerHTML = '<div class="box"><canvas></canvas><div class="ui"></div><button type="button" class="gear" aria-label="Settings">\u2699</button><div class="wait">Setting the stage…</div></div><div class="panel"><div class="fp"></div><div class="set" hidden>' +
+      '<label>Camera <select class="cam"><option value="auto">Director: mixes the views</option><option value="directed">Wide behind the party, swing on big moves</option><option value="side">Side on, everyone</option><option value="near">Side on, closer on a move</option><option value="actor">On whoever acts</option><option value="shoulder">Over the shoulder</option><option value="low">Low and close</option><option value="wide">Side on, wide</option><option value="behind">Behind their heads, a swing on every move</option></select></label>' +
       '<label>Speed <select class="spd"><option value="1">1×</option><option value="1.5">1.5×</option><option value="2">2×</option><option value="3">3×</option></select></label>' +
       '<label><input type="checkbox" class="flip"> Flipbook look</label><span class="meter"></span></div></div>';
     document.body.appendChild(root);
     canvas = root.querySelector('canvas'); el = { ui: root.querySelector('.ui'), fp: root.querySelector('.fp'), cam: root.querySelector('.cam'), spd: root.querySelector('.spd'), flip: root.querySelector('.flip'), wait: root.querySelector('.wait'), meter: root.querySelector('.meter'), box: root.querySelector('.box') };
+    root.querySelector('.gear').addEventListener('click', () => { const x = root.querySelector('.set'); x.hidden = !x.hidden; });
     el.cam.addEventListener('change', () => { set.camera = el.cam.value; }); el.spd.addEventListener('change', () => { set.speed = +el.spd.value || 1; }); el.flip.addEventListener('change', () => { set.flipbook = el.flip.checked; });
     stage = window.makeMFStage(canvas, { preserve: manual, shadow: 2048, maxPixelRatio: 2 });
     fight = window.makeMFFight(stage, { ui: el.ui, panel: el.fp, aspect: () => canvas.clientWidth / Math.max(1, canvas.clientHeight), width: () => canvas.clientWidth, cam: () => set.camera, weight: () => set.weight, foeWeight: () => set.foeWeight });
