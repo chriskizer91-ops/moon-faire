@@ -11,7 +11,7 @@ const rng = seed => { let s = seed >>> 0 || 1; return () => { s ^= s << 13; s >>
 // The numbers Chris is to choose. On the scale where the Jester has 1,000 HP; like everything, they grow 20% a level.
 const HERBS = {
   hp: 60,            // one HP herb: half the Jester's own heal of 120, the weakest heal (Chris's rule)
-  mp: 10,            // one MP herb
+  mp: 20,            // one MP herb (Chris, November 15: "yes mp herb is 20")
   inFight: 1,        // a herb eaten in a fight is worth this share of one eaten after it
   standUp: 0.10,     // a witch who fainted in a won fight gets up after it with this share of her HP (made up here)
 };
@@ -65,8 +65,8 @@ function fight(code, gap, tester, seed, rules, state, bag, herbs = HERBS) {
   return { won: B.over === 'won', state: out, turns: B.heroTurns, foeTurns: B.foeTurns, kos: B.kos, used };
 }
 // After a fight: anyone who fainted gets up, then she eats herbs by her habit. Returns how many of each she ate.
-function after(state, tester, rules, bag, herbs = HERBS) {
-  const h = HABIT[tester].after, used = { hp: 0, mp: 0 };
+function after(state, tester, rules, bag, herbs = HERBS, habit) {
+  const h = habit !== undefined ? habit : HABIT[tester].after, used = { hp: 0, mp: 0 };
   const maxHp = id => rules.heroes[id].hp, maxMp = id => rules.heroes[id].mp;
   for (const id of IDS) if (state.hp[id] <= 0) state.hp[id] = herbs.standUp;
   if (!h) return used;
@@ -82,6 +82,9 @@ function after(state, tester, rules, bag, herbs = HERBS) {
   }
   return used;
 }
+
+// "Top everybody up" (Chris, November 15): one press after a fight brings the whole party to full HP and MP while herbs last.
+const TOP_UP = { hpUnder: 1, hp: 1, mpUnder: 1, mp: 1 };
 
 // A stretch: fights one after another from a rest spot (everything full), in one ring of the chosen plan, until one is
 // lost or "most" have been won. "plants" is how many herbs of each kind she picks between one fight and the next.
@@ -104,10 +107,10 @@ function stretch(ringN, tester, seed, o = {}) {
     const ms = IDS.reduce((s, id) => s + state.mp[id] * rules.heroes[id].mp, 0) / IDS.reduce((s, id) => s + rules.heroes[id].mp, 0);
     left.hp += hs; left.mp += ms;
     bag.hp += plants.hp; bag.mp += plants.mp;
-    const u = after(state, tester, rules, bag, herbs); used.hp += u.hp; used.mp += u.mp;
+    const u = after(state, tester, rules, bag, herbs, o.after); used.hp += u.hp; used.mp += u.mp;
   }
   return { won, turns, used, leftHp: won ? left.hp / won : 0, leftMp: won ? left.mp / won : 0 };
 }
 const T = { w: 'normal', K: 'difficult', B: 'boss' };
 function parse(code) { const foes = []; code.replace(/(\d*)([wKB])/g, (_, n, k) => { for (let i = 0; i < (+n || 1); i++) foes.push(T[k]); }); return foes; }
-module.exports = { HERBS, HABIT, fight, after, stretch, full, PLAN, parse };
+module.exports = { HERBS, HABIT, TOP_UP, fight, after, stretch, full, PLAN, parse };

@@ -2,6 +2,8 @@
 const fs = require('fs');
 const D = JSON.parse(fs.readFileSync(__dirname + '/results-mp20.json', 'utf8'));
 const { HERBS, HABIT, PLAN } = require('./journey.js');
+const CH = JSON.parse(fs.readFileSync(__dirname + '/chosen.json', 'utf8'));
+const LF = JSON.parse(fs.readFileSync(__dirname + '/../testers/lastfight.json', 'utf8'));
 const ringFights = [17, 22, 27, 32, 37, 42];          // the walking fights each ring asks for, from the chosen levelling plan
 const A = 'attentive, careful', C = 'careless', X = 'expert, careful', AB = 'attentive, bold';
 const shade = x => `style="background: color-mix(in srgb, var(--heat) ${Math.round(Math.min(1, x / 40) * 55)}%, var(--card))"`;
@@ -23,6 +25,17 @@ const optCard = (o, i, name, word) => `<article class="opt"><h3>${name}</h3><dl>
   <div><dt>Rest spots inside the rings</dt><dd>${o.spots} <span>${o.per.filter(p => p.n).map(p => 'ring ' + p.r + ': ' + p.n).join(', ') || 'none needed'}</span></dd></div>
   <div><dt>Furthest apart, last ring</dt><dd>${show(o.per[5].L)} fights</dd></div>
   <div><dt>How it plays</dt><dd><span>${word}</span></dd></div></dl></article>`;
+const cap = t => t[0].toUpperCase() + t.slice(1);
+const cc = x => `<td ${shade(x.low)}><b>${show(x.low)}</b><span>${show(x.mid)} usually</span></td>`;
+let stock = '<div class="scroll"><table class="heat"><thead><tr><th>Ring</th><th class="num">Bag empty</th><th class="num">10 HP + 20 MP herbs</th><th class="num">20 + 40</th><th class="num">40 + 80</th></tr></thead><tbody>';
+for (const r of [3, 4, 5, 6]) { const c = CH.rings[r][A]; stock += `<tr><th scope="row">Ring ${r}<span class="n">level ${PLAN.rings[r - 1].partyEnters + 1}</span></th>${cc(c.empty)}${cc(c.s1)}${cc(c.s2)}${cc(c.s3)}</tr>`; }
+stock += '</tbody></table></div>';
+const pcs = x => (x > 0 && x < 0.095 ? (x * 100).toFixed(1) : Math.round(x * 100)) + '%';
+const shadeP = x => `style="background: color-mix(in srgb, var(--heat) ${Math.round(x * 55)}%, var(--card))"`;
+let lastT = '<div class="scroll"><table class="heat"><thead><tr><th>Tester</th>' + LF.settings.map(([n, g]) => `<th class="num">${cap(n)}<span class="n">level ${20 + g}</span></th>`).join('') + '</tr></thead><tbody>';
+for (const t of Object.keys(LF.rows)) lastT += `<tr><th scope="row">${cap(t)}</th>` + LF.rows[t].map(c => `<td ${shadeP(c.all)}><b>${pcs(c.all)}</b><span>${pcs(c.none)} with nothing</span></td>`).join('') + '</tr>';
+lastT += '</tbody></table></div>';
+const ex = LF.rows['expert, careful'], c6s = CH.rings[6][A], c5s = CH.rings[5][A];
 const w6 = D.want[6][A], c6 = D.rings[6][C], a6 = D.rings[6][A], b6 = D.rings[6][AB];
 const html = `<!DOCTYPE html>
 <html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
@@ -101,18 +114,45 @@ thead th span.n { font-weight: 400; }
  <p>Fights now start with the HP and MP the party has. She picks wild plants on the moor, Io makes them into herbs, and a rest spot refills everything for free. I played ${(D.n * 6 * 8 * 7).toLocaleString('en-US')} stretches of fights from a rest spot, with all eight testers, to see how many plants the moor needs and how far apart the rest spots can be.</p>
 </header>
 
-<section class="ask" aria-label="What I need from you">
- <h2>What I need from you</h2>
+<section class="ask" aria-label="What you decided">
+ <h2>What you decided on November 15</h2>
+ <ul>
+  <li><strong>Steady</strong> for the plants: about one HP plant and two MP plants to pick for every fight.</li>
+  <li><strong>An MP herb gives 20 MP.</strong></li>
+  <li><strong>"Top everybody up"</strong> outside a fight, in one press, for the whole party. Herbs are how the party heals between fights.</li>
+  <li><strong>A very big bag,</strong> so she can pick more in a safer place and carry it into a harder one.</li>
+  <li><strong>Easy, medium, hard and crazy</strong> offered before the last fight: its foes at level 20, 21, 22 or 22.8.</li>
+ </ul>
+</section>
+
+<section>
+ <h2>The last fight at your four settings</h2>
+ <p>Today's last fight stands in for the big bad. The party is level 20 and meets it fresh, straight from a rest spot. ${LF.n.toLocaleString('en-US')} fights for every number. The big number is with all eighteen finds, the small one with nothing found.</p>
+ ${lastT}
+ <p><strong>Crazy at 22.8 is "just barely".</strong> A careful expert who has found everything wins ${pcs(ex[3].all)} of the time, about one try in ${Math.round(1 / ex[3].all)}. With nothing found it is ${pcs(ex[3].none)}. The bold expert with everything wins ${pcs(LF.rows['expert, bold'][3].all)}, and nobody below an expert wins it at all. At a flat 23 the careful expert won 1%.</p>
+</section>
+
+<section>
+ <h2>Stocking up before a hard ring</h2>
+ <p>A careful, attentive player with steady plants who tops everybody up after every fight. How many fights she wins from a rest spot on an unlucky run, by what is in her bag when she sets out.</p>
+ ${stock}
+ <p>With an empty bag the last ring is a run of ${show(c6s.empty.low)} fights at a time. If she arrives with 40 HP herbs and 80 MP herbs she can go ${show(c6s.s3.low)} without a rest spot, which is most of the ring. So picking ahead in a safe place works the way you pictured.</p>
+</section>
+
+<section class="ask" aria-label="What is still open">
+ <h2>What is still open</h2>
  <ol>
-  <li><strong>Sparing, steady or generous</strong> with the plants. The three are just below.</li>
-  <li><strong>An MP herb gives 20 MP.</strong> Yes, or smaller? At 10 she eats twice as many.</li>
-  <li><strong>A witch who fainted gets up after a won fight with 10% of her HP.</strong> I made that up. Yes, or something else?</li>
+  <li><strong>A witch who fainted.</strong> As built she gets up after a won fight with 10% of her HP. Yes, or something else?</li>
+  <li><strong>Where the game teaches topping up.</strong> It will not happen by itself early on. A party that never eats a herb still wins about ${D.rings[1][A][0].mid} fights in a row in the first ring and ${D.rings[2][A][0].mid} in the second; it only bites in the third (${D.rings[3][A][0].mid}). I suggest a taught moment at the fair: the three set fights there do not refill her, and after the second the game shows "Top everybody up".</li>
+  <li><strong>The careless player in the far rings.</strong> Herbs do not save her: about ${D.rings[6][C][0].mid} fights from a rest spot in the last ring whatever she carries. Is that the game being hard, or should the main path there be gentler?</li>
+  <li><strong>A rest spot right before the last fight?</strong> The numbers above assume she meets it with everything full.</li>
+  <li><strong>The two play styles.</strong> "Bold" is still only a weaker player. Drop to five testers?</li>
  </ol>
 </section>
 
 <section>
- <h2>Three ways to set it</h2>
- <p>Each is sized so that a careful, attentive player reaches the next rest spot even on an unlucky run (the worst 1 in 10).</p>
+ <h2>The three ways it could be set</h2>
+ <p>You chose Steady. Each is sized so that a careful, attentive player reaches the next rest spot even on an unlucky run (the worst 1 in 10).</p>
  <div class="opts">
   ${optCard(O[0], 1, 'Sparing', 'Herbs are precious. The last two rings are a string of short runs between rest spots.')}
   ${optCard(O[1], 2, 'Steady', 'The first four rings need no rest spot inside them. The last two ask her to plan.')}

@@ -9,7 +9,15 @@ Made by the "Levelling" session on November 15, 2026, from Chris's decisions of 
 - She gets more by picking the wild plants already growing on the moor.
 - A rest spot refills everything for free, so rest spots are to be placed with care.
 
-**A proposal with numbers, waiting on Chris.** Nothing here is in the plan yet.
+**Chris chose on November 15 (12:56 pm):** steady plants (about 1 HP and 2 MP plants picked for every fight); an MP
+herb gives 20 MP; outside a fight one press tops the whole party up; the bag has no limit a player will meet, so she can
+pick more in a safer ring and carry it into a harder one; and before the last fight the game offers easy, medium, hard
+and crazy, which set its foes at level 20, 21, 22 or 22.8. **`herbs-chosen.json` is the plan the game reads.**
+Still open: what happens to a witch who fainted (as built she gets up with 10% HP), where the game teaches topping up,
+the careless player in the far rings, a rest spot before the last fight, and whether the two play styles stay.
+
+`chosen.js` measures the chosen rule (top everybody up to full, steady plants) with an empty bag and a stocked one;
+`../testers/lastfight.js` measures the four last-fight settings with all eight testers.
 
 The page for Chris: `herbs.html` (published; the link is in the project note `claude/herbs-and-rest-spots.md`).
 
@@ -79,7 +87,27 @@ Three ways to set it, each sized so the unlucky careful attentive player still r
   safe: in ring 6 with 2 + 4 plants a fight, 8 fights on an unlucky run against 40 for the careful player.
 - Rings 3 and 4 give the same numbers because they meet the same line-ups at the same gaps.
 
-## Not done yet (after Chris has picked)
+## The chosen rule, measured (`chosen.txt`, 200 runs each; careful attentive player, steady plants, tops everybody up)
+
+Fights won from a rest spot before the first loss, the unlucky 1 in 10 / the usual run, by what is in her bag when she
+sets out. Rings 1 to 4: 40 / 40 whatever she carries.
+
+| Ring | Bag empty | 10 HP + 20 MP herbs | 20 + 40 | 40 + 80 |
+|---|---|---|---|---|
+| 5 | 10 / 33 | 21 / 40 | 29 / 40 | 40 / 40 |
+| 6 | 5 / 11 | 12 / 19 | 19 / 26 | 34 / 40 |
+
+Topping up to full she eats, a fight: ring 1: 0.5 HP herbs and 2.8 MP herbs; ring 2: 1.4 and 3.1; rings 3 and 4: 2.2
+and 3.7; ring 5: 2.6 and 4.1; ring 6: 3.1 and 4.7.
+
+A party that never eats a herb (the "No plants" column above) still wins 23 / 31 fights in a row in ring 1 and
+12 / 18 in ring 2. So the game does not teach topping up by itself early on; it needs a taught moment.
+
+The last fight at the four settings (`../testers/lastfight.txt`, 3,000 fights each, fresh; wins with nothing / with
+all 18 finds): careful expert: easy 99% / 100%, medium 91% / 97%, hard 27% / 80%, crazy 0.1% / 3.6%. Careful
+attentive: 81% / 98%, 3% / 13%, 0% / 0%, 0% / 0%.
+
+## Not done yet
 
 - A whole playthrough of the chosen plan with carried HP and MP, herbs and rest spots, for all eight testers: fights,
   losses and hours. The levelling numbers so far assume fresh fights.

@@ -1,0 +1,19 @@
+{
+ "what": "Moon Faire: Io's herbs, plants and rest spots, as Chris chose them. For the open world, the fight piece and the menus to read.",
+ "chosen": "Chris, November 15, 2026 (7:38 am, 7:54 am and 12:56 pm). See the project note claude/herbs-and-rest-spots.md.",
+ "rule": "A fight starts with the HP and MP the party has. Outside a fight, Io's herbs are how the party is healed.",
+ "hpHerb": { "gives": 60, "scale": "HP on the scale where the Jester has 1,000 at level 1; like every HP number it grows 20% a level", "why": "half the Jester's own heal of 120, the weakest heal" },
+ "mpHerb": { "gives": 20, "scale": "MP on the engine's own scale (Io has 120, the Fox 100, the Jester 60)" },
+ "afterAFight": "One press, \"top everybody up\", brings the whole party to full HP and MP while herbs last.",
+ "inAFight": "A witch may eat one herb in place of her move. It is the same size as outside a fight, and it takes her turn.",
+ "bag": "No limit that a player will meet (show up to 999 of each).",
+ "plants": { "setting": "steady", "hpBetweenFights": 1, "mpBetweenFights": 2, "note": "About one HP plant and two MP plants to pick for every walking fight, across the game about 180 and 350. She may pick more in a safer ring and carry them into a harder one." },
+ "restSpot": "Refills all HP and MP for free. Gives no herbs.",
+ "restSpotsInsideRings": { "1": 0, "2": 0, "3": 0, "4": 0, "5": 3, "6": 6, "note": "Sized for a careful, attentive player who picks as she goes and does not stock up. Every ring also has a rest spot where it begins." },
+ "lastFight": { "note": "Before the last fight the game offers four settings. The party stops at level 20.", "easy": 20, "medium": 21, "hard": 22, "crazy": 22.8 },
+ "notDecided": {
+  "faintedAfterAWonFight": "As built: she gets up with 10% of her HP. Chris has not said.",
+  "spellsBetweenFights": "As built: none. Herbs are how the party heals outside a fight.",
+  "restSpotBeforeTheLastFight": "Assumed: yes, so she meets it with everything full."
+ }
+}
