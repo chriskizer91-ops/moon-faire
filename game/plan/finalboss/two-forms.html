@@ -34,7 +34,7 @@ thead th { font-size: 13px; color: var(--ink-2); font-weight: 700; }
 .num { text-align: right; white-space: nowrap; } th span.n { display: block; color: var(--ink-2); font-size: 13px; font-weight: 400; }
 .all { display: block; color: var(--ink-2); }
 .key { color: var(--ink-2); font-size: 15px; margin: 0 0 8px; }
-@media (max-width: 480px) { table { font-size: 14px; } th, td { padding: 8px 6px; } tbody th { white-space: normal; } thead th span.n { font-size: 12px; } }
+@media (max-width: 480px) { table { font-size: 14px; } th, td { padding: 8px 6px; } tbody th { white-space: normal; } thead th span.n { font-size: 12px; } .ask { padding: 16px 12px; } .ask .scroll { margin-left: -4px; margin-right: -4px; } }
 .note { color: var(--ink-2); font-size: 15px; }
 .prompt { background: var(--card); border: 1px solid var(--rule); border-radius: 10px; margin-bottom: 14px; overflow: hidden; }
 .phead { display: flex; flex-wrap: wrap; gap: 10px; justify-content: space-between; align-items: center; padding: 12px 14px; border-bottom: 1px solid var(--rule); }
@@ -49,77 +49,59 @@ footer { color: var(--ink-2); font-size: 15px; border-top: 1px solid var(--rule)
 <header>
  <p class="kicker">Moon Faire, task board F11</p>
  <h1>The final boss in two forms</h1>
- <p>You said the rough model is a good first draft of form one, that it should lose Life without showing damage, and that at zero it changes into a final form that is broken, larger and more vibrant. You asked for picture prompts for both forms, and whether the fight should be one body alone, harder than the gate fights, or the great wraith's numbers under new names with the same helpers. I played both with the eight testers.</p>
+ <p>You chose helpers first and then alone, with wraiths and brambles as the helpers and the fallen getting up at the Jester's Curtain Call. You also wondered about the whole party coming back to full HP and MP when the boss falls the first time, with a harder second round, if the balance still works out the same. I played that with the eight testers, and it does.</p>
 </header>
 
-<section class="ask" aria-label="My answer">
- <h2>My answer: use both of your ideas, one after the other</h2>
+<section class="ask" aria-label="The fight as you chose it">
+ <h2>The fight as you chose it</h2>
  <ul>
-  <li><strong>Form one is your second idea.</strong> The fire, whole, with the great wraith's own numbers under new names and the same four helpers.</li>
-  <li><strong>The final form is your first idea.</strong> The fire, broken open, alone, with a quarter of the Life and the same blows, acting twice as often.</li>
-  <li><strong>On hard, only an expert wins:</strong> 13% of the time with no finds and 63% with all 18. Today's last fight gives her 26% and 80%, so this is one notch harder at every setting.</li>
-  <li><strong>It needs no new rule</strong> beyond "the second form starts with the HP and MP the party has left".</li>
+  <li><strong>Form one, the fire, whole.</strong> The great wraith's own numbers under new names, with four helpers: wraiths and brambles it has called. It shows no damage.</li>
+  <li><strong>It falls, and the Curtain Call comes down.</strong> Every witch gets up with full HP and MP, and Io's Deity is ready again.</li>
+  <li><strong>The final form, the fire, broken open.</strong> Alone, with 20% more Life than form one and blows 10% bigger, acting twice as often.</li>
+  <li><strong>On hard, only an expert wins:</strong> 12% of the time with no finds and 65% with all 18. Without the refill it was 13% and 63%, so the balance is the same.</li>
  </ul>
- <p>It also plays the story out in the rules: the Jester gives the fire its ending, and it refuses.</p>
+ <p>The top number is how often that player wins with no finds, and the number under it is with all 18. The party is level 20 and arrives fresh from a rest spot.</p>
+ <div class="scroll"><table><thead><tr><th>Player</th><th class="num">Easy<span class="n">level 20</span></th><th class="num">Medium<span class="n">level 21</span></th><th class="num">Hard<span class="n">level 22</span></th><th class="num">Crazy<span class="n">level 22.8</span></th></tr></thead><tbody><tr><th>Very careless</th><td class="num">0.7%<span class="all">5.1%</span></td><td class="num">0%<span class="all">0.1%</span></td><td class="num">0%<span class="all">0%</span></td><td class="num">0%<span class="all">0%</span></td></tr><tr><th>Careless</th><td class="num">0.8%<span class="all">6.9%</span></td><td class="num">0%<span class="all">0%</span></td><td class="num">0%<span class="all">0%</span></td><td class="num">0%<span class="all">0%</span></td></tr><tr><th>Attentive, careful</th><td class="num">80%<span class="all">98%</span></td><td class="num">2.9%<span class="all">12%</span></td><td class="num">0%<span class="all">0%</span></td><td class="num">0%<span class="all">0%</span></td></tr><tr><th>Attentive, bold</th><td class="num">52%<span class="all">85%</span></td><td class="num">2.1%<span class="all">8.2%</span></td><td class="num">0%<span class="all">0%</span></td><td class="num">0%<span class="all">0%</span></td></tr><tr><th>Focused, careful</th><td class="num">96%<span class="all">100%</span></td><td class="num">35%<span class="all">65%</span></td><td class="num">0.2%<span class="all">2.9%</span></td><td class="num">0%<span class="all">0%</span></td></tr><tr><th>Focused, bold</th><td class="num">77%<span class="all">93%</span></td><td class="num">13%<span class="all">36%</span></td><td class="num">0%<span class="all">0%</span></td><td class="num">0%<span class="all">0%</span></td></tr><tr><th>Expert, careful</th><td class="num">100%<span class="all">100%</span></td><td class="num">91%<span class="all">97%</span></td><td class="num">12%<span class="all">65%</span></td><td class="num">0%<span class="all">0.3%</span></td></tr><tr><th>Expert, bold</th><td class="num">98%<span class="all">100%</span></td><td class="num">67%<span class="all">84%</span></td><td class="num">1.6%<span class="all">36%</span></td><td class="num">0%<span class="all">0%</span></td></tr></tbody></table></div>
+ <p class="note">56 to 67 party turns in a win, so about 4 to 10 minutes at 4 to 9 seconds a turn.</p>
 </section>
 
 <section>
- <h2>What the testers showed</h2>
- <p>In every table the top number is how often that player wins with no finds, and the number under it is with all 18. The party is level 20 and arrives fresh from a rest spot.</p>
-
- <h3>1. The helpers are most of what makes the great wraith hard</h3>
- <p>Take the helpers away and leave the great wraith its own numbers, and an attentive player wins 100% on easy and 100% on medium. With the helpers she wins 80% and 3.1%. So one body alone has to be far stronger than the great wraith before it is harder than the gate fights.</p>
- <div class="scroll"><table><thead><tr><th>Player</th><th class="num">Easy<span class="n">level 20</span></th><th class="num">Medium<span class="n">level 21</span></th><th class="num">Hard<span class="n">level 22</span></th><th class="num">Crazy<span class="n">level 22.8</span></th></tr></thead><tbody><tr><th>Attentive, careful</th><td class="num">100%<span class="all">100%</span></td><td class="num">100%<span class="all">100%</span></td><td class="num">60%<span class="all">89%</span></td><td class="num">1.1%<span class="all">15%</span></td></tr><tr><th>Focused, careful</th><td class="num">100%<span class="all">100%</span></td><td class="num">100%<span class="all">100%</span></td><td class="num">94%<span class="all">99%</span></td><td class="num">22%<span class="all">40%</span></td></tr><tr><th>Expert, careful</th><td class="num">100%<span class="all">100%</span></td><td class="num">100%<span class="all">100%</span></td><td class="num">96%<span class="all">100%</span></td><td class="num">23%<span class="all">60%</span></td></tr></tbody></table></div>
- <p class="note">The great wraith alone, with its own numbers. Not a proposal, only the comparison.</p>
-
- <h3>2. One body alone can be made hard enough, but it is a narrower fight</h3>
- <p>I gave one body 30% more Life than the great wraith in form one, then a final form with 40% of the great wraith's Life that hits 10% harder. That lands hard in the right place (the expert wins 17%, or 51% with every find). Three things came with it:</p>
+ <h2>What the refill changes</h2>
  <ul>
-  <li><strong>Easy is easier than the gate before it.</strong> An attentive player wins 100% on easy, where she wins about 80% against the great bramble.</li>
-  <li><strong>Part of the party's kit has nothing to do.</strong> With one foe the Fox can never cast Crazy Quilt, Pins and Needles has nothing to spread to, Sealed Fate's splash hits nobody, and there is never a choice of whom to hit.</li>
-  <li><strong>It swings on one trick.</strong> My testers spend their MP in form one as if it were the whole fight. An expert who knows the second form is coming and holds MP back wins 76% on hard with no finds, up from 17%. So it would be very hard the first time and much easier every time after.</li>
+  <li><strong>Hard and crazy come out the same</strong> as the version with no refill. The stronger final form takes back what the refill gives.</li>
+  <li><strong>Easy and medium are a touch kinder to a player who thinks.</strong> For her they are now about as hard as the great wraith's fight on its own (medium, focused player: 35%, against 18% with no refill).</li>
+  <li><strong>Nobody is punished for spending everything in form one.</strong> There is nothing to save for, so the fight is as hard on the tenth try as on the first.</li>
+  <li><strong>It is a longer fight.</strong> About 56 to 67 party turns in a win, against 41 to 46 with no refill.</li>
+  <li><strong>The careless player does worse.</strong> On easy she wins 0.8% of the time, or 6.9% with every find. With no refill it was 3.5% and 13%. The final form alone is a long fight, and she does not last it.</li>
  </ul>
- <div class="scroll"><table><thead><tr><th>Player</th><th class="num">Easy<span class="n">level 20</span></th><th class="num">Medium<span class="n">level 21</span></th><th class="num">Hard<span class="n">level 22</span></th><th class="num">Crazy<span class="n">level 22.8</span></th></tr></thead><tbody><tr><th>Very careless</th><td class="num">6.9%<span class="all">24%</span></td><td class="num">0.3%<span class="all">2.9%</span></td><td class="num">0%<span class="all">0.2%</span></td><td class="num">0%<span class="all">0%</span></td></tr><tr><th>Careless</th><td class="num">5.7%<span class="all">21%</span></td><td class="num">0.1%<span class="all">1.1%</span></td><td class="num">0%<span class="all">0%</span></td><td class="num">0%<span class="all">0%</span></td></tr><tr><th>Attentive, careful</th><td class="num">100%<span class="all">100%</span></td><td class="num">39%<span class="all">69%</span></td><td class="num">0%<span class="all">0.1%</span></td><td class="num">0%<span class="all">0%</span></td></tr><tr><th>Attentive, bold</th><td class="num">99%<span class="all">100%</span></td><td class="num">16%<span class="all">54%</span></td><td class="num">0%<span class="all">0%</span></td><td class="num">0%<span class="all">0%</span></td></tr><tr><th>Focused, careful</th><td class="num">99%<span class="all">100%</span></td><td class="num">41%<span class="all">76%</span></td><td class="num">0.1%<span class="all">2.3%</span></td><td class="num">0%<span class="all">0%</span></td></tr><tr><th>Focused, bold</th><td class="num">94%<span class="all">100%</span></td><td class="num">25%<span class="all">63%</span></td><td class="num">0%<span class="all">0.7%</span></td><td class="num">0%<span class="all">0%</span></td></tr><tr><th>Expert, careful</th><td class="num">100%<span class="all">100%</span></td><td class="num">94%<span class="all">99%</span></td><td class="num">17%<span class="all">51%</span></td><td class="num">0%<span class="all">0.3%</span></td></tr><tr><th>Expert, bold</th><td class="num">100%<span class="all">100%</span></td><td class="num">81%<span class="all">98%</span></td><td class="num">3%<span class="all">31%</span></td><td class="num">0%<span class="all">0.3%</span></td></tr></tbody></table></div>
- <p class="note">One body alone, in two forms. 39 to 52 party turns in a win, so about 3 to 8 minutes at 4 to 9 seconds a turn.</p>
+</section>
 
- <h3>3. Helpers first, then alone, is a notch harder than the gate everywhere</h3>
- <p>Form one is today's last fight exactly. The short final form on top of it takes a little off every number, so each setting is harder than the same fight at the gate, and hard stays an expert's fight. Holding MP back does not crack it: the same saving habit made the expert a little worse here (5.3% on hard), because in a crowd the MP is better spent early.</p>
+<section>
+ <h2>The numbers</h2>
+ <p>These are on the fight rules' scale, where the Jester has 1,000 HP, for easy, medium, hard and crazy. Names of blows are yours to choose.</p>
+ <div class="scroll"><table><thead><tr><th>Thing</th><th class="num">Easy<span class="n">level 20</span></th><th class="num">Medium<span class="n">level 21</span></th><th class="num">Hard<span class="n">level 22</span></th><th class="num">Crazy<span class="n">level 22.8</span></th></tr></thead><tbody>
+  <tr><th>Form one: Life</th><td class="num">8,000</td><td class="num">9,600</td><td class="num">11,520</td><td class="num">13,329</td></tr>
+  <tr><th>Form one: plain blow</th><td class="num">130</td><td class="num">156</td><td class="num">187</td><td class="num">217</td></tr>
+  <tr><th>Form one: marked blow at one witch</th><td class="num">440</td><td class="num">528</td><td class="num">634</td><td class="num">733</td></tr>
+  <tr><th>Form one: blow on everyone, growing each time</th><td class="num">110</td><td class="num">132</td><td class="num">158</td><td class="num">183</td></tr>
+  <tr><th>Final form: Life</th><td class="num">9,600</td><td class="num">11,520</td><td class="num">13,824</td><td class="num">15,995</td></tr>
+  <tr><th>Final form: plain blow</th><td class="num">143</td><td class="num">172</td><td class="num">206</td><td class="num">238</td></tr>
+  <tr><th>Final form: marked blow at one witch</th><td class="num">484</td><td class="num">581</td><td class="num">697</td><td class="num">806</td></tr>
+  <tr><th>Final form: blow on everyone, growing each time</th><td class="num">121</td><td class="num">145</td><td class="num">174</td><td class="num">202</td></tr>
+ </tbody></table></div>
+ <ul>
+  <li><strong>The helpers</strong> are two of the Shadow Wraith's size and two of the wisp's size. They use the wraiths' numbers until the bramble foes have their own.</li>
+  <li><strong>Form one acts every 10</strong> while a helper stands. Alone, in either form, the fire acts every 5. That is already the rule for a boss left alone.</li>
+  <li><strong>The final form starts with no Fate on it</strong> and ends for good, in the real Curtain Call.</li>
+ </ul>
+ <p>All of this is in <code>game/plan/finalboss/final-fight.json</code> for the fight piece to read.</p>
+</section>
+
+<section>
+ <h2>If you would rather not refill</h2>
+ <p>This is the version I first proposed: the fallen get up with a quarter of their HP, nothing else comes back, and the final form has a quarter of form one's Life with the same blows. It is shorter and kinder to the careless player, but an expert who spends everything in form one pays for it.</p>
  <div class="scroll"><table><thead><tr><th>Player</th><th class="num">Easy<span class="n">level 20</span></th><th class="num">Medium<span class="n">level 21</span></th><th class="num">Hard<span class="n">level 22</span></th><th class="num">Crazy<span class="n">level 22.8</span></th></tr></thead><tbody><tr><th>Very careless</th><td class="num">1.1%<span class="all">7.2%</span></td><td class="num">0%<span class="all">0.1%</span></td><td class="num">0%<span class="all">0%</span></td><td class="num">0%<span class="all">0%</span></td></tr><tr><th>Careless</th><td class="num">3.5%<span class="all">13%</span></td><td class="num">0.1%<span class="all">0.4%</span></td><td class="num">0%<span class="all">0%</span></td><td class="num">0%<span class="all">0%</span></td></tr><tr><th>Attentive, careful</th><td class="num">79%<span class="all">98%</span></td><td class="num">1.6%<span class="all">11%</span></td><td class="num">0%<span class="all">0%</span></td><td class="num">0%<span class="all">0%</span></td></tr><tr><th>Attentive, bold</th><td class="num">48%<span class="all">81%</span></td><td class="num">1.1%<span class="all">5.1%</span></td><td class="num">0%<span class="all">0%</span></td><td class="num">0%<span class="all">0%</span></td></tr><tr><th>Focused, careful</th><td class="num">93%<span class="all">100%</span></td><td class="num">18%<span class="all">45%</span></td><td class="num">0%<span class="all">4.6%</span></td><td class="num">0%<span class="all">0%</span></td></tr><tr><th>Focused, bold</th><td class="num">73%<span class="all">91%</span></td><td class="num">5.7%<span class="all">24%</span></td><td class="num">0%<span class="all">0.1%</span></td><td class="num">0%<span class="all">0%</span></td></tr><tr><th>Expert, careful</th><td class="num">99%<span class="all">100%</span></td><td class="num">89%<span class="all">95%</span></td><td class="num">13%<span class="all">63%</span></td><td class="num">0%<span class="all">0.5%</span></td></tr><tr><th>Expert, bold</th><td class="num">96%<span class="all">99%</span></td><td class="num">60%<span class="all">80%</span></td><td class="num">3.4%<span class="all">31%</span></td><td class="num">0%<span class="all">0.1%</span></td></tr></tbody></table></div>
- <p class="note">Helpers in form one, alone in the final form. 41 to 46 party turns in a win, so about 3 to 7 minutes at 4 to 9 seconds a turn.</p>
-
- <h3>For comparison: the great wraith's fight under new names, in one form</h3>
- <p>This is your second idea with nothing added, and it is the table you called a good balance. The trouble is only that it has no second Life bar, so the change of form could not happen at zero.</p>
- <div class="scroll"><table><thead><tr><th>Player</th><th class="num">Easy<span class="n">level 20</span></th><th class="num">Medium<span class="n">level 21</span></th><th class="num">Hard<span class="n">level 22</span></th><th class="num">Crazy<span class="n">level 22.8</span></th></tr></thead><tbody><tr><th>Very careless</th><td class="num">2.1%<span class="all">11%</span></td><td class="num">0.1%<span class="all">0.6%</span></td><td class="num">0%<span class="all">0%</span></td><td class="num">0%<span class="all">0%</span></td></tr><tr><th>Careless</th><td class="num">5.3%<span class="all">19%</span></td><td class="num">0.2%<span class="all">0.9%</span></td><td class="num">0%<span class="all">0%</span></td><td class="num">0%<span class="all">0%</span></td></tr><tr><th>Attentive, careful</th><td class="num">80%<span class="all">98%</span></td><td class="num">3.1%<span class="all">13%</span></td><td class="num">0%<span class="all">0%</span></td><td class="num">0%<span class="all">0%</span></td></tr><tr><th>Attentive, bold</th><td class="num">54%<span class="all">85%</span></td><td class="num">2.8%<span class="all">10%</span></td><td class="num">0%<span class="all">0%</span></td><td class="num">0%<span class="all">0%</span></td></tr><tr><th>Focused, careful</th><td class="num">96%<span class="all">100%</span></td><td class="num">35%<span class="all">65%</span></td><td class="num">0.3%<span class="all">6.6%</span></td><td class="num">0%<span class="all">0.1%</span></td></tr><tr><th>Focused, bold</th><td class="num">77%<span class="all">93%</span></td><td class="num">15%<span class="all">37%</span></td><td class="num">0%<span class="all">0.1%</span></td><td class="num">0%<span class="all">0%</span></td></tr><tr><th>Expert, careful</th><td class="num">100%<span class="all">100%</span></td><td class="num">91%<span class="all">97%</span></td><td class="num">26%<span class="all">80%</span></td><td class="num">0.1%<span class="all">3.6%</span></td></tr><tr><th>Expert, bold</th><td class="num">98%<span class="all">100%</span></td><td class="num">68%<span class="all">84%</span></td><td class="num">8.1%<span class="all">51%</span></td><td class="num">0%<span class="all">0.7%</span></td></tr></tbody></table></div>
- <p class="note">29 to 35 party turns in a win, so about 2 to 5 minutes at 4 to 9 seconds a turn.</p>
-</section>
-
-<section>
- <h2>The fight I would build</h2>
- <p>Numbers are on the fight simulator's scale, where the Jester has 1,000 HP. Names of blows are yours to choose.</p>
- <h3>Form one: the fire, whole</h3>
- <ul>
-  <li><strong>Life:</strong> 8,000, 9,600, 11,520, 13,330 on easy, medium, hard and crazy. The great wraith's own.</li>
-  <li><strong>Blows:</strong> the great wraith's three, renamed. A plain blow of 130, a marked blow of 440 at one witch, and a blow on everyone of 110 that grows by 25 each time. Each is 20% bigger for every level above 20.</li>
-  <li><strong>Helpers:</strong> the same four the great wraith has, two of the Shadow Wraith's size and two of the wisp's size.</li>
-  <li><strong>It shows no damage,</strong> however low its Life goes. Only the Life bar tells.</li>
-  <li><strong>It ends as every boss ends now:</strong> its Life runs out or the Jester seals it, the Curtain Call falls, and anyone who fainted gets up for the bow with a quarter of her HP.</li>
- </ul>
- <h3>The final form: the fire, broken open</h3>
- <ul>
-  <li><strong>The curtain tears open</strong> and it is back, alone, larger and brighter.</li>
-  <li><strong>Life:</strong> 2,000, 2,400, 2,880, 3,330. A quarter of form one's.</li>
-  <li><strong>Blows:</strong> the same three at the same sizes, but it acts twice as often. That is already the rule for a boss left alone.</li>
-  <li><strong>The party gets nothing back.</strong> It fights on with the HP and MP it has, Io's Deity does not return, and the fire starts with no Fate on it.</li>
-  <li><strong>This one ends for good,</strong> in the real Curtain Call.</li>
- </ul>
- <h3>Two dials, if you want it harder</h3>
- <div class="scroll"><table><thead><tr><th>Player</th><th class="num">Easy<span class="n">level 20</span></th><th class="num">Medium<span class="n">level 21</span></th><th class="num">Hard<span class="n">level 22</span></th><th class="num">Crazy<span class="n">level 22.8</span></th></tr></thead><tbody><tr><th>As proposed</th><td class="num">99%<span class="all">100%</span></td><td class="num">89%<span class="all">95%</span></td><td class="num">13%<span class="all">63%</span></td><td class="num">0%<span class="all">0.5%</span></td></tr><tr><th>Final form hits 20% harder</th><td class="num">99%<span class="all">100%</span></td><td class="num">77%<span class="all">95%</span></td><td class="num">5.8%<span class="all">46%</span></td><td class="num">0%<span class="all">0.2%</span></td></tr><tr><th>Nobody gets up when form one ends</th><td class="num">99%<span class="all">100%</span></td><td class="num">78%<span class="all">92%</span></td><td class="num">3.4%<span class="all">37%</span></td><td class="num">0%<span class="all">0%</span></td></tr></tbody></table></div>
- <p class="note">The expert only: no finds on top, all 18 under it.</p>
-</section>
-
-<section>
- <h2>Herbs do not rescue it</h2>
- <p>I gave the party 20 HP herbs and 20 MP herbs for the fight, then 60 of each. Nobody did better. Eating a herb costs a turn, and the way my testers use them they did slightly worse (the expert on hard: 2.5% and 29%). So a very big bag does not break the last fight. A cleverer herb habit might gain a little; I have not built one.</p>
+ <p class="note">41 to 46 party turns in a win, so about 3 to 7 minutes at 4 to 9 seconds a turn.</p>
 </section>
 
 <section>
@@ -171,15 +153,31 @@ LEAVE OUT. People, hands of people, creatures, lettering, labels, numbers, arrow
 <section class="ask" aria-label="Questions for you">
  <h2>Three things for you to say</h2>
  <ol>
-  <li><strong>Which fight?</strong> Helpers first and then alone (my pick), one body alone throughout, or the great wraith's fight in one form.</li>
-  <li><strong>When form one ends, do the fallen get up?</strong> As measured they do, at a quarter HP, because that is what the Curtain Call does now. If they stay down, the expert wins hard 3.4% of the time, or 37% with every find.</li>
-  <li><strong>Who are the helpers in form one?</strong> Wraiths and brambles it has called, or the four lanterns themselves. The numbers are the same either way.</li>
+  <li><strong>Is the full refill in?</strong> I have written it into the plan as the one to build, since the balance holds. Say if you would rather keep the shorter version.</li>
+  <li><strong>If the party falls in the final form, where does it start again?</strong> I measured it starting again from form one. Starting again from the final form would make the whole fight easier to finish, mostly for the players who struggle.</li>
+  <li><strong>What is the story reason for the party coming back to full?</strong> That one is yours. I can have Opus 5.5 bring you a few to choose from.</li>
  </ol>
+</section>
+
+<section>
+ <h2>How we got here</h2>
+ <p>Before you chose, I played three ways of building the fight. The short version:</p>
+ <ul>
+  <li><strong>The helpers are most of what makes the great wraith hard.</strong> Alone with its own numbers, an attentive player beats it 100% of the time on easy and 100% on medium. With the helpers she wins 80% and 3.1%.</li>
+  <li><strong>One body alone in both forms</strong> could be made hard enough with more Life, but easy became a walkover (100% for an attentive player), the Fox could never cast Crazy Quilt, and an expert who saved MP for the second form won hard 76% of the time, up from 17%.</li>
+  <li><strong>Herbs do not rescue the last fight.</strong> With 20 or 60 of each herb in the bag my testers did slightly worse, because eating one costs a turn. A cleverer herb habit might gain a little; I have not built one.</li>
+ </ul>
+ <h3>The great wraith's fight under new names, in one form</h3>
+ <div class="scroll"><table><thead><tr><th>Player</th><th class="num">Easy<span class="n">level 20</span></th><th class="num">Medium<span class="n">level 21</span></th><th class="num">Hard<span class="n">level 22</span></th><th class="num">Crazy<span class="n">level 22.8</span></th></tr></thead><tbody><tr><th>Very careless</th><td class="num">2.1%<span class="all">11%</span></td><td class="num">0.1%<span class="all">0.6%</span></td><td class="num">0%<span class="all">0%</span></td><td class="num">0%<span class="all">0%</span></td></tr><tr><th>Careless</th><td class="num">5.3%<span class="all">19%</span></td><td class="num">0.2%<span class="all">0.9%</span></td><td class="num">0%<span class="all">0%</span></td><td class="num">0%<span class="all">0%</span></td></tr><tr><th>Attentive, careful</th><td class="num">80%<span class="all">98%</span></td><td class="num">3.1%<span class="all">13%</span></td><td class="num">0%<span class="all">0%</span></td><td class="num">0%<span class="all">0%</span></td></tr><tr><th>Attentive, bold</th><td class="num">54%<span class="all">85%</span></td><td class="num">2.8%<span class="all">10%</span></td><td class="num">0%<span class="all">0%</span></td><td class="num">0%<span class="all">0%</span></td></tr><tr><th>Focused, careful</th><td class="num">96%<span class="all">100%</span></td><td class="num">35%<span class="all">65%</span></td><td class="num">0.3%<span class="all">6.6%</span></td><td class="num">0%<span class="all">0.1%</span></td></tr><tr><th>Focused, bold</th><td class="num">77%<span class="all">93%</span></td><td class="num">15%<span class="all">37%</span></td><td class="num">0%<span class="all">0.1%</span></td><td class="num">0%<span class="all">0%</span></td></tr><tr><th>Expert, careful</th><td class="num">100%<span class="all">100%</span></td><td class="num">91%<span class="all">97%</span></td><td class="num">26%<span class="all">80%</span></td><td class="num">0.1%<span class="all">3.6%</span></td></tr><tr><th>Expert, bold</th><td class="num">98%<span class="all">100%</span></td><td class="num">68%<span class="all">84%</span></td><td class="num">8.1%<span class="all">51%</span></td><td class="num">0%<span class="all">0.7%</span></td></tr></tbody></table></div>
+ <p class="note">The table you called a good balance, for comparison. 29 to 35 party turns in a win, so about 2 to 5 minutes at 4 to 9 seconds a turn.</p>
+ <h3>One body alone, in two forms</h3>
+ <div class="scroll"><table><thead><tr><th>Player</th><th class="num">Easy<span class="n">level 20</span></th><th class="num">Medium<span class="n">level 21</span></th><th class="num">Hard<span class="n">level 22</span></th><th class="num">Crazy<span class="n">level 22.8</span></th></tr></thead><tbody><tr><th>Very careless</th><td class="num">6.9%<span class="all">24%</span></td><td class="num">0.3%<span class="all">2.9%</span></td><td class="num">0%<span class="all">0.2%</span></td><td class="num">0%<span class="all">0%</span></td></tr><tr><th>Careless</th><td class="num">5.7%<span class="all">21%</span></td><td class="num">0.1%<span class="all">1.1%</span></td><td class="num">0%<span class="all">0%</span></td><td class="num">0%<span class="all">0%</span></td></tr><tr><th>Attentive, careful</th><td class="num">100%<span class="all">100%</span></td><td class="num">39%<span class="all">69%</span></td><td class="num">0%<span class="all">0.1%</span></td><td class="num">0%<span class="all">0%</span></td></tr><tr><th>Attentive, bold</th><td class="num">99%<span class="all">100%</span></td><td class="num">16%<span class="all">54%</span></td><td class="num">0%<span class="all">0%</span></td><td class="num">0%<span class="all">0%</span></td></tr><tr><th>Focused, careful</th><td class="num">99%<span class="all">100%</span></td><td class="num">41%<span class="all">76%</span></td><td class="num">0.1%<span class="all">2.3%</span></td><td class="num">0%<span class="all">0%</span></td></tr><tr><th>Focused, bold</th><td class="num">94%<span class="all">100%</span></td><td class="num">25%<span class="all">63%</span></td><td class="num">0%<span class="all">0.7%</span></td><td class="num">0%<span class="all">0%</span></td></tr><tr><th>Expert, careful</th><td class="num">100%<span class="all">100%</span></td><td class="num">94%<span class="all">99%</span></td><td class="num">17%<span class="all">51%</span></td><td class="num">0%<span class="all">0.3%</span></td></tr><tr><th>Expert, bold</th><td class="num">100%<span class="all">100%</span></td><td class="num">81%<span class="all">98%</span></td><td class="num">3%<span class="all">31%</span></td><td class="num">0%<span class="all">0.3%</span></td></tr></tbody></table></div>
+ <p class="note">39 to 52 party turns in a win, so about 3 to 8 minutes at 4 to 9 seconds a turn.</p>
 </section>
 
 <footer>
  <p>What these numbers are: 2,000 fights for every cell of the big tables and 1,000 for the rest, played by the eight pretend players through the approved fight rules, which are not changed. The helpers use the wraiths' numbers until the bramble foes have their own, and the finds are still to be tuned again for fights that carry HP and MP over.</p>
- <p>Made by the Levelling session on November 15, 2026. In the repo: <code>game/plan/finalboss/</code> (<code>forms.js</code>, <code>forms_run.js</code>, <code>forms.txt</code>, <code>picture-prompts.md</code>).</p>
+ <p>Made by the Levelling session on November 15, 2026. In the repo: <code>game/plan/finalboss/</code> (<code>forms.js</code>, <code>forms_run.js</code>, <code>final-fight.json</code>, <code>forms.txt</code>, <code>picture-prompts.md</code>).</p>
 </footer>
 </main>
 <script>

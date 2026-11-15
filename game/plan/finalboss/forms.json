@@ -701,6 +701,236 @@
     44.526119402985074,
     46
    ]
+  },
+  "chosen": {
+   "name": "Helpers in form one; the party back to full; then alone and stronger",
+   "forms": [
+    {
+     "code": "B2K2w"
+    },
+    {
+     "code": "B",
+     "life": 1.2,
+     "dmg": 1.1,
+     "fresh": true
+    }
+   ],
+   "rows": {
+    "very careless": [
+     {
+      "none": 0.0065,
+      "all": 0.0505,
+      "turns": 71.61538461538461,
+      "lostInFormOne": 0.9785
+     },
+     {
+      "none": 0,
+      "all": 0.0015,
+      "turns": 83.33333333333333,
+      "lostInFormOne": 0.9995
+     },
+     {
+      "none": 0,
+      "all": 0,
+      "turns": 0,
+      "lostInFormOne": 1
+     },
+     {
+      "none": 0,
+      "all": 0,
+      "turns": 0,
+      "lostInFormOne": 1
+     }
+    ],
+    "careless": [
+     {
+      "none": 0.008,
+      "all": 0.069,
+      "turns": 58.125,
+      "lostInFormOne": 0.9465
+     },
+     {
+      "none": 0,
+      "all": 0,
+      "turns": 0,
+      "lostInFormOne": 0.998
+     },
+     {
+      "none": 0,
+      "all": 0,
+      "turns": 0,
+      "lostInFormOne": 1
+     },
+     {
+      "none": 0,
+      "all": 0,
+      "turns": 0,
+      "lostInFormOne": 1
+     }
+    ],
+    "attentive, careful": [
+     {
+      "none": 0.799,
+      "all": 0.9845,
+      "turns": 53.19399249061327,
+      "lostInFormOne": 0.2
+     },
+     {
+      "none": 0.0285,
+      "all": 0.1245,
+      "turns": 56.08771929824562,
+      "lostInFormOne": 0.9685
+     },
+     {
+      "none": 0,
+      "all": 0,
+      "turns": 0,
+      "lostInFormOne": 1
+     },
+     {
+      "none": 0,
+      "all": 0,
+      "turns": 0,
+      "lostInFormOne": 1
+     }
+    ],
+    "attentive, bold": [
+     {
+      "none": 0.5205,
+      "all": 0.8485,
+      "turns": 54.763688760806915,
+      "lostInFormOne": 0.4615
+     },
+     {
+      "none": 0.0215,
+      "all": 0.0815,
+      "turns": 57,
+      "lostInFormOne": 0.9725
+     },
+     {
+      "none": 0,
+      "all": 0,
+      "turns": 0,
+      "lostInFormOne": 1
+     },
+     {
+      "none": 0,
+      "all": 0,
+      "turns": 0,
+      "lostInFormOne": 1
+     }
+    ],
+    "focused, careful": [
+     {
+      "none": 0.956,
+      "all": 0.999,
+      "turns": 54.53608786610879,
+      "lostInFormOne": 0.044
+     },
+     {
+      "none": 0.345,
+      "all": 0.6475,
+      "turns": 60.007246376811594,
+      "lostInFormOne": 0.648
+     },
+     {
+      "none": 0.002,
+      "all": 0.029,
+      "turns": 66.75,
+      "lostInFormOne": 0.997
+     },
+     {
+      "none": 0,
+      "all": 0,
+      "turns": 0,
+      "lostInFormOne": 1
+     }
+    ],
+    "focused, bold": [
+     {
+      "none": 0.7655,
+      "all": 0.925,
+      "turns": 54.73742651861529,
+      "lostInFormOne": 0.2345
+     },
+     {
+      "none": 0.1335,
+      "all": 0.3625,
+      "turns": 59.838951310861425,
+      "lostInFormOne": 0.8525
+     },
+     {
+      "none": 0,
+      "all": 0,
+      "turns": 0,
+      "lostInFormOne": 1
+     },
+     {
+      "none": 0,
+      "all": 0,
+      "turns": 0,
+      "lostInFormOne": 1
+     }
+    ],
+    "expert, careful": [
+     {
+      "none": 0.995,
+      "all": 1,
+      "turns": 55.45678391959799,
+      "lostInFormOne": 0.005
+     },
+     {
+      "none": 0.91,
+      "all": 0.9745,
+      "turns": 57.426923076923075,
+      "lostInFormOne": 0.0895
+     },
+     {
+      "none": 0.1165,
+      "all": 0.6465,
+      "turns": 64.33905579399142,
+      "lostInFormOne": 0.7355
+     },
+     {
+      "none": 0,
+      "all": 0.003,
+      "turns": 67,
+      "lostInFormOne": 0.999
+     }
+    ],
+    "expert, bold": [
+     {
+      "none": 0.9785,
+      "all": 0.9965,
+      "turns": 55.012774655084314,
+      "lostInFormOne": 0.0215
+     },
+     {
+      "none": 0.6735,
+      "all": 0.842,
+      "turns": 58.01855976243504,
+      "lostInFormOne": 0.322
+     },
+     {
+      "none": 0.016,
+      "all": 0.355,
+      "turns": 63.34375,
+      "lostInFormOne": 0.9195
+     },
+     {
+      "none": 0,
+      "all": 0,
+      "turns": 0,
+      "lostInFormOne": 1
+     }
+    ]
+   },
+   "turns": [
+    56.2025,
+    57.831202046035806,
+    64.07857142857142,
+    67
+   ]
   }
  },
  "extra": {

@@ -12,7 +12,7 @@ const table = (rows, names) => `<div class="scroll"><table>${head}<tbody>${(name
 const careful = ['attentive, careful', 'focused, careful', 'expert, careful'];
 const F = D.fights, X = D.extra;
 const mins = tt => { const a = Math.min(...tt), b = Math.max(...tt); return `${Math.round(a)} to ${Math.round(b)} party turns in a win, so about ${Math.round(a * 4 / 60)} to ${Math.round(b * 9 / 60)} minutes at 4 to 9 seconds a turn`; };
-const life = (base, share) => D.settings.map(([n, g]) => Math.round(base * share * Math.pow(1.2, g) / 10) * 10);
+const life = (base, share) => D.settings.map(([n, g]) => Math.round(base * share * Math.pow(1.2, g)));
 const fmt = n => n.toLocaleString('en-US');
 
 // the prompts: every "## F..." section of picture-prompts.md
@@ -21,7 +21,8 @@ md.replace(/\n## (F\d)\s+([^\n]+)\n\n([^\n]+)\n\n```\n([\s\S]*?)\n```/g, (_, id,
 if (prompts.length !== 3) throw new Error('expected three F prompts, found ' + prompts.length);
 const promptHtml = prompts.map((p, i) => `<div class="prompt"><div class="phead"><div><strong>${esc(p.title)}</strong><span>${esc(p.shape.replace(/`/g, ''))}</span></div><button type="button" data-copy="p${i}">Copy the prompt</button></div><pre id="p${i}" tabindex="0">${esc(p.text)}</pre></div>`).join('\n');
 
-const gw = F.gw.rows, al = F.alone.rows, bo = F.both.rows, lone = X.loneGw.rows;
+const gw = F.gw.rows, al = F.alone.rows, bo = F.both.rows, ch = F.chosen.rows, lone = X.loneGw.rows;
+const blow = (base, mul) => D.settings.map(([n, g]) => Math.round(base * mul * Math.pow(1.2, g)));
 const E = 'expert, careful', A = 'attentive, careful', Fo = 'focused, careful';
 const html = `<!DOCTYPE html>
 <html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
@@ -59,7 +60,7 @@ thead th { font-size: 13px; color: var(--ink-2); font-weight: 700; }
 .num { text-align: right; white-space: nowrap; } th span.n { display: block; color: var(--ink-2); font-size: 13px; font-weight: 400; }
 .all { display: block; color: var(--ink-2); }
 .key { color: var(--ink-2); font-size: 15px; margin: 0 0 8px; }
-@media (max-width: 480px) { table { font-size: 14px; } th, td { padding: 8px 6px; } tbody th { white-space: normal; } thead th span.n { font-size: 12px; } }
+@media (max-width: 480px) { table { font-size: 14px; } th, td { padding: 8px 6px; } tbody th { white-space: normal; } thead th span.n { font-size: 12px; } .ask { padding: 16px 12px; } .ask .scroll { margin-left: -4px; margin-right: -4px; } }
 .note { color: var(--ink-2); font-size: 15px; }
 .prompt { background: var(--card); border: 1px solid var(--rule); border-radius: 10px; margin-bottom: 14px; overflow: hidden; }
 .phead { display: flex; flex-wrap: wrap; gap: 10px; justify-content: space-between; align-items: center; padding: 12px 14px; border-bottom: 1px solid var(--rule); }
@@ -74,77 +75,59 @@ footer { color: var(--ink-2); font-size: 15px; border-top: 1px solid var(--rule)
 <header>
  <p class="kicker">Moon Faire, task board F11</p>
  <h1>The final boss in two forms</h1>
- <p>You said the rough model is a good first draft of form one, that it should lose Life without showing damage, and that at zero it changes into a final form that is broken, larger and more vibrant. You asked for picture prompts for both forms, and whether the fight should be one body alone, harder than the gate fights, or the great wraith's numbers under new names with the same helpers. I played both with the eight testers.</p>
+ <p>You chose helpers first and then alone, with wraiths and brambles as the helpers and the fallen getting up at the Jester's Curtain Call. You also wondered about the whole party coming back to full HP and MP when the boss falls the first time, with a harder second round, if the balance still works out the same. I played that with the eight testers, and it does.</p>
 </header>
 
-<section class="ask" aria-label="My answer">
- <h2>My answer: use both of your ideas, one after the other</h2>
+<section class="ask" aria-label="The fight as you chose it">
+ <h2>The fight as you chose it</h2>
  <ul>
-  <li><strong>Form one is your second idea.</strong> The fire, whole, with the great wraith's own numbers under new names and the same four helpers.</li>
-  <li><strong>The final form is your first idea.</strong> The fire, broken open, alone, with a quarter of the Life and the same blows, acting twice as often.</li>
-  <li><strong>On hard, only an expert wins:</strong> ${pc(bo[E][2].none)} of the time with no finds and ${pc(bo[E][2].all)} with all 18. Today's last fight gives her ${pc(gw[E][2].none)} and ${pc(gw[E][2].all)}, so this is one notch harder at every setting.</li>
-  <li><strong>It needs no new rule</strong> beyond "the second form starts with the HP and MP the party has left".</li>
+  <li><strong>Form one, the fire, whole.</strong> The great wraith's own numbers under new names, with four helpers: wraiths and brambles it has called. It shows no damage.</li>
+  <li><strong>It falls, and the Curtain Call comes down.</strong> Every witch gets up with full HP and MP, and Io's Deity is ready again.</li>
+  <li><strong>The final form, the fire, broken open.</strong> Alone, with 20% more Life than form one and blows 10% bigger, acting twice as often.</li>
+  <li><strong>On hard, only an expert wins:</strong> ${pc(ch[E][2].none)} of the time with no finds and ${pc(ch[E][2].all)} with all 18. Without the refill it was ${pc(bo[E][2].none)} and ${pc(bo[E][2].all)}, so the balance is the same.</li>
  </ul>
- <p>It also plays the story out in the rules: the Jester gives the fire its ending, and it refuses.</p>
+ <p>The top number is how often that player wins with no finds, and the number under it is with all 18. The party is level 20 and arrives fresh from a rest spot.</p>
+ ${table(ch)}
+ <p class="note">${mins(F.chosen.turns)}.</p>
 </section>
 
 <section>
- <h2>What the testers showed</h2>
- <p>In every table the top number is how often that player wins with no finds, and the number under it is with all 18. The party is level 20 and arrives fresh from a rest spot.</p>
-
- <h3>1. The helpers are most of what makes the great wraith hard</h3>
- <p>Take the helpers away and leave the great wraith its own numbers, and an attentive player wins ${pc(lone[A][0].none)} on easy and ${pc(lone[A][1].none)} on medium. With the helpers she wins ${pc(gw[A][0].none)} and ${pc(gw[A][1].none)}. So one body alone has to be far stronger than the great wraith before it is harder than the gate fights.</p>
- ${table(lone, careful)}
- <p class="note">The great wraith alone, with its own numbers. Not a proposal, only the comparison.</p>
-
- <h3>2. One body alone can be made hard enough, but it is a narrower fight</h3>
- <p>I gave one body 30% more Life than the great wraith in form one, then a final form with 40% of the great wraith's Life that hits 10% harder. That lands hard in the right place (the expert wins ${pc(al[E][2].none)}, or ${pc(al[E][2].all)} with every find). Three things came with it:</p>
+ <h2>What the refill changes</h2>
  <ul>
-  <li><strong>Easy is easier than the gate before it.</strong> An attentive player wins ${pc(al[A][0].none)} on easy, where she wins about 80% against the great bramble.</li>
-  <li><strong>Part of the party's kit has nothing to do.</strong> With one foe the Fox can never cast Crazy Quilt, Pins and Needles has nothing to spread to, Sealed Fate's splash hits nobody, and there is never a choice of whom to hit.</li>
-  <li><strong>It swings on one trick.</strong> My testers spend their MP in form one as if it were the whole fight. An expert who knows the second form is coming and holds MP back wins ${pc(D.saving.alone[E][2].none)} on hard with no finds, up from ${pc(al[E][2].none)}. So it would be very hard the first time and much easier every time after.</li>
+  <li><strong>Hard and crazy come out the same</strong> as the version with no refill. The stronger final form takes back what the refill gives.</li>
+  <li><strong>Easy and medium are a touch kinder to a player who thinks.</strong> For her they are now about as hard as the great wraith's fight on its own (medium, focused player: ${pc(ch[Fo][1].none)}, against ${pc(bo[Fo][1].none)} with no refill).</li>
+  <li><strong>Nobody is punished for spending everything in form one.</strong> There is nothing to save for, so the fight is as hard on the tenth try as on the first.</li>
+  <li><strong>It is a longer fight.</strong> About ${Math.round(Math.min(...F.chosen.turns))} to ${Math.round(Math.max(...F.chosen.turns))} party turns in a win, against ${Math.round(Math.min(...F.both.turns))} to ${Math.round(Math.max(...F.both.turns))} with no refill.</li>
+  <li><strong>The careless player does worse.</strong> On easy she wins ${pc(ch['careless'][0].none)} of the time, or ${pc(ch['careless'][0].all)} with every find. With no refill it was ${pc(bo['careless'][0].none)} and ${pc(bo['careless'][0].all)}. The final form alone is a long fight, and she does not last it.</li>
  </ul>
- ${table(al)}
- <p class="note">One body alone, in two forms. ${mins(F.alone.turns)}.</p>
+</section>
 
- <h3>3. Helpers first, then alone, is a notch harder than the gate everywhere</h3>
- <p>Form one is today's last fight exactly. The short final form on top of it takes a little off every number, so each setting is harder than the same fight at the gate, and hard stays an expert's fight. Holding MP back does not crack it: the same saving habit made the expert a little worse here (${pc(D.saving.both[E][2].none)} on hard), because in a crowd the MP is better spent early.</p>
+<section>
+ <h2>The numbers</h2>
+ <p>These are on the fight rules' scale, where the Jester has 1,000 HP, for easy, medium, hard and crazy. Names of blows are yours to choose.</p>
+ <div class="scroll"><table><thead><tr><th>Thing</th>${SET.map(s => `<th class="num">${s.name}<span class="n">level ${s.level}</span></th>`).join('')}</tr></thead><tbody>
+  <tr><th>Form one: Life</th>${life(8000, 1).map(x => `<td class="num">${fmt(x)}</td>`).join('')}</tr>
+  <tr><th>Form one: plain blow</th>${blow(130, 1).map(x => `<td class="num">${x}</td>`).join('')}</tr>
+  <tr><th>Form one: marked blow at one witch</th>${blow(440, 1).map(x => `<td class="num">${x}</td>`).join('')}</tr>
+  <tr><th>Form one: blow on everyone, growing each time</th>${blow(110, 1).map(x => `<td class="num">${x}</td>`).join('')}</tr>
+  <tr><th>Final form: Life</th>${life(8000, 1.2).map(x => `<td class="num">${fmt(x)}</td>`).join('')}</tr>
+  <tr><th>Final form: plain blow</th>${blow(130, 1.1).map(x => `<td class="num">${x}</td>`).join('')}</tr>
+  <tr><th>Final form: marked blow at one witch</th>${blow(440, 1.1).map(x => `<td class="num">${x}</td>`).join('')}</tr>
+  <tr><th>Final form: blow on everyone, growing each time</th>${blow(110, 1.1).map(x => `<td class="num">${x}</td>`).join('')}</tr>
+ </tbody></table></div>
+ <ul>
+  <li><strong>The helpers</strong> are two of the Shadow Wraith's size and two of the wisp's size. They use the wraiths' numbers until the bramble foes have their own.</li>
+  <li><strong>Form one acts every 10</strong> while a helper stands. Alone, in either form, the fire acts every 5. That is already the rule for a boss left alone.</li>
+  <li><strong>The final form starts with no Fate on it</strong> and ends for good, in the real Curtain Call.</li>
+ </ul>
+ <p>All of this is in <code>game/plan/finalboss/final-fight.json</code> for the fight piece to read.</p>
+</section>
+
+<section>
+ <h2>If you would rather not refill</h2>
+ <p>This is the version I first proposed: the fallen get up with a quarter of their HP, nothing else comes back, and the final form has a quarter of form one's Life with the same blows. It is shorter and kinder to the careless player, but an expert who spends everything in form one pays for it.</p>
  ${table(bo)}
- <p class="note">Helpers in form one, alone in the final form. ${mins(F.both.turns)}.</p>
-
- <h3>For comparison: the great wraith's fight under new names, in one form</h3>
- <p>This is your second idea with nothing added, and it is the table you called a good balance. The trouble is only that it has no second Life bar, so the change of form could not happen at zero.</p>
- ${table(gw)}
- <p class="note">${mins(F.gw.turns)}.</p>
-</section>
-
-<section>
- <h2>The fight I would build</h2>
- <p>Numbers are on the fight simulator's scale, where the Jester has 1,000 HP. Names of blows are yours to choose.</p>
- <h3>Form one: the fire, whole</h3>
- <ul>
-  <li><strong>Life:</strong> ${life(8000, 1).map(fmt).join(', ')} on easy, medium, hard and crazy. The great wraith's own.</li>
-  <li><strong>Blows:</strong> the great wraith's three, renamed. A plain blow of 130, a marked blow of 440 at one witch, and a blow on everyone of 110 that grows by 25 each time. Each is 20% bigger for every level above 20.</li>
-  <li><strong>Helpers:</strong> the same four the great wraith has, two of the Shadow Wraith's size and two of the wisp's size.</li>
-  <li><strong>It shows no damage,</strong> however low its Life goes. Only the Life bar tells.</li>
-  <li><strong>It ends as every boss ends now:</strong> its Life runs out or the Jester seals it, the Curtain Call falls, and anyone who fainted gets up for the bow with a quarter of her HP.</li>
- </ul>
- <h3>The final form: the fire, broken open</h3>
- <ul>
-  <li><strong>The curtain tears open</strong> and it is back, alone, larger and brighter.</li>
-  <li><strong>Life:</strong> ${life(8000, 0.25).map(fmt).join(', ')}. A quarter of form one's.</li>
-  <li><strong>Blows:</strong> the same three at the same sizes, but it acts twice as often. That is already the rule for a boss left alone.</li>
-  <li><strong>The party gets nothing back.</strong> It fights on with the HP and MP it has, Io's Deity does not return, and the fire starts with no Fate on it.</li>
-  <li><strong>This one ends for good,</strong> in the real Curtain Call.</li>
- </ul>
- <h3>Two dials, if you want it harder</h3>
- ${table({ 'as proposed': bo[E], 'final form hits 20% harder': X.bothHarder.rows[E], 'nobody gets up when form one ends': X.bothNoBow.rows[E] })}
- <p class="note">The expert only: no finds on top, all 18 under it.</p>
-</section>
-
-<section>
- <h2>Herbs do not rescue it</h2>
- <p>I gave the party 20 HP herbs and 20 MP herbs for the fight, then 60 of each. Nobody did better. Eating a herb costs a turn, and the way my testers use them they did slightly worse (the expert on hard: ${pc(D.herbs.both20.rows[E][2].none)} and ${pc(D.herbs.both20.rows[E][2].all)}). So a very big bag does not break the last fight. A cleverer herb habit might gain a little; I have not built one.</p>
+ <p class="note">${mins(F.both.turns)}.</p>
 </section>
 
 <section>
@@ -156,15 +139,31 @@ ${promptHtml}
 <section class="ask" aria-label="Questions for you">
  <h2>Three things for you to say</h2>
  <ol>
-  <li><strong>Which fight?</strong> Helpers first and then alone (my pick), one body alone throughout, or the great wraith's fight in one form.</li>
-  <li><strong>When form one ends, do the fallen get up?</strong> As measured they do, at a quarter HP, because that is what the Curtain Call does now. If they stay down, the expert wins hard ${pc(X.bothNoBow.rows[E][2].none)} of the time, or ${pc(X.bothNoBow.rows[E][2].all)} with every find.</li>
-  <li><strong>Who are the helpers in form one?</strong> Wraiths and brambles it has called, or the four lanterns themselves. The numbers are the same either way.</li>
+  <li><strong>Is the full refill in?</strong> I have written it into the plan as the one to build, since the balance holds. Say if you would rather keep the shorter version.</li>
+  <li><strong>If the party falls in the final form, where does it start again?</strong> I measured it starting again from form one. Starting again from the final form would make the whole fight easier to finish, mostly for the players who struggle.</li>
+  <li><strong>What is the story reason for the party coming back to full?</strong> That one is yours. I can have Opus 5.5 bring you a few to choose from.</li>
  </ol>
+</section>
+
+<section>
+ <h2>How we got here</h2>
+ <p>Before you chose, I played three ways of building the fight. The short version:</p>
+ <ul>
+  <li><strong>The helpers are most of what makes the great wraith hard.</strong> Alone with its own numbers, an attentive player beats it ${pc(lone[A][0].none)} of the time on easy and ${pc(lone[A][1].none)} on medium. With the helpers she wins ${pc(gw[A][0].none)} and ${pc(gw[A][1].none)}.</li>
+  <li><strong>One body alone in both forms</strong> could be made hard enough with more Life, but easy became a walkover (${pc(al[A][0].none)} for an attentive player), the Fox could never cast Crazy Quilt, and an expert who saved MP for the second form won hard ${pc(D.saving.alone[E][2].none)} of the time, up from ${pc(al[E][2].none)}.</li>
+  <li><strong>Herbs do not rescue the last fight.</strong> With 20 or 60 of each herb in the bag my testers did slightly worse, because eating one costs a turn. A cleverer herb habit might gain a little; I have not built one.</li>
+ </ul>
+ <h3>The great wraith's fight under new names, in one form</h3>
+ ${table(gw)}
+ <p class="note">The table you called a good balance, for comparison. ${mins(F.gw.turns)}.</p>
+ <h3>One body alone, in two forms</h3>
+ ${table(al)}
+ <p class="note">${mins(F.alone.turns)}.</p>
 </section>
 
 <footer>
  <p>What these numbers are: ${fmt(D.n)} fights for every cell of the big tables and ${fmt(D.nExtra)} for the rest, played by the eight pretend players through the approved fight rules, which are not changed. The helpers use the wraiths' numbers until the bramble foes have their own, and the finds are still to be tuned again for fights that carry HP and MP over.</p>
- <p>Made by the Levelling session on November 15, 2026. In the repo: <code>game/plan/finalboss/</code> (<code>forms.js</code>, <code>forms_run.js</code>, <code>forms.txt</code>, <code>picture-prompts.md</code>).</p>
+ <p>Made by the Levelling session on November 15, 2026. In the repo: <code>game/plan/finalboss/</code> (<code>forms.js</code>, <code>forms_run.js</code>, <code>final-fight.json</code>, <code>forms.txt</code>, <code>picture-prompts.md</code>).</p>
 </footer>
 </main>
 <script>

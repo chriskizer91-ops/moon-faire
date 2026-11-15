@@ -13,6 +13,9 @@ const FIGHTS = {
   gw:    { name: "The great wraith's fight under new names, one form", forms: [{ code: 'B2K2w' }] },
   alone: { name: 'One body alone, in two forms', forms: [{ code: 'B', life: 1.3 }, { code: 'B', life: 0.4, dmg: 1.1 }] },
   both:  { name: 'Helpers in form one, alone in form two', forms: [{ code: 'B2K2w' }, { code: 'B', life: 0.25 }] },
+  // Chris, 3:23 pm: helpers first and then alone; and maybe the whole party gets up full when it falls the first time,
+  // with a harder second round that works out to the same balance. Life 1.2 and blows 1.1 is what matched "both".
+  chosen: { name: 'Helpers in form one; the party back to full; then alone and stronger', forms: [{ code: 'B2K2w' }, { code: 'B', life: 1.2, dmg: 1.1, fresh: true }] },
 };
 const EXTRA = {
   loneGw:      { name: 'The great wraith alone, its own numbers, one form (to show what the helpers are worth)', forms: [{ code: 'B' }] },

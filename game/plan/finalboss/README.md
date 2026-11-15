@@ -11,13 +11,20 @@ is a stand-in.** The project note is `claude/final-boss-the-fire-that-would-not-
   the boss and it should lose hp but not take visible damage and then at zero hp transform into its final form which
   looks broken larger and more vibrant". So: **two forms.**
 - He asked which fight: one body alone, harder than the gate fights; or the great wraith's numbers under new names with
-  the same helpers, all at the last fight's level. **Not chosen yet.**
+  the same helpers, all at the last fight's level.
+- **November 15, 3:23 pm, he chose:** "helpers first and then alone"; the fallen get up at the Jester's Curtain Call;
+  the helpers are wraiths and brambles. And: "maybe ... when the boss falls the first time the whole party gets back up
+  full HP MP for some story reason and then the second round is more challenging but it still works out the same
+  balancing." Measured: with a final form of 20% more Life and blows 10% bigger, it does.
+  **`final-fight.json` is the fight the game reads** (made by `chosen.js`), with the full refill built in and marked
+  "to be confirmed by him", and the version without it beside it.
 
 ## Files
 
 | File | What it is |
 |---|---|
 | `picture-prompts.md` | F1 (form one, whole), F2 (the final form, broken open), F3 (both side by side). B2 and B3 are set aside. |
+| `final-fight.json` | **The chosen fight, for the fight piece to read.** Made by `chosen.js` from the rules and `forms.json`. |
 | `forms.js` | A fight in forms, through the approved engine, which is not changed. |
 | `forms_run.js` | Measures the ways of building the fight with the eight testers. Writes `forms.json` and `forms.txt`. |
 | `make_page.js` | Builds `two-forms.html`, the page for Chris, from `forms.json` and `picture-prompts.md`. |
@@ -43,6 +50,7 @@ Wins with no finds / with all 18, the careful expert, at easy, medium, hard, cra
 | The great wraith's fight under new names, one form (`B2K2w`) | 100 / 100 | 91 / 97 | 26 / 80 | 0.1 / 3.6 |
 | One body alone, two forms (`B` Life x1.3, then `B` Life x0.4, blows x1.1) | 100 / 100 | 94 / 99 | 17 / 51 | 0 / 0.3 |
 | Helpers in form one, alone in form two (`B2K2w`, then `B` Life x0.25) | 99 / 100 | 89 / 95 | 13 / 63 | 0 / 0.5 |
+| **Chosen:** the same, the party back to full at the change (`B2K2w`, then fresh, `B` Life x1.2, blows x1.1) | 100 / 100 | 91 / 97 | 12 / 65 | 0 / 0.3 |
 
 1. **The helpers are most of the great wraith's difficulty.** The great wraith alone, with its own numbers: the careful
    attentive player wins 100% on easy and medium and 60% on hard (with helpers: 80%, 3%, 0%).
@@ -53,12 +61,18 @@ Wins with no finds / with all 18, the careful expert, at easy, medium, hard, cra
    expert's fight, and the same saving habit does not help (5% on hard).
 4. **Herbs in the bag do not rescue it.** With 20 or 60 of each, the testers did slightly worse: a herb costs a turn.
 
-The "Levelling" session's pick is the third. Dials if it should be harder: the final form's blows 20% bigger (expert on
+5. **With the full refill** hard and crazy come out the same; easy and medium are about the great wraith's fight on its
+   own for a player who thinks; there is nothing to save MP for; the fight is longer (56 to 67 party turns in a win,
+   against 41 to 46); and the careless player does worse on easy (0.8% / 6.9%, against 3.5% / 13%), because the final
+   form alone is a long fight.
+
+Chris chose the third, and the fourth row of the table is his "maybe". Dials if it should be harder: the final form's blows 20% bigger (expert on
 hard 6 / 46), or nobody gets up when form one ends (3 / 37).
 
 ## Not done
 
-- Chris has not chosen. Nothing is in the game's rules.
+- Chris has not confirmed the full refill, said what happens when the party falls in the final form (measured: the
+  whole fight starts again), or given the story reason for the refill. Nothing is in the game's rules or the fight piece.
 - The testers do not know a second form is coming, apart from one crude "saving" habit.
 - The helpers use the wraiths' numbers; the bramble foes have none yet. The finds are to be tuned again.
 - The model has only form one. No fight backdrop, and no place on the map.

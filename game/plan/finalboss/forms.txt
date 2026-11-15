@@ -33,6 +33,17 @@ Helpers in form one, alone in form two   [{"code":"B2K2w"},{"code":"B","life":0.
   expert, bold          96% /  99%       60% /  80%      3.4% /  31%        0% / 0.1%
   party turns in a win (expert, all finds): 41, 43, 45, 46
 
+Helpers in form one; the party back to full; then alone and stronger   [{"code":"B2K2w"},{"code":"B","life":1.2,"dmg":1.1,"fresh":true}]
+  very careless        0.7% / 5.1%        0% / 0.1%        0% /   0%        0% /   0%
+  careless             0.8% / 6.9%        0% /   0%        0% /   0%        0% /   0%
+  attentive, careful    80% /  98%      2.9% /  12%        0% /   0%        0% /   0%
+  attentive, bold       52% /  85%      2.1% / 8.2%        0% /   0%        0% /   0%
+  focused, careful      96% / 100%       35% /  65%      0.2% / 2.9%        0% /   0%
+  focused, bold         77% /  93%       13% /  36%        0% /   0%        0% /   0%
+  expert, careful      100% / 100%       91% /  97%       12% /  65%        0% / 0.3%
+  expert, bold          98% / 100%       67% /  84%      1.6% /  36%        0% /   0%
+  party turns in a win (expert, all finds): 56, 58, 64, 67
+
 Other versions, the three careful thinking testers, 1000 fights each.
 
 The great wraith alone, its own numbers, one form (to show what the helpers are worth)   [{"code":"B"}]

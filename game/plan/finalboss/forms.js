@@ -9,7 +9,9 @@
 // By the approved rules a fight that ends on Sealed Fate ends in the Curtain Call, and the fallen get up for the bow at
 // a quarter of their HP. A form marked { bow: false } stands nobody up; without the mark the rule is left as it is.
 //
-// A form is { code, up, life, dmg, bow }: a line-up; how many levels above the fight's own level its numbers are (a foe one
+// A form marked { fresh: true } starts with the whole party up and full, HP and MP, and with every once-a-fight thing
+// back (Chris, November 15, 3:23 pm: "the whole party gets back up full HP MP for some story reason").
+// A form is { code, up, life, dmg, bow, fresh }: a line-up; how many levels above the fight's own level its numbers are (a foe one
 // level up has 20% more Life and hits 20% harder, by the approved rules, and "up" may be a fraction); and two more
 // multipliers on the big body alone, its Life and the size of its blows.
 const { E, choose, think, K } = require('../testers/testers.js');
@@ -73,6 +75,7 @@ function whole(forms, rules, gap, tester, seed, herbs, saver) {
   let state = full(), carry = null, turns = 0, foeTurns = 0;
   const bag = { hp: (herbs && herbs.hp) || 0, mp: (herbs && herbs.mp) || 0 };
   for (let i = 0; i < forms.length; i++) {
+    if (forms[i].fresh) { state = full(); carry = null; }
     const f = form(forms[i].code, gap + (forms[i].up || 0), tester, i ? (seed * 31 + 17 * i) >>> 0 : seed, rules[i], state, carry, bag, saver && i < forms.length - 1);
     turns += f.turns; foeTurns += f.foeTurns;
     if (!f.won) return { won: false, lostIn: i + 1, turns, foeTurns };
