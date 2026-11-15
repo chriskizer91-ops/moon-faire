@@ -8875,7 +8875,8 @@ vec4 seen(vec3 p, vec3 n, float face) { return seenSky(p, n, face, uSkyTest); }`
 
   // ---- her, and how she moves ----
   const me = { x: 0, z: 0, y: 0, face: 0, vx: 0, vz: 0, wb: 0, rb: 0, phase: 0, goal: null, stuck: 0, idleT: 0, idleNext: 6 };
-  const VIEWS = [2.3, 6.5]; const cam = { yaw: 0, pitch: 0.30, dist: VIEWS[0], d: VIEWS[0], view: 0, yawTo: null, lastDrag: -10, y: 0 };
+  const VIEWS = [2.3, 6.5];
+  const ZOOM_WALK = 1.15, ZOOM_RUN = 2.75, ZOOM_FAR = 14; const cam = { yaw: 0, pitch: 0.30, dist: VIEWS[0], d: VIEWS[0], view: 0, yawTo: null, lastDrag: -10, y: 0 };
   const keys = {}, lastTap = {}; let runLatch = false, near = null, talk = null, moorK = 0, paused = false;
   const blockIndex = new Map(); let allBlockers = [];
   function indexBlockers() { blockIndex.clear(); for (const b of allBlockers) { const r = b.r || Math.hypot(b.w, b.d); for (let i = Math.floor((b.x - r) / 8); i <= Math.floor((b.x + r) / 8); i++) for (let j = Math.floor((b.z - r) / 8); j <= Math.floor((b.z + r) / 8); j++) { const k = i + ',' + j; if (!blockIndex.has(k)) blockIndex.set(k, []); blockIndex.get(k).push(b); } } }
@@ -8929,7 +8930,7 @@ vec4 seen(vec3 p, vec3 n, float face) { return seenSky(p, n, face, uSkyTest); }`
       if (Math.abs(d) < 1.9) cam.yaw += d * Math.min(1, dt * 0.9 * Math.min(1, v / 1.2));
     }
     camT.set(me.x, me.y + 1.25, me.z);
-    { const want = cam.dist * (talk ? 1.0 : 1 + 0.20 * THREE.MathUtils.smoothstep(v, 0.15, 1.6) + 0.20 * THREE.MathUtils.smoothstep(v, 2.4, 4.2)); cam.d += (want - cam.d) * Math.min(1, dt * (want < cam.d ? 1.8 : 3.0)); }
+    { const want = talk ? cam.dist : Math.max(cam.dist, Math.min(ZOOM_FAR, cam.dist * (1 + ZOOM_WALK * THREE.MathUtils.smoothstep(v, 0.15, 1.6) + ZOOM_RUN * THREE.MathUtils.smoothstep(v, 2.4, 4.2)))); cam.d += (want - cam.d) * Math.min(1, dt * (want < cam.d ? 1.8 : 2.4)); }
     let dist = cam.d; const cp = Math.cos(cam.pitch), sp = Math.sin(cam.pitch);
     // keep the camera out of the ground: pull it in if a hill is between it and her, and lift it over the ground under it
     for (let i = 1; i <= 8; i++) { const t2 = dist * i / 8, x = camT.x + Math.sin(cam.yaw) * cp * t2, z = camT.z + Math.cos(cam.yaw) * cp * t2, y = camT.y + sp * t2; if (land.height(x, z) + 0.3 > y && i > 2) { dist = Math.max(1.6, dist * (i - 1) / 8); break; } }
