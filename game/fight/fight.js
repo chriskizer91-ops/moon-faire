@@ -411,6 +411,9 @@ function makeMFFight(stage, H) {
         }
       }
     }
+    // zoomed out (Chris, November 14, 9:16 pm: "exactly like that but zoomed out 25%"): the director's camera stands that much further from
+    // what it looks at, along the same line, so every angle is the same and everything is that much smaller in the picture
+    if (shot && CAM === 'auto') { const z = H.zoomOut ? H.zoomOut() : 1.25; for (let k = 0; k < 3; k++) shot.p[k] = shot.l[k] + (shot.p[k] - shot.l[k]) * z; if (shot.p[1] < 0.3) shot.p[1] = 0.3; }
     stage.free.on = !!shot; stage.free.group = !!(shot && shot.group); if (shot) { stage.free.pos.set(shot.p[0], shot.p[1], shot.p[2]); stage.free.look.set(shot.l[0], shot.l[1], shot.l[2]); stage.free.fov = shot.fov; stage.free.blur = shot.blur || 3.0; stage.free.dim = shot.dim || 0.82; }
     wx = Math.max(0, Math.min(FW - ww, wx)); wy = Math.max(0, Math.min(FH - wh, wy));
     if (!win || shot) win = { x: wx, y: wy, w: ww, h: wh }; else { const k = Math.min(1, dt * quick); win.x += (wx - win.x) * k; win.y += (wy - win.y) * k; win.w += (ww - win.w) * k; win.h = win.w / asp; if (win.h > FH) { win.h = FH; win.w = FH * asp; } }

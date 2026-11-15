@@ -149,3 +149,13 @@ not larger, just better colour usage."
   foe's Life turns to gold stripes. What was just lost shows white for a moment, then drains.
 - Turn chips: witches edged green, foes rose, a coming Heavy, Crush or Eclipse gold. The caption has a dark backing.
 - `checks/hits.py` takes a still as each move lands and a third of a second after.
+
+## Zoomed out, and a slower pace (Chris, November 14, 9:16 pm)
+
+"If you can make the camera angles be exactly like that but zoomed out 25%. And I think you should slow down the pacing of how moves
+are executed and followed through by like 10% slower."
+
+- `zoomOut: 1.25` (in `MF_FIGHT.settings`, or passed to `start`): the director's camera stands a quarter further from what it looks
+  at, along the same line. Every angle is unchanged; everything is a fifth smaller in the picture.
+- `pace: 0.9`: the whole fight (moves, their follow-through, the walk to a target, the pauses between) runs a tenth slower than the
+  models' own timing. The Speed choice multiplies this, so "1×" is now this pace.

@@ -13,6 +13,7 @@
 //     seed       the same seed gives the same dice
 //     label      words for the log's first line;   tag  anything, handed back unchanged
 //     camera, speed, flipbook, weight     settings for this fight (the player can change the first three in the fight)
+//     pace       how fast moves play against the models' own timing (0.9: a tenth slower);   zoomOut  how far back the director's camera stands (1.25)
 //     auto       'careless' | 'attentive' | 'expert': the engine's own players choose every move (for testing)
 // The fight draws on a canvas of its own. While it runs, the page that called it should stop drawing its own picture.
 (function () {
@@ -104,7 +105,7 @@
   const CODE = { w: 'wisp', K: 'wraith', B: 'great' };
   function lineUp(v) { if (Array.isArray(v)) return v.slice(); const out = []; String(v || 'w').replace(/(\d*)([wKB])/g, (_, n, k) => { for (let i = 0; i < (+n || 1); i++) out.push(CODE[k]); }); return out.length ? out : ['wisp']; }
   function label(list) { const n = {}; for (const k of list) n[k] = (n[k] || 0) + 1; const W = window.MF_FOES.KINDS, part = (k) => (n[k] === 1 ? 'a ' : n[k] + ' ') + W[k].name.toLowerCase() + (n[k] > 1 ? 's' : ''); const s = ['great', 'wraith', 'wisp'].filter((k) => n[k]).map(part).join(', '); return s.charAt(0).toUpperCase() + s.slice(1); }
-  const set = { camera: 'auto', speed: 1, flipbook: false, weight: 'lightest', foeWeight: 'light', rows: 540 };
+  const set = { pace: 0.9, zoomOut: 1.25, camera: 'auto', speed: 1, flipbook: false, weight: 'lightest', foeWeight: 'light', rows: 540 };
   let root = null, canvas = null, stage = null, fight = null, running = false, last = 0, clock = 0, manual = /[?&]shot/.test(location.search), el = {};
   function build() {
     if (root) return;
@@ -119,19 +120,19 @@
     root.querySelector('.gear').addEventListener('click', () => { const x = root.querySelector('.set'); x.hidden = !x.hidden; });
     el.cam.addEventListener('change', () => { set.camera = el.cam.value; }); el.spd.addEventListener('change', () => { set.speed = +el.spd.value || 1; }); el.flip.addEventListener('change', () => { set.flipbook = el.flip.checked; });
     stage = window.makeMFStage(canvas, { preserve: manual, shadow: 2048, maxPixelRatio: 2 });
-    fight = window.makeMFFight(stage, { ui: el.ui, panel: el.fp, aspect: () => canvas.clientWidth / Math.max(1, canvas.clientHeight), width: () => canvas.clientWidth, cam: () => set.camera, weight: () => set.weight, foeWeight: () => set.foeWeight });
+    fight = window.makeMFFight(stage, { ui: el.ui, panel: el.fp, aspect: () => canvas.clientWidth / Math.max(1, canvas.clientHeight), width: () => canvas.clientWidth, cam: () => set.camera, zoomOut: () => set.zoomOut, weight: () => set.weight, foeWeight: () => set.foeWeight });
     window.addEventListener('keydown', (e) => { if (!running) return; if (fight.key(e.key)) e.preventDefault(); });
   }
   function frame(now) {
     if (!running) return; requestAnimationFrame(frame);
-    const dt = Math.min(0.05, (now - last) / 1000) * set.speed; last = now; tick(dt);
+    const dt = Math.min(0.05, (now - last) / 1000) * set.speed * set.pace; last = now; tick(dt);      // pace: the whole fight runs a tenth slower than the models' own timing (Chris, November 14, 9:16 pm)
     if ((frame.n = (frame.n || 0) + 1) % 30 === 0) { const i = stage.info(); el.meter.textContent = Math.round(i.triangles / 1000) + ' thousand triangles, ' + i.calls + ' draws'; }
   }
   function tick(dt, noDraw) { clock += dt; stage.resize(); stage.flip.on = set.flipbook; stage.flip.rows = set.rows; fight.step(dt, clock); if (!noDraw) stage.render(); }
   const art = (id) => new Promise((ok) => stage.loadArt(id, window.MF_FIGHT_ART[id], ok));
   async function start(o) {
     o = o || {}; build(); if (running) throw new Error('A fight is already running');
-    for (const k of ['camera', 'speed', 'flipbook', 'weight', 'foeWeight', 'rows']) if (o[k] != null) set[k] = o[k];
+    for (const k of ['camera', 'speed', 'flipbook', 'weight', 'foeWeight', 'rows', 'pace', 'zoomOut']) if (o[k] != null) set[k] = o[k];
     el.cam.value = set.camera; el.spd.value = String(set.speed); el.flip.checked = !!set.flipbook;
     const place = window.MF_PLACES[o.place || 'F1']; if (!place) throw new Error('No fight place called ' + o.place);
     const list = lineUp(o.foes); root.hidden = false; el.wait.hidden = false; running = true;
