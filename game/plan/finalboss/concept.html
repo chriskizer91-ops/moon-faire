@@ -1,0 +1,160 @@
+<!DOCTYPE html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Moon Faire final boss</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible:ital,wght@0,400;0,700;1,400&family=Jacquard+24&display=swap" rel="stylesheet">
+<style>
+/* layout: one reading column; the finds as a list of cards, picture left and words right; tables and prompts scroll inside their own box */
+:root {
+  --page: #eeedf4; --card: #fcfcfb; --ink: #1c1a2e; --ink-2: #55526a; --rule: #d9d7e4; --lantern: #8a5a00; --cloth: #241c2b;
+  --way: #2f6f4f; --off: #8a5a00; --hid: #6a3fa0;
+  --display: "Jacquard 24", "Atkinson Hyperlegible", Georgia, serif; --body: "Atkinson Hyperlegible", Verdana, "Segoe UI", sans-serif;
+  color-scheme: light;
+}
+@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) {
+  --page: #121120; --card: #1a1a19; --ink: #f0efec; --ink-2: #b9b6c9; --rule: #33314a; --lantern: #e3b04b; --cloth: #241c2b;
+  --way: #6fc79a; --off: #e3b04b; --hid: #b99be8; color-scheme: dark; } }
+:root[data-theme="dark"] {
+  --page: #121120; --card: #1a1a19; --ink: #f0efec; --ink-2: #b9b6c9; --rule: #33314a; --lantern: #e3b04b; --cloth: #241c2b;
+  --way: #6fc79a; --off: #e3b04b; --hid: #b99be8; color-scheme: dark; }
+* { box-sizing: border-box; }
+html { -webkit-text-size-adjust: 100%; }
+body { margin: 0; background: var(--page); color: var(--ink); font: 17px/1.55 var(--body); }
+main { max-width: 860px; margin: 0 auto; padding: 28px 18px 64px; display: flex; flex-direction: column; gap: 34px; }
+header p { max-width: 62ch; margin: 10px 0 0; }
+h1 { font: 400 clamp(40px, 9vw, 60px)/1 var(--display); margin: 0; text-wrap: balance; letter-spacing: .01em; }
+.kicker { color: var(--lantern); font-weight: 700; margin: 0 0 6px; }
+h2 { font-size: 24px; line-height: 1.2; margin: 0 0 12px; text-wrap: balance; }
+h3 { font-size: 19px; margin: 22px 0 10px; } h3 .lvl { font-weight: 400; color: var(--ink-2); font-size: 15px; margin-left: 6px; }
+h4 { font-size: 17px; margin: 0 0 2px; }
+section > p, section > ul, section > ol { max-width: 65ch; }
+p { margin: 0 0 12px; } ul, ol { margin: 0; padding-left: 22px; display: flex; flex-direction: column; gap: 8px; }
+.ask { background: var(--card); border: 1px solid var(--rule); border-left: 5px solid var(--lantern); border-radius: 8px; padding: 16px 18px; }
+.finds { display: flex; flex-direction: column; gap: 10px; }
+.find { display: grid; grid-template-columns: 84px 1fr; gap: 14px; background: var(--card); border: 1px solid var(--rule); border-radius: 10px; padding: 12px; align-items: start; }
+.find img, .topaint { width: 84px; height: 84px; border-radius: 8px; background: var(--cloth); display: block; }
+.topaint { display: grid; place-items: center; color: #b9b6c9; font-size: 13px; border: 1px dashed #6b6480; }
+.new { font-size: 12px; font-weight: 400; color: var(--ink-2); border: 1px solid var(--rule); border-radius: 20px; padding: 1px 8px; margin-left: 6px; white-space: nowrap; }
+.does { font-weight: 700; margin: 0 0 4px; } .card { margin: 0 0 6px; color: var(--ink-2); font-style: italic; } .meta { margin: 0; font-size: 14px; color: var(--ink-2); }
+.how { font-weight: 700; } .how.h1 { color: var(--way); } .how.h2 { color: var(--off); } .how.h3 { color: var(--hid); }
+.scroll { overflow-x: auto; background: var(--card); border: 1px solid var(--rule); border-radius: 10px; margin-bottom: 14px; }
+table { border-collapse: collapse; width: 100%; font-size: 15px; font-variant-numeric: tabular-nums; }
+th, td { text-align: left; padding: 9px 12px; border-bottom: 1px solid var(--rule); vertical-align: top; }
+tbody tr:last-child > * { border-bottom: 0; } tbody th { font-weight: 400; }
+thead th { font-size: 13px; color: var(--ink-2); font-weight: 700; } .grp { border-left: 1px solid var(--rule); }
+.num { text-align: right; } td span, th span.n { display: block; color: var(--ink-2); font-size: 13px; }
+.prompt { background: var(--card); border: 1px solid var(--rule); border-radius: 10px; margin-bottom: 14px; overflow: hidden; }
+.phead { display: flex; flex-wrap: wrap; gap: 10px; justify-content: space-between; align-items: center; padding: 12px 14px; border-bottom: 1px solid var(--rule); }
+.phead span { display: block; font-size: 14px; color: var(--ink-2); }
+button { font: 700 15px var(--body); color: var(--page); background: var(--ink); border: 0; border-radius: 8px; padding: 9px 14px; cursor: pointer; }
+button:focus-visible, pre:focus-visible { outline: 3px solid var(--lantern); outline-offset: 2px; }
+pre { margin: 0; padding: 14px; max-height: 220px; overflow: auto; font: 13px/1.5 ui-monospace, Menlo, Consolas, monospace; white-space: pre-wrap; }
+code { font-size: .92em; background: var(--card); border: 1px solid var(--rule); border-radius: 4px; padding: 0 4px; }
+footer { color: var(--ink-2); font-size: 15px; border-top: 1px solid var(--rule); padding-top: 16px; }
+@media (max-width: 420px) { .find { grid-template-columns: 64px 1fr; } .find img, .topaint { width: 64px; height: 64px; } }
+</style></head>
+<body><main>
+<header>
+ <p class="kicker">Moon Faire, task board F11</p>
+ <h1>The final boss</h1>
+ <p>You asked for a big bad after the great wraith and the great bramble, and offered to have pictures made from a rough visual idea. Three Opus 5.5 helpers each took a side of it: the story, the look, and the fight. This is what they came to, put together. Every name is a stand-in and all of it is yours to change.</p>
+</header>
+
+<section class="ask" aria-label="The idea">
+ <h2>The idea: the fire that would not end</h2>
+ <p><strong>The story's own title is the boss.</strong> Long ago the beacon's keeper swore its light would never go out. Nobody came back to relieve him, and he kept the promise past his own death. The fire he would not let end has grown into a black sun that calls every flame on the moor to itself.</p>
+ <p><strong>It explains both halves of the game.</strong> The call has two hands. The wraiths fetch the lights. The brambles are the promise grown wild, "nothing leaves", hedging the far country so no warmth gets out. When the great wraith falls at level 10 the call goes on, because the great wraith was never the one calling.</p>
+ <p style="margin:0"><strong>It does not depend on what wraiths and wisps are.</strong> Whatever you decide they are, they can still be lights the fire calls home.</p>
+</section>
+
+<section>
+ <h2>What it looks like</h2>
+ <ul>
+  <li><strong>A black sphere like an eclipse,</strong> with a thin rose-white rim, and a ring of long flame-shaped blades round it: deep crimson at the root, pale rose at the tips.</li>
+  <li><strong>Three old-gold iron rings</strong> turning round it at different tilts.</li>
+  <li><strong>Two great iron hands with no arms,</strong> floating either side. They are all that is left of the keeper, still tending his fire.</li>
+  <li><strong>Four small stolen fair lanterns</strong> hanging on chains, the only warm amber on it.</li>
+  <li><strong>Ash-grey streamers</strong> hanging down to a cold iron cradle on the ground.</li>
+  <li><strong>About 8 metres tall and 5 wide.</strong> It does not walk. It looms, reaches and turns.</li>
+ </ul>
+ <p><strong>Why this look.</strong> A ring of rays round a black disc reads at a glance from the fight's distance, even with the Flipbook look on, and it looks nothing like a robed wraith or a bramble. Its crimson is no witch's colour and not the wraiths' green. It is also the lightest to draw: spheres, rings and flat strips that only turn, about 25,000 triangles and one light, with nothing that has to bend.</p>
+</section>
+
+<section>
+ <h2>How the fight could go</h2>
+ <ul>
+  <li><strong>The fire alone, chained to four stolen lanterns.</strong> No stages.</li>
+  <li><strong>The lanterns never attack. They feed it.</strong> Each lantern's turn takes Fate off the fire, so while four hang there the Jester can hardly seal it. Break the lanterns first, and every one broken is a light sent home.</li>
+  <li><strong>One new blow, "Douse":</strong> a single marked blow, bigger than a Crush, shown on the turn bar. On easy a healthy Jester can take one. On hard it is more than her whole HP, so the Fox has to turn it back or her ghost has to eat it, every time.</li>
+  <li><strong>Under half its Life the lanterns grow thorn coats,</strong> which is the bramble country's lesson coming back.</li>
+  <li><strong>It ends with Sealed Fate and the Curtain Call.</strong> The blades go out one by one, the lanterns drift up and away, and one small ordinary flame is left in the cradle. The lights go home.</li>
+ </ul>
+ <p>None of this is in the combat rules yet. It is shaped like today's last fight (one great foe with small helpers), so the numbers you called a good balance are a fair place to start tuning from.</p>
+</section>
+
+<section>
+ <h2>What each witch does at the end</h2>
+ <p>From the story helper, for the ending scene: the Ranger says it out loud, "Someone came back. We did." Io sets the warm amulet from the hollow in the keeper's iron hand. The Fox unpicks the promise stitch by stitch, and her bell rings him off duty. The Jester gives the fire the ending it refused.</p>
+</section>
+
+<section>
+ <h2>Other ways it could go</h2>
+ <ul>
+  <li><strong>The keeper as a whole figure:</strong> a stooped giant in a coat of bramble with an iron lantern cage for a chest. More of a person to feel for, but another tall robed shape next to the great wraith, and heavier to build.</li>
+  <li><strong>The vigil:</strong> every candle lit to bring the beacon back, poured into one pale wax figure. The only pale boss in a dark game.</li>
+  <li><strong>The night the moon left:</strong> the far country's own dark, hungry since Auros drifted on. It leans on your moon's slow turn, which you may have plans for.</li>
+  <li><strong>The song with no last verse:</strong> a great puppet from a troupe whose show never ended. It mirrors the Jester, which could take something from her.</li>
+  <li><strong>A fight in three stages</strong> (a wraith lesson, a bramble lesson, then the hunger). Grander, but harder to balance, because MP has to last all three.</li>
+ </ul>
+</section>
+
+<section>
+ <h2>Pictures to make</h2>
+ <p>Model sheets: the thing alone from three sides, on a flat backdrop, for building it in code. The first is the one proposed. The other two are there if you would rather see them side by side before choosing.</p>
+ <div class="prompt"><div class="phead"><div><strong>The fire that would not end (the one proposed)</strong><span>Shape: 3:2, 1536 x 1024 or larger.  Save as: `final-fire-sheet.png`.</span></div><button type="button" data-copy="p0">Copy the prompt</button></div><pre id="p0" tabindex="0">Model sheet of a single towering fantasy boss for my role-playing game, Moon Faire, full figure, shown three times side by side on one sheet: front view, three-quarter view, back view. Each view is the same size and stands on the same ground line.
+
+WHAT IT IS. An ancient beacon fire that would not go out, grown into a black sun. A floating black sphere like an eclipse, about a quarter of the figure's height, with a thin glowing rose-white rim. Around the sphere, a ring of thirty or so long flat flame-shaped blades that glow deep crimson at the root and pale rose-white at the tips, like a corona. Three engraved old-gold iron rings orbit the sphere at different tilts, like the rings of an old astronomer's globe. Below and to either side float two large hands made of overlapping dark iron blades, with no arms, held as if tending the fire. Twelve long ragged ash-grey streamers hang from under the sphere down to a low three-legged black iron brazier bowl on the ground, cold and empty. Four small old glass-and-iron fair lanterns, each with a small warm amber flame inside, hang on thin chains from the gold rings, two on each side.
+
+SIZE. The whole thing is about eight metres tall and five wide; the brazier bowl would come up to a person's chest.
+
+COLOURS. Eclipse black, old gold iron, deep crimson, pale rose-white, ash grey. The only warm amber is the four small lanterns. Nothing green and nothing blue.
+
+STYLE. A realistic, richly painted picture with believable metal, cloth and fire, in a dark, beautiful fairy-tale mood. Elegant and solemn, not horror: no gore, no face, no eyes. Bold simple shapes with a strong silhouette and strong contrast of light and dark, and little fine surface texture.
+
+BACKDROP AND LIGHT. A flat dark plum-grey backdrop, colour #383043, with no scenery, no floor pattern and no cast shadows on the backdrop. Even, soft light, so every part can be seen; the glow is its own.
+
+LEAVE OUT. People, hands of people, creatures, lettering, labels, numbers, arrows, borders and frames.</pre></div><div class="prompt"><div class="phead"><div><strong>The keeper who stayed (another way: the keeper as a whole figure)</strong><span>Shape: 3:2, 1536 x 1024 or larger.  Save as: `keeper-sheet.png`.</span></div><button type="button" data-copy="p1">Copy the prompt</button></div><pre id="p1" tabindex="0">Model sheet of a single towering fantasy boss for my role-playing game, Moon Faire, full figure, shown three times side by side on one sheet: front view, three-quarter view, back view. Each view is the same size and stands on the same ground line.
+
+WHAT IT IS. The last keeper of a dead airship beacon, who swore its light would never go out and kept the promise long past his own death. A very tall, stooped figure, about seven metres tall, in a long heavy coat woven of black-green bramble, with small iron charms hanging from the thorns. Where his chest should be there is a rusted six-sided iron lantern cage, and inside it burns one deep crimson fire with a hundred tiny warm amber flames crowded round it. His head is bowed under a deep hood of the same bramble, with no face to be seen, only dark. One long thin hand of dark iron holds a tall hooked lamp-lighter's pole like a staff; the other hangs open at his side. The coat's hem breaks into thorny runners that trail on the ground.
+
+COLOURS. Rusted iron, black-green thorn, deep crimson, pale cream. The only warm amber is the tiny flames in the cage. Nothing bright green and nothing blue.
+
+STYLE. A realistic, richly painted picture with believable iron, thorn and fire, in a dark, beautiful fairy-tale mood. Sad and patient, not horror: no gore, no face, no eyes. Bold simple shapes with a strong silhouette and strong contrast of light and dark, and little fine surface texture.
+
+BACKDROP AND LIGHT. A flat dark plum-grey backdrop, colour #383043, with no scenery, no floor pattern and no cast shadows on the backdrop. Even, soft light, so every part can be seen; the glow is its own.
+
+LEAVE OUT. Other people, creatures, lettering, labels, numbers, arrows, borders and frames.</pre></div><div class="prompt"><div class="phead"><div><strong>The vigil (another way: a pale figure of candle wax)</strong><span>Shape: 3:2, 1536 x 1024 or larger.  Save as: `vigil-sheet.png`.</span></div><button type="button" data-copy="p2">Copy the prompt</button></div><pre id="p2" tabindex="0">Model sheet of a single towering fantasy boss for my role-playing game, Moon Faire, full figure, shown three times side by side on one sheet: front view, three-quarter view, back view. Each view is the same size and stands on the same ground line.
+
+WHAT IT IS. Every candle ever lit on the moor to bring a dead beacon back, melted and poured into one tall veiled shape that keeps a vigil without end. A towering figure about seven and a half metres tall made of smooth pale bone-coloured candle wax: a tall column of a body heavy with long drips, hovering just above the ground. A smooth wax mask with no features for a face, behind a long smoke-grey veil that falls to the shoulders. Two long thin dripping arms with a candle wick at each fingertip. A crown of thirteen guttered candles: twelve dark, one burning deep crimson. Deep crimson light glows through the wax from inside, brightest along the drips.
+
+COLOURS. Bone-pale wax, soot grey, deep crimson, pale rose-white. Nothing green, nothing blue, and no warm orange.
+
+STYLE. A realistic, richly painted picture with believable wax, cloth and fire, in a dark, beautiful fairy-tale mood. Beautiful and eerie, not horror: no gore, no eyes. Bold simple shapes with a strong silhouette and strong contrast of light and dark, and little fine surface texture.
+
+BACKDROP AND LIGHT. A flat dark plum-grey backdrop, colour #383043, with no scenery, no floor pattern and no cast shadows on the backdrop. Even, soft light, so every part can be seen; the glow is its own.
+
+LEAVE OUT. People, creatures, lettering, labels, numbers, arrows, borders and frames.</pre></div>
+</section>
+
+<footer>Made by the Levelling session on November 15, 2026, with three Opus 5.5 helpers. The prompts are also in <code>game/plan/finalboss/picture-prompts.md</code>.</footer>
+</main>
+<script>
+document.addEventListener('click', function (e) {
+  var b = e.target.closest('button[data-copy]'); if (!b) return;
+  var pre = document.getElementById(b.getAttribute('data-copy')), was = b.textContent;
+  function done(ok) { b.textContent = ok ? 'Copied' : 'Select the text below and copy it'; setTimeout(function () { b.textContent = was; }, 2500); }
+  function select() { var r = document.createRange(); r.selectNodeContents(pre); var s = getSelection(); s.removeAllRanges(); s.addRange(r); done(false); }
+  try { navigator.clipboard.writeText(pre.textContent).then(function () { done(true); }, select); } catch (err) { select(); }
+});
+</script>
+</body></html>
