@@ -18832,6 +18832,7 @@ function makeMFFight(stage, H) {
 
   // ---------- the fight ----------
   const GEO = { pcx: 0, pcz: 0, fcx: 1, fcz: 0, ux: 1, uz: 0, D: 1, tall: 1 };
+  let intro = 0;      // seconds left of a fight's opening
   let B = null, phase = 'off', act = null, cur = null, selFoe = 0, selHero = 'jester', time = 0, shake = 0, win = null, auto = null, wait = 0, O = null, onDone = null, pick = null;
   const J = () => party.jester && party.jester.a.m;
   const heroesE = () => B.fighters.filter((f) => f.side === 'hero'), foesE = () => B.fighters.filter((f) => f.side === 'foe');
@@ -18865,7 +18866,7 @@ function makeMFFight(stage, H) {
       G.D = Math.hypot(G.fcx - G.pcx, G.fcz - G.pcz) || 1; G.ux = (G.fcx - G.pcx) / G.D; G.uz = (G.fcz - G.pcz) / G.D; G.tall = foes.reduce((q, f) => Math.max(q, f.K.h), 0);
       for (const P of hs) { P.a.rest = Math.atan2(G.fcx - P.x, G.fcz - P.z); P.a.face = P.a.rest; } }
     if (J()) { J().arena = 9; J().game.fates = foes.map(() => null); }
-    selFoe = 0; selHero = heroesE()[0].id; act = null; cur = null; pick = null; shake = 0; wait = 1.4; phase = 'wait'; elBanner.hidden = true; elTitle.hidden = true;
+    selFoe = 0; selHero = heroesE()[0].id; act = null; cur = null; pick = null; shake = 0; intro = 2.2; wait = CAMNOW() === 'directed' ? 2.5 : 1.4; phase = 'wait'; elBanner.hidden = true; elTitle.hidden = true;
     partyRows(); say((opts.label || 'A fight') + '.'); paint();
   }
   function partyRows() {
@@ -18990,7 +18991,7 @@ function makeMFFight(stage, H) {
   // ---------- the end ----------
   function finish() {
     act = { ev: [] }; syncAll(); act = null; phase = 'over'; cur = null;
-    for (const P of Object.values(party)) if (P.e) { P.a.aim = null; if (B.over === 'won') { P.a.rest = CAMNOW() === 'behind' ? Math.atan2(GEO.ux * 6 + SIDE(GEO.ux, GEO.uz)[0] * 2.2 + GEO.pcx - P.x, GEO.uz * 6 + SIDE(GEO.ux, GEO.uz)[1] * 2.2 + GEO.pcz - P.z) : 0; P.a.win(); } }
+    for (const P of Object.values(party)) if (P.e) { P.a.aim = null; if (B.over === 'won') { P.a.rest = REAR(CAMNOW()) ? Math.atan2(GEO.ux * 6 + SIDE(GEO.ux, GEO.uz)[0] * 2.2 + GEO.pcx - P.x, GEO.uz * 6 + SIDE(GEO.ux, GEO.uz)[1] * 2.2 + GEO.pcz - P.z) : 0; P.a.win(); } }
     const won = B.over === 'won', lvl = O.foeLevel || 1;
     const xp = won ? Math.round(foesE().reduce((s, f) => s + XP[f.tier] * Math.pow(XP_SLOPE, lvl - 1), 0)) : 0;
     const out = { result: B.over, won, xp, turns: B.heroTurns, foeTurns: B.foeTurns, fainted: B.kos, place: S.id, foes: O.foes.slice(), tag: O.tag == null ? null : O.tag, party: {} };
@@ -19043,27 +19044,42 @@ function makeMFFight(stage, H) {
   // 'behind' (Chris, November 14: "the camera is from behind their heads ... swing around and look at each move but cut back to the whole
   // group in between"): at rest the camera stands behind the party and looks over their heads at the foes. For each move it cuts to a
   // camera that swings round whoever is moving, then cuts back. It is a camera that really moves, so the painting behind is out of focus.
-  const CAMNOW = () => (H.cam ? H.cam() : 'side'), SIDE = (ux, uz) => (ux >= 0 ? [-uz, ux] : [uz, -ux]);      // SIDE: the way across a line, on the audience's side of it
+  const CAMNOW = () => (H.cam ? H.cam() : 'directed'), SIDE = (ux, uz) => (ux >= 0 ? [-uz, ux] : [uz, -ux]);      // SIDE: the way across a line, on the audience's side of it
   const ease = (k) => { k = Math.max(0, Math.min(1, k)); return k * k * (3 - 2 * k); }, mix = (p, q, k) => p + (q - p) * k, DEG = Math.PI / 180;
   const swing = (cx, cz, ux, uz, phi, R) => { const sd = SIDE(ux, uz), c = Math.cos(phi), n = Math.sin(phi); return [cx - ux * R * c + sd[0] * R * n, cz - uz * R * c + sd[1] * R * n]; };
+  // 'directed' (Chris, November 14, 7:26 pm: "behind the party with a wider angle ... director decisions"). The decisions:
+  //   1. Every fight opens on the painting, sharp and side on, for two seconds while the foes arrive. Then it cuts behind the party.
+  //   2. The resting view is wide: behind the party and off to the audience's side, high enough to see all four witches whole and every foe.
+  //   3. A plain move stays in that wide view, with a slow push in. Nothing cuts.
+  //   4. A big move earns its own shot, the swing: a witch's spells that are named in BIG, and a foe's Heavy, Crush or Eclipse.
+  //   5. A won fight ends on the party's bow, seen from the foes' side.
+  const BIG = { g_seal: 1, g_curtain: 1, taunt_heal: 1, shots: 1, moons_little_lie: 1, crazy_quilt: 1, same_cloth: 1, borrowed_face: 1, guardian: 1, revive: 1, garden: 1 };
+  const REAR = (c) => c === 'behind' || c === 'directed';
   function behindShot(a, playing, asp) {
-    const G = GEO, sd = SIDE(G.ux, G.uz);
+    const G = GEO, sd = SIDE(G.ux, G.uz), WIDE = CAMNOW() === 'directed';
+    if (WIDE && intro > 0 && phase !== 'over') return null;
+    // the wide view: from behind the party and well round to the audience's side (55 degrees off the line from party to foes), so the party
+    // is on the left with their backs to us and the foes are beyond them on the right. A narrow screen gets a wider lens, not a further camera.
+    const wide = (push) => { const th = 55 * DEG, R = 6.0 * (1 - 0.12 * push), q = [G.pcx - G.ux * R * Math.cos(th) + sd[0] * R * Math.sin(th), G.pcz - G.uz * R * Math.cos(th) + sd[1] * R * Math.sin(th)];
+      return { p: [q[0], 2.9 + 0.08 * G.tall - 0.2 * push, q[1]], l: [G.pcx + G.ux * 0.42 * G.D, 1.0 + 0.1 * G.tall, G.pcz + G.uz * 0.42 * G.D], fov: Math.min(64, 46 * Math.max(1, 1.45 / asp)), blur: 1.7, dim: 0.92, group: true }; };
     const group = () => { const back = 4.7 * Math.max(1, Math.min(2.3, 1.5 / asp)); return { p: [G.pcx - G.ux * back + sd[0] * 0.7, 2.7 + 0.1 * G.tall, G.pcz - G.uz * back + sd[1] * 0.7], l: [G.pcx + G.ux * 0.8 * G.D, 0.8 + 0.08 * G.tall, G.pcz + G.uz * 0.8 * G.D], fov: 36 + Math.max(0, G.tall - 2), blur: 2.0, dim: 0.9, group: true }; };
     if (phase === 'over' && B.over === 'won') return { p: [G.pcx + G.ux * 6 + sd[0] * 2.2, 1.5, G.pcz + G.uz * 6 + sd[1] * 2.2], l: [G.pcx, 1.15, G.pcz], fov: 34, blur: 2.4, dim: 0.9, group: true };      // the bow: from the foes' side, looking back at the party
-    if (!a || !playing || a.stage !== 'play') return group();
+    if (WIDE) { if (!a || !playing || a.stage !== 'play') return wide(0);
+      else if (!(a.kind === 'hero' ? BIG[a.anim] : a.move !== 'blow')) return wide(ease(a.t / 2.6)); }
+    else if (!a || !playing || a.stage !== 'play') return group();
     if (a.kind === 'hero') { const P = a.P, landed = a.hitK > 0 || a.landed; if (landed && a.landT == null) a.landT = a.t; const after = a.landT == null ? 0 : ease((a.t - a.landT) / 0.7);
       if (a.T && a.th !== P) {                               // a move at someone: from over her shoulder, round to her side; when it lands the camera looks to whoever it landed on
         const dx = a.T.x - P.x, dz = a.T.z - P.z, L = Math.hypot(dx, dz) || 1, ux = dx / L, uz = dz / L, tHit = a.tags ? 0.5 * P.a.dur(a.anim) : (a.hitsAt[0] || 0.6 * P.a.dur(a.anim)), th = a.tf ? a.tf.K.h : 1.7;
         const phi = (mix(24, 80, ease(a.t / tHit)) + 12 * after) * DEG, R = Math.max(4, Math.min(6.5, 3.6 + 0.3 * L)) + 0.25 * Math.max(0, th - 2) * after, q = swing(P.x + ux * 0.3 * L * after, P.z + uz * 0.3 * L * after, ux, uz, phi, R), k = mix(0.3, 0.8, after);
         return { p: [q[0], 1.75 + 0.12 * Math.max(0, th - 2) * after, q[1]], l: [P.x + ux * k * L, mix(1.15, 0.3 + 0.5 * th, after), P.z + uz * k * L], fov: 30 }; }
-      if (landed) return group();                            // a move at everyone, or on herself: once it lands, everyone is in the picture
+      if (landed) return WIDE ? wide(1) : group();                            // a move at everyone, or on herself: once it lands, everyone is in the picture
       const phi = mix(40, 140, ease(a.t / Math.max(1.5, 0.8 * P.a.dur(a.anim)))) * DEG, q = swing(P.x, P.z, G.ux, G.uz, phi, 4.6);
       return { p: [q[0], 1.7, q[1]], l: [P.x, 1.2, P.z], fov: 30 }; }
     const f = a.f, fp = f.m.root.position, tall = f.K.h, after = a.done ? ease((a.t - a.hitAt) / 0.7) : 0;
     if (a.tp && !a.all) {                                    // a foe strikes a witch: from behind her head as it comes, round to her side as it lands
       const P = a.tp, dx = fp.x - P.x, dz = fp.z - P.z, L = Math.hypot(dx, dz) || 1, ux = dx / L, uz = dz / L, phi = mix(12, 64, ease(a.t / a.hitAt)) * DEG, q = swing(P.x, P.z, ux, uz, phi, 3.3 + 0.45 * tall), k = mix(0.6, 0.12, after);
       return { p: [q[0], 1.9 + 0.2 * tall, q[1]], l: [P.x + ux * k * L, mix(0.3 + 0.5 * tall, 1.15, after), P.z + uz * k * L], fov: 34 }; }
-    if (a.all && a.done) return group();
+    if (a.all && a.done) return WIDE ? wide(1) : group();
     { const dx = fp.x - G.pcx, dz = fp.z - G.pcz, L = Math.hypot(dx, dz) || 1, phi = mix(-16, 32, ease(a.t / a.hitAt)) * DEG, q = swing(fp.x, fp.z, dx / L, dz / L, phi, 4.5 + 1.3 * tall);      // a foe on its own, or striking another foe: from the party's side, drifting round it
       return { p: [q[0], 1.6 + 0.3 * tall, q[1]], l: [fp.x, 0.55 * tall, fp.z], fov: 34 }; }
   }
@@ -19077,7 +19093,7 @@ function makeMFFight(stage, H) {
     const CAM = CAMNOW(), a = act && act.kind ? act : null, playing = a && phase === 'act' && !(a.kind === 'hero' && a.anim === 'g_curtain' && a.P.a.time > 5.2);
     const frame = (pts, kx, ky, least, foot) => { let x0 = 1e9, x1 = -1e9, y0 = 1e9, y1 = -1e9; for (const p of pts) { const q = stage.toFrame(_w.set(p[0], p[1], p[2])); x0 = Math.min(x0, q[0]); x1 = Math.max(x1, q[0]); y0 = Math.min(y0, q[1]); y1 = Math.max(y1, q[1]); }
       let cw = Math.max((x1 - x0) * kx, (y1 - y0) * ky * asp, FW * least); cw = Math.min(cw, ww); const ch = cw / asp; ww = cw; wh = ch; wx = (x0 + x1) / 2 - cw / 2; wy = y1 + ch * foot - ch; };
-    if (CAM === 'behind') shot = behindShot(a, playing, asp);
+    if (REAR(CAM)) { shot = behindShot(a, playing, asp); if (!shot) { const all = []; for (const id in party) if (party[id].e) heroPts(party[id], all); for (const f of foes) if (f.vis) foePts(f, all); frame(all, 1.08, 1.16, 0.4, 0.1); } }      // no shot: the fight's opening, on the sharp painting
     else if (CAM !== 'wide') {
       const all = []; for (const id in party) if (party[id].e) heroPts(party[id], all); for (const f of foes) if (f.up) foePts(f, all);
       frame(all, 1.08, 1.16, 0.4, 0.1);                    // at rest: everyone still standing, and no more of the place than that
@@ -19117,7 +19133,7 @@ function makeMFFight(stage, H) {
     leave() { group.visible = false; ui.hidden = true; panel.hidden = true; phase = 'off'; act = null; stage.free.on = false; for (const l of stage.near) l.intensity = 0; stage.dark = stage.dim = 0; stage.shakeX = stage.shakeY = 0; stage.catcher.scale.set(1, 1, 1);
       for (const id in party) { const P = party[id]; P.patch.visible = false; if (P.a.m.stop) P.a.m.stop(); } for (const k in pool) for (const m of pool[k]) { m.patch.visible = false; m.inUse = false; } },
     step(dt, t) {
-      if (phase === 'off' || !B) return; time = t;
+      if (phase === 'off' || !B) return; time = t; intro = Math.max(0, intro - dt);
       if (phase === 'wait') { wait -= dt; if (wait <= 0) next(); }
       else if (phase === 'ending') { wait -= dt; if (wait <= 0) finish(); }
       else if (phase === 'menu' && auto && cur) { wait -= dt; if (wait <= 0) { const c = E.choose(B, cur.e, auto); wait = 0.6; if (!choose(c.move, c.target)) { const m = E.heroMoves(B, cur.e).find((x) => x.ok); choose(m.id); } } }
@@ -19229,14 +19245,14 @@ function makeMFFight(stage, H) {
   const CODE = { w: 'wisp', K: 'wraith', B: 'great' };
   function lineUp(v) { if (Array.isArray(v)) return v.slice(); const out = []; String(v || 'w').replace(/(\d*)([wKB])/g, (_, n, k) => { for (let i = 0; i < (+n || 1); i++) out.push(CODE[k]); }); return out.length ? out : ['wisp']; }
   function label(list) { const n = {}; for (const k of list) n[k] = (n[k] || 0) + 1; const W = window.MF_FOES.KINDS, part = (k) => (n[k] === 1 ? 'a ' : n[k] + ' ') + W[k].name.toLowerCase() + (n[k] > 1 ? 's' : ''); const s = ['great', 'wraith', 'wisp'].filter((k) => n[k]).map(part).join(', '); return s.charAt(0).toUpperCase() + s.slice(1); }
-  const set = { camera: 'side', speed: 1, flipbook: false, weight: 'lightest', foeWeight: 'light', rows: 540 };
+  const set = { camera: 'directed', speed: 1, flipbook: false, weight: 'lightest', foeWeight: 'light', rows: 540 };
   let root = null, canvas = null, stage = null, fight = null, running = false, last = 0, clock = 0, manual = /[?&]shot/.test(location.search), el = {};
   function build() {
     if (root) return;
     const st = document.createElement('style'); st.textContent = CSS; document.head.appendChild(st);
     root = document.createElement('div'); root.className = 'mff'; root.hidden = true;
     root.innerHTML = '<div class="box"><canvas></canvas><div class="ui"></div><div class="wait">Setting the stage…</div></div><div class="panel"><div class="fp"></div><div class="set">' +
-      '<label>Camera <select class="cam"><option value="side">Side on, everyone</option><option value="near">Side on, closer on a move</option><option value="actor">On whoever acts</option><option value="shoulder">Over the shoulder</option><option value="low">Low and close</option><option value="wide">Side on, wide</option><option value="behind">Behind the party</option></select></label>' +
+      '<label>Camera <select class="cam"><option value="directed">Directed: wide, behind the party</option><option value="side">Side on, everyone</option><option value="near">Side on, closer on a move</option><option value="actor">On whoever acts</option><option value="shoulder">Over the shoulder</option><option value="low">Low and close</option><option value="wide">Side on, wide</option><option value="behind">Behind their heads, a swing on every move</option></select></label>' +
       '<label>Speed <select class="spd"><option value="1">1×</option><option value="1.5">1.5×</option><option value="2">2×</option><option value="3">3×</option></select></label>' +
       '<label><input type="checkbox" class="flip"> Flipbook look</label><span class="meter"></span></div></div>';
     document.body.appendChild(root);

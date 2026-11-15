@@ -93,3 +93,21 @@ facing the foes. Also some of the witches' animations need to be looked at, mayb
   line that turns a witch toward her target, so the Jester, the Fox and the Ranger cast while still facing the foes, and their
   spells and arrows went toward the back of the place. Fixed here.
 - Which animations Chris means is not known yet.
+
+## The directed camera (Chris, November 14, 7:26 pm)
+
+"I feel like maybe behind the party with a wider angle would be a good idea. I'm open to even more direction, decisions. I guess
+director decisions is what we have to decide here and this is very important."
+
+"Directed: wide, behind the party" is the default camera (`directed`; `behindShot` and `BIG` in `fight.js`). The decisions, which are
+Claude's and Chris's to overrule:
+
+1. Every fight opens on the painting, sharp and side on, for two seconds while the foes arrive. Then it cuts behind the party.
+2. The resting view is wide: behind the party and well round to the audience's side, so the party is on the left with their backs
+   to us, all four whole, and every foe is beyond them on the right.
+3. A plain move stays in that wide view, with a slow push in. Nothing cuts.
+4. A big move earns its own shot, the swing: Sealed Fate, Curtain Call, the Heal taunt, the gem's two shots, Pins and Needles,
+   Crazy Quilt, Same Cloth, Borrowed Face, the Guardian, Revive, Bloom; and a foe's Heavy, Crush or Eclipse.
+5. A won fight ends on the party's bow, seen from the foes' side.
+
+The painting is out of focus in every shot but the opening: that is what a camera behind the party costs with one painting a place.

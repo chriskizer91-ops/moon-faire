@@ -10,7 +10,8 @@ async def main():
     a = sys.argv[1:] + [None] * 6; place = a[0] or 'F1'; foes = a[1] or 'K2w'; many = int(a[2] or 4); w = int(a[3] or 1366); h = int(a[4] or 768); cam = a[5] or 'behind'
     async with async_playwright() as p:
         b, pg, errs = await open_fight(p, {'place': place, 'foes': foes, 'seed': 977, 'auto': 'attentive', 'camera': cam}, w=w, h=h); tag = '%s_%s_%s_%d' % (cam, place, foes, w)
-        await pg.evaluate(UNTIL, [['menu', 'over'], 900]); await pg.evaluate(FWD, 0.2); await shot(pg, tag + '_group.png')
+        await pg.evaluate(FWD, 1.2); await shot(pg, tag + '_intro.png')
+        await pg.evaluate('MF_FIGHT.debug.fight.setAuto(null)'); await pg.evaluate(UNTIL, [['menu', 'over'], 900]); await pg.evaluate(FWD, 1.4); await shot(pg, tag + '_group.png'); await pg.evaluate('MF_FIGHT.debug.fight.setAuto("attentive")')
         for k in range(many):
             r = await pg.evaluate(PLAY)
             if not r: break
