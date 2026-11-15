@@ -36,7 +36,17 @@ function makeMFFight(stage, H) {
   panel.innerHTML = '<div class="party"></div><p class="help"></p><div class="moves"></div><div class="castrow" hidden><button type="button" class="back" hidden></button><button type="button" class="cast" disabled></button></div>';
   const $ = (q) => ui.querySelector(q) || panel.querySelector(q), elBar = $('.turnbar'), elBanner = $('.banner'), elTitle = $('.title'), elFloats = $('.floats'), elBars = $('.bars'), elMoves = $('.moves'), elHelp = $('.help'), elLog = $('.log'), elParty = $('.party'), elCast = $('.cast'), elBack = $('.back'), elCastRow = $('.castrow');
   elBack.textContent = 'Back'; elBack.addEventListener('click', () => { sel = null; paint(); }); elCast.addEventListener('click', () => cast());
-  function float(v, text, cls) { const p = stage.toScreen(v); if (p[0] < -999) return; const d = document.createElement('span'); d.className = 'float ' + (cls || ''); d.textContent = text; d.style.left = p[0].toFixed(0) + 'px'; d.style.top = p[1].toFixed(0) + 'px'; elFloats.appendChild(d); setTimeout(() => d.remove(), 1500); }
+  // numbers over the picture stay on the one they belong to, even when the camera cuts
+  const floats = [];
+  function float(v, text, cls) { const d = document.createElement('span'); d.className = 'float ' + (cls || ''); d.textContent = text; elFloats.appendChild(d); const o = { d, pos: v.clone(), born: time }; floats.push(o); place(o); setTimeout(() => { d.remove(); const k = floats.indexOf(o); if (k >= 0) floats.splice(k, 1); }, 1500); }
+  function place(o) { const p = stage.toScreen(o.pos); o.d.style.display = p[0] < -999 ? 'none' : ''; o.d.style.left = p[0].toFixed(0) + 'px'; o.d.style.top = p[1].toFixed(0) + 'px'; }
+  // a blow that lands: a burst of light where it lands, the picture held for a beat, and the bar of whoever took it flashes
+  const burstTex = (() => { const c = document.createElement('canvas'); c.width = c.height = 96; const g = c.getContext('2d'), r = g.createRadialGradient(48, 48, 2, 48, 48, 46); r.addColorStop(0, 'rgba(255,255,255,1)'); r.addColorStop(0.25, 'rgba(255,255,255,0.75)'); r.addColorStop(0.55, 'rgba(255,255,255,0.18)'); r.addColorStop(1, 'rgba(255,255,255,0)'); g.fillStyle = r; g.fillRect(0, 0, 96, 96);
+    g.strokeStyle = 'rgba(255,255,255,0.9)'; g.lineWidth = 3; for (let k = 0; k < 8; k++) { const a = k * Math.PI / 4 + 0.2; g.beginPath(); g.moveTo(48 + 14 * Math.cos(a), 48 + 14 * Math.sin(a)); g.lineTo(48 + 44 * Math.cos(a), 48 + 44 * Math.sin(a)); g.stroke(); } return new THREE.CanvasTexture(c); })();
+  const bursts = []; let hitStop = 0;
+  function burst(v, colour, size) { let b = bursts.find((x) => !x.on); if (!b) { const m = new THREE.Sprite(new THREE.SpriteMaterial({ map: burstTex, transparent: true, depthTest: false, depthWrite: false, blending: THREE.AdditiveBlending, toneMapped: false })); m.renderOrder = 60; group.add(m); b = { m, on: false, t: 0, size: 1 }; bursts.push(b); }
+    b.on = true; b.t = 0; b.size = size; b.m.material.color.setHex(colour); b.m.material.rotation = rnd() * 6.28; b.m.position.copy(v); b.m.visible = true; }
+  const flash = (el) => { if (!el) return; el.classList.remove('hit'); void el.offsetWidth; el.classList.add('hit'); };
   function title(text) { elTitle.textContent = text; elTitle.hidden = false; clearTimeout(title.t); title.t = setTimeout(() => { elTitle.hidden = true; }, 2200); }
   const say = (t) => { elLog.textContent = t; };
 
@@ -70,7 +80,7 @@ function makeMFFight(stage, H) {
     foes = foesE().map((e, i) => { const kind = opts.foes[i], m = foeModel(kind), sp = free[size[kind]].shift() || free.small.shift() || [4 + i, 0], x = C[0] + sp[0], z = C[1] + sp[1];
       const f = { i, e, kind, m, K: m.K, x, z, up: true, vis: true, shown: { life: e.hp, fate: 0, max: e.max }, fade: 1, fadeTo: 1, dying: false, mark: {}, bar: null };
       m.root.position.set(x, 0, z); m.root.visible = m.fx.visible = true; m.patch.visible = true; m.setFade(1); m.reset(); m.play('appear', true);
-      const d = document.createElement('button'); d.type = 'button'; d.className = 'foebar ' + kind; d.innerHTML = '<span></span><div><i class="life"></i><i class="fate"></i></div>'; d.addEventListener('click', () => tapFoe(f)); elBars.appendChild(d); f.bar = d; return f; });
+      const d = document.createElement('button'); d.type = 'button'; d.className = 'foebar ' + kind; d.innerHTML = '<span></span><div><i class="lost"></i><i class="life"></i><i class="fate"></i></div>'; f.elLost = d.lastChild.children[0]; f.elLife = d.lastChild.children[1]; f.elFate = d.lastChild.children[2]; d.addEventListener('click', () => tapFoe(f)); elBars.appendChild(d); f.bar = d; return f; });
     // the party looks at the foes. GEO: the middle of each side, and the way from one to the other
     { const hs = heroesE().map((e) => party[e.id]), n = hs.length, m = foes.length, G = GEO; G.pcx = hs.reduce((q, P) => q + P.x, 0) / n; G.pcz = hs.reduce((q, P) => q + P.z, 0) / n; G.fcx = foes.reduce((q, f) => q + f.x, 0) / m; G.fcz = foes.reduce((q, f) => q + f.z, 0) / m;
       G.D = Math.hypot(G.fcx - G.pcx, G.fcz - G.pcz) || 1; G.ux = (G.fcx - G.pcx) / G.D; G.uz = (G.fcz - G.pcz) / G.D; G.tall = foes.reduce((q, f) => Math.max(q, f.K.h), 0);
@@ -81,15 +91,17 @@ function makeMFFight(stage, H) {
   }
   function partyRows() {
     elParty.innerHTML = '';
-    for (const id of ORDER) { const P = party[id]; if (!P || !P.e) continue; const d = document.createElement('button'); d.type = 'button'; d.className = 'who'; d.innerHTML = '<b></b><div class="hp"><i></i></div><span class="hpn"></span><div class="mp"><i></i></div><span class="mpn"></span>'; d.addEventListener('click', () => tapHero(P)); elParty.appendChild(d); P.row = d; }
+    for (const id of ORDER) { const P = party[id]; if (!P || !P.e) continue; const d = document.createElement('button'); d.type = 'button'; d.className = 'who'; d.innerHTML = '<b></b><div class="hp"><i class="lost"></i><i class="life"></i></div><span class="hpn"></span><div class="mp"><i></i></div><span class="mpn"></span>'; d.addEventListener('click', () => tapHero(P)); elParty.appendChild(d); P.row = d; }
   }
 
   // ---------- showing what the engine did ----------
   function killFoe(f) { if (f.dying || !f.up) return; f.dying = true; f.m.play('die', true); }
-  function showFoeLife(f, life, cls) { const was = f.shown.life; f.shown.life = Math.max(0, life); if (was - f.shown.life > 0.5) { float(f.m.anchor(f.K.top, _v), '−' + num(was - f.shown.life), cls || 'dmg'); shake = Math.max(shake, 0.35); if (f.shown.life <= 0.5) killFoe(f); else if (!f.dying) f.m.play('hurt', true); } }
-  function showHeroHp(P, hp) { const was = P.shown.hp, a = P.a; P.shown.hp = Math.max(0, Math.min(P.e.max, hp));
-    if (was - P.shown.hp > 0.5) { float(a.anchor('head', _v), '−' + num(was - P.shown.hp), 'dmg'); shake = Math.max(shake, 0.5); if (P.shown.hp <= 0.5) a.down(true); else a.hit(was - P.shown.hp > 0.2 * P.e.max); }
-    else if (P.shown.hp - was > 0.5) { if (was <= 0.5) a.down(false); float(a.anchor('head', _v), '+' + num(P.shown.hp - was), 'heal'); } }
+  function showFoeLife(f, life, cls) { const was = f.shown.life; f.shown.life = Math.max(0, life); const lost = was - f.shown.life; if (lost > 0.5) { const big = lost > 0.3 * f.shown.max || f.shown.life <= 0.5;
+      float(f.m.anchor(f.K.top, _v), '\u2212' + num(lost), (cls || 'dmg') + (big ? ' big' : '')); burst(f.m.anchor('chest', _v), 0xfff1c4, (big ? 1.5 : 1.05) * (0.9 + 0.5 * f.K.h)); hitStop = Math.max(hitStop, big ? 0.13 : 0.08); flash(f.bar); shake = Math.max(shake, big ? 0.6 : 0.4);
+      if (f.shown.life <= 0.5) killFoe(f); else if (!f.dying) f.m.play('hurt', true); } }
+  function showHeroHp(P, hp) { const was = P.shown.hp, a = P.a; P.shown.hp = Math.max(0, Math.min(P.e.max, hp)); const lost = was - P.shown.hp;
+    if (lost > 0.5) { const big = lost > 0.2 * P.e.max; float(a.anchor('head', _v), '\u2212' + num(lost), 'dmg hero' + (big ? ' big' : '')); burst(a.anchor('chest', _v), 0xff8a6a, big ? 2.0 : 1.4); hitStop = Math.max(hitStop, big ? 0.14 : 0.09); flash(P.row); shake = Math.max(shake, big ? 0.75 : 0.5); if (P.shown.hp <= 0.5) a.down(true); else a.hit(big); }
+    else if (-lost > 0.5) { if (was <= 0.5) a.down(false); float(a.anchor('head', _v), '+' + num(-lost), 'heal'); burst(a.anchor('chest', _v), 0x8dffb0, 1.5); flash(P.row); } }
   function showEvent(ev) {
     if (ev.type === 'dmg') { const f = foeOf(ev.id); if (f && f.up) showFoeLife(f, f.shown.life - ev.n); }
     else if (ev.type === 'hurt') { const P = party[ev.id]; if (P) showHeroHp(P, P.shown.hp - ev.n); }
@@ -231,7 +243,7 @@ function makeMFFight(stage, H) {
   function paint() {
     if (!B) return; const menu = phase === 'menu' && !!cur, pct = (k) => (100 * Math.max(0, Math.min(1, k))).toFixed(1) + '%';
     for (const e of heroesE()) { const P = party[e.id], d = P.row; if (!d) continue; const c = d.children;
-      c[0].textContent = P.a.name; c[1].firstChild.style.width = pct(P.shown.hp / e.max); c[2].textContent = num(P.shown.hp) + ' HP'; c[3].style.visibility = e.mpMax ? '' : 'hidden'; if (e.mpMax) c[3].firstChild.style.width = pct(P.shown.mp / e.mpMax);
+      c[0].textContent = P.a.name; c[1].children[0].style.width = c[1].children[1].style.width = pct(P.shown.hp / e.max); c[2].textContent = num(P.shown.hp) + ' HP'; { const k = P.shown.hp / e.max; d.classList.toggle('mid', k < 0.5 && k >= 0.25); d.classList.toggle('low', k < 0.25 && k > 0); } c[3].style.visibility = e.mpMax ? '' : 'hidden'; if (e.mpMax) c[3].firstChild.style.width = pct(P.shown.mp / e.mpMax);
       c[4].textContent = e.id === 'jester' && B.taunt > 0 ? 'catching ' + B.taunt : e.mpMax ? P.shown.mp + ' MP' : (e.id === 'ranger' && B.gem > 0 ? 'gem in ' + B.gem : '\u00a0');
       d.classList.toggle('now', menu && cur === P); d.classList.toggle('down', P.shown.hp <= 0.5); d.classList.toggle('pick', !!(sel && sel.kind === 'hero' && sel.ok.indexOf(e.id) >= 0)); d.classList.toggle('tgt', !!(sel && sel.kind === 'hero' && sel.t === e.id)); }
     elBar.innerHTML = ''; if (phase !== 'over') for (const b of E.bar(B)) { const big = b.move && b.move !== 'blow', c = document.createElement('span'); c.className = 'chip ' + b.u.side + (big ? ' marked' : ''); c.textContent = (big ? '\u25b2 ' : '') + b.u.name + (big ? ': ' + b.move.charAt(0).toUpperCase() + b.move.slice(1) : ''); elBar.appendChild(c); }      // a Heavy, Crush or Eclipse that is coming is named, with a mark that does not rely on colour
@@ -252,7 +264,7 @@ function makeMFFight(stage, H) {
       put.push([p[0], y]); d.style.left = p[0].toFixed(0) + 'px'; d.style.top = y.toFixed(0) + 'px';
       const life = f.shown.life, Lk = life / f.shown.max, Fk = Math.min(Lk, f.shown.fate / f.shown.max), sealedNow = life > 0 && f.shown.fate > 0 && f.shown.fate >= life;
       d.classList.toggle('sealed', sealedNow); { const aim = sel && sel.kind === 'foe'; d.classList.toggle('tgt', phase === 'menu' && (aim ? sel.t === f : f.i === selFoe)); d.classList.toggle('pick', !!(aim && sel.t !== f && sel.ok.indexOf(f) >= 0)); d.classList.toggle('dim', !!(aim && sel.ok.indexOf(f) < 0)); }
-      d.firstChild.textContent = f.e.name + (sealedNow ? ' · ' + WORDS.sealed : '') + (f.e.conf > 0 ? ' · lost' : '') + (f.e.cloth ? ' · cut' : ''); d.lastChild.children[0].style.width = (100 * Lk).toFixed(1) + '%'; d.lastChild.children[1].style.width = (100 * Fk).toFixed(1) + '%';
+      d.firstChild.textContent = f.e.name + (sealedNow ? ' · ' + WORDS.sealed : '') + (f.e.conf > 0 ? ' · lost' : '') + (f.e.cloth ? ' · cut' : ''); f.elLife.style.width = f.elLost.style.width = (100 * Lk).toFixed(1) + '%'; f.elFate.style.width = (100 * Fk).toFixed(1) + '%';
       // what the Jester's model is told: Fate on each foe, shown as dust falling round it
       if (m) { const k = f.mark; k.x = f.m.root.position.x; k.y = 0; k.z = f.m.root.position.z; k.r = f.K.r; k.h = f.K.h; k.k = life > 0 ? Math.min(1, f.shown.fate / life) : 0; k.sealed = sealedNow; m.game.fates[f.i] = life > 0 ? k : null; } }
   }
@@ -318,6 +330,7 @@ function makeMFFight(stage, H) {
   //   - a move at everyone or on herself is LOW until it lands, then HIGH over the foes, or HEADS when it is the party that feels it
   //   - a foe's strike at a witch takes "behind her head" and REVERSE in turn; its Eclipse is FOE, then HEADS as it falls on the party
   //   - a won fight ends on the bow
+  //   - whatever the shot, the camera goes to the target half a second before a move lands, so the blow itself is always seen
   let shotN = 0, lastShot = null;
   function directorShot(a, playing, asp) {
     const G = GEO, sd = SIDE(G.ux, G.uz), keep = (q) => (lastShot = q);
@@ -335,9 +348,10 @@ function makeMFFight(stage, H) {
     if (!playing || a.stage !== 'play') return keep(WIDE(a.stage === 'in' ? ease(a.g) * 0.6 : 0));      // crossing the ground
     if (a.shotK == null) a.shotK = shotN++;
     const n = a.shotK;
-    if (a.kind === 'hero') { const P = a.P, landed = a.hitK > 0 || a.landed; if (landed && a.landT == null) a.landT = a.t; const after = a.landT == null ? 0 : ease((a.t - a.landT) / 0.7), dur = P.a.dur(a.anim), tHit = a.tags ? 0.5 * dur : (a.hitsAt[0] || 0.6 * dur);
+    if (a.kind === 'hero') { const P = a.P, landed = a.hitK > 0 || a.landed; if (landed && a.landT == null) a.landT = a.t; const dur = P.a.dur(a.anim), tHit = (a.tags ? P.a.hits(a.mv)[0] : a.hitsAt[0]) || 0.6 * dur, lead = ease((a.t - (tHit - 0.5)) / 0.42), after = Math.max(lead, a.landT == null ? 0 : ease((a.t - a.landT) / 0.35));
       if (a.T && a.th !== P) { const d = dirTo(P.x, P.z, a.T.x, a.T.z), ux = d[0], uz = d[1], L = d[2], ps = SIDE(ux, uz), th = a.tf ? a.tf.K.h : 1.7, always = { g_seal: 1, g_curtain: 1, shots: 1, guardian: 1 }[a.anim];
-        const kind = always ? 'swing' : a.th ? 'profile' : a.from ? ['reverse', 'swing'][n % 2] : ['swing', 'profile', 'low'][n % 3];
+        let kind = always ? 'swing' : a.th ? 'profile' : a.from ? ['reverse', 'swing'][n % 2] : ['swing', 'profile', 'low'][n % 3];
+        if (kind === 'reverse' && after > 0.5) kind = 'profile';      // from behind the target the blow itself would be hidden by the target, so it cuts to the side just before it lands
         if (kind === 'profile') { const c = a.th ? 0.5 : 0.3, R = Math.max(3.4, Math.min(6.0, 2.2 + 0.5 * L)) * (1 - 0.1 * ease(a.t / tHit)), k = mix(c, 0.72, after);      // both of them, side on, pushing in; when it lands the picture slides to the one it landed on
           return keep({ p: [P.x + ux * k * L + ps[0] * R, 1.45, P.z + uz * k * L + ps[1] * R], l: [P.x + ux * k * L, 1.1 + 0.15 * Math.max(0, th - 2) * after, P.z + uz * k * L], fov: 34 }); }
         if (kind === 'low') { const phi = mix(105, 150, ease(a.t / Math.max(tHit, 1))) * DEG, q = swing(P.x, P.z, ux, uz, phi, 3.3);                                 // low in front of her as she casts; then to her target
@@ -345,7 +359,7 @@ function makeMFFight(stage, H) {
           const q2 = swing(a.T.x, a.T.z, ux, uz, 35 * DEG, 3.0 + 0.9 * th); return keep({ p: [q2[0], 0.9 + 0.3 * th, q2[1]], l: [a.T.x, 0.55 * th, a.T.z], fov: 34 }); }
         if (kind === 'reverse') { const R = 2.3 + 0.7 * th, k = mix(0.25, 0.85, after);                                                                               // from behind her target, looking back at her
           return keep({ p: [a.T.x + ux * R + ps[0] * (0.9 + 0.2 * th), 0.9 + 0.55 * th, a.T.z + uz * R + ps[1] * (0.9 + 0.2 * th)], l: [P.x + ux * k * L, mix(1.15, 0.5 * th, after), P.z + uz * k * L], fov: 36 }); }
-        const phi = (mix(24, 80, ease(a.t / tHit)) + 12 * after) * DEG, R = Math.max(4, Math.min(6.5, 3.6 + 0.3 * L)) + 0.25 * Math.max(0, th - 2) * after, q = swing(P.x + ux * 0.3 * L * after, P.z + uz * 0.3 * L * after, ux, uz, phi, R), k = mix(0.3, 0.8, after);      // the swing
+        const phi = (mix(24, mix(80, 42, Math.max(0, Math.min(1, (L - 3) / 5))), ease(a.t / tHit)) + 8 * after) * DEG, R = Math.max(4, Math.min(6.5, 3.6 + 0.3 * L)) + 0.25 * Math.max(0, th - 2) * after, q = swing(P.x + ux * 0.3 * L * after, P.z + uz * 0.3 * L * after, ux, uz, phi, R), k = mix(0.3, 0.8, after);      // the swing
         return keep({ p: [q[0], 1.75 + 0.12 * Math.max(0, th - 2) * after, q[1]], l: [P.x + ux * k * L, mix(1.15, 0.3 + 0.5 * th, after), P.z + uz * k * L], fov: 30 }); }
       if (landed) { const hitsFoes = AC.MOVES[a.id] && /needles|quilt/.test(a.id);                                                                                    // a move at everyone, or on herself, once it lands
         if (hitsFoes) { const h = 4.2 + 0.2 * G.tall - 0.4 * after; return keep({ p: [G.fcx - G.ux * 8.6 + sd[0] * 4.6, h, G.fcz - G.uz * 8.6 + sd[1] * 4.6], l: [G.fcx, 1.2, G.fcz], fov: 34, blur: 2.4, group: true }); }      // HIGH: not so high that the camera looks down past the painting
@@ -422,6 +436,9 @@ function makeMFFight(stage, H) {
       for (const id in party) { const P = party[id]; P.patch.visible = false; if (P.a.m.stop) P.a.m.stop(); } for (const k in pool) for (const m of pool[k]) { m.patch.visible = false; m.inUse = false; } },
     step(dt, t) {
       if (phase === 'off' || !B) return; time = t; intro = Math.max(0, intro - dt);
+      // a blow has just landed: the picture holds for a beat (the burst of light and the numbers keep moving)
+      const raw = dt; if (hitStop > 0) { hitStop -= raw; dt = raw * 0.05; }
+      for (const b of bursts) { if (!b.on) continue; b.t += raw / 0.34; if (b.t >= 1) { b.on = false; b.m.visible = false; continue; } const k = b.t, e = 1 - (1 - k) * (1 - k), sz = b.size * (0.3 + 1.5 * e); b.m.scale.set(sz, sz, 1); b.m.material.opacity = Math.pow(1 - k, 1.4); }
       if (phase === 'wait') { wait -= dt; if (wait <= 0) next(); }
       else if (phase === 'ending') { wait -= dt; if (wait <= 0) finish(); }
       else if (phase === 'menu' && auto && cur) { wait -= dt; if (wait <= 0) { const c = E.choose(B, cur.e, auto); wait = 0.6; if (!choose(c.move, c.target)) { const m = E.heroMoves(B, cur.e).find((x) => x.ok); choose(m.id); } } }
@@ -462,11 +479,11 @@ function makeMFFight(stage, H) {
         for (const f of foes) { if (!f.vis) continue; if (fr && a && f !== a.f && f !== a.tf && f !== a.tfo && inWay(f.x, f.z, 0.5 + f.K.r)) hid.add(f); const hide = !!(fr && a && hid.has(f)); f.m.root.visible = f.m.fx.visible = !hide; f.m.patch.visible = !hide; } }
       // the place answers a spell: it darkens, the picture shakes, and one shared light carries the spell
       const cast = mover ? mover.a : null, dk = cast ? Math.max(cast.dark, 0.55 * cast.dim) : 0; stage.dark = 1 - Math.pow(1 - 0.97 * dk, 2); stage.dim = cast ? cast.dim : 0;
-      shake = Math.max(shake * Math.exp(-dt * 5), 0.7 * (cast ? cast.shake : 0)); const sp = 16 * shake * (win ? win.w : 1) / Math.max(1, H.width()); stage.shakeX = (rnd() - 0.5) * sp; stage.shakeY = (rnd() - 0.5) * sp;
+      shake = Math.max(shake * Math.exp(-dt * 5), 0.7 * (cast ? cast.shake : 0)); const sp = (stage.free.on ? 85 : 16) * shake * (win ? win.w : 1) / Math.max(1, H.width()); stage.shakeX = (rnd() - 0.5) * sp; stage.shakeY = (rnd() - 0.5) * sp;
       const n0 = stage.near[0]; if (cast && cast.light) { n0.position.copy(cast.light.position); n0.color.copy(cast.light.color); n0.intensity = cast.light.intensity; n0.distance = 3.2; } else n0.intensity = 0;
       let k = 1; for (const f of foes) { if (k > 3) break; if (!f.up || !f.m.root.visible) continue; const l = stage.near[k++]; f.m.anchor('chest', l.position); l.color.setHex(f.K.light); l.distance = 3 + 1.2 * f.K.h; l.intensity = 0.5 * f.fade; }
       for (; k < 4; k++) stage.near[k].intensity = 0;
-      bars();
+      bars(); for (const o of floats) place(o);
     },
   };
   return api;

@@ -132,3 +132,20 @@ party is one slim strip of four. The log line is a caption on the picture. Camer
 or Eclipse on the turn bar is marked with a triangle and its name. Keys: 1 to 7, Tab or arrows, Enter, Esc.
 Not built from the brainstorm: the damage shown as a ghost on the target's bar before casting, and tapping a foe's body in the picture.
 `checks/ui.py` plays it by taps and keys on a phone and a laptop.
+
+## Seeing a blow land, and bars that read (Chris, November 14, 9:00 pm)
+
+"It's hard to see their attacks land, and the UI for the fight info needs to be easier to see. The HP bar should read more clearly:
+not larger, just better colour usage."
+
+- **The camera is on the target before the blow.** In the director camera, whatever the shot, it goes to whoever a move is aimed at
+  half a second before it lands. Before this a ranged move could land out of the picture. The shot from behind a target cuts to
+  the side just before the blow, because the target's own body hid it.
+- **A blow that lands** gives a burst of light where it lands, holds the picture for a beat (about a tenth of a second), shakes the
+  camera harder, and flashes the bar of whoever took it. The numbers are bigger, pop in, and stay on the one they belong to when the
+  camera cuts.
+- **The bars** are the same size, recoloured: every bar on a black track with a light edge. A witch's HP is green, amber under half,
+  red under a quarter, and her HP number takes the same colour. MP is blue. A foe's Life is rose red and its Fate gold; a sealed
+  foe's Life turns to gold stripes. What was just lost shows white for a moment, then drains.
+- Turn chips: witches edged green, foes rose, a coming Heavy, Crush or Eclipse gold. The caption has a dark backing.
+- `checks/hits.py` takes a still as each move lands and a third of a second after.

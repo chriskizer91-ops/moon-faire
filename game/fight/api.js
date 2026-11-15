@@ -77,6 +77,28 @@
 .mff .foebar.tgt{border-color:#f3dfae;box-shadow:0 0 0 3px rgba(243,223,174,.75)}.mff .foebar.pick{box-shadow:0 0 0 2px #7fd6ff}.mff .foebar.dim{opacity:.35}
 .mff .chip.marked{font-weight:700}
 .mff .set{margin-top:10px;padding-top:8px;border-top:1px solid #33283f}
+/* reading the fight (Chris, November 14, 9 pm: "the HP bar should read more clearly, not larger, just better colour usage"): every bar sits
+   on a black track with a light edge; a witch's HP is green, then amber under half, then red under a quarter; a foe's Life is rose red,
+   its Fate gold; whatever was just lost shows white for a moment before it drains; MP is blue */
+.mff .who .hp,.mff .foebar div{position:relative;background:#000;box-shadow:inset 0 0 0 1px rgba(255,255,255,.34);overflow:hidden}
+.mff .who .hp i,.mff .foebar i{position:absolute;left:0;top:0;bottom:0;display:block;height:auto}
+.mff .who .hp .lost,.mff .foebar .lost{background:#fff;transition:width .6s ease-in .28s}
+.mff .who .hp .life{background:#3ddc84}.mff .who.mid .hp .life{background:#ffc531}.mff .who.low .hp .life{background:#ff4a4a}
+.mff .who .hpn{color:#fff;font-weight:600}.mff .who.mid .hpn{color:#ffd76a}.mff .who.low .hpn{color:#ff8c8c}
+.mff .who .mp{background:#000;box-shadow:inset 0 0 0 1px rgba(255,255,255,.22)}.mff .who .mp i{background:#4da3ff}.mff .who .mpn{color:#a8cdff}
+.mff .who{background:#15101c;border-color:#4a3d5c}.mff .who.down{opacity:.6}.mff .who.down .hpn{color:#b9b0c4}
+.mff .foebar{background:rgba(6,4,10,.9);border:1px solid rgba(255,255,255,.4);color:#fff}.mff .foebar span{font-weight:600;text-shadow:0 1px 0 #000}
+.mff .foebar .life{background:#ff4d70}.mff .foebar .fate{background:#ffd54a;top:auto;height:3px;box-shadow:0 -1px 0 #000}
+.mff .foebar.sealed{border-color:#ffd54a}.mff .foebar.sealed .life{background:repeating-linear-gradient(45deg,#ffd54a 0 5px,#c9981a 5px 10px)}
+.mff .foebar.hit{animation:mffbar .3s ease-out}.mff .who.hit{animation:mffwho .32s ease-out}
+@keyframes mffbar{0%{background:#fff;transform:translate(-50%,-100%) scale(1.14)}100%{transform:translate(-50%,-100%) scale(1)}}
+@keyframes mffwho{0%{background:#fff;transform:scale(1.05)}100%{}}
+.mff .float{font-size:26px;font-weight:800;animation:mffpop 1.45s ease-out forwards;text-shadow:0 2px 0 #000,0 0 3px #000,0 0 10px #000;-webkit-text-stroke:1px rgba(0,0,0,.55)}
+.mff .float.big{font-size:38px}.mff .float.dmg{color:#fff}.mff .float.dmg.hero{color:#ff9a8c}.mff .float.heal{color:#7dffa6}.mff .float.end{color:#ffd0c2}.mff .float.fate{color:#ffd54a;font-size:15px;-webkit-text-stroke:0}
+@keyframes mffpop{0%{opacity:0;transform:translate(-50%,-100%) scale(2.3)}11%{opacity:1;transform:translate(-50%,-100%) scale(.94)}18%{transform:translate(-50%,-100%) scale(1)}72%{opacity:1;transform:translate(-50%,-150%) scale(1)}100%{opacity:0;transform:translate(-50%,-185%) scale(.92)}}
+.mff .log{left:8px;right:auto;max-width:calc(100% - 64px);background:rgba(6,4,10,.72);border-radius:8px;padding:4px 9px;color:#fff}
+.mff .log:empty{display:none}
+.mff .chip{background:rgba(6,4,10,.86);color:#fff}.mff .chip.hero{border-color:#3ddc84;color:#c9ffe0}.mff .chip.foe{border-color:#ff4d70;color:#ffd0da}.mff .chip.marked{border-color:#ffd54a;color:#ffe69a;background:rgba(60,34,0,.92)}.mff .chip.now{background:#fff;color:#111;border-color:#fff}
 @media (max-width:640px){.mff{font-size:14px}.mff .box{flex:0 0 46vh}.mff .tile{min-height:44px;padding:5px 9px}.mff .help{min-height:2.5em;margin:6px 2px 5px}.mff .panel{padding-bottom:4px}.mff .panel{flex:1 1 auto;max-height:none}.mff .title{font-size:24px}.mff .chip{font-size:11px;padding:1px 6px}.mff .moves{grid-template-columns:repeat(2,1fr)}.mff .who{padding:4px 5px 3px}.mff .who b{font-size:13px}.mff .who span{font-size:10.5px}.mff .party{gap:4px}}
 `;
   const CODE = { w: 'wisp', K: 'wraith', B: 'great' };
