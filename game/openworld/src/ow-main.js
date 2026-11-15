@@ -66,7 +66,7 @@
       if (Math.abs(d) < 1.9) cam.yaw += d * Math.min(1, dt * 0.9 * Math.min(1, v / 1.2));
     }
     camT.set(me.x, me.y + 1.25, me.z);
-    { const want = cam.dist * (talk ? 1.0 : 1 + 0.10 * THREE.MathUtils.smoothstep(v, 0.15, 1.6) + 0.15 * THREE.MathUtils.smoothstep(v, 2.4, 4.2)); cam.d += (want - cam.d) * Math.min(1, dt * (want < cam.d ? 1.3 : 3.0)); }
+    { const want = cam.dist * (talk ? 1.0 : 1 + 0.20 * THREE.MathUtils.smoothstep(v, 0.15, 1.6) + 0.20 * THREE.MathUtils.smoothstep(v, 2.4, 4.2)); cam.d += (want - cam.d) * Math.min(1, dt * (want < cam.d ? 1.8 : 3.0)); }
     let dist = cam.d; const cp = Math.cos(cam.pitch), sp = Math.sin(cam.pitch);
     // keep the camera out of the ground: pull it in if a hill is between it and her, and lift it over the ground under it
     for (let i = 1; i <= 8; i++) { const t2 = dist * i / 8, x = camT.x + Math.sin(cam.yaw) * cp * t2, z = camT.z + Math.cos(cam.yaw) * cp * t2, y = camT.y + sp * t2; if (land.height(x, z) + 0.3 > y && i > 2) { dist = Math.max(1.6, dist * (i - 1) / 8); break; } }
