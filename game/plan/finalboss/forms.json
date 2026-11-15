@@ -1,0 +1,1756 @@
+{
+ "n": 2000,
+ "nExtra": 1000,
+ "settings": [
+  [
+   "easy",
+   0
+  ],
+  [
+   "medium",
+   1
+  ],
+  [
+   "hard",
+   2
+  ],
+  [
+   "crazy",
+   2.8
+  ]
+ ],
+ "fights": {
+  "gw": {
+   "name": "The great wraith's fight under new names, one form",
+   "forms": [
+    {
+     "code": "B2K2w"
+    }
+   ],
+   "rows": {
+    "very careless": [
+     {
+      "none": 0.0215,
+      "all": 0.1065,
+      "turns": 35.2093023255814,
+      "lostInFormOne": 0.9785
+     },
+     {
+      "none": 0.0005,
+      "all": 0.006,
+      "turns": 40,
+      "lostInFormOne": 0.9995
+     },
+     {
+      "none": 0,
+      "all": 0,
+      "turns": 0,
+      "lostInFormOne": 1
+     },
+     {
+      "none": 0,
+      "all": 0,
+      "turns": 0,
+      "lostInFormOne": 1
+     }
+    ],
+    "careless": [
+     {
+      "none": 0.0535,
+      "all": 0.192,
+      "turns": 28.38317757009346,
+      "lostInFormOne": 0.9465
+     },
+     {
+      "none": 0.002,
+      "all": 0.0085,
+      "turns": 29.75,
+      "lostInFormOne": 0.998
+     },
+     {
+      "none": 0,
+      "all": 0,
+      "turns": 0,
+      "lostInFormOne": 1
+     },
+     {
+      "none": 0,
+      "all": 0,
+      "turns": 0,
+      "lostInFormOne": 1
+     }
+    ],
+    "attentive, careful": [
+     {
+      "none": 0.8,
+      "all": 0.9845,
+      "turns": 26.185625,
+      "lostInFormOne": 0.2
+     },
+     {
+      "none": 0.0315,
+      "all": 0.131,
+      "turns": 28.22222222222222,
+      "lostInFormOne": 0.9685
+     },
+     {
+      "none": 0,
+      "all": 0,
+      "turns": 0,
+      "lostInFormOne": 1
+     },
+     {
+      "none": 0,
+      "all": 0,
+      "turns": 0,
+      "lostInFormOne": 1
+     }
+    ],
+    "attentive, bold": [
+     {
+      "none": 0.5385,
+      "all": 0.8485,
+      "turns": 27.40297121634169,
+      "lostInFormOne": 0.4615
+     },
+     {
+      "none": 0.0275,
+      "all": 0.097,
+      "turns": 29.30909090909091,
+      "lostInFormOne": 0.9725
+     },
+     {
+      "none": 0,
+      "all": 0,
+      "turns": 0,
+      "lostInFormOne": 1
+     },
+     {
+      "none": 0,
+      "all": 0,
+      "turns": 0,
+      "lostInFormOne": 1
+     }
+    ],
+    "focused, careful": [
+     {
+      "none": 0.956,
+      "all": 0.999,
+      "turns": 27.536087866108787,
+      "lostInFormOne": 0.044
+     },
+     {
+      "none": 0.352,
+      "all": 0.6525,
+      "turns": 32.39488636363637,
+      "lostInFormOne": 0.648
+     },
+     {
+      "none": 0.003,
+      "all": 0.0655,
+      "turns": 34,
+      "lostInFormOne": 0.997
+     },
+     {
+      "none": 0,
+      "all": 0.0005,
+      "turns": 38,
+      "lostInFormOne": 1
+     }
+    ],
+    "focused, bold": [
+     {
+      "none": 0.7655,
+      "all": 0.925,
+      "turns": 27.737426518615283,
+      "lostInFormOne": 0.2345
+     },
+     {
+      "none": 0.1475,
+      "all": 0.373,
+      "turns": 31.952542372881357,
+      "lostInFormOne": 0.8525
+     },
+     {
+      "none": 0,
+      "all": 0.0015,
+      "turns": 37.333333333333336,
+      "lostInFormOne": 1
+     },
+     {
+      "none": 0,
+      "all": 0,
+      "turns": 0,
+      "lostInFormOne": 1
+     }
+    ],
+    "expert, careful": [
+     {
+      "none": 0.995,
+      "all": 1,
+      "turns": 28.45678391959799,
+      "lostInFormOne": 0.005
+     },
+     {
+      "none": 0.9105,
+      "all": 0.9745,
+      "turns": 30.368478857770455,
+      "lostInFormOne": 0.0895
+     },
+     {
+      "none": 0.2645,
+      "all": 0.7995,
+      "turns": 33.40453686200378,
+      "lostInFormOne": 0.7355
+     },
+     {
+      "none": 0.001,
+      "all": 0.036,
+      "turns": 33.5,
+      "lostInFormOne": 0.999
+     }
+    ],
+    "expert, bold": [
+     {
+      "none": 0.9785,
+      "all": 0.9965,
+      "turns": 28.012774655084314,
+      "lostInFormOne": 0.0215
+     },
+     {
+      "none": 0.678,
+      "all": 0.8425,
+      "turns": 30.567846607669615,
+      "lostInFormOne": 0.322
+     },
+     {
+      "none": 0.0805,
+      "all": 0.506,
+      "turns": 32.142857142857146,
+      "lostInFormOne": 0.9195
+     },
+     {
+      "none": 0,
+      "all": 0.0065,
+      "turns": 35.30769230769231,
+      "lostInFormOne": 1
+     }
+    ]
+   },
+   "turns": [
+    29.2025,
+    30.82097186700767,
+    32.88427299703264,
+    34.92307692307692
+   ]
+  },
+  "alone": {
+   "name": "One body alone, in two forms",
+   "forms": [
+    {
+     "code": "B",
+     "life": 1.3
+    },
+    {
+     "code": "B",
+     "life": 0.4,
+     "dmg": 1.1
+    }
+   ],
+   "rows": {
+    "very careless": [
+     {
+      "none": 0.0685,
+      "all": 0.242,
+      "turns": 55.583941605839414,
+      "lostInFormOne": 0.682
+     },
+     {
+      "none": 0.003,
+      "all": 0.0295,
+      "turns": 52.5,
+      "lostInFormOne": 0.9315
+     },
+     {
+      "none": 0,
+      "all": 0.002,
+      "turns": 65,
+      "lostInFormOne": 0.9965
+     },
+     {
+      "none": 0,
+      "all": 0,
+      "turns": 0,
+      "lostInFormOne": 0.9995
+     }
+    ],
+    "careless": [
+     {
+      "none": 0.0565,
+      "all": 0.2075,
+      "turns": 44.6283185840708,
+      "lostInFormOne": 0.8095
+     },
+     {
+      "none": 0.0015,
+      "all": 0.0115,
+      "turns": 47.666666666666664,
+      "lostInFormOne": 0.989
+     },
+     {
+      "none": 0,
+      "all": 0,
+      "turns": 0,
+      "lostInFormOne": 1
+     },
+     {
+      "none": 0,
+      "all": 0,
+      "turns": 0,
+      "lostInFormOne": 1
+     }
+    ],
+    "attentive, careful": [
+     {
+      "none": 1,
+      "all": 1,
+      "turns": 38.996,
+      "lostInFormOne": 0
+     },
+     {
+      "none": 0.385,
+      "all": 0.685,
+      "turns": 42.797402597402595,
+      "lostInFormOne": 0.3855
+     },
+     {
+      "none": 0,
+      "all": 0.001,
+      "turns": 45.5,
+      "lostInFormOne": 0.959
+     },
+     {
+      "none": 0,
+      "all": 0,
+      "turns": 0,
+      "lostInFormOne": 0.9995
+     }
+    ],
+    "attentive, bold": [
+     {
+      "none": 0.9865,
+      "all": 0.9995,
+      "turns": 38.98073998986315,
+      "lostInFormOne": 0.0065
+     },
+     {
+      "none": 0.163,
+      "all": 0.538,
+      "turns": 39.99386503067485,
+      "lostInFormOne": 0.57
+     },
+     {
+      "none": 0,
+      "all": 0,
+      "turns": 0,
+      "lostInFormOne": 0.9985
+     },
+     {
+      "none": 0,
+      "all": 0,
+      "turns": 0,
+      "lostInFormOne": 1
+     }
+    ],
+    "focused, careful": [
+     {
+      "none": 0.9895,
+      "all": 1,
+      "turns": 41.05305709954523,
+      "lostInFormOne": 0
+     },
+     {
+      "none": 0.4135,
+      "all": 0.76,
+      "turns": 46.96735187424426,
+      "lostInFormOne": 0.099
+     },
+     {
+      "none": 0.0005,
+      "all": 0.0225,
+      "turns": 45,
+      "lostInFormOne": 0.4705
+     },
+     {
+      "none": 0,
+      "all": 0,
+      "turns": 0,
+      "lostInFormOne": 0.9925
+     }
+    ],
+    "focused, bold": [
+     {
+      "none": 0.9415,
+      "all": 1,
+      "turns": 41.24163568773234,
+      "lostInFormOne": 0
+     },
+     {
+      "none": 0.2465,
+      "all": 0.634,
+      "turns": 43.77687626774848,
+      "lostInFormOne": 0.275
+     },
+     {
+      "none": 0,
+      "all": 0.0065,
+      "turns": 49.53846153846154,
+      "lostInFormOne": 0.867
+     },
+     {
+      "none": 0,
+      "all": 0,
+      "turns": 0,
+      "lostInFormOne": 0.997
+     }
+    ],
+    "expert, careful": [
+     {
+      "none": 1,
+      "all": 1,
+      "turns": 39.1075,
+      "lostInFormOne": 0
+     },
+     {
+      "none": 0.937,
+      "all": 0.9935,
+      "turns": 43.02241195304162,
+      "lostInFormOne": 0
+     },
+     {
+      "none": 0.167,
+      "all": 0.514,
+      "turns": 48.02994011976048,
+      "lostInFormOne": 0.155
+     },
+     {
+      "none": 0,
+      "all": 0.0025,
+      "turns": 52.8,
+      "lostInFormOne": 0.912
+     }
+    ],
+    "expert, bold": [
+     {
+      "none": 1,
+      "all": 1,
+      "turns": 39.0345,
+      "lostInFormOne": 0
+     },
+     {
+      "none": 0.8095,
+      "all": 0.9755,
+      "turns": 41.92464484249537,
+      "lostInFormOne": 0
+     },
+     {
+      "none": 0.0305,
+      "all": 0.3075,
+      "turns": 47.34426229508197,
+      "lostInFormOne": 0.2845
+     },
+     {
+      "none": 0,
+      "all": 0.003,
+      "turns": 52,
+      "lostInFormOne": 0.976
+     }
+    ]
+   },
+   "turns": [
+    39.025,
+    42.6801007556675,
+    48.134020618556704,
+    52
+   ]
+  },
+  "both": {
+   "name": "Helpers in form one, alone in form two",
+   "forms": [
+    {
+     "code": "B2K2w"
+    },
+    {
+     "code": "B",
+     "life": 0.25
+    }
+   ],
+   "rows": {
+    "very careless": [
+     {
+      "none": 0.011,
+      "all": 0.0725,
+      "turns": 49.04545454545455,
+      "lostInFormOne": 0.9785
+     },
+     {
+      "none": 0,
+      "all": 0.0015,
+      "turns": 59.333333333333336,
+      "lostInFormOne": 0.9995
+     },
+     {
+      "none": 0,
+      "all": 0,
+      "turns": 0,
+      "lostInFormOne": 1
+     },
+     {
+      "none": 0,
+      "all": 0,
+      "turns": 0,
+      "lostInFormOne": 1
+     }
+    ],
+    "careless": [
+     {
+      "none": 0.0345,
+      "all": 0.133,
+      "turns": 38.971014492753625,
+      "lostInFormOne": 0.9465
+     },
+     {
+      "none": 0.0005,
+      "all": 0.004,
+      "turns": 36,
+      "lostInFormOne": 0.998
+     },
+     {
+      "none": 0,
+      "all": 0,
+      "turns": 0,
+      "lostInFormOne": 1
+     },
+     {
+      "none": 0,
+      "all": 0,
+      "turns": 0,
+      "lostInFormOne": 1
+     }
+    ],
+    "attentive, careful": [
+     {
+      "none": 0.786,
+      "all": 0.983,
+      "turns": 38.04770992366412,
+      "lostInFormOne": 0.2
+     },
+     {
+      "none": 0.016,
+      "all": 0.1115,
+      "turns": 38.5,
+      "lostInFormOne": 0.9685
+     },
+     {
+      "none": 0,
+      "all": 0,
+      "turns": 0,
+      "lostInFormOne": 1
+     },
+     {
+      "none": 0,
+      "all": 0,
+      "turns": 0,
+      "lostInFormOne": 1
+     }
+    ],
+    "attentive, bold": [
+     {
+      "none": 0.475,
+      "all": 0.811,
+      "turns": 38.63473684210526,
+      "lostInFormOne": 0.4615
+     },
+     {
+      "none": 0.0115,
+      "all": 0.0515,
+      "turns": 39.30434782608695,
+      "lostInFormOne": 0.9725
+     },
+     {
+      "none": 0,
+      "all": 0,
+      "turns": 0,
+      "lostInFormOne": 1
+     },
+     {
+      "none": 0,
+      "all": 0,
+      "turns": 0,
+      "lostInFormOne": 1
+     }
+    ],
+    "focused, careful": [
+     {
+      "none": 0.932,
+      "all": 0.9985,
+      "turns": 39.348175965665234,
+      "lostInFormOne": 0.044
+     },
+     {
+      "none": 0.1845,
+      "all": 0.448,
+      "turns": 43.19512195121951,
+      "lostInFormOne": 0.648
+     },
+     {
+      "none": 0,
+      "all": 0.046,
+      "turns": 48.47826086956522,
+      "lostInFormOne": 0.997
+     },
+     {
+      "none": 0,
+      "all": 0,
+      "turns": 0,
+      "lostInFormOne": 1
+     }
+    ],
+    "focused, bold": [
+     {
+      "none": 0.7255,
+      "all": 0.913,
+      "turns": 39.292212267401794,
+      "lostInFormOne": 0.2345
+     },
+     {
+      "none": 0.057,
+      "all": 0.2385,
+      "turns": 42.69298245614035,
+      "lostInFormOne": 0.8525
+     },
+     {
+      "none": 0,
+      "all": 0.001,
+      "turns": 49.5,
+      "lostInFormOne": 1
+     },
+     {
+      "none": 0,
+      "all": 0,
+      "turns": 0,
+      "lostInFormOne": 1
+     }
+    ],
+    "expert, careful": [
+     {
+      "none": 0.994,
+      "all": 1,
+      "turns": 40.43209255533199,
+      "lostInFormOne": 0.005
+     },
+     {
+      "none": 0.8865,
+      "all": 0.9535,
+      "turns": 42.17315284827975,
+      "lostInFormOne": 0.0895
+     },
+     {
+      "none": 0.1295,
+      "all": 0.632,
+      "turns": 43.945945945945944,
+      "lostInFormOne": 0.7355
+     },
+     {
+      "none": 0,
+      "all": 0.0055,
+      "turns": 46.27272727272727,
+      "lostInFormOne": 0.999
+     }
+    ],
+    "expert, bold": [
+     {
+      "none": 0.9625,
+      "all": 0.9925,
+      "turns": 39.869610389610386,
+      "lostInFormOne": 0.0215
+     },
+     {
+      "none": 0.5985,
+      "all": 0.7955,
+      "turns": 42.292397660818715,
+      "lostInFormOne": 0.322
+     },
+     {
+      "none": 0.034,
+      "all": 0.3065,
+      "turns": 43.01470588235294,
+      "lostInFormOne": 0.9195
+     },
+     {
+      "none": 0,
+      "all": 0.001,
+      "turns": 46,
+      "lostInFormOne": 1
+     }
+    ]
+   },
+   "turns": [
+    40.81,
+    42.774869109947645,
+    44.526119402985074,
+    46
+   ]
+  }
+ },
+ "extra": {
+  "loneGw": {
+   "name": "The great wraith alone, its own numbers, one form (to show what the helpers are worth)",
+   "forms": [
+    {
+     "code": "B"
+    }
+   ],
+   "rows": {
+    "attentive, careful": [
+     {
+      "none": 1,
+      "all": 1,
+      "turns": 21.894,
+      "lostInFormOne": 0
+     },
+     {
+      "none": 1,
+      "all": 1,
+      "turns": 27.009,
+      "lostInFormOne": 0
+     },
+     {
+      "none": 0.604,
+      "all": 0.89,
+      "turns": 27.380794701986755,
+      "lostInFormOne": 0.396
+     },
+     {
+      "none": 0.011,
+      "all": 0.151,
+      "turns": 30.90909090909091,
+      "lostInFormOne": 0.989
+     }
+    ],
+    "focused, careful": [
+     {
+      "none": 1,
+      "all": 1,
+      "turns": 22.254,
+      "lostInFormOne": 0
+     },
+     {
+      "none": 1,
+      "all": 1,
+      "turns": 27,
+      "lostInFormOne": 0
+     },
+     {
+      "none": 0.942,
+      "all": 0.991,
+      "turns": 27.277070063694268,
+      "lostInFormOne": 0.058
+     },
+     {
+      "none": 0.223,
+      "all": 0.399,
+      "turns": 33.01793721973094,
+      "lostInFormOne": 0.777
+     }
+    ],
+    "expert, careful": [
+     {
+      "none": 1,
+      "all": 1,
+      "turns": 22.158,
+      "lostInFormOne": 0
+     },
+     {
+      "none": 1,
+      "all": 1,
+      "turns": 27,
+      "lostInFormOne": 0
+     },
+     {
+      "none": 0.955,
+      "all": 0.999,
+      "turns": 27.5717277486911,
+      "lostInFormOne": 0.045
+     },
+     {
+      "none": 0.231,
+      "all": 0.598,
+      "turns": 29.861471861471863,
+      "lostInFormOne": 0.769
+     }
+    ]
+   }
+  },
+  "aloneHarder": {
+   "name": "One body alone, the final form hitting 25% harder instead of 10%",
+   "forms": [
+    {
+     "code": "B",
+     "life": 1.3
+    },
+    {
+     "code": "B",
+     "life": 0.4,
+     "dmg": 1.25
+    }
+   ],
+   "rows": {
+    "attentive, careful": [
+     {
+      "none": 1,
+      "all": 1,
+      "turns": 38.985,
+      "lostInFormOne": 0
+     },
+     {
+      "none": 0.333,
+      "all": 0.597,
+      "turns": 42.38438438438438,
+      "lostInFormOne": 0.387
+     },
+     {
+      "none": 0,
+      "all": 0,
+      "turns": 0,
+      "lostInFormOne": 0.953
+     },
+     {
+      "none": 0,
+      "all": 0,
+      "turns": 0,
+      "lostInFormOne": 1
+     }
+    ],
+    "focused, careful": [
+     {
+      "none": 0.938,
+      "all": 1,
+      "turns": 40.99680170575693,
+      "lostInFormOne": 0
+     },
+     {
+      "none": 0.249,
+      "all": 0.541,
+      "turns": 46.28915662650602,
+      "lostInFormOne": 0.094
+     },
+     {
+      "none": 0,
+      "all": 0.004,
+      "turns": 47.75,
+      "lostInFormOne": 0.471
+     },
+     {
+      "none": 0,
+      "all": 0,
+      "turns": 0,
+      "lostInFormOne": 0.991
+     }
+    ],
+    "expert, careful": [
+     {
+      "none": 1,
+      "all": 1,
+      "turns": 39.138,
+      "lostInFormOne": 0
+     },
+     {
+      "none": 0.815,
+      "all": 0.959,
+      "turns": 42.09815950920245,
+      "lostInFormOne": 0
+     },
+     {
+      "none": 0.039,
+      "all": 0.24,
+      "turns": 48,
+      "lostInFormOne": 0.146
+     },
+     {
+      "none": 0,
+      "all": 0,
+      "turns": 0,
+      "lostInFormOne": 0.915
+     }
+    ]
+   }
+  },
+  "bothHarder": {
+   "name": "Helpers then alone, the final form hitting 20% harder",
+   "forms": [
+    {
+     "code": "B2K2w"
+    },
+    {
+     "code": "B",
+     "life": 0.25,
+     "dmg": 1.2
+    }
+   ],
+   "rows": {
+    "attentive, careful": [
+     {
+      "none": 0.771,
+      "all": 0.978,
+      "turns": 38.045395590142675,
+      "lostInFormOne": 0.192
+     },
+     {
+      "none": 0.007,
+      "all": 0.084,
+      "turns": 38.57142857142857,
+      "lostInFormOne": 0.97
+     },
+     {
+      "none": 0,
+      "all": 0,
+      "turns": 0,
+      "lostInFormOne": 1
+     },
+     {
+      "none": 0,
+      "all": 0,
+      "turns": 0,
+      "lostInFormOne": 1
+     }
+    ],
+    "focused, careful": [
+     {
+      "none": 0.903,
+      "all": 0.997,
+      "turns": 39.17829457364341,
+      "lostInFormOne": 0.042
+     },
+     {
+      "none": 0.111,
+      "all": 0.283,
+      "turns": 43.37837837837838,
+      "lostInFormOne": 0.627
+     },
+     {
+      "none": 0,
+      "all": 0.028,
+      "turns": 49.07142857142857,
+      "lostInFormOne": 0.999
+     },
+     {
+      "none": 0,
+      "all": 0,
+      "turns": 0,
+      "lostInFormOne": 1
+     }
+    ],
+    "expert, careful": [
+     {
+      "none": 0.991,
+      "all": 1,
+      "turns": 40.45408678102926,
+      "lostInFormOne": 0.003
+     },
+     {
+      "none": 0.767,
+      "all": 0.952,
+      "turns": 42.2464146023468,
+      "lostInFormOne": 0.084
+     },
+     {
+      "none": 0.058,
+      "all": 0.458,
+      "turns": 43.87931034482759,
+      "lostInFormOne": 0.736
+     },
+     {
+      "none": 0,
+      "all": 0.002,
+      "turns": 46.5,
+      "lostInFormOne": 0.999
+     }
+    ]
+   }
+  },
+  "bothNoBow": {
+   "name": "Helpers then alone, but nobody gets up when form one ends",
+   "forms": [
+    {
+     "code": "B2K2w",
+     "bow": false
+    },
+    {
+     "code": "B",
+     "life": 0.25
+    }
+   ],
+   "rows": {
+    "attentive, careful": [
+     {
+      "none": 0.657,
+      "all": 0.891,
+      "turns": 38.22526636225266,
+      "lostInFormOne": 0.192
+     },
+     {
+      "none": 0.016,
+      "all": 0.1,
+      "turns": 38.5625,
+      "lostInFormOne": 0.97
+     },
+     {
+      "none": 0,
+      "all": 0,
+      "turns": 0,
+      "lostInFormOne": 1
+     },
+     {
+      "none": 0,
+      "all": 0,
+      "turns": 0,
+      "lostInFormOne": 1
+     }
+    ],
+    "focused, careful": [
+     {
+      "none": 0.844,
+      "all": 0.973,
+      "turns": 38.83293838862559,
+      "lostInFormOne": 0.042
+     },
+     {
+      "none": 0.099,
+      "all": 0.316,
+      "turns": 43.77777777777778,
+      "lostInFormOne": 0.627
+     },
+     {
+      "none": 0,
+      "all": 0.044,
+      "turns": 48.77272727272727,
+      "lostInFormOne": 0.999
+     },
+     {
+      "none": 0,
+      "all": 0,
+      "turns": 0,
+      "lostInFormOne": 1
+     }
+    ],
+    "expert, careful": [
+     {
+      "none": 0.99,
+      "all": 1,
+      "turns": 40.41111111111111,
+      "lostInFormOne": 0.003
+     },
+     {
+      "none": 0.783,
+      "all": 0.917,
+      "turns": 41.96168582375479,
+      "lostInFormOne": 0.084
+     },
+     {
+      "none": 0.034,
+      "all": 0.368,
+      "turns": 41.970588235294116,
+      "lostInFormOne": 0.736
+     },
+     {
+      "none": 0,
+      "all": 0,
+      "turns": 0,
+      "lostInFormOne": 0.999
+     }
+    ]
+   }
+  }
+ },
+ "saving": {
+  "alone": {
+   "attentive, careful": [
+    {
+     "none": 0.998,
+     "all": 1,
+     "turns": 39.5060120240481,
+     "lostInFormOne": 0
+    },
+    {
+     "none": 0.391,
+     "all": 0.832,
+     "turns": 45.69565217391305,
+     "lostInFormOne": 0.335
+    },
+    {
+     "none": 0,
+     "all": 0.009,
+     "turns": 48.22222222222222,
+     "lostInFormOne": 0.956
+    },
+    {
+     "none": 0,
+     "all": 0,
+     "turns": 0,
+     "lostInFormOne": 1
+    }
+   ],
+   "focused, careful": [
+    {
+     "none": 0.997,
+     "all": 1,
+     "turns": 41.51554663991976,
+     "lostInFormOne": 0
+    },
+    {
+     "none": 0.796,
+     "all": 0.944,
+     "turns": 49.561557788944725,
+     "lostInFormOne": 0.087
+    },
+    {
+     "none": 0.128,
+     "all": 0.454,
+     "turns": 51.59375,
+     "lostInFormOne": 0.451
+    },
+    {
+     "none": 0,
+     "all": 0.002,
+     "turns": 61.5,
+     "lostInFormOne": 0.967
+    }
+   ],
+   "expert, careful": [
+    {
+     "none": 1,
+     "all": 1,
+     "turns": 39.349,
+     "lostInFormOne": 0
+    },
+    {
+     "none": 1,
+     "all": 1,
+     "turns": 44.542,
+     "lostInFormOne": 0
+    },
+    {
+     "none": 0.755,
+     "all": 0.944,
+     "turns": 48.850331125827815,
+     "lostInFormOne": 0.133
+    },
+    {
+     "none": 0.001,
+     "all": 0.038,
+     "turns": 56,
+     "lostInFormOne": 0.917
+    }
+   ]
+  },
+  "both": {
+   "attentive, careful": [
+    {
+     "none": 0.726,
+     "all": 0.955,
+     "turns": 38.11845730027548,
+     "lostInFormOne": 0.247
+    },
+    {
+     "none": 0.017,
+     "all": 0.101,
+     "turns": 38.64705882352941,
+     "lostInFormOne": 0.971
+    },
+    {
+     "none": 0,
+     "all": 0,
+     "turns": 0,
+     "lostInFormOne": 1
+    },
+    {
+     "none": 0,
+     "all": 0,
+     "turns": 0,
+     "lostInFormOne": 1
+    }
+   ],
+   "focused, careful": [
+    {
+     "none": 0.949,
+     "all": 0.995,
+     "turns": 39.73656480505795,
+     "lostInFormOne": 0.048
+    },
+    {
+     "none": 0.281,
+     "all": 0.306,
+     "turns": 44.07473309608541,
+     "lostInFormOne": 0.616
+    },
+    {
+     "none": 0.001,
+     "all": 0.062,
+     "turns": 44,
+     "lostInFormOne": 0.995
+    },
+    {
+     "none": 0,
+     "all": 0,
+     "turns": 0,
+     "lostInFormOne": 1
+    }
+   ],
+   "expert, careful": [
+    {
+     "none": 0.996,
+     "all": 1,
+     "turns": 40.613453815261046,
+     "lostInFormOne": 0.004
+    },
+    {
+     "none": 0.891,
+     "all": 0.958,
+     "turns": 42.303030303030305,
+     "lostInFormOne": 0.077
+    },
+    {
+     "none": 0.053,
+     "all": 0.379,
+     "turns": 44.64150943396226,
+     "lostInFormOne": 0.728
+    },
+    {
+     "none": 0,
+     "all": 0.001,
+     "turns": 55,
+     "lostInFormOne": 0.999
+    }
+   ]
+  }
+ },
+ "herbs": {
+  "gw20": {
+   "bag": {
+    "hp": 20,
+    "mp": 20
+   },
+   "rows": {
+    "attentive, careful": [
+     {
+      "none": 0.66,
+      "all": 0.883,
+      "turns": 26.306060606060605,
+      "lostInFormOne": 0.34
+     },
+     {
+      "none": 0.024,
+      "all": 0.109,
+      "turns": 27.208333333333332,
+      "lostInFormOne": 0.976
+     },
+     {
+      "none": 0,
+      "all": 0,
+      "turns": 0,
+      "lostInFormOne": 1
+     },
+     {
+      "none": 0,
+      "all": 0,
+      "turns": 0,
+      "lostInFormOne": 1
+     }
+    ],
+    "focused, careful": [
+     {
+      "none": 0.801,
+      "all": 0.944,
+      "turns": 27.50561797752809,
+      "lostInFormOne": 0.199
+     },
+     {
+      "none": 0.161,
+      "all": 0.402,
+      "turns": 33.515527950310556,
+      "lostInFormOne": 0.839
+     },
+     {
+      "none": 0.001,
+      "all": 0.061,
+      "turns": 34,
+      "lostInFormOne": 0.999
+     },
+     {
+      "none": 0,
+      "all": 0,
+      "turns": 0,
+      "lostInFormOne": 1
+     }
+    ],
+    "expert, careful": [
+     {
+      "none": 0.988,
+      "all": 1,
+      "turns": 28.511133603238868,
+      "lostInFormOne": 0.012
+     },
+     {
+      "none": 0.787,
+      "all": 0.938,
+      "turns": 30.59339263024142,
+      "lostInFormOne": 0.213
+     },
+     {
+      "none": 0.148,
+      "all": 0.538,
+      "turns": 33.54054054054054,
+      "lostInFormOne": 0.852
+     },
+     {
+      "none": 0,
+      "all": 0.018,
+      "turns": 35.44444444444444,
+      "lostInFormOne": 1
+     }
+    ]
+   }
+  },
+  "gw60": {
+   "bag": {
+    "hp": 60,
+    "mp": 60
+   },
+   "rows": {
+    "attentive, careful": [
+     {
+      "none": 0.66,
+      "all": 0.883,
+      "turns": 26.306060606060605,
+      "lostInFormOne": 0.34
+     },
+     {
+      "none": 0.024,
+      "all": 0.109,
+      "turns": 27.208333333333332,
+      "lostInFormOne": 0.976
+     },
+     {
+      "none": 0,
+      "all": 0,
+      "turns": 0,
+      "lostInFormOne": 1
+     },
+     {
+      "none": 0,
+      "all": 0,
+      "turns": 0,
+      "lostInFormOne": 1
+     }
+    ],
+    "focused, careful": [
+     {
+      "none": 0.801,
+      "all": 0.944,
+      "turns": 27.50561797752809,
+      "lostInFormOne": 0.199
+     },
+     {
+      "none": 0.161,
+      "all": 0.402,
+      "turns": 33.515527950310556,
+      "lostInFormOne": 0.839
+     },
+     {
+      "none": 0.001,
+      "all": 0.061,
+      "turns": 34,
+      "lostInFormOne": 0.999
+     },
+     {
+      "none": 0,
+      "all": 0,
+      "turns": 0,
+      "lostInFormOne": 1
+     }
+    ],
+    "expert, careful": [
+     {
+      "none": 0.988,
+      "all": 1,
+      "turns": 28.511133603238868,
+      "lostInFormOne": 0.012
+     },
+     {
+      "none": 0.787,
+      "all": 0.938,
+      "turns": 30.59339263024142,
+      "lostInFormOne": 0.213
+     },
+     {
+      "none": 0.148,
+      "all": 0.538,
+      "turns": 33.54054054054054,
+      "lostInFormOne": 0.852
+     },
+     {
+      "none": 0,
+      "all": 0.018,
+      "turns": 35.44444444444444,
+      "lostInFormOne": 1
+     }
+    ]
+   }
+  },
+  "alone20": {
+   "bag": {
+    "hp": 20,
+    "mp": 20
+   },
+   "rows": {
+    "attentive, careful": [
+     {
+      "none": 0.998,
+      "all": 1,
+      "turns": 38.998997995991985,
+      "lostInFormOne": 0
+     },
+     {
+      "none": 0.352,
+      "all": 0.514,
+      "turns": 42.61931818181818,
+      "lostInFormOne": 0.507
+     },
+     {
+      "none": 0.001,
+      "all": 0.001,
+      "turns": 47,
+      "lostInFormOne": 0.956
+     },
+     {
+      "none": 0,
+      "all": 0,
+      "turns": 0,
+      "lostInFormOne": 1
+     }
+    ],
+    "focused, careful": [
+     {
+      "none": 0.957,
+      "all": 1,
+      "turns": 40.843260188087775,
+      "lostInFormOne": 0
+     },
+     {
+      "none": 0.325,
+      "all": 0.739,
+      "turns": 47.566153846153846,
+      "lostInFormOne": 0.143
+     },
+     {
+      "none": 0.001,
+      "all": 0.01,
+      "turns": 47,
+      "lostInFormOne": 0.543
+     },
+     {
+      "none": 0,
+      "all": 0,
+      "turns": 0,
+      "lostInFormOne": 0.999
+     }
+    ],
+    "expert, careful": [
+     {
+      "none": 1,
+      "all": 1,
+      "turns": 39.14,
+      "lostInFormOne": 0
+     },
+     {
+      "none": 0.928,
+      "all": 0.995,
+      "turns": 42.932112068965516,
+      "lostInFormOne": 0
+     },
+     {
+      "none": 0.089,
+      "all": 0.459,
+      "turns": 49.10112359550562,
+      "lostInFormOne": 0.158
+     },
+     {
+      "none": 0,
+      "all": 0.001,
+      "turns": 52,
+      "lostInFormOne": 0.974
+     }
+    ]
+   }
+  },
+  "alone60": {
+   "bag": {
+    "hp": 60,
+    "mp": 60
+   },
+   "rows": {
+    "attentive, careful": [
+     {
+      "none": 0.998,
+      "all": 1,
+      "turns": 38.998997995991985,
+      "lostInFormOne": 0
+     },
+     {
+      "none": 0.352,
+      "all": 0.514,
+      "turns": 42.61931818181818,
+      "lostInFormOne": 0.507
+     },
+     {
+      "none": 0.001,
+      "all": 0.001,
+      "turns": 47,
+      "lostInFormOne": 0.956
+     },
+     {
+      "none": 0,
+      "all": 0,
+      "turns": 0,
+      "lostInFormOne": 1
+     }
+    ],
+    "focused, careful": [
+     {
+      "none": 0.957,
+      "all": 1,
+      "turns": 40.843260188087775,
+      "lostInFormOne": 0
+     },
+     {
+      "none": 0.325,
+      "all": 0.739,
+      "turns": 47.566153846153846,
+      "lostInFormOne": 0.143
+     },
+     {
+      "none": 0.001,
+      "all": 0.01,
+      "turns": 47,
+      "lostInFormOne": 0.543
+     },
+     {
+      "none": 0,
+      "all": 0,
+      "turns": 0,
+      "lostInFormOne": 0.999
+     }
+    ],
+    "expert, careful": [
+     {
+      "none": 1,
+      "all": 1,
+      "turns": 39.14,
+      "lostInFormOne": 0
+     },
+     {
+      "none": 0.928,
+      "all": 0.995,
+      "turns": 42.932112068965516,
+      "lostInFormOne": 0
+     },
+     {
+      "none": 0.089,
+      "all": 0.459,
+      "turns": 49.10112359550562,
+      "lostInFormOne": 0.158
+     },
+     {
+      "none": 0,
+      "all": 0.001,
+      "turns": 52,
+      "lostInFormOne": 0.974
+     }
+    ]
+   }
+  },
+  "both20": {
+   "bag": {
+    "hp": 20,
+    "mp": 20
+   },
+   "rows": {
+    "attentive, careful": [
+     {
+      "none": 0.594,
+      "all": 0.88,
+      "turns": 38.85858585858586,
+      "lostInFormOne": 0.34
+     },
+     {
+      "none": 0.007,
+      "all": 0.086,
+      "turns": 39.142857142857146,
+      "lostInFormOne": 0.976
+     },
+     {
+      "none": 0,
+      "all": 0,
+      "turns": 0,
+      "lostInFormOne": 1
+     },
+     {
+      "none": 0,
+      "all": 0,
+      "turns": 0,
+      "lostInFormOne": 1
+     }
+    ],
+    "focused, careful": [
+     {
+      "none": 0.759,
+      "all": 0.94,
+      "turns": 39.43741765480896,
+      "lostInFormOne": 0.199
+     },
+     {
+      "none": 0.053,
+      "all": 0.149,
+      "turns": 45.660377358490564,
+      "lostInFormOne": 0.839
+     },
+     {
+      "none": 0,
+      "all": 0.036,
+      "turns": 50.111111111111114,
+      "lostInFormOne": 0.999
+     },
+     {
+      "none": 0,
+      "all": 0,
+      "turns": 0,
+      "lostInFormOne": 1
+     }
+    ],
+    "expert, careful": [
+     {
+      "none": 0.978,
+      "all": 1,
+      "turns": 40.52453987730061,
+      "lostInFormOne": 0.012
+     },
+     {
+      "none": 0.616,
+      "all": 0.923,
+      "turns": 42.98863636363637,
+      "lostInFormOne": 0.213
+     },
+     {
+      "none": 0.025,
+      "all": 0.291,
+      "turns": 43.64,
+      "lostInFormOne": 0.852
+     },
+     {
+      "none": 0,
+      "all": 0,
+      "turns": 0,
+      "lostInFormOne": 1
+     }
+    ]
+   }
+  },
+  "both60": {
+   "bag": {
+    "hp": 60,
+    "mp": 60
+   },
+   "rows": {
+    "attentive, careful": [
+     {
+      "none": 0.594,
+      "all": 0.88,
+      "turns": 38.85858585858586,
+      "lostInFormOne": 0.34
+     },
+     {
+      "none": 0.007,
+      "all": 0.086,
+      "turns": 39.142857142857146,
+      "lostInFormOne": 0.976
+     },
+     {
+      "none": 0,
+      "all": 0,
+      "turns": 0,
+      "lostInFormOne": 1
+     },
+     {
+      "none": 0,
+      "all": 0,
+      "turns": 0,
+      "lostInFormOne": 1
+     }
+    ],
+    "focused, careful": [
+     {
+      "none": 0.759,
+      "all": 0.94,
+      "turns": 39.43741765480896,
+      "lostInFormOne": 0.199
+     },
+     {
+      "none": 0.053,
+      "all": 0.149,
+      "turns": 45.660377358490564,
+      "lostInFormOne": 0.839
+     },
+     {
+      "none": 0,
+      "all": 0.036,
+      "turns": 50.111111111111114,
+      "lostInFormOne": 0.999
+     },
+     {
+      "none": 0,
+      "all": 0,
+      "turns": 0,
+      "lostInFormOne": 1
+     }
+    ],
+    "expert, careful": [
+     {
+      "none": 0.978,
+      "all": 1,
+      "turns": 40.52453987730061,
+      "lostInFormOne": 0.012
+     },
+     {
+      "none": 0.616,
+      "all": 0.923,
+      "turns": 42.98863636363637,
+      "lostInFormOne": 0.213
+     },
+     {
+      "none": 0.025,
+      "all": 0.291,
+      "turns": 43.64,
+      "lostInFormOne": 0.852
+     },
+     {
+      "none": 0,
+      "all": 0,
+      "turns": 0,
+      "lostInFormOne": 1
+     }
+    ]
+   }
+  }
+ }
+}

@@ -1,0 +1,100 @@
+Wins with no finds / with all 18, over 2000 fights each.   easy (level 20)   medium (level 21)   hard (level 22)   crazy (level 22.8)
+
+The great wraith's fight under new names, one form   [{"code":"B2K2w"}]
+  very careless        2.1% /  11%      0.1% / 0.6%        0% /   0%        0% /   0%
+  careless             5.3% /  19%      0.2% / 0.9%        0% /   0%        0% /   0%
+  attentive, careful    80% /  98%      3.1% /  13%        0% /   0%        0% /   0%
+  attentive, bold       54% /  85%      2.8% /  10%        0% /   0%        0% /   0%
+  focused, careful      96% / 100%       35% /  65%      0.3% / 6.6%        0% / 0.1%
+  focused, bold         77% /  93%       15% /  37%        0% / 0.1%        0% /   0%
+  expert, careful      100% / 100%       91% /  97%       26% /  80%      0.1% / 3.6%
+  expert, bold          98% / 100%       68% /  84%      8.1% /  51%        0% / 0.7%
+  party turns in a win (expert, all finds): 29, 31, 33, 35
+
+One body alone, in two forms   [{"code":"B","life":1.3},{"code":"B","life":0.4,"dmg":1.1}]
+  very careless        6.9% /  24%      0.3% / 2.9%        0% / 0.2%        0% /   0%
+  careless             5.7% /  21%      0.1% / 1.1%        0% /   0%        0% /   0%
+  attentive, careful   100% / 100%       39% /  69%        0% / 0.1%        0% /   0%
+  attentive, bold       99% / 100%       16% /  54%        0% /   0%        0% /   0%
+  focused, careful      99% / 100%       41% /  76%      0.1% / 2.3%        0% /   0%
+  focused, bold         94% / 100%       25% /  63%        0% / 0.7%        0% /   0%
+  expert, careful      100% / 100%       94% /  99%       17% /  51%        0% / 0.3%
+  expert, bold         100% / 100%       81% /  98%      3.0% /  31%        0% / 0.3%
+  party turns in a win (expert, all finds): 39, 43, 48, 52
+
+Helpers in form one, alone in form two   [{"code":"B2K2w"},{"code":"B","life":0.25}]
+  very careless        1.1% / 7.2%        0% / 0.1%        0% /   0%        0% /   0%
+  careless             3.5% /  13%      0.1% / 0.4%        0% /   0%        0% /   0%
+  attentive, careful    79% /  98%      1.6% /  11%        0% /   0%        0% /   0%
+  attentive, bold       48% /  81%      1.1% / 5.1%        0% /   0%        0% /   0%
+  focused, careful      93% / 100%       18% /  45%        0% / 4.6%        0% /   0%
+  focused, bold         73% /  91%      5.7% /  24%        0% / 0.1%        0% /   0%
+  expert, careful       99% / 100%       89% /  95%       13% /  63%        0% / 0.5%
+  expert, bold          96% /  99%       60% /  80%      3.4% /  31%        0% / 0.1%
+  party turns in a win (expert, all finds): 41, 43, 45, 46
+
+Other versions, the three careful thinking testers, 1000 fights each.
+
+The great wraith alone, its own numbers, one form (to show what the helpers are worth)   [{"code":"B"}]
+  attentive, careful   100% / 100%      100% / 100%       60% /  89%      1.1% /  15%
+  focused, careful     100% / 100%      100% / 100%       94% /  99%       22% /  40%
+  expert, careful      100% / 100%      100% / 100%       96% / 100%       23% /  60%
+
+One body alone, the final form hitting 25% harder instead of 10%   [{"code":"B","life":1.3},{"code":"B","life":0.4,"dmg":1.25}]
+  attentive, careful   100% / 100%       33% /  60%        0% /   0%        0% /   0%
+  focused, careful      94% / 100%       25% /  54%        0% / 0.4%        0% /   0%
+  expert, careful      100% / 100%       82% /  96%      3.9% /  24%        0% /   0%
+
+Helpers then alone, the final form hitting 20% harder   [{"code":"B2K2w"},{"code":"B","life":0.25,"dmg":1.2}]
+  attentive, careful    77% /  98%      0.7% / 8.4%        0% /   0%        0% /   0%
+  focused, careful      90% / 100%       11% /  28%        0% / 2.8%        0% /   0%
+  expert, careful       99% / 100%       77% /  95%      5.8% /  46%        0% / 0.2%
+
+Helpers then alone, but nobody gets up when form one ends   [{"code":"B2K2w","bow":false},{"code":"B","life":0.25}]
+  attentive, careful    66% /  89%      1.6% /  10%        0% /   0%        0% /   0%
+  focused, careful      84% /  97%       10% /  32%        0% / 4.4%        0% /   0%
+  expert, careful       99% / 100%       78% /  92%      3.4% /  37%        0% /   0%
+
+A player who knows the second form is coming and saves MP in the first.
+
+One body alone, in two forms
+  attentive, careful   100% / 100%       39% /  83%        0% / 0.9%        0% /   0%
+  focused, careful     100% / 100%       80% /  94%       13% /  45%        0% / 0.2%
+  expert, careful      100% / 100%      100% / 100%       76% /  94%      0.1% / 3.8%
+
+Helpers in form one, alone in form two
+  attentive, careful    73% /  96%      1.7% /  10%        0% /   0%        0% /   0%
+  focused, careful      95% / 100%       28% /  31%      0.1% / 6.2%        0% /   0%
+  expert, careful      100% / 100%       89% /  96%      5.3% /  38%        0% / 0.1%
+
+With herbs in the bag, eaten in the fight when Io cannot mend (20 HP herbs and 20 MP herbs; then 60 and 60).
+
+The great wraith's fight under new names, one form, 20 and 20 herbs
+  attentive, careful    66% /  88%      2.4% /  11%        0% /   0%        0% /   0%
+  focused, careful      80% /  94%       16% /  40%      0.1% / 6.1%        0% /   0%
+  expert, careful       99% / 100%       79% /  94%       15% /  54%        0% / 1.8%
+
+The great wraith's fight under new names, one form, 60 and 60 herbs
+  attentive, careful    66% /  88%      2.4% /  11%        0% /   0%        0% /   0%
+  focused, careful      80% /  94%       16% /  40%      0.1% / 6.1%        0% /   0%
+  expert, careful       99% / 100%       79% /  94%       15% /  54%        0% / 1.8%
+
+One body alone, in two forms, 20 and 20 herbs
+  attentive, careful   100% / 100%       35% /  51%      0.1% / 0.1%        0% /   0%
+  focused, careful      96% / 100%       33% /  74%      0.1% / 1.0%        0% /   0%
+  expert, careful      100% / 100%       93% / 100%      8.9% /  46%        0% / 0.1%
+
+One body alone, in two forms, 60 and 60 herbs
+  attentive, careful   100% / 100%       35% /  51%      0.1% / 0.1%        0% /   0%
+  focused, careful      96% / 100%       33% /  74%      0.1% / 1.0%        0% /   0%
+  expert, careful      100% / 100%       93% / 100%      8.9% /  46%        0% / 0.1%
+
+Helpers in form one, alone in form two, 20 and 20 herbs
+  attentive, careful    59% /  88%      0.7% / 8.6%        0% /   0%        0% /   0%
+  focused, careful      76% /  94%      5.3% /  15%        0% / 3.6%        0% /   0%
+  expert, careful       98% / 100%       62% /  92%      2.5% /  29%        0% /   0%
+
+Helpers in form one, alone in form two, 60 and 60 herbs
+  attentive, careful    59% /  88%      0.7% / 8.6%        0% /   0%        0% /   0%
+  focused, careful      76% /  94%      5.3% /  15%        0% / 3.6%        0% /   0%
+  expert, careful       98% / 100%       62% /  92%      2.5% /  29%        0% /   0%
