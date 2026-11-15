@@ -60,7 +60,7 @@ The party is at the ring's middle level and meets the ring's own foes. "40" mean
 
 What she eats a fight when she has all she wants (HP herbs, MP herbs): ring 1: 0.3, 1.9; ring 2: 1.1, 2.3;
 rings 3 and 4: 1.8, 3.0; ring 5: 2.2, 3.6; ring 6: 2.6, 4.1. Over the 177 walking fights of the chosen plan that is
-about 290 HP herbs and 560 MP herbs.
+about 330 HP herbs and 570 MP herbs.
 
 Three ways to set it, each sized so the unlucky careful attentive player still reaches the next rest spot:
 
