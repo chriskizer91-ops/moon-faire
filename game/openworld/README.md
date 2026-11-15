@@ -8,7 +8,11 @@ The game's map. Walking and exploring happen here, in 3D; fights stay on painted
 - `out/moon-faire-square-test.html`: the same world started in the fair square with four witches and all eleven fair folk, as a speed test.
 - `out/moon-faire-open-world-picture-prompts.html`: the 52 prompts Chris painted the texture packs and skin sheets from, with their reference pictures.
 
-Keys: WASD or the arrows walk; a direction pressed twice (or Shift) runs; drag, Q and E, or C (mouse-look) turn the camera; Z switches the near and far view; the wheel or a pinch zooms; E, Space or Enter talks; M is the map; F is the Flipbook look.
+Keys: WASD or the arrows walk; a direction pressed twice (or Shift) runs; drag, Q and E, or C (mouse-look) turn the camera; Z switches the near and far view; the wheel or a pinch zooms; E, Space or Enter talks; M is the map; F is the Flipbook look. Esc opens the menu.
+
+The camera zooms by itself: closest when she stands still, 10% wider as she walks, another 15% wider as she runs (Chris, Nov 14: he likes to be as close as it goes). The distance set by Z, the wheel or a pinch is the standing distance.
+
+Everything drawn over the picture lives in `src/ow.tpl.html` (markup and CSS) and the lower part of `src/ow-main.js`: dark plum tickets with a gilt line for what the game says (place name, buttons, menu, toasts, cards), lamp-lit paper bubbles for what people say. A bubble hangs over the speaker's head (`headTop` through the camera) with its tail pointing at them; lines type out, a crescent means more, a full moon means the last line. Glinting eyes by the place name mean foes may be near. Jacquard 24 is embedded by `build.py` for names and titles.
 
 ## Build it
 
@@ -29,7 +33,7 @@ python3 -I prep_round23.py              # the kit's picture sheets, from round2/
 python3 -I prep_palette.py data         # the land's 64 colours for the Flipbook look
 ```
 
-To look at a build without a graphics card: `python3 check.py '["name", x, z, face, yaw, pitch, dist]' ...` (Playwright and Chrome) loads the page, puts her there and writes `look/v_<name>.png`. `check_test.py` loads the square test; `check_lane.py` runs her the length of the fair; `check_play2.py` checks speeds, the encounter card and the Flipbook look.
+To look at a build without a graphics card: `python3 check.py '["name", x, z, face, yaw, pitch, dist]' ...` (Playwright and Chrome) loads the page, puts her there and writes `look/v_<name>.png`. `check_test.py` loads the square test; `check_lane.py` runs her the length of the fair; `check_play2.py` checks speeds, the encounter card and the Flipbook look. `check_ui.py [lap|phone]` takes the interface's screenshots (`look/ui_*.png`).
 
 ## What is where
 

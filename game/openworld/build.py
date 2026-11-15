@@ -37,6 +37,9 @@ parts = [s for s in scripts() if 'function makeMFStage' not in s] + [rd('models/
          'window.OW_DATA = ' + json.dumps(data, separators=(',', ':')) + ';', land_src] + [open(os.path.join(HERE, 'src', f), encoding='utf-8').read() for f in ['ow-core.js', 'ow-terrain.js', 'ow-kit.js', 'ow-places.js', 'ow-dressing.js', 'ow-props.js', 'ow-flora.js', 'ow-main.js']]
 for p in parts: assert '</script' not in p.lower(), 'a script holds a closing tag'
 tpl = open(os.path.join(HERE, 'src', 'ow.tpl.html'), encoding='utf-8').read(); os.makedirs(os.path.join(HERE, 'out'), exist_ok=True)
+# Jacquard 24 (the titles' and names' lettering) goes inside the page, so it looks the same offline; reading text falls back to the system's own
+FONT = os.path.join(G, '..', 'art', 'fonts', 'jacquard24-latin.woff2')
+tpl = tpl.replace('/*FONTS*/', '@font-face { font-family: "Jacquard 24"; font-style: normal; font-weight: 400; font-display: swap; src: url(data:font/woff2;base64,%s) format("woff2"); }' % base64.b64encode(open(FONT, 'rb').read()).decode() if os.path.exists(FONT) else '')
 for name, title, h1, notes, flag in (('moon-faire-open-world.html', 'Moon Faire: the open world', 'The open world', 'notes_world.html', ''), ('moon-faire-square-test.html', 'Moon Faire: the fair square test', 'The fair square test', 'notes_test.html', '<script>window.OW_TEST = true;</script>\n')):
     page = tpl.replace('/*TITLE*/', title).replace('/*H1*/', h1).replace('/*NOTES*/', open(os.path.join(HERE, 'src', notes), encoding='utf-8').read()).replace('/*SCRIPTS*/', flag + '\n'.join('<script>\n%s\n</script>' % p for p in parts))
     open(os.path.join(HERE, 'out', name), 'w', encoding='utf-8').write(page)
