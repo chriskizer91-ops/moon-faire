@@ -100,6 +100,16 @@
 .mff .log{left:8px;right:auto;max-width:calc(100% - 64px);background:rgba(6,4,10,.72);border-radius:8px;padding:4px 9px;color:#fff}
 .mff .log:empty{display:none}
 .mff .chip{background:rgba(6,4,10,.86);color:#fff}.mff .chip.hero{border-color:#3ddc84;color:#c9ffe0}.mff .chip.foe{border-color:#ff4d70;color:#ffd0da}.mff .chip.marked{border-color:#ffd54a;color:#ffe69a;background:rgba(60,34,0,.92)}.mff .chip.now{background:#fff;color:#111;border-color:#fff}
+.mff .castrow[hidden],.mff .back[hidden]{display:none}
+.mff .float.part{font-size:21px}.mff .float.total{font-size:40px;color:#ffd54a}.mff .float.total.hero{color:#ffb0a4}
+.mff .float.total::after{content:' total';font-size:14px;letter-spacing:.03em;-webkit-text-stroke:0}
+/* a laptop or desk screen (Chris, November 15: "running across the whole of the screen is too much. It should be condensed to the bottom
+   right-hand corner"): the picture takes the whole window and the witches' boxes, the moves and Cast sit in one card in the corner */
+@media (min-width:900px){.mff{display:block}.mff .box{position:absolute;inset:0}
+.mff .panel{position:absolute;right:14px;bottom:14px;width:430px;max-height:calc(100% - 90px);overflow:auto;border:1px solid rgba(255,255,255,.2);border-radius:14px;background:rgba(18,13,25,.9);padding:10px;box-shadow:0 8px 30px rgba(0,0,0,.5)}
+.mff .moves{grid-template-columns:repeat(2,1fr)}.mff .tile{min-height:44px;padding:6px 9px}.mff .cast,.mff .back{min-height:46px}.mff .help{min-height:2.6em;margin:7px 2px 6px}
+.mff .castrow{position:static;background:none;padding:0}.mff .gear{right:auto;left:10px;bottom:10px}.mff .log{left:60px;bottom:14px;max-width:calc(100% - 530px)}
+.mff .who{padding:4px 6px 3px}.mff .who b{font-size:13px}.mff .who span{font-size:11px}}
 @media (max-width:640px){.mff{font-size:14px}.mff .box{flex:0 0 46vh}.mff .tile{min-height:44px;padding:5px 9px}.mff .help{min-height:2.5em;margin:6px 2px 5px}.mff .panel{padding-bottom:4px}.mff .panel{flex:1 1 auto;max-height:none}.mff .title{font-size:24px}.mff .chip{font-size:11px;padding:1px 6px}.mff .moves{grid-template-columns:repeat(2,1fr)}.mff .who{padding:4px 5px 3px}.mff .who b{font-size:13px}.mff .who span{font-size:10.5px}.mff .party{gap:4px}}
 `;
   const CODE = { w: 'wisp', K: 'wraith', B: 'great' };
@@ -120,7 +130,7 @@
     root.querySelector('.gear').addEventListener('click', () => { const x = root.querySelector('.set'); x.hidden = !x.hidden; });
     el.cam.addEventListener('change', () => { set.camera = el.cam.value; }); el.spd.addEventListener('change', () => { set.speed = +el.spd.value || 1; }); el.flip.addEventListener('change', () => { set.flipbook = el.flip.checked; });
     stage = window.makeMFStage(canvas, { preserve: manual, shadow: 2048, maxPixelRatio: 2 });
-    fight = window.makeMFFight(stage, { ui: el.ui, panel: el.fp, aspect: () => canvas.clientWidth / Math.max(1, canvas.clientHeight), width: () => canvas.clientWidth, cam: () => set.camera, zoomOut: () => set.zoomOut, weight: () => set.weight, foeWeight: () => set.foeWeight });
+    fight = window.makeMFFight(stage, { ui: el.ui, panel: el.fp, aspect: () => canvas.clientWidth / Math.max(1, canvas.clientHeight), width: () => canvas.clientWidth, cam: () => set.camera, zoomOut: () => set.zoomOut, inset: () => { if (!window.matchMedia('(min-width:900px)').matches) return null; const r = root.querySelector('.panel').getBoundingClientRect(); return { w: r.width + 14, h: r.height + 14 }; }, weight: () => set.weight, foeWeight: () => set.foeWeight });
     window.addEventListener('keydown', (e) => { if (!running) return; if (fight.key(e.key)) e.preventDefault(); });
   }
   function frame(now) {

@@ -18,7 +18,7 @@ three = 'if (!window.THREE) {\n' + rd('lib/three.r128.min.js') + '\n}' if '--gua
 parts = [three, rd('models/jester/meshopt_simplifier.js'), rd('models/jester/palette.js'),
          rd('models/jester/jester_tex.js'), rd('models/jester/jester_lod.js'), rd('models/jester/lod.js'),
          rd('fight/witches/fox_tex.js'), rd('fight/witches/fox_lod.js'), rd('fight/witches/ranger_tex.js'), rd('fight/witches/ranger_lod.js'), rd('fight/witches/io_tex.js'), rd('fight/witches/io_lod.js'),
-         rd('fight/witches/witch_levels.js'), rd('models/foes/wisp.js'), rd('models/foes/wraith.js'), rd('fight/foes.js'), engine, rd('fight/places.js'),
+         rd('fight/witches/witch_levels.js'), rd('models/foes/wisp.js'), rd('models/foes/wraith.js'), rd('fight/foes.js'), engine, rd('fight/places.js'), rd('fight/spell_extents.js'),
          'window.MF_FIGHT_ART = {' + ', '.join('%s: "%s"' % (k, art(v)) for k, v in ART.items()) + '};',
          stage_cameras.patched(rd('src/stage.js')), rd('fight/actors.js'), rd('fight/fight.js'), rd('fight/api.js')]
 for p in parts: assert '</script' not in p.lower(), 'a script holds a closing tag'

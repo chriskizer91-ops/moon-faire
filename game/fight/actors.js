@@ -20,7 +20,7 @@
     i_plain: { anim: 'crescent', aim: 'front', near: 1.4, hits: [2.38] }, i_thorn: { anim: 'thorn', aim: 'front', near: 1.4, hits: [2.62] },
     i_mend: { anim: 'salve', aim: 'front', near: 1.3, hits: [5.4] }, i_bloom: { anim: 'garden', hits: [7.5] },
     i_deity: { anim: 'herb', hits: [3.0] },                                     // stand-in: she plants her prayer; the Guardian comes on her next turn
-    i_deity_arrives: { anim: 'guardian', aim: 'front', near: 4.2, hits: [9.4] },
+    i_deity_arrives: { anim: 'guardian', aim: 'front', near: 1.8, hits: [13.02] },      // her model's own numbers: the foe stands 1.8 m in front of her and the stag strikes at 13.02 s (planting to 7 s, the stag arriving to 11.6 s, then its leap)
     i_revive: { anim: 'revive', aim: 'front', near: 1.3, hits: [6.4] },
   };
   const NAMES = { jester: 'Jester', fox: 'Fox', ranger: 'Ranger', io: 'Io' };

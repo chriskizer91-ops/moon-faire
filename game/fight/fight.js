@@ -38,8 +38,8 @@ function makeMFFight(stage, H) {
   elBack.textContent = 'Back'; elBack.addEventListener('click', () => { sel = null; paint(); }); elCast.addEventListener('click', () => cast());
   // numbers over the picture stay on the one they belong to, even when the camera cuts
   const floats = [];
-  function float(v, text, cls) { const d = document.createElement('span'); d.className = 'float ' + (cls || ''); d.textContent = text; elFloats.appendChild(d); const o = { d, pos: v.clone(), born: time }; floats.push(o); place(o); setTimeout(() => { d.remove(); const k = floats.indexOf(o); if (k >= 0) floats.splice(k, 1); }, 1500); }
-  function place(o) { const p = stage.toScreen(o.pos); o.d.style.display = p[0] < -999 ? 'none' : ''; o.d.style.left = p[0].toFixed(0) + 'px'; o.d.style.top = p[1].toFixed(0) + 'px'; }
+  function float(v, text, cls, key) { if (key) for (const q of floats) if (q.key === key) q.dy += 30; const d = document.createElement('span'); d.className = 'float ' + (cls || ''); d.textContent = text; elFloats.appendChild(d); const o = { d, pos: v.clone(), born: time, key: key || null, dy: 0 }; floats.push(o); place(o); setTimeout(() => { d.remove(); const k = floats.indexOf(o); if (k >= 0) floats.splice(k, 1); }, 1700); }
+  function place(o) { const p = stage.toScreen(o.pos); o.d.style.display = p[0] < -999 ? 'none' : ''; o.d.style.left = p[0].toFixed(0) + 'px'; o.d.style.top = (p[1] - o.dy).toFixed(0) + 'px'; }
   // a blow that lands: a burst of light where it lands, the picture held for a beat, and the bar of whoever took it flashes
   const burstTex = (() => { const c = document.createElement('canvas'); c.width = c.height = 96; const g = c.getContext('2d'), r = g.createRadialGradient(48, 48, 2, 48, 48, 46); r.addColorStop(0, 'rgba(255,255,255,1)'); r.addColorStop(0.25, 'rgba(255,255,255,0.75)'); r.addColorStop(0.55, 'rgba(255,255,255,0.18)'); r.addColorStop(1, 'rgba(255,255,255,0)'); g.fillStyle = r; g.fillRect(0, 0, 96, 96);
     g.strokeStyle = 'rgba(255,255,255,0.9)'; g.lineWidth = 3; for (let k = 0; k < 8; k++) { const a = k * Math.PI / 4 + 0.2; g.beginPath(); g.moveTo(48 + 14 * Math.cos(a), 48 + 14 * Math.sin(a)); g.lineTo(48 + 44 * Math.cos(a), 48 + 44 * Math.sin(a)); g.stroke(); } return new THREE.CanvasTexture(c); })();
@@ -71,14 +71,14 @@ function makeMFFight(stage, H) {
     for (const id in party) { const P = party[id]; P.e = null; P.a.root.visible = false; if (P.a.fx) P.a.fx.visible = false; P.patch.visible = false; }
     for (const e of heroesE()) { const P = hero(e.id), p = S.party[e.id], st = opts.party && opts.party[e.id]; P.e = e; P.home.x = P.x = C[0] + p[0]; P.home.z = P.z = C[1] + p[1];
       if (st) { if (st.hp != null) e.hp = Math.max(0, Math.min(e.max, st.hp)); if (st.mp != null) e.mp = Math.max(0, Math.min(e.mpMax, st.mp)); }
-      P.a.reset(); P.a.root.visible = true; if (P.a.fx) P.a.fx.visible = true; P.patch.visible = true; P.a.root.position.set(P.x, 0, P.z); P.shown.hp = e.hp; P.shown.mp = e.mp; if (e.hp <= 0) P.a.down(true); }
+      P.a.reset(); P.a.root.visible = true; if (P.a.fx) P.a.fx.visible = true; P.patch.visible = true; P.a.root.position.set(P.x, 0, P.z); P.shown.hp = P.seenHp = e.hp; P.shown.mp = e.mp; P.tal = null; if (e.hp <= 0) P.a.down(true); }
     if (!heroesE().some((e) => e.hp > 0)) heroesE()[0].hp = 1;
     // the foes: each kind takes the first free place of its own size
     for (const k in pool) for (const m of pool[k]) { m.inUse = false; m.root.visible = m.fx.visible = false; m.patch.visible = false; }
     const free = { small: S.spots.small.slice(), mid: (opts.foes.indexOf('great') >= 0 ? S.spots.midBig : S.spots.mid).slice(), big: S.spots.big.slice() }, size = { wisp: 'small', wraith: 'mid', great: 'big' };
     elBars.innerHTML = '';
     foes = foesE().map((e, i) => { const kind = opts.foes[i], m = foeModel(kind), sp = free[size[kind]].shift() || free.small.shift() || [4 + i, 0], x = C[0] + sp[0], z = C[1] + sp[1];
-      const f = { i, e, kind, m, K: m.K, x, z, up: true, vis: true, shown: { life: e.hp, fate: 0, max: e.max }, fade: 1, fadeTo: 1, dying: false, mark: {}, bar: null };
+      const f = { i, e, kind, m, K: m.K, x, z, up: true, vis: true, seenLife: e.hp, tal: null, shown: { life: e.hp, fate: 0, max: e.max }, fade: 1, fadeTo: 1, dying: false, mark: {}, bar: null };
       m.root.position.set(x, 0, z); m.root.visible = m.fx.visible = true; m.patch.visible = true; m.setFade(1); m.reset(); m.play('appear', true);
       const d = document.createElement('button'); d.type = 'button'; d.className = 'foebar ' + kind; d.innerHTML = '<span></span><div><i class="lost"></i><i class="life"></i><i class="fate"></i></div>'; f.elLost = d.lastChild.children[0]; f.elLife = d.lastChild.children[1]; f.elFate = d.lastChild.children[2]; d.addEventListener('click', () => tapFoe(f)); elBars.appendChild(d); f.bar = d; return f; });
     // the party looks at the foes. GEO: the middle of each side, and the way from one to the other
@@ -86,7 +86,7 @@ function makeMFFight(stage, H) {
       G.D = Math.hypot(G.fcx - G.pcx, G.fcz - G.pcz) || 1; G.ux = (G.fcx - G.pcx) / G.D; G.uz = (G.fcz - G.pcz) / G.D; G.tall = foes.reduce((q, f) => Math.max(q, f.K.h), 0);
       for (const P of hs) { P.a.rest = Math.atan2(G.fcx - P.x, G.fcz - P.z); P.a.face = P.a.rest; } }
     if (J()) { J().arena = 9; J().game.fates = foes.map(() => null); }
-    selFoe = 0; selHero = heroesE()[0].id; act = null; cur = null; sel = null; shake = 0; intro = 2.2; lastShot = null; wait = CAMNOW() === 'directed' || CAMNOW() === 'auto' ? 2.5 : 1.4; phase = 'wait'; elBanner.hidden = true; elTitle.hidden = true;
+    told.length = 0; now = 0; selFoe = 0; selHero = heroesE()[0].id; act = null; cur = null; sel = null; shake = 0; intro = 2.2; lastShot = null; wait = CAMNOW() === 'directed' || CAMNOW() === 'auto' ? 2.5 : 1.4; phase = 'wait'; elBanner.hidden = true; elTitle.hidden = true;
     partyRows(); say((opts.label || 'A fight') + '.'); paint();
   }
   function partyRows() {
@@ -96,12 +96,32 @@ function makeMFFight(stage, H) {
 
   // ---------- showing what the engine did ----------
   function killFoe(f) { if (f.dying || !f.up) return; f.dying = true; f.m.play('die', true); }
-  function showFoeLife(f, life, cls) { const was = f.shown.life; f.shown.life = Math.max(0, life); const lost = was - f.shown.life; if (lost > 0.5) { const big = lost > 0.3 * f.shown.max || f.shown.life <= 0.5;
-      float(f.m.anchor(f.K.top, _v), '\u2212' + num(lost), (cls || 'dmg') + (big ? ' big' : '')); burst(f.m.anchor('chest', _v), 0xfff1c4, (big ? 1.5 : 1.05) * (0.9 + 0.5 * f.K.h)); hitStop = Math.max(hitStop, big ? 0.13 : 0.08); flash(f.bar); shake = Math.max(shake, big ? 0.6 : 0.4);
-      if (f.shown.life <= 0.5) killFoe(f); else if (!f.dying) f.m.play('hurt', true); } }
+  // A blow lands in two beats (Chris, November 15: "it doesn't tell you how much damage until after the attack has landed ... a beat pause ...
+  // then damage"). As it lands: the burst of light, the held picture, the shake, the flinch, the bar's flash. A beat later: the number, and
+  // the bar drains. Several blows on one fighter in a move stack their numbers, each a line above the last as in Envoi's battles, and then
+  // the total is told. shown.* is what the fight knows; seen* is what the player has been told so far.
+  const BEAT = 0.45, TOTAL_AFTER = 0.6, told = []; let now = 0;
+  const manyHits = () => !!(act && act.kind === 'hero' && act.hitsAt && act.hitsAt.length > 1);
+  const waiting = (T) => told.some((q) => q.T === T), numbersBusy = () => told.length > 0 || foes.some((f) => f.tal) || Object.values(party).some((P) => P.tal);
+  function showFoeLife(f, life, cls) { const was = f.shown.life; f.shown.life = Math.max(0, life); const lost = was - f.shown.life; if (lost <= 0.5) return; const big = lost > 0.3 * f.shown.max || f.shown.life <= 0.5;
+    burst(f.m.anchor('chest', _v), 0xfff1c4, (big ? 1.5 : 1.05) * (0.9 + 0.5 * f.K.h)); hitStop = Math.max(hitStop, big ? 0.13 : 0.08); flash(f.bar); shake = Math.max(shake, big ? 0.6 : 0.4); if (!f.dying) f.m.play('hurt', true);
+    told.push({ T: f, foe: true, n: lost, at: now + BEAT, big, cls: cls || 'dmg', multi: manyHits() }); }
   function showHeroHp(P, hp) { const was = P.shown.hp, a = P.a; P.shown.hp = Math.max(0, Math.min(P.e.max, hp)); const lost = was - P.shown.hp;
-    if (lost > 0.5) { const big = lost > 0.2 * P.e.max; float(a.anchor('head', _v), '\u2212' + num(lost), 'dmg hero' + (big ? ' big' : '')); burst(a.anchor('chest', _v), 0xff8a6a, big ? 2.0 : 1.4); hitStop = Math.max(hitStop, big ? 0.14 : 0.09); flash(P.row); shake = Math.max(shake, big ? 0.75 : 0.5); if (P.shown.hp <= 0.5) a.down(true); else a.hit(big); }
-    else if (-lost > 0.5) { if (was <= 0.5) a.down(false); float(a.anchor('head', _v), '+' + num(-lost), 'heal'); burst(a.anchor('chest', _v), 0x8dffb0, 1.5); flash(P.row); } }
+    if (lost > 0.5) { const big = lost > 0.2 * P.e.max; burst(a.anchor('chest', _v), 0xff8a6a, big ? 2.0 : 1.4); hitStop = Math.max(hitStop, big ? 0.14 : 0.09); flash(P.row); shake = Math.max(shake, big ? 0.75 : 0.5); if (P.shown.hp > 0.5) a.hit(big); told.push({ T: P, foe: false, n: lost, at: now + BEAT, big, cls: 'dmg hero' }); }
+    else if (-lost > 0.5) { if (was <= 0.5) a.down(false); burst(a.anchor('chest', _v), 0x8dffb0, 1.5); told.push({ T: P, foe: false, n: lost, at: now + 0.2, big: false, cls: 'heal' }); } }
+  function tell(q) {                                       // the number, and the bar
+    const T = q.T, multi = q.n > 0 && (q.multi || T.tal || told.some((x) => x !== q && x.T === T && x.n > 0));
+    if (q.foe) { T.seenLife = Math.max(0, T.seenLife - q.n); float(T.m.anchor(T.K.top, _v), '\u2212' + num(q.n), q.cls + (q.big && !multi ? ' big' : '') + (multi ? ' part' : ''), T); if (T.seenLife <= 0.5 && T.shown.life <= 0.5) killFoe(T); }
+    else { T.seenHp = Math.max(0, Math.min(T.e.max, T.seenHp - q.n)); float(T.a.anchor('head', _v), (q.n > 0 ? '\u2212' : '+') + num(Math.abs(q.n)), q.cls + (q.big && !multi ? ' big' : '') + (multi ? ' part' : ''), T); flash(T.row); if (T.seenHp <= 0.5 && T.shown.hp <= 0.5) T.a.down(true); }
+    if (q.n > 0) { const t = T.tal || (T.tal = { k: 0, sum: 0, at: 0 }); t.k++; t.sum += Math.round(q.n); t.at = now + TOTAL_AFTER; }
+    paint();
+  }
+  function tellDue() {
+    for (let i = 0; i < told.length; i++) if (told[i].at <= now) { const q = told.splice(i--, 1)[0]; tell(q); }
+    const more = act && act.kind === 'hero' && act.stage === 'play' && manyHits() && act.hitK < act.hitsAt.length;      // a move with several blows keeps its count open until the last has landed
+    const sum = (T, foe) => { const t = T.tal; if (!t || t.at > now || waiting(T) || more) return; T.tal = null; if (t.k > 1) float(foe ? T.m.anchor(T.K.top, _v) : T.a.anchor('head', _v), '\u2212' + num(t.sum), 'dmg total' + (foe ? '' : ' hero'), T); };
+    for (const f of foes) sum(f, true); for (const id in party) if (party[id].e) sum(party[id], false);
+  }
   function showEvent(ev) {
     if (ev.type === 'dmg') { const f = foeOf(ev.id); if (f && f.up) showFoeLife(f, f.shown.life - ev.n); }
     else if (ev.type === 'hurt') { const P = party[ev.id]; if (P) showHeroHp(P, P.shown.hp - ev.n); }
@@ -112,8 +132,8 @@ function makeMFFight(stage, H) {
   function syncFates() { for (const f of foes) { if (!f.up) continue; const wasF = f.shown.fate; f.shown.fate = f.e.fate; if (f.shown.fate > wasF + 0.5 && f.shown.life > 0.5) float(f.m.anchor('chest', _v), WORDS.fate + ' +' + num(f.shown.fate - wasF), 'fate'); } if (J()) J().game.catches = B.taunt; }
   function syncAll() {                                     // whatever has not been shown yet is shown now, so the picture never disagrees with the engine
     if (act) { while (act.ev.length) showEvent(act.ev.shift()); }
-    for (const f of foes) { if (!f.up) continue; if (Math.abs(f.shown.life - f.e.hp) > 0.5) showFoeLife(f, f.e.hp, 'end'); f.shown.life = f.e.hp; if (f.e.hp <= 0) killFoe(f); }
-    for (const e of heroesE()) { const P = party[e.id]; if (Math.abs(P.shown.hp - e.hp) > 0.5) showHeroHp(P, e.hp); P.shown.hp = e.hp; P.shown.mp = e.mp; if (e.hp > 0 && P.a.isDown) P.a.down(false); if (e.hp <= 0 && !P.a.isDown) P.a.down(true); }
+    for (const f of foes) { if (!f.up) continue; if (Math.abs(f.shown.life - f.e.hp) > 0.5) showFoeLife(f, f.e.hp, 'end'); f.shown.life = f.e.hp; if (!waiting(f)) { f.seenLife = f.e.hp; if (f.e.hp <= 0) killFoe(f); } }
+    for (const e of heroesE()) { const P = party[e.id]; if (Math.abs(P.shown.hp - e.hp) > 0.5) showHeroHp(P, e.hp); P.shown.hp = e.hp; P.shown.mp = e.mp; if (!waiting(P)) { P.seenHp = e.hp; if (e.hp <= 0 && !P.a.isDown) P.a.down(true); } if (e.hp > 0 && P.a.isDown) P.a.down(false); }
     syncFates(); paint();
   }
 
@@ -162,7 +182,10 @@ function makeMFFight(stage, H) {
     act = { kind: 'hero', P, id, mv, anim: mv.anim, ev, t: 0, tf: target && target.foe, th: target && target.hero, T, thenMenu, others: (X && X.others) || [], stage: 'play', hitK: 0, hitsAt: [], tags: P.id === 'jester', hitSeen: 0, from: null, to: null, g: 0 };
     if (T && mv.near && !self) {                           // she goes to her target first: her spell is built to land that far in front of her
       const dx = P.home.x - T.x, dz = P.home.z - T.z, L = Math.hypot(dx, dz) || 1, r = target.foe ? mv.near + target.foe.K.r * (mv.aim === 'front' ? 0.6 : 0.3) : mv.near;
-      if (L > r + 0.3) { act.from = { x: P.x, z: P.z }; act.to = { x: T.x + dx / L * r, z: T.z + dz / L * r }; act.stage = 'in'; act.gd = Math.max(0.35, Math.min(0.8, (L - r) / 9)); }
+      if (L > r + 0.3) { let to = null;      // she comes at her target from home; if someone else is standing where she would stop, she comes round to one side
+        for (const ang of [0, 30, -30, 58, -58, 85]) { const c = Math.cos(ang * Math.PI / 180), n = Math.sin(ang * Math.PI / 180), vx = (dx * c - dz * n) / L, vz = (dx * n + dz * c) / L, q = { x: T.x + vx * r, z: T.z + vz * r };
+          const blocked = foes.some((f) => f.up && f !== target.foe && Math.hypot(f.x - q.x, f.z - q.z) < f.K.r + 0.75) || Object.values(party).some((o) => o.e && o !== P && o !== target.hero && Math.hypot(o.x - q.x, o.z - q.z) < 0.9); if (!to || !blocked) to = q; if (!blocked) break; }
+        act.from = { x: P.x, z: P.z }; act.to = to; act.stage = 'in'; act.gd = Math.max(0.35, Math.min(0.8, (L - r) / 9)); }
     }
     if (P.id === 'jester') { m.game.catches = 0; m.game.friends = (X && X.fallen ? X.fallen : []).map((p) => ({ x: p.x, z: p.z }));
       m.game.others = (mv.anim === 'g_seal' || mv.anim === 'g_curtain') ? act.others.map((o) => ({ x: o.x, z: o.z, h: o.K.h })) : []; }
@@ -182,14 +205,14 @@ function makeMFFight(stage, H) {
     if (a.anim === 'taunt_attack') { if (tag === 'burst') { showSome(a, 99); m.game.catches = B.taunt; } return; }
     const all = a.anim === 'g_curtain' ? [f].concat(a.others) : [f];
     if (tag === 'land') float(f.m.anchor(f.K.top, _v), WORDS.sealed, 'fate');
-    else if (tag === 'zero') { f.shown.life = 0; f.shown.fate = 0; float(f.m.anchor('chest', _v), WORDS.ended, 'end'); shake = Math.max(shake, 0.6); title(a.anim === 'g_curtain' ? 'Curtain Call' : 'Sealed Fate'); }
+    else if (tag === 'zero') { f.shown.life = 0; f.seenLife = 0; f.shown.fate = 0; float(f.m.anchor('chest', _v), WORDS.ended, 'end'); shake = Math.max(shake, 0.6); title(a.anim === 'g_curtain' ? 'Curtain Call' : 'Sealed Fate'); }
     else if (tag === 'doom') { for (const o of all) if (o.up) o.fadeTo = 0; }
     else if (tag === 'gone') { for (const o of all) if (o.up) gone(o); }
     else if (tag === 'splash') { for (const o of a.others) if (o.up) showFoeLife(o, o.e.hp, 'end'); }
-    else if (tag === 'rise') { for (const e of heroesE()) { const P = party[e.id]; if (e.hp > 0 && P.a.isDown) { P.shown.hp = e.hp; P.a.down(false); float(P.a.anchor('head', _v), WORDS.up, 'heal'); } } }
+    else if (tag === 'rise') { for (const e of heroesE()) { const P = party[e.id]; if (e.hp > 0 && P.a.isDown) { P.shown.hp = e.hp; P.seenHp = e.hp; P.a.down(false); float(P.a.anchor('head', _v), WORDS.up, 'heal'); } } }
     paint();
   }
-  function gone(f) { f.up = false; f.vis = false; f.shown.life = 0; f.m.root.visible = f.m.fx.visible = false; f.m.patch.visible = false; }
+  function gone(f) { f.up = false; f.vis = false; f.shown.life = 0; f.seenLife = 0; f.tal = null; f.m.root.visible = f.m.fx.visible = false; f.m.patch.visible = false; }
 
   // ---------- a foe's move ----------
   function foeActs(f, move) {
@@ -243,9 +266,9 @@ function makeMFFight(stage, H) {
   function paint() {
     if (!B) return; const menu = phase === 'menu' && !!cur, pct = (k) => (100 * Math.max(0, Math.min(1, k))).toFixed(1) + '%';
     for (const e of heroesE()) { const P = party[e.id], d = P.row; if (!d) continue; const c = d.children;
-      c[0].textContent = P.a.name; c[1].children[0].style.width = c[1].children[1].style.width = pct(P.shown.hp / e.max); c[2].textContent = num(P.shown.hp) + ' HP'; { const k = P.shown.hp / e.max; d.classList.toggle('mid', k < 0.5 && k >= 0.25); d.classList.toggle('low', k < 0.25 && k > 0); } c[3].style.visibility = e.mpMax ? '' : 'hidden'; if (e.mpMax) c[3].firstChild.style.width = pct(P.shown.mp / e.mpMax);
+      c[0].textContent = P.a.name; c[1].children[0].style.width = c[1].children[1].style.width = pct(P.seenHp / e.max); c[2].textContent = num(P.seenHp) + ' HP'; { const k = P.seenHp / e.max; d.classList.toggle('mid', k < 0.5 && k >= 0.25); d.classList.toggle('low', k < 0.25 && k > 0); } c[3].style.visibility = e.mpMax ? '' : 'hidden'; if (e.mpMax) c[3].firstChild.style.width = pct(P.shown.mp / e.mpMax);
       c[4].textContent = e.id === 'jester' && B.taunt > 0 ? 'catching ' + B.taunt : e.mpMax ? P.shown.mp + ' MP' : (e.id === 'ranger' && B.gem > 0 ? 'gem in ' + B.gem : '\u00a0');
-      d.classList.toggle('now', menu && cur === P); d.classList.toggle('down', P.shown.hp <= 0.5); d.classList.toggle('pick', !!(sel && sel.kind === 'hero' && sel.ok.indexOf(e.id) >= 0)); d.classList.toggle('tgt', !!(sel && sel.kind === 'hero' && sel.t === e.id)); }
+      d.classList.toggle('now', menu && cur === P); d.classList.toggle('down', P.seenHp <= 0.5); d.classList.toggle('pick', !!(sel && sel.kind === 'hero' && sel.ok.indexOf(e.id) >= 0)); d.classList.toggle('tgt', !!(sel && sel.kind === 'hero' && sel.t === e.id)); }
     elBar.innerHTML = ''; if (phase !== 'over') for (const b of E.bar(B)) { const big = b.move && b.move !== 'blow', c = document.createElement('span'); c.className = 'chip ' + b.u.side + (big ? ' marked' : ''); c.textContent = (big ? '\u25b2 ' : '') + b.u.name + (big ? ': ' + b.move.charAt(0).toUpperCase() + b.move.slice(1) : ''); elBar.appendChild(c); }      // a Heavy, Crush or Eclipse that is coming is named, with a mark that does not rely on colour
     if (elBar.firstChild && menu) elBar.firstChild.classList.add('now');
     elMoves.innerHTML = ''; elCastRow.hidden = !menu;
@@ -262,7 +285,7 @@ function makeMFFight(stage, H) {
     for (const f of foes) { const d = f.bar, on = f.up && phase !== 'off' && !f.dying; d.hidden = !on; if (!on) { if (m) m.game.fates[f.i] = null; continue; }
       const p = stage.toScreen(_v.set(f.m.root.position.x, f.K.bar, f.m.root.position.z)); let y = p[1]; for (let k = 0; k < 6 && put.some((q) => Math.abs(q[0] - p[0]) < 96 && Math.abs(q[1] - y) < 30); k++) y -= 30;      // two bars never sit on each other
       put.push([p[0], y]); d.style.left = p[0].toFixed(0) + 'px'; d.style.top = y.toFixed(0) + 'px';
-      const life = f.shown.life, Lk = life / f.shown.max, Fk = Math.min(Lk, f.shown.fate / f.shown.max), sealedNow = life > 0 && f.shown.fate > 0 && f.shown.fate >= life;
+      const life = f.shown.life, Lk = f.seenLife / f.shown.max, Fk = Math.min(Lk, f.shown.fate / f.shown.max), sealedNow = life > 0 && f.shown.fate > 0 && f.shown.fate >= life;
       d.classList.toggle('sealed', sealedNow); { const aim = sel && sel.kind === 'foe'; d.classList.toggle('tgt', phase === 'menu' && (aim ? sel.t === f : f.i === selFoe)); d.classList.toggle('pick', !!(aim && sel.t !== f && sel.ok.indexOf(f) >= 0)); d.classList.toggle('dim', !!(aim && sel.ok.indexOf(f) < 0)); }
       d.firstChild.textContent = f.e.name + (sealedNow ? ' · ' + WORDS.sealed : '') + (f.e.conf > 0 ? ' · lost' : '') + (f.e.cloth ? ' · cut' : ''); f.elLife.style.width = f.elLost.style.width = (100 * Lk).toFixed(1) + '%'; f.elFate.style.width = (100 * Fk).toFixed(1) + '%';
       // what the Jester's model is told: Fate on each foe, shown as dust falling round it
@@ -332,6 +355,7 @@ function makeMFFight(stage, H) {
   //   - a won fight ends on the bow
   //   - whatever the shot, the camera goes to the target half a second before a move lands, so the blow itself is always seen
   let shotN = 0, lastShot = null;
+  const WIDE_SPELLS = { guardian: 'foe', moons_little_lie: 'foes', crazy_quilt: 'foes', borrowed_face: 'self', taunt_heal: 'party', g_curtain: 'foes' };      // the value: who else must be in the picture
   function directorShot(a, playing, asp) {
     const G = GEO, sd = SIDE(G.ux, G.uz), keep = (q) => (lastShot = q);
     if (intro > 0 && phase !== 'over') return null;
@@ -344,10 +368,20 @@ function makeMFFight(stage, H) {
       const f = foes[selFoe] && foes[selFoe].up ? foes[selFoe] : upFoes()[0], tx = f ? f.x : G.fcx, tz = f ? f.z : G.fcz, th = f ? f.K.h : 2, d = dirTo(cur.x, cur.z, tx, tz), ps = SIDE(d[0], d[1]), k = Math.max(1, Math.min(1.5, 1.2 / asp));
       return keep({ p: [cur.x - d[0] * 2.9 * k + ps[0] * 0.95, 2.05 + 0.05 * th, cur.z - d[1] * 2.9 * k + ps[1] * 0.95], l: [cur.x + d[0] * 0.72 * d[2], 0.7 + 0.13 * th, cur.z + d[1] * 0.72 * d[2]], fov: Math.min(56, 42 * k), blur: 2.2, dim: 0.9, group: true }); }
     if (!a) return lastShot || WIDE(0);                      // between moves: hold
-    if (a.kind === 'hero' && a.anim === 'g_curtain' && a.stage === 'play' && a.P.a.time > 5.2) return keep(WIDE(1));
     if (!playing || a.stage !== 'play') return keep(WIDE(a.stage === 'in' ? ease(a.g) * 0.6 : 0));      // crossing the ground
     if (a.shotK == null) a.shotK = shotN++;
     const n = a.shotK;
+    // FIT (Chris, November 15: "you can't see the deer summons and other wider shots ... be specific on how wide the shot is for certain
+    // spells"): for the spells in WIDE_SPELLS the shot is sized from the spell's own measured room (spell_extents.js, made by
+    // checks/measure.py), plus whoever it is aimed at, so all of the animation is in the picture from its first moment to its last.
+    if (a.kind === 'hero' && WIDE_SPELLS[a.anim] && window.MF_EXTENTS && window.MF_EXTENTS[a.anim]) { const P = a.P, X = window.MF_EXTENTS[a.anim], T = a.T && a.th !== P ? a.T : null;
+      if (!a.fit) { const d = T ? dirTo(P.x, P.z, T.x, T.z) : [G.ux, G.uz, 0], ps = SIDE(d[0], d[1]), B0 = { a0: Math.min(-1, X.a0), a1: Math.max(1, Math.min(X.a1, Math.max(d[2] + 1.5, 7))), b0: Math.max(-5.5, Math.min(-1, X.b0)), b1: Math.min(5.5, Math.max(1, X.b1)), up: Math.max(2.2, Math.min(7, X.up)) };
+        const add = (x, z, r, h) => { const rx = x - P.x, rz = z - P.z, al = rx * d[0] + rz * d[1], ac = rx * ps[0] + rz * ps[1]; B0.a0 = Math.min(B0.a0, al - r); B0.a1 = Math.max(B0.a1, al + r); B0.b0 = Math.min(B0.b0, ac - r); B0.b1 = Math.max(B0.b1, ac + r); B0.up = Math.max(B0.up, h); };
+        if (a.tf) add(a.tf.x, a.tf.z, a.tf.K.r + 0.3, a.tf.K.h + 0.3); if (WIDE_SPELLS[a.anim] === 'foes') for (const f of upFoes()) add(f.x, f.z, f.K.r + 0.3, f.K.h + 0.3); if (WIDE_SPELLS[a.anim] === 'party') for (const id in party) if (party[id].e) add(party[id].x, party[id].z, 0.6, 2.1);
+        a.fit = { d, ps, B: B0, x: P.x, z: P.z }; }
+      const F = a.fit, B0 = F.B, phi = mix(68, 56, ease(a.t / Math.max(2, P.a.dur(a.anim)))) * DEG, hl = (B0.a1 - B0.a0) / 2, hd = (B0.b1 - B0.b0) / 2, ca = (B0.a0 + B0.a1) / 2, cb = (B0.b0 + B0.b1) / 2, fov = 38, tv = Math.tan(fov / 2 * DEG), thz = tv * asp;
+      const w = hl * Math.sin(phi) + hd * Math.cos(phi), dp = hl * Math.cos(phi) + hd * Math.sin(phi), R = (Math.max(w / thz, (0.5 * B0.up + 0.45) / tv) + dp) * 1.1, cx = F.x + F.d[0] * ca + F.ps[0] * cb, cz = F.z + F.d[1] * ca + F.ps[1] * cb, q = swing(cx, cz, F.d[0], F.d[1], phi, R);
+      return keep({ p: [q[0], 0.5 * B0.up + 0.9, q[1]], l: [cx, 0.46 * B0.up, cz], fov, blur: 2.2, group: true, fit: true }); }
     if (a.kind === 'hero') { const P = a.P, landed = a.hitK > 0 || a.landed; if (landed && a.landT == null) a.landT = a.t; const dur = P.a.dur(a.anim), tHit = (a.tags ? P.a.hits(a.mv)[0] : a.hitsAt[0]) || 0.6 * dur, lead = ease((a.t - (tHit - 0.5)) / 0.42), after = Math.max(lead, a.landT == null ? 0 : ease((a.t - a.landT) / 0.35));
       if (a.T && a.th !== P) { const d = dirTo(P.x, P.z, a.T.x, a.T.z), ux = d[0], uz = d[1], L = d[2], ps = SIDE(ux, uz), th = a.tf ? a.tf.K.h : 1.7, always = { g_seal: 1, g_curtain: 1, shots: 1, guardian: 1 }[a.anim];
         let kind = always ? 'swing' : a.th ? 'profile' : a.from ? ['reverse', 'swing'][n % 2] : ['swing', 'profile', 'low'][n % 3];
@@ -413,15 +447,22 @@ function makeMFFight(stage, H) {
     }
     // zoomed out (Chris, November 14, 9:16 pm: "exactly like that but zoomed out 25%"): the director's camera stands that much further from
     // what it looks at, along the same line, so every angle is the same and everything is that much smaller in the picture
-    if (shot && CAM === 'auto') { const z = H.zoomOut ? H.zoomOut() : 1.25; for (let k = 0; k < 3; k++) shot.p[k] = shot.l[k] + (shot.p[k] - shot.l[k]) * z; if (shot.p[1] < 0.3) shot.p[1] = 0.3; }
-    stage.free.on = !!shot; stage.free.group = !!(shot && shot.group); if (shot) { stage.free.pos.set(shot.p[0], shot.p[1], shot.p[2]); stage.free.look.set(shot.l[0], shot.l[1], shot.l[2]); stage.free.fov = shot.fov; stage.free.blur = shot.blur || 3.0; stage.free.dim = shot.dim || 0.82; }
+    // (November 15: it used to be measured from what the camera looks at, every picture. When the camera turned to the target as a blow landed,
+    // that point moved away and the camera backed off with it: the "tiny zoom away". And a shot held between moves was pushed back again every
+    // picture. Now the extra distance is taken once for each shot and held.)
+    let cp = shot ? shot.p.slice() : null;
+    if (shot && CAM === 'auto' && !shot.fit) { const z = (H.zoomOut ? H.zoomOut() : 1.25) - 1, dx = shot.p[0] - shot.l[0], dy = shot.p[1] - shot.l[1], dz = shot.p[2] - shot.l[2], d = Math.hypot(dx, dy, dz) || 1; let d0 = d;
+      if (a && !shot.group) { if (a.zd == null || Math.abs(d - a.zl) > 0.8) a.zd = d; a.zl = d; d0 = a.zd; }
+      const k = z * d0 / d; cp[0] += dx * k; cp[1] = Math.max(0.3, cp[1] + dy * k); cp[2] += dz * k; }
+    { const I = H.inset ? H.inset() : null, cwid = Math.max(1, H.width()), want = I ? [Math.min(0.2 * cwid, 0.5 * I.w * Math.min(1, I.h / 260)), 0.1 * I.h] : [0, 0], sh = stage.free.shift, k = Math.min(1, dt * 3); sh[0] += (want[0] - sh[0]) * k; sh[1] += (want[1] - sh[1]) * k; }      // on a wide screen the witches' card sits in the bottom right corner: the picture's middle moves left and up, more while the card is tall
+    stage.free.on = !!shot; stage.free.group = !!(shot && shot.group); if (shot) { stage.free.pos.set(cp[0], cp[1], cp[2]); stage.free.look.set(shot.l[0], shot.l[1], shot.l[2]); stage.free.fov = shot.fov; stage.free.blur = shot.blur || 3.0; stage.free.dim = shot.dim || 0.82; }
     wx = Math.max(0, Math.min(FW - ww, wx)); wy = Math.max(0, Math.min(FH - wh, wy));
     if (!win || shot) win = { x: wx, y: wy, w: ww, h: wh }; else { const k = Math.min(1, dt * quick); win.x += (wx - win.x) * k; win.y += (wy - win.y) * k; win.w += (ww - win.w) * k; win.h = win.w / asp; if (win.h > FH) { win.h = FH; win.w = FH * asp; } }
     stage.setWindow(win.x, win.y, win.w, win.h);
   }
 
   const api = {
-    group, party, get foes() { return foes; }, get phase() { return phase; }, get battle() { return B; }, get current() { return cur ? cur.id : null; }, get act() { return act; }, result: null, choose, hero,
+    group, party, get foes() { return foes; }, get phase() { return phase; }, get battle() { return B; }, get geo() { return GEO; }, get current() { return cur ? cur.id : null; }, get act() { return act; }, result: null, choose, hero,
     setAuto(style) { auto = style || null; },
     // keys: 1 to 7 pick a move, Tab or the arrows change who it is aimed at, Enter casts, Esc goes back
     key(k) { if (phase !== 'menu' || !cur) return false;
@@ -440,7 +481,7 @@ function makeMFFight(stage, H) {
     step(dt, t) {
       if (phase === 'off' || !B) return; time = t; intro = Math.max(0, intro - dt);
       // a blow has just landed: the picture holds for a beat (the burst of light and the numbers keep moving)
-      const raw = dt; if (hitStop > 0) { hitStop -= raw; dt = raw * 0.05; }
+      const raw = dt; now += raw; tellDue(); if (hitStop > 0) { hitStop -= raw; dt = raw * 0.05; }
       for (const b of bursts) { if (!b.on) continue; b.t += raw / 0.34; if (b.t >= 1) { b.on = false; b.m.visible = false; continue; } const k = b.t, e = 1 - (1 - k) * (1 - k), sz = b.size * (0.3 + 1.5 * e); b.m.scale.set(sz, sz, 1); b.m.material.opacity = Math.pow(1 - k, 1.4); }
       if (phase === 'wait') { wait -= dt; if (wait <= 0) next(); }
       else if (phase === 'ending') { wait -= dt; if (wait <= 0) finish(); }
@@ -454,14 +495,15 @@ function makeMFFight(stage, H) {
             else while (a.hitK < a.hitsAt.length && a.t >= a.hitsAt[a.hitK]) { a.hitK++; showSome(a, a.hitK >= a.hitsAt.length ? 99 : Math.ceil(a.ev.length / (a.hitsAt.length - a.hitK + 1))); }
             if (a.t > 0.3 && !A.busy) { syncAll(); A.aim = null; if (P.id === 'jester' || P.id === 'fox') A.m.targetDist = 0; if (a.from) { a.stage = 'out'; a.g = 0; } else a.stage = 'done'; } }
           else if (a.stage === 'out') { A.aim = Math.atan2(a.from.x - a.to.x, a.from.z - a.to.z); if (glide(a, P, dt, true)) { A.aim = null; a.stage = 'done'; } }
-          if (a.stage === 'done') { act = null; if (B.over) { phase = 'ending'; wait = 0.9; } else if (a.thenMenu) toMenu(); else { phase = 'wait'; wait = 0.35; } paint(); }
+          if (a.stage === 'done' && !numbersBusy()) { act = null; if (B.over) { phase = 'ending'; wait = 0.9; } else if (a.thenMenu) toMenu(); else { phase = 'wait'; wait = 0.35; } paint(); }
         } else { const f = a.f, m = f.m, p = m.root.position;
           if (a.stage === 'in') { if (glide(a, _w, dt)) { p.set(a.to.x, 0, a.to.z); foePlay(); } else p.set(_w.x, 0, _w.z); }
           else if (a.stage === 'play') { a.t += dt; if (!f.K.reach) m.root.translateZ((m.dash || 0) * dt);
             if (!a.done && a.t >= a.hitAt) { a.done = true; if (a.quiet) { const at = a.tp ? a.tp.a.anchor('head', _v) : m.anchor(f.K.top, _v); float(at, WORDS.miss, 'fate'); } showSome(a, 99); }
             if (a.t > a.dur + 0.2 && !m.busy) { syncAll(); if (a.from && !f.dying) { a.stage = 'out'; a.g = 0; } else a.stage = 'done'; } }
           else if (a.stage === 'out') { if (glide(a, _w, dt, true)) a.stage = 'done'; else p.set(_w.x, 0, _w.z); }
-          if (a.stage === 'done') { p.set(f.x, 0, f.z); act = null; if (B.over) { phase = 'ending'; wait = 0.9; } else { phase = 'wait'; wait = 0.25; } paint(); }
+          if (a.stage === 'done') p.set(f.x, 0, f.z);
+          if (a.stage === 'done' && !numbersBusy()) { act = null; if (B.over) { phase = 'ending'; wait = 0.9; } else { phase = 'wait'; wait = 0.25; } paint(); }
         }
       }
       // the party: each where she is, turned as her move asks

@@ -23,7 +23,7 @@ def patched(s):
         "    textures: {}, ownPal: {}, soft: {},\n"
         "    // the camera moved for a shot: where it stands, what it looks at, its lens (degrees), how far out of focus the painting behind is\n"
         "    // (0 sharp; each step is twice as soft) and how much of its light is kept. While on is false the camera is the painter's, as always.\n"
-        "    free: { on: false, pos: new THREE.Vector3(), look: new THREE.Vector3(), fov: 23, blur: 3.0, dim: 0.82 },")
+        "    free: { on: false, pos: new THREE.Vector3(), look: new THREE.Vector3(), fov: 23, blur: 3.0, dim: 0.82, shift: [0, 0] },")
     one("      api.fullProj = camera.projectionMatrix.clone(); api.fullInv = camera.projectionMatrixInverse.clone();",
         "      api.fullProj = camera.projectionMatrix.clone(); api.fullInv = camera.projectionMatrixInverse.clone();\n"
         "      // the painter's camera, kept so it can be put back, and the height of its horizon in the painting\n"
@@ -37,7 +37,9 @@ def patched(s):
         "        const d = _v.copy(FR.look).sub(FR.pos), yaw = Math.atan2(d.x, -d.z), pit = Math.atan2(d.y, Math.hypot(d.x, d.z)), tf = Math.tan(FR.fov / 2 * RAD), fpx = (FH / 2) / Math.tan(api.fixed.fov / 2 * RAD);\n"
         "        camera.clearViewOffset(); camera.fov = FR.fov; camera.aspect = canvas.clientWidth / Math.max(1, canvas.clientHeight); camera.near = 0.1; camera.far = 400;\n"
         "        camera.position.copy(FR.pos); camera.lookAt(_v.copy(FR.look).add(_v2.set(sx * 0.003, sy * 0.003, 0))); camera.updateMatrixWorld(); camera.updateProjectionMatrix(); api._free = true;\n"
-        "        let bh = 2 * fpx * tf, bwid = bh * camera.aspect; if (bwid > FW) { bh *= FW / bwid; bwid = FW; } const t = 0.5 + 0.5 * Math.tan(pit) / tf, by = Math.min(api.fixed.hy - t * bh, 2 * FH - api.fixed.hy - 24 - bh); let bx = FW / 2 + fpx * yaw - bwid / 2; if (bwid <= FW) bx = Math.max(0, Math.min(FW - bwid, bx));      // as large as the lens asks, its horizon on the camera's horizon, slid sideways by the camera's turn but kept inside the painting when it fits\n"
+        "        let bh = 2 * fpx * tf, bwid = bh * camera.aspect; if (bwid > FW) { bh *= FW / bwid; bwid = FW; } const t = 0.5 + 0.5 * Math.tan(pit) / tf; let by = Math.min(api.fixed.hy - t * bh, 2 * FH - api.fixed.hy - 24 - bh); let bx = FW / 2 + fpx * yaw - bwid / 2; if (bwid <= FW) bx = Math.max(0, Math.min(FW - bwid, bx));      // as large as the lens asks, its horizon on the camera's horizon, slid sideways by the camera's turn but kept inside the painting when it fits\n"
+        "        // shift: the middle of the picture can be moved off the middle of the screen (pixels left and up), for a screen with a panel in one corner\n"
+        "        const SH = FR.shift, cw = canvas.clientWidth, chh = Math.max(1, canvas.clientHeight); if (SH && (SH[0] || SH[1])) { const fw = cw + 2 * Math.abs(SH[0]), fh = chh + 2 * Math.abs(SH[1]); camera.fov = 2 * Math.atan(tf * fh / chh) / RAD; camera.aspect = fw / fh; camera.setViewOffset(fw, fh, SH[0] > 0 ? 2 * SH[0] : 0, SH[1] > 0 ? 2 * SH[1] : 0, cw, chh); bx += SH[0] * bwid / cw; by += SH[1] * bh / chh; }\n"
         "        bw = [bx / FW, 1 - (by + bh) / FH, bwid / FW, bh / FH];\n"
         "      } else if (api._free) { const X = api.fixed; camera.position.copy(X.pos); camera.quaternion.copy(X.quat); camera.fov = X.fov; camera.aspect = X.aspect; camera.near = X.near; camera.far = X.far; camera.updateMatrixWorld(); api._free = false; }\n"
         "      const pixPaint = F.on && F.painting !== 'smooth' && api.painting && bgMat.map;")

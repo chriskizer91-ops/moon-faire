@@ -159,3 +159,30 @@ are executed and followed through by like 10% slower."
   at, along the same line. Every angle is unchanged; everything is a fifth smaller in the picture.
 - `pace: 0.9`: the whole fight (moves, their follow-through, the walk to a target, the pauses between) runs a tenth slower than the
   models' own timing. The Speed choice multiplies this, so "1×" is now this pace.
+
+## The number after the blow, the zoom-away, the laptop corner, and the wide spells (Chris, November 15, 1:03 pm)
+
+"Camera is perfect except a tiny zoom away when attacks land ... the attack damage number should be moved to the end of the attack
+landing ... a beat pause after the attack lands and then damage. If multiple hits happen, you could show each damage from those hits
+adding up to the total damage using the battle sequence from Envoi ... On the laptop ... it should be condensed to the bottom
+right-hand corner. You also can't see the deer summons and other wider shots on some of the spells."
+
+- **The zoom-away, found.** The 25% extra distance was measured from the point the camera looks at, every picture. As a blow landed
+  the camera turned to the target, that point moved away, and the camera backed off with it. A shot held between moves was also
+  pushed back again every picture. The extra distance is now taken once for each shot and held (`camera()` in `fight.js`).
+- **The number comes a beat after the blow** (`BEAT`, 0.45 s; `showFoeLife`, `tell`, `tellDue`). As it lands: the burst, the held
+  picture, the shake, the flinch, the bar's flash. A beat later: the number, and the bar drains. A foe that is ended falls when its
+  number is told. Several blows on one fighter stack their numbers a line apart, as Envoi's battle screen does
+  (`src/battle/screen.js`, `number`), and then the total is told in gold. A move does not end until its numbers are told.
+- **A laptop or desk screen** (900 pixels wide or more): the picture takes the whole window, and the witches' boxes, the moves and
+  Cast are one card in the bottom right corner. The middle of the picture moves left and up to keep clear of the card
+  (`stage.free.shift`, added in `tools/stage_cameras.py`). The phone layout is unchanged.
+- **Wide spells are fitted.** `checks/measure.py` plays every move and measures the room it takes up; the result is
+  `spell_extents.js`. For the spells in `WIDE_SPELLS` (the Guardian, The Moon's Little Lie, Crazy Quilt, Borrowed Face, the Heal
+  taunt, Curtain Call) the director uses a shot sized to hold all of that room and whoever the spell is aimed at.
+- **Why the deer was never seen:** the Guardian's blow was timed at 9.4 s when the model's own time is 13.02 s, so the camera left for
+  the target while the stag was still growing behind Io. She also stood 4.2 m from her target when the model wants 1.8 m. Both fixed
+  in `actors.js`.
+- A witch who walks up to a target now comes round to one side if someone else is standing where she would stop.
+- `checks/beats.py`, `checks/wide.py`. Note for anyone writing a check: Io's and the Ranger's models never advance more than 0.05 s a
+  step, so step them at 1/30 s or finer.
