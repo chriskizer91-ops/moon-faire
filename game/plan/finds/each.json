@@ -1,0 +1,1995 @@
+{
+ "n": 4000,
+ "tests": [
+  [
+   "B2K2w",
+   0,
+   "the last gate"
+  ],
+  [
+   "BK2w",
+   0,
+   "the level-17 gate"
+  ],
+  [
+   "B",
+   0,
+   "the lone great wraith"
+  ],
+  [
+   "2K4w",
+   4,
+   "the worst walking fight"
+  ]
+ ],
+ "base": {
+  "B2K2w": {
+   "careless": {
+    "win": 0.059,
+    "turns": 28.6864406779661,
+    "kos": 2.0635593220338984
+   },
+   "attentive": {
+    "win": 0.807,
+    "turns": 26.176579925650557,
+    "kos": 0.5876703841387856
+   },
+   "expert": {
+    "win": 0.99425,
+    "turns": 28.442796077445312,
+    "kos": 0.1724918280110636
+   }
+  },
+  "BK2w": {
+   "careless": {
+    "win": 0.1705,
+    "turns": 29.074780058651026,
+    "kos": 1.6070381231671553
+   },
+   "attentive": {
+    "win": 1,
+    "turns": 27,
+    "kos": 0
+   },
+   "expert": {
+    "win": 1,
+    "turns": 27.786,
+    "kos": 0.0215
+   }
+  },
+  "B": {
+   "careless": {
+    "win": 0.57675,
+    "turns": 28.408322496749026,
+    "kos": 1.4542696142175986
+   },
+   "attentive": {
+    "win": 1,
+    "turns": 21.846,
+    "kos": 0
+   },
+   "expert": {
+    "win": 1,
+    "turns": 22.1205,
+    "kos": 0
+   }
+  },
+  "2K4w": {
+   "careless": {
+    "win": 0.235,
+    "turns": 24.540425531914895,
+    "kos": 1.7468085106382978
+   },
+   "attentive": {
+    "win": 1,
+    "turns": 18.02275,
+    "kos": 0.003
+   },
+   "expert": {
+    "win": 1,
+    "turns": 18.558,
+    "kos": 0
+   }
+  }
+ },
+ "each": {
+  "heal5": {
+   "does": "All healing is 5% stronger.",
+   "r": {
+    "B2K2w": {
+     "careless": {
+      "win": 0.06025,
+      "turns": 28.6597510373444,
+      "kos": 2.112033195020747
+     },
+     "attentive": {
+      "win": 0.83675,
+      "turns": 26.19749028981177,
+      "kos": 0.6026292201971916
+     },
+     "expert": {
+      "win": 0.99475,
+      "turns": 28.352601156069365,
+      "kos": 0.16235234983664237
+     }
+    },
+    "BK2w": {
+     "careless": {
+      "win": 0.18,
+      "turns": 29.184722222222224,
+      "kos": 1.6291666666666667
+     },
+     "attentive": {
+      "win": 1,
+      "turns": 27,
+      "kos": 0
+     },
+     "expert": {
+      "win": 1,
+      "turns": 27.777,
+      "kos": 0.0215
+     }
+    },
+    "B": {
+     "careless": {
+      "win": 0.591,
+      "turns": 28.438663282571913,
+      "kos": 1.4259729272419628
+     },
+     "attentive": {
+      "win": 1,
+      "turns": 21.786,
+      "kos": 0
+     },
+     "expert": {
+      "win": 1,
+      "turns": 22.107,
+      "kos": 0
+     }
+    },
+    "2K4w": {
+     "careless": {
+      "win": 0.24025,
+      "turns": 24.604578563995837,
+      "kos": 1.7398543184183142
+     },
+     "attentive": {
+      "win": 1,
+      "turns": 18.0225,
+      "kos": 0.00275
+     },
+     "expert": {
+      "win": 1,
+      "turns": 18.555,
+      "kos": 0
+     }
+    }
+   }
+  },
+  "hp2": {
+   "does": "All four have 2% more HP.",
+   "r": {
+    "B2K2w": {
+     "careless": {
+      "win": 0.0665,
+      "turns": 28.883458646616543,
+      "kos": 2.154135338345865
+     },
+     "attentive": {
+      "win": 0.8405,
+      "turns": 26.235574063057705,
+      "kos": 0.5823914336704342
+     },
+     "expert": {
+      "win": 0.99425,
+      "turns": 28.58335428715112,
+      "kos": 0.14256977621322606
+     }
+    },
+    "BK2w": {
+     "careless": {
+      "win": 0.191,
+      "turns": 29.327225130890053,
+      "kos": 1.681937172774869
+     },
+     "attentive": {
+      "win": 1,
+      "turns": 27,
+      "kos": 0
+     },
+     "expert": {
+      "win": 1,
+      "turns": 27.617,
+      "kos": 0.0175
+     }
+    },
+    "B": {
+     "careless": {
+      "win": 0.61775,
+      "turns": 28.524888709024687,
+      "kos": 1.435046539862404
+     },
+     "attentive": {
+      "win": 1,
+      "turns": 21.7605,
+      "kos": 0
+     },
+     "expert": {
+      "win": 1,
+      "turns": 22.101,
+      "kos": 0
+     }
+    },
+    "2K4w": {
+     "careless": {
+      "win": 0.24925,
+      "turns": 24.68505516549649,
+      "kos": 1.7221664994984955
+     },
+     "attentive": {
+      "win": 1,
+      "turns": 17.997,
+      "kos": 0
+     },
+     "expert": {
+      "win": 1,
+      "turns": 18.555,
+      "kos": 0
+     }
+    }
+   }
+  },
+  "hp3": {
+   "does": "All four have 3% more HP.",
+   "r": {
+    "B2K2w": {
+     "careless": {
+      "win": 0.07325,
+      "turns": 28.87372013651877,
+      "kos": 2.092150170648464
+     },
+     "attentive": {
+      "win": 0.8535,
+      "turns": 26.261862917398947,
+      "kos": 0.5790861159929701
+     },
+     "expert": {
+      "win": 0.996,
+      "turns": 28.65461847389558,
+      "kos": 0.1307730923694779
+     }
+    },
+    "BK2w": {
+     "careless": {
+      "win": 0.20175,
+      "turns": 29.39529120198265,
+      "kos": 1.691449814126394
+     },
+     "attentive": {
+      "win": 1,
+      "turns": 27,
+      "kos": 0
+     },
+     "expert": {
+      "win": 1,
+      "turns": 27.543,
+      "kos": 0.015
+     }
+    },
+    "B": {
+     "careless": {
+      "win": 0.64025,
+      "turns": 28.5696993361968,
+      "kos": 1.420929324482624
+     },
+     "attentive": {
+      "win": 1,
+      "turns": 21.705,
+      "kos": 0
+     },
+     "expert": {
+      "win": 1,
+      "turns": 22.1025,
+      "kos": 0
+     }
+    },
+    "2K4w": {
+     "careless": {
+      "win": 0.2575,
+      "turns": 24.74368932038835,
+      "kos": 1.7446601941747573
+     },
+     "attentive": {
+      "win": 1,
+      "turns": 17.997,
+      "kos": 0
+     },
+     "expert": {
+      "win": 1,
+      "turns": 18.555,
+      "kos": 0
+     }
+    }
+   }
+  },
+  "hp5": {
+   "does": "All four have 5% more HP.",
+   "r": {
+    "B2K2w": {
+     "careless": {
+      "win": 0.08275,
+      "turns": 29.036253776435046,
+      "kos": 2.105740181268882
+     },
+     "attentive": {
+      "win": 0.8745,
+      "turns": 26.323613493424816,
+      "kos": 0.5614636935391653
+     },
+     "expert": {
+      "win": 0.998,
+      "turns": 28.761773547094187,
+      "kos": 0.10445891783567134
+     }
+    },
+    "BK2w": {
+     "careless": {
+      "win": 0.2305,
+      "turns": 29.46637744034707,
+      "kos": 1.6616052060737527
+     },
+     "attentive": {
+      "win": 1,
+      "turns": 27,
+      "kos": 0
+     },
+     "expert": {
+      "win": 1,
+      "turns": 27.41475,
+      "kos": 0.01125
+     }
+    },
+    "B": {
+     "careless": {
+      "win": 0.68125,
+      "turns": 28.563302752293577,
+      "kos": 1.3688073394495412
+     },
+     "attentive": {
+      "win": 1,
+      "turns": 21.6345,
+      "kos": 0
+     },
+     "expert": {
+      "win": 1,
+      "turns": 22.0905,
+      "kos": 0
+     }
+    },
+    "2K4w": {
+     "careless": {
+      "win": 0.27325,
+      "turns": 24.77676120768527,
+      "kos": 1.7456541628545288
+     },
+     "attentive": {
+      "win": 1,
+      "turns": 17.997,
+      "kos": 0
+     },
+     "expert": {
+      "win": 1,
+      "turns": 18.553,
+      "kos": 0
+     }
+    }
+   }
+  },
+  "mp5": {
+   "does": "All four have 5% more MP.",
+   "r": {
+    "B2K2w": {
+     "careless": {
+      "win": 0.0595,
+      "turns": 28.722689075630253,
+      "kos": 2.092436974789916
+     },
+     "attentive": {
+      "win": 0.80975,
+      "turns": 26.201605433775857,
+      "kos": 0.5970978697128744
+     },
+     "expert": {
+      "win": 0.9945,
+      "turns": 28.443690296631473,
+      "kos": 0.17320261437908496
+     }
+    },
+    "BK2w": {
+     "careless": {
+      "win": 0.1715,
+      "turns": 29.08600583090379,
+      "kos": 1.6180758017492711
+     },
+     "attentive": {
+      "win": 1,
+      "turns": 27,
+      "kos": 0
+     },
+     "expert": {
+      "win": 1,
+      "turns": 27.786,
+      "kos": 0.0215
+     }
+    },
+    "B": {
+     "careless": {
+      "win": 0.57775,
+      "turns": 28.43574210298572,
+      "kos": 1.466897446992644
+     },
+     "attentive": {
+      "win": 1,
+      "turns": 21.846,
+      "kos": 0
+     },
+     "expert": {
+      "win": 1,
+      "turns": 22.1205,
+      "kos": 0
+     }
+    },
+    "2K4w": {
+     "careless": {
+      "win": 0.2365,
+      "turns": 24.627906976744185,
+      "kos": 1.7642706131078225
+     },
+     "attentive": {
+      "win": 1,
+      "turns": 18.02275,
+      "kos": 0.003
+     },
+     "expert": {
+      "win": 1,
+      "turns": 18.558,
+      "kos": 0
+     }
+    }
+   }
+  },
+  "mp10": {
+   "does": "All four have 10% more MP.",
+   "r": {
+    "B2K2w": {
+     "careless": {
+      "win": 0.05925,
+      "turns": 28.751054852320674,
+      "kos": 2.0928270042194095
+     },
+     "attentive": {
+      "win": 0.823,
+      "turns": 26.30315917375456,
+      "kos": 0.6643377885783718
+     },
+     "expert": {
+      "win": 0.9945,
+      "turns": 28.443690296631473,
+      "kos": 0.17320261437908496
+     }
+    },
+    "BK2w": {
+     "careless": {
+      "win": 0.172,
+      "turns": 29.093023255813954,
+      "kos": 1.635174418604651
+     },
+     "attentive": {
+      "win": 1,
+      "turns": 27,
+      "kos": 0
+     },
+     "expert": {
+      "win": 1,
+      "turns": 27.786,
+      "kos": 0.0215
+     }
+    },
+    "B": {
+     "careless": {
+      "win": 0.579,
+      "turns": 28.443436960276337,
+      "kos": 1.4801381692573403
+     },
+     "attentive": {
+      "win": 1,
+      "turns": 21.846,
+      "kos": 0
+     },
+     "expert": {
+      "win": 1,
+      "turns": 22.1205,
+      "kos": 0
+     }
+    },
+    "2K4w": {
+     "careless": {
+      "win": 0.2375,
+      "turns": 24.661052631578947,
+      "kos": 1.776842105263158
+     },
+     "attentive": {
+      "win": 1,
+      "turns": 18.02275,
+      "kos": 0.003
+     },
+     "expert": {
+      "win": 1,
+      "turns": 18.558,
+      "kos": 0
+     }
+    }
+   }
+  },
+  "foxmp5": {
+   "does": "The Fox's spells cost 5% less MP.",
+   "r": {
+    "B2K2w": {
+     "careless": {
+      "win": 0.059,
+      "turns": 28.6864406779661,
+      "kos": 2.0635593220338984
+     },
+     "attentive": {
+      "win": 0.80825,
+      "turns": 26.18806062480668,
+      "kos": 0.591710485617074
+     },
+     "expert": {
+      "win": 0.9945,
+      "turns": 28.443690296631473,
+      "kos": 0.17320261437908496
+     }
+    },
+    "BK2w": {
+     "careless": {
+      "win": 0.17025,
+      "turns": 29.05433186490455,
+      "kos": 1.6005873715124816
+     },
+     "attentive": {
+      "win": 1,
+      "turns": 27,
+      "kos": 0
+     },
+     "expert": {
+      "win": 1,
+      "turns": 27.786,
+      "kos": 0.0215
+     }
+    },
+    "B": {
+     "careless": {
+      "win": 0.57675,
+      "turns": 28.408322496749026,
+      "kos": 1.4542696142175986
+     },
+     "attentive": {
+      "win": 1,
+      "turns": 21.846,
+      "kos": 0
+     },
+     "expert": {
+      "win": 1,
+      "turns": 22.1205,
+      "kos": 0
+     }
+    },
+    "2K4w": {
+     "careless": {
+      "win": 0.235,
+      "turns": 24.540425531914895,
+      "kos": 1.7468085106382978
+     },
+     "attentive": {
+      "win": 1,
+      "turns": 18.02275,
+      "kos": 0.003
+     },
+     "expert": {
+      "win": 1,
+      "turns": 18.558,
+      "kos": 0
+     }
+    }
+   }
+  },
+  "iomp5": {
+   "does": "Io's spells cost 5% less MP.",
+   "r": {
+    "B2K2w": {
+     "careless": {
+      "win": 0.05975,
+      "turns": 28.736401673640167,
+      "kos": 2.1046025104602513
+     },
+     "attentive": {
+      "win": 0.80825,
+      "turns": 26.18806062480668,
+      "kos": 0.5920197958552428
+     },
+     "expert": {
+      "win": 0.99425,
+      "turns": 28.442796077445312,
+      "kos": 0.1724918280110636
+     }
+    },
+    "BK2w": {
+     "careless": {
+      "win": 0.17175,
+      "turns": 29.106259097525474,
+      "kos": 1.6244541484716157
+     },
+     "attentive": {
+      "win": 1,
+      "turns": 27,
+      "kos": 0
+     },
+     "expert": {
+      "win": 1,
+      "turns": 27.786,
+      "kos": 0.0215
+     }
+    },
+    "B": {
+     "careless": {
+      "win": 0.57775,
+      "turns": 28.43574210298572,
+      "kos": 1.466897446992644
+     },
+     "attentive": {
+      "win": 1,
+      "turns": 21.846,
+      "kos": 0
+     },
+     "expert": {
+      "win": 1,
+      "turns": 22.1205,
+      "kos": 0
+     }
+    },
+    "2K4w": {
+     "careless": {
+      "win": 0.2365,
+      "turns": 24.627906976744185,
+      "kos": 1.7642706131078225
+     },
+     "attentive": {
+      "win": 1,
+      "turns": 18.02275,
+      "kos": 0.003
+     },
+     "expert": {
+      "win": 1,
+      "turns": 18.558,
+      "kos": 0
+     }
+    }
+   }
+  },
+  "jhp5": {
+   "does": "The Jester has 5% more HP (stands in for \"takes 5% less damage\").",
+   "r": {
+    "B2K2w": {
+     "careless": {
+      "win": 0.0705,
+      "turns": 28.80496453900709,
+      "kos": 2.0886524822695036
+     },
+     "attentive": {
+      "win": 0.871,
+      "turns": 26.15671641791045,
+      "kos": 0.618828932261768
+     },
+     "expert": {
+      "win": 0.997,
+      "turns": 28.40295887662989,
+      "kos": 0.15421263791374124
+     }
+    },
+    "BK2w": {
+     "careless": {
+      "win": 0.213,
+      "turns": 29.064553990610328,
+      "kos": 1.6314553990610328
+     },
+     "attentive": {
+      "win": 1,
+      "turns": 27,
+      "kos": 0
+     },
+     "expert": {
+      "win": 1,
+      "turns": 27.36,
+      "kos": 0.02625
+     }
+    },
+    "B": {
+     "careless": {
+      "win": 0.65975,
+      "turns": 28.300871542250853,
+      "kos": 1.4130352406214475
+     },
+     "attentive": {
+      "win": 1,
+      "turns": 21.7665,
+      "kos": 0
+     },
+     "expert": {
+      "win": 1,
+      "turns": 22.092,
+      "kos": 0
+     }
+    },
+    "2K4w": {
+     "careless": {
+      "win": 0.25925,
+      "turns": 24.41176470588235,
+      "kos": 1.7270973963355833
+     },
+     "attentive": {
+      "win": 1,
+      "turns": 17.997,
+      "kos": 0
+     },
+     "expert": {
+      "win": 1,
+      "turns": 18.553,
+      "kos": 0
+     }
+    }
+   }
+  },
+  "ranger5": {
+   "does": "The Ranger's arrows and gem shots hit 5% harder.",
+   "r": {
+    "B2K2w": {
+     "careless": {
+      "win": 0.06425,
+      "turns": 28.64980544747082,
+      "kos": 2.0817120622568095
+     },
+     "attentive": {
+      "win": 0.85175,
+      "turns": 26.33548576460229,
+      "kos": 0.48253595538597005
+     },
+     "expert": {
+      "win": 0.99375,
+      "turns": 28.265911949685535,
+      "kos": 0.16754716981132076
+     }
+    },
+    "BK2w": {
+     "careless": {
+      "win": 0.17975,
+      "turns": 29.025034770514605,
+      "kos": 1.623087621696801
+     },
+     "attentive": {
+      "win": 1,
+      "turns": 27,
+      "kos": 0
+     },
+     "expert": {
+      "win": 1,
+      "turns": 27.6665,
+      "kos": 0.01925
+     }
+    },
+    "B": {
+     "careless": {
+      "win": 0.59575,
+      "turns": 28.34074695761645,
+      "kos": 1.4842635333613092
+     },
+     "attentive": {
+      "win": 1,
+      "turns": 21.432,
+      "kos": 0
+     },
+     "expert": {
+      "win": 1,
+      "turns": 21.513,
+      "kos": 0
+     }
+    },
+    "2K4w": {
+     "careless": {
+      "win": 0.24375,
+      "turns": 24.61230769230769,
+      "kos": 1.7507692307692309
+     },
+     "attentive": {
+      "win": 1,
+      "turns": 18.11925,
+      "kos": 0.002
+     },
+     "expert": {
+      "win": 1,
+      "turns": 18.602,
+      "kos": 0
+     }
+    }
+   }
+  },
+  "ranger10": {
+   "does": "The Ranger's arrows and gem shots hit 10% harder.",
+   "r": {
+    "B2K2w": {
+     "careless": {
+      "win": 0.0735,
+      "turns": 28.608843537414966,
+      "kos": 1.9863945578231292
+     },
+     "attentive": {
+      "win": 0.89275,
+      "turns": 26.489778773452816,
+      "kos": 0.36964435732287876
+     },
+     "expert": {
+      "win": 0.99425,
+      "turns": 28.111139049534824,
+      "kos": 0.16167965803369375
+     }
+    },
+    "BK2w": {
+     "careless": {
+      "win": 0.197,
+      "turns": 28.99492385786802,
+      "kos": 1.6560913705583757
+     },
+     "attentive": {
+      "win": 1,
+      "turns": 27,
+      "kos": 0
+     },
+     "expert": {
+      "win": 1,
+      "turns": 27.55475,
+      "kos": 0.016
+     }
+    },
+    "B": {
+     "careless": {
+      "win": 0.6155,
+      "turns": 28.27497969130788,
+      "kos": 1.5008123476848092
+     },
+     "attentive": {
+      "win": 1,
+      "turns": 21.1965,
+      "kos": 0
+     },
+     "expert": {
+      "win": 1,
+      "turns": 21.1935,
+      "kos": 0
+     }
+    },
+    "2K4w": {
+     "careless": {
+      "win": 0.2525,
+      "turns": 24.503960396039602,
+      "kos": 1.7336633663366336
+     },
+     "attentive": {
+      "win": 1,
+      "turns": 18.12275,
+      "kos": 0.00125
+     },
+     "expert": {
+      "win": 1,
+      "turns": 18.632,
+      "kos": 0
+     }
+    }
+   }
+  },
+  "fox5": {
+   "does": "The Fox's Stitch and Pins and Needles hit 5% harder.",
+   "r": {
+    "B2K2w": {
+     "careless": {
+      "win": 0.061,
+      "turns": 28.684426229508198,
+      "kos": 2.0901639344262297
+     },
+     "attentive": {
+      "win": 0.82425,
+      "turns": 26.230815893236276,
+      "kos": 0.5441310282074613
+     },
+     "expert": {
+      "win": 0.99425,
+      "turns": 28.365602212723157,
+      "kos": 0.16771435755594669
+     }
+    },
+    "BK2w": {
+     "careless": {
+      "win": 0.17325,
+      "turns": 29.072150072150073,
+      "kos": 1.6277056277056277
+     },
+     "attentive": {
+      "win": 1,
+      "turns": 27,
+      "kos": 0
+     },
+     "expert": {
+      "win": 1,
+      "turns": 27.67875,
+      "kos": 0.02025
+     }
+    },
+    "B": {
+     "careless": {
+      "win": 0.58375,
+      "turns": 28.385438972162742,
+      "kos": 1.468950749464668
+     },
+     "attentive": {
+      "win": 1,
+      "turns": 21.657,
+      "kos": 0
+     },
+     "expert": {
+      "win": 1,
+      "turns": 21.816,
+      "kos": 0
+     }
+    },
+    "2K4w": {
+     "careless": {
+      "win": 0.23775,
+      "turns": 24.51104100946372,
+      "kos": 1.7707676130389065
+     },
+     "attentive": {
+      "win": 1,
+      "turns": 17.83825,
+      "kos": 0.003
+     },
+     "expert": {
+      "win": 1,
+      "turns": 18.471,
+      "kos": 0
+     }
+    }
+   }
+  },
+  "fox10": {
+   "does": "The Fox's Stitch and Pins and Needles hit 10% harder.",
+   "r": {
+    "B2K2w": {
+     "careless": {
+      "win": 0.06375,
+      "turns": 28.666666666666668,
+      "kos": 2.0588235294117645
+     },
+     "attentive": {
+      "win": 0.84025,
+      "turns": 26.313894674204107,
+      "kos": 0.5028265397203213
+     },
+     "expert": {
+      "win": 0.99375,
+      "turns": 28.29761006289308,
+      "kos": 0.16402515723270442
+     }
+    },
+    "BK2w": {
+     "careless": {
+      "win": 0.177,
+      "turns": 29.060734463276837,
+      "kos": 1.6596045197740112
+     },
+     "attentive": {
+      "win": 1,
+      "turns": 27,
+      "kos": 0
+     },
+     "expert": {
+      "win": 1,
+      "turns": 27.59275,
+      "kos": 0.01975
+     }
+    },
+    "B": {
+     "careless": {
+      "win": 0.588,
+      "turns": 28.375425170068027,
+      "kos": 1.4774659863945578
+     },
+     "attentive": {
+      "win": 1,
+      "turns": 21.4575,
+      "kos": 0
+     },
+     "expert": {
+      "win": 1,
+      "turns": 21.549,
+      "kos": 0
+     }
+    },
+    "2K4w": {
+     "careless": {
+      "win": 0.2415,
+      "turns": 24.494824016563147,
+      "kos": 1.7836438923395446
+     },
+     "attentive": {
+      "win": 1,
+      "turns": 17.698,
+      "kos": 0.00325
+     },
+     "expert": {
+      "win": 1,
+      "turns": 18.367,
+      "kos": 0
+     }
+    }
+   }
+  },
+  "io5": {
+   "does": "Io's Thorn and her Deity hit 5% harder.",
+   "r": {
+    "B2K2w": {
+     "careless": {
+      "win": 0.0595,
+      "turns": 28.672268907563026,
+      "kos": 2.096638655462185
+     },
+     "attentive": {
+      "win": 0.826,
+      "turns": 26.25756658595642,
+      "kos": 0.5314769975786925
+     },
+     "expert": {
+      "win": 0.99425,
+      "turns": 28.335177269298466,
+      "kos": 0.16494845360824742
+     }
+    },
+    "BK2w": {
+     "careless": {
+      "win": 0.171,
+      "turns": 29.084795321637426,
+      "kos": 1.6198830409356726
+     },
+     "attentive": {
+      "win": 1,
+      "turns": 27,
+      "kos": 0
+     },
+     "expert": {
+      "win": 1,
+      "turns": 27.691,
+      "kos": 0.0215
+     }
+    },
+    "B": {
+     "careless": {
+      "win": 0.58325,
+      "turns": 28.38491213030433,
+      "kos": 1.4667809687098157
+     },
+     "attentive": {
+      "win": 1,
+      "turns": 21.6975,
+      "kos": 0
+     },
+     "expert": {
+      "win": 1,
+      "turns": 21.87,
+      "kos": 0
+     }
+    },
+    "2K4w": {
+     "careless": {
+      "win": 0.23675,
+      "turns": 24.56282998944034,
+      "kos": 1.7602956705385429
+     },
+     "attentive": {
+      "win": 1,
+      "turns": 17.6485,
+      "kos": 0.00275
+     },
+     "expert": {
+      "win": 1,
+      "turns": 18.382,
+      "kos": 0
+     }
+    }
+   }
+  },
+  "io10": {
+   "does": "Io's Thorn and her Deity hit 10% harder.",
+   "r": {
+    "B2K2w": {
+     "careless": {
+      "win": 0.06125,
+      "turns": 28.76326530612245,
+      "kos": 2.1346938775510202
+     },
+     "attentive": {
+      "win": 0.84625,
+      "turns": 26.33500738552437,
+      "kos": 0.47621861152141803
+     },
+     "expert": {
+      "win": 0.9945,
+      "turns": 28.221719457013574,
+      "kos": 0.15736551030668677
+     }
+    },
+    "BK2w": {
+     "careless": {
+      "win": 0.1735,
+      "turns": 29.07348703170029,
+      "kos": 1.6412103746397695
+     },
+     "attentive": {
+      "win": 1,
+      "turns": 27,
+      "kos": 0
+     },
+     "expert": {
+      "win": 1,
+      "turns": 27.6415,
+      "kos": 0.02175
+     }
+    },
+    "B": {
+     "careless": {
+      "win": 0.5865,
+      "turns": 28.3614663256607,
+      "kos": 1.4650468883205456
+     },
+     "attentive": {
+      "win": 1,
+      "turns": 21.5055,
+      "kos": 0
+     },
+     "expert": {
+      "win": 1,
+      "turns": 21.6285,
+      "kos": 0
+     }
+    },
+    "2K4w": {
+     "careless": {
+      "win": 0.23925,
+      "turns": 24.493207941483803,
+      "kos": 1.7533960292580981
+     },
+     "attentive": {
+      "win": 1,
+      "turns": 17.3825,
+      "kos": 0.00275
+     },
+     "expert": {
+      "win": 1,
+      "turns": 18.153,
+      "kos": 0
+     }
+    }
+   }
+  },
+  "fate5": {
+   "does": "Every blow the Jester takes lays 5% more Fate on the foe.",
+   "r": {
+    "B2K2w": {
+     "careless": {
+      "win": 0.073,
+      "turns": 28.181506849315067,
+      "kos": 1.976027397260274
+     },
+     "attentive": {
+      "win": 0.84425,
+      "turns": 26.05744743855493,
+      "kos": 0.6505774355937223
+     },
+     "expert": {
+      "win": 0.9955,
+      "turns": 27.774485183324963,
+      "kos": 0.17177297840281266
+     }
+    },
+    "BK2w": {
+     "careless": {
+      "win": 0.204,
+      "turns": 28.70098039215686,
+      "kos": 1.6764705882352942
+     },
+     "attentive": {
+      "win": 1,
+      "turns": 27,
+      "kos": 0
+     },
+     "expert": {
+      "win": 1,
+      "turns": 27.614,
+      "kos": 0.0215
+     }
+    },
+    "B": {
+     "careless": {
+      "win": 0.61725,
+      "turns": 28.14135277440259,
+      "kos": 1.4795463750506277
+     },
+     "attentive": {
+      "win": 1,
+      "turns": 21.0645,
+      "kos": 0
+     },
+     "expert": {
+      "win": 1,
+      "turns": 21.063,
+      "kos": 0
+     }
+    },
+    "2K4w": {
+     "careless": {
+      "win": 0.246,
+      "turns": 24.33028455284553,
+      "kos": 1.7642276422764227
+     },
+     "attentive": {
+      "win": 1,
+      "turns": 18.02275,
+      "kos": 0.003
+     },
+     "expert": {
+      "win": 1,
+      "turns": 18.558,
+      "kos": 0
+     }
+    }
+   }
+  },
+  "fate10": {
+   "does": "Every blow the Jester takes lays 10% more Fate on the foe.",
+   "r": {
+    "B2K2w": {
+     "careless": {
+      "win": 0.0915,
+      "turns": 27.494535519125684,
+      "kos": 1.9207650273224044
+     },
+     "attentive": {
+      "win": 0.88625,
+      "turns": 25.933145275035262,
+      "kos": 0.7308885754583921
+     },
+     "expert": {
+      "win": 0.997,
+      "turns": 27.077733199598796,
+      "kos": 0.17452357071213642
+     }
+    },
+    "BK2w": {
+     "careless": {
+      "win": 0.23925,
+      "turns": 28.309299895506793,
+      "kos": 1.7147335423197492
+     },
+     "attentive": {
+      "win": 1,
+      "turns": 26.967,
+      "kos": 0
+     },
+     "expert": {
+      "win": 1,
+      "turns": 27.47725,
+      "kos": 0.0225
+     }
+    },
+    "B": {
+     "careless": {
+      "win": 0.6585,
+      "turns": 27.77107061503417,
+      "kos": 1.474183750949127
+     },
+     "attentive": {
+      "win": 1,
+      "turns": 21,
+      "kos": 0
+     },
+     "expert": {
+      "win": 1,
+      "turns": 21,
+      "kos": 0
+     }
+    },
+    "2K4w": {
+     "careless": {
+      "win": 0.256,
+      "turns": 24.033203125,
+      "kos": 1.7412109375
+     },
+     "attentive": {
+      "win": 1,
+      "turns": 18.02275,
+      "kos": 0.003
+     },
+     "expert": {
+      "win": 1,
+      "turns": 18.558,
+      "kos": 0
+     }
+    }
+   }
+  },
+  "splash": {
+   "does": "Sealed Fate takes 25% of their Life from the other foes, up from 20%.",
+   "r": {
+    "B2K2w": {
+     "careless": {
+      "win": 0.06925,
+      "turns": 28.577617328519857,
+      "kos": 2.0902527075812274
+     },
+     "attentive": {
+      "win": 0.9035,
+      "turns": 26.583563918096292,
+      "kos": 0.2952407304925291
+     },
+     "expert": {
+      "win": 0.99425,
+      "turns": 28.27181292431481,
+      "kos": 0.1724918280110636
+     }
+    },
+    "BK2w": {
+     "careless": {
+      "win": 0.1775,
+      "turns": 29.046478873239437,
+      "kos": 1.6295774647887324
+     },
+     "attentive": {
+      "win": 1,
+      "turns": 27,
+      "kos": 0
+     },
+     "expert": {
+      "win": 1,
+      "turns": 27.777,
+      "kos": 0.0215
+     }
+    },
+    "B": {
+     "careless": {
+      "win": 0.57675,
+      "turns": 28.408322496749026,
+      "kos": 1.4542696142175986
+     },
+     "attentive": {
+      "win": 1,
+      "turns": 21.846,
+      "kos": 0
+     },
+     "expert": {
+      "win": 1,
+      "turns": 22.1205,
+      "kos": 0
+     }
+    },
+    "2K4w": {
+     "careless": {
+      "win": 0.24175,
+      "turns": 23.86142709410548,
+      "kos": 1.7125129265770425
+     },
+     "attentive": {
+      "win": 1,
+      "turns": 17.35325,
+      "kos": 0.003
+     },
+     "expert": {
+      "win": 1,
+      "turns": 17.564,
+      "kos": 0
+     }
+    }
+   }
+  },
+  "catch4": {
+   "does": "The Jester catches 4 blows a taunt, up from 3.",
+   "r": {
+    "B2K2w": {
+     "careless": {
+      "win": 0.0675,
+      "turns": 28.52962962962963,
+      "kos": 1.8555555555555556
+     },
+     "attentive": {
+      "win": 0.807,
+      "turns": 26.176579925650557,
+      "kos": 0.5876703841387856
+     },
+     "expert": {
+      "win": 0.99425,
+      "turns": 28.442796077445312,
+      "kos": 0.1724918280110636
+     }
+    },
+    "BK2w": {
+     "careless": {
+      "win": 0.17575,
+      "turns": 29.10810810810811,
+      "kos": 1.6429587482219061
+     },
+     "attentive": {
+      "win": 1,
+      "turns": 27,
+      "kos": 0
+     },
+     "expert": {
+      "win": 1,
+      "turns": 27.635,
+      "kos": 0
+     }
+    },
+    "B": {
+     "careless": {
+      "win": 0.57675,
+      "turns": 28.408322496749026,
+      "kos": 1.4542696142175986
+     },
+     "attentive": {
+      "win": 1,
+      "turns": 21.846,
+      "kos": 0
+     },
+     "expert": {
+      "win": 1,
+      "turns": 22.1205,
+      "kos": 0
+     }
+    },
+    "2K4w": {
+     "careless": {
+      "win": 0.2225,
+      "turns": 24.841573033707864,
+      "kos": 1.855056179775281
+     },
+     "attentive": {
+      "win": 1,
+      "turns": 18.02275,
+      "kos": 0.003
+     },
+     "expert": {
+      "win": 1,
+      "turns": 18.558,
+      "kos": 0
+     }
+    }
+   }
+  },
+  "jheal10": {
+   "does": "The Jester's own heal is 10% stronger.",
+   "r": {
+    "B2K2w": {
+     "careless": {
+      "win": 0.06,
+      "turns": 28.7,
+      "kos": 2.1
+     },
+     "attentive": {
+      "win": 0.83525,
+      "turns": 26.14546542951212,
+      "kos": 0.6028135288835678
+     },
+     "expert": {
+      "win": 0.9945,
+      "turns": 28.36375062845651,
+      "kos": 0.17094017094017094
+     }
+    },
+    "BK2w": {
+     "careless": {
+      "win": 0.176,
+      "turns": 29.073863636363637,
+      "kos": 1.6306818181818181
+     },
+     "attentive": {
+      "win": 1,
+      "turns": 27,
+      "kos": 0
+     },
+     "expert": {
+      "win": 1,
+      "turns": 27.77325,
+      "kos": 0.02125
+     }
+    },
+    "B": {
+     "careless": {
+      "win": 0.5855,
+      "turns": 28.37873612297182,
+      "kos": 1.4436379163108455
+     },
+     "attentive": {
+      "win": 1,
+      "turns": 21.8055,
+      "kos": 0
+     },
+     "expert": {
+      "win": 1,
+      "turns": 22.1205,
+      "kos": 0
+     }
+    },
+    "2K4w": {
+     "careless": {
+      "win": 0.237,
+      "turns": 24.51793248945148,
+      "kos": 1.7468354430379747
+     },
+     "attentive": {
+      "win": 1,
+      "turns": 18.02275,
+      "kos": 0.003
+     },
+     "expert": {
+      "win": 1,
+      "turns": 18.558,
+      "kos": 0
+     }
+    }
+   }
+  },
+  "bloom4": {
+   "does": "Io's Bloom opens 4 times, up from 3.",
+   "r": {
+    "B2K2w": {
+     "careless": {
+      "win": 0.06475,
+      "turns": 28.99227799227799,
+      "kos": 1.9922779922779923
+     },
+     "attentive": {
+      "win": 0.807,
+      "turns": 26.16171003717472,
+      "kos": 0.5861214374225526
+     },
+     "expert": {
+      "win": 0.99425,
+      "turns": 28.442796077445312,
+      "kos": 0.1724918280110636
+     }
+    },
+    "BK2w": {
+     "careless": {
+      "win": 0.188,
+      "turns": 29.347074468085108,
+      "kos": 1.6648936170212767
+     },
+     "attentive": {
+      "win": 1,
+      "turns": 27,
+      "kos": 0
+     },
+     "expert": {
+      "win": 1,
+      "turns": 27.787,
+      "kos": 0.0215
+     }
+    },
+    "B": {
+     "careless": {
+      "win": 0.5955,
+      "turns": 28.488664987405542,
+      "kos": 1.431570109151973
+     },
+     "attentive": {
+      "win": 1,
+      "turns": 21.846,
+      "kos": 0
+     },
+     "expert": {
+      "win": 1,
+      "turns": 22.1205,
+      "kos": 0
+     }
+    },
+    "2K4w": {
+     "careless": {
+      "win": 0.238,
+      "turns": 24.550420168067227,
+      "kos": 1.7563025210084033
+     },
+     "attentive": {
+      "win": 1,
+      "turns": 18.02275,
+      "kos": 0.003
+     },
+     "expert": {
+      "win": 1,
+      "turns": 18.558,
+      "kos": 0
+     }
+    }
+   }
+  },
+  "revive40": {
+   "does": "Io's Revive brings a friend back at 40% HP, up from 30%.",
+   "r": {
+    "B2K2w": {
+     "careless": {
+      "win": 0.0775,
+      "turns": 29.441935483870967,
+      "kos": 2.1903225806451614
+     },
+     "attentive": {
+      "win": 0.87475,
+      "turns": 26.28179479851386,
+      "kos": 0.5795941697627893
+     },
+     "expert": {
+      "win": 0.99525,
+      "turns": 28.441346395378044,
+      "kos": 0.17231851293644812
+     }
+    },
+    "BK2w": {
+     "careless": {
+      "win": 0.219,
+      "turns": 29.73744292237443,
+      "kos": 1.8550228310502284
+     },
+     "attentive": {
+      "win": 1,
+      "turns": 27,
+      "kos": 0
+     },
+     "expert": {
+      "win": 1,
+      "turns": 27.78925,
+      "kos": 0.0185
+     }
+    },
+    "B": {
+     "careless": {
+      "win": 0.69725,
+      "turns": 28.972750089637863,
+      "kos": 1.6583004661168879
+     },
+     "attentive": {
+      "win": 1,
+      "turns": 21.846,
+      "kos": 0
+     },
+     "expert": {
+      "win": 1,
+      "turns": 22.1205,
+      "kos": 0
+     }
+    },
+    "2K4w": {
+     "careless": {
+      "win": 0.27125,
+      "turns": 24.525345622119815,
+      "kos": 1.8691244239631337
+     },
+     "attentive": {
+      "win": 1,
+      "turns": 18.02275,
+      "kos": 0.003
+     },
+     "expert": {
+      "win": 1,
+      "turns": 18.558,
+      "kos": 0
+     }
+    }
+   }
+  },
+  "decoy3": {
+   "does": "The Fox's ghost eats 3 blows, up from 2.",
+   "r": {
+    "B2K2w": {
+     "careless": {
+      "win": 0.06975,
+      "turns": 29.519713261648747,
+      "kos": 2.021505376344086
+     },
+     "attentive": {
+      "win": 0.807,
+      "turns": 26.176579925650557,
+      "kos": 0.5876703841387856
+     },
+     "expert": {
+      "win": 0.99625,
+      "turns": 29.68732747804266,
+      "kos": 0.10765370138017566
+     }
+    },
+    "BK2w": {
+     "careless": {
+      "win": 0.202,
+      "turns": 29.85272277227723,
+      "kos": 1.5495049504950495
+     },
+     "attentive": {
+      "win": 1,
+      "turns": 27,
+      "kos": 0
+     },
+     "expert": {
+      "win": 1,
+      "turns": 27.85725,
+      "kos": 0.0215
+     }
+    },
+    "B": {
+     "careless": {
+      "win": 0.61775,
+      "turns": 28.906110886280857,
+      "kos": 1.4002428166734115
+     },
+     "attentive": {
+      "win": 1,
+      "turns": 21.846,
+      "kos": 0
+     },
+     "expert": {
+      "win": 1,
+      "turns": 22.1205,
+      "kos": 0
+     }
+    },
+    "2K4w": {
+     "careless": {
+      "win": 0.2475,
+      "turns": 24.776767676767676,
+      "kos": 1.6787878787878787
+     },
+     "attentive": {
+      "win": 1,
+      "turns": 18.02275,
+      "kos": 0.003
+     },
+     "expert": {
+      "win": 1,
+      "turns": 18.558,
+      "kos": 0
+     }
+    }
+   }
+  },
+  "cloth": {
+   "does": "A blow the Fox turns back lands at two and a half times, up from double.",
+   "r": {
+    "B2K2w": {
+     "careless": {
+      "win": 0.06325,
+      "turns": 28.391304347826086,
+      "kos": 2.035573122529644
+     },
+     "attentive": {
+      "win": 0.807,
+      "turns": 26.175030978934323,
+      "kos": 0.5876703841387856
+     },
+     "expert": {
+      "win": 0.9945,
+      "turns": 28.39894419306184,
+      "kos": 0.1480643539467069
+     }
+    },
+    "BK2w": {
+     "careless": {
+      "win": 0.17625,
+      "turns": 28.914893617021278,
+      "kos": 1.6070921985815603
+     },
+     "attentive": {
+      "win": 1,
+      "turns": 27,
+      "kos": 0
+     },
+     "expert": {
+      "win": 1,
+      "turns": 27.7845,
+      "kos": 0.0215
+     }
+    },
+    "B": {
+     "careless": {
+      "win": 0.5785,
+      "turns": 28.32886776145203,
+      "kos": 1.4464131374243734
+     },
+     "attentive": {
+      "win": 1,
+      "turns": 21.09,
+      "kos": 0
+     },
+     "expert": {
+      "win": 1,
+      "turns": 21.093,
+      "kos": 0
+     }
+    },
+    "2K4w": {
+     "careless": {
+      "win": 0.2375,
+      "turns": 24.55578947368421,
+      "kos": 1.7473684210526317
+     },
+     "attentive": {
+      "win": 1,
+      "turns": 17.107,
+      "kos": 0.002
+     },
+     "expert": {
+      "win": 1,
+      "turns": 17.181,
+      "kos": 0
+     }
+    }
+   }
+  },
+  "bow": {
+   "does": "The whole party gets up for the bow at 50% HP, up from 25%.",
+   "r": {
+    "B2K2w": {
+     "careless": {
+      "win": 0.059,
+      "turns": 28.6864406779661,
+      "kos": 2.0635593220338984
+     },
+     "attentive": {
+      "win": 0.807,
+      "turns": 26.176579925650557,
+      "kos": 0.5876703841387856
+     },
+     "expert": {
+      "win": 0.99425,
+      "turns": 28.442796077445312,
+      "kos": 0.1724918280110636
+     }
+    },
+    "BK2w": {
+     "careless": {
+      "win": 0.1705,
+      "turns": 29.074780058651026,
+      "kos": 1.6070381231671553
+     },
+     "attentive": {
+      "win": 1,
+      "turns": 27,
+      "kos": 0
+     },
+     "expert": {
+      "win": 1,
+      "turns": 27.786,
+      "kos": 0.0215
+     }
+    },
+    "B": {
+     "careless": {
+      "win": 0.57675,
+      "turns": 28.408322496749026,
+      "kos": 1.4542696142175986
+     },
+     "attentive": {
+      "win": 1,
+      "turns": 21.846,
+      "kos": 0
+     },
+     "expert": {
+      "win": 1,
+      "turns": 22.1205,
+      "kos": 0
+     }
+    },
+    "2K4w": {
+     "careless": {
+      "win": 0.235,
+      "turns": 24.540425531914895,
+      "kos": 1.7468085106382978
+     },
+     "attentive": {
+      "win": 1,
+      "turns": 18.02275,
+      "kos": 0.003
+     },
+     "expert": {
+      "win": 1,
+      "turns": 18.558,
+      "kos": 0
+     }
+    }
+   }
+  },
+  "gem1": {
+   "does": "The Ranger's gem is ready after 1 of her turns, down from 2.",
+   "r": {
+    "B2K2w": {
+     "careless": {
+      "win": 0.07225,
+      "turns": 28.501730103806228,
+      "kos": 2.1038062283737022
+     },
+     "attentive": {
+      "win": 0.93325,
+      "turns": 26.78033753013662,
+      "kos": 0.25341548352531473
+     },
+     "expert": {
+      "win": 0.99775,
+      "turns": 28.1796542219995,
+      "kos": 0.08694562766224004
+     }
+    },
+    "BK2w": {
+     "careless": {
+      "win": 0.1965,
+      "turns": 29.153944020356235,
+      "kos": 1.6653944020356235
+     },
+     "attentive": {
+      "win": 1,
+      "turns": 26.994,
+      "kos": 0
+     },
+     "expert": {
+      "win": 1,
+      "turns": 27.74075,
+      "kos": 0.02
+     }
+    },
+    "B": {
+     "careless": {
+      "win": 0.61975,
+      "turns": 28.18233158531666,
+      "kos": 1.45421540943929
+     },
+     "attentive": {
+      "win": 1,
+      "turns": 21.0195,
+      "kos": 0
+     },
+     "expert": {
+      "win": 1,
+      "turns": 21.0285,
+      "kos": 0
+     }
+    },
+    "2K4w": {
+     "careless": {
+      "win": 0.24825,
+      "turns": 24.31923464249748,
+      "kos": 1.649546827794562
+     },
+     "attentive": {
+      "win": 1,
+      "turns": 17.10775,
+      "kos": 0.00325
+     },
+     "expert": {
+      "win": 1,
+      "turns": 17.954,
+      "kos": 0
+     }
+    }
+   }
+  }
+ }
+}

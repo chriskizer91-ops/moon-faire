@@ -1,0 +1,547 @@
+{
+ "what": "Moon Faire: the finds for the bigger game (task board S5). Made by game/plan/finds/export.js; do not edit by hand.",
+ "status": "A proposal for Chris. Every new name and card is a stand-in; the five with a \"code\" are the cards already in game/world/world.json.",
+ "rule": "A find changes the numbers listed in \"changes\" in the combat engine's RULES ({path, mul} multiplies, {path, add} adds) and nothing else.",
+ "finds": [
+  {
+   "id": "cold-lantern-glass",
+   "ring": 1,
+   "how": "on the way",
+   "new": false,
+   "code": "W4-f",
+   "witch": null,
+   "name": "Cold lantern glass",
+   "does": "All four have 5% more MP.",
+   "card": "A lantern's glass, found in the heather a long way from any post. The flame behind it answered the call one night and pulled the glass halfway after it. It is still cold to hold.",
+   "picture": "art/items/cold-lantern-glass.png",
+   "pictureExists": true,
+   "changes": [
+    {
+     "path": "heroes.jester.mp",
+     "mul": 1.05
+    },
+    {
+     "path": "heroes.fox.mp",
+     "mul": 1.05
+    },
+    {
+     "path": "heroes.io.mp",
+     "mul": 1.05
+    }
+   ],
+   "measuredAs": null,
+   "aloneAtTheLastGate": {
+    "careless": 0.001,
+    "attentive": 0.003
+   }
+  },
+  {
+   "id": "stubborn-candle",
+   "ring": 1,
+   "how": "off the path",
+   "new": true,
+   "code": null,
+   "witch": null,
+   "name": "The stubborn candle",
+   "does": "All four have 2% more HP.",
+   "card": "A candle stub from a fair stall, dropped in the heather half a mile out. The call took it this far and no further. It is still lit, and it leans the wrong way.",
+   "picture": "art/items/stubborn-candle.png",
+   "pictureExists": false,
+   "changes": [
+    {
+     "path": "heroes.jester.hp",
+     "mul": 1.02
+    },
+    {
+     "path": "heroes.ranger.hp",
+     "mul": 1.02
+    },
+    {
+     "path": "heroes.fox.hp",
+     "mul": 1.02
+    },
+    {
+     "path": "heroes.io.hp",
+     "mul": 1.02
+    }
+   ],
+   "measuredAs": null,
+   "aloneAtTheLastGate": {
+    "careless": 0.008,
+    "attentive": 0.033
+   }
+  },
+  {
+   "id": "straight-spark",
+   "ring": 1,
+   "how": "hidden",
+   "new": true,
+   "code": null,
+   "witch": "Ranger",
+   "name": "The straight spark",
+   "does": "The Ranger's arrows and gem shots hit 5% harder.",
+   "card": "A flint arrowhead, wedged in a crack of the drystone wall. Struck on steel it throws one spark, and the spark flies dead straight. Nothing else out here does.",
+   "picture": "art/items/straight-spark.png",
+   "pictureExists": false,
+   "changes": [
+    {
+     "path": "r.plain",
+     "mul": 1.05
+    },
+    {
+     "path": "r.lit",
+     "mul": 1.05
+    }
+   ],
+   "measuredAs": null,
+   "aloneAtTheLastGate": {
+    "careless": 0.005,
+    "attentive": 0.045
+   }
+  },
+  {
+   "id": "cut-thread",
+   "ring": 2,
+   "how": "on the way",
+   "new": false,
+   "code": "W5-e",
+   "witch": "Fox",
+   "name": "The cut thread",
+   "does": "The Fox's spells cost 5% less MP.",
+   "card": "One thread of the call, snipped by the Fox where it caught on a standing stone. Every flame on the moor has one, pulled tight toward the crag. Even cut, it still twitches that way.",
+   "picture": "art/items/cut-thread.png",
+   "pictureExists": true,
+   "changes": [
+    {
+     "path": "f.stitchMp",
+     "mul": 0.95
+    },
+    {
+     "path": "f.needlesMp",
+     "mul": 0.95
+    },
+    {
+     "path": "f.clothMp",
+     "mul": 0.95
+    },
+    {
+     "path": "f.quiltMp",
+     "mul": 0.95
+    },
+    {
+     "path": "f.decoyMp",
+     "mul": 0.95
+    }
+   ],
+   "measuredAs": null,
+   "aloneAtTheLastGate": {
+    "careless": 0,
+    "attentive": 0.001
+   }
+  },
+  {
+   "id": "idle-needle",
+   "ring": 2,
+   "how": "off the path",
+   "new": true,
+   "code": null,
+   "witch": "Fox",
+   "name": "The idle needle",
+   "does": "The Fox's Stitch and Pins and Needles hit 5% harder.",
+   "card": "A long steel needle, stuck in the wood of a dead lamp post with nothing through its eye. The Fox says it is the one thing on this moor that is not being pulled anywhere.",
+   "picture": "art/items/idle-needle.png",
+   "pictureExists": false,
+   "changes": [
+    {
+     "path": "f.stitch",
+     "mul": 1.05
+    },
+    {
+     "path": "f.needles",
+     "mul": 1.05
+    }
+   ],
+   "measuredAs": null,
+   "aloneAtTheLastGate": {
+    "careless": 0.002,
+    "attentive": 0.017
+   }
+  },
+  {
+   "id": "brass-snuffer",
+   "ring": 2,
+   "how": "hidden",
+   "new": true,
+   "code": null,
+   "witch": "Jester",
+   "name": "The brass snuffer",
+   "does": "Every blow the Jester takes lays 5% more Fate on the foe.",
+   "card": "A candle snuffer: a small brass cap on a long handle, made for one job. It gives a flame its ending, gently, and all at once. The Jester would not let anyone else carry it.",
+   "picture": "art/items/brass-snuffer.png",
+   "pictureExists": false,
+   "changes": [
+    {
+     "path": "fate.perBlow",
+     "mul": 1.05
+    }
+   ],
+   "measuredAs": null,
+   "aloneAtTheLastGate": {
+    "careless": 0.014,
+    "attentive": 0.037
+   }
+  },
+  {
+   "id": "warm-stone",
+   "ring": 3,
+   "how": "on the way",
+   "new": false,
+   "code": "W6-f",
+   "witch": "Io",
+   "name": "The warm stone",
+   "does": "All four have 5% more HP.",
+   "card": "A stone from the edge of the farm lad's fire ring. That fire had someone feeding it all night, and it never once tried to leave. The stone keeps its warmth for hours.",
+   "picture": "art/items/warm-stone.png",
+   "pictureExists": true,
+   "changes": [
+    {
+     "path": "heroes.jester.hp",
+     "mul": 1.05
+    },
+    {
+     "path": "heroes.ranger.hp",
+     "mul": 1.05
+    },
+    {
+     "path": "heroes.fox.hp",
+     "mul": 1.05
+    },
+    {
+     "path": "heroes.io.hp",
+     "mul": 1.05
+    }
+   ],
+   "measuredAs": null,
+   "aloneAtTheLastGate": {
+    "careless": 0.024,
+    "attentive": 0.068
+   }
+  },
+  {
+   "id": "winter-blackthorn",
+   "ring": 3,
+   "how": "off the path",
+   "new": true,
+   "code": null,
+   "witch": "Io",
+   "name": "The winter blackthorn",
+   "does": "Io's Thorn and her Deity hit 5% harder.",
+   "card": "A sprig of blackthorn in full white flower, long out of season. It grew where a wisp lay down and was warm for a while. Io keeps it in her hat band.",
+   "picture": "art/items/winter-blackthorn.png",
+   "pictureExists": false,
+   "changes": [
+    {
+     "path": "i.thorn",
+     "mul": 1.05
+    },
+    {
+     "path": "i.deity",
+     "mul": 1.05
+    }
+   ],
+   "measuredAs": null,
+   "aloneAtTheLastGate": {
+    "careless": 0.001,
+    "attentive": 0.019
+   }
+  },
+  {
+   "id": "hollow-amulet",
+   "ring": 3,
+   "how": "hidden",
+   "new": false,
+   "code": "W7-b",
+   "witch": "Io",
+   "name": "The hollow amulet",
+   "does": "All healing is 5% stronger.",
+   "card": "It lay on the flat stone in the hollow, where nothing on the moor pulls. Nobody knows who left it there. It is warm the way a hand is warm, not the way a fire is.",
+   "picture": "art/items/hollow-amulet.png",
+   "pictureExists": true,
+   "changes": [
+    {
+     "path": "j.heal",
+     "mul": 1.05
+    },
+    {
+     "path": "i.mend",
+     "mul": 1.05
+    },
+    {
+     "path": "i.bloom",
+     "mul": 1.05
+    }
+   ],
+   "measuredAs": null,
+   "aloneAtTheLastGate": {
+    "careless": 0.001,
+    "attentive": 0.03
+   }
+  },
+  {
+   "id": "warm-oil-flask",
+   "ring": 4,
+   "how": "on the way",
+   "new": true,
+   "code": null,
+   "witch": null,
+   "name": "The warm oil flask",
+   "does": "All four have 2% more HP.",
+   "card": "A tin flask of lamp oil, left at the foot of a post. Its lamp went east long ago. The oil stayed, and it has never gone cold.",
+   "picture": "art/items/warm-oil-flask.png",
+   "pictureExists": false,
+   "changes": [
+    {
+     "path": "heroes.jester.hp",
+     "mul": 1.02
+    },
+    {
+     "path": "heroes.ranger.hp",
+     "mul": 1.02
+    },
+    {
+     "path": "heroes.fox.hp",
+     "mul": 1.02
+    },
+    {
+     "path": "heroes.io.hp",
+     "mul": 1.02
+    }
+   ],
+   "measuredAs": null,
+   "aloneAtTheLastGate": {
+    "careless": 0.008,
+    "attentive": 0.033
+   }
+  },
+  {
+   "id": "fourth-seed",
+   "ring": 4,
+   "how": "off the path",
+   "new": true,
+   "code": null,
+   "witch": "Io",
+   "name": "The fourth seed",
+   "does": "Io's Bloom opens 4 times, up from 3.",
+   "card": "A twist of brown paper from a seed-seller at some other fair, in some other year. The writing says three. There are four.",
+   "picture": "art/items/fourth-seed.png",
+   "pictureExists": false,
+   "changes": [
+    {
+     "path": "i.bloomTicks",
+     "add": 1
+    }
+   ],
+   "measuredAs": null,
+   "aloneAtTheLastGate": {
+    "careless": 0.006,
+    "attentive": 0
+   }
+  },
+  {
+   "id": "paired-amulet",
+   "ring": 4,
+   "how": "hidden",
+   "new": true,
+   "code": null,
+   "witch": "Io",
+   "name": "The paired amulet",
+   "does": "All healing is 5% stronger.",
+   "card": "The same grey-green stone as the hollow amulet, and the same spiral, cut the other way round. Laid side by side the two carvings run into each other like one line.",
+   "picture": "art/items/paired-amulet.png",
+   "pictureExists": false,
+   "changes": [
+    {
+     "path": "j.heal",
+     "mul": 1.05
+    },
+    {
+     "path": "i.mend",
+     "mul": 1.05
+    },
+    {
+     "path": "i.bloom",
+     "mul": 1.05
+    }
+   ],
+   "measuredAs": null,
+   "aloneAtTheLastGate": {
+    "careless": 0.001,
+    "attentive": 0.03
+   }
+  },
+  {
+   "id": "spare-outline",
+   "ring": 5,
+   "how": "on the way",
+   "new": true,
+   "code": null,
+   "witch": "Fox",
+   "name": "The spare outline",
+   "does": "The Fox's ghost eats 3 blows, up from 2.",
+   "card": "The shape of a person, cut out of an old fair handbill and pinned to a post. Nobody is printed on it. The Fox folded it very carefully and said it would do.",
+   "picture": "art/items/spare-outline.png",
+   "pictureExists": false,
+   "changes": [
+    {
+     "path": "f.decoy",
+     "add": 1
+    }
+   ],
+   "measuredAs": null,
+   "aloneAtTheLastGate": {
+    "careless": 0.011,
+    "attentive": 0
+   }
+  },
+  {
+   "id": "keepers-glove",
+   "ring": 5,
+   "how": "off the path",
+   "new": true,
+   "code": null,
+   "witch": null,
+   "name": "The keeper's glove",
+   "does": "All four have 2% more HP.",
+   "card": "One thick wool glove, scorched across the palm, the kind a lamp keeper wears to lift hot glass. There is only the one. It is a comfort to hold.",
+   "picture": "art/items/keepers-glove.png",
+   "pictureExists": false,
+   "changes": [
+    {
+     "path": "heroes.jester.hp",
+     "mul": 1.02
+    },
+    {
+     "path": "heroes.ranger.hp",
+     "mul": 1.02
+    },
+    {
+     "path": "heroes.fox.hp",
+     "mul": 1.02
+    },
+    {
+     "path": "heroes.io.hp",
+     "mul": 1.02
+    }
+   ],
+   "measuredAs": null,
+   "aloneAtTheLastGate": {
+    "careless": 0.008,
+    "attentive": 0.033
+   }
+  },
+  {
+   "id": "curtain-weight",
+   "ring": 5,
+   "how": "hidden",
+   "new": true,
+   "code": null,
+   "witch": "Jester",
+   "name": "The curtain weight",
+   "does": "Sealed Fate takes 25% of their Life from the other foes, up from 20%.",
+   "card": "A lead weight from the hem of a stage curtain. It is what makes a curtain fall straight, and fall everywhere at once. The Jester laughed for a long time when she found it.",
+   "picture": "art/items/curtain-weight.png",
+   "pictureExists": false,
+   "changes": [
+    {
+     "path": "fate.splash",
+     "add": 0.05
+    }
+   ],
+   "measuredAs": null,
+   "aloneAtTheLastGate": {
+    "careless": 0.01,
+    "attentive": 0.096
+   }
+  },
+  {
+   "id": "lit-taper",
+   "ring": 6,
+   "how": "on the way",
+   "new": true,
+   "code": null,
+   "witch": "Io",
+   "name": "The lit taper",
+   "does": "Io's Revive brings a friend back at 40% HP, up from 30%.",
+   "card": "A long wax taper, the kind used to carry a flame from one lamp to the next. It was left burning in a crack of the rock, out of the wind. One flame can always light another.",
+   "picture": "art/items/lit-taper.png",
+   "pictureExists": false,
+   "changes": [
+    {
+     "path": "i.revive",
+     "add": 0.1
+    }
+   ],
+   "measuredAs": null,
+   "aloneAtTheLastGate": {
+    "careless": 0.019,
+    "attentive": 0.068
+   }
+  },
+  {
+   "id": "keepers-charm",
+   "ring": 6,
+   "how": "off the path",
+   "new": false,
+   "code": "W9-b",
+   "witch": "Jester",
+   "name": "The keeper's charm",
+   "does": "The Jester takes 5% less damage.",
+   "card": "A small iron charm, hung from an empty lamp bracket on the side of the tower. Keepers once hung one on every bracket they trimmed, so the flame would know someone was coming back. This is the last one, and nobody came back.",
+   "picture": "art/items/keepers-charm.png",
+   "pictureExists": true,
+   "changes": [
+    {
+     "path": "heroes.jester.hp",
+     "mul": 1.0526315789473684
+    }
+   ],
+   "measuredAs": "The Jester has 5.3% more HP, which is the same thing against blows and very slightly less with healing.",
+   "aloneAtTheLastGate": {
+    "careless": 0.011,
+    "attentive": 0.064
+   }
+  },
+  {
+   "id": "far-amulet",
+   "ring": 6,
+   "how": "hidden",
+   "new": true,
+   "code": null,
+   "witch": "Io",
+   "name": "The far amulet",
+   "does": "All healing is 5% stronger.",
+   "card": "The third spiral. Whoever carved the three left them a long walk apart, like markers on a road nobody remembers. This one was the furthest, and the hardest to reach.",
+   "picture": "art/items/far-amulet.png",
+   "pictureExists": false,
+   "changes": [
+    {
+     "path": "j.heal",
+     "mul": 1.05
+    },
+    {
+     "path": "i.mend",
+     "mul": 1.05
+    },
+    {
+     "path": "i.bloom",
+     "mul": 1.05
+    }
+   ],
+   "measuredAs": null,
+   "aloneAtTheLastGate": {
+    "careless": 0.001,
+    "attentive": 0.03
+   }
+  }
+ ]
+}
