@@ -6,6 +6,8 @@ const quick = JSON.parse(fs.readFileSync(__dirname + '/results-quick.json', 'utf
 // measured with 3,000 fights each (see README): the last gate at the party's level and one level under it
 const lastGate = { level: '6% / 81% / 99%', over: '61% / 100% / 100%' };
 const keys = ['A', 'B', 'C'];
+const chosen = fs.existsSync(__dirname + '/plan-chosen.json') ? JSON.parse(fs.readFileSync(__dirname + '/plan-chosen.json', 'utf8')) : null;
+const chosenRuns = chosen ? JSON.parse(fs.readFileSync(__dirname + '/results-chosen.json', 'utf8')) : null;
 const fmt = n => Math.round(n).toLocaleString('en-US');
 const hours = m => { const h = Math.round(m / 30) / 2; return (Math.floor(h) || '') + (h % 1 ? '½' : ''); };
 const hm = m => Math.floor(m / 60) + ' h ' + String(Math.round(m % 60 / 5) * 5).padStart(2, '0');
@@ -149,13 +151,18 @@ footer { color: var(--ink-2); font-size: 15px; border-top: 1px solid var(--rule)
  <p>You asked for 5 to 10 times the fights of the first plan, and a wider span of levels, now that there is open land to run off into. Here are three sizes of game. Each was played through 2,000 times for each play style, with the combat engine you approved deciding every fight. Nothing inside a fight changes.</p>
 </header>
 
-<section class="ask" aria-label="What I need from you">
+${chosen ? `<section class="ask" aria-label="What Chris chose">
+ <h2>Chosen: option ${chosen.chosen.option}</h2>
+ <p><strong>${chosen.top} levels, ${chosen.fightsToFinish} fights to finish, ${chosen.chosen.fights} fights, and level ${chosen.top} is the top.</strong> ${chosen.chosen.by}.</p>
+ <p>It is written into the plan as <code>game/plan/levelling/plan-chosen.json</code>, and played again from that file alone: ${chosenRuns['steady/attentive'].wins[1]} wins to finish, ${hours(chosenRuns['steady/attentive'].minutes.quick)} to ${hours(chosenRuns['steady/attentive'].minutes.slow)} hours of fights.</p>
+ <p style="margin:0"><strong>What the top level changes.</strong> The party stops at level ${chosen.top}, so fighting more than you must no longer makes the last gate easier: it stays at 81% for a player who pays attention. The things she finds are the way to ease it, as you described for the first plan.</p>
+</section>` : `<section class="ask" aria-label="What I need from you">
  <h2>What I need from you</h2>
  <ol>
   <li><strong>A, B or C.</strong> Or any pair from the table under "Two dials".</li>
   <li><strong>Full-size fights or small packs</strong> as the usual thing she meets.</li>
  </ol>
-</section>
+</section>`}
 
 <section>
  <h2>Three sizes</h2>
@@ -183,7 +190,7 @@ footer { color: var(--ink-2); font-size: 15px; border-top: 1px solid var(--rule)
   <li><strong>Levels come quickly, then slowly:</strong> a level every 5 or 6 wins at the start, every 13 or 14 near the end.</li>
   <li><strong>Walking fights stay safe.</strong> A player who pays attention won every walking fight in every run, even against foes 4 levels over. A player pressing any button lost ${walkLost.map(x => Math.round(x)).join(', ')} walking fights in a whole game of A, B, C.</li>
   <li><strong>The last gate is as hard as you approved.</strong> At the party's level it is won ${lastGate.level} of the time (any button / paying attention / expert). One level over, ${lastGate.over}.</li>
-  <li><strong>Fighting more than you must is the easy setting.</strong> A player who fights half as many fights again in every ring reaches the last gate about one level ahead (${keys.map(k => k + ': ' + ex(k).wins[1] + ' wins').join(', ')}). That turns the last gate from 81% to 100% for an attentive player, with no change to the rules. There is no top level: the numbers keep growing.</li>
+  <li><strong>Fighting more than you must is the easy setting.</strong> A player who fights half as many fights again in every ring reaches the last gate about one level ahead (${keys.map(k => k + ': ' + ex(k).wins[1] + ' wins').join(', ')}). That turns the last gate from 81% to 100% for an attentive player, with no change to the rules. These runs had no top level.${chosen ? ' The chosen plan stops at level ' + chosen.top + ', so this does not apply to it.' : ''}</li>
  </ul>
 </section>
 

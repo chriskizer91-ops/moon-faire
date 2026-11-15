@@ -2,7 +2,13 @@
 
 Made by the "Levelling" session on November 14, 2026. Chris asked for 5 to 10 times the fights of the starter plan
 (about 120 to 240) and a wider span of levels, now that the map is an open world. This folder holds three options
-with numbers, for him to choose from. **Nothing is chosen yet, and `../sim/plan.js` is not changed.**
+with numbers, which he chose from.
+
+**Chris chose option B on November 14, 2026 (7:30 pm): 20 levels, 180 fights to finish, level 20 the top.** He said
+nothing against full-size fights, and the "3 to 6 hours" he named is their figure, so the plan uses them.
+The plan the game reads is **`plan-chosen.json`** (or `plan-chosen.js`, which a page loads as `window.MF_LEVELS`
+with `levelOf(xp)`, `xpOf(foes, foeLevel)` and `ringOf(level)`). `../sim/plan.js` is the first, five-level plan and
+is not changed; for levels, XP and what is met where, `plan-chosen.json` replaces it.
 
 The page for Chris: `levelling-options.html` (published; the link is in the project note
 `claude/levelling-for-the-bigger-game-options.md`).
@@ -15,6 +21,9 @@ The page for Chris: `levelling-options.html` (published; the link is in the proj
 | `run.js` | Plays each option through 2,000 times per play style. Writes `results-full.json` and `results-full.txt`; with `quick`, `results-quick.*`. |
 | `gaps.js` | Every line-up at every level gap from 4 under to 4 over: wins, length, faints. Writes `gaps.json`. |
 | `make_page.js` | Builds `levelling-options.html` from the results. |
+| `play.js` | The playthrough itself, shared by `run.js` and `check_chosen.js`. |
+| `choose.js` | Writes an option out as the plan: `plan-chosen.json` and `plan-chosen.js`. |
+| `check_chosen.js` | Plays the chosen plan 2,000 times per play style from `plan-chosen.js` alone. Writes `results-chosen.*`. |
 
 The approved combat engine is used unchanged, through `../sim/lib.js`. No rule or number of the engine is touched.
 
@@ -23,6 +32,8 @@ cd game/plan/levelling
 node gaps.js 400          # about 10 seconds
 node run.js > results-full.txt          # about 15 seconds
 node run.js quick > results-quick.txt
+node choose.js B full "Chris, November 14, 2026, 7:30 pm"
+node check_chosen.js > results-chosen.txt
 node make_page.js
 ```
 
@@ -53,6 +64,14 @@ node make_page.js
 - Small packs as the usual fight (`run.js quick`): the same fights and levels in about a quarter less time
   (middle guess 2 h 10, 3 h 15, 4 h 15).
 - Levels and fights are separate dials: `results-*.json` `grid` has all nine pairs of 14, 20, 26 levels with 120, 180, 240 fights.
+
+## The chosen plan, checked (2,000 playthroughs per play style, from `plan-chosen.js` alone)
+
+- Wins to finish: 182 / 180 / 180 (careless / attentive / expert). Fights alone: 3 h 00 / 4 h 15 / 6 h 10.
+- **Level 20 is the top, so extra fighting does not ease the last gate.** A player who fights half as many again in
+  every ring still meets it at level 20: 81% for an attentive player, about 22 tries for a careless one. In the
+  options' own runs, which had no top level, that player arrived a level ahead. Finds are the lever now
+  (`lore/combat-balance.md`: both small finds took the first plan's boss from 81% to 87%).
 
 ## Not measured
 
