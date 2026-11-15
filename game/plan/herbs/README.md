@@ -107,6 +107,30 @@ The last fight at the four settings (`../testers/lastfight.txt`, 3,000 fights ea
 all 18 finds): careful expert: easy 99% / 100%, medium 91% / 97%, hard 27% / 80%, crazy 0.1% / 3.6%. Careful
 attentive: 81% / 98%, 3% / 13%, 0% / 0%, 0% / 0%.
 
+## Whole games under the revised plan (`game.js`, `game.txt`; 100 games for every number)
+
+`../levelling/plan-v2.json`: walking foes one below to two above the party, gates at 10 and 20. HP and MP carried,
+steady plants, "top everybody up" after every fight, waking at the last rest spot after a loss.
+
+| Tester | Fights won | Fights lost, rest spots only where a band begins | Lost, with rest spots also inside bands 5 and 6 | Tries at the great wraith / great bramble | Hours of fights (quick / middle / slow guess) |
+|---|---|---|---|---|---|
+| very careless | 189 | 125 | 124 | 48 / 45 | 10.0 / 14.0 / 20.1 |
+| careless | 184 | 44 | 42 | 19 / 16 | 5.8 / 8.2 / 11.8 |
+| attentive, careful | 181 | 1.4 | 0.5 | 1.3 / 1.2 | 3.3 / 4.7 / 6.8 |
+| attentive, bold | 181 | 3.9 | 1.9 | 1.9 / 1.6 | 3.3 / 4.7 / 6.7 |
+| focused, careful | 181 | 1.4 | 0.2 | 1.0 / 1.0 | 3.3 / 4.6 / 6.7 |
+| focused, bold | 182 | 4.1 | 1.2 | 1.4 / 1.3 | 3.2 / 4.6 / 6.6 |
+| expert, careful | 182 | 1.3 | 0.1 | 1.0 / 1.0 | 3.4 / 4.8 / 6.9 |
+| expert, bold | 182 | 3.7 | 0.7 | 1.1 / 1.0 | 3.2 / 4.6 / 6.7 |
+
+- With walking foes no more than two levels over, a player who thinks hardly ever loses a walking fight, even with
+  rest spots only where a band begins. The inside rest spots (band 5 every 10 fights, band 6 every 6) are a comfort,
+  not a need.
+- She eats every herb she picks: about 176 HP herbs and 352 MP herbs in a game. Steady plants are just enough.
+- A careless player finishes, but loses about 42 fights on the way and needs about 19 tries at the great wraith.
+  Nearly all her losses are at the two gates and in bands 5 and 6.
+- The hours are still a guess (4 to 9 seconds a witch turn). They do not include the final boss.
+
 ## Not done yet
 
 - A whole playthrough of the chosen plan with carried HP and MP, herbs and rest spots, for all eight testers: fights,

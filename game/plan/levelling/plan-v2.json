@@ -1,0 +1,251 @@
+{
+ "what": "Moon Faire: levels, XP, what is met where, the two gates and the last fight. Made by game/plan/levelling/plan2.js; do not edit by hand. It replaces plan-chosen.json.",
+ "chosen": "Chris: option B (November 14); walking foes one below to two above, gates at 10 and 20, then the final boss (November 15, 1:06 pm).",
+ "top": 20,
+ "fightsToFinish": 180,
+ "walking": {
+  "foeLevel": "the party's level, from 1 below to 2 above, each as likely as the others",
+  "below": 1,
+  "above": 2
+ },
+ "xp": {
+  "wisp": 10,
+  "shadowWraith": 40,
+  "greatWraith": 400,
+  "perFoeLevel": 1.2,
+  "codes": {
+   "w": "wisp",
+   "K": "shadowWraith",
+   "B": "greatWraith"
+  }
+ },
+ "toReach": {
+  "1": 0,
+  "2": 80,
+  "3": 270,
+  "4": 530,
+  "5": 870,
+  "6": 1490,
+  "7": 2300,
+  "8": 3400,
+  "9": 5300,
+  "10": 7800,
+  "11": 13500,
+  "12": 17500,
+  "13": 22600,
+  "14": 29100,
+  "15": 39100,
+  "16": 52100,
+  "17": 68100,
+  "18": 93100,
+  "19": 124100,
+  "20": 163100
+ },
+ "fair": [
+  {
+   "id": "T1",
+   "foes": "2w",
+   "foeLevel": 1
+  },
+  {
+   "id": "T2",
+   "foes": "3w",
+   "foeLevel": 1
+  },
+  {
+   "id": "T3",
+   "foes": "3w",
+   "foeLevel": 2
+  }
+ ],
+ "bands": [
+  {
+   "band": 1,
+   "from": 2,
+   "to": 5,
+   "tier": 1,
+   "country": "wraith",
+   "meets": [
+    {
+     "foes": "2w",
+     "weight": 2
+    },
+    {
+     "foes": "3w",
+     "weight": 4
+    },
+    {
+     "foes": "4w",
+     "weight": 2
+    }
+   ]
+  },
+  {
+   "band": 2,
+   "from": 5,
+   "to": 8,
+   "tier": 2,
+   "country": "wraith",
+   "meets": [
+    {
+     "foes": "3w",
+     "weight": 3
+    },
+    {
+     "foes": "4w",
+     "weight": 2
+    },
+    {
+     "foes": "K",
+     "weight": 1
+    },
+    {
+     "foes": "K2w",
+     "weight": 2
+    }
+   ]
+  },
+  {
+   "band": 3,
+   "from": 8,
+   "to": 10,
+   "tier": 3,
+   "country": "wraith",
+   "meets": [
+    {
+     "foes": "4w",
+     "weight": 2
+    },
+    {
+     "foes": "5w",
+     "weight": 1
+    },
+    {
+     "foes": "K2w",
+     "weight": 3
+    },
+    {
+     "foes": "2K",
+     "weight": 1
+    },
+    {
+     "foes": "K4w",
+     "weight": 1
+    }
+   ]
+  },
+  {
+   "band": 4,
+   "from": 10,
+   "to": 14,
+   "tier": 3,
+   "country": "bramble",
+   "meets": [
+    {
+     "foes": "4w",
+     "weight": 2
+    },
+    {
+     "foes": "5w",
+     "weight": 1
+    },
+    {
+     "foes": "K2w",
+     "weight": 3
+    },
+    {
+     "foes": "2K",
+     "weight": 1
+    },
+    {
+     "foes": "K4w",
+     "weight": 1
+    }
+   ]
+  },
+  {
+   "band": 5,
+   "from": 14,
+   "to": 17,
+   "tier": 4,
+   "country": "bramble",
+   "meets": [
+    {
+     "foes": "5w",
+     "weight": 2
+    },
+    {
+     "foes": "K2w",
+     "weight": 2
+    },
+    {
+     "foes": "K4w",
+     "weight": 2
+    },
+    {
+     "foes": "2K2w",
+     "weight": 2
+    }
+   ]
+  },
+  {
+   "band": 6,
+   "from": 17,
+   "to": 20,
+   "tier": 5,
+   "country": "bramble",
+   "meets": [
+    {
+     "foes": "6w",
+     "weight": 2
+    },
+    {
+     "foes": "K4w",
+     "weight": 2
+    },
+    {
+     "foes": "2K2w",
+     "weight": 2
+    },
+    {
+     "foes": "3K",
+     "weight": 1
+    },
+    {
+     "foes": "2K4w",
+     "weight": 1
+    }
+   ]
+  }
+ ],
+ "gates": [
+  {
+   "id": "great-wraith",
+   "name": "The final great wraith fight",
+   "opensAtLevel": 10,
+   "foes": "B2K2w",
+   "foeLevel": 10,
+   "note": "The first plan's own last fight: the great wraith, two Shadow Wraiths and two wisps."
+  },
+  {
+   "id": "great-bramble",
+   "name": "The great bramble fight",
+   "opensAtLevel": 20,
+   "foes": "B2K2w",
+   "foeLevel": 20,
+   "note": "A stand-in line-up with the great wraith's numbers until the bramble foes have their own."
+  }
+ ],
+ "lastFight": {
+  "note": "The final boss, after the great bramble. The game offers four settings. Today's B2K2w stands in for it.",
+  "easy": 20,
+  "medium": 21,
+  "hard": 22,
+  "crazy": 22.8
+ },
+ "notes": [
+  "A line-up is written as in game/plan/sim: w wisp, K Shadow Wraith, B great wraith.",
+  "Bands 4 to 6 are bramble country. Their line-ups here are wraith-family stand-ins until the bramble foes have fight numbers (task board F3).",
+  "The party shares XP and levels together. Losing costs nothing: she wakes at the last rest spot."
+ ]
+}

@@ -1,5 +1,20 @@
 # Levelling for the bigger game (task board F4)
 
+**Revised on November 15, 2026 (1:06 pm) by Chris's word. The plan the game reads is now `plan-v2.json`
+(`plan-v2.js` for a page, as `window.MF_LEVELS`), made by `plan2.js`. It replaces `plan-chosen.json`.**
+
+- Walking foes are from one level below the party to two above, wherever she is ("when exploring and running around,
+  you can run into one level below to two levels above in the broad open area").
+- Two gates in place of six: the final great wraith fight at level 10, and the great bramble fight at level 20. Then
+  the final boss, at level 20, 21, 22 or 22.8 (easy, medium, hard, crazy).
+- Still option B: 20 levels, about 180 fights to finish, level 20 the top.
+- Six bands of land by the party's level (2 to 5, 5 to 8, 8 to 10, 10 to 14, 14 to 17, 17 to 20) say what line-ups are
+  met and are where finds and rest spots are counted. Bands 1 to 3 are wraith country, 4 to 6 bramble country. The
+  bramble bands use wraith-family line-ups as stand-ins until the bramble foes have fight numbers.
+- Whole games under this plan, with herbs and rest spots and all eight testers, are played by `../herbs/game.js`.
+
+What follows is the record of how option B was chosen, and still describes `plan-chosen.json`.
+
 Made by the "Levelling" session on November 14, 2026. Chris asked for 5 to 10 times the fights of the starter plan
 (about 120 to 240) and a wider span of levels, now that the map is an open world. This folder holds three options
 with numbers, which he chose from.
