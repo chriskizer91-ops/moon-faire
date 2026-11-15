@@ -1,0 +1,1063 @@
+{
+ "n": 2000,
+ "last": {
+  "very careless": [
+   {
+    "level": 20,
+    "none": {
+     "win": 0.0215,
+     "turns": 35.2093023255814,
+     "kos": 1.7906976744186047,
+     "hpLeft": 0.2805015706105719,
+     "mpLeft": 0.3586378737541528
+    },
+    "all": {
+     "win": 0.1065,
+     "turns": 38.840375586854464,
+     "kos": 1.1737089201877935,
+     "hpLeft": 0.336022175228415,
+     "mpLeft": 0.37094191163239604
+    }
+   },
+   {
+    "level": 21,
+    "none": {
+     "win": 0.0005,
+     "turns": 40,
+     "kos": 0,
+     "hpLeft": 0.4551332441847894,
+     "mpLeft": 0.18571428571428572
+    },
+    "all": {
+     "win": 0.006,
+     "turns": 41.416666666666664,
+     "kos": 1.4166666666666667,
+     "hpLeft": 0.34488170483186625,
+     "mpLeft": 0.304602206736353
+    }
+   },
+   {
+    "level": 22,
+    "none": {
+     "win": 0,
+     "turns": 0,
+     "kos": 0,
+     "hpLeft": 0,
+     "mpLeft": 0
+    },
+    "all": {
+     "win": 0,
+     "turns": 0,
+     "kos": 0,
+     "hpLeft": 0,
+     "mpLeft": 0
+    }
+   },
+   {
+    "level": 23,
+    "none": {
+     "win": 0,
+     "turns": 0,
+     "kos": 0,
+     "hpLeft": 0,
+     "mpLeft": 0
+    },
+    "all": {
+     "win": 0,
+     "turns": 0,
+     "kos": 0,
+     "hpLeft": 0,
+     "mpLeft": 0
+    }
+   }
+  ],
+  "careless": [
+   {
+    "level": 20,
+    "none": {
+     "win": 0.0535,
+     "turns": 28.38317757009346,
+     "kos": 1.925233644859813,
+     "hpLeft": 0.24123237262519262,
+     "mpLeft": 0.5445260347129505
+    },
+    "all": {
+     "win": 0.192,
+     "turns": 29.78125,
+     "kos": 1.8984375,
+     "hpLeft": 0.2584684135076621,
+     "mpLeft": 0.5452852787456451
+    }
+   },
+   {
+    "level": 21,
+    "none": {
+     "win": 0.002,
+     "turns": 29.75,
+     "kos": 1.25,
+     "hpLeft": 0.16806213979958046,
+     "mpLeft": 0.5267857142857143
+    },
+    "all": {
+     "win": 0.0085,
+     "turns": 33.294117647058826,
+     "kos": 2.4705882352941178,
+     "hpLeft": 0.25284632742382945,
+     "mpLeft": 0.4144496823119491
+    }
+   },
+   {
+    "level": 22,
+    "none": {
+     "win": 0,
+     "turns": 0,
+     "kos": 0,
+     "hpLeft": 0,
+     "mpLeft": 0
+    },
+    "all": {
+     "win": 0,
+     "turns": 0,
+     "kos": 0,
+     "hpLeft": 0,
+     "mpLeft": 0
+    }
+   },
+   {
+    "level": 23,
+    "none": {
+     "win": 0,
+     "turns": 0,
+     "kos": 0,
+     "hpLeft": 0,
+     "mpLeft": 0
+    },
+    "all": {
+     "win": 0,
+     "turns": 0,
+     "kos": 0,
+     "hpLeft": 0,
+     "mpLeft": 0
+    }
+   }
+  ],
+  "attentive, careful": [
+   {
+    "level": 20,
+    "none": {
+     "win": 0.8,
+     "turns": 26.185625,
+     "kos": 0.575625,
+     "hpLeft": 0.37035039250314805,
+     "mpLeft": 0.4051160714285676
+    },
+    "all": {
+     "win": 0.9845,
+     "turns": 26.529202640934486,
+     "kos": 0.30827831386490606,
+     "hpLeft": 0.4539622915387273,
+     "mpLeft": 0.43557510754676726
+    }
+   },
+   {
+    "level": 21,
+    "none": {
+     "win": 0.0315,
+     "turns": 28.22222222222222,
+     "kos": 0.5396825396825397,
+     "hpLeft": 0.2367024270676341,
+     "mpLeft": 0.3276643990929705
+    },
+    "all": {
+     "win": 0.131,
+     "turns": 27.770992366412212,
+     "kos": 0.4198473282442748,
+     "hpLeft": 0.2824494195830939,
+     "mpLeft": 0.36575125674920933
+    }
+   },
+   {
+    "level": 22,
+    "none": {
+     "win": 0,
+     "turns": 0,
+     "kos": 0,
+     "hpLeft": 0,
+     "mpLeft": 0
+    },
+    "all": {
+     "win": 0,
+     "turns": 0,
+     "kos": 0,
+     "hpLeft": 0,
+     "mpLeft": 0
+    }
+   },
+   {
+    "level": 23,
+    "none": {
+     "win": 0,
+     "turns": 0,
+     "kos": 0,
+     "hpLeft": 0,
+     "mpLeft": 0
+    },
+    "all": {
+     "win": 0,
+     "turns": 0,
+     "kos": 0,
+     "hpLeft": 0,
+     "mpLeft": 0
+    }
+   }
+  ],
+  "attentive, bold": [
+   {
+    "level": 20,
+    "none": {
+     "win": 0.5385,
+     "turns": 27.40297121634169,
+     "kos": 0.7000928505106778,
+     "hpLeft": 0.3080062098482877,
+     "mpLeft": 0.3706194455498078
+    },
+    "all": {
+     "win": 0.8485,
+     "turns": 27.301119622863876,
+     "kos": 0.43606364172068357,
+     "hpLeft": 0.3439079166103744,
+     "mpLeft": 0.4119233777993144
+    }
+   },
+   {
+    "level": 21,
+    "none": {
+     "win": 0.0275,
+     "turns": 29.30909090909091,
+     "kos": 0.8363636363636363,
+     "hpLeft": 0.3056912277725564,
+     "mpLeft": 0.28779220779220765
+    },
+    "all": {
+     "win": 0.097,
+     "turns": 30.829896907216494,
+     "kos": 1.1546391752577319,
+     "hpLeft": 0.32603277370210026,
+     "mpLeft": 0.27507453572326607
+    }
+   },
+   {
+    "level": 22,
+    "none": {
+     "win": 0,
+     "turns": 0,
+     "kos": 0,
+     "hpLeft": 0,
+     "mpLeft": 0
+    },
+    "all": {
+     "win": 0,
+     "turns": 0,
+     "kos": 0,
+     "hpLeft": 0,
+     "mpLeft": 0
+    }
+   },
+   {
+    "level": 23,
+    "none": {
+     "win": 0,
+     "turns": 0,
+     "kos": 0,
+     "hpLeft": 0,
+     "mpLeft": 0
+    },
+    "all": {
+     "win": 0,
+     "turns": 0,
+     "kos": 0,
+     "hpLeft": 0,
+     "mpLeft": 0
+    }
+   }
+  ],
+  "focused, careful": [
+   {
+    "level": 20,
+    "none": {
+     "win": 0.956,
+     "turns": 27.536087866108787,
+     "kos": 0.7259414225941423,
+     "hpLeft": 0.4096435216379833,
+     "mpLeft": 0.36560071727435767
+    },
+    "all": {
+     "win": 0.999,
+     "turns": 27.13763763763764,
+     "kos": 0.32732732732732733,
+     "hpLeft": 0.49108187856833124,
+     "mpLeft": 0.4214640598786964
+    }
+   },
+   {
+    "level": 21,
+    "none": {
+     "win": 0.352,
+     "turns": 32.39488636363637,
+     "kos": 2.055397727272727,
+     "hpLeft": 0.23870702541149652,
+     "mpLeft": 0.22305194805194783
+    },
+    "all": {
+     "win": 0.6525,
+     "turns": 32.37241379310345,
+     "kos": 1.650574712643678,
+     "hpLeft": 0.273781317596971,
+     "mpLeft": 0.2450107466591918
+    }
+   },
+   {
+    "level": 22,
+    "none": {
+     "win": 0.003,
+     "turns": 34,
+     "kos": 3.3333333333333335,
+     "hpLeft": 0.15159361538994645,
+     "mpLeft": 0.15
+    },
+    "all": {
+     "win": 0.0655,
+     "turns": 36.80916030534351,
+     "kos": 0.9236641221374046,
+     "hpLeft": 0.29852000971455633,
+     "mpLeft": 0.15489001782057082
+    }
+   },
+   {
+    "level": 23,
+    "none": {
+     "win": 0,
+     "turns": 0,
+     "kos": 0,
+     "hpLeft": 0,
+     "mpLeft": 0
+    },
+    "all": {
+     "win": 0,
+     "turns": 0,
+     "kos": 0,
+     "hpLeft": 0,
+     "mpLeft": 0
+    }
+   }
+  ],
+  "focused, bold": [
+   {
+    "level": 20,
+    "none": {
+     "win": 0.7655,
+     "turns": 27.737426518615283,
+     "kos": 0.67472240365774,
+     "hpLeft": 0.3497680667032863,
+     "mpLeft": 0.3629607166184575
+    },
+    "all": {
+     "win": 0.925,
+     "turns": 27.433513513513514,
+     "kos": 0.36702702702702705,
+     "hpLeft": 0.4056205956801341,
+     "mpLeft": 0.41106300028251036
+    }
+   },
+   {
+    "level": 21,
+    "none": {
+     "win": 0.1475,
+     "turns": 31.952542372881357,
+     "kos": 2.298305084745763,
+     "hpLeft": 0.2097333358043794,
+     "mpLeft": 0.226222760290557
+    },
+    "all": {
+     "win": 0.373,
+     "turns": 32.75871313672922,
+     "kos": 1.769436997319035,
+     "hpLeft": 0.2646845892364813,
+     "mpLeft": 0.24290992143931434
+    }
+   },
+   {
+    "level": 22,
+    "none": {
+     "win": 0,
+     "turns": 0,
+     "kos": 0,
+     "hpLeft": 0,
+     "mpLeft": 0
+    },
+    "all": {
+     "win": 0.0015,
+     "turns": 37.333333333333336,
+     "kos": 1,
+     "hpLeft": 0.24112310532033146,
+     "mpLeft": 0.1472125435540069
+    }
+   },
+   {
+    "level": 23,
+    "none": {
+     "win": 0,
+     "turns": 0,
+     "kos": 0,
+     "hpLeft": 0,
+     "mpLeft": 0
+    },
+    "all": {
+     "win": 0,
+     "turns": 0,
+     "kos": 0,
+     "hpLeft": 0,
+     "mpLeft": 0
+    }
+   }
+  ],
+  "expert, careful": [
+   {
+    "level": 20,
+    "none": {
+     "win": 0.995,
+     "turns": 28.45678391959799,
+     "kos": 0.16733668341708544,
+     "hpLeft": 0.4946654723794132,
+     "mpLeft": 0.3598636037329511
+    },
+    "all": {
+     "win": 1,
+     "turns": 29.2255,
+     "kos": 0.055,
+     "hpLeft": 0.5731150929029899,
+     "mpLeft": 0.38100688153309936
+    }
+   },
+   {
+    "level": 21,
+    "none": {
+     "win": 0.9105,
+     "turns": 30.368478857770455,
+     "kos": 0.5381658429434377,
+     "hpLeft": 0.39149067245629304,
+     "mpLeft": 0.3084333568682816
+    },
+    "all": {
+     "win": 0.9745,
+     "turns": 30.763468445356594,
+     "kos": 0.3909697280656747,
+     "hpLeft": 0.5219216506583727,
+     "mpLeft": 0.3110174430557652
+    }
+   },
+   {
+    "level": 22,
+    "none": {
+     "win": 0.2645,
+     "turns": 33.40453686200378,
+     "kos": 2.003780718336484,
+     "hpLeft": 0.18344558512131331,
+     "mpLeft": 0.2117337294085882
+    },
+    "all": {
+     "win": 0.7995,
+     "turns": 32.94684177611007,
+     "kos": 1.5666041275797373,
+     "hpLeft": 0.25956500775711255,
+     "mpLeft": 0.24530913266784674
+    }
+   },
+   {
+    "level": 23,
+    "none": {
+     "win": 0,
+     "turns": 0,
+     "kos": 0,
+     "hpLeft": 0,
+     "mpLeft": 0
+    },
+    "all": {
+     "win": 0.0065,
+     "turns": 36.30769230769231,
+     "kos": 2.6923076923076925,
+     "hpLeft": 0.15761134293147586,
+     "mpLeft": 0.12831680514607335
+    }
+   }
+  ],
+  "expert, bold": [
+   {
+    "level": 20,
+    "none": {
+     "win": 0.9785,
+     "turns": 28.012774655084314,
+     "kos": 0.2733776188042923,
+     "hpLeft": 0.42015898270071805,
+     "mpLeft": 0.37271333673990337
+    },
+    "all": {
+     "win": 0.9965,
+     "turns": 28.401404917210236,
+     "kos": 0.26793778223783243,
+     "hpLeft": 0.47490894951708584,
+     "mpLeft": 0.40046941298027544
+    }
+   },
+   {
+    "level": 21,
+    "none": {
+     "win": 0.678,
+     "turns": 30.567846607669615,
+     "kos": 0.6423303834808259,
+     "hpLeft": 0.3544510695068054,
+     "mpLeft": 0.32227665402444355
+    },
+    "all": {
+     "win": 0.8425,
+     "turns": 30.814836795252226,
+     "kos": 0.4433234421364985,
+     "hpLeft": 0.44776227505061406,
+     "mpLeft": 0.33803771751155387
+    }
+   },
+   {
+    "level": 22,
+    "none": {
+     "win": 0.0805,
+     "turns": 32.142857142857146,
+     "kos": 1.4472049689440993,
+     "hpLeft": 0.19760380253020138,
+     "mpLeft": 0.25283939662821675
+    },
+    "all": {
+     "win": 0.506,
+     "turns": 33.015810276679844,
+     "kos": 1.2025691699604744,
+     "hpLeft": 0.23950504204331075,
+     "mpLeft": 0.25225964385561506
+    }
+   },
+   {
+    "level": 23,
+    "none": {
+     "win": 0,
+     "turns": 0,
+     "kos": 0,
+     "hpLeft": 0,
+     "mpLeft": 0
+    },
+    "all": {
+     "win": 0.0005,
+     "turns": 40,
+     "kos": 1,
+     "hpLeft": 0.2625243503984237,
+     "mpLeft": 0.11010452961672464
+    }
+   }
+  ]
+ },
+ "other": {
+  "very careless": [
+   {
+    "code": "3w",
+    "gap": 1,
+    "name": "three wisps, 1 level over",
+    "r": {
+     "win": 1,
+     "turns": 10.7325,
+     "kos": 0,
+     "hpLeft": 0.9665839204015833,
+     "mpLeft": 0.8307714285714293
+    }
+   },
+   {
+    "code": "2K2w",
+    "gap": 2,
+    "name": "two Shadow Wraiths and two wisps, 2 over",
+    "r": {
+     "win": 0.99,
+     "turns": 26.982323232323232,
+     "kos": 0.30252525252525253,
+     "hpLeft": 0.6733432472683999,
+     "mpLeft": 0.5543650793650796
+    }
+   },
+   {
+    "code": "2K4w",
+    "gap": 4,
+    "name": "the worst walking fight, 4 over",
+    "r": {
+     "win": 0.0785,
+     "turns": 34.21656050955414,
+     "kos": 1.5477707006369428,
+     "hpLeft": 0.3857157505498284,
+     "mpLeft": 0.4095086442220198
+    }
+   },
+   {
+    "code": "B",
+    "gap": 0,
+    "name": "the great wraith alone, the level-14 gate",
+    "r": {
+     "win": 0.487,
+     "turns": 34.65503080082136,
+     "kos": 0.6652977412731006,
+     "hpLeft": 0.4328667777382332,
+     "mpLeft": 0.43376356702845376
+    }
+   },
+   {
+    "code": "BK2w",
+    "gap": 0,
+    "name": "the level-17 gate",
+    "r": {
+     "win": 0.1385,
+     "turns": 35.584837545126355,
+     "kos": 1.1335740072202165,
+     "hpLeft": 0.3394349027864125,
+     "mpLeft": 0.3836255801959774
+    }
+   }
+  ],
+  "careless": [
+   {
+    "code": "3w",
+    "gap": 1,
+    "name": "three wisps, 1 level over",
+    "r": {
+     "win": 1,
+     "turns": 9.4405,
+     "kos": 0,
+     "hpLeft": 0.9520937503374546,
+     "mpLeft": 0.8751428571428563
+    }
+   },
+   {
+    "code": "2K2w",
+    "gap": 2,
+    "name": "two Shadow Wraiths and two wisps, 2 over",
+    "r": {
+     "win": 0.9985,
+     "turns": 19.59839759639459,
+     "kos": 0.299949924887331,
+     "hpLeft": 0.6274667761580702,
+     "mpLeft": 0.7361005794405887
+    }
+   },
+   {
+    "code": "2K4w",
+    "gap": 4,
+    "name": "the worst walking fight, 4 over",
+    "r": {
+     "win": 0.2265,
+     "turns": 24.47240618101545,
+     "kos": 1.7858719646799117,
+     "hpLeft": 0.4016700280736703,
+     "mpLeft": 0.562141280353201
+    }
+   },
+   {
+    "code": "B",
+    "gap": 0,
+    "name": "the great wraith alone, the level-14 gate",
+    "r": {
+     "win": 0.59,
+     "turns": 28.427118644067797,
+     "kos": 1.4754237288135594,
+     "hpLeft": 0.2927451904882502,
+     "mpLeft": 0.5910956416464895
+    }
+   },
+   {
+    "code": "BK2w",
+    "gap": 0,
+    "name": "the level-17 gate",
+    "r": {
+     "win": 0.18,
+     "turns": 28.886111111111113,
+     "kos": 1.5583333333333333,
+     "hpLeft": 0.2658672927503713,
+     "mpLeft": 0.5459523809523809
+    }
+   }
+  ],
+  "attentive, careful": [
+   {
+    "code": "3w",
+    "gap": 1,
+    "name": "three wisps, 1 level over",
+    "r": {
+     "win": 1,
+     "turns": 6.9695,
+     "kos": 0,
+     "hpLeft": 0.9782940407896202,
+     "mpLeft": 0.8750857142857285
+    }
+   },
+   {
+    "code": "2K2w",
+    "gap": 2,
+    "name": "two Shadow Wraiths and two wisps, 2 over",
+    "r": {
+     "win": 1,
+     "turns": 14.0575,
+     "kos": 0,
+     "hpLeft": 0.8734196590013341,
+     "mpLeft": 0.6636214285714505
+    }
+   },
+   {
+    "code": "2K4w",
+    "gap": 4,
+    "name": "the worst walking fight, 4 over",
+    "r": {
+     "win": 1,
+     "turns": 17.9655,
+     "kos": 0.0005,
+     "hpLeft": 0.7501159790326881,
+     "mpLeft": 0.5983571428571425
+    }
+   },
+   {
+    "code": "B",
+    "gap": 0,
+    "name": "the great wraith alone, the level-14 gate",
+    "r": {
+     "win": 1,
+     "turns": 21.84,
+     "kos": 0,
+     "hpLeft": 0.6909765687226394,
+     "mpLeft": 0.626707142857147
+    }
+   },
+   {
+    "code": "BK2w",
+    "gap": 0,
+    "name": "the level-17 gate",
+    "r": {
+     "win": 1,
+     "turns": 27,
+     "kos": 0,
+     "hpLeft": 0.5063932694180355,
+     "mpLeft": 0.46472500000000194
+    }
+   }
+  ],
+  "attentive, bold": [
+   {
+    "code": "3w",
+    "gap": 1,
+    "name": "three wisps, 1 level over",
+    "r": {
+     "win": 1,
+     "turns": 6.7745,
+     "kos": 0,
+     "hpLeft": 0.9677833799299062,
+     "mpLeft": 0.8437214285714402
+    }
+   },
+   {
+    "code": "2K2w",
+    "gap": 2,
+    "name": "two Shadow Wraiths and two wisps, 2 over",
+    "r": {
+     "win": 1,
+     "turns": 14.0575,
+     "kos": 0,
+     "hpLeft": 0.87184482128271,
+     "mpLeft": 0.6637250000000224
+    }
+   },
+   {
+    "code": "2K4w",
+    "gap": 4,
+    "name": "the worst walking fight, 4 over",
+    "r": {
+     "win": 1,
+     "turns": 17.9535,
+     "kos": 0.0005,
+     "hpLeft": 0.7343173142477843,
+     "mpLeft": 0.6000071428571452
+    }
+   },
+   {
+    "code": "B",
+    "gap": 0,
+    "name": "the great wraith alone, the level-14 gate",
+    "r": {
+     "win": 1,
+     "turns": 21.127,
+     "kos": 0.0015,
+     "hpLeft": 0.5814994894080094,
+     "mpLeft": 0.6676642857142908
+    }
+   },
+   {
+    "code": "BK2w",
+    "gap": 0,
+    "name": "the level-17 gate",
+    "r": {
+     "win": 0.9885,
+     "turns": 27.4405665149216,
+     "kos": 0.30652503793626706,
+     "hpLeft": 0.38136222682546045,
+     "mpLeft": 0.460889515138377
+    }
+   }
+  ],
+  "focused, careful": [
+   {
+    "code": "3w",
+    "gap": 1,
+    "name": "three wisps, 1 level over",
+    "r": {
+     "win": 1,
+     "turns": 6.9695,
+     "kos": 0,
+     "hpLeft": 0.9782940407896202,
+     "mpLeft": 0.8750857142857285
+    }
+   },
+   {
+    "code": "2K2w",
+    "gap": 2,
+    "name": "two Shadow Wraiths and two wisps, 2 over",
+    "r": {
+     "win": 1,
+     "turns": 14.0575,
+     "kos": 0,
+     "hpLeft": 0.8734196590013341,
+     "mpLeft": 0.6636214285714505
+    }
+   },
+   {
+    "code": "2K4w",
+    "gap": 4,
+    "name": "the worst walking fight, 4 over",
+    "r": {
+     "win": 1,
+     "turns": 17.9655,
+     "kos": 0.0005,
+     "hpLeft": 0.75167978537784,
+     "mpLeft": 0.5982357142857142
+    }
+   },
+   {
+    "code": "B",
+    "gap": 0,
+    "name": "the great wraith alone, the level-14 gate",
+    "r": {
+     "win": 1,
+     "turns": 22.224,
+     "kos": 0,
+     "hpLeft": 0.6844320270870149,
+     "mpLeft": 0.6117142857142894
+    }
+   },
+   {
+    "code": "BK2w",
+    "gap": 0,
+    "name": "the level-17 gate",
+    "r": {
+     "win": 1,
+     "turns": 27,
+     "kos": 0,
+     "hpLeft": 0.5360610078277729,
+     "mpLeft": 0.4599464285714301
+    }
+   }
+  ],
+  "focused, bold": [
+   {
+    "code": "3w",
+    "gap": 1,
+    "name": "three wisps, 1 level over",
+    "r": {
+     "win": 1,
+     "turns": 6.7745,
+     "kos": 0,
+     "hpLeft": 0.9677833799299062,
+     "mpLeft": 0.8437214285714402
+    }
+   },
+   {
+    "code": "2K2w",
+    "gap": 2,
+    "name": "two Shadow Wraiths and two wisps, 2 over",
+    "r": {
+     "win": 1,
+     "turns": 14.0575,
+     "kos": 0,
+     "hpLeft": 0.87184482128271,
+     "mpLeft": 0.6637250000000224
+    }
+   },
+   {
+    "code": "2K4w",
+    "gap": 4,
+    "name": "the worst walking fight, 4 over",
+    "r": {
+     "win": 1,
+     "turns": 17.9535,
+     "kos": 0.0005,
+     "hpLeft": 0.7343173142477843,
+     "mpLeft": 0.6000071428571452
+    }
+   },
+   {
+    "code": "B",
+    "gap": 0,
+    "name": "the great wraith alone, the level-14 gate",
+    "r": {
+     "win": 1,
+     "turns": 21.438,
+     "kos": 0,
+     "hpLeft": 0.5750011799974349,
+     "mpLeft": 0.6551285714285768
+    }
+   },
+   {
+    "code": "BK2w",
+    "gap": 0,
+    "name": "the level-17 gate",
+    "r": {
+     "win": 0.999,
+     "turns": 26.994494494494493,
+     "kos": 0.03003003003003003,
+     "hpLeft": 0.4357465086960436,
+     "mpLeft": 0.46971614471614886
+    }
+   }
+  ],
+  "expert, careful": [
+   {
+    "code": "3w",
+    "gap": 1,
+    "name": "three wisps, 1 level over",
+    "r": {
+     "win": 1,
+     "turns": 6.9695,
+     "kos": 0,
+     "hpLeft": 0.9782940407896202,
+     "mpLeft": 0.8750857142857285
+    }
+   },
+   {
+    "code": "2K2w",
+    "gap": 2,
+    "name": "two Shadow Wraiths and two wisps, 2 over",
+    "r": {
+     "win": 1,
+     "turns": 15.8775,
+     "kos": 0,
+     "hpLeft": 0.8506035211642141,
+     "mpLeft": 0.6411035714285657
+    }
+   },
+   {
+    "code": "2K4w",
+    "gap": 4,
+    "name": "the worst walking fight, 4 over",
+    "r": {
+     "win": 1,
+     "turns": 18.55,
+     "kos": 0,
+     "hpLeft": 0.7735664875970932,
+     "mpLeft": 0.5822035714285771
+    }
+   },
+   {
+    "code": "B",
+    "gap": 0,
+    "name": "the great wraith alone, the level-14 gate",
+    "r": {
+     "win": 1,
+     "turns": 22.101,
+     "kos": 0,
+     "hpLeft": 0.625170150730112,
+     "mpLeft": 0.617178571428573
+    }
+   },
+   {
+    "code": "BK2w",
+    "gap": 0,
+    "name": "the level-17 gate",
+    "r": {
+     "win": 1,
+     "turns": 27.762,
+     "kos": 0.02,
+     "hpLeft": 0.5498627974912483,
+     "mpLeft": 0.39431428571428356
+    }
+   }
+  ],
+  "expert, bold": [
+   {
+    "code": "3w",
+    "gap": 1,
+    "name": "three wisps, 1 level over",
+    "r": {
+     "win": 1,
+     "turns": 6.7745,
+     "kos": 0,
+     "hpLeft": 0.9677833799299062,
+     "mpLeft": 0.8437214285714402
+    }
+   },
+   {
+    "code": "2K2w",
+    "gap": 2,
+    "name": "two Shadow Wraiths and two wisps, 2 over",
+    "r": {
+     "win": 1,
+     "turns": 15.6775,
+     "kos": 0,
+     "hpLeft": 0.8180501012134723,
+     "mpLeft": 0.6437928571428604
+    }
+   },
+   {
+    "code": "2K4w",
+    "gap": 4,
+    "name": "the worst walking fight, 4 over",
+    "r": {
+     "win": 1,
+     "turns": 18.514,
+     "kos": 0,
+     "hpLeft": 0.7262463084460681,
+     "mpLeft": 0.5911964285714296
+    }
+   },
+   {
+    "code": "B",
+    "gap": 0,
+    "name": "the great wraith alone, the level-14 gate",
+    "r": {
+     "win": 1,
+     "turns": 21.975,
+     "kos": 0,
+     "hpLeft": 0.5660876678547654,
+     "mpLeft": 0.6251035714285724
+    }
+   },
+   {
+    "code": "BK2w",
+    "gap": 0,
+    "name": "the level-17 gate",
+    "r": {
+     "win": 0.995,
+     "turns": 27.57386934673367,
+     "kos": 0.12361809045226131,
+     "hpLeft": 0.47288037912380754,
+     "mpLeft": 0.42264895908112393
+    }
+   }
+  ]
+ }
+}
