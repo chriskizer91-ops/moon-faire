@@ -1,0 +1,3440 @@
+{
+ "writer": "B",
+ "people": {
+  "fair-baker": {
+   "guess": "Heat that went up somebody's flue and never found the way back down; once he hears a wisp was warmed and went home, lost heat looking for its own oven.",
+   "invented": [
+    "His grandmother built his oven, and in sixty years it never tried to leave before tonight.",
+    "He bakes the fair's bread for the road through the night.",
+    "Once the Jester has been by a few times he keeps a bun on the corner of the cart for her, and he hides his good knife.",
+    "He marks each lamp that comes home in the flour on his board."
+   ],
+   "lines": [
+    {
+     "id": "fair-baker-01",
+     "slot": "hello",
+     "kind": "talk",
+     "when": {
+      "talks": [
+       0,
+       0
+      ],
+      "stage": [
+       0,
+       1
+      ]
+     },
+     "text": "Evening, bells. Have a bun before the oven pulls it up the flue. I'm only half joking.",
+     "emote": "wave"
+    },
+    {
+     "id": "fair-baker-02",
+     "slot": "hello",
+     "kind": "talk",
+     "when": {
+      "talks": [
+       0,
+       0
+      ],
+      "stage": [
+       2,
+       3
+      ]
+     },
+     "text": "You look half frozen, bells. Stand by the oven a minute. Whatever she's pulling at, she's still got warmth for four.",
+     "emote": "beckon"
+    },
+    {
+     "id": "fair-baker-03",
+     "slot": "hello",
+     "kind": "talk",
+     "when": {
+      "talks": [
+       0,
+       0
+      ],
+      "stage": [
+       4,
+       5
+      ]
+     },
+     "text": "Bells, at last. Years you've walked past my cart, and it took a night like this to stop you. Bun. Still warm.",
+     "emote": "laugh"
+    },
+    {
+     "id": "fair-baker-04",
+     "slot": "stage",
+     "kind": "talk",
+     "when": {
+      "stage": [
+       0,
+       0
+      ]
+     },
+     "text": "Every bun in this tray has risen lopsided, all leaning east. I've baked forty thousand buns and never a lopsided one.",
+     "emote": "surprised"
+    },
+    {
+     "id": "fair-baker-05",
+     "slot": "stage",
+     "kind": "talk",
+     "when": {
+      "stage": [
+       0,
+       0
+      ]
+     },
+     "text": "I've shut the damper right down and she still draws. Like she's heard somebody calling her name.",
+     "emote": "think"
+    },
+    {
+     "id": "fair-baker-06",
+     "slot": "stage",
+     "kind": "talk",
+     "when": {
+      "stage": [
+       1,
+       1
+      ]
+     },
+     "text": "Want to know what I reckon? Heat that went up somebody's flue and never found the way back down. That's them.",
+     "emote": "think"
+    },
+    {
+     "id": "fair-baker-07",
+     "slot": "stage",
+     "kind": "talk",
+     "when": {
+      "stage": [
+       1,
+       1
+      ]
+     },
+     "text": "She pulls so hard the door rattles on its latch. I've wedged it with the rolling pin. She's not having my door.",
+     "emote": "laugh"
+    },
+    {
+     "id": "fair-baker-08",
+     "slot": "stage",
+     "kind": "talk",
+     "when": {
+      "stage": [
+       2,
+       2
+      ]
+     },
+     "text": "I've stood here since you went out, peel in one hand and poker in the other. My arms have gone to dough.",
+     "emote": "shrug"
+    },
+    {
+     "id": "fair-baker-09",
+     "slot": "stage",
+     "kind": "talk",
+     "when": {
+      "stage": [
+       2,
+       2
+      ]
+     },
+     "text": "My grandmother built this oven. In sixty years the old girl never tried to leave. She's trying tonight. I won't have it.",
+     "emote": "cross"
+    },
+    {
+     "id": "fair-baker-10",
+     "slot": "stage",
+     "kind": "talk",
+     "when": {
+      "stage": [
+       3,
+       3
+      ]
+     },
+     "text": "She's still drawing, but soft now. Like a sigh, not a shout. Something out there has let go a little.",
+     "emote": "nod"
+    },
+    {
+     "id": "fair-baker-11",
+     "slot": "stage",
+     "kind": "talk",
+     "when": {
+      "stage": [
+       3,
+       3
+      ]
+     },
+     "text": "I've hung the peel back on its hook. First time since dusk. I'm keeping one eye on it, mind.",
+     "emote": "point"
+    },
+    {
+     "id": "fair-baker-12",
+     "slot": "stage",
+     "kind": "talk",
+     "when": {
+      "stage": [
+       4,
+       4
+      ]
+     },
+     "text": "I've damped her down to embers so there's less for it to take. Worst bread I've made in years. Worth it.",
+     "emote": "shrug"
+    },
+    {
+     "id": "fair-baker-13",
+     "slot": "stage",
+     "kind": "talk",
+     "when": {
+      "stage": [
+       4,
+       4
+      ]
+     },
+     "text": "Take a bun back up with you. If anything up there gets close, throw it hard. It's yesterday's.",
+     "emote": "laugh"
+    },
+    {
+     "id": "fair-baker-14",
+     "slot": "stage",
+     "kind": "talk",
+     "when": {
+      "stage": [
+       5,
+       5
+      ]
+     },
+     "text": "She draws like an oven again. Only an oven. I'll have the road's bread done by morning after all.",
+     "emote": "nod"
+    },
+    {
+     "id": "fair-baker-15",
+     "slot": "stage",
+     "kind": "talk",
+     "when": {
+      "stage": [
+       5,
+       5
+      ]
+     },
+     "text": "First tray all night that rose straight up. You did that, bells. Don't ask me how I know. A baker knows.",
+     "emote": "laugh"
+    },
+    {
+     "id": "fair-baker-16",
+     "slot": "count",
+     "kind": "talk",
+     "when": {
+      "talks": [
+       1,
+       1
+      ]
+     },
+     "text": "Back already? Then the bun was good. I knew it was. I just like to hear it.",
+     "emote": "laugh"
+    },
+    {
+     "id": "fair-baker-17",
+     "slot": "count",
+     "kind": "talk",
+     "when": {
+      "talks": [
+       2,
+       4
+      ]
+     },
+     "text": "I've started keeping a bun on the corner for you. Don't tell your three. They'll all want a corner.",
+     "emote": "nod"
+    },
+    {
+     "id": "fair-baker-18",
+     "slot": "count",
+     "kind": "talk",
+     "when": {
+      "talks": [
+       5,
+       9
+      ]
+     },
+     "text": "You know which jar's the honey and where I hide the good knife. That makes you family at this cart.",
+     "emote": "greet_bow"
+    },
+    {
+     "id": "fair-baker-19",
+     "slot": "count",
+     "kind": "talk",
+     "when": {
+      "talks": [
+       10,
+       99
+      ]
+     },
+     "text": "Once more and I'm putting you to work. Apron's on the hook. Mind the peel, it has opinions.",
+     "emote": "point"
+    },
+    {
+     "id": "fair-baker-20",
+     "slot": "just",
+     "kind": "talk",
+     "when": {
+      "just": "won"
+     },
+     "text": "You've the look of someone who's won. Have the one with the most currants. That's the winner's bun.",
+     "emote": "laugh"
+    },
+    {
+     "id": "fair-baker-21",
+     "slot": "just",
+     "kind": "talk",
+     "when": {
+      "just": "hurt"
+     },
+     "text": "One of you is walking stiff. I've nothing for that but bread and sympathy, and you can have both.",
+     "emote": "sad"
+    },
+    {
+     "id": "fair-baker-22",
+     "slot": "just",
+     "kind": "talk",
+     "when": {
+      "just": "away"
+     },
+     "text": "Where've you been, bells? I've had a bun going cold for you since two trays ago.",
+     "emote": "shrug"
+    },
+    {
+     "id": "fair-baker-23",
+     "slot": "just",
+     "kind": "talk",
+     "when": {
+      "just": "lamp"
+     },
+     "text": "Brought another one home? I'll mark it in the flour with the others. There. That's yours, the crooked one.",
+     "emote": "point"
+    },
+    {
+     "id": "fair-baker-24",
+     "slot": "gossip",
+     "kind": "talk",
+     "when": {
+      "met": "old-night-watchman"
+     },
+     "text": "In all the years I've known the watchman he never took a bun off me. Tonight he took two. That's how I know it's bad.",
+     "emote": "think"
+    },
+    {
+     "id": "fair-baker-25",
+     "slot": "gossip",
+     "kind": "talk",
+     "when": {
+      "met": "farm-lad"
+     },
+     "text": "You've been out to the farm lad? Tell him there's a loaf here with his name on it. Well. With my thumb in it.",
+     "emote": "laugh"
+    },
+    {
+     "id": "fair-baker-26",
+     "slot": "gossip",
+     "kind": "talk",
+     "when": {
+      "heard": "wisp-warmed"
+     },
+     "text": "Your herb-witch held one till it warmed, and it went home? Lost heat, like I said. Heat always wants its own oven.",
+     "emote": "nod"
+    },
+    {
+     "id": "fair-baker-27",
+     "slot": "gossip",
+     "kind": "talk",
+     "when": {
+      "heard": "card"
+     },
+     "text": "The fortune-teller turned you the card with the empty fire? Not round here. There's always somebody stood by my fire.",
+     "emote": "shake_head"
+    },
+    {
+     "id": "fair-baker-28",
+     "slot": "level",
+     "kind": "talk",
+     "when": {
+      "level": [
+       1,
+       4
+      ]
+     },
+     "text": "You four look like you came out of the oven early. Soft in the middle. No offence meant, bells.",
+     "emote": "laugh"
+    },
+    {
+     "id": "fair-baker-29",
+     "slot": "level",
+     "kind": "talk",
+     "when": {
+      "level": [
+       5,
+       14
+      ]
+     },
+     "text": "You've got a crust on you now, the four of you. You walk past my cart like you know where you're going.",
+     "emote": "nod"
+    },
+    {
+     "id": "fair-baker-30",
+     "slot": "level",
+     "kind": "talk",
+     "when": {
+      "level": [
+       15,
+       20
+      ]
+     },
+     "text": "When I'm old I'll tell folk I fed you. They won't believe me. I'll show them the peel. It proves nothing.",
+     "emote": "laugh"
+    },
+    {
+     "id": "fair-baker-31",
+     "slot": "lamps",
+     "kind": "talk",
+     "when": {
+      "lamps": [
+       1,
+       5
+      ]
+     },
+     "text": "She was pulling like a horse at dusk. Now it's more like a goat. Bring a few more and she'll be a cat.",
+     "emote": "laugh"
+    },
+    {
+     "id": "fair-baker-32",
+     "slot": "lamps",
+     "kind": "talk",
+     "when": {
+      "lamps": [
+       12,
+       12
+      ]
+     },
+     "text": "Twelve home. I baked twelve rolls, one for every lamp. That's a lie. I baked twelve and ate three.",
+     "emote": "laugh"
+    },
+    {
+     "id": "fair-baker-33",
+     "slot": "thing",
+     "kind": "talk",
+     "when": {
+      "has": "stone"
+     },
+     "text": "That stone's warmer than my oven floor tonight. Lend it me an hour and I'll bake you a loaf on it.",
+     "emote": "surprised"
+    },
+    {
+     "id": "fair-baker-34",
+     "slot": "thing",
+     "kind": "talk",
+     "when": {
+      "has": "amulet"
+     },
+     "text": "Warm like dough when it's proving. That's the best warm there is. Keep it close, bells.",
+     "emote": "nod"
+    },
+    {
+     "id": "fair-baker-35",
+     "slot": "doing",
+     "kind": "talk",
+     "when": {
+      "doing": "work"
+     },
+     "text": "Can't stop, she's on the turn. Talk while I knock these back. You can knead if you're bored.",
+     "emote": "beckon"
+    },
+    {
+     "id": "fair-baker-36",
+     "slot": "doing",
+     "kind": "talk",
+     "when": {
+      "doing": "rest"
+     },
+     "text": "Sitting down for the first time since noon. The oven can pull on its own a minute. There's flour sack enough for two.",
+     "emote": "wave"
+    },
+    {
+     "id": "fair-baker-37",
+     "slot": "bark",
+     "kind": "bark",
+     "when": {
+      "talks": [
+       0,
+       0
+      ]
+     },
+     "text": "Buns! Hot buns! Mind your fingers!"
+    },
+    {
+     "id": "fair-baker-38",
+     "slot": "bark",
+     "kind": "bark",
+     "when": {
+      "talks": [
+       3,
+       99
+      ]
+     },
+     "text": "Bells! Eat something, you're all jingle!"
+    },
+    {
+     "id": "fair-baker-39",
+     "slot": "bark",
+     "kind": "bark",
+     "when": {
+      "stage": [
+       2,
+       4
+      ]
+     },
+     "text": "Come near my oven and you'll get the peel!"
+    },
+    {
+     "id": "fair-baker-40",
+     "slot": "bark",
+     "kind": "bark",
+     "when": {},
+     "text": "Fresh out! Come and smell that!"
+    }
+   ]
+  },
+  "old-night-watchman": {
+   "guess": "Stragglers: every fair has someone out after the lamps who can't find their own wagon, and the cold things look like that to him, lost and not wicked.",
+   "invented": [
+    "He has walked the rows for forty years, and before tonight he never once had to go back on a round.",
+    "He bought his first wick from the lamp-seller as a lad, and she counted his change twice.",
+    "He has a bad leg of his own.",
+    "Tonight he hung a second lamp on every ring post, and later wired the ring lamps to their posts."
+   ],
+   "lines": [
+    {
+     "id": "old-night-watchman-01",
+     "slot": "hello",
+     "kind": "talk",
+     "when": {
+      "talks": [
+       0,
+       0
+      ],
+      "stage": [
+       0,
+       1
+      ]
+     },
+     "text": "You four, is it. The ring's yours when you want it. Losing costs nothing. You'll wake by your own wagon, none the worse.",
+     "emote": "point"
+    },
+    {
+     "id": "old-night-watchman-02",
+     "slot": "hello",
+     "kind": "talk",
+     "when": {
+      "talks": [
+       0,
+       0
+      ],
+      "stage": [
+       2,
+       3
+      ]
+     },
+     "text": "Out past the gate at this hour. I'd tell you not to, but you'd go anyway. Sit on the ring rope a minute.",
+     "emote": "nod"
+    },
+    {
+     "id": "old-night-watchman-03",
+     "slot": "hello",
+     "kind": "talk",
+     "when": {
+      "talks": [
+       0,
+       0
+      ],
+      "stage": [
+       4,
+       5
+      ]
+     },
+     "text": "So you came back down. Good. I don't say good to many people. Ask anyone.",
+     "emote": "nod"
+    },
+    {
+     "id": "old-night-watchman-04",
+     "slot": "stage",
+     "kind": "talk",
+     "when": {
+      "stage": [
+       0,
+       0
+      ]
+     },
+     "text": "Forty years I've latched shutters. I know a loose one by the sound. Tonight they're all latched and all rattling east.",
+     "emote": "think"
+    },
+    {
+     "id": "old-night-watchman-05",
+     "slot": "stage",
+     "kind": "talk",
+     "when": {
+      "stage": [
+       0,
+       0
+      ]
+     },
+     "text": "Trimmed every wick on this row before dusk. Trimmed them straight. Look at them now, leaning like I'd been drinking.",
+     "emote": "cross"
+    },
+    {
+     "id": "old-night-watchman-06",
+     "slot": "stage",
+     "kind": "talk",
+     "when": {
+      "stage": [
+       1,
+       1
+      ]
+     },
+     "text": "Started my round at the square. Got to the ring and the square was dark again. I've never had to go back before.",
+     "emote": "shake_head"
+    },
+    {
+     "id": "old-night-watchman-07",
+     "slot": "stage",
+     "kind": "talk",
+     "when": {
+      "stage": [
+       1,
+       1
+      ]
+     },
+     "text": "Every fair there's somebody out after the lamps who can't find their wagon. Those cold things look like that to me.",
+     "emote": "think"
+    },
+    {
+     "id": "old-night-watchman-08",
+     "slot": "stage",
+     "kind": "talk",
+     "when": {
+      "stage": [
+       2,
+       2
+      ]
+     },
+     "text": "They put it out, I light it. They put it out, I light it. I've more flint than they've got night.",
+     "emote": "cross"
+    },
+    {
+     "id": "old-night-watchman-09",
+     "slot": "stage",
+     "kind": "talk",
+     "when": {
+      "stage": [
+       2,
+       2
+      ]
+     },
+     "text": "I've hung a second lamp on every ring post. If the cold ones want to stop somewhere, they'll stop where you can reach.",
+     "emote": "point"
+    },
+    {
+     "id": "old-night-watchman-10",
+     "slot": "stage",
+     "kind": "talk",
+     "when": {
+      "stage": [
+       3,
+       3
+      ]
+     },
+     "text": "The shutters have stopped rattling. The lamps still lean, but the shutters have stopped. I'll take the shutters.",
+     "emote": "nod"
+    },
+    {
+     "id": "old-night-watchman-11",
+     "slot": "stage",
+     "kind": "talk",
+     "when": {
+      "stage": [
+       3,
+       3
+      ]
+     },
+     "text": "You've the look of folk about to go where they shouldn't at night. I've seen it plenty. Go anyway. Come back.",
+     "emote": "nod"
+    },
+    {
+     "id": "old-night-watchman-12",
+     "slot": "stage",
+     "kind": "talk",
+     "when": {
+      "stage": [
+       4,
+       4
+      ]
+     },
+     "text": "Every shutter's shut. Every lamp's lit. That's all a watchman can do. The rest went up that hill with you.",
+     "emote": "nod"
+    },
+    {
+     "id": "old-night-watchman-13",
+     "slot": "stage",
+     "kind": "talk",
+     "when": {
+      "stage": [
+       4,
+       4
+      ]
+     },
+     "text": "They're leaning worse than at dusk. I've wired the ring lamps to their posts. Don't laugh. It's mostly working.",
+     "emote": "cross"
+    },
+    {
+     "id": "old-night-watchman-14",
+     "slot": "stage",
+     "kind": "talk",
+     "when": {
+      "stage": [
+       5,
+       5
+      ]
+     },
+     "text": "Walked the whole round and not one went out behind me. Felt wrong. I kept looking back like a fool.",
+     "emote": "shrug"
+    },
+    {
+     "id": "old-night-watchman-15",
+     "slot": "stage",
+     "kind": "talk",
+     "when": {
+      "stage": [
+       5,
+       5
+      ]
+     },
+     "text": "Lost, I always said. Now every one of them's found its way, and I didn't have to walk a single one home.",
+     "emote": "nod"
+    },
+    {
+     "id": "old-night-watchman-16",
+     "slot": "count",
+     "kind": "talk",
+     "when": {
+      "talks": [
+       1,
+       1
+      ]
+     },
+     "text": "Back, is it. The ring's still there. So am I. Neither of us is going anywhere tonight.",
+     "emote": "nod"
+    },
+    {
+     "id": "old-night-watchman-17",
+     "slot": "count",
+     "kind": "talk",
+     "when": {
+      "talks": [
+       2,
+       4
+      ]
+     },
+     "text": "One rule in my ring. Get up after. Everything else is bruises and opinions.",
+     "emote": "point"
+    },
+    {
+     "id": "old-night-watchman-18",
+     "slot": "count",
+     "kind": "talk",
+     "when": {
+      "talks": [
+       5,
+       9
+      ]
+     },
+     "text": "You know my round now. Shutters first. Then lamps. Then you, it turns out.",
+     "emote": "nod"
+    },
+    {
+     "id": "old-night-watchman-19",
+     "slot": "count",
+     "kind": "talk",
+     "when": {
+      "talks": [
+       10,
+       99
+      ]
+     },
+     "text": "Every round tonight I get to this post and there you are. I've started counting you as one of my lamps.",
+     "emote": "laugh"
+    },
+    {
+     "id": "old-night-watchman-20",
+     "slot": "just",
+     "kind": "talk",
+     "when": {
+      "just": "won"
+     },
+     "text": "Won, did you. I'll bet you stood in front of the other three the whole time. Daft. Don't change it.",
+     "emote": "nod"
+    },
+    {
+     "id": "old-night-watchman-21",
+     "slot": "just",
+     "kind": "talk",
+     "when": {
+      "just": "lost"
+     },
+     "text": "Woke by the wagon? That's the ring's one kindness. Cost you nothing but a sore head. Now go and do it properly.",
+     "emote": "point"
+    },
+    {
+     "id": "old-night-watchman-22",
+     "slot": "just",
+     "kind": "talk",
+     "when": {
+      "just": "hurt"
+     },
+     "text": "One of yours is favouring a leg. I know that walk, I've got it myself. Get her seen to before the next bout.",
+     "emote": "point"
+    },
+    {
+     "id": "old-night-watchman-23",
+     "slot": "just",
+     "kind": "talk",
+     "when": {
+      "just": "away"
+     },
+     "text": "Thought you'd gone off east with the lamps. I checked your wagon twice. Don't make a thing of it.",
+     "emote": "shrug"
+    },
+    {
+     "id": "old-night-watchman-24",
+     "slot": "gossip",
+     "kind": "talk",
+     "when": {
+      "met": "old-lamp-seller"
+     },
+     "text": "The lamp-seller sold me my first wick when I was a lad. Counted my change twice. Still does, every time.",
+     "emote": "laugh"
+    },
+    {
+     "id": "old-night-watchman-25",
+     "slot": "gossip",
+     "kind": "talk",
+     "when": {
+      "met": "pie-seller"
+     },
+     "text": "The pie-seller shouts at the dark like it owes her money. I've not seen it argue back yet.",
+     "emote": "laugh"
+    },
+    {
+     "id": "old-night-watchman-26",
+     "slot": "gossip",
+     "kind": "talk",
+     "when": {
+      "heard": "wraith-down"
+     },
+     "text": "They say the thing on the road at the stones is gone. Good. I never trust anything that stands still on a road at night.",
+     "emote": "nod"
+    },
+    {
+     "id": "old-night-watchman-27",
+     "slot": "gossip",
+     "kind": "talk",
+     "when": {
+      "heard": "wick"
+     },
+     "text": "The lamplighter's new wick went out on the dead post, I hear. She'll light it again tomorrow. So would I.",
+     "emote": "nod"
+    },
+    {
+     "id": "old-night-watchman-28",
+     "slot": "level",
+     "kind": "talk",
+     "when": {
+      "level": [
+       1,
+       4
+      ]
+     },
+     "text": "Your bouts last long enough for me to trim all four ring lamps. That'll change. Keep at it.",
+     "emote": "nod"
+    },
+    {
+     "id": "old-night-watchman-29",
+     "slot": "level",
+     "kind": "talk",
+     "when": {
+      "level": [
+       5,
+       14
+      ]
+     },
+     "text": "The cold ones used to stop at my ring for the warm. Now they see you four in it and think twice.",
+     "emote": "nod"
+    },
+    {
+     "id": "old-night-watchman-30",
+     "slot": "level",
+     "kind": "talk",
+     "when": {
+      "level": [
+       15,
+       20
+      ]
+     },
+     "text": "Forty years I've told fighters in that ring to mind their feet. I've nothing to tell you four. I don't like it.",
+     "emote": "shrug"
+    },
+    {
+     "id": "old-night-watchman-31",
+     "slot": "lamps",
+     "kind": "talk",
+     "when": {
+      "lamps": [
+       2,
+       8
+      ]
+     },
+     "text": "Since your lamps started coming home I only go back for every other post. That's a good night, for tonight.",
+     "emote": "nod"
+    },
+    {
+     "id": "old-night-watchman-32",
+     "slot": "lamps",
+     "kind": "talk",
+     "when": {
+      "lamps": [
+       12,
+       12
+      ]
+     },
+     "text": "Twelve, is it. Then the captain flies. I've never trusted a ship at night. I trust that man, mind.",
+     "emote": "nod"
+    },
+    {
+     "id": "old-night-watchman-33",
+     "slot": "thing",
+     "kind": "talk",
+     "when": {
+      "has": "glass"
+     },
+     "text": "Lantern glass, and cold with it. Not one of mine. Mine are all on their posts, and I'd know.",
+     "emote": "shake_head"
+    },
+    {
+     "id": "old-night-watchman-34",
+     "slot": "thing",
+     "kind": "talk",
+     "when": {
+      "has": "charm"
+     },
+     "text": "A keeper's charm. Hung so the flame would know they'd be back. I've never needed one. I just come back.",
+     "emote": "nod"
+    },
+    {
+     "id": "old-night-watchman-35",
+     "slot": "doing",
+     "kind": "talk",
+     "when": {
+      "doing": "walk"
+     },
+     "text": "Walk with me if you're talking. I'm three posts behind, and they won't wait.",
+     "emote": "beckon"
+    },
+    {
+     "id": "old-night-watchman-36",
+     "slot": "doing",
+     "kind": "talk",
+     "when": {
+      "doing": "watch"
+     },
+     "text": "Watching the ring lamps. That one leans further than the rest. I want to know why before it goes.",
+     "emote": "point"
+    },
+    {
+     "id": "old-night-watchman-37",
+     "slot": "bark",
+     "kind": "bark",
+     "when": {
+      "talks": [
+       0,
+       0
+      ]
+     },
+     "text": "Ring's open, you four. Step in any time."
+    },
+    {
+     "id": "old-night-watchman-38",
+     "slot": "bark",
+     "kind": "bark",
+     "when": {
+      "talks": [
+       3,
+       99
+      ]
+     },
+     "text": "Evening, Jester. Still standing, then."
+    },
+    {
+     "id": "old-night-watchman-39",
+     "slot": "bark",
+     "kind": "bark",
+     "when": {
+      "stage": [
+       2,
+       4
+      ]
+     },
+     "text": "Light, you stubborn thing. Light!"
+    },
+    {
+     "id": "old-night-watchman-40",
+     "slot": "bark",
+     "kind": "bark",
+     "when": {},
+     "text": "Mind the rope. It bites."
+    }
+   ]
+  },
+  "pie-seller": {
+   "guess": "They're hungry: cold, hungry things going where the warm is, with the same look as every lad who ever walked past her cart without his coin.",
+   "invented": [
+    "She has sold pies at the fair for twenty years.",
+    "She has grown sons, who were never round her cart as much as the Jester is tonight.",
+    "She keeps a slate for regulars who owe her.",
+    "Tonight, for once in her life, she gives pies away."
+   ],
+   "lines": [
+    {
+     "id": "pie-seller-01",
+     "slot": "hello",
+     "kind": "talk",
+     "when": {
+      "talks": [
+       0,
+       0
+      ],
+      "stage": [
+       0,
+       1
+      ]
+     },
+     "text": "Look at you, all bones under all those bells. Here. Mutton. You can pay me when you're famous.",
+     "emote": "beckon"
+    },
+    {
+     "id": "pie-seller-02",
+     "slot": "hello",
+     "kind": "talk",
+     "when": {
+      "talks": [
+       0,
+       0
+      ],
+      "stage": [
+       2,
+       3
+      ]
+     },
+     "text": "You're the ones fetching the captain's lamps back. A pie each, and the bill goes to him.",
+     "emote": "laugh"
+    },
+    {
+     "id": "pie-seller-03",
+     "slot": "hello",
+     "kind": "talk",
+     "when": {
+      "talks": [
+       0,
+       0
+      ],
+      "stage": [
+       4,
+       5
+      ]
+     },
+     "text": "The state of you. Whatever you've been doing, you've been doing it hungry. Sit. Mutton.",
+     "emote": "point"
+    },
+    {
+     "id": "pie-seller-04",
+     "slot": "stage",
+     "kind": "talk",
+     "when": {
+      "stage": [
+       0,
+       0
+      ]
+     },
+     "text": "Sold eleven pies since dusk and every one went down quick. Folk eat fast when they're nervous. Good for trade.",
+     "emote": "laugh"
+    },
+    {
+     "id": "pie-seller-05",
+     "slot": "stage",
+     "kind": "talk",
+     "when": {
+      "stage": [
+       0,
+       0
+      ]
+     },
+     "text": "If you ask me, those cold things are hungry. I know a hungry face. I've been selling pies to it for twenty years.",
+     "emote": "think"
+    },
+    {
+     "id": "pie-seller-06",
+     "slot": "stage",
+     "kind": "talk",
+     "when": {
+      "stage": [
+       1,
+       1
+      ]
+     },
+     "text": "A whole string of lights went over my cart, low. Tell me they weren't the captain's. Oh, love. They were, weren't they.",
+     "emote": "sad"
+    },
+    {
+     "id": "pie-seller-07",
+     "slot": "stage",
+     "kind": "talk",
+     "when": {
+      "stage": [
+       1,
+       1
+      ]
+     },
+     "text": "Nobody's buying. They're all down at the gate gawping east. You can't sell a pie to the back of a head.",
+     "emote": "cross"
+    },
+    {
+     "id": "pie-seller-08",
+     "slot": "stage",
+     "kind": "talk",
+     "when": {
+      "stage": [
+       2,
+       2
+      ]
+     },
+     "text": "I'm giving pies away to anyone who'll stand by my lamp. Company keeps it lit. Don't you dare tell anyone I'm giving.",
+     "emote": "shrug"
+    },
+    {
+     "id": "pie-seller-09",
+     "slot": "stage",
+     "kind": "talk",
+     "when": {
+      "stage": [
+       2,
+       2
+      ]
+     },
+     "text": "Something cold sat on my cart roof a whole minute. I banged a pan at it and it went. So did my lamp.",
+     "emote": "cross"
+    },
+    {
+     "id": "pie-seller-10",
+     "slot": "stage",
+     "kind": "talk",
+     "when": {
+      "stage": [
+       3,
+       3
+      ]
+     },
+     "text": "Folk are buying again. They come out when things settle, like snails after rain. I'll take a snail's coin.",
+     "emote": "laugh"
+    },
+    {
+     "id": "pie-seller-11",
+     "slot": "stage",
+     "kind": "talk",
+     "when": {
+      "stage": [
+       3,
+       3
+      ]
+     },
+     "text": "You're going somewhere tonight, the four of you. Then take a pie each, eat it on the way, and don't argue.",
+     "emote": "point"
+    },
+    {
+     "id": "pie-seller-12",
+     "slot": "stage",
+     "kind": "talk",
+     "when": {
+      "stage": [
+       4,
+       4
+      ]
+     },
+     "text": "I've done my sums. Four of you, one captain, one hill and a lot of dark. I'm keeping five pies hot.",
+     "emote": "think"
+    },
+    {
+     "id": "pie-seller-13",
+     "slot": "stage",
+     "kind": "talk",
+     "when": {
+      "stage": [
+       4,
+       4
+      ]
+     },
+     "text": "Still selling. If the sky falls in tonight, it'll fall on folk who've been fed and paid up.",
+     "emote": "nod"
+    },
+    {
+     "id": "pie-seller-14",
+     "slot": "stage",
+     "kind": "talk",
+     "when": {
+      "stage": [
+       5,
+       5
+      ]
+     },
+     "text": "Pies! Free pies! Don't look at me like that. Tonight I'm giving and tomorrow I'll be sorry.",
+     "emote": "laugh"
+    },
+    {
+     "id": "pie-seller-15",
+     "slot": "stage",
+     "kind": "talk",
+     "when": {
+      "stage": [
+       5,
+       5
+      ]
+     },
+     "text": "My lamp's sitting up straight like a child at table. I gave it a pie. It can't eat it. It's the thought.",
+     "emote": "sad"
+    },
+    {
+     "id": "pie-seller-16",
+     "slot": "count",
+     "kind": "talk",
+     "when": {
+      "talks": [
+       1,
+       1
+      ]
+     },
+     "text": "Back for another? Thought so. Nobody stops at one of mine.",
+     "emote": "laugh"
+    },
+    {
+     "id": "pie-seller-17",
+     "slot": "count",
+     "kind": "talk",
+     "when": {
+      "talks": [
+       2,
+       4
+      ]
+     },
+     "text": "You're getting a taste for it. That's how it starts. Next it's three a day and you're on my slate.",
+     "emote": "point"
+    },
+    {
+     "id": "pie-seller-18",
+     "slot": "count",
+     "kind": "talk",
+     "when": {
+      "talks": [
+       5,
+       9
+      ]
+     },
+     "text": "I've stopped charging you. Don't get used to it. I've stopped charging you tonight.",
+     "emote": "nod"
+    },
+    {
+     "id": "pie-seller-19",
+     "slot": "count",
+     "kind": "talk",
+     "when": {
+      "talks": [
+       10,
+       99
+      ]
+     },
+     "text": "You're round here more than my own sons ever were. At least you eat what's put in front of you.",
+     "emote": "laugh"
+    },
+    {
+     "id": "pie-seller-20",
+     "slot": "just",
+     "kind": "talk",
+     "when": {
+      "just": "lost"
+     },
+     "text": "Knocked flat, were you? Nobody's knocked flat twice on a belly full of my mutton. Eat.",
+     "emote": "point"
+    },
+    {
+     "id": "pie-seller-21",
+     "slot": "just",
+     "kind": "talk",
+     "when": {
+      "just": "hurt"
+     },
+     "text": "One of yours looks done in, and you're stood here talking to me. Hot food first. Heroics after. Go on.",
+     "emote": "cross"
+    },
+    {
+     "id": "pie-seller-22",
+     "slot": "just",
+     "kind": "talk",
+     "when": {
+      "just": "away"
+     },
+     "text": "Where've you been? I saved you one, then I sold it. You were gone too long, love. Trade's trade.",
+     "emote": "shrug"
+    },
+    {
+     "id": "pie-seller-23",
+     "slot": "just",
+     "kind": "talk",
+     "when": {
+      "just": "lamp"
+     },
+     "text": "Another lamp on the captain's ship? Good. Now tell him to sit down. He'll wear a ditch round those posts.",
+     "emote": "laugh"
+    },
+    {
+     "id": "pie-seller-24",
+     "slot": "gossip",
+     "kind": "talk",
+     "when": {
+      "met": "captain"
+     },
+     "text": "You've talked to the captain, then. Lamps this, lamps that. Did he say if he'd eaten? He never says.",
+     "emote": "think"
+    },
+    {
+     "id": "pie-seller-25",
+     "slot": "gossip",
+     "kind": "talk",
+     "when": {
+      "met": "fair-baker"
+     },
+     "text": "The baker calls his bread travelling bread. It travels because nobody eats it. Tell him I said so.",
+     "emote": "laugh"
+    },
+    {
+     "id": "pie-seller-26",
+     "slot": "gossip",
+     "kind": "talk",
+     "when": {
+      "heard": "stitched"
+     },
+     "text": "I hear your Fox sewed the captain's lights down with thread. I've sewn crusts shut for years. Nobody calls me a witch.",
+     "emote": "laugh"
+    },
+    {
+     "id": "pie-seller-27",
+     "slot": "gossip",
+     "kind": "talk",
+     "when": {
+      "heard": "lamps-gone"
+     },
+     "text": "Is it true all twelve of the captain's lamps went? Every one? That poor man. No wonder he's off his food.",
+     "emote": "sad"
+    },
+    {
+     "id": "pie-seller-28",
+     "slot": "level",
+     "kind": "talk",
+     "when": {
+      "level": [
+       1,
+       4
+      ]
+     },
+     "text": "You walk like you're not sure the ground will hold you. More mutton. That's my answer to most things.",
+     "emote": "nod"
+    },
+    {
+     "id": "pie-seller-29",
+     "slot": "level",
+     "kind": "talk",
+     "when": {
+      "level": [
+       5,
+       14
+      ]
+     },
+     "text": "You've filled out. Not in the waist, love. In the shoulders. In how you stand at my cart.",
+     "emote": "nod"
+    },
+    {
+     "id": "pie-seller-30",
+     "slot": "level",
+     "kind": "talk",
+     "when": {
+      "level": [
+       15,
+       20
+      ]
+     },
+     "text": "Folk will boast they bought pies off the same cart as you. I'll be charging extra for that by next fair.",
+     "emote": "laugh"
+    },
+    {
+     "id": "pie-seller-31",
+     "slot": "lamps",
+     "kind": "talk",
+     "when": {
+      "lamps": [
+       1,
+       5
+      ]
+     },
+     "text": "A few home. That's a few less for the captain to fret about. Fretting men don't eat, and I won't have that.",
+     "emote": "point"
+    },
+    {
+     "id": "pie-seller-32",
+     "slot": "lamps",
+     "kind": "talk",
+     "when": {
+      "lamps": [
+       6,
+       11
+      ]
+     },
+     "text": "More than half home. The captain'll be up that ladder humming. He hums when he's happy. Badly, mind.",
+     "emote": "laugh"
+    },
+    {
+     "id": "pie-seller-33",
+     "slot": "thing",
+     "kind": "talk",
+     "when": {
+      "errand": {
+       "pie": "open"
+      }
+     },
+     "text": "That pie's for the captain, love, not for walking round the fair with. Mind it's still hot when it gets there.",
+     "emote": "point"
+    },
+    {
+     "id": "pie-seller-34",
+     "slot": "thing",
+     "kind": "talk",
+     "when": {
+      "errand": {
+       "pie": "done"
+      }
+     },
+     "text": "The captain ate it? Good. Did he say anything? No, don't tell me. Two words and red ears, I'll bet.",
+     "emote": "laugh"
+    },
+    {
+     "id": "pie-seller-35",
+     "slot": "doing",
+     "kind": "talk",
+     "when": {
+      "doing": "work"
+     },
+     "text": "Hot pies, love, hot pies. Talk quick, I've a queue of nobody behind you.",
+     "emote": "laugh"
+    },
+    {
+     "id": "pie-seller-36",
+     "slot": "doing",
+     "kind": "talk",
+     "when": {
+      "doing": "chat"
+     },
+     "text": "Sorry, love, I was giving someone a piece of my mind. They'll want it back. Now, what can I do you for?",
+     "emote": "shrug"
+    },
+    {
+     "id": "pie-seller-37",
+     "slot": "bark",
+     "kind": "bark",
+     "when": {
+      "talks": [
+       0,
+       0
+      ]
+     },
+     "text": "Hot pies! Pay now, thank me after!"
+    },
+    {
+     "id": "pie-seller-38",
+     "slot": "bark",
+     "kind": "bark",
+     "when": {
+      "talks": [
+       3,
+       99
+      ]
+     },
+     "text": "There's my girl! Eaten today?"
+    },
+    {
+     "id": "pie-seller-39",
+     "slot": "bark",
+     "kind": "bark",
+     "when": {
+      "stage": [
+       2,
+       4
+      ]
+     },
+     "text": "Shoo! Go and be cold somewhere else!"
+    },
+    {
+     "id": "pie-seller-40",
+     "slot": "bark",
+     "kind": "bark",
+     "when": {},
+     "text": "Pies! Hot as they come!"
+    }
+   ]
+  },
+  "gate-keeper": {
+   "guess": "They have been sent for: folk do not all go one way through a gate unless someone has called them, and he would like to know who.",
+   "invented": [
+    "He writes everyone who passes the gate in a book, the four too, though they go free as the fair's own.",
+    "He and the watchman have nodded to each other every night for twenty years.",
+    "The coin tin on his table always comes out right.",
+    "There is a stool at the coin table that he has never once sat on.",
+    "He kept the gate bar down from dusk until the light showed on the crag."
+   ],
+   "lines": [
+    {
+     "id": "gate-keeper-01",
+     "slot": "hello",
+     "kind": "talk",
+     "when": {
+      "talks": [
+       0,
+       0
+      ],
+      "stage": [
+       0,
+       1
+      ]
+     },
+     "text": "You. The troupe. You go in and out free. I write you down anyway.",
+     "emote": "nod"
+    },
+    {
+     "id": "gate-keeper-02",
+     "slot": "hello",
+     "kind": "talk",
+     "when": {
+      "talks": [
+       0,
+       0
+      ],
+      "stage": [
+       2,
+       3
+      ]
+     },
+     "text": "You're the four bringing the lamps back through my gate. I've a line in the book for each. Carry on.",
+     "emote": "point"
+    },
+    {
+     "id": "gate-keeper-03",
+     "slot": "hello",
+     "kind": "talk",
+     "when": {
+      "talks": [
+       0,
+       0
+      ],
+      "stage": [
+       4,
+       5
+      ]
+     },
+     "text": "You. Out my gate and back more times tonight than anyone. That's not a complaint. It's a count.",
+     "emote": "nod"
+    },
+    {
+     "id": "gate-keeper-04",
+     "slot": "stage",
+     "kind": "talk",
+     "when": {
+      "stage": [
+       0,
+       0
+      ]
+     },
+     "text": "Four cold lights out over the bar since dusk. I wrote them down. I don't know what to put under paid.",
+     "emote": "cross"
+    },
+    {
+     "id": "gate-keeper-05",
+     "slot": "stage",
+     "kind": "talk",
+     "when": {
+      "stage": [
+       0,
+       0
+      ]
+     },
+     "text": "I look at faces coming in. Tonight every face keeps turning round to look east.",
+     "emote": "point"
+    },
+    {
+     "id": "gate-keeper-06",
+     "slot": "stage",
+     "kind": "talk",
+     "when": {
+      "stage": [
+       1,
+       1
+      ]
+     },
+     "text": "Folk don't all go one way unless they've been sent for. Those lamps were sent for. I'd like to know who by.",
+     "emote": "think"
+    },
+    {
+     "id": "gate-keeper-07",
+     "slot": "stage",
+     "kind": "talk",
+     "when": {
+      "stage": [
+       1,
+       1
+      ]
+     },
+     "text": "Out is free. I said that. I did not mean lamps.",
+     "emote": "cross"
+    },
+    {
+     "id": "gate-keeper-08",
+     "slot": "stage",
+     "kind": "talk",
+     "when": {
+      "stage": [
+       2,
+       2
+      ]
+     },
+     "text": "Some cold lights come back in over the bar now. Going home, by the look. I count them. They don't pay either.",
+     "emote": "shrug"
+    },
+    {
+     "id": "gate-keeper-09",
+     "slot": "stage",
+     "kind": "talk",
+     "when": {
+      "stage": [
+       2,
+       2
+      ]
+     },
+     "text": "I've had the bar down since dusk. It stops nothing that flies. It's a matter of principle.",
+     "emote": "cross"
+    },
+    {
+     "id": "gate-keeper-10",
+     "slot": "stage",
+     "kind": "talk",
+     "when": {
+      "stage": [
+       3,
+       3
+      ]
+     },
+     "text": "That blue thread on the captain's lamps. Had I owned some at dusk, nothing would have gone over my gate.",
+     "emote": "nod"
+    },
+    {
+     "id": "gate-keeper-11",
+     "slot": "stage",
+     "kind": "talk",
+     "when": {
+      "stage": [
+       3,
+       3
+      ]
+     },
+     "text": "Fewer cold things on the road now. I'd still like a word with whatever's at the top of it.",
+     "emote": "point"
+    },
+    {
+     "id": "gate-keeper-12",
+     "slot": "stage",
+     "kind": "talk",
+     "when": {
+      "stage": [
+       4,
+       4
+      ]
+     },
+     "text": "You came down by air, so you never passed my bar. I've counted you in anyway. Go and finish it.",
+     "emote": "nod"
+    },
+    {
+     "id": "gate-keeper-13",
+     "slot": "stage",
+     "kind": "talk",
+     "when": {
+      "stage": [
+       4,
+       4
+      ]
+     },
+     "text": "Not a soul on the crag road. Bar down, eyes on it. That's my part. Yours is up there.",
+     "emote": "point"
+    },
+    {
+     "id": "gate-keeper-14",
+     "slot": "stage",
+     "kind": "talk",
+     "when": {
+      "stage": [
+       5,
+       5
+      ]
+     },
+     "text": "There's a light on the crag. Not mine to count. I've counted it. One.",
+     "emote": "point"
+    },
+    {
+     "id": "gate-keeper-15",
+     "slot": "stage",
+     "kind": "talk",
+     "when": {
+      "stage": [
+       5,
+       5
+      ]
+     },
+     "text": "I've put the bar up. First time since dusk. Don't read anything into it.",
+     "emote": "shrug"
+    },
+    {
+     "id": "gate-keeper-16",
+     "slot": "count",
+     "kind": "talk",
+     "when": {
+      "talks": [
+       1,
+       1
+      ]
+     },
+     "text": "Still you.",
+     "emote": "nod"
+    },
+    {
+     "id": "gate-keeper-17",
+     "slot": "count",
+     "kind": "talk",
+     "when": {
+      "talks": [
+       2,
+       4
+      ]
+     },
+     "text": "You again. You've a column in the book now. It's narrow.",
+     "emote": "nod"
+    },
+    {
+     "id": "gate-keeper-18",
+     "slot": "count",
+     "kind": "talk",
+     "when": {
+      "talks": [
+       5,
+       9
+      ]
+     },
+     "text": "You can stand on my side of the table. Don't touch the tin.",
+     "emote": "nod"
+    },
+    {
+     "id": "gate-keeper-19",
+     "slot": "count",
+     "kind": "talk",
+     "when": {
+      "talks": [
+       10,
+       99
+      ]
+     },
+     "text": "You've a page of your own in the book now. It's a long page. I've not minded writing it.",
+     "emote": "nod"
+    },
+    {
+     "id": "gate-keeper-20",
+     "slot": "just",
+     "kind": "talk",
+     "when": {
+      "just": "won"
+     },
+     "text": "You won. I can tell. You came back the same number you went out.",
+     "emote": "nod"
+    },
+    {
+     "id": "gate-keeper-21",
+     "slot": "just",
+     "kind": "talk",
+     "when": {
+      "just": "hurt"
+     },
+     "text": "One of you is walking short. Sit her on my stool. I've never once sat on it. Somebody might as well.",
+     "emote": "point"
+    },
+    {
+     "id": "gate-keeper-22",
+     "slot": "just",
+     "kind": "talk",
+     "when": {
+      "just": "away"
+     },
+     "text": "You were gone a while. I noticed. I notice everyone. That's all it is.",
+     "emote": "shrug"
+    },
+    {
+     "id": "gate-keeper-23",
+     "slot": "just",
+     "kind": "talk",
+     "when": {
+      "just": "lamp"
+     },
+     "text": "Another one in over the bar. That one I let through.",
+     "emote": "nod"
+    },
+    {
+     "id": "gate-keeper-24",
+     "slot": "gossip",
+     "kind": "talk",
+     "when": {
+      "met": "farm-lad"
+     },
+     "text": "You've seen the farm lad, then. Went out by day for rushes and never came back in. His line's been open all day.",
+     "emote": "think"
+    },
+    {
+     "id": "gate-keeper-25",
+     "slot": "gossip",
+     "kind": "talk",
+     "when": {
+      "met": "old-night-watchman"
+     },
+     "text": "The watchman and I nod. Twenty years of nods. Tonight he stopped and said it was cold. I agreed. A long talk, for us.",
+     "emote": "nod"
+    },
+    {
+     "id": "gate-keeper-26",
+     "slot": "gossip",
+     "kind": "talk",
+     "when": {
+      "heard": "card"
+     },
+     "text": "The fortune-teller turned you the bad card, I hear. She took a coin for it. I'd have told you the same for nothing.",
+     "emote": "shrug"
+    },
+    {
+     "id": "gate-keeper-27",
+     "slot": "gossip",
+     "kind": "talk",
+     "when": {
+      "heard": "pie"
+     },
+     "text": "The captain got his pie, I hear. Walked past my table with gravy on his collar. I didn't mention it.",
+     "emote": "nod"
+    },
+    {
+     "id": "gate-keeper-28",
+     "slot": "level",
+     "kind": "talk",
+     "when": {
+      "level": [
+       1,
+       4
+      ]
+     },
+     "text": "You four go out my gate like you're off picking mushrooms. I watch the road till you're back.",
+     "emote": "nod"
+    },
+    {
+     "id": "gate-keeper-29",
+     "slot": "level",
+     "kind": "talk",
+     "when": {
+      "level": [
+       5,
+       14
+      ]
+     },
+     "text": "Your faces don't change at the gate any more, going out or coming in. That's how I know.",
+     "emote": "nod"
+    },
+    {
+     "id": "gate-keeper-30",
+     "slot": "level",
+     "kind": "talk",
+     "when": {
+      "level": [
+       15,
+       20
+      ]
+     },
+     "text": "When you four go out, the road goes quiet for an hour. Nothing comes near my gate. I've written that down too.",
+     "emote": "nod"
+    },
+    {
+     "id": "gate-keeper-31",
+     "slot": "lamps",
+     "kind": "talk",
+     "when": {
+      "lamps": [
+       1,
+       5
+      ]
+     },
+     "text": "Some ticked off. Your sharp-eyed one ticks them too, under her breath. We agree so far.",
+     "emote": "nod"
+    },
+    {
+     "id": "gate-keeper-32",
+     "slot": "lamps",
+     "kind": "talk",
+     "when": {
+      "lamps": [
+       12,
+       12
+      ]
+     },
+     "text": "Twelve ticks. I underlined the total. I don't underline.",
+     "emote": "nod"
+    },
+    {
+     "id": "gate-keeper-33",
+     "slot": "thing",
+     "kind": "talk",
+     "when": {
+      "has": "thread"
+     },
+     "text": "That thread still pulls east. Cut, and it still wants to go. Some things you can't turn back at a gate.",
+     "emote": "think"
+    },
+    {
+     "id": "gate-keeper-34",
+     "slot": "thing",
+     "kind": "talk",
+     "when": {
+      "has": "amulet"
+     },
+     "text": "Left on a stone, and nobody saw who. That would never happen at my gate.",
+     "emote": "shake_head"
+    },
+    {
+     "id": "gate-keeper-35",
+     "slot": "doing",
+     "kind": "talk",
+     "when": {
+      "doing": "watch"
+     },
+     "text": "Watching the road. Talk if you like. I won't look round.",
+     "emote": "nod"
+    },
+    {
+     "id": "gate-keeper-36",
+     "slot": "doing",
+     "kind": "talk",
+     "when": {
+      "doing": "work"
+     },
+     "text": "Counting the tin. Wait. There. Right again. It's always right. What is it?",
+     "emote": "think"
+    },
+    {
+     "id": "gate-keeper-37",
+     "slot": "bark",
+     "kind": "bark",
+     "when": {
+      "talks": [
+       0,
+       0
+      ]
+     },
+     "text": "In or out. Make your mind up."
+    },
+    {
+     "id": "gate-keeper-38",
+     "slot": "bark",
+     "kind": "bark",
+     "when": {
+      "talks": [
+       3,
+       99
+      ]
+     },
+     "text": "You. Again. Go on, then."
+    },
+    {
+     "id": "gate-keeper-39",
+     "slot": "bark",
+     "kind": "bark",
+     "when": {
+      "stage": [
+       2,
+       4
+      ]
+     },
+     "text": "You there! You haven't paid!"
+    },
+    {
+     "id": "gate-keeper-40",
+     "slot": "bark",
+     "kind": "bark",
+     "when": {},
+     "text": "Mind the bar."
+    }
+   ]
+  },
+  "chestnut-roaster": {
+   "guess": "Fire that said yes: the lamps and the cold lights were asked and went, where his coals were asked and said no.",
+   "invented": [
+    "He keeps one coal from every place the fair has stood, in a tin.",
+    "Within the first hour after the lamps went he had told the story eleven times.",
+    "The fortune-teller will not read his cards any more, because he talked through the last reading.",
+    "He says the gate keeper laughed once, in spring, three fairs back."
+   ],
+   "lines": [
+    {
+     "id": "chestnut-roaster-01",
+     "slot": "hello",
+     "kind": "talk",
+     "when": {
+      "talks": [
+       0,
+       0
+      ],
+      "stage": [
+       0,
+       1
+      ]
+     },
+     "text": "You four at my brazier. Sit. I'll tell you a thing about my coals, and you tell me a thing about you.",
+     "emote": "beckon"
+    },
+    {
+     "id": "chestnut-roaster-02",
+     "slot": "hello",
+     "kind": "talk",
+     "when": {
+      "talks": [
+       0,
+       0
+      ],
+      "stage": [
+       2,
+       3
+      ]
+     },
+     "text": "Back off the moor? Come to the fire and tell me all of it. I'll tell it better tomorrow, but you tell it first.",
+     "emote": "laugh"
+    },
+    {
+     "id": "chestnut-roaster-03",
+     "slot": "hello",
+     "kind": "talk",
+     "when": {
+      "talks": [
+       0,
+       0
+      ],
+      "stage": [
+       4,
+       5
+      ]
+     },
+     "text": "Here they are. I've been telling your story all night and you've never once heard it. Sit down, it's good.",
+     "emote": "laugh"
+    },
+    {
+     "id": "chestnut-roaster-04",
+     "slot": "stage",
+     "kind": "talk",
+     "when": {
+      "stage": [
+       0,
+       0
+      ]
+     },
+     "text": "Six people have told me their flame's leaning. I've started a list. Nobody's told me theirs is standing up straight.",
+     "emote": "think"
+    },
+    {
+     "id": "chestnut-roaster-05",
+     "slot": "stage",
+     "kind": "talk",
+     "when": {
+      "stage": [
+       0,
+       0
+      ]
+     },
+     "text": "The gate keeper's been staring east since dusk and won't say why. I've asked four times. That's three more than usual.",
+     "emote": "laugh"
+    },
+    {
+     "id": "chestnut-roaster-06",
+     "slot": "stage",
+     "kind": "talk",
+     "when": {
+      "stage": [
+       1,
+       1
+      ]
+     },
+     "text": "Here's what I think. My coals were asked and said no. Those cold lights are fire that said yes.",
+     "emote": "think"
+    },
+    {
+     "id": "chestnut-roaster-07",
+     "slot": "stage",
+     "kind": "talk",
+     "when": {
+      "stage": [
+       1,
+       1
+      ]
+     },
+     "text": "I've told the lamps going over eleven times now. Each time the lamps get bigger. By midnight they'll be cows.",
+     "emote": "laugh"
+    },
+    {
+     "id": "chestnut-roaster-08",
+     "slot": "stage",
+     "kind": "talk",
+     "when": {
+      "stage": [
+       2,
+       2
+      ]
+     },
+     "text": "Every cold one that goes over, my coals go a bit grey and come back. Asked again. Still no. Good coals.",
+     "emote": "nod"
+    },
+    {
+     "id": "chestnut-roaster-09",
+     "slot": "stage",
+     "kind": "talk",
+     "when": {
+      "stage": [
+       2,
+       2
+      ]
+     },
+     "text": "Half the fair stands at my brazier now. Warmest spot by the gate, and I'm the best talker. In that order.",
+     "emote": "laugh"
+    },
+    {
+     "id": "chestnut-roaster-10",
+     "slot": "stage",
+     "kind": "talk",
+     "when": {
+      "stage": [
+       3,
+       3
+      ]
+     },
+     "text": "Twelve stitches of blue and one ring of the Fox's bell. I saw it. I've told it twice and I'm not tired yet.",
+     "emote": "laugh"
+    },
+    {
+     "id": "chestnut-roaster-11",
+     "slot": "stage",
+     "kind": "talk",
+     "when": {
+      "stage": [
+       3,
+       3
+      ]
+     },
+     "text": "My coals haven't gone grey in an hour. I don't trust it. I keep poking them to check they're still mine.",
+     "emote": "think"
+    },
+    {
+     "id": "chestnut-roaster-12",
+     "slot": "stage",
+     "kind": "talk",
+     "when": {
+      "stage": [
+       4,
+       4
+      ]
+     },
+     "text": "They went grey again just now, and stayed grey longer. I blew on them like a madman. Be quick up there.",
+     "emote": "sad"
+    },
+    {
+     "id": "chestnut-roaster-13",
+     "slot": "stage",
+     "kind": "talk",
+     "when": {
+      "stage": [
+       4,
+       4
+      ]
+     },
+     "text": "Nobody to tell. Folk have gone quiet and gone to their wagons. A gossip with no one to tell is a man with chestnuts.",
+     "emote": "shrug"
+    },
+    {
+     "id": "chestnut-roaster-14",
+     "slot": "stage",
+     "kind": "talk",
+     "when": {
+      "stage": [
+       5,
+       5
+      ]
+     },
+     "text": "Red as a robin, my coals. I keep a coal from every place we stand, in a tin. Tonight's is the one that said no.",
+     "emote": "laugh"
+    },
+    {
+     "id": "chestnut-roaster-15",
+     "slot": "stage",
+     "kind": "talk",
+     "when": {
+      "stage": [
+       5,
+       5
+      ]
+     },
+     "text": "I've told it to four people and they've told four each. By morning you'll have fought the moon and won.",
+     "emote": "laugh"
+    },
+    {
+     "id": "chestnut-roaster-16",
+     "slot": "count",
+     "kind": "talk",
+     "when": {
+      "talks": [
+       1,
+       1
+      ]
+     },
+     "text": "Back for the end of the story? There isn't one. I keep adding bits.",
+     "emote": "laugh"
+    },
+    {
+     "id": "chestnut-roaster-17",
+     "slot": "count",
+     "kind": "talk",
+     "when": {
+      "talks": [
+       2,
+       4
+      ]
+     },
+     "text": "I've been keeping score of who's asked after you four. It's most of the fair. The rest are asleep.",
+     "emote": "nod"
+    },
+    {
+     "id": "chestnut-roaster-18",
+     "slot": "count",
+     "kind": "talk",
+     "when": {
+      "talks": [
+       5,
+       9
+      ]
+     },
+     "text": "You know all my stories now. That's dangerous. You'll start telling them better than me.",
+     "emote": "laugh"
+    },
+    {
+     "id": "chestnut-roaster-19",
+     "slot": "count",
+     "kind": "talk",
+     "when": {
+      "talks": [
+       10,
+       99
+      ]
+     },
+     "text": "You come by so often I've put you in the story. You're the bit where somebody comes by again.",
+     "emote": "laugh"
+    },
+    {
+     "id": "chestnut-roaster-20",
+     "slot": "just",
+     "kind": "talk",
+     "when": {
+      "just": "won"
+     },
+     "text": "You won? Tell me how. Slowly. Leave nothing out. I'll put the good bits back in later.",
+     "emote": "beckon"
+    },
+    {
+     "id": "chestnut-roaster-21",
+     "slot": "just",
+     "kind": "talk",
+     "when": {
+      "just": "lost"
+     },
+     "text": "Flat on your backs, the four of you? Don't tell the baker, he'll tell the whole row. Tell me. I'll tell it kindly.",
+     "emote": "laugh"
+    },
+    {
+     "id": "chestnut-roaster-22",
+     "slot": "just",
+     "kind": "talk",
+     "when": {
+      "just": "away"
+     },
+     "text": "There you are. Three things happened while you were gone, and I had to tell them all to the gate keeper.",
+     "emote": "shrug"
+    },
+    {
+     "id": "chestnut-roaster-23",
+     "slot": "just",
+     "kind": "talk",
+     "when": {
+      "just": "lamp"
+     },
+     "text": "Another lamp over the gate? I saw it come in. My coals jumped up to meet it like a dog at the door.",
+     "emote": "surprised"
+    },
+    {
+     "id": "chestnut-roaster-24",
+     "slot": "gossip",
+     "kind": "talk",
+     "when": {
+      "met": "fortune-teller"
+     },
+     "text": "The fortune-teller won't read for me any more. I talked through the last one. Every card. She had to sit down.",
+     "emote": "laugh"
+    },
+    {
+     "id": "chestnut-roaster-25",
+     "slot": "gossip",
+     "kind": "talk",
+     "when": {
+      "met": "gate-keeper"
+     },
+     "text": "The gate keeper laughed once. Three fairs back, in spring. I was there. I'm the only one who believes me.",
+     "emote": "laugh"
+    },
+    {
+     "id": "chestnut-roaster-26",
+     "slot": "gossip",
+     "kind": "talk",
+     "when": {
+      "heard": "wick"
+     },
+     "text": "I hear the lamplighter's new wick lit and went out. My coals came back. Hers didn't. Poor old post.",
+     "emote": "sad"
+    },
+    {
+     "id": "chestnut-roaster-27",
+     "slot": "gossip",
+     "kind": "talk",
+     "when": {
+      "heard": "beacon"
+     },
+     "text": "They say there's a light on the crag. I know. I was first to say so. Ask anyone. Don't ask the gate keeper.",
+     "emote": "laugh"
+    },
+    {
+     "id": "chestnut-roaster-28",
+     "slot": "level",
+     "kind": "talk",
+     "when": {
+      "level": [
+       1,
+       4
+      ]
+     },
+     "text": "You've the look of folk with your first story still in you. Give it here. I'll mind it for you.",
+     "emote": "beckon"
+    },
+    {
+     "id": "chestnut-roaster-29",
+     "slot": "level",
+     "kind": "talk",
+     "when": {
+      "level": [
+       5,
+       14
+      ]
+     },
+     "text": "Folk talk about you at my brazier now without me starting it. That's how I know you're somebody.",
+     "emote": "nod"
+    },
+    {
+     "id": "chestnut-roaster-30",
+     "slot": "level",
+     "kind": "talk",
+     "when": {
+      "level": [
+       15,
+       20
+      ]
+     },
+     "text": "They'll tell your story long after mine are forgotten. I don't even mind. Much. A bit.",
+     "emote": "laugh"
+    },
+    {
+     "id": "chestnut-roaster-31",
+     "slot": "lamps",
+     "kind": "talk",
+     "when": {
+      "lamps": [
+       1,
+       5
+      ]
+     },
+     "text": "Every lamp that comes over, I tell whoever's nearest. I told one to a pony. It took it very well.",
+     "emote": "laugh"
+    },
+    {
+     "id": "chestnut-roaster-32",
+     "slot": "lamps",
+     "kind": "talk",
+     "when": {
+      "lamps": [
+       6,
+       11
+      ]
+     },
+     "text": "Past half now. I've stopped telling folk it's hopeless. I never said hopeless. I said tricky.",
+     "emote": "laugh"
+    },
+    {
+     "id": "chestnut-roaster-33",
+     "slot": "thing",
+     "kind": "talk",
+     "when": {
+      "has": "thread"
+     },
+     "text": "That thread twitches toward the crag. My coals did the same, just before they said no. Hold it tight.",
+     "emote": "think"
+    },
+    {
+     "id": "chestnut-roaster-34",
+     "slot": "thing",
+     "kind": "talk",
+     "when": {
+      "has": "stone"
+     },
+     "text": "Warm, that stone. Hold it by my coals a minute. Let them see what staying put looks like.",
+     "emote": "laugh"
+    },
+    {
+     "id": "chestnut-roaster-35",
+     "slot": "doing",
+     "kind": "talk",
+     "when": {
+      "doing": "work"
+     },
+     "text": "Hold on, turning. Too late and they split. Too early and they sulk. Right. Go on.",
+     "emote": "think"
+    },
+    {
+     "id": "chestnut-roaster-36",
+     "slot": "doing",
+     "kind": "talk",
+     "when": {
+      "doing": "chat"
+     },
+     "text": "Sorry, I was telling the gate keeper a story. Not listening. Never is. Now then, you.",
+     "emote": "laugh"
+    },
+    {
+     "id": "chestnut-roaster-37",
+     "slot": "bark",
+     "kind": "bark",
+     "when": {
+      "talks": [
+       0,
+       0
+      ]
+     },
+     "text": "Chestnuts! Free, and worth every bit!"
+    },
+    {
+     "id": "chestnut-roaster-38",
+     "slot": "bark",
+     "kind": "bark",
+     "when": {
+      "talks": [
+       3,
+       99
+      ]
+     },
+     "text": "Jester! Come and hear the new bit!"
+    },
+    {
+     "id": "chestnut-roaster-39",
+     "slot": "bark",
+     "kind": "bark",
+     "when": {
+      "stage": [
+       2,
+       4
+      ]
+     },
+     "text": "Stay red, you lot. Stay red."
+    },
+    {
+     "id": "chestnut-roaster-40",
+     "slot": "bark",
+     "kind": "bark",
+     "when": {},
+     "text": "Hot chestnuts! Hot news!"
+    }
+   ]
+  },
+  "captain": {
+   "guess": "Deserters, lights that jumped ship; once he hears a beaten one was warmed and went home, crew lost overboard instead, to be hauled in, not hanged.",
+   "invented": [
+    "He reads the weather by his pennant.",
+    "When a lamp comes home he stands by its post a minute, and he has put a hand to every post.",
+    "He eats standing up."
+   ],
+   "lines": [
+    {
+     "id": "captain-01",
+     "slot": "hello",
+     "kind": "talk",
+     "when": {
+      "talks": [
+       0,
+       0
+      ],
+      "stage": [
+       0,
+       1
+      ]
+     },
+     "text": "Evening. Mind the mooring lines, they're taut tonight. No wind to pull them. I've checked.",
+     "emote": "nod"
+    },
+    {
+     "id": "captain-02",
+     "slot": "hello",
+     "kind": "talk",
+     "when": {
+      "talks": [
+       0,
+       0
+      ],
+      "stage": [
+       2,
+       3
+      ]
+     },
+     "text": "You're the ones bringing my crew home. Thank you. I don't say it twice, so that'll have to last.",
+     "emote": "thanks"
+    },
+    {
+     "id": "captain-03",
+     "slot": "hello",
+     "kind": "talk",
+     "when": {
+      "talks": [
+       0,
+       0
+      ],
+      "stage": [
+       4,
+       5
+      ]
+     },
+     "text": "We've not talked, you and me. You brought my lamps home. That's introduction enough.",
+     "emote": "greet_bow"
+    },
+    {
+     "id": "captain-04",
+     "slot": "stage",
+     "kind": "talk",
+     "when": {
+      "stage": [
+       0,
+       0
+      ]
+     },
+     "text": "My lamps are leaning on their hooks. All twelve, the same way. Not a breath of wind, and the pennant hangs dead.",
+     "emote": "point"
+    },
+    {
+     "id": "captain-05",
+     "slot": "stage",
+     "kind": "talk",
+     "when": {
+      "stage": [
+       0,
+       0
+      ]
+     },
+     "text": "Clear sky, and the air's going east all the same. Slow, like a tide going out. I don't trust a tide in a field.",
+     "emote": "think"
+    },
+    {
+     "id": "captain-06",
+     "slot": "stage",
+     "kind": "talk",
+     "when": {
+      "stage": [
+       1,
+       1
+      ]
+     },
+     "text": "Twelve empty hooks. I keep counting them. They keep coming out twelve.",
+     "emote": "sad"
+    },
+    {
+     "id": "captain-07",
+     "slot": "stage",
+     "kind": "talk",
+     "when": {
+      "stage": [
+       1,
+       1
+      ]
+     },
+     "text": "Lost crew at ports before. Never all at once. Those cold lights going east? Deserters, I'd say. Jumped ship.",
+     "emote": "cross"
+    },
+    {
+     "id": "captain-08",
+     "slot": "stage",
+     "kind": "talk",
+     "when": {
+      "stage": [
+       2,
+       2
+      ]
+     },
+     "text": "Each one home goes up on its post, and I stand by it a minute. Daft. A captain counts his crew back aboard.",
+     "emote": "nod"
+    },
+    {
+     "id": "captain-09",
+     "slot": "stage",
+     "kind": "talk",
+     "when": {
+      "stage": [
+       2,
+       2
+      ]
+     },
+     "text": "Rigging hums every time a cold one goes over. No wind in it. I know most weather. I don't know this.",
+     "emote": "think"
+    },
+    {
+     "id": "captain-10",
+     "slot": "stage",
+     "kind": "talk",
+     "when": {
+      "stage": [
+       3,
+       3
+      ]
+     },
+     "text": "Twelve on deck. Stitched down with blue. I've walked the rail twice and put a hand to every post.",
+     "emote": "nod"
+    },
+    {
+     "id": "captain-11",
+     "slot": "stage",
+     "kind": "talk",
+     "when": {
+      "stage": [
+       3,
+       3
+      ]
+     },
+     "text": "Wind's fair, sky's clear, crew's all aboard. That's three things I couldn't say an hour ago.",
+     "emote": "nod"
+    },
+    {
+     "id": "captain-12",
+     "slot": "stage",
+     "kind": "talk",
+     "when": {
+      "stage": [
+       4,
+       4
+      ],
+      "where": "W8"
+     },
+     "text": "Colder up here than the field. My lamps are burning small, like crew keeping their heads down. Good crew.",
+     "emote": "nod"
+    },
+    {
+     "id": "captain-13",
+     "slot": "stage",
+     "kind": "talk",
+     "when": {
+      "stage": [
+       4,
+       4
+      ],
+      "where": "W8"
+     },
+     "text": "Tower's black as pitch. Wherever I stand her off, all twelve stay lit. You'll have something to aim at coming down.",
+     "emote": "point"
+    },
+    {
+     "id": "captain-14",
+     "slot": "stage",
+     "kind": "talk",
+     "when": {
+      "stage": [
+       5,
+       5
+      ]
+     },
+     "text": "Saw my lamps brighten when the crag lit. All twelve at once. Like crew answering a hail.",
+     "emote": "surprised"
+    },
+    {
+     "id": "captain-15",
+     "slot": "stage",
+     "kind": "talk",
+     "when": {
+      "stage": [
+       5,
+       5
+      ]
+     },
+     "text": "Calm at last. When the fair moves on I'll take her out lit end to end, and dip to that light as I pass.",
+     "emote": "nod"
+    },
+    {
+     "id": "captain-16",
+     "slot": "count",
+     "kind": "talk",
+     "when": {
+      "talks": [
+       1,
+       1
+      ]
+     },
+     "text": "You again. Good. I like a face that comes back.",
+     "emote": "nod"
+    },
+    {
+     "id": "captain-17",
+     "slot": "count",
+     "kind": "talk",
+     "when": {
+      "talks": [
+       2,
+       4
+      ]
+     },
+     "text": "You come by regular as a harbour bell. I could set a glass by you.",
+     "emote": "nod"
+    },
+    {
+     "id": "captain-18",
+     "slot": "count",
+     "kind": "talk",
+     "when": {
+      "talks": [
+       5,
+       9
+      ]
+     },
+     "text": "I'd let you take the helm, if I let anybody take the helm. I don't. But I'd think about it.",
+     "emote": "laugh"
+    },
+    {
+     "id": "captain-19",
+     "slot": "count",
+     "kind": "talk",
+     "when": {
+      "talks": [
+       10,
+       99
+      ]
+     },
+     "text": "You're aboard so often I'll have to sign you on. Pay's poor. Food's mutton.",
+     "emote": "laugh"
+    },
+    {
+     "id": "captain-20",
+     "slot": "just",
+     "kind": "talk",
+     "when": {
+      "just": "won"
+     },
+     "text": "Won, by the look of you. Good. Don't celebrate near my lamps. They've had enough excitement for one night.",
+     "emote": "laugh"
+    },
+    {
+     "id": "captain-21",
+     "slot": "just",
+     "kind": "talk",
+     "when": {
+      "just": "hurt"
+     },
+     "text": "One of yours is listing. Bring her aboard and sit her on a coil of rope. Best seat I've got.",
+     "emote": "point"
+    },
+    {
+     "id": "captain-22",
+     "slot": "just",
+     "kind": "talk",
+     "when": {
+      "just": "away",
+      "where": "W3"
+     },
+     "text": "Long time gone. I watched the gate. Then the sky. Then the gate again.",
+     "emote": "nod"
+    },
+    {
+     "id": "captain-23",
+     "slot": "just",
+     "kind": "talk",
+     "when": {
+      "just": "lamp"
+     },
+     "text": "Another one home. One less I'm lying awake for. Go on. Fetch its mates.",
+     "emote": "thanks"
+    },
+    {
+     "id": "captain-24",
+     "slot": "gossip",
+     "kind": "talk",
+     "when": {
+      "met": "pie-seller"
+     },
+     "text": "The pie-seller's been at you about me, I suppose. Thinks I don't eat. I eat. Standing up.",
+     "emote": "shrug"
+    },
+    {
+     "id": "captain-25",
+     "slot": "gossip",
+     "kind": "talk",
+     "when": {
+      "met": "gate-keeper"
+     },
+     "text": "The gate keeper and I agree on one thing. You count what you're trusted with. Every night, twice.",
+     "emote": "nod"
+    },
+    {
+     "id": "captain-26",
+     "slot": "gossip",
+     "kind": "talk",
+     "when": {
+      "heard": "wisp-warmed"
+     },
+     "text": "Your herb-witch warmed one till it went home, I hear. Then maybe they're not deserters. Overboard, more like.",
+     "emote": "think"
+    },
+    {
+     "id": "captain-27",
+     "slot": "gossip",
+     "kind": "talk",
+     "when": {
+      "heard": "wraith-down"
+     },
+     "text": "Something stood on the road by the stones, and it's gone now? Good. A road's a channel. You keep it clear.",
+     "emote": "nod"
+    },
+    {
+     "id": "captain-28",
+     "slot": "level",
+     "kind": "talk",
+     "when": {
+      "level": [
+       1,
+       4
+      ]
+     },
+     "text": "You go out like a new crew. Loud, and all at once. You'll learn to go quiet.",
+     "emote": "nod"
+    },
+    {
+     "id": "captain-29",
+     "slot": "level",
+     "kind": "talk",
+     "when": {
+      "level": [
+       5,
+       14
+      ]
+     },
+     "text": "You're coming back steadier. Less noise, more done. That's a crew.",
+     "emote": "nod"
+    },
+    {
+     "id": "captain-30",
+     "slot": "level",
+     "kind": "talk",
+     "when": {
+      "level": [
+       15,
+       20
+      ]
+     },
+     "text": "I've flown through storms that frightened me less than you four. I mean that kindly.",
+     "emote": "laugh"
+    },
+    {
+     "id": "captain-31",
+     "slot": "lamps",
+     "kind": "talk",
+     "when": {
+      "lamps": [
+       1,
+       5
+      ]
+     },
+     "text": "Bow's lit. Stern's dark. She looks like she's winking at me.",
+     "emote": "laugh"
+    },
+    {
+     "id": "captain-32",
+     "slot": "lamps",
+     "kind": "talk",
+     "when": {
+      "lamps": [
+       6,
+       11
+      ]
+     },
+     "text": "More lit than dark now. I could fly her on that. I won't. Twelve or nothing.",
+     "emote": "shake_head"
+    },
+    {
+     "id": "captain-33",
+     "slot": "thing",
+     "kind": "talk",
+     "when": {
+      "errand": {
+       "pie": "open"
+      }
+     },
+     "text": "That's the pie-seller's mutton. I'd know it in a fog. Thank her, and tell her I'm eating it, so she can stop looking.",
+     "emote": "thanks"
+    },
+    {
+     "id": "captain-34",
+     "slot": "thing",
+     "kind": "talk",
+     "when": {
+      "errand": {
+       "pie": "done"
+      }
+     },
+     "text": "That pie's still sitting warm in me. If the pie-seller asks, tell her I sat down to eat it. It'll please her.",
+     "emote": "nod"
+    },
+    {
+     "id": "captain-35",
+     "slot": "doing",
+     "kind": "talk",
+     "when": {
+      "doing": "walk",
+      "where": "W3"
+     },
+     "text": "Walk with me. Post to post. It helps me think, and I've a lot to think about.",
+     "emote": "beckon"
+    },
+    {
+     "id": "captain-36",
+     "slot": "doing",
+     "kind": "talk",
+     "when": {
+      "doing": "watch",
+      "stage": [
+       2,
+       4
+      ]
+     },
+     "text": "Watching my lamps. A good flame burns like it's listening to you. Tonight they're listening to something else.",
+     "emote": "point"
+    },
+    {
+     "id": "captain-37",
+     "slot": "bark",
+     "kind": "bark",
+     "when": {
+      "talks": [
+       0,
+       0
+      ]
+     },
+     "text": "Stand clear of the ladder, there!"
+    },
+    {
+     "id": "captain-38",
+     "slot": "bark",
+     "kind": "bark",
+     "when": {
+      "talks": [
+       3,
+       99
+      ]
+     },
+     "text": "Ahoy, you four!"
+    },
+    {
+     "id": "captain-39",
+     "slot": "bark",
+     "kind": "bark",
+     "when": {
+      "stage": [
+       2,
+       4
+      ]
+     },
+     "text": "Hold, you lot. Hold fast."
+    },
+    {
+     "id": "captain-40",
+     "slot": "bark",
+     "kind": "bark",
+     "when": {},
+     "text": "Keep your bells clear of my rigging!"
+    }
+   ]
+  }
+ },
+ "pairs": [
+  {
+   "id": "B-pair-01",
+   "who": [
+    "old-night-watchman",
+    "fair-baker"
+   ],
+   "when": {
+    "stage": [
+     0,
+     1
+    ]
+   },
+   "lines": [
+    {
+     "by": "old-night-watchman",
+     "text": "Your oven's drawing like a chimney fire. I can hear it from the ring."
+    },
+    {
+     "by": "fair-baker",
+     "text": "She wants to go somewhere. I keep telling her she lives here."
+    },
+    {
+     "by": "old-night-watchman",
+     "text": "My lamps want the same. I tell them too. They don't listen either."
+    },
+    {
+     "by": "fair-baker",
+     "text": "Have a bun. No? Suit yourself. You always say no."
+    }
+   ]
+  },
+  {
+   "id": "B-pair-02",
+   "who": [
+    "pie-seller",
+    "fair-baker"
+   ],
+   "when": {
+    "stage": [
+     0,
+     1
+    ]
+   },
+   "lines": [
+    {
+     "by": "pie-seller",
+     "text": "Your oven's eating all the warm on this row. My pies go cold just standing here."
+    },
+    {
+     "by": "fair-baker",
+     "text": "Then sell them faster. You've the voice for it."
+    },
+    {
+     "by": "pie-seller",
+     "text": "I've the voice. What I haven't got is anyone stopping. They all walk past looking up."
+    },
+    {
+     "by": "fair-baker",
+     "text": "Looking up's free. Buns cost. That's the trouble with tonight."
+    }
+   ]
+  },
+  {
+   "id": "B-pair-03",
+   "who": [
+    "chestnut-roaster",
+    "fair-baker"
+   ],
+   "when": {
+    "stage": [
+     1,
+     2
+    ]
+   },
+   "news": "lamps-gone",
+   "lines": [
+    {
+     "by": "chestnut-roaster",
+     "text": "Twelve of the captain's lamps, straight over my hat. Off their hooks and away east."
+    },
+    {
+     "by": "fair-baker",
+     "text": "Twelve? So that's what went over the row. I took it for sparks off my flue."
+    },
+    {
+     "by": "chestnut-roaster",
+     "text": "Sparks go out. These kept going. Over the gate and up the crag road, the lot."
+    },
+    {
+     "by": "fair-baker",
+     "text": "My oven's been pulling that way all night. Same way they went."
+    }
+   ]
+  },
+  {
+   "id": "B-pair-04",
+   "who": [
+    "pie-seller",
+    "captain"
+   ],
+   "when": {
+    "stage": [
+     1,
+     1
+    ]
+   },
+   "lines": [
+    {
+     "by": "pie-seller",
+     "text": "You've lost your lamps and you've lost your colour. One of those I can fix."
+    },
+    {
+     "by": "captain",
+     "text": "Is it the mutton?"
+    },
+    {
+     "by": "pie-seller",
+     "text": "It's always the mutton. Eat it before you go chasing anything."
+    }
+   ]
+  },
+  {
+   "id": "B-pair-05",
+   "who": [
+    "chestnut-roaster",
+    "gate-keeper"
+   ],
+   "when": {
+    "stage": [
+     4,
+     4
+    ]
+   },
+   "lines": [
+    {
+     "by": "chestnut-roaster",
+     "text": "You've been staring at that crag since they went up. What are you watching for?"
+    },
+    {
+     "by": "gate-keeper",
+     "text": "Counting."
+    },
+    {
+     "by": "chestnut-roaster",
+     "text": "Counting what? There's nothing up there to count."
+    },
+    {
+     "by": "gate-keeper",
+     "text": "Not yet."
+    }
+   ]
+  },
+  {
+   "id": "B-pair-06",
+   "who": [
+    "gate-keeper",
+    "captain"
+   ],
+   "when": {
+    "stage": [
+     2,
+     2
+    ]
+   },
+   "lines": [
+    {
+     "by": "gate-keeper",
+     "text": "How many on deck now? I want to check the book."
+    },
+    {
+     "by": "captain",
+     "text": "Count them yourself. You will anyway."
+    },
+    {
+     "by": "gate-keeper",
+     "text": "I have. I wanted to hear you get it right."
+    },
+    {
+     "by": "captain",
+     "text": "Dry as ship's biscuit, you are. Same number, then."
+    }
+   ]
+  },
+  {
+   "id": "B-pair-07",
+   "who": [
+    "old-night-watchman",
+    "gate-keeper"
+   ],
+   "when": {
+    "stage": [
+     2,
+     4
+    ]
+   },
+   "news": "flat",
+   "lines": [
+    {
+     "by": "old-night-watchman",
+     "text": "The four got knocked flat in my ring. Woke by their wagon, none the worse."
+    },
+    {
+     "by": "gate-keeper",
+     "text": "They didn't come through my gate flat."
+    },
+    {
+     "by": "old-night-watchman",
+     "text": "Didn't say they did. Said they got up."
+    },
+    {
+     "by": "gate-keeper",
+     "text": "Good."
+    }
+   ]
+  },
+  {
+   "id": "B-pair-08",
+   "who": [
+    "chestnut-roaster",
+    "pie-seller"
+   ],
+   "when": {
+    "stage": [
+     2,
+     2
+    ]
+   },
+   "news": "first-lamp",
+   "lines": [
+    {
+     "by": "chestnut-roaster",
+     "text": "First of the captain's lamps came back over the gate. The four carried it in."
+    },
+    {
+     "by": "pie-seller",
+     "text": "Did he eat when he got it? Tell me he ate."
+    },
+    {
+     "by": "chestnut-roaster",
+     "text": "He took it up the ladder like a newborn. I didn't see him eat."
+    },
+    {
+     "by": "pie-seller",
+     "text": "Men. Lamps first, mouths after."
+    }
+   ]
+  },
+  {
+   "id": "B-pair-09",
+   "who": [
+    "old-night-watchman",
+    "captain"
+   ],
+   "when": {
+    "stage": [
+     0,
+     0
+    ]
+   },
+   "lines": [
+    {
+     "by": "old-night-watchman",
+     "text": "Your lamps keeping their flames, captain? Mine won't stay lit past the next post."
+    },
+    {
+     "by": "captain",
+     "text": "Mine lean. All twelve. But they're on hooks. They're staying."
+    },
+    {
+     "by": "old-night-watchman",
+     "text": "I said that about mine an hour ago."
+    }
+   ]
+  },
+  {
+   "id": "B-pair-10",
+   "who": [
+    "fair-baker",
+    "gate-keeper"
+   ],
+   "when": {
+    "stage": [
+     5,
+     5
+    ]
+   },
+   "lines": [
+    {
+     "by": "fair-baker",
+     "text": "Have you seen it? A light on the crag. Small, but it's there."
+    },
+    {
+     "by": "gate-keeper",
+     "text": "I saw it first."
+    },
+    {
+     "by": "fair-baker",
+     "text": "Have a bun on it. Go on. Nobody's looking."
+    },
+    {
+     "by": "gate-keeper",
+     "text": "One. And I'm paying for it."
+    }
+   ]
+  },
+  {
+   "id": "B-pair-11",
+   "who": [
+    "old-lamp-seller",
+    "gate-keeper"
+   ],
+   "when": {
+    "stage": [
+     1,
+     2
+    ]
+   },
+   "lines": [
+    {
+     "by": "old-lamp-seller",
+     "text": "Twenty-six cold lights over the square since dusk. What do you make it at the gate?"
+    },
+    {
+     "by": "gate-keeper",
+     "text": "Twenty-eight."
+    },
+    {
+     "by": "old-lamp-seller",
+     "text": "Then two came round the back of the tents."
+    },
+    {
+     "by": "gate-keeper",
+     "text": "Or you blinked."
+    }
+   ]
+  },
+  {
+   "id": "B-pair-12",
+   "who": [
+    "fortune-teller",
+    "fair-baker"
+   ],
+   "when": {
+    "stage": [
+     2,
+     3
+    ]
+   },
+   "lines": [
+    {
+     "by": "fortune-teller",
+     "text": "Cut the deck for me, baker. Your hands are warm. Mine haven't been since dusk."
+    },
+    {
+     "by": "fair-baker",
+     "text": "Floury, mind. You'll have bread on your stars."
+    },
+    {
+     "by": "fortune-teller",
+     "text": "Oh. Oh, that's a good card. That's the first good card all night."
+    },
+    {
+     "by": "fair-baker",
+     "text": "Flour does that. I could have told you years ago."
+    }
+   ]
+  },
+  {
+   "id": "B-pair-13",
+   "who": [
+    "ribbon-dyer",
+    "chestnut-roaster"
+   ],
+   "when": {
+    "stage": [
+     1,
+     2
+    ]
+   },
+   "lines": [
+    {
+     "by": "ribbon-dyer",
+     "text": "Your coals. When they came back. What colour?"
+    },
+    {
+     "by": "chestnut-roaster",
+     "text": "Red. Same as ever. Why?"
+    },
+    {
+     "by": "ribbon-dyer",
+     "text": "Not the same. Redder."
+    },
+    {
+     "by": "chestnut-roaster",
+     "text": "Redder. I'll put that in. Nobody ever gives me a new bit."
+    }
+   ]
+  },
+  {
+   "id": "B-pair-14",
+   "who": [
+    "ballad-singer",
+    "captain"
+   ],
+   "when": {
+    "stage": [
+     1,
+     2
+    ]
+   },
+   "lines": [
+    {
+     "by": "ballad-singer",
+     "text": "Captain, can I put your lamps in a song? Twelve lamps flying east. It's a gift."
+    },
+    {
+     "by": "captain",
+     "text": "Leave them out."
+    },
+    {
+     "by": "ballad-singer",
+     "text": "Why? It's the best thing that's happened all year."
+    },
+    {
+     "by": "captain",
+     "text": "Not to them."
+    }
+   ]
+  }
+ ]
+}

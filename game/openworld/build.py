@@ -33,8 +33,10 @@ for pid in used:
     if m: keep.add(m.group(1))
 if not keep or any(k not in T for k in keep): keep = set(T)
 tex = 'window.MF_NPC_TEX = ' + json.dumps({k: v for k, v in T.items() if k in keep}) + ';\n'
-parts = [s for s in scripts() if 'function makeMFStage' not in s] + [rd('models/jester/palette.js'), rd('people/npc/emotes.js'), npcs, tex, rd('people/npc/npc.js'),
-         'window.OW_DATA = ' + json.dumps(data, separators=(',', ':')) + ';', land_src] + [open(os.path.join(HERE, 'src', f), encoding='utf-8').read() for f in ['ow-core.js', 'ow-terrain.js', 'ow-kit.js', 'ow-places.js', 'ow-dressing.js', 'ow-props.js', 'ow-flora.js', 'ow-main.js']]
+# the fair folk's lines and minds (people/talk): the written bank if it has been built (build_talk.py), the picker, the minds
+TALK = [rd('people/talk/' + f) for f in ['lines.js', 'talk.js', 'minds.js'] if os.path.exists(os.path.join(G, 'people/talk', f))]
+parts = [s for s in scripts() if 'function makeMFStage' not in s] + [rd('models/jester/palette.js'), rd('people/npc/emotes.js'), npcs, tex, rd('people/npc/npc.js')] + TALK + [
+         'window.OW_DATA = ' + json.dumps(data, separators=(',', ':')) + ';', land_src] + [open(os.path.join(HERE, 'src', f), encoding='utf-8').read() for f in ['ow-core.js', 'ow-terrain.js', 'ow-kit.js', 'ow-places.js', 'ow-dressing.js', 'ow-props.js', 'ow-flora.js', 'ow-folk.js', 'ow-main.js']]
 for p in parts: assert '</script' not in p.lower(), 'a script holds a closing tag'
 tpl = open(os.path.join(HERE, 'src', 'ow.tpl.html'), encoding='utf-8').read(); os.makedirs(os.path.join(HERE, 'out'), exist_ok=True)
 # Jacquard 24 (the titles' and names' lettering) goes inside the page, so it looks the same offline; reading text falls back to the system's own
