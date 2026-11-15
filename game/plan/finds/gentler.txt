@@ -1,12 +1,12 @@
 
-ring 5 gate, BK2w, finds at half strength
+ring 5 gate, BK2w, finds at half of the chosen strength
   nothing                     0 finds   wins  17% /100% /100%
-  what lies on the way        5 finds   wins  24% /100% /100%
-  and what is off the path   10 finds   wins  28% /100% /100%
-  everything                 15 finds   wins  34% /100% /100%
+  what lies on the way        5 finds   wins  22% /100% /100%
+  and what is off the path   10 finds   wins  24% /100% /100%
+  everything                 15 finds   wins  26% /100% /100%
 
-ring 6 gate, B2K2w, finds at half strength
+ring 6 gate, B2K2w, finds at half of the chosen strength
   nothing                     0 finds   wins   6% / 81% / 99%
-  what lies on the way        6 finds   wins  10% / 90% /100%
-  and what is off the path   12 finds   wins  15% / 95% /100%
-  everything                 18 finds   wins  20% / 99% /100%
+  what lies on the way        6 finds   wins   9% / 86% /100%
+  and what is off the path   12 finds   wins  11% / 90% /100%
+  everything                 18 finds   wins  13% / 94% /100%

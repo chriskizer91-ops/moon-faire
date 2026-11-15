@@ -1,21 +1,20 @@
-// Builds finds.html from finds.json, each.json, profiles.json, gentler.json and picture-prompts.md.
+// Builds finds.html from finds.json, each.json, profiles.json and target.json.
 const fs = require('fs');
 const { execFileSync } = require('child_process');
 const rd = f => JSON.parse(fs.readFileSync(__dirname + '/' + f, 'utf8'));
-const J = rd('finds.json'), E = rd('each.json'), P = rd('profiles.json'), G = rd('gentler.json');
-const prompts = fs.readFileSync(__dirname + '/picture-prompts.md', 'utf8');
+const J = rd('finds.json'), E = rd('each.json'), P = rd('profiles.json'), T = rd('target.json');
 const esc = s => String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
 const pc = x => Math.round(x * 100) + '%';
 const pts = x => { const v = Math.round(x * 100); return (v > 0 ? '+' : '') + v; };
-// small copies of the five painted cards, made by the Python beside this file
-const thumbs = JSON.parse(execFileSync('python3', ['-I', __dirname + '/thumbs.py', __dirname + '/../../art/items'], { maxBuffer: 1 << 26 }).toString());
+// small copies of the painted cards, made by the Python beside this file
+const thumbs = JSON.parse(execFileSync('python3', ['-I', __dirname + '/thumbs.py', __dirname + '/../../art/items'].concat(J.finds.map(f => f.id)), { maxBuffer: 1 << 26 }).toString());
 const howClass = { 'on the way': 'h1', 'off the path': 'h2', 'hidden': 'h3' };
 const card = f => {
   const a = f.aloneAtTheLastGate;
-  const worth = Math.abs(a.attentive) < 0.01 && Math.abs(a.careless) < 0.01 ? 'no help that the runs can see' : `${pts(a.attentive)} points paying attention, ${pts(a.careless)} pressing any button`;
+  const worth = Math.abs(a.attentive) < 0.01 && Math.abs(a.careless) < 0.01 ? 'too small for the runs to see' : `${pts(a.attentive)} points paying attention, ${pts(a.careless)} pressing any button`;
   const img = thumbs[f.id] ? `<img alt="" src="${thumbs[f.id]}">` : '<div class="topaint">to paint</div>';
   return `<article class="find">${img}<div>
-   <h4>${esc(f.name)}${f.new ? ' <span class="new">new, stand-in</span>' : ''}</h4>
+   <h4>${esc(f.name)}${f.new ? ' <span class="new">new</span>' : ''}</h4>
    <p class="does">${esc(f.does)}</p>
    <p class="card">${esc(f.card)}</p>
    <p class="meta"><span class="how ${howClass[f.how]}">${f.how}</span>${f.witch ? ' for ' + (f.witch === 'Io' ? 'Io' : 'the ' + f.witch) + '.' : ''} Alone at the last gate: ${worth}.</p>
@@ -23,20 +22,23 @@ const card = f => {
 };
 const ringNames = { 1: 'party level 2 to 5', 2: 'party level 5 to 8', 3: 'party level 8 to 11', 4: 'party level 11 to 14', 5: 'party level 14 to 17', 6: 'party level 17 to 20' };
 const rings = [1, 2, 3, 4, 5, 6].map(r => `<h3>Ring ${r} <span class="lvl">${ringNames[r]}</span></h3><div class="finds">${J.finds.filter(f => f.ring === r).map(card).join('')}</div>`).join('');
-const last = P.gates[2], lastG = G.gates[1], r5 = P.gates[1], r5G = G.gates[0], r4 = P.gates[0];
+const last = P.gates[2], r5 = P.gates[1], r4 = P.gates[0];
 const tries = x => (1 / Math.max(x, 0.001)).toFixed(x > 0.5 ? 1 : 0);
-let strength = '<div class="scroll"><table><thead><tr><th>She has found</th><th class="num">Full strength, as written</th><th class="num">Half strength</th></tr></thead><tbody>';
-const cell = r => `<td class="num"><b>${pc(r.attentive.win)}</b> paying attention<span>${pc(r.careless.win)} pressing any button, ${tries(r.careless.win)} tries</span></td>`;
-last.kinds.forEach((k, i) => { strength += `<tr><th scope="row">${k.label}<span class="n">${k.finds} finds</span></th>${cell(k.r)}${cell(lastG.kinds[i].r)}</tr>`; });
+let strength = '<div class="scroll"><table><thead><tr><th>She has found</th><th class="num">Paying attention</th><th class="num">Pressing any button</th></tr></thead><tbody>';
+last.kinds.forEach(k => { strength += `<tr><th scope="row">${k.label}<span class="n">${k.finds} finds</span></th><td class="num"><b>${pc(k.r.attentive.win)}</b></td><td class="num">${pc(k.r.careless.win)}<span>${tries(k.r.careless.win)} tries</span></td></tr>`; });
 strength += '</tbody></table></div>';
+const tg = (gap, k) => T.rows.find(r => r.gap === gap && r.k === k).r;
+let bigbad = '<div class="scroll"><table><thead><tr><th>The last fight\'s foes are</th><th class="num">With no finds</th><th class="num">With all eighteen</th></tr></thead><tbody>';
+for (const [gap, name] of [[0, 'level 20, the party\'s own'], [1, 'level 21'], [2, 'level 22'], [3, 'level 23']]) {
+  const a = tg(gap, 0), b = tg(gap, 1);
+  bigbad += `<tr><th scope="row">${name}</th><td class="num"><b>${pc(a.attentive)}</b> paying attention<span>${pc(a.expert)} expert</span></td><td class="num"><b>${pc(b.attentive)}</b> paying attention<span>${pc(b.expert)} expert</span></td></tr>`;
+}
+bigbad += '</tbody></table></div>';
 let earlier = '<div class="scroll"><table><thead><tr><th>She has found</th><th class="num">The great wraith alone, level 14</th><th class="num">The level-17 gate</th></tr></thead><tbody>';
-r4.kinds.forEach((k, i) => { earlier += `<tr><th scope="row">${k.label}</th><td class="num">${pc(k.r.careless.win)}<span>${k.finds} finds</span></td><td class="num">${pc(r5.kinds[i].r.careless.win)}<span>${r5.kinds[i].finds} finds; ${pc(r5G.kinds[i].r.careless.win)} at half strength</span></td></tr>`; });
+r4.kinds.forEach((k, i) => { earlier += `<tr><th scope="row">${k.label}</th><td class="num">${pc(k.r.careless.win)}<span>${k.finds} finds</span></td><td class="num">${pc(r5.kinds[i].r.careless.win)}<span>${r5.kinds[i].finds} finds</span></td></tr>`; });
 earlier += '</tbody></table></div>';
 const each = id => E.each[id].r.B2K2w, base = E.base.B2K2w, dd = (id, s) => pts(each(id)[s].win - base[s].win);
-const hardest = P.extra[1];
-// the three prompts, each in its own box with a Copy button
-const blocks = []; prompts.replace(/## (I\d  [^\n]+)\n([\s\S]*?)```\n([\s\S]*?)```/g, (_, title, intro, body) => { blocks.push({ title: title.replace(/^I\d  /, ''), attach: (intro.match(/Attach:[^\n]+/) || [''])[0], body: body.trim() }); });
-const promptHtml = blocks.map((b, i) => `<div class="prompt"><div class="phead"><div><strong>${esc(b.title)}</strong><span>${esc(b.attach)}</span></div><button type="button" data-copy="p${i}">Copy the prompt</button></div><pre id="p${i}" tabindex="0">${esc(b.body)}</pre></div>`).join('');
+const e2 = tg(2, 0), a2 = tg(2, 1), e1 = tg(1, 0), a1 = tg(1, 1), e3 = tg(3, 0), a3 = tg(3, 1);
 
 const html = `<!DOCTYPE html>
 <html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
@@ -97,25 +99,34 @@ footer { color: var(--ink-2); font-size: 15px; border-top: 1px solid var(--rule)
 <header>
  <p class="kicker">Moon Faire, task board S5</p>
  <h1>Finds for the bigger game</h1>
- <p>Level 20 is the top, so what she finds is now the only thing that makes the last gate easier. Here are 18 finds, three in each of the six rings: one on the way, one off the path, one hidden. Five are the cards the game already has. Thirteen are new, and every new name and card is a stand-in for you to change.</p>
+ <p>Eighteen finds, three in each of the six rings: one on the way, one off the path, one hidden. Five are the cards the game already had and thirteen are new. All eighteen are painted now.</p>
 </header>
 
-<section class="ask" aria-label="What I need from you">
- <h2>What I need from you</h2>
- <ol>
-  <li><strong>Full strength or half strength.</strong> The table just below shows both.</li>
-  <li><strong>The two MP finds.</strong> Cold lantern glass and The cut thread do nothing the runs can see, because every fight starts with full MP. Keep them as they are, or shall I give them a new job and measure it?</li>
-  <li><strong>The names and cards.</strong> Say what to change, or have them rewritten. The pictures to paint are at the bottom.</li>
- </ol>
+<section class="ask" aria-label="What you decided">
+ <h2>What you decided on November 15</h2>
+ <ul>
+  <li><strong>Half strength.</strong> Every percentage on this page is half of what I first proposed.</li>
+  <li><strong>The names and cards work.</strong> They are no longer stand-ins.</li>
+  <li><strong>The two MP finds stay,</strong> because fights will start with the MP she has, and she will have to refill it.</li>
+  <li><strong>A big bad at level 21 or 22,</strong> against a party that stops at 20, so anyone can see the whole game but winning it takes real effort. Only an expert who has found everything should just barely win.</li>
+ </ul>
 </section>
 
 <section>
- <h2>What the finds do at the last gate</h2>
- <p>The great wraith, two Shadow Wraiths and two wisps, at level 20. ${P.n.toLocaleString('en-US')} fights for every number.</p>
+ <h2>Against a big bad at level 21 or 22</h2>
+ <p>This is today's last fight (the great wraith, two Shadow Wraiths and two wisps) with its foes moved up, since the big bad itself is not designed yet. ${T.n.toLocaleString('en-US')} fights for every number.</p>
+ ${bigbad}
+ <p><strong>At level 21</strong> a player paying attention wins ${pc(e1.attentive)} of the time with nothing and ${pc(a1.attentive)} with every find. An expert hardly notices: ${pc(e1.expert)} and ${pc(a1.expert)}.</p>
+ <p><strong>At level 22</strong> nobody but an expert wins at all, which is what you asked for. But an expert already wins ${pc(e2.expert)} with nothing and ${pc(a2.expert)} with every find, and that is well past "just barely". At level 23 even an expert with everything wins ${pc(a3.expert)}.</p>
+ <p>So your aim sits between 22 and 23 for this line-up. A big bad at level 22 that is a little tougher than today's last fight would put the expert with everything at "just barely". That is a number to set when the big bad is designed, and when fights carry HP and MP over, which will change all of this.</p>
+</section>
+
+<section>
+ <h2>At the party's own level, as the last gate stands today</h2>
+ <p>${P.n.toLocaleString('en-US')} fights for every number.</p>
  ${strength}
- <p>With nothing found it is the fight you approved: ${pc(last.kinds[0].r.attentive.win)} for a player paying attention. At full strength, the six finds that lie on the way are enough to make it ${pc(last.kinds[1].r.attentive.win)}, and everything makes it certain. At half strength it takes all eighteen to do that. An expert wins ${pc(last.kinds[0].r.expert.win)} of the time with nothing.</p>
  <h3>The two gates before it, for a player pressing any button</h3>
- <p>A player paying attention never loses these. For anyone else the finds are the difference between two tries and six.</p>
+ <p>A player paying attention never loses these.</p>
  ${earlier}
 </section>
 
@@ -128,32 +139,16 @@ footer { color: var(--ink-2); font-size: 15px; border-top: 1px solid var(--rule)
 <section>
  <h2>What the measuring found</h2>
  <ul>
-  <li><strong>HP is the strongest thing a find can give.</strong> 2% more HP is worth ${dd('hp2', 'attentive')} points at the last gate, and 5% is worth ${dd('hp5', 'attentive')}. 5% stronger healing is worth ${dd('heal5', 'attentive')}. This is what your combat notes said, so the HP finds stay small.</li>
-  <li><strong>MP finds do nothing in one fight.</strong> 5% more MP: ${dd('mp5', 'attentive')} points. The Fox's spells 5% cheaper: ${dd('foxmp5', 'attentive')}. Nobody runs out of MP in a single fight.</li>
-  <li><strong>The curtain weight is the big one.</strong> Sealed Fate taking 25% from the other foes is worth ${dd('splash', 'attentive')} points alone. It is the hidden find of ring 5, and it is meant to feel like a prize.</li>
-  <li><strong>Two finds are worth more than the runs show.</strong> The pretend player who pays attention never calls the Fox's ghost and seldom leans on Bloom, so The spare outline and The fourth seed only show up for the any-button player. A real player who uses them will get more.</li>
+  <li><strong>HP is the strongest thing a find can give.</strong> At the sizes first proposed, 2% more HP was worth ${dd('hp2', 'attentive')} points at the last gate and 5% was worth ${dd('hp5', 'attentive')}; 5% stronger healing was worth ${dd('heal5', 'attentive')}. This is what your combat notes said.</li>
+  <li><strong>MP finds do nothing while every fight starts with full MP.</strong> Once fights start with the MP she has, they will matter. That is not measured yet.</li>
+  <li><strong>The curtain weight is the big one.</strong> At 25% it was worth ${dd('splash', 'attentive')} points alone. It is the hidden find of ring 5, and it is meant to feel like a prize.</li>
+  <li><strong>Two finds are worth more than the runs show.</strong> The pretend player who pays attention never calls the Fox's ghost and seldom leans on Bloom, so The spare outline and The fourth seed barely register. A real player who uses them will get more. The new testers you asked for should fix this.</li>
   <li><strong>Left out on purpose.</strong> The Ranger's gem ready a turn sooner was worth ${dd('gem1', 'attentive')} points alone, which is too much. The Jester catching a fourth blow helped nobody. Getting up for the bow at 50% changed no result.</li>
-  <li><strong>If the story ever adds a fight harder than the last gate,</strong> the full set is what makes it winnable. The hardest fight in your combat notes goes from ${pc(hardest.none.attentive.win)} to ${pc(hardest.all.attentive.win)} for a player paying attention with all eighteen.</li>
  </ul>
 </section>
 
-<section>
- <h2>Pictures to paint</h2>
- <p>Thirteen new cards: two sheets of six and one on its own. Each prompt follows the first item sheet's, so the new cards match the old. Attach the files named, paste the prompt, and save the result under the name given.</p>
- ${promptHtml}
-</section>
-
-<footer>Made by the Levelling session on November 14, 2026. The finds as data, the measurements and these prompts are in <code>game/plan/finds/</code>.</footer>
+<footer>Made by the Levelling session on November 14 and 15, 2026. The finds as data, the measurements and the pictures' prompts are in <code>game/plan/finds/</code>; the pictures are in <code>game/art/items/</code>.</footer>
 </main>
-<script>
-document.addEventListener('click', function (e) {
-  var b = e.target.closest('button[data-copy]'); if (!b) return;
-  var pre = document.getElementById(b.getAttribute('data-copy')), was = b.textContent;
-  function done(ok) { b.textContent = ok ? 'Copied' : 'Select the text below and copy it'; setTimeout(function () { b.textContent = was; }, 2500); }
-  function select() { var r = document.createRange(); r.selectNodeContents(pre); var s = getSelection(); s.removeAllRanges(); s.addRange(r); done(false); }
-  try { navigator.clipboard.writeText(pre.textContent).then(function () { done(true); }, select); } catch (err) { select(); }
-});
-</script>
 </body></html>`;
 fs.writeFileSync(__dirname + '/finds.html', html);
-console.log('wrote finds.html', (html.length / 1024).toFixed(0) + ' KB;', blocks.length, 'prompts;', Object.keys(thumbs).length, 'pictures');
+console.log('wrote finds.html', (html.length / 1024).toFixed(0) + ' KB;', Object.keys(thumbs).length, 'pictures');

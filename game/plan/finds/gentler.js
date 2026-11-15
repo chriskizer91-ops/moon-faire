@@ -1,4 +1,4 @@
-// The same 18 finds at half strength: every percentage halved (5% becomes 2.5%, Revive 35%, Sealed Fate 22.5%);
+// The same 18 finds at half of the strength in finds.js (so a quarter of the first proposal, now that Chris has chosen half);
 // the two finds that add a whole thing (a fourth Bloom, a third blow for the ghost) stay as they are.
 const fs = require('fs');
 const { measure } = require('./lib.js');
@@ -10,7 +10,7 @@ const kinds = [['nothing', []], ['what lies on the way', ['on the way']], ['and 
 const p = x => (x * 100).toFixed(0).padStart(3) + '%';
 const out = { n: N, gates: [] };
 for (const g of [{ ring: 5, code: 'BK2w' }, { ring: 6, code: 'B2K2w' }]) {
-  console.log('\nring ' + g.ring + ' gate, ' + g.code + ', finds at half strength');
+  console.log('\nring ' + g.ring + ' gate, ' + g.code + ', finds at half of the chosen strength');
   const row = { gate: g, kinds: [] };
   for (const [label, hows] of kinds) {
     const have = F.filter(f => f.ring <= g.ring && hows.includes(f.how));

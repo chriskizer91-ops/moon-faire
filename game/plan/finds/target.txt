@@ -1,0 +1,24 @@
+
+The last fight (B2K2w), its foes 0 levels above the party
+  no finds                                 6% / 81% / 99%
+  every find, at the chosen strength      20% / 98% /100%
+  every find, at twice that               39% /100% /100%
+  every find, at half that                13% / 94% /100%
+
+The last fight (B2K2w), its foes 1 level above the party
+  no finds                                 0% /  3% / 91%
+  every find, at the chosen strength       1% / 13% / 97%
+  every find, at twice that                3% / 36% / 99%
+  every find, at half that                 1% /  7% / 96%
+
+The last fight (B2K2w), its foes 2 levels above the party
+  no finds                                 0% /  0% / 27%
+  every find, at the chosen strength       0% /  0% / 80%
+  every find, at twice that                0% /  0% / 90%
+  every find, at half that                 0% /  0% / 62%
+
+The last fight (B2K2w), its foes 3 levels above the party
+  no finds                                 0% /  0% /  0%
+  every find, at the chosen strength       0% /  0% /  1%
+  every find, at twice that                0% /  0% /  6%
+  every find, at half that                 0% /  0% /  0%

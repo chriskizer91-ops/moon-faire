@@ -1,0 +1,48 @@
+# Moon Faire Finds — generation prompts
+
+Generated with the built-in image generator, using the five item reference thumbnails embedded in Moon Faire finds.html.
+
+## items2.png
+
+Use case: stylized-concept. Asset type: Moon Faire fantasy role-playing game inventory art.
+The five attached images are EXISTING ITEM ART style references from this same game: cold lantern glass, cut blue thread, warm stone, hollow amulet, and keeper's iron charm. Match their near-black plum wool cloth, soft cool light from upper left, rich realistic hand-painted material rendering, and compact isolated composition. Do not copy the five reference objects into the output. They are references for surface, lighting, and style.
+STYLE: realistic, richly detailed, hand-painted with believable scale and painterly but detailed surfaces: real wax, tin, brass, steel, stone, wool, paper, and leather. No pixel art, no cartoon, no anime, no drawn outlines. A quiet moody tactile small treasure painting, exactly the same finish as the existing item pictures.
+BACKGROUND: plain continuous near-black plum wool cloth, subtly textured, with NO folds, seams, borders, dividing lines or lettering. Soft cool light from upper left, short soft shadows lower right. Any glow is subtle and local.
+LEAVE OUT: hands, actual people, creatures, readable lettering, numbers, labels, price tags, frames, and shadows of anything outside the picture.
+Output exactly ONE landscape image, 3:2, at least 1536 x 1024 pixels. Filename items2.png. It is a seamless sheet of six item pictures in TWO ROWS OF THREE EQUAL SQUARE CELLS, no drawn grid, borders or gaps. Each item is alone centered in its own invisible square cell, fills about 60% of its cell, and has generous safe margins. In normalized coordinates, item centers are (1/6,1/4), (1/2,1/4), (5/6,1/4), (1/6,3/4), (1/2,3/4), (5/6,3/4). Nothing including smoke, cords, light trails or shadows crosses a cell boundary.
+THE SIX THINGS, left to right, top row first then bottom:
+1. TOP LEFT, the stubborn candle: a short fat tallow candle stub in a dented tin holder, burning with a small steady gold flame that leans a little to the left.
+2. TOP MIDDLE, the straight spark: ONE knapped grey flint arrowhead lying flat, finely chipped edges, with a SINGLE bright white-gold spark and a SHORT absolutely straight trail of light leaving its point. Keep spark and trail within this cell.
+3. TOP RIGHT, the idle needle: ONE long bright steel sewing needle lying diagonally, unthreaded, cold blue glint along its length and at its visible open eye. No thread.
+4. BOTTOM LEFT, the brass snuffer: ONE old brass candle snuffer, small cone-shaped cap on a long thin twisted handle, lying diagonally, brass worn bright at rim, thin curl of pale smoke from beneath cap.
+5. BOTTOM MIDDLE, the winter blackthorn: ONE short dark blackthorn sprig with long sharp thorns and a cluster of small white FIVE-PETALLED flowers, faintly luminous.
+6. BOTTOM RIGHT, the warm oil flask: ONE small dented tin oil flask with a cork stopper and wire handle, standing upright, a soft amber warmth through a worn seam and on the cloth beside it.
+Exactly six distinct items in the listed order. No additional props.
+
+## items3.png
+
+Use case: stylized-concept. Asset type: Moon Faire fantasy role-playing game inventory art.
+The five attached images are EXISTING ITEM ART style references from this same game: cold lantern glass, cut blue thread, warm stone, hollow amulet, and keeper's iron charm. Match their near-black plum wool cloth, soft cool light from upper left, rich realistic hand-painted material rendering, and compact isolated composition. Do not copy the five reference objects into the output. They are references for surface, lighting, and style.
+STYLE: realistic, richly detailed, hand-painted with believable scale and painterly but detailed surfaces: real wax, tin, brass, steel, stone, wool, paper, and leather. No pixel art, no cartoon, no anime, no drawn outlines. A quiet moody tactile small treasure painting, exactly the same finish as the existing item pictures.
+BACKGROUND: plain continuous near-black plum wool cloth, subtly textured, with NO folds, seams, borders, dividing lines or lettering. Soft cool light from upper left, short soft shadows lower right. Any glow is subtle and local.
+LEAVE OUT: hands, actual people, creatures, readable lettering, numbers, labels, price tags, frames, and shadows of anything outside the picture.
+Output exactly ONE landscape image, 3:2, at least 1536 x 1024 pixels. Filename items3.png. It is a seamless sheet of six item pictures in TWO ROWS OF THREE EQUAL SQUARE CELLS, no drawn grid, borders or gaps. Each item is alone centered in its own invisible square cell, fills about 60% of its cell including cords, and has generous safe margins. In normalized coordinates, item centers are (1/6,1/4), (1/2,1/4), (5/6,1/4), (1/6,3/4), (1/2,3/4), (5/6,3/4). Nothing including shadows crosses a cell boundary.
+THE SIX THINGS, left to right, top row first then bottom:
+1. TOP LEFT, the fourth seed: a small twist of brown paper lying open, with EXACTLY FOUR round pale seeds spilled on it, one seed just splitting to show a thread of green. Only four seeds, all visible, no extra seeds.
+2. TOP MIDDLE, the paired amulet: a round pale grey-green stone pendant carved with ONE spiral turning the OPPOSITE WAY to the hollow amulet in reference image 4 (a mirrored spiral), rimmed in worn silver, on a looped leather cord, soft rose-gold sheen. Match that reference pendant's material, craftsmanship, and scale; mirror only its spiral direction.
+3. TOP RIGHT, the spare outline: a flat paper cut-out in the simple plain silhouette of a standing person, cut from a faded printed handbill, slightly curled edges, one brass pin through top. This is an inanimate flat paper silhouette with no face, not a person. Its faint aged handbill marks are illegible, no readable text.
+4. BOTTOM LEFT, the keeper's glove: ONE thick grey wool work glove lying PALM UP, palm scorched brown and patched with leather. Five finger shapes, no hand inside.
+5. BOTTOM MIDDLE, the curtain weight: ONE small heavy teardrop of dull grey lead, still stitched into a torn CORNER of deep midnight-blue velvet with a gold cord edge. Velvet scrap and attached lead weight form one small item.
+6. BOTTOM RIGHT, the lit taper: ONE long thin cream wax taper lying diagonally, tip burning with a small clear gold flame, few wax drips along its length.
+Exactly six distinct item compositions in listed order. No additional props.
+
+## far-amulet.png
+
+Use case: stylized-concept. Asset type: Moon Faire fantasy role-playing game inventory art.
+The five attached images are EXISTING ITEM ART style references from this same game: cold lantern glass, cut blue thread, warm stone, hollow amulet, and keeper's iron charm. Match their near-black plum wool cloth, soft cool light from upper left, rich realistic hand-painted material rendering, and compact isolated composition. Do not copy the five reference objects into the output. They are references for surface, lighting, and style.
+STYLE: realistic, richly detailed, hand-painted with believable scale and painterly but detailed surfaces: real wax, tin, brass, steel, stone, wool, paper, and leather. No pixel art, no cartoon, no anime, no drawn outlines. A quiet moody tactile small treasure painting, exactly the same finish as the existing item pictures.
+BACKGROUND: plain continuous near-black plum wool cloth, subtly textured, with NO folds, seams, borders, dividing lines or lettering. Soft cool light from upper left, short soft shadows lower right. Any glow is subtle and local.
+LEAVE OUT: hands, actual people, creatures, readable lettering, numbers, labels, price tags, frames, and shadows of anything outside the picture.
+Output exactly ONE SQUARE image, at least 1024 x 1024 pixels. Filename far-amulet.png. One small item picture for an item card. The object lies alone in the exact middle and fills about 60% of the square INCLUDING its cord, with generous safe margins all around.
+THE THING: The far amulet, a round pendant of pale grey-green stone carved with EXACTLY THREE small spirals joined at the middle, rimmed in worn silver gone dark, on a looped brown leather cord, with a soft rose-gold sheen. The three spirals form a connected triskelion-like triple spiral carved into the same stone; no more or fewer spirals, no runes or text. Match reference image 4's stone, aged metal craftsmanship, leather cord, painterly finish and soft lighting; change the single spiral to the requested connected triple spiral. Keep plain near-black plum cloth evenly dark across the entire square with no vignette border. Only one pendant, no other objects.
+

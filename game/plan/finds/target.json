@@ -1,0 +1,165 @@
+{
+ "n": 3000,
+ "rows": [
+  {
+   "gap": 0,
+   "label": "no finds",
+   "k": 0,
+   "r": {
+    "careless": 0.058666666666666666,
+    "attentive": 0.805,
+    "expert": 0.9946666666666667
+   }
+  },
+  {
+   "gap": 0,
+   "label": "every find, at the chosen strength",
+   "k": 1,
+   "r": {
+    "careless": 0.19966666666666666,
+    "attentive": 0.984,
+    "expert": 1
+   }
+  },
+  {
+   "gap": 0,
+   "label": "every find, at twice that",
+   "k": 2,
+   "r": {
+    "careless": 0.38566666666666666,
+    "attentive": 1,
+    "expert": 1
+   }
+  },
+  {
+   "gap": 0,
+   "label": "every find, at half that",
+   "k": 0.5,
+   "r": {
+    "careless": 0.128,
+    "attentive": 0.9423333333333334,
+    "expert": 0.998
+   }
+  },
+  {
+   "gap": 1,
+   "label": "no finds",
+   "k": 0,
+   "r": {
+    "careless": 0.0013333333333333333,
+    "attentive": 0.03166666666666667,
+    "expert": 0.9093333333333333
+   }
+  },
+  {
+   "gap": 1,
+   "label": "every find, at the chosen strength",
+   "k": 1,
+   "r": {
+    "careless": 0.009333333333333334,
+    "attentive": 0.13166666666666665,
+    "expert": 0.974
+   }
+  },
+  {
+   "gap": 1,
+   "label": "every find, at twice that",
+   "k": 2,
+   "r": {
+    "careless": 0.025666666666666667,
+    "attentive": 0.36133333333333334,
+    "expert": 0.9913333333333333
+   }
+  },
+  {
+   "gap": 1,
+   "label": "every find, at half that",
+   "k": 0.5,
+   "r": {
+    "careless": 0.005333333333333333,
+    "attentive": 0.073,
+    "expert": 0.9556666666666667
+   }
+  },
+  {
+   "gap": 2,
+   "label": "no finds",
+   "k": 0,
+   "r": {
+    "careless": 0,
+    "attentive": 0,
+    "expert": 0.273
+   }
+  },
+  {
+   "gap": 2,
+   "label": "every find, at the chosen strength",
+   "k": 1,
+   "r": {
+    "careless": 0,
+    "attentive": 0,
+    "expert": 0.8003333333333333
+   }
+  },
+  {
+   "gap": 2,
+   "label": "every find, at twice that",
+   "k": 2,
+   "r": {
+    "careless": 0,
+    "attentive": 0.0006666666666666666,
+    "expert": 0.8966666666666666
+   }
+  },
+  {
+   "gap": 2,
+   "label": "every find, at half that",
+   "k": 0.5,
+   "r": {
+    "careless": 0,
+    "attentive": 0,
+    "expert": 0.6156666666666667
+   }
+  },
+  {
+   "gap": 3,
+   "label": "no finds",
+   "k": 0,
+   "r": {
+    "careless": 0,
+    "attentive": 0,
+    "expert": 0
+   }
+  },
+  {
+   "gap": 3,
+   "label": "every find, at the chosen strength",
+   "k": 1,
+   "r": {
+    "careless": 0,
+    "attentive": 0,
+    "expert": 0.008
+   }
+  },
+  {
+   "gap": 3,
+   "label": "every find, at twice that",
+   "k": 2,
+   "r": {
+    "careless": 0,
+    "attentive": 0,
+    "expert": 0.06466666666666666
+   }
+  },
+  {
+   "gap": 3,
+   "label": "every find, at half that",
+   "k": 0.5,
+   "r": {
+    "careless": 0,
+    "attentive": 0,
+    "expert": 0.0003333333333333333
+   }
+  }
+ ]
+}
