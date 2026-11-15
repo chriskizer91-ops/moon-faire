@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>/*TITLE*/</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible:wght@400;700&family=Jacquard+24&display=swap" rel="stylesheet">
+<style>
+/* The walk page's own look (game/src/walk.tpl.html): the picture first and as large as the window allows, its controls under it. */
+:root {
+  color-scheme: dark;
+  --bg: #171119; --panel: #241a28; --ink: #f2e9ee; --muted: #b6a7ba; --line: #40323f;
+  --amber: #ffb964; --lilac: #cdb4ff; --lilac-soft: #342a48;
+  --display: "Jacquard 24", "Palatino Linotype", Palatino, Georgia, serif;
+  --body: "Atkinson Hyperlegible", "Segoe UI", system-ui, -apple-system, Arial, sans-serif;
+}
+* { box-sizing: border-box; }
+[hidden] { display: none !important; }
+html { -webkit-text-size-adjust: 100%; }
+body { margin: 0; background: var(--bg); color: var(--ink); font-family: var(--body); font-size: 16px; line-height: 1.45; }
+main { max-width: 1280px; margin: 0 auto; padding: 14px 16px 56px; display: flex; flex-direction: column; gap: 12px; }
+header { display: flex; flex-wrap: wrap; align-items: center; gap: 8px 16px; }
+h1 { font-family: var(--display); font-weight: 400; font-size: clamp(28px, 6vw, 40px); line-height: 1; margin: 0; flex: 1 1 240px; }
+h2 { font-family: var(--display); font-weight: 400; font-size: 26px; margin: 0; }
+p { margin: 0; }
+.row { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; }
+button, select { font: 700 15px var(--body); color: var(--ink); background: var(--panel); border: 1px solid var(--line); border-radius: 999px; padding: 8px 14px; cursor: pointer; }
+button:hover:not(:disabled) { border-color: var(--lilac); }
+button[aria-pressed="true"] { background: var(--lilac); color: #1c1326; border-color: var(--lilac); }
+button:focus-visible, select:focus-visible, input:focus-visible { outline: 3px solid var(--amber); outline-offset: 2px; }
+#stagebox { position: relative; width: min(100%, calc(84vh * 16 / 9)); margin: 0 auto; aspect-ratio: 16 / 9; background: #1c151f; border-radius: 12px; overflow: hidden; border: 1px solid var(--line); }
+#stagebox:fullscreen { width: 100%; aspect-ratio: auto; border-radius: 0; border: 0; }
+#stage { display: block; width: 100%; height: 100%; touch-action: none; cursor: grab; }
+#stage:active { cursor: grabbing; }
+#loading, #err { position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; text-align: center; padding: 20px; background: #1c151f; }
+#err { color: var(--amber); }
+#meter { font-size: 13px; min-height: 1.45em; text-align: center; font-variant-numeric: tabular-nums; }
+#toast, #prompt { position: absolute; left: 50%; transform: translateX(-50%); background: #1c1326e6; border: 1px solid var(--line); border-radius: 10px; padding: 8px 14px; max-width: min(92%, 560px); text-align: center; }
+#toast { top: 10px; }
+#prompt { bottom: 12px; display: flex; gap: 10px; align-items: center; padding: 6px 8px 6px 14px; }
+#prompt[hidden] { display: none; }
+@media (max-width: 700px) { #stagebox { aspect-ratio: 4 / 3; } }
+#place { position: absolute; left: 10px; top: 10px; background: #1c1326cc; border: 1px solid var(--line); border-radius: 999px; padding: 4px 12px; font-size: 13px; font-weight: 700; pointer-events: none; }
+#say { position: absolute; left: 50%; bottom: 12px; transform: translateX(-50%); width: min(94%, 620px); background: #1c1326f2; border: 1px solid var(--amber); border-radius: 12px; padding: 10px 14px; display: flex; flex-direction: column; gap: 6px; }
+#say b { color: var(--amber); } #say p { font-size: clamp(14px, 2.3vw, 17px); } #say button { align-self: flex-end; }
+#card { position: absolute; inset: 0; background: #0c080e; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 8px; cursor: pointer; text-align: center; padding: 8px; }
+#card img { max-width: 100%; max-height: 78%; display: block; border-radius: 6px; } #card p { font-family: var(--display); font-size: clamp(22px, 4vw, 36px); } #card span { font-size: 13px; color: var(--muted); }
+#mapbox { position: absolute; inset: 0; background: #0c080ef2; display: flex; align-items: center; justify-content: center; }
+#mapwrap { position: relative; height: 100%; aspect-ratio: 3 / 2; max-width: 100%; cursor: crosshair; } #mapwrap img { width: 100%; height: 100%; display: block; object-fit: contain; }
+#mappins { position: absolute; inset: 0; }
+#mappins button { position: absolute; transform: translate(-50%, -50%); padding: 3px 8px; font-size: 12px; background: #1c1326e6; border-color: var(--amber); }
+#mapme { position: absolute; width: 14px; height: 14px; border-radius: 50%; background: var(--lilac); border: 2px solid #1c1326; transform: translate(-50%, -50%); pointer-events: none; box-shadow: 0 0 0 3px #cdb4ff66; }
+#mapclose { position: absolute; right: 8px; top: 8px; }
+#maphint { position: absolute; left: 8px; bottom: 8px; font-size: 13px; background: #1c1326e6; border-radius: 8px; padding: 4px 10px; pointer-events: none; }
+.notes { display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 12px; margin-top: 8px; }
+.notes > div { background: var(--panel); border: 1px solid var(--line); border-radius: 12px; padding: 14px 16px; display: flex; flex-direction: column; gap: 8px; }
+.notes ul { margin: 0; padding-left: 18px; display: flex; flex-direction: column; gap: 5px; }
+.muted { color: var(--muted); }
+kbd { font: 700 13px var(--body); border: 1px solid var(--line); border-radius: 5px; padding: 1px 6px; background: #00000040; }
+input[type=range] { accent-color: var(--lilac); width: 180px; }
+</style>
+</head>
+<body>
+<main>
+  <header>
+    <h1>/*H1*/</h1>
+    <div class="row"><button type="button" id="mapbtn">Map</button></div>
+  </header>
+
+  <div id="stagebox">
+    <canvas id="stage" aria-label="The game picture: the Jester on the open land between the fair and the moor"></canvas>
+    <div id="place"></div>
+    <div id="prompt" hidden><span></span><button type="button" id="use">Do it</button></div>
+    <div id="say" hidden><b id="sayname"></b><p id="sayline"></p><button type="button" id="saynext">Next</button></div>
+    <div id="toast" role="status" hidden></div>
+    <div id="mapbox" hidden><div id="mapwrap"><img id="mapimg" alt="The world map"><div id="mappins"></div><div id="mapme"></div><div id="maphint">Tap a pin or anywhere on the land to go there</div></div><button type="button" id="mapclose">Close</button></div>
+    <div id="card" hidden><img id="cardimg" alt=""><p id="cardline"></p><span>The fight will happen here, on its painted place. Tap, or press Space, to go on.</span></div>
+    <div id="loading">Making the land…</div>
+    <div id="err" hidden></div>
+  </div>
+
+  <p id="meter" class="muted"></p>
+
+  <div class="row">
+    <button type="button" id="viewsw">View: near</button>
+    <button type="button" id="looksw" aria-pressed="false">Mouse look</button>
+    <button type="button" id="encsw" aria-pressed="true">Encounters</button>
+    <button type="button" id="flipsw" aria-pressed="false">Flipbook look</button>
+    <label class="row" id="fliprow" hidden><span class="muted">Pixels down the screen</span> <input type="range" id="fliprows" min="200" max="1080" step="20" value="600"></label>
+    <label class="row"><span class="muted">Witches</span> <select id="weight"><option value="lightest">Lightest</option><option value="light">Light</option></select></label>
+    <label class="row"><span class="muted">Sharpness</span> <select id="detail"><option value="1">Fast</option><option value="1.5" selected>Sharp</option><option value="2">Sharpest</option></select></label>
+    <button type="button" id="full">Full screen</button>
+  </div>
+
+/*NOTES*/
+</main>
+/*SCRIPTS*/
+</body>
+</html>

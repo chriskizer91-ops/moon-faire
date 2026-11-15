@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Moon Faire open world: pictures to make</title>
+<style>
+:root { color-scheme: dark; --bg: #171119; --panel: #241a28; --ink: #f2e9ee; --muted: #b6a7ba; --line: #40323f; --amber: #ffb964; --lilac: #cdb4ff; --green: #8fdca8; }
+* { box-sizing: border-box; }
+body { margin: 0; background: var(--bg); color: var(--ink); font: 16px/1.5 "Atkinson Hyperlegible", "Segoe UI", system-ui, -apple-system, Arial, sans-serif; }
+main { max-width: 980px; margin: 0 auto; padding: 18px 16px 64px; }
+h1 { font: 400 clamp(28px, 6vw, 40px)/1.1 "Palatino Linotype", Palatino, Georgia, serif; margin: 0 0 10px; }
+h2 { font: 400 28px/1.15 "Palatino Linotype", Palatino, Georgia, serif; margin: 40px 0 6px; }
+h3 { font-size: 17px; margin: 0; }
+p { margin: 8px 0; } ul, ol { margin: 8px 0; padding-left: 22px; } li { margin: 4px 0; }
+a { color: var(--lilac); }
+.muted { color: var(--muted); }
+.box, .card { background: var(--panel); border: 1px solid var(--line); border-radius: 12px; padding: 14px 16px; margin: 12px 0; }
+.rounds { display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 12px; } .rounds > div { background: var(--panel); border: 1px solid var(--line); border-radius: 12px; padding: 12px 14px; }
+.card header { display: flex; flex-wrap: wrap; align-items: center; gap: 8px 10px; margin-bottom: 8px; }
+.code { font-weight: 700; color: #1c1326; background: var(--amber); border-radius: 6px; padding: 1px 8px; }
+.tag { margin-left: auto; font-size: 13px; font-weight: 700; border-radius: 999px; padding: 2px 10px; border: 1px solid var(--line); }
+.tag.r1 { color: var(--green); border-color: var(--green); } .tag.r2 { color: var(--lilac); } .tag.r3 { color: var(--muted); }
+dl { display: grid; grid-template-columns: max-content 1fr; gap: 2px 12px; margin: 0 0 8px; } dt { color: var(--muted); } dd { margin: 0; }
+code { font: 14px ui-monospace, Menlo, Consolas, monospace; color: var(--amber); overflow-wrap: anywhere; }
+.lbl { color: var(--muted); font-size: 13px; font-weight: 700; margin: 10px 0 4px; }
+.refs { display: flex; flex-wrap: wrap; gap: 10px; } .refs figure { margin: 0; max-width: 230px; } .refs img { display: block; max-width: 100%; max-height: 130px; border-radius: 6px; border: 1px solid var(--line); }
+figcaption { font-size: 13px; margin-top: 4px; }
+pre { white-space: pre-wrap; overflow-wrap: anywhere; font: 14px/1.45 ui-monospace, Menlo, Consolas, monospace; background: #120d14; border: 1px solid var(--line); border-radius: 8px; padding: 10px 12px; margin: 0 0 8px; }
+button { font: 700 14px inherit; color: var(--ink); background: #342a48; border: 1px solid var(--line); border-radius: 999px; padding: 7px 14px; cursor: pointer; }
+button:focus-visible, a:focus-visible { outline: 3px solid var(--amber); outline-offset: 2px; }
+.gallery { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 14px; } .gallery figure { margin: 0; } .gallery img { display: block; width: 100%; border-radius: 8px; border: 1px solid var(--line); }
+</style>
+</head>
+<body>
+<main>
+<h1>Moon Faire open world: pictures to make</h1>
+<p>/*N*/ prompts and /*NREF*/ reference pictures for the open-world map. Walking and exploring happen in the 3D open world. Fights stay on painted backdrops and are not part of this list.</p>
+
+<div class="box">
+<h3>Texture packs, not building reference photos</h3>
+<p>The open world paints flat pictures straight onto simple 3D shapes. It does not model a building by looking at photos of it. So the useful pictures are of two kinds:</p>
+<ul>
+<li><b>Texture packs</b> (sets A, B and E): seamless squares of ground, cloth, wood, stone and plants. One square of striped canvas covers every striped tent in every zone, at any size and from any side. This is what lets the world grow: a new zone reuses the packs and needs only a few new squares of its own.</li>
+<li><b>Skin sheets</b> (sets C and D): flat front views of the few things a pack cannot describe, such as a tent's door, a stall's counter with its goods, or the wagon. They work the way the fair folk's skins do.</li>
+</ul>
+</div>
+
+<h2>How to make them</h2>
+<ol>
+<li>For each prompt, attach the reference pictures shown on its card. They are all at the bottom of this page, each with a Save link, and in the zip that came with this page.</li>
+<li>Paste the prompt. Each one is complete, with its rules included.</li>
+<li>Save the result under the file name on the card.</li>
+<li>Zip a round together and send it back.</li>
+</ol>
+<p>If a picture comes back with a lamp glow, a shadow, or perspective in it, ask for it again. Those three are what spoil a texture.</p>
+
+<h2>Three rounds</h2>
+<div class="rounds">/*CHECK*/</div>
+<p class="muted">The airship is not in this list. It is a model of its own, like the witches, and wants its own references.</p>
+
+/*SETS*/
+
+<h2>Reference pictures</h2>
+<p class="muted">Your own paintings, and close-ups cut from them. Attach the ones a card names.</p>
+<div class="gallery">/*GALLERY*/</div>
+</main>
+<script>
+for (const a of document.querySelectorAll('a.save')) a.href = a.closest('figure').querySelector('img').src;
+for (const b of document.querySelectorAll('button.copy')) b.addEventListener('click', async () => {
+  const pre = b.previousElementSibling, t = pre.textContent;
+  try { await navigator.clipboard.writeText(t); b.textContent = 'Copied'; }
+  catch (e) { const r = document.createRange(); r.selectNodeContents(pre); const s = getSelection(); s.removeAllRanges(); s.addRange(r); b.textContent = 'Selected: now copy'; }
+  setTimeout(() => { b.textContent = 'Copy prompt'; }, 2000);
+});
+</script>
+</body>
+</html>
