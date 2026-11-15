@@ -89,7 +89,7 @@ facing the foes. Also some of the witches' animations need to be looked at, mayb
 - "Side on, everyone" is the default camera now: the whole party and every foe from the side, in front of the sharp painting, for the
   whole fight. The witches rest facing the foes and turn to the audience to bow when the fight is won.
 - "Behind the party" and the other cameras stay in the menu.
-- A fault in the version before this one (commit `3f78a98`, live on the page from 6:29 to about 6:55 pm): a comment had swallowed the
+- A fault in the version before this one (commit `3f78a98`, live on the page from 6:29 to 6:42 pm): a comment had swallowed the
   line that turns a witch toward her target, so the Jester, the Fox and the Ranger cast while still facing the foes, and their
   spells and arrows went toward the back of the place. Fixed here.
 - Which animations Chris means is not known yet.
