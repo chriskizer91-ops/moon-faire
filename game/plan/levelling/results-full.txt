@@ -1,0 +1,137 @@
+
+===== Option A: Fourteen levels, about 120 fights (full fights; fine tuning 0.989)
+rings:
+  ring 1  party 2 to 5  foes level 2 to 6  meets 2w 3w 4w  gate K2w at level 5
+  ring 2  party 5 to 8  foes level 5 to 9  meets 3w 4w K K2w  gate 2K2w at level 8
+  ring 3  party 8 to 11  foes level 8 to 12  meets 5w K2w K4w 2K2w  gate B at level 11
+  ring 4  party 11 to 14  foes level 11 to 15  meets 6w K4w 2K2w 3K 2K4w  gate B2K2w at level 14
+XP to reach each level: L1 0, L2 80, L3 350, L4 660, L5 1,010, L6 2,110, L7 3,110, L8 4,210, L9 8,310, L10 12,410, L11 16,810, L12 28,810, L13 39,810, L14 50,810
+  steady/careless      wins 116 / 121 / 126  lost 23.8  last gate tries 21.79  witch turns 2297  foe turns 1330  minutes 228-320-462  end level 14/14/14
+  steady/attentive     wins 115 / 120 / 125  lost 0.3  last gate tries 1.32  witch turns 1251  foe turns 494  minutes 120-170-245  end level 14/14/14
+  steady/expert        wins 115 / 120 / 125  lost 0  last gate tries 1  witch turns 1274  foe turns 488  minutes 121-172-248  end level 14/14/14
+  explorer/careless    wins 151 / 157 / 163  lost 12.5  last gate tries 11.42  witch turns 2347  foe turns 1184  minutes 228-322-465  end level 15/15/15
+  explorer/attentive   wins 149 / 156 / 162  lost 0.2  last gate tries 1.16  witch turns 1480  foe turns 560  minutes 143-202-291  end level 15/15/15
+  explorer/expert      wins 149 / 156 / 162  lost 0  last gate tries 1  witch turns 1513  foe turns 554  minutes 145-205-295  end level 15/15/15
+  levels arrive on win number (steady, attentive): L2:3 L3:8 L4:14 L5:21 L6:30 L7:38 L8:46 L9:57 L10:68 L11:79 L12:92 L13:105 L14:119
+  gates (steady/attentive):
+     Leaving the fair                     party level 2  wins so far 3 
+     Ring 1 gate (K2w, level 5)           party level 5  wins so far 22  tries 1
+     Ring 2 gate (2K2w, level 8)          party level 8  wins so far 47  tries 1
+     Ring 3 gate (B, level 11)            party level 11  wins so far 80  tries 1
+     Ring 4 gate (B2K2w, level 14)        party level 14  wins so far 120  tries 1.32
+  gates (explorer/attentive):
+     Leaving the fair                     party level 2  wins so far 3 
+     Ring 1 gate (K2w, level 5)           party level 5  wins so far 31  tries 1
+     Ring 2 gate (2K2w, level 8)          party level 8  wins so far 63  tries 1
+     Ring 3 gate (B, level 11)            party level 11  wins so far 107  tries 1
+     Ring 4 gate (B2K2w, level 14)        party level 14  wins so far 156  tries 1.16
+  gates (steady/careless):
+     Leaving the fair                     party level 2  wins so far 3 
+     Ring 1 gate (K2w, level 5)           party level 5  wins so far 22  tries 1
+     Ring 2 gate (2K2w, level 8)          party level 8  wins so far 47  tries 1
+     Ring 3 gate (B, level 11)            party level 11  wins so far 81  tries 1.98
+     Ring 4 gate (B2K2w, level 14)        party level 14  wins so far 121  tries 21.79
+  how far above the party the walking foes were (steady, attentive): -2 7%, -1 14%, +0 20%, +1 20%, +2 20%, +3 13%, +4 6%
+
+===== Option B: Twenty levels, about 180 fights (full fights; fine tuning 0.99)
+rings:
+  ring 1  party 2 to 5  foes level 2 to 6  meets 2w 3w 4w  gate 4w at level 5
+  ring 2  party 5 to 8  foes level 5 to 9  meets 3w 4w K K2w  gate K2w at level 8
+  ring 3  party 8 to 11  foes level 8 to 12  meets 4w 5w K2w 2K K4w  gate 2K2w at level 11
+  ring 4  party 11 to 14  foes level 11 to 15  meets 4w 5w K2w 2K K4w  gate B at level 14
+  ring 5  party 14 to 17  foes level 14 to 18  meets 5w K2w K4w 2K2w  gate BK2w at level 17
+  ring 6  party 17 to 20  foes level 17 to 21  meets 6w K4w 2K2w 3K 2K4w  gate B2K2w at level 20
+XP to reach each level: L1 0, L2 80, L3 330, L4 610, L5 920, L6 1,810, L7 2,690, L8 3,640, L9 6,340, L10 9,040, L11 11,940, L12 17,840, L13 23,340, L14 29,140, L15 46,140, L16 60,140, L17 74,140, L18 115,140, L19 149,140, L20 184,140
+  steady/careless      wins 175 / 182 / 188  lost 30.4  last gate tries 22.45  witch turns 3377  foe turns 1857  minutes 331-466-673  end level 20/20/20
+  steady/attentive     wins 174 / 180 / 186  lost 0.3  last gate tries 1.34  witch turns 1899  foe turns 722  minutes 181-256-369  end level 20/20/20
+  steady/expert        wins 174 / 180 / 186  lost 0  last gate tries 1.01  witch turns 1936  foe turns 718  minutes 183-259-374  end level 20/20/20
+  explorer/careless    wins 221 / 228 / 235  lost 15  last gate tries 8.4  witch turns 3396  foe turns 1630  minutes 327-462-667  end level 21/21/21
+  explorer/attentive   wins 219 / 227 / 234  lost 0.1  last gate tries 1.13  witch turns 2175  foe turns 793  minutes 208-295-425  end level 21/21/21
+  explorer/expert      wins 219 / 227 / 234  lost 0  last gate tries 1  witch turns 2222  foe turns 790  minutes 211-300-431  end level 21/21/21
+  levels arrive on win number (steady, attentive): L2:3 L3:8 L4:13 L5:19 L6:27 L7:34 L8:41 L9:50 L10:59 L11:68 L12:79 L13:89 L14:100 L15:112 L16:125 L17:137 L18:151 L19:165 L20:179
+  gates (steady/attentive):
+     Leaving the fair                     party level 2  wins so far 3 
+     Ring 1 gate (4w, level 5)            party level 5  wins so far 20  tries 1
+     Ring 2 gate (K2w, level 8)           party level 8  wins so far 42  tries 1
+     Ring 3 gate (2K2w, level 11)         party level 11  wins so far 69  tries 1
+     Ring 4 gate (B, level 14)            party level 14  wins so far 101  tries 1
+     Ring 5 gate (BK2w, level 17)         party level 17  wins so far 138  tries 1
+     Ring 6 gate (B2K2w, level 20)        party level 20  wins so far 180  tries 1.34
+  gates (explorer/attentive):
+     Leaving the fair                     party level 2  wins so far 3 
+     Ring 1 gate (4w, level 5)            party level 5  wins so far 28  tries 1
+     Ring 2 gate (K2w, level 8)           party level 8  wins so far 56  tries 1
+     Ring 3 gate (2K2w, level 11)         party level 11  wins so far 91  tries 1
+     Ring 4 gate (B, level 14)            party level 14  wins so far 128  tries 1
+     Ring 5 gate (BK2w, level 17)         party level 17  wins so far 174  tries 1
+     Ring 6 gate (B2K2w, level 20)        party level 21  wins so far 227  tries 1.13
+  gates (steady/careless):
+     Leaving the fair                     party level 2  wins so far 3 
+     Ring 1 gate (4w, level 5)            party level 5  wins so far 20  tries 1
+     Ring 2 gate (K2w, level 8)           party level 8  wins so far 42  tries 1
+     Ring 3 gate (2K2w, level 11)         party level 11  wins so far 69  tries 1
+     Ring 4 gate (B, level 14)            party level 14  wins so far 101  tries 1.94
+     Ring 5 gate (BK2w, level 17)         party level 17  wins so far 138  tries 6.55
+     Ring 6 gate (B2K2w, level 20)        party level 20  wins so far 182  tries 22.45
+  how far above the party the walking foes were (steady, attentive): -2 7%, -1 14%, +0 20%, +1 20%, +2 20%, +3 13%, +4 6%
+
+===== Option C: Twenty-six levels, about 240 fights (full fights; fine tuning 0.99)
+rings:
+  ring 1  party 2 to 5  foes level 2 to 6  meets 2w 3w 4w  gate 4w at level 5
+  ring 2  party 5 to 8  foes level 5 to 9  meets 3w 4w K K2w  gate K2w at level 8
+  ring 3  party 8 to 11  foes level 8 to 12  meets 3w 4w K K2w  gate 2K2w at level 11
+  ring 4  party 11 to 14  foes level 11 to 15  meets 4w 5w K2w 2K K4w  gate B at level 14
+  ring 5  party 14 to 17  foes level 14 to 18  meets 4w 5w K2w 2K K4w  gate 2K4w at level 17
+  ring 6  party 17 to 20  foes level 17 to 21  meets 5w K2w K4w 2K2w  gate B3w at level 20
+  ring 7  party 20 to 23  foes level 20 to 24  meets 5w K2w K4w 2K2w  gate BK2w at level 23
+  ring 8  party 23 to 26  foes level 23 to 27  meets 6w K4w 2K2w 3K 2K4w  gate B2K2w at level 26
+XP to reach each level: L1 0, L2 80, L3 330, L4 610, L5 910, L6 1,750, L7 2,560, L8 3,420, L9 5,220, L10 6,920, L11 8,720, L12 13,920, L13 18,720, L14 23,720, L15 36,720, L16 46,120, L17 55,920, L18 79,920, L19 102,920, L20 125,920, L21 181,920, L22 224,920, L23 269,920, L24 389,920, L25 489,920, L26 589,920
+  steady/careless      wins 234 / 241 / 248  lost 32.8  last gate tries 21.81  witch turns 4306  foe turns 2285  minutes 419-590-853  end level 26/26/26
+  steady/attentive     wins 232 / 239 / 246  lost 0.3  last gate tries 1.3  witch turns 2519  foe turns 942  minutes 239-339-489  end level 26/26/26
+  steady/expert        wins 232 / 239 / 246  lost 0  last gate tries 1  witch turns 2571  foe turns 939  minutes 242-344-496  end level 26/26/26
+  explorer/careless    wins 288 / 297 / 305  lost 16  last gate tries 6.4  witch turns 4325  foe turns 2018  minutes 414-585-846  end level 27/27/27
+  explorer/attentive   wins 287 / 295 / 304  lost 0.1  last gate tries 1.08  witch turns 2825  foe turns 1015  minutes 270-382-551  end level 27/27/27
+  explorer/expert      wins 287 / 295 / 304  lost 0  last gate tries 1  witch turns 2887  foe turns 1012  minutes 274-389-560  end level 27/27/27
+  levels arrive on win number (steady, attentive): L2:3 L3:8 L4:13 L5:19 L6:26 L7:33 L8:39 L9:48 L10:56 L11:64 L12:74 L13:82 L14:92 L15:102 L16:112 L17:123 L18:135 L19:146 L20:158 L21:172 L22:184 L23:197 L24:211 L25:225 L26:238
+  gates (steady/attentive):
+     Leaving the fair                     party level 2  wins so far 3 
+     Ring 1 gate (4w, level 5)            party level 5  wins so far 20  tries 1
+     Ring 2 gate (K2w, level 8)           party level 8  wins so far 40  tries 1
+     Ring 3 gate (2K2w, level 11)         party level 11  wins so far 65  tries 1
+     Ring 4 gate (B, level 14)            party level 14  wins so far 93  tries 1
+     Ring 5 gate (2K4w, level 17)         party level 17  wins so far 124  tries 1
+     Ring 6 gate (B3w, level 20)          party level 20  wins so far 159  tries 1
+     Ring 7 gate (BK2w, level 23)         party level 23  wins so far 198  tries 1
+     Ring 8 gate (B2K2w, level 26)        party level 26  wins so far 239  tries 1.3
+  gates (explorer/attentive):
+     Leaving the fair                     party level 2  wins so far 3 
+     Ring 1 gate (4w, level 5)            party level 5  wins so far 28  tries 1
+     Ring 2 gate (K2w, level 8)           party level 8  wins so far 53  tries 1
+     Ring 3 gate (2K2w, level 11)         party level 11  wins so far 83  tries 1
+     Ring 4 gate (B, level 14)            party level 14  wins so far 118  tries 1
+     Ring 5 gate (2K4w, level 17)         party level 17  wins so far 154  tries 1
+     Ring 6 gate (B3w, level 20)          party level 20  wins so far 199  tries 1
+     Ring 7 gate (BK2w, level 23)         party level 23  wins so far 244  tries 1
+     Ring 8 gate (B2K2w, level 26)        party level 27  wins so far 295  tries 1.08
+  gates (steady/careless):
+     Leaving the fair                     party level 2  wins so far 3 
+     Ring 1 gate (4w, level 5)            party level 5  wins so far 20  tries 1
+     Ring 2 gate (K2w, level 8)           party level 8  wins so far 40  tries 1
+     Ring 3 gate (2K2w, level 11)         party level 11  wins so far 65  tries 1
+     Ring 4 gate (B, level 14)            party level 14  wins so far 93  tries 1.9
+     Ring 5 gate (2K4w, level 17)         party level 17  wins so far 124  tries 1
+     Ring 6 gate (B3w, level 20)          party level 20  wins so far 159  tries 3.54
+     Ring 7 gate (BK2w, level 23)         party level 23  wins so far 199  tries 6.56
+     Ring 8 gate (B2K2w, level 26)        party level 26  wins so far 241  tries 21.81
+  how far above the party the walking foes were (steady, attentive): -2 7%, -1 14%, +0 20%, +1 20%, +2 20%, +3 13%, +4 6%
+
+===== The two dials (steady, attentive): levels, wins aimed for, wins, wins a level, win on which level 5 comes, minutes quick-middle-slow
+   14 levels  120  wins 120  a level 9.2  L5 on win 21  minutes 120-170-244
+   14 levels  180  wins 180  a level 13.8  L5 on win 30  minutes 180-254-366
+   14 levels  240  wins 242  a level 18.6  L5 on win 40  minutes 241-340-490
+   20 levels  120  wins 120  a level 6.3  L5 on win 14  minutes 122-172-249
+   20 levels  180  wins 180  a level 9.5  L5 on win 19  minutes 181-256-369
+   20 levels  240  wins 240  a level 12.6  L5 on win 25  minutes 240-339-489
+   26 levels  120  wins 120  a level 4.8  L5 on win 11  minutes 123-174-251
+   26 levels  180  wins 180  a level 7.2  L5 on win 15  minutes 182-258-372
+   26 levels  240  wins 239  a level 9.6  L5 on win 19  minutes 239-339-489

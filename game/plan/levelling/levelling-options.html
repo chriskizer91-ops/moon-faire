@@ -1,0 +1,198 @@
+<!DOCTYPE html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Moon Faire levelling options</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible:ital,wght@0,400;0,700;1,400&family=Jacquard+24&display=swap" rel="stylesheet">
+<style>
+/* layout: one reading column; the three options as cards side by side, stacking on a phone; tables scroll inside their own box */
+:root {
+  --page: #eeedf4; --card: #fcfcfb; --ink: #1c1a2e; --ink-2: #55526a; --rule: #d9d7e4; --lantern: #8a5a00;
+  --s1: #2a78d6; --s2: #eb6834; --s3: #1baf7a;
+  --display: "Jacquard 24", "Atkinson Hyperlegible", Georgia, serif; --body: "Atkinson Hyperlegible", Verdana, "Segoe UI", sans-serif;
+  color-scheme: light;
+}
+@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) {
+  --page: #121120; --card: #1a1a19; --ink: #f0efec; --ink-2: #b9b6c9; --rule: #33314a; --lantern: #e3b04b;
+  --s1: #3987e5; --s2: #d95926; --s3: #199e70; color-scheme: dark; } }
+:root[data-theme="dark"] {
+  --page: #121120; --card: #1a1a19; --ink: #f0efec; --ink-2: #b9b6c9; --rule: #33314a; --lantern: #e3b04b;
+  --s1: #3987e5; --s2: #d95926; --s3: #199e70; color-scheme: dark; }
+* { box-sizing: border-box; }
+html { -webkit-text-size-adjust: 100%; }
+body { margin: 0; background: var(--page); color: var(--ink); font: 17px/1.55 var(--body); }
+main { max-width: 860px; margin: 0 auto; padding: 28px 18px 64px; display: flex; flex-direction: column; gap: 34px; }
+header p { max-width: 62ch; margin: 10px 0 0; }
+h1 { font: 400 clamp(40px, 9vw, 60px)/1 var(--display); margin: 0; text-wrap: balance; letter-spacing: .01em; }
+.kicker { color: var(--lantern); font-weight: 700; margin: 0 0 6px; }
+h2 { font-size: 24px; line-height: 1.2; margin: 0 0 12px; text-wrap: balance; }
+h3 { font-size: 18px; margin: 0 0 8px; }
+section > p, section > ul { max-width: 65ch; }
+p { margin: 0 0 12px; } ul { margin: 0; padding-left: 20px; display: flex; flex-direction: column; gap: 8px; }
+.ask { background: var(--card); border: 1px solid var(--rule); border-left: 5px solid var(--lantern); border-radius: 8px; padding: 16px 18px; }
+.ask ol { margin: 0; padding-left: 22px; display: flex; flex-direction: column; gap: 6px; }
+.opts { display: grid; grid-template-columns: repeat(auto-fit, minmax(230px, 1fr)); gap: 14px; }
+.opt { background: var(--card); border: 1px solid var(--rule); border-radius: 10px; padding: 16px; position: relative; }
+.opt h3 { font-size: 20px; padding-right: 44px; }
+.tag { position: absolute; top: 14px; right: 14px; width: 34px; height: 34px; border-radius: 50%; display: grid; place-items: center; font-weight: 700; color: #fff; }
+.tag.s1, .chip.s1 { background: var(--s1); } .tag.s2, .chip.s2 { background: var(--s2); } .tag.s3, .chip.s3 { background: var(--s3); }
+.chip { display: inline-block; width: 12px; height: 12px; border-radius: 3px; margin-right: 8px; }
+dl { margin: 0; display: flex; flex-direction: column; gap: 10px; }
+dt { color: var(--ink-2); font-size: 14px; } dd { margin: 0; font-weight: 700; font-variant-numeric: tabular-nums; }
+dd span, td span { display: block; font-weight: 400; color: var(--ink-2); font-size: 14px; }
+.was { color: var(--ink-2); margin-top: 12px; }
+figure { margin: 0; background: var(--card); border: 1px solid var(--rule); border-radius: 10px; padding: 16px; position: relative; }
+figcaption { font-weight: 700; margin-bottom: 4px; } .sub { color: var(--ink-2); font-size: 15px; margin: 0 0 8px; }
+.legend { display: flex; flex-wrap: wrap; gap: 6px 18px; font-size: 15px; margin-bottom: 6px; }
+svg { display: block; width: 100%; max-width: 660px; height: auto; margin: 0 auto; touch-action: pan-y; }
+.grid { stroke: var(--rule); stroke-width: 1; } .tick, .axis { fill: var(--ink-2); font: 12px var(--body); font-variant-numeric: tabular-nums; }
+.end { fill: var(--ink); font: 700 12.5px var(--body); }
+.line { fill: none; stroke-width: 2; stroke-linejoin: round; stroke-linecap: round; }
+.line.s1 { stroke: var(--s1); } .line.s2 { stroke: var(--s2); } .line.s3 { stroke: var(--s3); }
+.dot { stroke: var(--card); stroke-width: 2; } .dot.s1 { fill: var(--s1); } .dot.s2 { fill: var(--s2); } .dot.s3 { fill: var(--s3); }
+.cross { stroke: var(--ink-2); stroke-width: 1; }
+#tip { position: absolute; pointer-events: none; background: var(--ink); color: var(--page); border-radius: 6px; padding: 8px 10px; font-size: 14px; line-height: 1.4; visibility: hidden; white-space: nowrap; font-variant-numeric: tabular-nums; }
+#tip b { display: block; } #tip i { display: inline-block; width: 9px; height: 9px; border-radius: 2px; margin-right: 6px; }
+.scroll { overflow-x: auto; background: var(--card); border: 1px solid var(--rule); border-radius: 10px; margin-bottom: 18px; }
+table { border-collapse: collapse; width: 100%; font-size: 15px; font-variant-numeric: tabular-nums; }
+th, td { text-align: left; padding: 9px 12px; border-bottom: 1px solid var(--rule); vertical-align: top; }
+tbody tr:last-child > * { border-bottom: 0; }
+thead th { font-size: 13px; color: var(--ink-2); font-weight: 700; white-space: nowrap; }
+.num { text-align: right; } td.pick { box-shadow: inset 0 0 0 2px var(--lantern); border-radius: 4px; }
+.xps { display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 14px; align-items: start; }
+.xp td, .xp th { padding: 5px 10px; }
+code { font-size: .92em; background: var(--card); border: 1px solid var(--rule); border-radius: 4px; padding: 0 4px; }
+footer { color: var(--ink-2); font-size: 15px; border-top: 1px solid var(--rule); padding-top: 16px; }
+</style></head>
+<body><main>
+<header>
+ <p class="kicker">Moon Faire, task board F4</p>
+ <h1>Levelling for the bigger game</h1>
+ <p>You asked for 5 to 10 times the fights of the first plan, and a wider span of levels, now that there is open land to run off into. Here are three sizes of game. Each was played through 2,000 times for each play style, with the combat engine you approved deciding every fight. Nothing inside a fight changes.</p>
+</header>
+
+<section class="ask" aria-label="What I need from you">
+ <h2>What I need from you</h2>
+ <ol>
+  <li><strong>A, B or C.</strong> Or any pair from the table under "Two dials".</li>
+  <li><strong>Full-size fights or small packs</strong> as the usual thing she meets.</li>
+ </ol>
+</section>
+
+<section>
+ <h2>Three sizes</h2>
+ <div class="opts"><article class="opt"><div class="tag s1">A</div>
+  <h3>14 levels, 120 fights</h3>
+  <dl>
+   <div><dt>Fights alone</dt><dd>2 to 4 hours <span>middle guess 2 h 50</span></dd></div>
+   <div><dt>Land beyond the fair</dt><dd>4 rings <span>three levels each</span></dd></div>
+   <div><dt>A new level</dt><dd>every 6 wins at first <span>every 14 at the end</span></dd></div>
+   <div><dt>The Jester at the end</dt><dd>10,700 HP <span>12,800 one level on</span></dd></div>
+   <div><dt>The last great wraith</dt><dd>85,600 Life</dd></div>
+  </dl></article><article class="opt"><div class="tag s2">B</div>
+  <h3>20 levels, 180 fights</h3>
+  <dl>
+   <div><dt>Fights alone</dt><dd>3 to 6 hours <span>middle guess 4 h 15</span></dd></div>
+   <div><dt>Land beyond the fair</dt><dd>6 rings <span>three levels each</span></dd></div>
+   <div><dt>A new level</dt><dd>every 5 wins at first <span>every 14 at the end</span></dd></div>
+   <div><dt>The Jester at the end</dt><dd>31,900 HP <span>38,300 one level on</span></dd></div>
+   <div><dt>The last great wraith</dt><dd>256,000 Life</dd></div>
+  </dl></article><article class="opt"><div class="tag s3">C</div>
+  <h3>26 levels, 240 fights</h3>
+  <dl>
+   <div><dt>Fights alone</dt><dd>4 to 8 hours <span>middle guess 5 h 40</span></dd></div>
+   <div><dt>Land beyond the fair</dt><dd>8 rings <span>three levels each</span></dd></div>
+   <div><dt>A new level</dt><dd>every 5 wins at first <span>every 13 at the end</span></dd></div>
+   <div><dt>The Jester at the end</dt><dd>95,400 HP <span>114,000 one level on</span></dd></div>
+   <div><dt>The last great wraith</dt><dd>763,000 Life</dd></div>
+  </dl></article></div>
+ <p class="was">The first plan, for comparison: 5 levels, about 24 fights, 25 to 45 minutes of fights.</p>
+</section>
+
+<section>
+ <figure>
+  <figcaption id="chart-title">When each level arrives</figcaption>
+  <p class="sub">Party level against fights won, for a player who pays attention and fights only what the gates ask.</p>
+  <div class="legend"><span><span class="chip s1"></span>A: 14 levels, 120 fights</span><span><span class="chip s2"></span>B: 20 levels, 180 fights</span><span><span class="chip s3"></span>C: 26 levels, 240 fights</span></div>
+  <svg viewBox="0 0 440 330" role="img" aria-labelledby="chart-title" id="chart"><line class="grid" x1="40" x2="352" y1="290.0" y2="290.0"/><text class="tick" x="32" y="294.0" text-anchor="end">1</text><line class="grid" x1="40" x2="352" y1="245.8" y2="245.8"/><text class="tick" x="32" y="249.8" text-anchor="end">5</text><line class="grid" x1="40" x2="352" y1="190.6" y2="190.6"/><text class="tick" x="32" y="194.6" text-anchor="end">10</text><line class="grid" x1="40" x2="352" y1="135.4" y2="135.4"/><text class="tick" x="32" y="139.4" text-anchor="end">15</text><line class="grid" x1="40" x2="352" y1="80.2" y2="80.2"/><text class="tick" x="32" y="84.2" text-anchor="end">20</text><line class="grid" x1="40" x2="352" y1="25.0" y2="25.0"/><text class="tick" x="32" y="29.0" text-anchor="end">25</text><text class="tick" x="40.0" y="308" text-anchor="middle">0</text><text class="tick" x="102.4" y="308" text-anchor="middle">50</text><text class="tick" x="164.8" y="308" text-anchor="middle">100</text><text class="tick" x="227.2" y="308" text-anchor="middle">150</text><text class="tick" x="289.6" y="308" text-anchor="middle">200</text><text class="tick" x="352.0" y="308" text-anchor="middle">250</text><text class="axis" x="196.0" y="326" text-anchor="middle">fights won</text><line id="cross" class="cross" x1="0" x2="0" y1="14" y2="290" visibility="hidden"/><path class="line s1" d="M40.0,290.0H43.7V279.0H50.0V267.9H57.5V256.9H66.2V245.8H77.4V234.8H87.4V223.8H97.4V212.7H111.1V201.7H124.9V190.6H138.6V179.6H154.8V168.6H171.0V157.5H188.5V146.5"/><circle class="dot s1" cx="188.5" cy="146.5" r="5"/><text class="end" x="198.5" y="150.5">A: level 14</text><path class="line s2" d="M40.0,290.0H43.7V279.0H50.0V267.9H56.2V256.9H63.7V245.8H73.7V234.8H82.4V223.8H91.2V212.7H102.4V201.7H113.6V190.6H124.9V179.6H138.6V168.6H151.1V157.5H164.8V146.5H179.8V135.4H196.0V124.4H211.0V113.4H228.4V102.3H245.9V91.3H263.4V80.2"/><circle class="dot s2" cx="263.4" cy="80.2" r="5"/><text class="end" x="273.4" y="84.2">B: level 20</text><path class="line s3" d="M40.0,290.0H43.7V279.0H50.0V267.9H56.2V256.9H63.7V245.8H72.4V234.8H81.2V223.8H88.7V212.7H99.9V201.7H109.9V190.6H119.9V179.6H132.4V168.6H142.3V157.5H154.8V146.5H167.3V135.4H179.8V124.4H193.5V113.4H208.5V102.3H222.2V91.3H237.2V80.2H254.7V69.2H269.6V58.2H285.9V47.1H303.3V36.1H320.8V25.0H337.0V14.0"/><circle class="dot s3" cx="337.0" cy="14.0" r="5"/><text class="end" x="347.0" y="18.0">C: level 26</text></svg>
+  <div id="tip"></div>
+ </figure>
+ <p class="sub" style="margin-top:10px">All three climb at nearly the same pace. A longer game is the same climb carried further.</p>
+</section>
+
+<section>
+ <h2>The same in all three</h2>
+ <ul>
+  <li><strong>XP for a foe is unchanged.</strong> A level-1 wisp gives 10, a Shadow Wraith 40, a great wraith 400, and 20% more for every foe level. The three set fights at the fair still take the party to level 2.</li>
+  <li><strong>The land beyond the fair is in rings.</strong> Each ring is worth three levels. Its foes run from the level the party arrives at to one above the level it leaves at. So walking foes are between 2 levels under the party and 4 over, which is your rule for ordinary foes.</li>
+  <li><strong>A gate fight ends each ring,</strong> and it opens at the level the ring ends on, as the lamp room door opens at level 5 today. The last gate is the big one from the first plan: the great wraith, two Shadow Wraiths and two wisps, at the top level.</li>
+  <li><strong>Levels come quickly, then slowly:</strong> a level every 5 or 6 wins at the start, every 13 or 14 near the end.</li>
+  <li><strong>Walking fights stay safe.</strong> A player who pays attention won every walking fight in every run, even against foes 4 levels over. A player pressing any button lost 2, 2, 3 walking fights in a whole game of A, B, C.</li>
+  <li><strong>The last gate is as hard as you approved.</strong> At the party's level it is won 6% / 81% / 99% of the time (any button / paying attention / expert). One level over, 61% / 100% / 100%.</li>
+  <li><strong>Fighting more than you must is the easy setting.</strong> A player who fights half as many fights again in every ring reaches the last gate about one level ahead (A: 156 wins, B: 227 wins, C: 295 wins). That turns the last gate from 81% to 100% for an attentive player, with no change to the rules. There is no top level: the numbers keep growing.</li>
+ </ul>
+</section>
+
+<section>
+ <h2>Rings and gates</h2>
+ <p>"Wins by then" is how many fights a steady, attentive player has won when the gate falls. "Tries, any button" is how many goes a player pressing any button needs at that gate.</p>
+ <h3><span class="chip s1"></span>Option A: 14 levels, 120 fights</h3><div class="scroll"><table><thead><tr><th>Ring</th><th>Party level</th><th>Foe levels</th><th>What she meets</th><th>Gate fight</th><th class="num">Wins by then</th><th class="num">Tries, any button</th></tr></thead><tbody><tr><td>The fair</td><td>1 to 2</td><td>1 to 2</td><td>three set fights, as now</td><td></td><td class="num">3</td><td class="num"></td></tr><tr><td>1</td><td>2 to 5</td><td>2 to 6</td><td>2 wisps; 3 wisps; 4 wisps</td><td>a Shadow Wraith and 2 wisps, level 5</td><td class="num">22</td><td class="num">1</td></tr><tr><td>2</td><td>5 to 8</td><td>5 to 9</td><td>3 wisps; 4 wisps; 1 Shadow Wraith; 1 Shadow Wraith, 2 wisps</td><td>2 Shadow Wraiths and 2 wisps, level 8</td><td class="num">47</td><td class="num">1</td></tr><tr><td>3</td><td>8 to 11</td><td>8 to 12</td><td>5 wisps; 1 Shadow Wraith, 2 wisps; 1 Shadow Wraith, 4 wisps; 2 Shadow Wraiths, 2 wisps</td><td>the great wraith alone, level 11</td><td class="num">80</td><td class="num">2.0</td></tr><tr><td>4</td><td>11 to 14</td><td>11 to 15</td><td>6 wisps; 1 Shadow Wraith, 4 wisps; 2 Shadow Wraiths, 2 wisps; 3 Shadow Wraiths; 2 Shadow Wraiths, 4 wisps</td><td>the great wraith, 2 Shadow Wraiths and 2 wisps, level 14</td><td class="num">120</td><td class="num">21.8</td></tr></tbody></table></div><h3><span class="chip s2"></span>Option B: 20 levels, 180 fights</h3><div class="scroll"><table><thead><tr><th>Ring</th><th>Party level</th><th>Foe levels</th><th>What she meets</th><th>Gate fight</th><th class="num">Wins by then</th><th class="num">Tries, any button</th></tr></thead><tbody><tr><td>The fair</td><td>1 to 2</td><td>1 to 2</td><td>three set fights, as now</td><td></td><td class="num">3</td><td class="num"></td></tr><tr><td>1</td><td>2 to 5</td><td>2 to 6</td><td>2 wisps; 3 wisps; 4 wisps</td><td>4 wisps, level 5</td><td class="num">20</td><td class="num">1</td></tr><tr><td>2</td><td>5 to 8</td><td>5 to 9</td><td>3 wisps; 4 wisps; 1 Shadow Wraith; 1 Shadow Wraith, 2 wisps</td><td>a Shadow Wraith and 2 wisps, level 8</td><td class="num">42</td><td class="num">1</td></tr><tr><td>3</td><td>8 to 11</td><td>8 to 12</td><td>4 wisps; 5 wisps; 1 Shadow Wraith, 2 wisps; 2 Shadow Wraiths; 1 Shadow Wraith, 4 wisps</td><td>2 Shadow Wraiths and 2 wisps, level 11</td><td class="num">69</td><td class="num">1</td></tr><tr><td>4</td><td>11 to 14</td><td>11 to 15</td><td>4 wisps; 5 wisps; 1 Shadow Wraith, 2 wisps; 2 Shadow Wraiths; 1 Shadow Wraith, 4 wisps</td><td>the great wraith alone, level 14</td><td class="num">101</td><td class="num">1.9</td></tr><tr><td>5</td><td>14 to 17</td><td>14 to 18</td><td>5 wisps; 1 Shadow Wraith, 2 wisps; 1 Shadow Wraith, 4 wisps; 2 Shadow Wraiths, 2 wisps</td><td>the great wraith, a Shadow Wraith and 2 wisps, level 17</td><td class="num">138</td><td class="num">6.5</td></tr><tr><td>6</td><td>17 to 20</td><td>17 to 21</td><td>6 wisps; 1 Shadow Wraith, 4 wisps; 2 Shadow Wraiths, 2 wisps; 3 Shadow Wraiths; 2 Shadow Wraiths, 4 wisps</td><td>the great wraith, 2 Shadow Wraiths and 2 wisps, level 20</td><td class="num">180</td><td class="num">22.4</td></tr></tbody></table></div><h3><span class="chip s3"></span>Option C: 26 levels, 240 fights</h3><div class="scroll"><table><thead><tr><th>Ring</th><th>Party level</th><th>Foe levels</th><th>What she meets</th><th>Gate fight</th><th class="num">Wins by then</th><th class="num">Tries, any button</th></tr></thead><tbody><tr><td>The fair</td><td>1 to 2</td><td>1 to 2</td><td>three set fights, as now</td><td></td><td class="num">3</td><td class="num"></td></tr><tr><td>1</td><td>2 to 5</td><td>2 to 6</td><td>2 wisps; 3 wisps; 4 wisps</td><td>4 wisps, level 5</td><td class="num">20</td><td class="num">1</td></tr><tr><td>2</td><td>5 to 8</td><td>5 to 9</td><td>3 wisps; 4 wisps; 1 Shadow Wraith; 1 Shadow Wraith, 2 wisps</td><td>a Shadow Wraith and 2 wisps, level 8</td><td class="num">40</td><td class="num">1</td></tr><tr><td>3</td><td>8 to 11</td><td>8 to 12</td><td>3 wisps; 4 wisps; 1 Shadow Wraith; 1 Shadow Wraith, 2 wisps</td><td>2 Shadow Wraiths and 2 wisps, level 11</td><td class="num">65</td><td class="num">1</td></tr><tr><td>4</td><td>11 to 14</td><td>11 to 15</td><td>4 wisps; 5 wisps; 1 Shadow Wraith, 2 wisps; 2 Shadow Wraiths; 1 Shadow Wraith, 4 wisps</td><td>the great wraith alone, level 14</td><td class="num">93</td><td class="num">1.9</td></tr><tr><td>5</td><td>14 to 17</td><td>14 to 18</td><td>4 wisps; 5 wisps; 1 Shadow Wraith, 2 wisps; 2 Shadow Wraiths; 1 Shadow Wraith, 4 wisps</td><td>2 Shadow Wraiths and 4 wisps, level 17</td><td class="num">124</td><td class="num">1</td></tr><tr><td>6</td><td>17 to 20</td><td>17 to 21</td><td>5 wisps; 1 Shadow Wraith, 2 wisps; 1 Shadow Wraith, 4 wisps; 2 Shadow Wraiths, 2 wisps</td><td>the great wraith and 3 wisps, level 20</td><td class="num">159</td><td class="num">3.5</td></tr><tr><td>7</td><td>20 to 23</td><td>20 to 24</td><td>5 wisps; 1 Shadow Wraith, 2 wisps; 1 Shadow Wraith, 4 wisps; 2 Shadow Wraiths, 2 wisps</td><td>the great wraith, a Shadow Wraith and 2 wisps, level 23</td><td class="num">198</td><td class="num">6.6</td></tr><tr><td>8</td><td>23 to 26</td><td>23 to 27</td><td>6 wisps; 1 Shadow Wraith, 4 wisps; 2 Shadow Wraiths, 2 wisps; 3 Shadow Wraiths; 2 Shadow Wraiths, 4 wisps</td><td>the great wraith, 2 Shadow Wraiths and 2 wisps, level 26</td><td class="num">239</td><td class="num">21.8</td></tr></tbody></table></div>
+ <p>Which piece of the map each ring is, and what each gate fight is in the story, are not decided here. The great wraiths in the middle of the game are stand-ins, there to show that a lone great wraith works as a gate.</p>
+</section>
+
+<section>
+ <h2>Two dials</h2>
+ <p><strong>Levels and fights are separate.</strong> The three options sit on the diagonal. Any other square works too: the same fights with more levels means levels come faster and the numbers get bigger.</p>
+ <div class="scroll"><table><thead><tr><th></th><th class="num">120 fights</th><th class="num">180 fights</th><th class="num">240 fights</th></tr></thead><tbody><tr><th scope="row">14 levels</th><td class="num pick">a level every 9 wins<br><span>2 h 50 of fights</span></td><td class="num">a level every 14 wins<br><span>4 h 15 of fights</span></td><td class="num">a level every 19 wins<br><span>5 h 40 of fights</span></td></tr><tr><th scope="row">20 levels</th><td class="num">a level every 6 wins<br><span>2 h 50 of fights</span></td><td class="num pick">a level every 10 wins<br><span>4 h 15 of fights</span></td><td class="num">a level every 13 wins<br><span>5 h 40 of fights</span></td></tr><tr><th scope="row">26 levels</th><td class="num">a level every 5 wins<br><span>2 h 55 of fights</span></td><td class="num">a level every 7 wins<br><span>4 h 20 of fights</span></td><td class="num pick">a level every 10 wins<br><span>5 h 40 of fights</span></td></tr></tbody></table></div>
+ <p><strong>How big the usual fight is.</strong> If most walking fights are two to four wisps and the big packs are rare, the game has the same number of fights and levels but takes about a quarter less time.</p>
+ <div class="scroll"><table><thead><tr><th></th><th class="num">A, 120 fights</th><th class="num">B, 180 fights</th><th class="num">C, 240 fights</th></tr></thead><tbody><tr><th scope="row">Full-size fights, as above</th><td class="num">2 h 50<br><span>10 witch turns a fight</span></td><td class="num">4 h 15<br><span>11 witch turns a fight</span></td><td class="num">5 h 40<br><span>11 witch turns a fight</span></td></tr><tr><th scope="row">Small packs most of the time</th><td class="num">2 h 10<br><span>8 witch turns a fight</span></td><td class="num">3 h 15<br><span>8 witch turns a fight</span></td><td class="num">4 h 15<br><span>8 witch turns a fight</span></td></tr></tbody></table></div>
+</section>
+
+<section>
+ <h2>What these numbers do not cover</h2>
+ <ul>
+  <li><strong>The hours are a guess.</strong> They assume 4 to 9 seconds for a witch's turn, as the first plan did. Nobody has timed a real fight with its animations yet, and the long moves run 13 to 15 seconds at normal speed.</li>
+  <li><strong>Every fight starts fresh,</strong> with full HP and MP. The fight piece can carry HP and MP from one fight to the next. If you want that, a long stretch between rest spots gets harder, and it needs its own measuring.</li>
+  <li><strong>Only three kinds of foe exist.</strong> New kinds for the moor will change what a walking fight is worth and how long it runs.</li>
+  <li><strong>Walking and talking time is not in the hours.</strong> Nor is how often a fight comes while she walks. The open world has to offer about this many fights on the way through each ring.</li>
+ </ul>
+</section>
+
+<section>
+ <h2>What I made up</h2>
+ <ul>
+  <li>Three levels to a ring, and 4, 6 or 8 rings.</li>
+  <li>Which line-ups are met in which ring, and the gate fights other than the first plan's own.</li>
+  <li>The XP totals for each level. They are sized so the climb takes the fights you asked for.</li>
+ </ul>
+</section>
+
+<section>
+ <h2>The numbers in full</h2>
+ <div class="xps"><div><h3><span class="chip s1"></span>Option A</h3><div class="scroll"><table class="xp"><thead><tr><th class="num">Level</th><th class="num">XP in all</th><th class="num">Comes on win</th><th class="num">Jester's HP</th></tr></thead><tbody><tr><td class="num">1</td><td class="num">0</td><td class="num"></td><td class="num">1,000</td></tr><tr><td class="num">2</td><td class="num">80</td><td class="num">3</td><td class="num">1,200</td></tr><tr><td class="num">3</td><td class="num">350</td><td class="num">8</td><td class="num">1,440</td></tr><tr><td class="num">4</td><td class="num">660</td><td class="num">14</td><td class="num">1,730</td></tr><tr><td class="num">5</td><td class="num">1,010</td><td class="num">21</td><td class="num">2,070</td></tr><tr><td class="num">6</td><td class="num">2,110</td><td class="num">30</td><td class="num">2,490</td></tr><tr><td class="num">7</td><td class="num">3,110</td><td class="num">38</td><td class="num">2,990</td></tr><tr><td class="num">8</td><td class="num">4,210</td><td class="num">46</td><td class="num">3,580</td></tr><tr><td class="num">9</td><td class="num">8,310</td><td class="num">57</td><td class="num">4,300</td></tr><tr><td class="num">10</td><td class="num">12,410</td><td class="num">68</td><td class="num">5,160</td></tr><tr><td class="num">11</td><td class="num">16,810</td><td class="num">79</td><td class="num">6,190</td></tr><tr><td class="num">12</td><td class="num">28,810</td><td class="num">92</td><td class="num">7,430</td></tr><tr><td class="num">13</td><td class="num">39,810</td><td class="num">105</td><td class="num">8,920</td></tr><tr><td class="num">14</td><td class="num">50,810</td><td class="num">119</td><td class="num">10,700</td></tr></tbody></table></div></div><div><h3><span class="chip s2"></span>Option B</h3><div class="scroll"><table class="xp"><thead><tr><th class="num">Level</th><th class="num">XP in all</th><th class="num">Comes on win</th><th class="num">Jester's HP</th></tr></thead><tbody><tr><td class="num">1</td><td class="num">0</td><td class="num"></td><td class="num">1,000</td></tr><tr><td class="num">2</td><td class="num">80</td><td class="num">3</td><td class="num">1,200</td></tr><tr><td class="num">3</td><td class="num">330</td><td class="num">8</td><td class="num">1,440</td></tr><tr><td class="num">4</td><td class="num">610</td><td class="num">13</td><td class="num">1,730</td></tr><tr><td class="num">5</td><td class="num">920</td><td class="num">19</td><td class="num">2,070</td></tr><tr><td class="num">6</td><td class="num">1,810</td><td class="num">27</td><td class="num">2,490</td></tr><tr><td class="num">7</td><td class="num">2,690</td><td class="num">34</td><td class="num">2,990</td></tr><tr><td class="num">8</td><td class="num">3,640</td><td class="num">41</td><td class="num">3,580</td></tr><tr><td class="num">9</td><td class="num">6,340</td><td class="num">50</td><td class="num">4,300</td></tr><tr><td class="num">10</td><td class="num">9,040</td><td class="num">59</td><td class="num">5,160</td></tr><tr><td class="num">11</td><td class="num">11,940</td><td class="num">68</td><td class="num">6,190</td></tr><tr><td class="num">12</td><td class="num">17,840</td><td class="num">79</td><td class="num">7,430</td></tr><tr><td class="num">13</td><td class="num">23,340</td><td class="num">89</td><td class="num">8,920</td></tr><tr><td class="num">14</td><td class="num">29,140</td><td class="num">100</td><td class="num">10,700</td></tr><tr><td class="num">15</td><td class="num">46,140</td><td class="num">112</td><td class="num">12,800</td></tr><tr><td class="num">16</td><td class="num">60,140</td><td class="num">125</td><td class="num">15,400</td></tr><tr><td class="num">17</td><td class="num">74,140</td><td class="num">137</td><td class="num">18,500</td></tr><tr><td class="num">18</td><td class="num">115,140</td><td class="num">151</td><td class="num">22,200</td></tr><tr><td class="num">19</td><td class="num">149,140</td><td class="num">165</td><td class="num">26,600</td></tr><tr><td class="num">20</td><td class="num">184,140</td><td class="num">179</td><td class="num">31,900</td></tr></tbody></table></div></div><div><h3><span class="chip s3"></span>Option C</h3><div class="scroll"><table class="xp"><thead><tr><th class="num">Level</th><th class="num">XP in all</th><th class="num">Comes on win</th><th class="num">Jester's HP</th></tr></thead><tbody><tr><td class="num">1</td><td class="num">0</td><td class="num"></td><td class="num">1,000</td></tr><tr><td class="num">2</td><td class="num">80</td><td class="num">3</td><td class="num">1,200</td></tr><tr><td class="num">3</td><td class="num">330</td><td class="num">8</td><td class="num">1,440</td></tr><tr><td class="num">4</td><td class="num">610</td><td class="num">13</td><td class="num">1,730</td></tr><tr><td class="num">5</td><td class="num">910</td><td class="num">19</td><td class="num">2,070</td></tr><tr><td class="num">6</td><td class="num">1,750</td><td class="num">26</td><td class="num">2,490</td></tr><tr><td class="num">7</td><td class="num">2,560</td><td class="num">33</td><td class="num">2,990</td></tr><tr><td class="num">8</td><td class="num">3,420</td><td class="num">39</td><td class="num">3,580</td></tr><tr><td class="num">9</td><td class="num">5,220</td><td class="num">48</td><td class="num">4,300</td></tr><tr><td class="num">10</td><td class="num">6,920</td><td class="num">56</td><td class="num">5,160</td></tr><tr><td class="num">11</td><td class="num">8,720</td><td class="num">64</td><td class="num">6,190</td></tr><tr><td class="num">12</td><td class="num">13,920</td><td class="num">74</td><td class="num">7,430</td></tr><tr><td class="num">13</td><td class="num">18,720</td><td class="num">82</td><td class="num">8,920</td></tr><tr><td class="num">14</td><td class="num">23,720</td><td class="num">92</td><td class="num">10,700</td></tr><tr><td class="num">15</td><td class="num">36,720</td><td class="num">102</td><td class="num">12,800</td></tr><tr><td class="num">16</td><td class="num">46,120</td><td class="num">112</td><td class="num">15,400</td></tr><tr><td class="num">17</td><td class="num">55,920</td><td class="num">123</td><td class="num">18,500</td></tr><tr><td class="num">18</td><td class="num">79,920</td><td class="num">135</td><td class="num">22,200</td></tr><tr><td class="num">19</td><td class="num">102,920</td><td class="num">146</td><td class="num">26,600</td></tr><tr><td class="num">20</td><td class="num">125,920</td><td class="num">158</td><td class="num">31,900</td></tr><tr><td class="num">21</td><td class="num">181,920</td><td class="num">172</td><td class="num">38,300</td></tr><tr><td class="num">22</td><td class="num">224,920</td><td class="num">184</td><td class="num">46,000</td></tr><tr><td class="num">23</td><td class="num">269,920</td><td class="num">197</td><td class="num">55,200</td></tr><tr><td class="num">24</td><td class="num">389,920</td><td class="num">211</td><td class="num">66,200</td></tr><tr><td class="num">25</td><td class="num">489,920</td><td class="num">225</td><td class="num">79,500</td></tr><tr><td class="num">26</td><td class="num">589,920</td><td class="num">238</td><td class="num">95,400</td></tr></tbody></table></div></div></div>
+</section>
+
+<footer>Made by the Levelling session on November 14, 2026. The code and results are in <code>game/plan/levelling/</code>: <code>options.js</code> holds the three options, <code>run.js</code> plays them, <code>gaps.js</code> measures every line-up at every level gap.</footer>
+</main>
+<script>
+(function () {
+  var D = [{"k":"A","top":14,"pts":[[0,1],[3,2],[8,3],[14,4],[21,5],[30,6],[38,7],[46,8],[57,9],[68,10],[79,11],[92,12],[105,13],[119,14]]},{"k":"B","top":20,"pts":[[0,1],[3,2],[8,3],[13,4],[19,5],[27,6],[34,7],[41,8],[50,9],[59,10],[68,11],[79,12],[89,13],[100,14],[112,15],[125,16],[137,17],[151,18],[165,19],[179,20]]},{"k":"C","top":26,"pts":[[0,1],[3,2],[8,3],[13,4],[19,5],[26,6],[33,7],[39,8],[48,9],[56,10],[64,11],[74,12],[82,13],[92,14],[102,15],[112,16],[123,17],[135,18],[146,19],[158,20],[172,21],[184,22],[197,23],[211,24],[225,25],[238,26]]}], m = {"l":40,"r":88,"t":14,"b":40}, W = 440, xMax = 250;
+  var svg = document.getElementById('chart'), cross = document.getElementById('cross'), tip = document.getElementById('tip'), fig = svg.parentNode;
+  function levelAt(s, w) { var L = 1; for (var i = 0; i < s.pts.length; i++) if (s.pts[i][0] <= w) L = s.pts[i][1]; return L; }
+  function move(e) {
+    var r = svg.getBoundingClientRect(), x = (e.clientX - r.left) / r.width * W;
+    var w = Math.round((x - m.l) / (W - m.l - m.r) * xMax);
+    if (w < 0 || w > xMax) return hide();
+    var cx = m.l + (W - m.l - m.r) * w / xMax;
+    cross.setAttribute('x1', cx); cross.setAttribute('x2', cx); cross.setAttribute('visibility', 'visible');
+    var h = '<b>After ' + w + ' wins</b>';
+    D.forEach(function (s, i) { var last = s.pts[s.pts.length - 1][0]; h += '<span><i style="background:var(--s' + (i + 1) + ')"></i>' + s.k + ': ' + (w > last ? 'finished at level ' + s.top : 'level ' + levelAt(s, w)) + '</span><br>'; });
+    tip.innerHTML = h; tip.style.visibility = 'visible';
+    var f = fig.getBoundingClientRect(), left = e.clientX - f.left + 14;
+    if (left + tip.offsetWidth > f.width - 8) left = e.clientX - f.left - tip.offsetWidth - 14;
+    tip.style.left = Math.max(8, left) + 'px'; tip.style.top = Math.max(8, e.clientY - f.top - tip.offsetHeight - 10) + 'px';
+  }
+  function hide() { cross.setAttribute('visibility', 'hidden'); tip.style.visibility = 'hidden'; }
+  svg.addEventListener('pointermove', move); svg.addEventListener('pointerdown', move); svg.addEventListener('pointerleave', hide);
+})();
+</script>
+</body></html>
