@@ -1,7 +1,9 @@
 // Writes final-fight.json: the final fight as Chris chose it, for the fight piece to read.   node chosen.js
 // Chris, November 15, 2026: 1:58 pm (two forms; form one shows no damage), 3:23 pm (helpers first and then alone; the
 // fallen get up at the Jester's Curtain Call; the helpers are wraiths and brambles; and maybe the whole party comes
-// back to full HP and MP with a harder second round, if the balance works out the same, which forms_run.js shows it does).
+// back to full HP and MP with a harder second round, if the balance works out the same, which forms_run.js shows it does),
+// 4:18 pm (the full refill is in; a party that falls in the final form starts again from before the first form; a rest
+// spot just outside the place of the fight; the refill comes from the Jester's magic, life and death).
 const fs = require('fs');
 const { RULES } = require('../sim/blob-battle-engine.js');
 const D = JSON.parse(fs.readFileSync(__dirname + '/forms.json', 'utf8'));
@@ -13,8 +15,10 @@ const pct = c => ({ noFinds: +(c.none * 100).toFixed(1), allFinds: +(c.all * 100
 const rows = key => Object.fromEntries(Object.entries(D.fights[key].rows).map(([t, r]) => [t, Object.fromEntries(Object.keys(settings).map((n, i) => [n, pct(r[i])]))]));
 const out = {
   what: 'Moon Faire: the final fight, in two forms, as Chris chose it. For the fight piece and the open world to read.',
-  chosen: 'Chris, November 15, 2026 (1:58 pm and 3:23 pm). See the project note claude/final-boss-the-fire-that-would-not-end.md. Every name is a stand-in.',
+  chosen: 'Chris, November 15, 2026 (1:58 pm, 3:23 pm and 4:18 pm). See the project note claude/final-boss-the-fire-that-would-not-end.md. Every name is a stand-in.',
   party: 'Level 20, the top. It meets the fight fresh from a rest spot.',
+  restSpot: 'One just outside the place where the fight happens (Chris, 4:18 pm).',
+  ifThePartyFalls: 'In either form, the whole fight starts again from before form one (Chris, 4:18 pm). The rest spot is just outside.',
   settings: { note: 'Before the fight the game offers four settings. Each sets the level of everything in both forms.', ...settings },
   scale: 'Numbers are on the fight rules\' scale (the Jester has 1,000 HP), already worked out for each setting: 20% more Life and 20% bigger blows for every level above 20.',
   formOne: {
@@ -31,9 +35,8 @@ const out = {
   },
   theChange: {
     partyGetsBack: 'Everything: every witch up, full HP and MP, and every once-a-fight move ready again.',
-    status: 'Chris said "maybe" (3:23 pm), if the balance works out the same. Measured: it does. Built in here as the one to make; to be confirmed by him.',
-    storyReason: 'Not written. His to say.',
-    ifThePartyFallsInTheFinalForm: 'Not decided. Measured as: the whole fight starts again from form one.',
+    status: 'Chosen by Chris (4:18 pm): "Yes, the full refill is in."',
+    storyReason: 'Chris\'s direction (4:18 pm), the wording not written yet: it comes from the magic the Jester is doing and from what the boss is, a black orb inside light. The duality of life and death is the Jester\'s thing, so beating the first form tops everybody off.',
   },
   finalForm: {
     name: 'The fire, broken open',
@@ -45,10 +48,10 @@ const out = {
   },
   measured: { fightsEachCell: D.n, percentOfFightsWon: rows('chosen'), partyTurnsInAWin: D.fights.chosen.turns.map(x => Math.round(x)) },
   ifThereIsNoRefill: {
-    note: 'The version first proposed: the fallen get up at a quarter HP, nothing else comes back, and the final form has a quarter of form one\'s Life with the same blows.',
+    note: 'Not chosen; kept for the record. The version first proposed: the fallen get up at a quarter HP, nothing else comes back, and the final form has a quarter of form one\'s Life with the same blows.',
     finalFormBody: body(0.25, 1), percentOfFightsWon: rows('both'), partyTurnsInAWin: D.fights.both.turns.map(x => Math.round(x)),
   },
-  notDone: ['The story reason for the party coming back to full.', 'What happens when the party falls in the final form.', 'Names for both forms and their three blows.',
+  notDone: ['The words and the picture for the refill (Chris gave the direction).', 'Names for both forms and their three blows.',
     'The bramble foes\' own numbers.', 'The final form\'s model, the fight\'s backdrop, and its place on the map.', 'The finds tuned again for fights that carry HP and MP over.'],
 };
 fs.writeFileSync(__dirname + '/final-fight.json', JSON.stringify(out, null, 1));

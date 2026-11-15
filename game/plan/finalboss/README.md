@@ -16,8 +16,11 @@ is a stand-in.** The project note is `claude/final-boss-the-fire-that-would-not-
   the helpers are wraiths and brambles. And: "maybe ... when the boss falls the first time the whole party gets back up
   full HP MP for some story reason and then the second round is more challenging but it still works out the same
   balancing." Measured: with a final form of 20% more Life and blows 10% bigger, it does.
-  **`final-fight.json` is the fight the game reads** (made by `chosen.js`), with the full refill built in and marked
-  "to be confirmed by him", and the version without it beside it.
+  **`final-fight.json` is the fight the game reads** (made by `chosen.js`).
+- **November 15, 4:18 pm:** "Yes, the full refill is in. If the party falls in the final form they start again from
+  before the first form." A rest spot just outside the place of the fight. The refill's story reason is to come from
+  the Jester's magic and from what the boss is, a black orb inside light: life and death are her thing. He also said
+  of the model in its two forms: "it looks great".
 
 ## Files
 
@@ -71,8 +74,7 @@ hard 6 / 46), or nobody gets up when form one ends (3 / 37).
 
 ## Not done
 
-- Chris has not confirmed the full refill, said what happens when the party falls in the final form (measured: the
-  whole fight starts again), or given the story reason for the refill. Nothing is in the game's rules or the fight piece.
+- The words and the picture for the refill (Chris gave the direction). Nothing is in the game's rules or the fight piece.
 - The testers do not know a second form is coming, apart from one crude "saving" habit.
 - The helpers use the wraiths' numbers; the bramble foes have none yet. The finds are to be tuned again.
 - The model has only form one. No fight backdrop, and no place on the map.

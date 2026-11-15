@@ -75,7 +75,7 @@ footer { color: var(--ink-2); font-size: 15px; border-top: 1px solid var(--rule)
 <header>
  <p class="kicker">Moon Faire, task board F11</p>
  <h1>The final boss in two forms</h1>
- <p>You chose helpers first and then alone, with wraiths and brambles as the helpers and the fallen getting up at the Jester's Curtain Call. You also wondered about the whole party coming back to full HP and MP when the boss falls the first time, with a harder second round, if the balance still works out the same. I played that with the eight testers, and it does.</p>
+ <p>This is the last fight as you chose it on November 15: helpers first and then alone, wraiths and brambles as the helpers, and the whole party back to full HP and MP when the boss falls the first time, with a harder second round. I played it with the eight testers, and the balance holds.</p>
 </header>
 
 <section class="ask" aria-label="The fight as you chose it">
@@ -124,8 +124,8 @@ footer { color: var(--ink-2); font-size: 15px; border-top: 1px solid var(--rule)
 </section>
 
 <section>
- <h2>If you would rather not refill</h2>
- <p>This is the version I first proposed: the fallen get up with a quarter of their HP, nothing else comes back, and the final form has a quarter of form one's Life with the same blows. It is shorter and kinder to the careless player, but an expert who spends everything in form one pays for it.</p>
+ <h2>The version without the refill, for the record</h2>
+ <p>You chose the refill. This is the version I first proposed: the fallen get up with a quarter of their HP, nothing else comes back, and the final form has a quarter of form one's Life with the same blows. It is shorter and kinder to the careless player, but an expert who spends everything in form one pays for it.</p>
  ${table(bo)}
  <p class="note">${mins(F.both.turns)}.</p>
 </section>
@@ -136,13 +136,14 @@ footer { color: var(--ink-2); font-size: 15px; border-top: 1px solid var(--rule)
 ${promptHtml}
 </section>
 
-<section class="ask" aria-label="Questions for you">
- <h2>Three things for you to say</h2>
- <ol>
-  <li><strong>Is the full refill in?</strong> I have written it into the plan as the one to build, since the balance holds. Say if you would rather keep the shorter version.</li>
-  <li><strong>If the party falls in the final form, where does it start again?</strong> I measured it starting again from form one. Starting again from the final form would make the whole fight easier to finish, mostly for the players who struggle.</li>
-  <li><strong>What is the story reason for the party coming back to full?</strong> That one is yours. I can have Opus 5.5 bring you a few to choose from.</li>
- </ol>
+<section class="ask" aria-label="What you decided">
+ <h2>What you decided</h2>
+ <ul>
+  <li><strong>The full refill is in.</strong> When form one falls, the whole party is up with full HP and MP.</li>
+  <li><strong>Why it happens:</strong> it comes from the Jester's magic and from what the boss is, a black orb inside light. Life and death are her thing, so beating the first form tops everybody off. The words for it are still to write.</li>
+  <li><strong>If the party falls in the final form,</strong> it starts again from before the first form.</li>
+  <li><strong>A rest spot</strong> stands just outside the place where the fight happens.</li>
+ </ul>
 </section>
 
 <section>

@@ -1,7 +1,9 @@
 {
  "what": "Moon Faire: the final fight, in two forms, as Chris chose it. For the fight piece and the open world to read.",
- "chosen": "Chris, November 15, 2026 (1:58 pm and 3:23 pm). See the project note claude/final-boss-the-fire-that-would-not-end.md. Every name is a stand-in.",
+ "chosen": "Chris, November 15, 2026 (1:58 pm, 3:23 pm and 4:18 pm). See the project note claude/final-boss-the-fire-that-would-not-end.md. Every name is a stand-in.",
  "party": "Level 20, the top. It meets the fight fresh from a rest spot.",
+ "restSpot": "One just outside the place where the fight happens (Chris, 4:18 pm).",
+ "ifThePartyFalls": "In either form, the whole fight starts again from before form one (Chris, 4:18 pm). The rest spot is just outside.",
  "settings": {
   "note": "Before the fight the game offers four settings. Each sets the level of everything in both forms.",
   "easy": 20,
@@ -94,9 +96,8 @@
  },
  "theChange": {
   "partyGetsBack": "Everything: every witch up, full HP and MP, and every once-a-fight move ready again.",
-  "status": "Chris said \"maybe\" (3:23 pm), if the balance works out the same. Measured: it does. Built in here as the one to make; to be confirmed by him.",
-  "storyReason": "Not written. His to say.",
-  "ifThePartyFallsInTheFinalForm": "Not decided. Measured as: the whole fight starts again from form one."
+  "status": "Chosen by Chris (4:18 pm): \"Yes, the full refill is in.\"",
+  "storyReason": "Chris's direction (4:18 pm), the wording not written yet: it comes from the magic the Jester is doing and from what the boss is, a black orb inside light. The duality of life and death is the Jester's thing, so beating the first form tops everybody off."
  },
  "finalForm": {
   "name": "The fire, broken open",
@@ -295,7 +296,7 @@
   ]
  },
  "ifThereIsNoRefill": {
-  "note": "The version first proposed: the fallen get up at a quarter HP, nothing else comes back, and the final form has a quarter of form one's Life with the same blows.",
+  "note": "Not chosen; kept for the record. The version first proposed: the fallen get up at a quarter HP, nothing else comes back, and the final form has a quarter of form one's Life with the same blows.",
   "finalFormBody": {
    "life": {
     "easy": 2000,
@@ -482,8 +483,7 @@
   ]
  },
  "notDone": [
-  "The story reason for the party coming back to full.",
-  "What happens when the party falls in the final form.",
+  "The words and the picture for the refill (Chris gave the direction).",
   "Names for both forms and their three blows.",
   "The bramble foes' own numbers.",
   "The final form's model, the fight's backdrop, and its place on the map.",
