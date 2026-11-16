@@ -58,6 +58,21 @@ The scripts carry the paths of the workspace they were written in. To run them u
 
 The Ranger's and Io's page builders start from the Fox's page script and template and change them, so the Fox's folder must be in place first.
 
+## The finer Flipbook look on each witch's own page (November 16)
+
+Chris asked for all four witches' own pages to have the two sliders (Pixel size and Colours) that the "how light can she go" pages have. The Ranger's already had them. `tools/finer_look.py` put them into the other three, on their own branches:
+
+| Witch | Branch | What changed | Her page |
+|---|---|---|---|
+| Jester | `claude/jester-3d-model` | `viewer/stage.js`, `viewer/game.js` | her game moves, https://claude.ai/artifact/MnovyvRW8qZj9DnUMwUP4n |
+| Io | `claude/io-3d-model` | `viewer/stage.js`, `viewer_io/index.tpl.html`, `deliver/Io_3D_stage14.html` | https://claude.ai/artifact/Uvz35Hj97w5yjyA5j2Z6Ep |
+| Fox | `claude/fox-3d-model` | `viewer/stage.js`, `viewer/app.js`, `deliver/Fox_Witch_3D.html` | https://claude.ai/artifact/NSajYYfjiCixdsi3JL6dUs (new on November 16: her own page had no link before, only the file) |
+
+- The Jester's and Io's `stage.js` are now the same file as the Ranger's. The Fox keeps her own older stage (the little theatre only) with the enlarging pass added.
+- The Jester's night square page (`viewer/app.js`, https://claude.ai/artifact/8733piMPdu8AMzQbmPQTjh) was left alone and not republished. Chris wants it kept exactly as it is.
+- The live pages were checked against the branches before anything was republished: Io's page and the Jester's game moves page had the same checksums as the builds in their branches, so each republished page is the old page with only this change.
+- `tools/finer_test.py` opens a page before and after and takes the same pictures of both. `tools/stage_hunks.py` shows the stage change as find-and-replace pairs.
+
 ## What was checked, and what was not
 
 - Full is unchanged: the Ranger's Full picture matches her own page pixel for pixel, and Io's Full has the same triangle count as her own build.
