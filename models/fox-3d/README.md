@@ -276,5 +276,5 @@ Chris asked for every witch's own page to have the finer look the "how light can
 - `viewer/app.js`: the sliders are made by the page script. Turn the Flipbook look on and two sliders show under the switches: Pixel size (chunky to fine) and Colours (smooth to flipbook). They open at 1.2 mm of her to a pixel and full flipbook colours, which Chris said looks good on the witches. Pixel size all the way to chunky is the look as it was.
 - The look still starts off.
 - The change was made by `light-levels/tools/finer_look.py` on branch `claude/moon-faire-light-levels`, which works on these sources and on a finished page alike.
-- `deliver/Fox_Witch_3D.html` is her page as it was with only this change made to it.
+- `deliver/Fox_Witch_3D.html` is her page as it was with only this change made to it. It is published at https://claude.ai/artifact/NSajYYfjiCixdsi3JL6dUs ("Fox Witch 3D", new on November 16: her own page had no link before). Republish later builds of her page to that link.
 - Checked in stills at phone size: look off is the same picture as before, the old look matches Pixel size at chunky, the sliders show and hide with the switch, no errors. Not checked: on a real phone or laptop.
