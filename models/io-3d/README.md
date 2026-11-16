@@ -752,3 +752,14 @@ They also show her whole look from many sides, with the robe: useful when the ro
 3. Not wanted: more work on her boots; more detail on belt, pouch and necklace.
 4. Still open if he asks: the cloak nearer to M1; hair on top of her head; bringing her jog, squat, kneel and hover into line
    with the other witches' versions.
+
+## The finer Flipbook look (November 16)
+
+Chris asked for every witch's own page to have the finer look the "how light can she go" pages have (`claude/HOW-TO-flipbook-look.md`, section 11).
+
+- `viewer/stage.js` is now the same file as the Ranger's. `stage.pixelWhole` (starts `true`) and `stage.snap` (starts `1`) are new. With neither set, the picture is drawn as before.
+- `viewer_io/index.tpl.html`: the sliders are made by the page script. Turn the Flipbook look on and two sliders show under the switches: Pixel size (chunky to fine) and Colours (smooth to flipbook). They open at 1.2 mm of her to a pixel and full flipbook colours, which Chris said looks good on the witches. Pixel size all the way to chunky is the look as it was.
+- The look still starts off.
+- The change was made by `light-levels/tools/finer_look.py` on branch `claude/moon-faire-light-levels`, which works on these sources and on a finished page alike.
+- `deliver/Io_3D_stage14.html` is the stage fourteen page with only this change made to it.
+- Checked in stills at phone size: look off is the same picture as before, the old look matches Pixel size at chunky, the sliders show and hide with the switch, no errors. Not checked: on a real phone or laptop.
