@@ -348,3 +348,13 @@ python3 shoot.py shots/x 'new Promise(r => setTimeout(() => { T.step(200, 1/60);
 ```
 
 `build_site.sh` expects `out/site/fb/` (copy `out/fb` there). The reference files are data: run Python that reads them with `-I`.
+
+## The finer Flipbook look (November 16)
+
+Chris asked for every witch's own page to have the finer look the "how light can she go" pages have (`claude/HOW-TO-flipbook-look.md`, section 11).
+
+- `viewer/stage.js` is now the same file as the Ranger's. `stage.pixelWhole` (starts `true`) and `stage.snap` (starts `1`) are new. With neither set, the picture is drawn as before.
+- `viewer/game.js` (her game moves page): the sliders are made by the page script. `viewer/app.js` (the night square page) was left alone, because Chris wants that page kept exactly as it is. It shares `stage.js`, and sets neither new setting, so a rebuild of it draws the same picture. Turn the Flipbook look on and two sliders show under the switches: Pixel size (chunky to fine) and Colours (smooth to flipbook). They open at 1.2 mm of her to a pixel and full flipbook colours, which Chris said looks good on the witches. Pixel size all the way to chunky is the look as it was.
+- The look still starts off.
+- The change was made by `light-levels/tools/finer_look.py` on branch `claude/moon-faire-light-levels`, which works on these sources and on a finished page alike.
+- Checked in stills at phone size: look off is the same picture as before, the old look matches Pixel size at chunky, the sliders show and hide with the switch, no errors. Not checked: on a real phone or laptop.
