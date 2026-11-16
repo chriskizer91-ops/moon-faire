@@ -11,7 +11,7 @@ async def open_fight(p, opts, w=1366, h=768):
     await pg.evaluate('(o) => { window.RES = null; MF_PAGE.go(o).then(() => { window.RES = window.MF_LAST; }); }', opts)
     await pg.wait_for_function('(MF_FIGHT.debug.fight && MF_FIGHT.debug.fight.phase !== "off" && MF_FIGHT.debug.fight.battle) || document.getElementById("out").textContent.indexOf("could not") >= 0', timeout=300000)
     return b, pg, errs
-async def shot(pg, name): await pg.screenshot(path=os.path.join(SHOTS, name))
+async def shot(pg, name): await pg.screenshot(path=os.path.join(SHOTS, name), timeout=180000)
 STATE = '''() => { const f = MF_FIGHT.debug.fight, B = f.battle; return { phase: f.phase, cur: f.current, act: f.act && f.act.kind ? (f.act.kind + ':' + f.act.anim + ':' + f.act.stage) : null, over: B.over,
   heroes: B.fighters.filter(x => x.side === 'hero').map(x => x.id + ' ' + Math.round(x.hp)), foes: B.fighters.filter(x => x.side === 'foe').map(x => x.name + ' ' + Math.round(x.hp) + '/' + Math.round(x.fate)), log: document.querySelector('.mff .log').textContent }; }'''
 # step until the phase is one of want (or n steps have passed)

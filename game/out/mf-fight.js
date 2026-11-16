@@ -18954,7 +18954,7 @@ function makeMFStage(canvas, o) {
         if (!A.one && !A.isDown && A.cur !== 'down') { const want = walking ? 'jog' : 'idle'; if (A.cur !== want) { m.play(want); A.cur = want; } }
         if (A.isDown && id === 'io' && m.move === 'down' && m.moveT >= 4.2) A.froze = true;                                    // Io lies where she fell until she is helped up (her own move gets up by itself)
         m.animate(A.froze ? 0 : dt);
-        if (id === 'io' && m.spellFx) { m.spellFx.dummy.visible = false; m.spellFx.ally.visible = false; m.spellFx.ally2.visible = false; if (m.wood && m.wood.FALLEN && m.wood.FALLEN.isObject3D) m.wood.FALLEN.visible = false; }      // her practice targets: the fight has real ones
+        if (id === 'io' && m.spellFx) { m.spellFx.dummy.visible = false; m.spellFx.ally.visible = false; m.spellFx.ally2.visible = false; const Fl = m.wood && m.wood.FALLEN; if (Fl && Fl.isObject3D) Fl.visible = false; else if (Fl && Fl.G) Fl.G.visible = false; }      // her practice targets: the fight has real ones
       }
       // she turns to her target while she casts at it, then back to how she rests; a blow rocks her back a little
       // rest: the way she stands between moves (the fight turns her to the foes)
@@ -19149,7 +19149,9 @@ function makeMFFight(stage, H) {
   function heroPlays(P, id, target, ev, thenMenu, X) {
     const mv = id === 'j_curtain' ? { anim: 'g_curtain', aim: 'left' } : AC.MOVES[id], a = P.a, m = a.m;
     const T = target ? (target.foe ? { x: target.foe.x, z: target.foe.z } : { x: target.hero.x, z: target.hero.z }) : null, self = target && target.hero === P;
-    act = { kind: 'hero', P, id, mv, anim: mv.anim, ev, t: 0, tf: target && target.foe, th: target && target.hero, T, thenMenu, others: (X && X.others) || [], stage: 'play', hitK: 0, hitsAt: [], tags: P.id === 'jester', hitSeen: 0, from: null, to: null, g: 0 };
+    const inv = [P]; if (target && target.foe) inv.push(target.foe); if (target && target.hero) inv.push(target.hero); for (const q of ev) { const o = q.type === 'dmg' ? foeOf(q.id) : (q.type === 'heal' || q.type === 'hurt') ? party[q.id] : null; if (o && inv.indexOf(o) < 0) inv.push(o); }
+    if (X && X.others && (mv.anim === 'g_seal' || mv.anim === 'g_curtain')) for (const o of X.others) if (inv.indexOf(o) < 0) inv.push(o);
+    act = { kind: 'hero', inv, P, id, mv, anim: mv.anim, ev, t: 0, tf: target && target.foe, th: target && target.hero, T, thenMenu, others: (X && X.others) || [], stage: 'play', hitK: 0, hitsAt: [], tags: P.id === 'jester', hitSeen: 0, from: null, to: null, g: 0 };
     if (T && mv.near && !self) {                           // she goes to her target first: her spell is built to land that far in front of her
       const dx = P.home.x - T.x, dz = P.home.z - T.z, L = Math.hypot(dx, dz) || 1, r = target.foe ? mv.near + target.foe.K.r * (mv.aim === 'front' ? 0.6 : 0.3) : mv.near;
       if (L > r + 0.3) { let to = null;      // she comes at her target from home; if someone else is standing where she would stop, she comes round to one side
@@ -19193,7 +19195,8 @@ function makeMFFight(stage, H) {
     else if (!all && !ev.length) tp = (B.fighters.find((x) => x.id === 'fox' && x.hp > 0) && party.fox) || null;      // her ghost took it
     const m = f.m, anim = m.ACTIONS[f.K.moves[move]] ? f.K.moves[move] : f.K.moves.blow, A = m.ACTIONS[anim];
     const T = tp ? { x: tp.x, z: tp.z } : tfo && tfo !== f ? { x: tfo.x, z: tfo.z } : null;
-    act = { kind: 'foe', f, move, anim, ev, t: 0, hitAt: (A.hits[0] || 0.6) * A.dur, dur: A.dur, done: false, tp, tfo, T, all, stage: 'play', from: null, to: null, g: 0, quiet: !ev.length };
+    const inv = [f]; if (tp) inv.push(tp); if (tfo && tfo !== f) inv.push(tfo); for (const q of ev) { const o = q.type === 'dmg' ? foeOf(q.id) : q.type === 'hurt' ? party[q.id] : null; if (o && inv.indexOf(o) < 0) inv.push(o); }
+    act = { kind: 'foe', inv, f, move, anim, ev, t: 0, hitAt: (A.hits[0] || 0.6) * A.dur, dur: A.dur, done: false, tp, tfo, T, all, stage: 'play', from: null, to: null, g: 0, quiet: !ev.length };
     if (T && f.K.reach) { const dx = f.x - T.x, dz = f.z - T.z, L = Math.hypot(dx, dz) || 1, r = f.K.reach; if (L > r + 0.3) { act.from = { x: f.x, z: f.z }; act.to = { x: T.x + dx / L * r, z: T.z + dz / L * r }; act.stage = 'in'; act.gd = Math.max(0.4, Math.min(0.9, (L - r) / 8)); } }
     phase = 'act'; say(words[0] || (f.e.name + ' ' + WORDS.acts + '.')); if (act.stage === 'play') foePlay(); paint();
   }
@@ -19252,9 +19255,9 @@ function makeMFFight(stage, H) {
   }
   function bars() {
     const m = J(), put = [];
-    for (const f of foes) { const d = f.bar, on = f.up && phase !== 'off' && !f.dying; d.hidden = !on; if (!on) { if (m) m.game.fates[f.i] = null; continue; }
+    for (const f of foes) { const d = f.bar, hx = stage.free.on ? stage.toScreen(_v.set(f.m.root.position.x, f.K.bar, f.m.root.position.z))[0] : 100, on = f.up && phase !== 'off' && !f.dying && !f.out && hx > 30 && hx < H.width() - 30; d.hidden = !on; if (!on) { if (m) m.game.fates[f.i] = null; continue; }
       const p = stage.toScreen(_v.set(f.m.root.position.x, f.K.bar, f.m.root.position.z)); let y = p[1]; for (let k = 0; k < 6 && put.some((q) => Math.abs(q[0] - p[0]) < 96 && Math.abs(q[1] - y) < 30); k++) y -= 30;      // two bars never sit on each other
-      put.push([p[0], y]); d.style.left = p[0].toFixed(0) + 'px'; d.style.top = y.toFixed(0) + 'px';
+      if (y < 54) y = 54; put.push([p[0], y]); d.style.left = p[0].toFixed(0) + 'px'; d.style.top = y.toFixed(0) + 'px';
       const life = f.shown.life, Lk = f.seenLife / f.shown.max, Fk = Math.min(Lk, f.shown.fate / f.shown.max), sealedNow = life > 0 && f.shown.fate > 0 && f.shown.fate >= life;
       d.classList.toggle('sealed', sealedNow); { const aim = sel && sel.kind === 'foe'; d.classList.toggle('tgt', phase === 'menu' && (aim ? sel.t === f : f.i === selFoe)); d.classList.toggle('pick', !!(aim && sel.t !== f && sel.ok.indexOf(f) >= 0)); d.classList.toggle('dim', !!(aim && sel.ok.indexOf(f) < 0)); }
       d.firstChild.textContent = f.e.name + (sealedNow ? ' · ' + WORDS.sealed : '') + (f.e.conf > 0 ? ' · lost' : '') + (f.e.cloth ? ' · cut' : ''); f.elLife.style.width = f.elLost.style.width = (100 * Lk).toFixed(1) + '%'; f.elFate.style.width = (100 * Fk).toFixed(1) + '%';
@@ -19336,7 +19339,7 @@ function makeMFFight(stage, H) {
     const dirTo = (x0, z0, x1, z1) => { const dx = x1 - x0, dz = z1 - z0, L = Math.hypot(dx, dz) || 1; return [dx / L, dz / L, L]; };
     if (phase === 'menu' && cur) {                           // TURN: over her shoulder, at the foe she is aiming at
       const f = foes[selFoe] && foes[selFoe].up ? foes[selFoe] : upFoes()[0], tx = f ? f.x : G.fcx, tz = f ? f.z : G.fcz, th = f ? f.K.h : 2, d = dirTo(cur.x, cur.z, tx, tz), ps = SIDE(d[0], d[1]), k = Math.max(1, Math.min(1.5, 1.2 / asp));
-      return keep({ p: [cur.x - d[0] * 2.9 * k + ps[0] * 0.95, 2.05 + 0.05 * th, cur.z - d[1] * 2.9 * k + ps[1] * 0.95], l: [cur.x + d[0] * 0.72 * d[2], 0.7 + 0.13 * th, cur.z + d[1] * 0.72 * d[2]], fov: Math.min(56, 42 * k), blur: 2.2, dim: 0.9, group: true }); }
+      return keep({ p: [cur.x - d[0] * 2.9 * k + ps[0] * 0.95, 2.05 + 0.05 * th, cur.z - d[1] * 2.9 * k + ps[1] * 0.95], l: [cur.x + d[0] * 0.72 * d[2], 0.7 + 0.13 * th, cur.z + d[1] * 0.72 * d[2]], fov: Math.min(56, 42 * k), blur: 2.2, dim: 0.9, group: true, turn: true }); }
     if (!a) return lastShot || WIDE(0);                      // between moves: hold
     if (!playing || a.stage !== 'play') return keep(WIDE(a.stage === 'in' ? ease(a.g) * 0.6 : 0));      // crossing the ground
     if (a.shotK == null) a.shotK = shotN++;
@@ -19372,14 +19375,114 @@ function makeMFFight(stage, H) {
       return keep({ p: [q[0], 0.65, q[1]], l: [P.x, 1.25, P.z], fov: 32 }); }
     const f = a.f, fp = f.m.root.position, tall = f.K.h, after = a.done ? ease((a.t - a.hitAt) / 0.7) : 0;
     if (a.tp && !a.all) { const P = a.tp, d = dirTo(P.x, P.z, fp.x, fp.z), ux = d[0], uz = d[1], L = d[2], ps = SIDE(ux, uz);
-      if (n % 2) { const R = 2.4 + 0.75 * tall, k = mix(0.3, 0.9, after);                                                                                           // from behind the foe, down at the witch it strikes
+      if (n % 2 && tall < 4) { const R = 2.4 + 0.75 * tall, k = mix(0.3, 0.9, after);      // (not the great wraith: from behind it, its cloak hid the witch it struck)                                                                                           // from behind the foe, down at the witch it strikes
         return keep({ p: [fp.x + ux * R + ps[0] * (1.0 + 0.3 * tall), 1.0 + 0.6 * tall, fp.z + uz * R + ps[1] * (1.0 + 0.3 * tall)], l: [fp.x - ux * k * L, 1.1, fp.z - uz * k * L], fov: 38 }); }
       const phi = mix(12, 64, ease(a.t / a.hitAt)) * DEG, q = swing(P.x, P.z, ux, uz, phi, 3.3 + 0.45 * tall), k = mix(0.6, 0.12, after);                             // from behind her head as it comes, round to her side as it lands
       return keep({ p: [q[0], 1.9 + 0.2 * tall, q[1]], l: [P.x + ux * k * L, mix(0.3 + 0.5 * tall, 1.15, after), P.z + uz * k * L], fov: 34 }); }
     if (a.all && a.done) return keep(HEADS());
+    // the great wraith, at everyone: it is too tall, and the party stands too near it, for a picture of it alone from the party's side
+    // (the party would be half in the picture, right in front of the camera). So: wide, from behind the party, pushing in as it winds up,
+    // with all of it and all of them in the picture, then the cut to behind their heads as it lands.
+    if (tall >= 4) return keep(WIDE(0.5 * ease(a.t / a.hitAt)));
     { const d = dirTo(G.pcx, G.pcz, fp.x, fp.z), phi = mix(-16, 32, ease(a.t / a.hitAt)) * DEG, q = swing(fp.x, fp.z, d[0], d[1], phi, 4.5 + 1.3 * tall);              // FOE: a foe on its own, from the party's side, drifting round it
       return keep({ p: [q[0], 1.6 + 0.3 * tall, q[1]], l: [fp.x, 0.55 * tall, fp.z], fov: 34 }); }
   }
+  // ---------- the framing guard ----------
+  // (Chris, November 15, 5:10 pm: "the whole of each attack is within the camera when it executes ... it's cutting off the top of the great
+  // wraith's head at some points, or the witch furthest to the edge isn't fully in the image".)
+  // The director still calls every shot. The guard only checks it: everyone the shot is about must be whole in the picture, from the top
+  // of a raised scythe to the feet, clear of the turn strip along the top and of the card in the corner. When someone is not, the camera
+  // keeps its angle and moves by the least that puts them right: back, and a little across or up. A cut is corrected before it is shown;
+  // inside a shot the camera eases there.
+  //   a view of everyone (wide, heads, high, the bow): every witch and every foe
+  //   a witch's turn: her and every foe; another witch at the picture's edge is brought in whole, or left out whole
+  //   a move: whoever the shot is on: the one of those the move involves who is nearest what the camera looks at, whoever of them stands
+  //           right by that one (a blow at arm's length shows both ends), and any of them the director already had whole. (A first try
+  //           kept everyone a move involves whole all the time. It turned close shots into wide ones, and that is not what Chris asked
+  //           for: "I do like the way it's cutting around".)
+  //           The great wraith is never left partly in the picture: it is so big that it is never just background, and its head at the
+  //           top edge (or its cloak filling one side of a close shot) was the thing Chris saw. If the picture can slide a little so that
+  //           it is wholly out, it does; if not, the camera backs away until all of it is in, scythe and all.
+  //           Anyone else at the picture's edge is brought in whole, or left out whole, when that takes only a small move. When it does not:
+  //           a witch or small foe the move does not involve steps out for that shot (as those in the camera's way already did), and
+  //           someone the move does involve stays as the director had them.
+  // A move's shot keeps one distance. It never drifts closer again, and what the blow's landing will need is looked up as the camera
+  // starts to turn to the target, so the camera is already wide enough when the blow lands and holds still through it.
+  // How big everyone really is, [height, half width] in metres, was measured in every move by checks/bodies.py: the great wraith stands
+  // 6.65 m to the tip of its scythe (not the 5.6 m the shots were sized for) and lifts it to 8.85 m in its sweep.
+  const BODY = { wisp: { stand: [1.4, 0.7], flicker: [1.55, 0.9] }, wraith: { stand: [2.5, 1.1], sweep: [3.2, 1.4], grasp: [2.7, 1.2] }, great: { stand: [6.8, 2.5], sweep: [8.9, 3.6], swallow: [8.3, 2.9], eclipse: [9.8, 3.4] } };
+  const isFoe = (o) => !!o.K;
+  // (a foe takes the room of its own move for the whole of that move, walking in included, so the shot is the right size from its start)
+  function bodyOf(o) {
+    if (isFoe(o)) { const p = o.m.root.position, B = BODY[o.kind], s = (act && act.kind === 'foe' && act.f === o && B[act.anim]) || B.stand; return { x: p.x, z: p.z, h: s[0], r: s[1] }; }
+    const dn = o.a.isDown; return { x: o.x, z: o.z, h: dn ? 1.6 : 1.95, r: dn ? 0.9 : o.id === 'io' ? 0.8 : 0.65 };
+  }
+  const guard = { on: true, a: 0, b: 0, c: 0, up: 0, c0: 0, ahead: 0, p: null, l: null, g: null, act: null, add: new Set(), hide: new Set(), req: [], move: 0, bob: 0 };
+  // the camera's own axes for a place p and a point l it looks at, with the picture's size
+  function frameFor(p, l, fov, W, Hh, I) { let fx = l[0] - p[0], fy = l[1] - p[1], fz = l[2] - p[2]; const n = Math.hypot(fx, fy, fz) || 1; fx /= n; fy /= n; fz /= n; let rx = -fz, rz = fx; const rn = Math.hypot(rx, rz) || 1; rx /= rn; rz /= rn;
+    return { p, f: [fx, fy, fz], r: [rx, 0, rz], u: [-rz * fy, rz * fx - rx * fz, rx * fy], k: Math.tan(fov / 2 * DEG) / (Hh / 2), W, Hh, I, sh: stage.free.shift }; }
+  // a body as points, in the camera's terms [across, up, away]: its top, feet, sides and middle
+  const PTS = [[0, 1, 0], [0, 0, 0], [-1, 0.5, 0], [1, 0.5, 0], [-0.7, 0.92, 0], [0.7, 0.92, 0], [-0.8, 0.03, 0], [0.8, 0.03, 0], [0, 0.5, 0], [0, 0.25, 0], [0, 0.75, 0], [0, 0, -1], [-0.7, 0, -0.7], [0.7, 0, -0.7]];      // the last three: the ground on the side nearest the camera, where a hem or a cloak's fringe hangs lowest in the picture
+  function ptsOf(F, b) { const out = [], hn = Math.hypot(F.f[0], F.f[2]) || 1, hx = F.f[0] / hn, hz = F.f[2] / hn; for (const q of PTS) { const x = b.x + q[0] * b.r * F.r[0] + q[2] * b.r * hx - F.p[0], y = q[1] * b.h - F.p[1], z = b.z + q[0] * b.r * F.r[2] + q[2] * b.r * hz - F.p[2]; out.push([x * F.r[0] + z * F.r[2], x * F.u[0] + y * F.u[1] + z * F.u[2], x * F.f[0] + y * F.f[1] + z * F.f[2]]); } return out; }
+  // the part of the picture a body must be inside, as slopes from the camera: mode 0 the whole picture, 1 above the corner card, 2 left of it
+  // (on a wide screen the guard keeps feet 50 px clear of the bottom, where the message line and the gear are; the checks call it a cut at 38)
+  function safeOf(F, mode, pad) { const top = F.W < 640 ? 24 : 34, I = F.I; let x0 = pad, x1 = F.W - pad, y0 = pad < 0 ? 0 : top + pad, y1 = F.Hh - (I && pad >= 0 ? Math.max(pad, pad >= 10 ? 50 : 38) : pad); if (pad < 0) { pad = 0; y1 = F.Hh; } if (I && mode === 1) y1 = F.Hh - I.h - pad; if (I && mode === 2) x1 = F.W - I.w - pad;
+    return { tl: -(x0 + F.sh[0] - F.W / 2) * F.k, tr: (x1 + F.sh[0] - F.W / 2) * F.k, tt: (F.Hh / 2 - F.sh[1] - y0) * F.k, tb: -(F.Hh / 2 - F.sh[1] - y1) * F.k }; }
+  // is a body whole in the picture (2), cut by its edge, the strip or the card (1), or not in it at all (0), with the camera moved by m
+  function seen(F, b, m, pad) { const S = safeOf(F, 0, pad), E = safeOf(F, 0, -1), I = F.I, cx = I ? (F.W - I.w - pad + F.sh[0] - F.W / 2) * F.k : 0, cy = I ? -(F.Hh / 2 - F.sh[1] - (F.Hh - I.h - pad)) * F.k : 0; let inN = 0, onN = 0, n = 0, near = false;
+    for (const q of ptsOf(F, b)) { n++; const z = q[2] - m[2]; if (z < 0.3) { near = near || z > -1.5; continue; } if (z < 1.6) near = true; const x = (q[0] - m[0]) / z, y = (q[1] - m[1]) / z, card = I && x > cx && -y > cy;
+      if (x >= -S.tl && x <= S.tr && y <= S.tt && y >= -S.tb && !card) inN++; if (x >= -E.tl && x <= E.tr && y <= E.tt && y >= -E.tb && !card) onN++; }
+    return { st: inN === n ? 2 : onN === 0 ? 0 : 1, near: near && onN > 0, in: inN / n }; }
+  // the least move [across, up, away] that puts every point inside S: as near as it can stay, then as little across and up as it can
+  function fitMove(F, S, P, ex, cMax) { let zmin = 1e9; for (const q of P) if (q[2] < zmin) zmin = q[2];
+    const span = (c) => { let aLo = ex ? ex[0] : -1e9, aHi = ex ? ex[1] : 1e9, bLo = -1e9, bHi = 1e9; for (const q of P) { const z = q[2] - c; aHi = Math.min(aHi, q[0] + S.tl * z); aLo = Math.max(aLo, q[0] - S.tr * z); bHi = Math.min(bHi, q[1] + S.tb * z); bLo = Math.max(bLo, q[1] - S.tt * z); }
+      if (F.u[1] > 0.2) bLo = Math.max(bLo, (0.3 - F.p[1] - c * F.f[1]) / F.u[1]);
+      return { aLo, aHi, bLo, bHi, ok: aLo <= aHi && bLo <= bHi && zmin - c >= 1.9 }; };
+    let c = Math.min(0, cMax || 0), s = span(c);
+    if (!s.ok) { let lo = -40, hi = c; for (let k = 0; k < 15; k++) { const mid = (lo + hi) / 2; if (span(mid).ok) lo = mid; else hi = mid; } c = lo - 0.04; s = span(c); }
+    const cl = (v, lo, hi) => (lo > hi ? (lo + hi) / 2 : Math.max(lo, Math.min(hi, v)));
+    return { m: [cl(0, s.aLo, s.aHi), cl(0, s.bLo, s.bHi), c], s }; }
+  function fitAll(F, list, ex, cMax) { if (!list.length) return { m: [0, 0, Math.min(0, cMax || 0)], s: null, mode: 0 }; const P = []; for (const o of list) for (const q of ptsOf(F, bodyOf(o))) P.push(q);
+    let best = fitMove(F, safeOf(F, 0, 14), P, ex, cMax); best.mode = 0; if (!F.I) return best;
+    if (list.every((o) => seen(F, bodyOf(o), best.m, 14).st === 2)) return best;                              // nobody is under the card: done
+    const A = fitMove(F, safeOf(F, 1, 14), P, ex, cMax), B2 = fitMove(F, safeOf(F, 2, 14), P, ex, cMax); A.mode = 1; B2.mode = 2; return A.m[2] >= B2.m[2] ? A : B2; }
+  // what the guard asks of a shot: the move to make, and who steps out. cMax: the camera is already this far back (0 or less)
+  function guardFor(cp, shot, a, W, Hh, I, cMax, dry, lift) {
+    let F = frameFor(cp, shot.l, shot.fov, W, Hh, I); const everyone = Object.values(party).filter((P) => P.e).concat(foes.filter((f) => f.vis)).filter((o) => !guard.hide.has(o) && !(a && a.hid && a.hid.has(o))), hide = [], dist = Math.hypot(shot.l[0] - cp[0], shot.l[1] - cp[1], shot.l[2] - cp[2]);
+    const latch = dry || guard.add;      // who has been brought in whole for this shot (a look ahead keeps its own list)
+    let req, more = [], rest = [];
+    if (shot.turn && cur) { req = [cur].concat(foes.filter((f) => f.vis && f.up)); more = everyone.filter((o) => req.indexOf(o) < 0); }
+    else if (shot.group && !shot.fit) req = everyone;
+    else { const inv = (a && a.inv ? a.inv : []).filter((o) => everyone.indexOf(o) >= 0);
+      if (shot.fit) req = inv.slice();
+      else { const d2 = inv.map((o) => { const b = bodyOf(o); return Math.hypot(b.x - shot.l[0], b.z - shot.l[2]) - b.r; }), first = inv[d2.indexOf(Math.min.apply(null, d2))], fb = first ? bodyOf(first) : null; req = inv.filter((o) => { if (o === first) return true; const b = bodyOf(o); return Math.hypot(b.x - fb.x, b.z - fb.z) - b.r - fb.r <= 3.5 || seen(F, b, [0, 0, 0], 0).st === 2; }); }
+      for (const o of everyone) if (req.indexOf(o) < 0) (shot.fit || inv.indexOf(o) >= 0 ? more : rest).push(o); }
+    for (const o of more.concat(rest)) if (latch.has(o) && req.indexOf(o) < 0) req.push(o);
+    // the camera may also lift its eyes: looking down at a witch's feet it would have to climb and back far away to take in something tall
+    // beside her, so a higher aim is tried too, and the one that keeps the camera nearest wins (the lower aim, when there is little in it)
+    const lifts = lift != null ? [lift] : shot.fit ? [0] : [0, 0.5, 1, 1.6, 2.3, 3.1, 4], F0 = F, cost = (q) => -q.m[2] + 0.8 * Math.abs(q.m[1]) + 0.3 * Math.abs(q.m[0]) + 0.2 * q.up;
+    const fit = () => { let best = null; for (const up of lifts) { const F2 = up ? frameFor(cp, [shot.l[0], shot.l[1] + up, shot.l[2]], shot.fov, W, Hh, I) : F0,  s2 = fitAll(F2, req, null, cMax); s2.F = F2; s2.up = up; if (!best || cost(s2) < cost(best) - 0.15) best = s2; } F = best.F; return best; };
+    // at the edge: can the picture slide a little so that this one is wholly out of it, at no cost to the others?
+    const slideOut = (o, sol, ex, lim) => { const b = bodyOf(o), P = ptsOf(F, b), E = safeOf(F, 0, -1), c = sol.m[2], sp = sol.s; let outHi = 1e9, outLo = -1e9, mid = 0; for (const p of P) { const z = p[2] - c; if (z < 0.3) return false; outHi = Math.min(outHi, p[0] - (E.tr + 0.02) * z); outLo = Math.max(outLo, p[0] + (E.tl + 0.02) * z); mid += p[0] / P.length; }
+      const right = mid - sol.m[0] > 0, lo = Math.max(sp ? sp.aLo : -1e9, ex[0], right ? -1e9 : outLo), hi = Math.min(sp ? sp.aHi : 1e9, ex[1], right ? outHi : 1e9), a2 = Math.max(lo, Math.min(hi, sol.m[0]));
+      if (lo > hi || Math.abs(a2 - sol.m[0]) > (lim || 0.1) * F.W * F.k * Math.max(3, dist)) return false; if (right) ex[1] = Math.min(ex[1], outHi); else ex[0] = Math.max(ex[0], outLo); sol.m[0] = a2; return true; };
+    let sol = fit(); const ex = [-1e9, 1e9];
+    for (let pass = 0; pass < 10; pass++) { let again = false; ex[0] = -1e9; ex[1] = 1e9;
+      for (const o of more.concat(rest)) { if (req.indexOf(o) >= 0) continue; const q = seen(F, bodyOf(o), sol.m, 8); if (q.st !== 1) continue;
+        const big = o.kind === 'great', mine = more.indexOf(o) >= 0; let whole = shot.turn || shot.fit;
+        if (!whole) { if (q.near && !big) continue; req.push(o); const s2 = fit(), cheap = Math.hypot(s2.m[0] - sol.m[0], s2.m[1] - sol.m[1], s2.m[2] - sol.m[2]) <= Math.max(0.6, (mine || big ? 0.25 : 0.1) * dist); req.pop(); if (cheap) whole = true; else if (!q.near && slideOut(o, sol, ex, big ? 0.35 : 0.1)) continue; else if (big) whole = true; else continue; }
+        req.push(o); if (mine || big || shot.turn || shot.fit) latch.add(o); again = true; break; }      // (a bystander is weighed again every picture: kept whole only while that stays cheap)
+      if (!again) break; sol = fit(); }
+    for (const o of rest) if (req.indexOf(o) < 0 && o.kind !== 'great' && seen(F, bodyOf(o), sol.m, 4).st === 1) hide.push(o);
+    return { F, m: sol.m, up: sol.up || 0, req, hide };
+  }
+  // the director's shot as it will be a little later in this move (for looking ahead to where a blow lands); nothing is changed by asking
+  function shotLater(a, t2, asp) { const keepShot = lastShot, hero = a.kind === 'hero', tHit = hero ? hitTime(a) : a.hitAt, b = Object.assign({}, a, { t: t2 });
+    if (t2 >= tHit) { if (hero) { b.landed = true; if (b.landT == null) b.landT = tHit; } else b.done = true; }
+    const q = directorShot(b, true, asp); lastShot = keepShot; if (!q || q.group) return null;
+    const z = (H.zoomOut ? H.zoomOut() : 1.25) - 1, dx = q.p[0] - q.l[0], dy = q.p[1] - q.l[1], dz = q.p[2] - q.l[2], d = Math.hypot(dx, dy, dz) || 1, k = z * (a.zd == null ? d : a.zd) / d;
+    return { shot: q, cp: [q.p[0] + dx * k, Math.max(0.3, q.p[1] + dy * k), q.p[2] + dz * k] }; }
+  const hitTime = (a) => (a.tags ? a.P.a.hits(a.mv)[0] : a.hitsAt[0]) || 0.6 * a.P.a.dur(a.anim);
   // the older cameras: a window on the painting, or (for 'shoulder' and 'low') a camera that really moves, with the painting out of focus behind
   const heroPts = (P, out) => { out.push([P.x - 0.75, 0, P.z], [P.x, P.id === 'io' ? 2.25 : 2.0, P.z], [P.x + 0.75, 0, P.z + 0.9]); };
   const foePts = (f, out) => { const p = f.m.root.position, r = f.K.r + 0.35; out.push([p.x - r, 0, p.z], [p.x + r, 0, p.z + 0.5], [p.x, f.K.h + 0.25, p.z]); };
@@ -19424,8 +19527,32 @@ function makeMFFight(stage, H) {
     if (shot && CAM === 'auto' && !shot.fit) { const z = (H.zoomOut ? H.zoomOut() : 1.25) - 1, dx = shot.p[0] - shot.l[0], dy = shot.p[1] - shot.l[1], dz = shot.p[2] - shot.l[2], d = Math.hypot(dx, dy, dz) || 1; let d0 = d;
       if (a && !shot.group) { if (a.zd == null || Math.abs(d - a.zl) > 0.8) a.zd = d; a.zl = d; d0 = a.zd; }
       const k = z * d0 / d; cp[0] += dx * k; cp[1] = Math.max(0.3, cp[1] + dy * k); cp[2] += dz * k; }
-    { const I = H.inset ? H.inset() : null, cwid = Math.max(1, H.width()), want = I ? [Math.min(0.2 * cwid, 0.5 * I.w * Math.min(1, I.h / 260)), 0.1 * I.h] : [0, 0], sh = stage.free.shift, k = Math.min(1, dt * 3); sh[0] += (want[0] - sh[0]) * k; sh[1] += (want[1] - sh[1]) * k; }      // on a wide screen the witches' card sits in the bottom right corner: the picture's middle moves left and up, more while the card is tall
-    stage.free.on = !!shot; stage.free.group = !!(shot && shot.group); if (shot) { stage.free.pos.set(cp[0], cp[1], cp[2]); stage.free.look.set(shot.l[0], shot.l[1], shot.l[2]); stage.free.fov = shot.fov; stage.free.blur = shot.blur || 3.0; stage.free.dim = shot.dim || 0.82; }
+    { const I = H.inset ? H.inset() : null, cwid = Math.max(1, H.width()), want = I ? [Math.min(0.2 * cwid, 0.5 * I.w * Math.min(1, I.h / 260)), 0.1 * I.h] : [0, 0], sh = stage.free.shift, k = Math.min(1, dt * 3); sh[0] += (want[0] - sh[0]) * k; sh[1] += (want[1] - sh[1]) * k; guard.shWant = want; }      // on a wide screen the witches' card sits in the bottom right corner: the picture's middle moves left and up, more while the card is tall
+    let cl = shot ? shot.l : null; guard.view = null;
+    if (shot && CAM === 'auto' && guard.on) { const W = Math.max(1, H.width()), Hh = W / asp, I = H.inset ? H.inset() : null, kind = shot.turn ? 't' : shot.fit ? 'f' : shot.group ? 'g' : 'm';
+      const cut = !guard.p || Math.hypot(cp[0] - guard.p[0], cp[1] - guard.p[1], cp[2] - guard.p[2]) > 1.0 || guard.g !== kind, newAct = !!a && guard.act !== a;
+      if (a) guard.inv = a.inv; if (cut && !a) guard.inv = null;
+      if (cut && guard.shWant) { stage.free.shift[0] = guard.shWant[0]; stage.free.shift[1] = guard.shWant[1]; }      // on a cut the picture's middle goes straight to where the card wants it
+      if (cut || newAct) { guard.add.clear(); guard.hide.clear(); guard.bob = 0; guard.c0 = cut ? null : guard.c; guard.ahead = 0; guard.turned = false; }
+      const hold = kind === 'm' && !cut ? guard.c : 0, pan = !cut && dt > 1e-4 && guard.l ? Math.hypot(shot.l[0] - guard.l[0], shot.l[1] - guard.l[1], shot.l[2] - guard.l[2]) / dt : 0;
+      // looking ahead: when a move's shot begins, and again as the camera starts its turn to where the blow lands, the director's shot is
+      // run forward to its end (or its next cut) to find the furthest back it will need to be. The camera takes that distance at once.
+      if (kind === 'm' && a && a.stage === 'play') { const tHit = a.kind === 'hero' ? hitTime(a) : a.hitAt, end = Math.min(a.t + 12, a.kind === 'hero' ? a.P.a.dur(a.anim) : a.dur), turn = a.t >= tHit - 0.55 && a.t < tHit + 0.6;
+        if (cut || newAct || (turn && !guard.turned)) { let prev = cp, far = 0; const sim = new Set(guard.add), g1 = guardFor(cp, shot, a, W, Hh, I, 0, sim), out = new Set(g1.hide); far = Math.min(far, g1.m[2]);
+          for (let t2 = a.t + 0.2; t2 <= end; t2 += 0.2) { const L = shotLater(a, t2, asp); if (!L || Math.hypot(L.cp[0] - prev[0], L.cp[1] - prev[1], L.cp[2] - prev[2]) > 2.4) break; prev = L.cp; const g2 = guardFor(L.cp, L.shot, a, W, Hh, I, far, sim); far = Math.min(far, g2.m[2]); for (const o of g2.hide) out.add(o); }
+          for (const o of out) guard.hide.add(o);      // a bystander who would have to step out part way through the shot is out of it from its first picture
+          guard.ahead = Math.min(guard.ahead, far); guard.turned = turn; } }
+      const who = a || (guard.inv ? { inv: guard.inv } : null), back = Math.min(hold, kind === 'm' ? guard.ahead : 0), k = (r) => Math.min(1, dt * r), R0 = guardFor(cp, shot, who, W, Hh, I, back);
+      guard.up = cut ? R0.up : guard.up + (R0.up - guard.up) * k(3);                                              // the lift of the camera's aim eases; the rest is worked out for the aim it has now
+      const R = Math.abs(guard.up - R0.up) < 0.01 ? R0 : guardFor(cp, shot, who, W, Hh, I, back, false, guard.up), m = R.m;
+      if (pan > 3.5 && kind === 'm') m[2] = Math.min(hold, guard.ahead);      // a quick turn of the camera passes over people; it is not a reason to back away
+      if (cut) { guard.a = m[0]; guard.b = m[1]; guard.c = m[2]; guard.c0 = m[2]; }
+      else { const q = kind === 'm' ? 18 : 30; guard.a += (m[0] - guard.a) * k(q); guard.b += (m[1] - guard.b) * k(q); guard.c += (m[2] - guard.c) * k(m[2] < guard.c ? 14 : 0.7); guard.bob = Math.max(guard.bob, Math.abs(guard.c - guard.c0)); }
+      for (const o of R.hide) guard.hide.add(o); guard.req = R.req; guard.p = cp.slice(); guard.l = shot.l.slice(); guard.g = kind; if (a) guard.act = a; guard.move = Math.hypot(guard.a, guard.b, guard.c);
+      const F = frameFor(cp, [shot.l[0], shot.l[1] + guard.up, shot.l[2]], shot.fov, W, Hh, I), mv = [F.r[0] * guard.a + F.u[0] * guard.b + F.f[0] * guard.c, F.u[1] * guard.b + F.f[1] * guard.c, F.r[2] * guard.a + F.u[2] * guard.b + F.f[2] * guard.c];
+      cp = [cp[0] + mv[0], cp[1] + mv[1], cp[2] + mv[2]]; cl = [shot.l[0] + mv[0], shot.l[1] + guard.up + mv[1], shot.l[2] + mv[2]]; }
+    else { guard.hide.clear(); guard.req = []; guard.p = null; }
+    stage.free.on = !!shot; stage.free.group = !!(shot && shot.group); if (shot) { stage.free.pos.set(cp[0], cp[1], cp[2]); stage.free.look.set(cl[0], cl[1], cl[2]); stage.free.fov = shot.fov; stage.free.blur = shot.blur || 3.0; stage.free.dim = shot.dim || 0.82; }
     wx = Math.max(0, Math.min(FW - ww, wx)); wy = Math.max(0, Math.min(FH - wh, wy));
     if (!win || shot) win = { x: wx, y: wy, w: ww, h: wh }; else { const k = Math.min(1, dt * quick); win.x += (wx - win.x) * k; win.y += (wy - win.y) * k; win.w += (ww - win.w) * k; win.h = win.w / asp; if (win.h > FH) { win.h = FH; win.w = FH * asp; } }
     stage.setWindow(win.x, win.y, win.w, win.h);
@@ -19434,6 +19561,12 @@ function makeMFFight(stage, H) {
   const api = {
     group, party, get foes() { return foes; }, get phase() { return phase; }, get battle() { return B; }, get geo() { return GEO; }, get current() { return cur ? cur.id : null; }, get act() { return act; }, result: null, choose, hero,
     setAuto(style) { auto = style || null; },
+    guard,
+    // for the checks: everyone who is showing, and whether the picture's edge, the turn strip or the corner card cuts them (2 px of grace)
+    audit() { const out = [], fr = stage.free; if (!fr.on) return out; const W = Math.max(1, H.width()), Hh = W / H.aspect(), I = H.inset ? H.inset() : null, F = frameFor([fr.pos.x, fr.pos.y, fr.pos.z], [fr.look.x, fr.look.y, fr.look.z], fr.fov, W, Hh, I);
+      for (const o of Object.values(party).filter((P) => P.e).concat(foes.filter((f) => f.vis))) { if (o.out) continue; const b = bodyOf(o), q = seen(F, b, [0, 0, 0], 2), top = ptsOf(F, b)[0], ty = top[2] > 0.3 ? Hh / 2 - F.sh[1] - top[1] / top[2] / F.k : -1;
+        out.push({ who: isFoe(o) ? o.e.name : o.id, cut: q.st === 1, near: q.near, in: q.in, top: Math.round(ty), must: guard.req.indexOf(o) >= 0, inv: !!(act && act.inv && act.inv.indexOf(o) >= 0), shot: !lastShot ? '' : lastShot.turn ? 'turn' : lastShot.fit ? 'fit' : lastShot.group ? 'group' : 'move' }); }
+      return out; },
     // keys: 1 to 7 pick a move, Tab or the arrows change who it is aimed at, Enter casts, Esc goes back
     key(k) { if (phase !== 'menu' || !cur) return false;
       if (k === 'Tab' || k === 'ArrowRight' || k === 'ArrowLeft') { const step = k === 'ArrowLeft' ? -1 : 1;
@@ -19487,11 +19620,13 @@ function makeMFFight(stage, H) {
         m.animate(0, 0, t, dt); m.patch.position.set(p.x, 0.006, p.z); m.patch.material.opacity = 0.7 * f.fade;
         if (f.dying && !m.busy) gone(f); }
       camera(dt);
-      // when the camera has moved in for a move, anyone standing on the line from it to what it looks at steps out of the picture, and stays out for that shot
+      // who steps out of the picture for a shot: anyone standing on the line from a move's camera to what it looks at, and (with the guard)
+      // anyone the shot is not about who would be cut by the picture's edge or stands very near the camera. Once out, out for that shot.
       { const fr = stage.free.on && !stage.free.group ? stage.free : null, a = act && act.kind ? act : null, hid = a ? (a.hid || (a.hid = new Set())) : null; if (a && !fr) hid.clear();
         const inWay = (x, z, r) => { const ax = fr.pos.x, az = fr.pos.z, bx = fr.look.x - ax, bz = fr.look.z - az, L2 = bx * bx + bz * bz || 1, k = Math.max(0, Math.min(1, ((x - ax) * bx + (z - az) * bz) / L2)); return Math.hypot(x - ax - bx * k, z - az - bz * k) < r || Math.hypot(x - ax, z - az) < 2.2; };
-        for (const id in party) { const P = party[id]; if (!P.e) continue; if (fr && a && P !== a.P && P !== a.th && P !== a.tp && inWay(P.x, P.z, 0.85)) hid.add(P); const hide = !!(fr && a && hid.has(P)); P.a.root.visible = !hide; if (P.a.fx) P.a.fx.visible = !hide; P.patch.visible = !hide; }
-        for (const f of foes) { if (!f.vis) continue; if (fr && a && f !== a.f && f !== a.tf && f !== a.tfo && inWay(f.x, f.z, 0.5 + f.K.r)) hid.add(f); const hide = !!(fr && a && hid.has(f)); f.m.root.visible = f.m.fx.visible = !hide; f.m.patch.visible = !hide; } }
+        const edge = (o) => stage.free.on && guard.hide.has(o);
+        for (const id in party) { const P = party[id]; if (!P.e) continue; if (fr && a && P !== a.P && P !== a.th && P !== a.tp && inWay(P.x, P.z, 0.85)) { hid.add(P); if (guard.p) guard.hide.add(P); } const hide = !!(fr && a && hid.has(P)) || edge(P); P.a.root.visible = !hide; if (P.a.fx) P.a.fx.visible = !hide; P.patch.visible = !hide; P.out = hide; }
+        for (const f of foes) { if (!f.vis) continue; if (fr && a && f !== a.f && f !== a.tf && f !== a.tfo && inWay(f.x, f.z, 0.5 + f.K.r)) { hid.add(f); if (guard.p) guard.hide.add(f); } const hide = !!(fr && a && hid.has(f)) || edge(f); f.m.root.visible = f.m.fx.visible = !hide; f.m.patch.visible = !hide; f.out = hide; } }
       // the place answers a spell: it darkens, the picture shakes, and one shared light carries the spell
       const cast = mover ? mover.a : null, dk = cast ? Math.max(cast.dark, 0.55 * cast.dim) : 0; stage.dark = 1 - Math.pow(1 - 0.97 * dk, 2); stage.dim = cast ? cast.dim : 0;
       shake = Math.max(shake * Math.exp(-dt * 5), 0.7 * (cast ? cast.shake : 0)); const sp = (stage.free.on ? 85 : 16) * shake * (win ? win.w : 1) / Math.max(1, H.width()); stage.shakeX = (rnd() - 0.5) * sp; stage.shakeY = (rnd() - 0.5) * sp;

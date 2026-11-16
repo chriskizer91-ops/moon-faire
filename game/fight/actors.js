@@ -57,7 +57,7 @@
         if (!A.one && !A.isDown && A.cur !== 'down') { const want = walking ? 'jog' : 'idle'; if (A.cur !== want) { m.play(want); A.cur = want; } }
         if (A.isDown && id === 'io' && m.move === 'down' && m.moveT >= 4.2) A.froze = true;                                    // Io lies where she fell until she is helped up (her own move gets up by itself)
         m.animate(A.froze ? 0 : dt);
-        if (id === 'io' && m.spellFx) { m.spellFx.dummy.visible = false; m.spellFx.ally.visible = false; m.spellFx.ally2.visible = false; if (m.wood && m.wood.FALLEN && m.wood.FALLEN.isObject3D) m.wood.FALLEN.visible = false; }      // her practice targets: the fight has real ones
+        if (id === 'io' && m.spellFx) { m.spellFx.dummy.visible = false; m.spellFx.ally.visible = false; m.spellFx.ally2.visible = false; const Fl = m.wood && m.wood.FALLEN; if (Fl && Fl.isObject3D) Fl.visible = false; else if (Fl && Fl.G) Fl.G.visible = false; }      // her practice targets: the fight has real ones
       }
       // she turns to her target while she casts at it, then back to how she rests; a blow rocks her back a little
       // rest: the way she stands between moves (the fight turns her to the foes)

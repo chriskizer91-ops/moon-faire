@@ -186,3 +186,43 @@ right-hand corner. You also can't see the deer summons and other wider shots on 
 - A witch who walks up to a target now comes round to one side if someone else is standing where she would stop.
 - `checks/beats.py`, `checks/wide.py`. Note for anyone writing a check: Io's and the Ranger's models never advance more than 0.05 s a
   step, so step them at 1/30 s or finer.
+
+## Nobody cut off by the picture's edge (Chris, November 15, 5:10 pm)
+
+Chris, on his laptop, in the last fight: "the whole of each attack is within the camera when it executes ... it's like cutting off the
+top of the great wraith's head at some points. Or the witch furthest to the edge isn't fully in the image ... I do like the way it's
+cutting around." He asked for one or two Opus 5.5 sub-agents (high effort) to go through the whole fight with the Great Wraith.
+
+**What was wrong.** The shots were sized for a great wraith 5.6 m tall. Measured (`checks/bodies.py`, every move, bones and all), it
+stands 6.65 m to the tip of its scythe and lifts it to 8.85 m in its sweep, so its top was out of the picture most of the time, in the
+wide views too. With the picture counted honestly, someone was cut by an edge in 70% of the moments of that fight on a laptop.
+
+**The framing guard** (`fight.js`, "the framing guard"). The director still calls every shot. The guard checks it against everyone's
+real size and the parts of the screen that are taken (the turn strip, the corner card, the message line), and when someone the shot is
+about is not whole, moves the camera by the least that puts it right: back, a little across or up, or its aim a little higher. The
+camera's angle to the painting stays the same.
+
+- A view of everyone (wide, behind the heads, high, the bow): every witch and every foe is whole.
+- A witch's turn: she and every foe are whole; another witch at the edge is brought in whole.
+- A move: whoever the shot is on (the one the camera looks at, and whoever stands right by them) is whole. Anyone else at the edge is
+  brought in or left out when that takes only a small move; if it doesn't, a witch or small foe the move doesn't involve steps out for
+  that shot, as those in the camera's way already did.
+- The great wraith is never left partly in the picture. If the picture can slide so that it is wholly out, it does; if not, the camera
+  backs away until all of it is in. So a close shot of a small fight right beside it is now a wider shot with the whole of it in.
+- A move's shot keeps one distance: when it begins, the director's shot is run forward to its end to find the furthest back it will
+  need, and the camera takes that at once. It does not back away as a blow lands.
+
+**Two director changes.** The great wraith's attack on everyone is a wide shot from behind the party, pushing in (a picture of it alone
+from the party's side put the party half in the picture, right in front of the lens). And it is never shot from behind itself: its
+cloak hid the witch it struck.
+
+**Also fixed.** Io's Revive showed her grey practice figure lying across her lap (the reviewers found it; `actors.js` hid the wrong
+thing). A foe's bar no longer sits in the turn strip, and a foe out of the picture shows no bar.
+
+**Checks.** `checks/audit.py [on|off]` plays the whole fight without drawing and counts the moments anyone is cut. `checks/film.py`
+photographs every move at three moments and every turn; `checks/sheets.py` puts them on contact sheets. `checks/trace.py` and
+`checks/stills.py` follow one move. `checks/bodies.py` measures everyone.
+
+**Left as it was.** The Fox's spells at every foe (Crazy Quilt, Pins and Needles) are fitted to the spell's whole room, and the
+reviewers found them very wide, with small figures. That is the fitted shot from 1:03 pm, not the guard, and Chris hasn't asked for it
+closer. In a ranged move the camera still turns to where the shot lands and leaves the one who fired out of the picture.
