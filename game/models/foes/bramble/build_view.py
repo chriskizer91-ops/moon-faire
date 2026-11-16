@@ -3,6 +3,7 @@
 
     python3 build_view.py                               # the page Chris opens (three.js r128 from cdnjs)
     python3 build_view.py --three FILE_URL --out PATH   # a test copy that loads three.js from somewhere else
+    python3 build_view.py --inline THREE_MIN_JS --out PATH   # one file with three.js inside it, which needs no network
 """
 import argparse
 import pathlib
@@ -160,8 +161,12 @@ def main():
     ap = argparse.ArgumentParser()
     ap.add_argument('--three', default=CDN, help='where the page loads three.js r128 from')
     ap.add_argument('--out', default=str(HERE / 'out' / 'brambles-view.html'))
+    ap.add_argument('--inline', default='', help='a three.min.js (r128) to put inside the page')
     a = ap.parse_args()
     html = PAGE.replace('%THREE%', a.three)
+    if a.inline:
+        three = pathlib.Path(a.inline).read_text(encoding='utf-8').replace('</script>', '<\\/script>')
+        html = html.replace('<script src="' + a.three + '"></script>', '<script>\n' + three + '\n</script>')
     for mark, path in (('%SIMPLIFIER%', SIMPLIFIER), ('%BRAMBLE%', HERE / 'bramble.js'), ('%COLOSSUS%', HERE / 'colossus.js'), ('%BRAMBLES%', HERE / 'brambles.js')):
         html = html.replace(mark, path.read_text(encoding='utf-8').replace('</script>', '<\\/script>'))
     out = pathlib.Path(a.out)
