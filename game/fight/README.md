@@ -226,3 +226,8 @@ photographs every move at three moments and every turn; `checks/sheets.py` puts 
 **Left as it was.** The Fox's spells at every foe (Crazy Quilt, Pins and Needles) are fitted to the spell's whole room, and the
 reviewers found them very wide, with small figures. That is the fitted shot from 1:03 pm, not the guard, and Chris hasn't asked for it
 closer. In a ranged move the camera still turns to where the shot lands and leaves the one who fired out of the picture.
+
+**Found by the reviewers and not fixed.** Twice in the fight the witch a blow lands on stood straight behind another witch from the
+camera (a Shadow Wraith's sweep on the Jester behind the Fox; the great wraith's Crush on the Ranger behind Io), so the hit showed but
+she didn't. Nobody is cut by an edge there; it is one body in front of another, and it wants its own fix (the camera choosing the side
+the target is clear from).
