@@ -267,3 +267,14 @@ Chris, 13 Nov: "so it's like her talk and she's not the jester"; she "would have
 - Chris, 13 Nov, after trying them: all five stay. She also keeps the Jester's bow and twirl, and the Jester's wave and jump are fine as they are. He likes that each witch can hover and talk while hovering, and wants the four to hover together one day.
 - Not done: the trouser cloth does not lift in her fingers in the curtsey; the bell does not swing when flicked; she cannot wink (her eyes shut together).
 - Motion has not been seen: the test machine draws about two frames a second. Timing came from arithmetic (a 30 cm jump is 0.5 s in the air) and from the Jester's moves.
+
+## The finer Flipbook look (November 16)
+
+Chris asked for every witch's own page to have the finer look the "how light can she go" pages have (`claude/HOW-TO-flipbook-look.md`, section 11).
+
+- `viewer/stage.js` is still her own older stage (the little theatre only), with the enlarging pass added. `stage.pixelWhole` (starts `true`) and `stage.snap` (starts `1`) are new. With neither set, the picture is drawn as before.
+- `viewer/app.js`: the sliders are made by the page script. Turn the Flipbook look on and two sliders show under the switches: Pixel size (chunky to fine) and Colours (smooth to flipbook). They open at 1.2 mm of her to a pixel and full flipbook colours, which Chris said looks good on the witches. Pixel size all the way to chunky is the look as it was.
+- The look still starts off.
+- The change was made by `light-levels/tools/finer_look.py` on branch `claude/moon-faire-light-levels`, which works on these sources and on a finished page alike.
+- `deliver/Fox_Witch_3D.html` is her page as it was with only this change made to it.
+- Checked in stills at phone size: look off is the same picture as before, the old look matches Pixel size at chunky, the sliders show and hide with the switch, no errors. Not checked: on a real phone or laptop.

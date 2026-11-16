@@ -64,12 +64,22 @@ function makeStage(canvas, o) {
       ' float n = max(max(texture2D(tD, uv + vec2(px.x, 0.0)).a, texture2D(tD, uv - vec2(px.x, 0.0)).a), max(texture2D(tD, uv + vec2(0.0, px.y)).a, texture2D(tD, uv - vec2(0.0, px.y)).a));\n' +
       ' float m = min(min(texture2D(tD, uv + vec2(px.x, 0.0)).a, texture2D(tD, uv - vec2(px.x, 0.0)).a), min(texture2D(tD, uv + vec2(0.0, px.y)).a, texture2D(tD, uv - vec2(0.0, px.y)).a));\n' +
       ' if (c.a < 0.5) { gl_FragColor = vec4(n > 0.6 ? vec3(0.075, 0.05, 0.065) : uBg * (1.0 - c.a) + c.rgb, 1.0); return; }\n' +
-      ' vec3 col = c.rgb + uBg * (1.0 - c.a); float l = dot(col, vec3(0.30, 0.59, 0.11)); col = clamp(l + (col - l) * 1.4, 0.0, 1.0); col = clamp((col - 0.42) * 1.14 + 0.42, 0.0, 1.0); if (m < 0.4) col *= 0.45;\n' +                       // the rim of the figure, inked
+      ' vec3 col = c.rgb + uBg * (1.0 - c.a); float l = dot(col, vec3(0.30, 0.59, 0.11)); col = clamp(l + (col - l) * (1.0 + 0.4 * uSnap), 0.0, 1.0); col = clamp((col - 0.42) * (1.0 + 0.14 * uSnap) + 0.42, 0.0, 1.0); if (m < 0.4) col *= 0.45;\n' +                       // the rim of the figure, inked
       ' float best = 1e9; vec3 pick = col; for (int i = 0; i < ' + NP + '; i++) { vec3 d = col - uPal[i]; float e = dot(d * d, vec3(0.30, 0.59, 0.11)); if (e < best) { best = e; pick = uPal[i]; } }\n' +
       ' gl_FragColor = vec4(mix(col, pick, uSnap), 1.0); }' });
   const postScene = new THREE.Scene(), postCam = new THREE.OrthographicCamera(-1, 1, 1, -1, 0, 1);
   const postQuad = new THREE.Mesh(new THREE.PlaneGeometry(2, 2), postMat); postQuad.frustumCulled = false; postScene.add(postQuad);
-  const api = { look: 'smooth', mmPerPixel: 4.75, dim: 0 }, _sz = new THREE.Vector2();
+  // the finished small picture, and the pass that enlarges it
+  const rt2 = new THREE.WebGLRenderTarget(4, 4, { minFilter: THREE.LinearFilter, magFilter: THREE.LinearFilter, format: THREE.RGBAFormat, depthBuffer: false });
+  const upMat = new THREE.ShaderMaterial({ depthTest: false, depthWrite: false, toneMapped: false,
+    uniforms: { tU: { value: rt2.texture }, uRes: { value: new THREE.Vector2(4, 4) }, uScale: { value: new THREE.Vector2(1, 1) } },
+    vertexShader: 'varying vec2 vUv; void main(){ vUv = uv; gl_Position = vec4(position.xy, 0.0, 1.0); }',
+    fragmentShader: 'precision highp float; uniform sampler2D tU; uniform vec2 uRes; uniform vec2 uScale; varying vec2 vUv;\n' +
+      'void main(){ vec2 p = vUv * uRes; vec2 i = floor(p); vec2 x = (p - i) * uScale;\n' +                 // x: where this screen pixel sits inside its pixel of the small picture, in screen pixels
+      ' vec2 sh = clamp(x - (uScale - 0.5), 0.0, 0.5) - clamp(0.5 - x, 0.0, 0.5);\n' +                        // within half a screen pixel of an edge, lean toward the neighbour
+      ' gl_FragColor = texture2D(tU, (i + 0.5 + sh) / uRes); }' });
+  const upScene = new THREE.Scene(), upQuad = new THREE.Mesh(new THREE.PlaneGeometry(2, 2), upMat); upQuad.frustumCulled = false; upScene.add(upQuad);
+  const api = { look: 'smooth', mmPerPixel: 4.75, pixelWhole: true, snap: 1, dim: 0 }, _sz = new THREE.Vector2();
   const LIT = [[hemi, hemi.intensity, 0.7], [key, key.intensity, 0.6], [fill, fill.intensity, 0.7], [backKey, backKey.intensity, 0.6]];
   function render() {
     placeCamera();
@@ -77,11 +87,15 @@ function makeStage(canvas, o) {
     if (api.look !== 'flipbook') { floor.visible = !api.noFloor; scene.background = api.bg || BG; renderer.render(scene, camera); return; }
     renderer.getDrawingBufferSize(_sz);
     const vis = 2 * orbit.dist * Math.tan(orbit.fov * Math.PI / 360);
-    const want = vis / (api.mmPerPixel / 1000), div = Math.max(1, Math.round(_sz.y / want)), h = Math.max(48, Math.round(_sz.y / div)), w = Math.max(16, Math.round(_sz.x / div));
-    if (rt.width !== w || rt.height !== h) { rt.setSize(w, h); postMat.uniforms.uRes.value.set(w, h); }
+    const want = vis / (api.mmPerPixel / 1000); let w, h;
+    if (api.pixelWhole) { const div = Math.max(1, Math.round(_sz.y / want)); h = Math.max(48, Math.round(_sz.y / div)); w = Math.max(16, Math.round(_sz.x / div)); }      // whole screen pixels to each of hers
+    else { h = Math.max(48, Math.min(_sz.y, Math.round(want))); w = Math.max(16, Math.round(_sz.x * h / _sz.y)); }                                                      // any size, down to the screen's own
+    if (rt.width !== w || rt.height !== h) { rt.setSize(w, h); rt2.setSize(w, h); postMat.uniforms.uRes.value.set(w, h); upMat.uniforms.uRes.value.set(w, h); }
+    upMat.uniforms.uScale.value.set(_sz.x / w, _sz.y / h); postMat.uniforms.uSnap.value = api.snap;
     floor.visible = false; scene.background = null; const oc = renderer.getClearAlpha(); renderer.setClearColor(0x000000, 0);
-    renderer.setRenderTarget(rt); renderer.clear(); renderer.render(scene, camera); renderer.setRenderTarget(null);
-    renderer.setClearColor(0x000000, oc); renderer.render(postScene, postCam);
+    renderer.setRenderTarget(rt); renderer.clear(); renderer.render(scene, camera);
+    renderer.setRenderTarget(rt2); renderer.clear(); renderer.render(postScene, postCam);      // her as inked pixels, in a small picture of its own
+    renderer.setRenderTarget(null); renderer.setClearColor(0x000000, oc); renderer.render(upScene, postCam);      // and that picture enlarged to the screen
   }
   const follow = (x, z) => { key.position.set(x + 1.7, 3.6, z + 3.2); key.target.position.set(x, 0.9, z); key.target.updateMatrixWorld(); };      // the light and its shadow go where she goes
   return Object.assign(api, { renderer, scene, camera, orbit, key, rim, rim2, hemi, fill, floor, shadowCatcher, lanterns, follow, resize, render, placeCamera, BG });

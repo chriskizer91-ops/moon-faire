@@ -116,7 +116,16 @@
   let outerOn = true;
   chip(toggleRow, 'Full detail', () => goHash({ small: !small }), !small);
   // The Flipbook look (claude/HOW-TO-flipbook-look.md): she is redrawn at her sprites' pixel size, in the flipbook's colours, with an inked outline. Starts off.
-  chip(toggleRow, 'Flipbook look', (b) => { stage.look = stage.look === 'flipbook' ? 'smooth' : 'flipbook'; b.setAttribute('aria-pressed', stage.look === 'flipbook'); }, false);
+  // The finer Flipbook look (claude/HOW-TO-flipbook-look.md, section 11): two sliders that show while the look is on. They open at the setting
+  // Chris liked for the witches: 1.2 mm of her to a pixel, full flipbook colours. Pixel size at chunky is the look as it first was (4.75 mm).
+  const flipBox = document.createElement('div'); flipBox.id = 'flipset'; flipBox.style.cssText = 'display:none; margin-top:8px; font-size:13px; opacity:.9';
+  flipBox.innerHTML = '<label style="display:flex; align-items:center; gap:8px; flex-wrap:wrap">Pixel size: chunky <input type="range" id="pix" min="0" max="100" step="1" value="77" style="width:150px; accent-color:#d9b24c" aria-label="Pixel size, from chunky to fine"> fine <output id="pixout"></output></label>' +
+    '<label style="display:flex; align-items:center; gap:8px; flex-wrap:wrap; margin-top:6px">Colours: smooth <input type="range" id="snap" min="0" max="100" step="5" value="100" style="width:150px; accent-color:#d9b24c" aria-label="Colours, from smooth to the flipbook\'s own"> flipbook <output id="snapout"></output></label>';
+  toggleRow.parentNode.appendChild(flipBox);
+  const flipSet = () => { const on = stage.look === 'flipbook', pix = +$('pix').value, mm = 4.75 * Math.pow(0.8 / 4.75, pix / 100); stage.pixelWhole = pix === 0; stage.mmPerPixel = mm; stage.snap = +$('snap').value / 100;
+    $('pixout').textContent = mm.toFixed(1) + ' mm of her to a pixel'; $('snapout').textContent = $('snap').value + '%'; flipBox.style.display = on ? 'block' : 'none'; };
+  $('pix').addEventListener('input', flipSet); $('snap').addEventListener('input', flipSet);
+  chip(toggleRow, 'Flipbook look', (b) => { stage.look = stage.look === 'flipbook' ? 'smooth' : 'flipbook'; b.setAttribute('aria-pressed', stage.look === 'flipbook'); flipSet(); }, false);
   // two things Chris is choosing between by eye (13 Nov): the head's depth-only reshaping, and a larger head
   chip(toggleRow, 'Half speed', (b) => { slow = !slow; b.setAttribute('aria-pressed', slow); }, false);
 
