@@ -1,0 +1,20 @@
+<!DOCTYPE html><html><body style="margin:0;background:#222"><canvas id="c" style="width:600px;height:800px"></canvas>
+<script src="three.js"></script><script src="meshopt.js"></script><script src="palette.js"></script><script src="io_tex.js"></script>
+<script>document.write('<script src="'+(new URLSearchParams(location.search).get('m')||'io_lod')+'.js"><\/script>')</script>
+<script src="stage_lod.js"></script><script src="lod_io.js"></script>
+<script>
+window.setup = async function(opts){
+  const stage = window.stage = makeStage(document.getElementById('c'), {shadow:2048, preserve:true});
+  stage.resize(600,800,1); if ('square' in stage) stage.square=false; stage.glow=false;
+  await MeshoptSimplifier.ready;
+  const t0=performance.now();
+  if (typeof opts==='function') opts = opts(JSON.parse(JSON.stringify(WITCH_LOD.LEVELS)));
+  const J = window.J = (opts && opts.opts) ? WITCH_LOD.raw(opts) : Array.isArray(opts) ? WITCH_LOD.raw(opts[0], opts[1]) : (typeof opts==='string') ? WITCH_LOD.raw(opts) : makeIo(opts);
+  stage.scene.add(J.root); window.T=0; J.pose({arm:15,leg:0});
+  const parts={}; let tr=0; for (const k in J.meshes){ const n=J.meshes[k].geometry.index.count/3; parts[k]=n; if(!/Over$/.test(k)) tr+=n; }
+  return {tris:tr, own:J.triangles, draws:Object.keys(J.meshes).length, bones:J.bones.length, build:Math.round(performance.now()-t0), parts};
+};
+window.adv = function(n, dt){ dt=dt||1/60; for(let i=0;i<n;i++){ T+=dt; J.animate(dt);} };
+window.time = function(n){ const a=performance.now(); adv(n); return +((performance.now()-a)/n).toFixed(3); };
+window.view = function(az, el, dist, ty, tx){ const ob=stage.orbit; ob.fov=20; ob.az=az; ob.el=el; ob.dist=dist; ob.target.set(tx||0, ty==null?0.88:ty, 0); stage.renderer.info.autoReset=false; stage.renderer.info.reset(); stage.render(); const i=stage.renderer.info.render; return {calls:i.calls, tris:i.triangles}; };
+</script></body></html>
