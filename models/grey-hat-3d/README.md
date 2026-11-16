@@ -10,6 +10,13 @@ something or just talks to them", and he gets his own folder because he is a cha
   Project docs `claude/HOW-TO-3d-witch-models.md` and `claude/HOW-TO-3d-witch-faces.md`. Read both before writing any code.
 - Project note for this folder: `claude/grey-hat-3d-reference-prompts.md`.
 
+## His light version at the fair folk's size (November 16, 2026)
+
+Chris: "Can you make A level of detail model of the gray hat Captain and only matching the model size that the other NPCs are".
+Built on the fair folk's kit in `npc/` (start with `npc/README.md`): 2,781 triangles at the game's quarter weight (the fair folk:
+2.5 to 2.9 thousand), 5,608 at half, 10,775 at full. Painted from this model, drawn flat-on in the kit's frame. Game code:
+`await MF_NPC.make('grey-hat-captain')` after loading `npc/greyhat_npc.js`. Page: https://claude.ai/artifact/JLyeUSnZWjme7DPzWpdwVQ
+
 ## Stage 7, second half: going to a point, running, sitting, and the game-code calls (November 14, 2026)
 
 Chris asked for "all of the animations that the NPCs have". The first half (face, talking loops, emotes, fidgets) was built by an
