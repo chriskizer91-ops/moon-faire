@@ -358,3 +358,32 @@ Chris asked for every witch's own page to have the finer look the "how light can
 - The look still starts off.
 - The change was made by `light-levels/tools/finer_look.py` on branch `claude/moon-faire-light-levels`, which works on these sources and on a finished page alike.
 - Checked in stills at phone size: look off is the same picture as before, the old look matches Pixel size at chunky, the sliders show and hide with the switch, no errors. Not checked: on a real phone or laptop.
+
+## The purple glow of her first animation (November 18)
+
+Chris looked again at *A Fool's Mercy in 3D* (`scenes/jester-square-3d/`, October), the first time she was animated, and asked
+for its purple glow on the 3D model's moves: a copy of her full demo, with every move and spell, and no new lore.
+
+Published as its own page, "Jester Witch Purple Glow": https://claude.ai/artifact/PBMhLL3ExxXbTPgvUbnp3T
+
+- **What the glow is in the October film.** Her painted frames bloom magenta and violet while she casts (`glow_map` in
+  `tools/build_scene.py` picks out that light, and `drawJesterGlow` in `scenes/lib/jester.js` lays it on additively), with a pool of
+  violet light on the ground round her. Colours: violet 190,110,255 and magenta 235,110,215 (`scenes/lib/fx.js`).
+- **`viewer/purple.js`.** An add-on to the night square page. It wraps `J.animate`, so the model (`src/`) and `viewer/app.js` are
+  not changed, and the night square and game moves pages build exactly as before. It adds:
+  - a patch on each of her standard materials (28): violet light falling on her cloth, a glow round her edges, a stronger light round
+    whichever hand is out, and a white-pink heart at her pendant. Each patched material keeps its own program key, so the face's and the
+    sheen's patches still run. Strong light is softened so it stays violet instead of burning white.
+  - the glow in her hands, a magenta haze behind her (pushed away from the camera so her body hides its middle), a violet pool on the
+    ground, one violet lamp with her and one in the square, and sparks (one `THREE.Points`) from her hands and off her body.
+  - how strongly: 0.2 standing, 0.3 in a body move, and through a spell it gathers from the start to the first blow, flares on each blow
+    (`J.state.hitN`) and ebbs as she recovers. A move counts as a spell when it has a blow in it (not the jump). The numbers are `LOOK`
+    at the top of the file.
+  - a **Purple glow** switch at the head of the Switches row and a **Strength** slider (0 to 200%). `?purple=0` opens it off,
+    `?purpleK=150` at another strength.
+- **Building.** `./build_purple.sh` makes `out/purple/` (the night square template with a new title, a note and `purple.js` after
+  `app.js`); `python3 build_single.py purple` makes `deliver/Jester_Witch_3D_purple_glow.html` (5.1 MB), published from
+  `dist/jester-purple-glow.html`. Republish to the link above after a rebuild.
+- Checked: stills of eight spells at their blows before and after, standing with the glow on and off, a dance, the Flipbook look and
+  the little theatre; the single file run on its own clock with buttons pressed, with no errors. Not checked: at real speed, or on a
+  real phone (the extra lamp and the sparks are the new cost there).
