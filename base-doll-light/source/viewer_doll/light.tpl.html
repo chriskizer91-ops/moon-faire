@@ -1,0 +1,182 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Moon Faire: the base doll light</title>
+<style>
+:root{--velvet:#15121c;--curtain:#211b2b;--stage:#383043;--blue:#d0567c;--blued:#7a2443;--silver:#f0dfc0;--teal:#49c9bc;--gold:#d9ad55;--ink:#f0ebf5;--muted:#a99db9;--line:#3a3049;
+  --serif:"Iowan Old Style","Palatino Linotype",Palatino,Georgia,serif;--body:system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;--mono:ui-monospace,Menlo,Consolas,monospace;color-scheme:dark}
+*,*::before,*::after{box-sizing:border-box}
+html,body{margin:0;background:var(--velvet);color:var(--ink)}
+body{font:15px/1.5 var(--body);padding:14px 14px 40px}
+.wrap{max-width:900px;margin:0 auto;display:flex;flex-direction:column;gap:14px}
+h1{font:400 clamp(36px,10vw,58px)/.95 var(--serif);margin:0;color:var(--silver)}
+h1 em{font-style:italic;color:var(--blue)}
+.eyebrow{font:600 11px var(--mono);letter-spacing:.16em;text-transform:uppercase;color:var(--gold);margin:0 0 4px}
+.sub{color:var(--muted);font-size:14.5px;margin:6px 0 0;max-width:62ch}
+.play{display:flex;flex-direction:column;gap:14px}
+.stagebox{position:sticky;top:0;z-index:5;background:var(--stage);border:1px solid var(--line);border-radius:8px;overflow:hidden;width:100%;height:min(66vh,128vw);min-height:340px;touch-action:none}
+canvas#stage{display:block;width:100%;height:100%;touch-action:none;cursor:grab}
+.hud{position:absolute;left:10px;top:8px;font:12px var(--mono);color:var(--muted);background:rgba(21,18,28,.72);padding:2px 8px;border-radius:4px;pointer-events:none}
+#ref{position:absolute;right:8px;top:8px;width:min(25%,190px);border:1px solid var(--gold);border-radius:4px;background:#3b2f43;box-shadow:0 4px 18px rgba(0,0,0,.45);pointer-events:none}
+#ref[hidden]{display:none}
+.reftag{position:absolute;right:14px;top:12px;font:600 10px var(--mono);letter-spacing:.1em;text-transform:uppercase;color:var(--gold);text-shadow:0 1px 2px #000;pointer-events:none}
+#ref[hidden]+.reftag{display:none}
+.err{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;padding:24px;text-align:center;background:var(--stage)}
+.err[hidden]{display:none}
+.label{font:600 11px var(--mono);letter-spacing:.12em;text-transform:uppercase;color:var(--muted);margin:0 0 6px}
+.chips{display:flex;flex-wrap:wrap;gap:8px}
+.chip{font:600 14px var(--body);color:var(--ink);background:var(--curtain);border:1px solid var(--line);border-radius:999px;padding:9px 15px;min-height:42px;cursor:pointer}
+.chip:focus-visible{outline:2px solid var(--teal);outline-offset:2px}
+.chip[aria-pressed="true"]{background:var(--blued);border-color:var(--silver);color:#fff}
+.notes{background:var(--curtain);border:1px solid var(--line);border-radius:8px;padding:12px 14px}
+.notes h2{font:600 15px var(--body);margin:0 0 6px;color:var(--silver)}
+.notes ul{margin:0;padding-left:18px;display:grid;gap:5px;color:var(--ink)}
+.notes li::marker{color:var(--blue)}
+.notes .m{color:var(--muted)}
+.sw{width:42px;height:42px;min-height:42px;padding:0;border-radius:50%;border:2px solid var(--line)}
+.sw[aria-pressed="true"]{border-color:var(--silver);box-shadow:0 0 0 2px var(--blued)}
+.pair{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+.slide{display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin-top:8px;font-size:14px;color:var(--muted)}
+.slide input[type=range]{flex:1 1 180px;min-width:160px;accent-color:var(--gold, #d9b24c);height:32px}
+.slide output{min-width:5.5em;color:var(--silver);font-variant-numeric:tabular-nums}
+@media (max-width:560px){.pair{grid-template-columns:1fr}}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <p class="eyebrow">Moon Faire · the base doll · light models</p>
+    <h1>The <em>doll</em>, light</h1>
+    <p class="sub">Only the light models: every outfit as one ~50,000-triangle model of her, its look baked from the full outfit, with her live face. Drag to turn her, pinch to zoom.</p>
+  </header>
+  <div class="play">
+  <div class="stagebox" id="box">
+    <canvas id="stage"></canvas>
+    <div class="hud" id="hud">loading</div>
+    <div class="err" id="err" hidden></div>
+  </div>
+  <div><p class="label">Outfit</p><div class="chips" id="outfits"></div></div>
+  <div><p class="label">Moves</p><div class="chips" id="moves"></div></div>
+  <div><p class="label">View</p><div class="chips" id="views"></div></div>
+  <div><p class="label">Her face</p><div class="chips" id="feels"></div></div>
+  <div><p class="label">Show</p><div class="chips" id="shows"></div>
+    <div id="flipCtl" hidden>
+      <label class="slide"><span>Pixel size: chunky</span><input type="range" id="pix" min="0" max="100" step="1" value="77" aria-label="Pixel size, from chunky to fine"><span>fine</span><output id="pixout"></output></label>
+      <label class="slide"><span>Colours: smooth</span><input type="range" id="snap" min="0" max="100" step="5" value="100" aria-label="Colours, from smooth to the flipbook's own"><span>flipbook</span><output id="snapout"></output></label>
+    </div></div>
+  </div>
+  <div class="notes">
+    <h2>What this page is</h2>
+    <ul>
+      <li>Only the light models. Each outfit is one model of about 50,000 triangles (the full outfits are 450,000 to 560,000): her body, the clothes and the bun as one mesh, with the paintings, shine and sheen baked into its pictures.</li>
+      <li>Her face is its own small live mesh, so she still blinks, talks and shows her feelings. Every move works, and skirts, capes and sleeves still swing.</li>
+      <li>The fae's wings, the bard's feather and the masquerade mask stay real see-through pieces (they count inside the 50,000).</li>
+      <li>Each outfit downloads only its light model (about 3 MB) and the small file of how it moves, the first time you pick it. The full outfits' paintings are never loaded and the full clothes are never drawn.</li>
+    </ul>
+    <h2 style="margin-top:12px">What is different from the full doll</h2>
+    <ul class="m">
+      <li>The look is baked, so it does not change with the light the way the full model's does: velvet sheen and shine are close copies, not live.</li>
+      <li>She always wears the bun, and there is no bra-and-shorts look here (that has no light model).</li>
+    </ul>
+  </div>
+</div>
+</div>
+<script>/*THREE*/</script>
+<script>/*PAL*/</script>
+<script>/*STAGE*/</script>
+<script>/*TEX*/</script>
+<script>/*MODEL*/</script>
+<script>/*LIGHT*/</script>
+<script>
+(function () {
+  'use strict';
+  const $ = (id) => document.getElementById(id), canvas = $('stage'), box = $('box');
+  let stage, R;
+  try {
+    // the Flipbook look's colours: the 56 every witch shares, and eight of the doll's own skin tones (so bare skin is not one flat colour). 64 is the most it holds.
+    const SKIN8 = [[115, 62, 46], [139, 80, 60], [166, 95, 69], [184, 109, 81], [200, 121, 90], [216, 133, 99], [233, 145, 108], [248, 160, 125]];
+    stage = makeStage(canvas, { shadow: 2048, palette: (window.JESTER_PALETTE || []).concat(SKIN8) });
+    if ('square' in stage) stage.square = false;
+    if ('glow' in stage) stage.glow = false;
+    R = makeIo({ doll: true });
+    stage.scene.add(R.root);
+  } catch (e) { $('err').hidden = false; $('err').textContent = 'She could not be drawn on this device: ' + (e && e.message ? e.message : e); return; }
+  const orbit = stage.orbit; orbit.az = 0.35; orbit.el = 0.08; orbit.dist = 6.3; orbit.fov = 20; orbit.target.set(0, 0.90, 0);
+  let want = { az: orbit.az, el: orbit.el, dist: orbit.dist, ty: 0.90 }, easing = true, spin = false;
+  const VIEWS = [['Front', 0, 0.05, 6.3, 0.90], ['Three-quarter', 0.7, 0.08, 6.3, 0.90], ['Side', -Math.PI / 2, 0.05, 6.3, 0.90], ['Back', Math.PI, 0.05, 6.3, 0.90],
+    ['Face', 0, 0, 1.9, 1.47], ['Face, turned', -0.75, 0, 1.9, 1.47], ['Top of her head', 0.4, 0.95, 2.0, 1.52], ['Body', 0.35, 0.05, 3.4, 1.05], ['Feet', 0.5, 0.35, 1.7, 0.08]];
+  function chips(host, items, onPick, first, cls) {
+    items.forEach((it, i) => { const b = document.createElement('button'); b.className = 'chip' + (cls ? ' ' + cls : ''); b.type = 'button'; if (cls) { b.style.background = it[1]; b.setAttribute('aria-label', it[0]); b.title = it[0]; } else b.textContent = it[0]; b.setAttribute('aria-pressed', i === first ? 'true' : 'false');
+      b.addEventListener('click', () => { [...host.children].forEach((c) => c.setAttribute('aria-pressed', 'false')); b.setAttribute('aria-pressed', 'true'); onPick(it); }); host.appendChild(b); });
+  }
+  chips($('views'), VIEWS, (v) => { want = { az: v[1], el: v[2], dist: v[3], ty: v[4] }; easing = true; spin = false; $('spinB').setAttribute('aria-pressed', 'false'); }, -1);
+  // her moves: 'pose' holds her still; the short ones end by themselves and she goes back to standing
+  const MOVES = [['Stand still', 'pose'], ['Standing', 'idle'], ['Walk', 'walk'], ['Jog', 'jog'], ['Talk', 'talk'], ['Wave', 'wave'], ['Curtsey', 'curtsey'], ['Twirl', 'twirl'], ['Look round', 'look'], ['Squat', 'squat'], ['Kneel', 'kneel'], ['Hover', 'hover']];
+  const press = (host, i) => [...host.children].forEach((c, j) => c.setAttribute('aria-pressed', j === i ? 'true' : 'false'));
+  let shown = 'idle';
+  chips($('moves'), MOVES, (m) => { if (m[1] === 'pose') { R.pose({ arm: 15, leg: 0 }); shown = 'pose'; } else shown = R.play(m[1]); }, 1);
+  const FEELS = [['Blinking', null], ['Talking', 'talk'], ['Surprised', 'surprised'], ['Stern', 'stern'], ['Delighted', 'delighted'], ['Hit', 'hit'], ['Concentrating', 'casting']];
+  chips($('feels'), FEELS, (f) => { R.talk(f[1] === 'talk'); R.setFeel(f[1] === 'talk' ? null : f[1]); }, 0);
+  R.pose({ arm: 15, leg: 0 }); R.play('idle');
+  const toggle = (host, id, label, on, fn) => { const b = document.createElement('button'); b.className = 'chip'; b.type = 'button'; b.id = id; b.textContent = label; b.setAttribute('aria-pressed', on ? 'true' : 'false');
+    b.addEventListener('click', () => { const v = b.getAttribute('aria-pressed') !== 'true'; b.setAttribute('aria-pressed', v ? 'true' : 'false'); fn(v); }); host.appendChild(b); };
+  toggle($('shows'), 'spinB', 'Turn slowly', false, (v) => { spin = v; easing = false; });
+  // the Flipbook look, with how fine its pixels are (4.75 mm of her to a pixel, as the flipbook was, down to 0.8 mm) and how far its colours go
+  const flipSet = () => { const v = +$('pix').value, mm = 4.75 * Math.pow(0.8 / 4.75, v / 100); stage.pixelWhole = v === 0; stage.mmPerPixel = mm; stage.snap = +$('snap').value / 100;
+    $('pixout').textContent = mm.toFixed(mm < 2 ? 2 : 1) + ' mm'; $('snapout').textContent = $('snap').value + '%'; };
+  $('pix').addEventListener('input', flipSet); $('snap').addEventListener('input', flipSet); flipSet();
+  toggle($('shows'), 'flipB', 'Flipbook look', false, (v) => { stage.look = v ? 'flipbook' : 'smooth'; $('flipCtl').hidden = !v; flipSet(); });
+  // the light models only: an outfit's own module (how it moves: heels, the skirt kept off her legs, the wings' flutter) is put on without
+  // its paintings and without drawing it, and its ~50,000-triangle light model (wardrobe_light/<code>_light.js) is shown in its place
+  const OUTFITS = /*OUTFITS*/[], KEEPTEX = /*KEEPTEX*/[];          // [name, code]; the outfits whose kept see-through pieces need their paintings
+  const EXACT = /*EXACT*/{};                                       // the outfits whose hooks read their boots: those are made exact, not coarse
+  const scriptP = {};
+  const script = (f) => scriptP[f] || (scriptP[f] = new Promise((ok, bad) => { const s = document.createElement('script'); s.src = f + '.js'; s.onload = ok;
+    s.onerror = () => { delete scriptP[f]; bad(new Error('could not load ' + f)); }; document.head.appendChild(s); }));
+  let dressing = Promise.resolve(), lightCode = null, lightTris = 0, first = true;
+  R.root.visible = false;                                          // nothing is drawn until her first light model is in
+  const hudSay = () => { $('hud').textContent = lightCode ? (OUTFITS.find((o) => o[1] === lightCode) || [lightCode])[0] + ' · ' + lightTris.toLocaleString() + ' triangles' : 'loading her light model…'; };
+  const again = () => { if (shown === 'pose') R.pose({ arm: 15, leg: 0 }); else R.play(shown); };
+  const dress = (code) => { dressing = dressing.then(async () => {
+      if (!first) $('hud').textContent = 'loading her light model…';
+      try {
+        await Promise.all([script('wardrobe_light/' + code + '_light'), script('wardrobe/hair_bun'), (KEEPTEX.includes(code) ? script('wardrobe/' + code + '_tex') : Promise.resolve()).then(() => script('wardrobe/' + code))]);
+        await window.DOLLLIGHT_PREP(R, code);                       // its pictures decoded before it is shown
+        // all at once, between two frames: the old light model off, the outfit's module on (not drawn), the new light model shown
+        if (lightCode) { window.DOLLLIGHT_DROP(R, lightCode); lightCode = null; }
+        R.wardrobe.wear(code, false, { light: true, keep: window.DOLLLIGHT[code].keep || [], exact: EXACT[code] });
+        const r = window.DOLLLIGHT_USE(R, code, true); lightCode = code; lightTris = r ? r.tris : 0;
+        R.root.visible = true; first = false;
+      } catch (e) { $('err').hidden = false; $('err').textContent = 'That light model could not be loaded: ' + (e && e.message ? e.message : e); }
+      again(); hudSay(); }); };
+  const START = Math.max(0, OUTFITS.findIndex((o) => o[1] === 'D1'));
+  chips($('outfits'), OUTFITS, (o) => dress(o[1]), START);
+  // drag to turn, pinch or wheel to zoom
+  const pts = new Map(); let pinch0 = 0, dist0 = 0;
+  canvas.addEventListener('pointerdown', (e) => { canvas.setPointerCapture(e.pointerId); pts.set(e.pointerId, [e.clientX, e.clientY]); easing = false; if (pts.size === 2) { const a = [...pts.values()]; pinch0 = Math.hypot(a[0][0] - a[1][0], a[0][1] - a[1][1]); dist0 = orbit.dist; } });
+  canvas.addEventListener('pointermove', (e) => { const p = pts.get(e.pointerId); if (!p) return; const dx = e.clientX - p[0], dy = e.clientY - p[1]; pts.set(e.pointerId, [e.clientX, e.clientY]);
+    if (pts.size === 1) { orbit.az -= dx * 0.008; orbit.el = Math.max(-0.3, Math.min(1.3, orbit.el + dy * 0.006)); }
+    else if (pts.size === 2 && pinch0 > 0) { const a = [...pts.values()], d = Math.hypot(a[0][0] - a[1][0], a[0][1] - a[1][1]); orbit.dist = Math.max(1.0, Math.min(9, dist0 * pinch0 / d)); orbit.target.y = Math.max(0.05, Math.min(1.7, orbit.target.y + dy * 0.0012)); } });
+  const up = (e) => { pts.delete(e.pointerId); pinch0 = 0; };
+  canvas.addEventListener('pointerup', up); canvas.addEventListener('pointercancel', up);
+  canvas.addEventListener('wheel', (e) => { e.preventDefault(); easing = false; orbit.dist = Math.max(1.0, Math.min(9, orbit.dist * Math.exp(e.deltaY * 0.001))); }, { passive: false });
+  let sized = '';
+  function fit() { const w = box.clientWidth, h = box.clientHeight, pr = Math.min(window.devicePixelRatio || 1, 2), k = w + 'x' + h + 'x' + pr; if (k !== sized && w > 0 && h > 0) { sized = k; stage.resize(w, h, pr); } }
+  let last = 0;
+  function frame(now) {
+    requestAnimationFrame(frame); const dt = Math.min(0.05, (now - last) / 1000 || 0.016); last = now; fit();
+    R.animate(dt);
+    if (R.move !== shown) { shown = R.move; press($('moves'), MOVES.findIndex((m) => m[1] === shown)); }       // a short move has ended
+    if (spin) orbit.az += dt * 0.5;
+    if (easing) { let d = want.az - orbit.az; d = Math.atan2(Math.sin(d), Math.cos(d)); const k = Math.min(1, dt * 5); orbit.az += d * k; orbit.el += (want.el - orbit.el) * k; orbit.dist += (want.dist - orbit.dist) * k; orbit.target.y += (want.ty - orbit.target.y) * k; orbit.target.z += (0 - orbit.target.z) * k; }
+    stage.render();
+  }
+  hudSay(); dress(OUTFITS[START][1]);
+  window.DOLLPAGE = { stage, R, step() { fit(); stage.render(); } };
+  requestAnimationFrame(frame);
+})();
+</script>
+</body>
+</html>

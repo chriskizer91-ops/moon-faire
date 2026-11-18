@@ -31,3 +31,10 @@ Nothing in the game loads this folder yet.
 ## Made from
 
 The workspace of the session that made it (not in this repo): the doll and its 21 outfits, the light-model tools (`tools/lightbake/`: simplify to 50,000 triangles, unwrap, bake the pictures, compare with the full model), `build_doll_light_site.py` and `build_doll_light_single.py`.
+
+## The rest of this folder (added November 18)
+
+- `doll-full-site/`: the full doll page, the same page as https://claude.ai/artifact/TvHFXuVgnHo8e6kkTGcWNC. Open `doll-full-site/index.html` from a local web server (it fetches its outfit files). It is a later build of that page than the link: it also has the light-only setup the light page uses, which the full page does not use.
+- `source/`: what the pages are built from: the doll and Io's model code (`src/`), the 21 outfits and the bun (`wardrobe/`, with `HOWTO.md`), the light-model loader, the page templates (`viewer_doll/`), the build scripts, the light-model tools (`tools/lightbake/`, with its README) and the session's test scripts (`work-scripts/`). The 21 light models themselves are in `doll-full-site/wardrobe_light/`. The scripts still carry the session's paths (`/home/claude/io`, `/home/claude/work`).
+- `prompt-pages/`: the two prompt pages Chris used to paint the doll's references and the outfits in ChatGPT, with their build scripts.
+- Not here: Chris's own paintings (the doll references and the outfit pictures). Their prepared copies are inside `source/wardrobe/*_tex.js`.
