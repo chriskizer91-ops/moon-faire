@@ -1,0 +1,147 @@
+{
+ "full": {
+  "weight": {
+   "drop": [
+    "torso",
+    "legs",
+    "sleeve"
+   ],
+   "rest": 1
+  },
+  "triangles": 10775,
+  "parts": {
+   "forearm": 230,
+   "boots": 1754,
+   "soles": 650,
+   "hands": 1829,
+   "head": 2192,
+   "shirt": 560,
+   "trousers": 808,
+   "boot": 288,
+   "sleeves": 400,
+   "lace": 176,
+   "glove": 192,
+   "cuff": 56,
+   "belt": 56,
+   "pouch": 192,
+   "scroll": 60,
+   "hair": 432,
+   "brim": 120,
+   "hat": 360,
+   "beard": 140,
+   "glasses": 280
+  }
+ },
+ "half": {
+  "weight": {
+   "drop": [
+    "torso",
+    "legs",
+    "sleeve"
+   ],
+   "keep": {
+    "head": 0.85,
+    "hands": 0.4,
+    "boots": 0.24,
+    "soles": 0.1,
+    "forearm": 0.7,
+    "hat": 0.95,
+    "brim": 0.9,
+    "glasses": 1.0,
+    "hair": 0.9,
+    "beard": 0.9,
+    "shirt": 0.8,
+    "trousers": 0.75,
+    "sleeves": 0.75,
+    "lace": 0.6,
+    "boot": 0.7,
+    "glove": 0.7,
+    "cuff": 0.7,
+    "belt": 0.9,
+    "pouch": 0.5,
+    "scroll": 0.8
+   },
+   "rest": 0.6,
+   "scale": 0.866
+  },
+  "triangles": 5608,
+  "parts": {
+   "forearm": 138,
+   "boots": 348,
+   "soles": 56,
+   "hands": 633,
+   "head": 1612,
+   "shirt": 387,
+   "trousers": 524,
+   "boot": 174,
+   "sleeves": 258,
+   "lace": 90,
+   "glove": 115,
+   "cuff": 33,
+   "belt": 43,
+   "pouch": 83,
+   "scroll": 40,
+   "hair": 336,
+   "brim": 92,
+   "hat": 296,
+   "beard": 108,
+   "glasses": 242
+  }
+ },
+ "quarter": {
+  "weight": {
+   "drop": [
+    "torso",
+    "legs",
+    "sleeve"
+   ],
+   "keep": {
+    "head": 0.52,
+    "hands": 0.2,
+    "boots": 0.12,
+    "soles": 0.05,
+    "forearm": 0.45,
+    "hat": 0.75,
+    "brim": 0.6,
+    "glasses": 0.8,
+    "hair": 0.6,
+    "beard": 0.6,
+    "shirt": 0.45,
+    "trousers": 0.42,
+    "sleeves": 0.42,
+    "lace": 0.35,
+    "boot": 0.4,
+    "glove": 0.45,
+    "cuff": 0.5,
+    "belt": 0.8,
+    "pouch": 0.3,
+    "scroll": 0.6
+   },
+   "rest": 0.35,
+   "scale": 0.7099
+  },
+  "triangles": 2781,
+  "parts": {
+   "forearm": 72,
+   "boots": 149,
+   "soles": 22,
+   "hands": 258,
+   "head": 808,
+   "shirt": 177,
+   "trousers": 239,
+   "boot": 81,
+   "sleeves": 119,
+   "lace": 43,
+   "glove": 60,
+   "cuff": 19,
+   "belt": 31,
+   "pouch": 38,
+   "scroll": 24,
+   "hair": 184,
+   "brim": 51,
+   "hat": 190,
+   "beard": 58,
+   "glasses": 158
+  }
+ }
+}

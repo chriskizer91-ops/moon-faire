@@ -1,0 +1,23 @@
+<!doctype html><html><head><meta charset="utf-8"><style>html,body{margin:0;background:#383043}canvas{display:block}</style></head><body>
+<canvas id="c" width="700" height="900"></canvas>
+<script src="node_modules/three/build/three.min.js"></script>
+<script src="out/palette.js"></script>
+<script src="viewer/stage.js"></script>
+<script src="out/noiz_tex.js"></script>
+<script src="out/noiz.js"></script>
+<script>
+window.T = {}; var T = window.T;
+try {
+  T.stage = makeStage(document.getElementById('c'), { preserve: true, shadow: 2048 });
+  if ('square' in T.stage) T.stage.square = false; if ('glow' in T.stage) T.stage.glow = false;
+  const t0 = performance.now();
+  const QS = new URLSearchParams(location.search), OPTS = QS.get('o') ? JSON.parse(QS.get('o')) : {};
+  T.j = makeNoiz(OPTS);
+  T.buildMs = performance.now() - t0;
+  T.stage.scene.add(T.j.root); T.stage.scene.add(T.j.fx);
+  T.step = (n, dt) => { for (let i = 0; i < n; i++) T.j.animate(dt); };
+  T.view = (az, el, dist, ty, fov, w, h, tx, tz) => { const o = T.stage.orbit; o.az = az; o.el = el; o.dist = dist; o.target.y = ty; o.target.x = tx || 0; o.target.z = tz || 0; if (fov) o.fov = fov; T.stage.resize(w || 700, h || 900, 1); T.stage.render(); return T.stage.renderer.info.render.triangles; };
+  T.clean = (mode) => { const s = T.stage; s.noFloor = true; s.floor.visible = false; s.shadowCatcher.visible = false; s.bg = new THREE.Color(mode === 'mask' ? 0x00ff00 : 0x383043); T.j.fx.visible = mode !== 'mask' && mode !== 'nodust'; };
+  T.ok = true;
+} catch (e) { T.err = String(e.stack || e); console.error(T.err); }
+</script></body></html>

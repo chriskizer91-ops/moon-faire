@@ -1,0 +1,268 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>The Grey Hat 3D</title>
+<style>
+:root{
+  /* layout: one column: title, the stage, rows of round buttons, then plain notes. One visual world on purpose: the plum studio his paintings are made in. */
+  --velvet:#15121c;--curtain:#211b2b;--stage:#383043;--red:#c5453d;--redd:#8f2b27;--gold:#dcb565;--linen:#f2eadd;--ink:#f0ebf5;--muted:#a99db9;--line:#3a3049;
+  --serif:"Iowan Old Style","Palatino Linotype",Palatino,Georgia,serif;--body:system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;--mono:ui-monospace,Menlo,Consolas,monospace;color-scheme:dark}
+*,*::before,*::after{box-sizing:border-box}
+html,body{margin:0;background:var(--velvet);color:var(--ink)}
+body{font:15px/1.5 var(--body);padding:14px 16px 40px}
+.wrap{max-width:900px;margin:0 auto;display:flex;flex-direction:column;gap:14px}
+h1{font:400 clamp(36px,10vw,58px)/.95 var(--serif);margin:0;color:var(--linen);text-wrap:balance}
+h1 em{font-style:italic;color:var(--gold)}
+.eyebrow{font:600 11px var(--mono);letter-spacing:.16em;text-transform:uppercase;color:var(--gold);margin:0 0 4px}
+.sub{color:var(--muted);font-size:14.5px;margin:6px 0 0;max-width:62ch}
+.stagebox{position:relative;background:var(--stage);border:1px solid var(--line);border-radius:8px;overflow:hidden;width:100%;height:min(74vh,128vw);min-height:340px;touch-action:none}
+canvas#stage{display:block;width:100%;height:100%;touch-action:none;cursor:grab}
+.hud{position:absolute;left:10px;top:8px;font:12px var(--mono);color:var(--muted);background:rgba(21,18,28,.72);padding:2px 8px;border-radius:4px;pointer-events:none}
+#ref{position:absolute;right:8px;top:8px;width:min(25%,190px);border:1px solid var(--gold);border-radius:4px;background:#3b2f43;box-shadow:0 4px 18px rgba(0,0,0,.45);pointer-events:none}
+#ref[hidden]{display:none}
+.reftag{position:absolute;right:14px;top:12px;font:600 10px var(--mono);letter-spacing:.1em;text-transform:uppercase;color:var(--gold);text-shadow:0 1px 2px #000;pointer-events:none}
+#ref[hidden]+.reftag{display:none}
+.err{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;padding:24px;text-align:center;background:var(--stage)}
+.err[hidden]{display:none}
+.label{font:600 11px var(--mono);letter-spacing:.12em;text-transform:uppercase;color:var(--muted);margin:0 0 6px}
+.chips{display:flex;flex-wrap:wrap;gap:8px}
+.chip{font:600 14px var(--body);color:var(--ink);background:var(--curtain);border:1px solid var(--line);border-radius:999px;padding:9px 15px;min-height:42px;cursor:pointer}
+.chip:focus-visible{outline:2px solid var(--gold);outline-offset:2px}
+.chip[aria-pressed="true"]{background:var(--redd);border-color:var(--gold);color:#fff}
+.notes{background:var(--curtain);border:1px solid var(--line);border-radius:8px;padding:12px 14px;display:flex;flex-direction:column;gap:12px}
+.notes h2{font:600 15px var(--body);margin:0 0 6px;color:var(--linen)}
+.notes ul{margin:0;padding-left:18px;display:grid;gap:5px;color:var(--ink)}
+.notes li::marker{color:var(--red)}
+.notes .m{color:var(--muted)}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <p class="eyebrow">Moon Faire · the man they meet · first build</p>
+    <h1>Noiz, <em>the Grey Hat</em></h1>
+    <p class="sub">Where he stands right now, part-way through his first build. Drag to turn him, pinch or scroll to zoom. New: he blinks and talks, and he has the fair folk's fourteen emotes. Press a button under "Talk" or "Emotes".</p>
+  </header>
+  <div class="stagebox" id="box">
+    <canvas id="stage"></canvas>
+    <div class="hud" id="hud">loading</div>
+    <img id="ref" alt="The painting for this view" hidden><span class="reftag">Painting</span>
+    <div class="err" id="err" hidden></div>
+  </div>
+  <div><p class="label">Look at</p><div class="chips" id="views"></div></div>
+  <div><p class="label">Movement</p><div class="chips" id="moves"></div></div>
+  <div><p class="label">Talk</p><div class="chips" id="talks"></div></div>
+  <div><p class="label">Emotes</p><div class="chips" id="emotes"></div></div>
+  <div><p class="label">Go and sit</p><div class="chips" id="goes"></div></div>
+  <div><p class="label">Arms, in the A-pose</p><div class="chips" id="poses"></div></div>
+  <div><p class="label">Show</p><div class="chips" id="shows"></div></div>
+  <div class="notes">
+    <div>
+      <h2>New: everything the fair folk can do</h2>
+      <ul>
+        <li>You asked for all of the animations the fair folk have. They are all here now, made his own.</li>
+        <li><b>Go and sit</b> is the new row. <b>Walk over</b> and <b>Run over</b> send him round a small loop and back, and he turns to face you. <b>Sit</b> puts a stool behind him and sits him down; <b>Stand</b> gets him up. <b>Face me</b> turns him to where you are looking from.</li>
+        <li><b>His feet do not slide.</b> When he goes somewhere he is moved by the foot he is standing on, so starting, stopping and turning are real steps. He shortens his last strides so that he arrives with his feet together.</li>
+        <li><b>His run</b> is a heavy-booted jog, a little over twice his walking speed, with both feet off the ground twice in each stride.</li>
+        <li><b>Seated,</b> his hands rest on his thighs, and Talk and every emote still work.</li>
+        <li><b>His face moves.</b> He blinks on his own, and his eyes and mouth change using your painting of his six faces. His face at rest is exactly as before.</li>
+        <li><b>Talk:</b> <b>Calm</b>, <b>Lively</b> or <b>Gruff</b>, until you press <b>Quiet</b>. Gruff is his own: left hand on his belt, chin down, a short chop of the right hand.</li>
+        <li><b>Emotes:</b> each plays once and he goes back to what he was doing. His bow is a showman's bow: right arm across his waist, left hand sweeping out low.</li>
+        <li><b>On his own</b> (in "Idle") he now and then shifts his weight, looks about, or rubs his hands.</li>
+        <li><b>Rough for now:</b> when he turns on the spot he swivels without stepping. He can stop up to a hand's width short of the spot he was sent to. The smile is small, because the painting's smile is small. He does not touch his hat in the bow: his elbow came through his sleeve when he did.</li>
+        <li><b>I cannot watch him move from here,</b> only look at stills. Tell me which moves feel too fast, too slow, too big or too small.</li>
+      </ul>
+    </div>
+    <div>
+      <h2>Before that: his hat, belt, pouch, scroll and jewellery</h2>
+      <ul class="m">
+        <li>Grey felt hat with a drooping brim, pearls and a feather earring, and a belt with a steel ring, pouch, scroll, charms and dagger that swing as he walks. "Hat" and "Belt" under the views look closely.</li>
+      </ul>
+    </div>
+    <div>
+      <h2>Before that: he stands and walks like a man</h2>
+      <ul class="m">
+        <li>He stands with his weight on his right leg and his arms by his sides. In "Walk" his heel lands first, the foot rolls and the toe pushes off. In "Talk" he gestures with both hands.</li>
+        <li>Rough: he walks on the spot, and the boots are still the old painted leather.</li>
+      </ul>
+    </div>
+    <div>
+      <h2>Before that: his hair is hair, over real ears</h2>
+      <ul class="m">
+        <li>His hair is built from about 130 wavy locks over a thin cap, with real ears and glasses that rest on them. It moves when he walks or nods. "Old hair" puts the old shell back.</li>
+        <li>Rough: the top of his head looks combed flat, the hairline is a hard edge, and close up the strands look scratchy.</li>
+      </ul>
+    </div>
+    <div>
+      <h2>Before that: a real shirt that moves</h2>
+      <ul>
+        <li>You asked for paint on his lower arms and upper chest first, then the shirt on top. <b>Both are done.</b></li>
+        <li><b>The doll is painted.</b> His forearms have skin, shading and dark hair. His chest has collarbones, a little hair and soft shading, and so do his belly, back and upper arms. Press "Doll" to see it with the clothes off.</li>
+        <li><b>The shirt is its own piece of cloth now.</b> Nothing of his body is printed on it. It has a body, two full sleeves gathered into a band below the elbow, lace cuffs in two layers, a ruffled front in three layers, a collar, and dark red lacing through eight small eyelets. In the open front you see his real chest behind the lacing.</li>
+        <li><b>It moves.</b> The sleeves, cuffs, ruffles and the loose part of the body hang by their own weight, lag behind him and settle. Press "Walk" or "Talk" to see it. His arms are kept inside his sleeves.</li>
+        <li>The lace is cut from your close painting of the fabrics, with real holes in it. The linen is from the same painting.</li>
+        <li><b>The trousers sway a little</b> when he walks: the baggy part trails his legs by up to a centimetre. The holes are untouched.</li>
+        <li>The corset is still the old painted piece, cut down to just the corset, sitting over the shirt.</li>
+        <li>Press "Old shirt" to put the old painted shirt back and compare.</li>
+        <li><b>Rough for now:</b> the ruffled front is flatter and tidier than you painted it. There is a small step in the cloth at each top corner of the open front, by his neck. The sleeves are plainer than you painted them. The leather wrist cuffs are still the old painted piece and their top edge is uneven.</li>
+        <li>I cannot watch him move from here, only look at stills. If the shirt does something odd when he walks or talks, tell me.</li>
+      </ul>
+    </div>
+    <div>
+      <h2>Changed on November 13</h2>
+      <ul>
+        <li><b>His face was missing on your screen. That was my mistake.</b> One line of his neck was cut short. A phone's graphics chip will not draw a shape with a line cut short, so his whole head went. The test renderer I use here draws it anyway, which is why I never saw it. It is fixed, and the build now stops if it ever happens again.</li>
+        <li>I still cannot see a real phone from here. <b>If his face is still missing, tell me.</b></li>
+        <li><b>His sleeves.</b> Each sleeve now gathers into a band below the elbow. A lace ruffle in two tiers hangs from the band as its own piece of cloth, and his bare forearm comes out from inside it. Before, the ruffle was only a swelling of the arm.</li>
+        <li>A sharp flap at each upper arm is gone. The measuring had taken part of his body for sleeve.</li>
+        <li>The same fix cleaned his neck: it is plain skin now, with no streaks.</li>
+      </ul>
+    </div>
+    <div>
+      <h2>Where he is: first build</h2>
+      <ul>
+        <li>You said he looks pretty good and not to remake him from scratch, so everything else is as it was.</li>
+        <li><b>His head is now the head the witches wear</b> (the Jester's face model, at a man's size, with a wider jaw and a lower crown), with his own face from C1 painted on it and his profile from C3 at the sides. Press "Blank doll" to see the shape with no paint.</li>
+        <li>His glasses are a real object.</li>
+        <li>His body is measured from B1 and B2 and wears those paintings, laid on from four sides. His sleeves take their sides from A3.</li>
+        <li>His hands are the full hand model the witches use, at a man's size, in two plain colours: glove leather and skin.</li>
+        <li>He stands 1.78 m in his boots. That is my number for a man of average height; nothing in the paintings fixes it.</li>
+      </ul>
+    </div>
+    <div>
+      <h2>The gold on his boots</h2>
+      <ul>
+        <li><b>Flecks</b> sit on the leather of each boot and move with it. Each one glints in its own time.</li>
+        <li><b>Motes</b> drift slowly round his feet while he stands.</li>
+        <li><b>The trail:</b> a boot sheds dust whenever it moves, and the dust hangs where it was shed and fades. Here he walks on the spot, so the dust streams away behind him. In a game it will be left along his path.</li>
+      </ul>
+    </div>
+    <div>
+      <h2>Rough, or not built</h2>
+      <ul class="m">
+        <li><b>His neck</b> is one plain skin colour, with no painting on it.</li>
+        <li><b>His body is his clothes as one smooth skin,</b> not a body with clothes on it. The chest ruffles, lace, corset straps, buckles, trouser holes and boot straps are paint, not shapes, and the paint is soft up close. Only the sleeve ruffles are real shapes.</li>
+        <li>Under his arms and between his legs the paint is drawn out, because no painting looks there.</li>
+        <li>His face does not blink or talk yet (C2 is not used yet). His hand paintings (D) and boot paintings (E) are not used yet either.</li>
+        <li>Not built: the hat, the belt and its ring, the pouch, the scroll, the charms, the dagger, the pearls and the feather earring. Rounds 1 and 2 of your paintings for all of these are saved.</li>
+        <li>The walk and the talk are first drafts borrowed from the Ranger's stride. Nothing bends as cloth. I cannot watch movement play here, so its timing needs your eye.</li>
+      </ul>
+    </div>
+  </div>
+</div>
+<!--THREE-->
+<script>/*PAL*/</script>
+<script>/*STAGE*/</script>
+<script>/*TEX*/</script>
+<script>/*MODEL*/</script>
+<script>
+(function () {
+  'use strict';
+  const $ = (id) => document.getElementById(id), canvas = $('stage'), box = $('box');
+  const REFS = /*REFS*/{};
+  let stage, R;
+  try {
+    stage = makeStage(canvas, { shadow: 2048 });
+    if ('square' in stage) stage.square = false;
+    if ('glow' in stage) stage.glow = false;
+    R = makeNoiz({});
+    stage.scene.add(R.root); stage.scene.add(R.fx);
+  } catch (e) { $('err').hidden = false; $('err').textContent = 'He could not be drawn on this device: ' + (e && e.message ? e.message : e); return; }
+  const orbit = stage.orbit; orbit.az = 0.5; orbit.el = 0.06; orbit.dist = 6.2; orbit.fov = 20; orbit.target.set(0, 0.90, 0);
+  let want = { az: 0.5, el: 0.06, dist: 6.2, ty: 0.90, tx: 0, tz: 0 }, easing = true, spin = false;
+  // name, azimuth, elevation, distance, target height, painting, target x, target z
+  const VIEWS = [['Three-quarter', 0.5, 0.06, 6.2, 0.90, 'front'], ['Front', 0, 0.05, 6.2, 0.90, 'front'], ['Side', Math.PI / 2, 0.05, 6.2, 0.90, 'side'], ['Back', Math.PI, 0.05, 6.2, 0.90, 'back'],
+    ['Hat', 0.45, 0.10, 2.7, 1.70, 'hat'], ['Belt', -0.30, 0.04, 2.9, 0.93, 'belt'], ['Face', 0, 0.03, 2.0, 1.63, 'face'], ['Head, turned', 0.6, 0.05, 2.3, 1.61, 'faceq'], ['Profile', -Math.PI / 2, 0.03, 2.3, 1.61, 'prof'], ['Shirt and corset', 0.3, 0.05, 2.9, 1.24, 'chest'], ['Trousers', 0.3, 0.05, 3.3, 0.70, 'legs'], ['Close on the holes', 0.55, 0.02, 1.5, 0.66, 'legs', 0.13, 0], ['Boots', 0.6, 0.16, 2.3, 0.20, 'boot', 0, 0.03], ['Hands', 0.9, 0.10, 2.0, 0.92, 'hand', 0.44, -0.06, 'handL']];
+  const POSES = [['As painted', {}], ['Arms down', { arm: 17 }], ['Arms out', { arm: 90 }]];
+  let refKey = 'front', showRef = true;
+  function chips(host, items, onPick, first) {
+    items.forEach((it, i) => { const b = document.createElement('button'); b.className = 'chip'; b.type = 'button'; b.textContent = it[0]; b.setAttribute('aria-pressed', i === first ? 'true' : 'false');
+      b.addEventListener('click', () => { [...host.children].forEach((c) => { if (!c.dataset.toggle) c.setAttribute('aria-pressed', 'false'); }); b.setAttribute('aria-pressed', 'true'); onPick(it); }); host.appendChild(b); });
+  }
+  function setRef() { const im = $('ref'), src = REFS[refKey]; im.hidden = !(showRef && src); if (src && im.getAttribute('src') !== src) im.src = src; }
+  const press = (host, i) => [...$(host).children].forEach((c, k) => { if (!c.dataset.toggle) c.setAttribute('aria-pressed', k === i ? 'true' : 'false'); });
+  // a view with a bone's name at its end looks at where that bone is now (his hand hangs by his thigh in the stance and is out to the side in the A-pose)
+  const pickView = (v) => { want = { az: v[1], el: v[2], dist: v[3], ty: v[4], tx: (v[6] || 0) + R.root.position.x, tz: (v[7] || 0) + R.root.position.z }; if (v[8] && R.SK[v[8]]) { R.root.updateMatrixWorld(true); const e = R.SK[v[8]].matrixWorld.elements; want.tx = e[12]; want.ty = e[13] - 0.05; want.tz = e[14]; } easing = true; spin = false; refKey = v[5]; setRef(); const sb = $('spinB'); if (sb) sb.setAttribute('aria-pressed', 'false'); };
+  chips($('views'), VIEWS, pickView, 0);
+  // He starts in his resting stance, breathing ("Idle"). "A-pose" (under Show) puts back the pose of his paintings, which is the one he is
+  // measured in. The three "Arms" buttons are versions of that pose, so pressing one turns "A-pose" on; pressing a movement turns it off.
+  const MOVES = [['Stand still', 'stand'], ['Idle', 'idle'], ['Walk', 'walk'], ['Talk', 'talk']];
+  let move = 'idle', aPose = 0;
+  const setA = (on) => { const b = $('aposeB'); if (b) b.setAttribute('aria-pressed', on ? 'true' : 'false'); };
+  chips($('moves'), MOVES, (v) => { R.stop(); move = v[1]; R.play(move); press('poses', -1); press('goes', -1); setA(false); }, 1);
+  chips($('poses'), POSES, (p) => { aPose = POSES.indexOf(p); R.pose(p[1]); press('moves', -1); setA(true); }, -1);
+  R.play('idle', true);
+  // Talk: one of his three talking loops keeps going until "Quiet" (or another loop). Emotes: each plays once, over whatever his legs are
+  // doing, and he goes back to it. In the A-pose there is nothing for them to play over, so pressing one first puts him back in "Idle".
+  const unA = () => { if (R.debug.ACT && $('aposeB').getAttribute('aria-pressed') === 'true') { move = 'idle'; R.play('idle'); press('poses', -1); press('moves', 1); setA(false); } };
+  chips($('talks'), [['Calm', 'talk_calm'], ['Lively', 'talk_lively'], ['Gruff', 'talk_gruff'], ['Quiet', null]], (v) => { unA(); R.talkLoop(v[1]); if (v[1]) R.act(v[1]); else press('talks', -1); }, -1);
+  const EMOTES = [['Nod', 'nod'], ['Shake head', 'shake_head'], ['Wave', 'wave'], ['Bow', 'greet_bow'], ['Shrug', 'shrug'], ['Laugh', 'laugh'], ['Point', 'point'], ['Think', 'think'], ['Surprised', 'surprised'], ['Sad', 'sad'], ['Cross', 'cross'], ['Beckon', 'beckon'], ['Refuse', 'refuse'], ['Thanks', 'thanks']];
+  EMOTES.forEach((e) => { const b = document.createElement('button'); b.className = 'chip'; b.type = 'button'; b.textContent = e[0]; b.setAttribute('aria-pressed', 'false'); b.addEventListener('click', () => { unA(); R.act(e[1]); }); $('emotes').appendChild(b); });
+  const toggle = (host, id, label, on, fn) => { const b = document.createElement('button'); b.className = 'chip'; b.type = 'button'; b.id = id; b.dataset.toggle = '1'; b.textContent = label; b.setAttribute('aria-pressed', on ? 'true' : 'false');
+    b.addEventListener('click', () => { const v = b.getAttribute('aria-pressed') !== 'true'; b.setAttribute('aria-pressed', v ? 'true' : 'false'); fn(v); }); host.appendChild(b); };
+  toggle($('shows'), 'refB', 'Painting beside him', true, (v) => { showRef = v; setRef(); });
+  toggle($('shows'), 'aposeB', 'A-pose', false, (v) => { if (v) { R.pose(POSES[aPose][1]); press('poses', aPose); press('moves', -1); } else { R.play(move); press('poses', -1); press('moves', MOVES.findIndex((m) => m[1] === move)); } });
+  toggle($('shows'), 'spinB', 'Turn slowly', false, (v) => { spin = v; easing = false; });
+  toggle($('shows'), 'dustB', 'Gold dust', true, (v) => { R.dust.amount = v ? 1 : 0; });
+  // "Hat" and "Belt and jewellery": his hat, and his pearls, feather earring, belt, pouch, scroll, charms and dagger (stage 6)
+  toggle($('shows'), 'hatB', 'Hat', true, (v) => { R.setHat(v); });
+  toggle($('shows'), 'propsB', 'Belt and jewellery', true, (v) => { R.setProps(v); });
+  toggle($('shows'), 'blankB', 'Blank doll', false, (v) => { R.setBlank(v); });
+  // "Doll": his clothes come off and the body built to go under them shows, with his own head, hair, glasses and hands
+  toggle($('shows'), 'dollB', 'Doll', false, (v) => { R.setDoll(v); });
+  // "Old trousers": the old painted leg skin goes back on in place of the new trousers, for comparing
+  toggle($('shows'), 'oldTB', 'Old trousers', false, (v) => { R.setOldTrousers(v); });
+  // "Old shirt": the old painted shirt skin goes back on in place of the new cloth shirt, for comparing
+  toggle($('shows'), 'oldSB', 'Old shirt', false, (v) => { R.setOldShirt(v); });
+  // "Old hair": the old one-piece painted shell goes back on in place of the new hair, for comparing
+  toggle($('shows'), 'oldHB', 'Old hair', false, (v) => { R.setOldHair(v); });
+  setRef();
+  // drag to turn, pinch or wheel to zoom
+  const pts = new Map(); let pinch0 = 0, dist0 = 0;
+  canvas.addEventListener('pointerdown', (e) => { canvas.setPointerCapture(e.pointerId); pts.set(e.pointerId, [e.clientX, e.clientY]); easing = false; if (pts.size === 2) { const a = [...pts.values()]; pinch0 = Math.hypot(a[0][0] - a[1][0], a[0][1] - a[1][1]); dist0 = orbit.dist; } });
+  canvas.addEventListener('pointermove', (e) => { const p = pts.get(e.pointerId); if (!p) return; const dx = e.clientX - p[0], dy = e.clientY - p[1]; pts.set(e.pointerId, [e.clientX, e.clientY]);
+    if (pts.size === 1) { orbit.az -= dx * 0.008; orbit.el = Math.max(-0.45, Math.min(1.35, orbit.el + dy * 0.006)); }
+    else if (pts.size === 2 && pinch0 > 0) { const a = [...pts.values()], d = Math.hypot(a[0][0] - a[1][0], a[0][1] - a[1][1]); orbit.dist = Math.max(0.7, Math.min(10, dist0 * pinch0 / d)); orbit.target.y = Math.max(0.1, Math.min(1.75, orbit.target.y + dy * 0.0012)); } });
+  const up = (e) => { pts.delete(e.pointerId); pinch0 = 0; };
+  canvas.addEventListener('pointerup', up); canvas.addEventListener('pointercancel', up);
+  canvas.addEventListener('wheel', (e) => { e.preventDefault(); easing = false; orbit.dist = Math.max(0.7, Math.min(10, orbit.dist * Math.exp(e.deltaY * 0.001))); }, { passive: false });
+  let sized = '';
+  function fit() { const w = box.clientWidth, h = box.clientHeight, pr = Math.min(window.devicePixelRatio || 1, 2), k = w + 'x' + h + 'x' + pr; if (k !== sized && w > 0 && h > 0) { sized = k; stage.resize(w, h, pr); R.dust.setPixelRatio(pr); } }
+  let last = 0;
+  // Go and sit (stage 7): the calls game code makes on him, as it does on the fair folk. "Walk over" and "Run over" send him round a small
+  // loop and back to where he began, to turn and face you. "Sit" puts a stool where he says his seat must be and sits him on it.
+  const stool = new THREE.Group();
+  { const wood = new THREE.MeshStandardMaterial({ color: 0x4a3a2a, roughness: 0.85 }), top = new THREE.Mesh(new THREE.CylinderGeometry(0.19, 0.19, 0.05, 28), wood); top.position.y = -0.025; stool.add(top);
+    for (let i = 0; i < 3; i++) { const a = i * 2.094 + 0.5, leg = new THREE.Mesh(new THREE.CylinderGeometry(0.018, 0.022, 0.42, 10), wood); leg.position.set(Math.sin(a) * 0.13, -0.25, Math.cos(a) * 0.13); leg.rotation.set(Math.cos(a) * 0.12, 0, -Math.sin(a) * 0.12); stool.add(leg); }
+    stool.traverse((o) => { o.castShadow = true; }); stool.visible = false; stage.scene.add(stool); }
+  const camXZ = () => [orbit.target.x + Math.sin(orbit.az) * Math.cos(orbit.el) * orbit.dist, orbit.target.z + Math.cos(orbit.az) * Math.cos(orbit.el) * orbit.dist];
+  const awake = () => { unA(); if (move !== 'idle') { move = 'idle'; R.play('idle'); } press('moves', 1); };
+  async function tour(run) {
+    awake(); R.stop(); const go = run ? R.runTo : R.walkTo, far = run ? 1.7 : 1;
+    if (!(await go(1.5 * far, 1.1 * far))) return; if (!(await go(-1.5 * far, 0.9 * far))) return; if (!(await go(0, 0))) return;
+    R.face(...camXZ()); stool.visible = false; press('goes', -1);
+  }
+  chips($('goes'), [['Walk over', 'walk'], ['Run over', 'run'], ['Sit', 'sit'], ['Stand', 'stand'], ['Face me', 'face']], (v) => {
+    if (v[1] === 'walk' || v[1] === 'run') tour(v[1] === 'run');
+    else if (v[1] === 'sit') { awake(); R.stop(); const st = R.seat(); stool.position.set(st.x, st.height, st.z); stool.visible = true; R.sit(); }
+    else if (v[1] === 'stand') R.stand();
+    else { awake(); R.face(...camXZ()); }
+  }, -1);
+  let rootX = R.root.position.x, rootZ = R.root.position.z;
+  function frame(now) {
+    requestAnimationFrame(frame); const dt = Math.min(0.05, (now - last) / 1000 || 0.016); last = now; fit();
+    R.animate(dt);
+    { const rp = R.root.position, ddx = rp.x - rootX, ddz = rp.z - rootZ; rootX = rp.x; rootZ = rp.z; orbit.target.x += ddx; orbit.target.z += ddz; if (want) { want.tx = (want.tx || 0) + ddx; want.tz = (want.tz || 0) + ddz; } }      // the picture goes with him when he walks off
+    if (spin) orbit.az += dt * 0.5;
+    if (easing) { let d = want.az - orbit.az; d = Math.atan2(Math.sin(d), Math.cos(d)); const k = Math.min(1, dt * 5); orbit.az += d * k; orbit.el += (want.el - orbit.el) * k; orbit.dist += (want.dist - orbit.dist) * k; orbit.target.y += (want.ty - orbit.target.y) * k; orbit.target.x += ((want.tx || 0) - orbit.target.x) * k; orbit.target.z += ((want.tz || 0) - orbit.target.z) * k; }
+    stage.render();
+  }
+  $('hud').textContent = 'First build · ' + Math.round(R.triangles / 1000) + 'k triangles · ' + R.dust.count + ' points of gold';
+  window.NOIZ = { stage, R, step() { fit(); stage.render(); } };
+  requestAnimationFrame(frame);
+})();
+</script>
+</body>
+</html>

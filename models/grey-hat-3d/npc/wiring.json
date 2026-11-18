@@ -1,0 +1,4 @@
+{ "talk": ["talk_gruff", "talk_calm", "talk_lively"], "greet": "greet_bow", "fidgets": ["fidget_look", "fidget_hands", "fidget_shift"], "pace": 0.9,
+  "likes": ["beckon", "laugh", "point"],
+  "moods": { "yes": "nod", "no": "shake_head", "happy": "laugh", "unsure": "think", "upset": "cross", "thanks": "thanks", "bye": "wave" },
+  "note": "Stand-ins until Chris says who he is: the same choice as his full model's wiring (README, Stage 7)" }

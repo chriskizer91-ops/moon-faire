@@ -1,0 +1,9 @@
+{
+  "name": "grey-hat-3d",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Noiz, the Grey Hat: 3D model for Moon Faire: three.js r128, built in code",
+  "dependencies": {
+    "three": "^0.128.0"
+  }
+}
