@@ -1,0 +1,231 @@
+{
+ "n": 3000,
+ "settings": [
+  [
+   "easy",
+   0
+  ],
+  [
+   "medium",
+   1
+  ],
+  [
+   "hard",
+   2
+  ],
+  [
+   "crazy",
+   2.8
+  ]
+ ],
+ "rows": {
+  "very careless": [
+   {
+    "name": "easy",
+    "level": 20,
+    "none": 0.021666666666666667,
+    "all": 0.10533333333333333
+   },
+   {
+    "name": "medium",
+    "level": 21,
+    "none": 0.0003333333333333333,
+    "all": 0.008
+   },
+   {
+    "name": "hard",
+    "level": 22,
+    "none": 0,
+    "all": 0
+   },
+   {
+    "name": "crazy",
+    "level": 22.8,
+    "none": 0,
+    "all": 0
+   }
+  ],
+  "careless": [
+   {
+    "name": "easy",
+    "level": 20,
+    "none": 0.058666666666666666,
+    "all": 0.19966666666666666
+   },
+   {
+    "name": "medium",
+    "level": 21,
+    "none": 0.0013333333333333333,
+    "all": 0.009333333333333334
+   },
+   {
+    "name": "hard",
+    "level": 22,
+    "none": 0,
+    "all": 0
+   },
+   {
+    "name": "crazy",
+    "level": 22.8,
+    "none": 0,
+    "all": 0
+   }
+  ],
+  "attentive, careful": [
+   {
+    "name": "easy",
+    "level": 20,
+    "none": 0.805,
+    "all": 0.984
+   },
+   {
+    "name": "medium",
+    "level": 21,
+    "none": 0.03166666666666667,
+    "all": 0.13166666666666665
+   },
+   {
+    "name": "hard",
+    "level": 22,
+    "none": 0,
+    "all": 0
+   },
+   {
+    "name": "crazy",
+    "level": 22.8,
+    "none": 0,
+    "all": 0
+   }
+  ],
+  "attentive, bold": [
+   {
+    "name": "easy",
+    "level": 20,
+    "none": 0.5433333333333333,
+    "all": 0.8443333333333334
+   },
+   {
+    "name": "medium",
+    "level": 21,
+    "none": 0.02666666666666667,
+    "all": 0.094
+   },
+   {
+    "name": "hard",
+    "level": 22,
+    "none": 0,
+    "all": 0
+   },
+   {
+    "name": "crazy",
+    "level": 22.8,
+    "none": 0,
+    "all": 0
+   }
+  ],
+  "focused, careful": [
+   {
+    "name": "easy",
+    "level": 20,
+    "none": 0.9563333333333334,
+    "all": 0.9993333333333333
+   },
+   {
+    "name": "medium",
+    "level": 21,
+    "none": 0.3526666666666667,
+    "all": 0.6486666666666666
+   },
+   {
+    "name": "hard",
+    "level": 22,
+    "none": 0.0036666666666666666,
+    "all": 0.06533333333333333
+   },
+   {
+    "name": "crazy",
+    "level": 22.8,
+    "none": 0,
+    "all": 0.0003333333333333333
+   }
+  ],
+  "focused, bold": [
+   {
+    "name": "easy",
+    "level": 20,
+    "none": 0.7703333333333333,
+    "all": 0.9186666666666666
+   },
+   {
+    "name": "medium",
+    "level": 21,
+    "none": 0.14633333333333334,
+    "all": 0.368
+   },
+   {
+    "name": "hard",
+    "level": 22,
+    "none": 0,
+    "all": 0.001
+   },
+   {
+    "name": "crazy",
+    "level": 22.8,
+    "none": 0,
+    "all": 0
+   }
+  ],
+  "expert, careful": [
+   {
+    "name": "easy",
+    "level": 20,
+    "none": 0.9946666666666667,
+    "all": 1
+   },
+   {
+    "name": "medium",
+    "level": 21,
+    "none": 0.9093333333333333,
+    "all": 0.974
+   },
+   {
+    "name": "hard",
+    "level": 22,
+    "none": 0.273,
+    "all": 0.8003333333333333
+   },
+   {
+    "name": "crazy",
+    "level": 22.8,
+    "none": 0.0006666666666666666,
+    "all": 0.035666666666666666
+   }
+  ],
+  "expert, bold": [
+   {
+    "name": "easy",
+    "level": 20,
+    "none": 0.973,
+    "all": 0.9956666666666667
+   },
+   {
+    "name": "medium",
+    "level": 21,
+    "none": 0.6736666666666666,
+    "all": 0.8403333333333334
+   },
+   {
+    "name": "hard",
+    "level": 22,
+    "none": 0.083,
+    "all": 0.5
+   },
+   {
+    "name": "crazy",
+    "level": 22.8,
+    "none": 0,
+    "all": 0.007
+   }
+  ]
+ }
+}

@@ -1,0 +1,9 @@
+The last fight: wins with no finds / with all 18.   easy (level 20)   medium (level 21)   hard (level 22)   crazy (level 22.8)
+  very careless         2.2% /  11%      0.0% / 0.8%        0% /   0%        0% /   0%
+  careless              5.9% /  20%      0.1% / 0.9%        0% /   0%        0% /   0%
+  attentive, careful     81% /  98%      3.2% /  13%        0% /   0%        0% /   0%
+  attentive, bold        54% /  84%      2.7% / 9.4%        0% /   0%        0% /   0%
+  focused, careful       96% / 100%       35% /  65%      0.4% / 6.5%        0% / 0.0%
+  focused, bold          77% /  92%       15% /  37%        0% / 0.1%        0% /   0%
+  expert, careful        99% / 100%       91% /  97%       27% /  80%      0.1% / 3.6%
+  expert, bold           97% / 100%       67% /  84%      8.3% /  50%        0% / 0.7%

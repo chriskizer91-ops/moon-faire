@@ -1,0 +1,193 @@
+<!DOCTYPE html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Moon Faire final boss in two forms</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible:ital,wght@0,400;0,700;1,400&family=Jacquard+24&display=swap" rel="stylesheet">
+<style>
+/* layout: one reading column; tables and prompts scroll inside their own box */
+:root {
+  --page: #eeedf4; --card: #fcfcfb; --ink: #1c1a2e; --ink-2: #55526a; --rule: #d9d7e4; --lantern: #8a5a00;
+  --display: "Jacquard 24", "Atkinson Hyperlegible", Georgia, serif; --body: "Atkinson Hyperlegible", Verdana, "Segoe UI", sans-serif;
+  color-scheme: light;
+}
+@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) {
+  --page: #121120; --card: #1a1a19; --ink: #f0efec; --ink-2: #b9b6c9; --rule: #33314a; --lantern: #e3b04b; color-scheme: dark; } }
+:root[data-theme="dark"] { --page: #121120; --card: #1a1a19; --ink: #f0efec; --ink-2: #b9b6c9; --rule: #33314a; --lantern: #e3b04b; color-scheme: dark; }
+* { box-sizing: border-box; }
+html { -webkit-text-size-adjust: 100%; }
+body { margin: 0; background: var(--page); color: var(--ink); font: 17px/1.55 var(--body); }
+main { max-width: 860px; margin: 0 auto; padding: 28px 18px 64px; display: flex; flex-direction: column; gap: 34px; }
+header p { max-width: 62ch; margin: 10px 0 0; }
+h1 { font: 400 clamp(40px, 9vw, 60px)/1 var(--display); margin: 0; text-wrap: balance; letter-spacing: .01em; }
+.kicker { color: var(--lantern); font-weight: 700; margin: 0 0 6px; }
+h2 { font-size: 24px; line-height: 1.2; margin: 0 0 12px; text-wrap: balance; }
+h3 { font-size: 19px; margin: 22px 0 8px; }
+section > p, section > ul, section > ol, .ask > p, .ask > ul { max-width: 65ch; }
+p { margin: 0 0 12px; } ul, ol { margin: 0 0 12px; padding-left: 22px; display: flex; flex-direction: column; gap: 8px; }
+.ask { background: var(--card); border: 1px solid var(--rule); border-left: 5px solid var(--lantern); border-radius: 8px; padding: 16px 18px; }
+.ask > :last-child { margin-bottom: 0; }
+.scroll { overflow-x: auto; background: var(--card); border: 1px solid var(--rule); border-radius: 10px; margin-bottom: 14px; }
+table { border-collapse: collapse; width: 100%; font-size: 15px; font-variant-numeric: tabular-nums; }
+th, td { text-align: left; padding: 9px 12px; border-bottom: 1px solid var(--rule); vertical-align: top; }
+tbody tr:last-child > * { border-bottom: 0; } tbody th { font-weight: 400; white-space: nowrap; }
+thead th { font-size: 13px; color: var(--ink-2); font-weight: 700; }
+.num { text-align: right; white-space: nowrap; } th span.n { display: block; color: var(--ink-2); font-size: 13px; font-weight: 400; }
+.all { display: block; color: var(--ink-2); }
+.key { color: var(--ink-2); font-size: 15px; margin: 0 0 8px; }
+@media (max-width: 480px) { table { font-size: 14px; } th, td { padding: 8px 6px; } tbody th { white-space: normal; } thead th span.n { font-size: 12px; } .ask { padding: 16px 12px; } .ask .scroll { margin-left: -4px; margin-right: -4px; } }
+.note { color: var(--ink-2); font-size: 15px; }
+.prompt { background: var(--card); border: 1px solid var(--rule); border-radius: 10px; margin-bottom: 14px; overflow: hidden; }
+.phead { display: flex; flex-wrap: wrap; gap: 10px; justify-content: space-between; align-items: center; padding: 12px 14px; border-bottom: 1px solid var(--rule); }
+.phead span { display: block; font-size: 14px; color: var(--ink-2); }
+button { font: 700 15px var(--body); color: var(--page); background: var(--ink); border: 0; border-radius: 8px; padding: 9px 14px; cursor: pointer; }
+button:focus-visible, pre:focus-visible { outline: 3px solid var(--lantern); outline-offset: 2px; }
+pre { margin: 0; padding: 14px; max-height: 220px; overflow: auto; font: 13px/1.5 ui-monospace, Menlo, Consolas, monospace; white-space: pre-wrap; }
+code { font-size: .92em; background: var(--card); border: 1px solid var(--rule); border-radius: 4px; padding: 0 4px; }
+footer { color: var(--ink-2); font-size: 15px; border-top: 1px solid var(--rule); padding-top: 16px; }
+</style></head>
+<body><main>
+<header>
+ <p class="kicker">Moon Faire, task board F11</p>
+ <h1>The final boss in two forms</h1>
+ <p>This is the last fight as you chose it on November 15: helpers first and then alone, wraiths and brambles as the helpers, and the whole party back to full HP and MP when the boss falls the first time, with a harder second round. I played it with the eight testers, and the balance holds.</p>
+</header>
+
+<section class="ask" aria-label="The fight as you chose it">
+ <h2>The fight as you chose it</h2>
+ <ul>
+  <li><strong>Form one, the fire, whole.</strong> The great wraith's own numbers under new names, with four helpers: wraiths and brambles it has called. It shows no damage.</li>
+  <li><strong>It falls, and the Curtain Call comes down.</strong> Every witch gets up with full HP and MP, and Io's Deity is ready again.</li>
+  <li><strong>The final form, the fire, broken open.</strong> Alone, with 20% more Life than form one and blows 10% bigger, acting twice as often.</li>
+  <li><strong>On hard, only an expert wins:</strong> 12% of the time with no finds and 65% with all 18. Without the refill it was 13% and 63%, so the balance is the same.</li>
+ </ul>
+ <p>The top number is how often that player wins with no finds, and the number under it is with all 18. The party is level 20 and arrives fresh from a rest spot.</p>
+ <div class="scroll"><table><thead><tr><th>Player</th><th class="num">Easy<span class="n">level 20</span></th><th class="num">Medium<span class="n">level 21</span></th><th class="num">Hard<span class="n">level 22</span></th><th class="num">Crazy<span class="n">level 22.8</span></th></tr></thead><tbody><tr><th>Very careless</th><td class="num">0.7%<span class="all">5.1%</span></td><td class="num">0%<span class="all">0.1%</span></td><td class="num">0%<span class="all">0%</span></td><td class="num">0%<span class="all">0%</span></td></tr><tr><th>Careless</th><td class="num">0.8%<span class="all">6.9%</span></td><td class="num">0%<span class="all">0%</span></td><td class="num">0%<span class="all">0%</span></td><td class="num">0%<span class="all">0%</span></td></tr><tr><th>Attentive, careful</th><td class="num">80%<span class="all">98%</span></td><td class="num">2.9%<span class="all">12%</span></td><td class="num">0%<span class="all">0%</span></td><td class="num">0%<span class="all">0%</span></td></tr><tr><th>Attentive, bold</th><td class="num">52%<span class="all">85%</span></td><td class="num">2.1%<span class="all">8.2%</span></td><td class="num">0%<span class="all">0%</span></td><td class="num">0%<span class="all">0%</span></td></tr><tr><th>Focused, careful</th><td class="num">96%<span class="all">100%</span></td><td class="num">35%<span class="all">65%</span></td><td class="num">0.2%<span class="all">2.9%</span></td><td class="num">0%<span class="all">0%</span></td></tr><tr><th>Focused, bold</th><td class="num">77%<span class="all">93%</span></td><td class="num">13%<span class="all">36%</span></td><td class="num">0%<span class="all">0%</span></td><td class="num">0%<span class="all">0%</span></td></tr><tr><th>Expert, careful</th><td class="num">100%<span class="all">100%</span></td><td class="num">91%<span class="all">97%</span></td><td class="num">12%<span class="all">65%</span></td><td class="num">0%<span class="all">0.3%</span></td></tr><tr><th>Expert, bold</th><td class="num">98%<span class="all">100%</span></td><td class="num">67%<span class="all">84%</span></td><td class="num">1.6%<span class="all">36%</span></td><td class="num">0%<span class="all">0%</span></td></tr></tbody></table></div>
+ <p class="note">56 to 67 party turns in a win, so about 4 to 10 minutes at 4 to 9 seconds a turn.</p>
+</section>
+
+<section>
+ <h2>What the refill changes</h2>
+ <ul>
+  <li><strong>Hard and crazy come out the same</strong> as the version with no refill. The stronger final form takes back what the refill gives.</li>
+  <li><strong>Easy and medium are a touch kinder to a player who thinks.</strong> For her they are now about as hard as the great wraith's fight on its own (medium, focused player: 35%, against 18% with no refill).</li>
+  <li><strong>Nobody is punished for spending everything in form one.</strong> There is nothing to save for, so the fight is as hard on the tenth try as on the first.</li>
+  <li><strong>It is a longer fight.</strong> About 56 to 67 party turns in a win, against 41 to 46 with no refill.</li>
+  <li><strong>The careless player does worse.</strong> On easy she wins 0.8% of the time, or 6.9% with every find. With no refill it was 3.5% and 13%. The final form alone is a long fight, and she does not last it.</li>
+ </ul>
+</section>
+
+<section>
+ <h2>The numbers</h2>
+ <p>These are on the fight rules' scale, where the Jester has 1,000 HP, for easy, medium, hard and crazy. Names of blows are yours to choose.</p>
+ <div class="scroll"><table><thead><tr><th>Thing</th><th class="num">Easy<span class="n">level 20</span></th><th class="num">Medium<span class="n">level 21</span></th><th class="num">Hard<span class="n">level 22</span></th><th class="num">Crazy<span class="n">level 22.8</span></th></tr></thead><tbody>
+  <tr><th>Form one: Life</th><td class="num">8,000</td><td class="num">9,600</td><td class="num">11,520</td><td class="num">13,329</td></tr>
+  <tr><th>Form one: plain blow</th><td class="num">130</td><td class="num">156</td><td class="num">187</td><td class="num">217</td></tr>
+  <tr><th>Form one: marked blow at one witch</th><td class="num">440</td><td class="num">528</td><td class="num">634</td><td class="num">733</td></tr>
+  <tr><th>Form one: blow on everyone, growing each time</th><td class="num">110</td><td class="num">132</td><td class="num">158</td><td class="num">183</td></tr>
+  <tr><th>Final form: Life</th><td class="num">9,600</td><td class="num">11,520</td><td class="num">13,824</td><td class="num">15,995</td></tr>
+  <tr><th>Final form: plain blow</th><td class="num">143</td><td class="num">172</td><td class="num">206</td><td class="num">238</td></tr>
+  <tr><th>Final form: marked blow at one witch</th><td class="num">484</td><td class="num">581</td><td class="num">697</td><td class="num">806</td></tr>
+  <tr><th>Final form: blow on everyone, growing each time</th><td class="num">121</td><td class="num">145</td><td class="num">174</td><td class="num">202</td></tr>
+ </tbody></table></div>
+ <ul>
+  <li><strong>The helpers</strong> are two of the Shadow Wraith's size and two of the wisp's size. They use the wraiths' numbers until the bramble foes have their own.</li>
+  <li><strong>Form one acts every 10</strong> while a helper stands. Alone, in either form, the fire acts every 5. That is already the rule for a boss left alone.</li>
+  <li><strong>The final form starts with no Fate on it</strong> and ends for good, in the real Curtain Call.</li>
+ </ul>
+ <p>All of this is in <code>game/plan/finalboss/final-fight.json</code> for the fight piece to read.</p>
+</section>
+
+<section>
+ <h2>The version without the refill, for the record</h2>
+ <p>You chose the refill. This is the version I first proposed: the fallen get up with a quarter of their HP, nothing else comes back, and the final form has a quarter of form one's Life with the same blows. It is shorter and kinder to the careless player, but an expert who spends everything in form one pays for it.</p>
+ <div class="scroll"><table><thead><tr><th>Player</th><th class="num">Easy<span class="n">level 20</span></th><th class="num">Medium<span class="n">level 21</span></th><th class="num">Hard<span class="n">level 22</span></th><th class="num">Crazy<span class="n">level 22.8</span></th></tr></thead><tbody><tr><th>Very careless</th><td class="num">1.1%<span class="all">7.2%</span></td><td class="num">0%<span class="all">0.1%</span></td><td class="num">0%<span class="all">0%</span></td><td class="num">0%<span class="all">0%</span></td></tr><tr><th>Careless</th><td class="num">3.5%<span class="all">13%</span></td><td class="num">0.1%<span class="all">0.4%</span></td><td class="num">0%<span class="all">0%</span></td><td class="num">0%<span class="all">0%</span></td></tr><tr><th>Attentive, careful</th><td class="num">79%<span class="all">98%</span></td><td class="num">1.6%<span class="all">11%</span></td><td class="num">0%<span class="all">0%</span></td><td class="num">0%<span class="all">0%</span></td></tr><tr><th>Attentive, bold</th><td class="num">48%<span class="all">81%</span></td><td class="num">1.1%<span class="all">5.1%</span></td><td class="num">0%<span class="all">0%</span></td><td class="num">0%<span class="all">0%</span></td></tr><tr><th>Focused, careful</th><td class="num">93%<span class="all">100%</span></td><td class="num">18%<span class="all">45%</span></td><td class="num">0%<span class="all">4.6%</span></td><td class="num">0%<span class="all">0%</span></td></tr><tr><th>Focused, bold</th><td class="num">73%<span class="all">91%</span></td><td class="num">5.7%<span class="all">24%</span></td><td class="num">0%<span class="all">0.1%</span></td><td class="num">0%<span class="all">0%</span></td></tr><tr><th>Expert, careful</th><td class="num">99%<span class="all">100%</span></td><td class="num">89%<span class="all">95%</span></td><td class="num">13%<span class="all">63%</span></td><td class="num">0%<span class="all">0.5%</span></td></tr><tr><th>Expert, bold</th><td class="num">96%<span class="all">99%</span></td><td class="num">60%<span class="all">80%</span></td><td class="num">3.4%<span class="all">31%</span></td><td class="num">0%<span class="all">0.1%</span></td></tr></tbody></table></div>
+ <p class="note">41 to 46 party turns in a win, so about 3 to 7 minutes at 4 to 9 seconds a turn.</p>
+</section>
+
+<section>
+ <h2>Pictures to make</h2>
+ <p>Make the first one first. If your picture maker takes a picture to work from, give it the first picture (or a screenshot of the model page) with the second prompt, so the final form is plainly the same thing. Both forms are the same parts, so the final form costs about the same to draw as the first.</p>
+<div class="prompt"><div class="phead"><div><strong>Form one: the fire, whole</strong><span>Shape: 3:2, 1536 x 1024 or larger.  Save as: final-fire-form1-sheet.png.</span></div><button type="button" data-copy="p0">Copy the prompt</button></div><pre id="p0" tabindex="0">Model sheet of a single towering fantasy boss for my role-playing game, Moon Faire, full figure, shown three times side by side on one sheet: front view, three-quarter view, back view. Each view is the same size and stands on the same ground line.
+
+WHAT IT IS. An ancient beacon fire that would not go out, grown into a black sun. This is its first form: whole, calm and perfectly kept, with no crack, chip or wound anywhere on it. A floating black sphere like an eclipse, about a quarter of the figure's height, perfectly round and smooth, with a thin glowing rose-white rim. Around the sphere, an even ring of thirty or so long flat flame-shaped blades, all the same length, glowing deep crimson at the root and pale rose-white at the tips, like a corona. Three unbroken engraved old-gold iron rings orbit the sphere at different tilts, like the rings of an old astronomer's globe. A curtain of twelve long ash-rose streamers hangs straight down from under the sphere into a low, wide, three-legged black iron brazier bowl on the ground. The bowl's rim is set with short iron thorns, and a dull crimson glow lies inside it. To either side of the streamers float two large open hands made of overlapping dark iron blades, with no arms, palms turned inward as if tending the fire. Four small old glass-and-iron fair lanterns, each with a small warm amber flame inside, hang on short chains from four hooked iron arms on the bowl's rim.
+
+SIZE. The whole thing is about eight metres tall and five wide; the brazier bowl would come up to a person's chest.
+
+COLOURS. Eclipse black, old gold iron, deep crimson, pale rose-white, ash rose. The only warm amber is the four small lanterns. Nothing green and nothing blue.
+
+STYLE. A realistic, richly painted picture with believable metal, cloth and fire, in a dark, beautiful fairy-tale mood. Elegant and solemn, not horror: no gore, no face, no eyes. Bold simple shapes with a strong silhouette and strong contrast of light and dark, and little fine surface texture.
+
+BACKDROP AND LIGHT. A flat dark plum-grey backdrop, colour #383043, with no scenery, no floor pattern and no cast shadows on the backdrop. Even, soft light, so every part can be seen; the glow is its own.
+
+LEAVE OUT. People, hands of people, creatures, lettering, labels, numbers, arrows, borders and frames.</pre></div>
+<div class="prompt"><div class="phead"><div><strong>The final form: the fire, broken open</strong><span>Shape: 3:2, 1536 x 1024 or larger.  Save as: final-fire-form2-sheet.png.</span></div><button type="button" data-copy="p1">Copy the prompt</button></div><pre id="p1" tabindex="0">Model sheet of a single towering fantasy boss for my role-playing game, Moon Faire, full figure, shown three times side by side on one sheet: front view, three-quarter view, back view. Each view is the same size and stands on the same ground line.
+
+WHAT IT IS. An ancient beacon fire that would not go out, in its final form. It was a calm black sun with a corona of crimson blades, three gold rings, two iron hands and an iron brazier bowl. It has been ended once and would not end, and it has broken open. It is larger, wilder and far brighter than before, and everything that was whole is now in pieces held in the air around a blazing heart. The black eclipse sphere has burst into seven large curved shards of smooth black shell, hanging apart like the pieces of a broken egg with wide gaps between them. In the gaps blazes the heart: a ball of white-hot fire, pure white at the centre, hot rose around it, fierce crimson at its edge, far bigger and brighter than the thin rim of light it used to have. At the very centre of the white, one tiny ordinary candle flame of warm amber. The corona is uneven now: forty or so flat flame-shaped blades of very different lengths, the longest twice as long as the shortest, a few snapped off and drifting free, hot crimson at the root and white at the tips. The three old-gold iron rings are broken into six curved pieces of different lengths, turning at wild tilts, their snapped ends glowing white-hot rose. The streamers have caught fire: twelve ribbons of crimson flame whipping outward and upward instead of hanging down. The three-legged black iron brazier bowl is split into two halves, tipped apart and lifted a little off the ground, with crimson light pouring up between them. One of the two great iron hands has come apart into its separate dark iron blades, drifting loose; the other hand is whole and held close under the heart, as if still trying to hold it together. Four small old fair lanterns hang open and dark on their chains from the bowl's halves, their glass broken and no flame in them.
+
+SIZE. About twelve metres tall and nine wide: half as tall again as it was. The split brazier bowl is still only chest height to a person, so the growth shows.
+
+COLOURS. Eclipse black, old gold iron, hot crimson, bright rose, and pure white at the heart. Much more saturated and luminous than a calm fire: it should be the brightest thing in the game. The only warm amber is the one tiny flame at the very centre. Nothing green and nothing blue.
+
+STYLE. A realistic, richly painted picture with believable metal and fire, in a dark, beautiful fairy-tale mood. Terrible and beautiful, not horror: no gore, no face, no eyes. Bold simple shapes with a strong silhouette and strong contrast of light and dark, and little fine surface texture. Every piece is a clean, separate shape with clear air round it.
+
+BACKDROP AND LIGHT. A flat dark plum-grey backdrop, colour #383043, with no scenery, no floor pattern and no cast shadows on the backdrop. Even, soft light, so every part can be seen; the glow is its own.
+
+LEAVE OUT. People, hands of people, creatures, lettering, labels, numbers, arrows, borders and frames.</pre></div>
+<div class="prompt"><div class="phead"><div><strong>Both forms side by side (only if wanted: it shows how much bigger the final form is)</strong><span>Shape: 3:2, 1536 x 1024 or larger.  Save as: final-fire-both-forms.png.</span></div><button type="button" data-copy="p2">Copy the prompt</button></div><pre id="p2" tabindex="0">One sheet showing the two forms of a single towering fantasy boss for my role-playing game, Moon Faire, side by side, both seen from the front, standing on the same ground line and drawn to the same scale.
+
+ON THE LEFT, the first form, about eight metres tall: an ancient beacon fire grown into a calm black sun. A perfectly round floating black sphere like an eclipse with a thin rose-white rim, an even corona of thirty or so flat flame-shaped blades in deep crimson and pale rose-white, three unbroken old-gold iron rings orbiting it, a curtain of ash-rose streamers hanging down into a low three-legged black iron brazier bowl, two large open hands of dark iron blades floating either side, and four small fair lanterns with warm amber flames hanging from hooks on the bowl's rim. Whole and undamaged.
+
+ON THE RIGHT, the final form, about twelve metres tall: the same thing broken open. The black sphere burst into seven curved shards hanging apart round a blazing white-hot heart with one tiny amber candle flame at its centre; an uneven corona of forty or so blades, some very long, some snapped off and drifting, hot crimson to white; the gold rings broken into six curved pieces with white-hot ends; the streamers turned to ribbons of crimson flame whipping outward; the brazier bowl split in two halves and lifted off the ground; one iron hand come apart into loose blades and the other held close under the heart; the four lanterns open, dark and broken.
+
+The brazier bowl is the same size in both, chest height to a person, so the growth shows.
+
+COLOURS. Eclipse black, old gold iron, crimson, rose, white. The right-hand form is much brighter and more saturated than the left. Nothing green and nothing blue.
+
+STYLE. A realistic, richly painted picture in a dark, beautiful fairy-tale mood, not horror: no gore, no face, no eyes. Bold simple shapes with strong silhouettes.
+
+BACKDROP AND LIGHT. A flat dark plum-grey backdrop, colour #383043, with no scenery, no floor pattern and no cast shadows on the backdrop. Even, soft light.
+
+LEAVE OUT. People, hands of people, creatures, lettering, labels, numbers, arrows, borders and frames.</pre></div>
+</section>
+
+<section class="ask" aria-label="What you decided">
+ <h2>What you decided</h2>
+ <ul>
+  <li><strong>The full refill is in.</strong> When form one falls, the whole party is up with full HP and MP.</li>
+  <li><strong>Why it happens:</strong> it comes from the Jester's magic and from what the boss is, a black orb inside light. Life and death are her thing, so beating the first form tops everybody off. The words for it are still to write.</li>
+  <li><strong>If the party falls in the final form,</strong> it starts again from before the first form.</li>
+  <li><strong>A rest spot</strong> stands just outside the place where the fight happens.</li>
+ </ul>
+</section>
+
+<section>
+ <h2>How we got here</h2>
+ <p>Before you chose, I played three ways of building the fight. The short version:</p>
+ <ul>
+  <li><strong>The helpers are most of what makes the great wraith hard.</strong> Alone with its own numbers, an attentive player beats it 100% of the time on easy and 100% on medium. With the helpers she wins 80% and 3.1%.</li>
+  <li><strong>One body alone in both forms</strong> could be made hard enough with more Life, but easy became a walkover (100% for an attentive player), the Fox could never cast Crazy Quilt, and an expert who saved MP for the second form won hard 76% of the time, up from 17%.</li>
+  <li><strong>Herbs do not rescue the last fight.</strong> With 20 or 60 of each herb in the bag my testers did slightly worse, because eating one costs a turn. A cleverer herb habit might gain a little; I have not built one.</li>
+ </ul>
+ <h3>The great wraith's fight under new names, in one form</h3>
+ <div class="scroll"><table><thead><tr><th>Player</th><th class="num">Easy<span class="n">level 20</span></th><th class="num">Medium<span class="n">level 21</span></th><th class="num">Hard<span class="n">level 22</span></th><th class="num">Crazy<span class="n">level 22.8</span></th></tr></thead><tbody><tr><th>Very careless</th><td class="num">2.1%<span class="all">11%</span></td><td class="num">0.1%<span class="all">0.6%</span></td><td class="num">0%<span class="all">0%</span></td><td class="num">0%<span class="all">0%</span></td></tr><tr><th>Careless</th><td class="num">5.3%<span class="all">19%</span></td><td class="num">0.2%<span class="all">0.9%</span></td><td class="num">0%<span class="all">0%</span></td><td class="num">0%<span class="all">0%</span></td></tr><tr><th>Attentive, careful</th><td class="num">80%<span class="all">98%</span></td><td class="num">3.1%<span class="all">13%</span></td><td class="num">0%<span class="all">0%</span></td><td class="num">0%<span class="all">0%</span></td></tr><tr><th>Attentive, bold</th><td class="num">54%<span class="all">85%</span></td><td class="num">2.8%<span class="all">10%</span></td><td class="num">0%<span class="all">0%</span></td><td class="num">0%<span class="all">0%</span></td></tr><tr><th>Focused, careful</th><td class="num">96%<span class="all">100%</span></td><td class="num">35%<span class="all">65%</span></td><td class="num">0.3%<span class="all">6.6%</span></td><td class="num">0%<span class="all">0.1%</span></td></tr><tr><th>Focused, bold</th><td class="num">77%<span class="all">93%</span></td><td class="num">15%<span class="all">37%</span></td><td class="num">0%<span class="all">0.1%</span></td><td class="num">0%<span class="all">0%</span></td></tr><tr><th>Expert, careful</th><td class="num">100%<span class="all">100%</span></td><td class="num">91%<span class="all">97%</span></td><td class="num">26%<span class="all">80%</span></td><td class="num">0.1%<span class="all">3.6%</span></td></tr><tr><th>Expert, bold</th><td class="num">98%<span class="all">100%</span></td><td class="num">68%<span class="all">84%</span></td><td class="num">8.1%<span class="all">51%</span></td><td class="num">0%<span class="all">0.7%</span></td></tr></tbody></table></div>
+ <p class="note">The table you called a good balance, for comparison. 29 to 35 party turns in a win, so about 2 to 5 minutes at 4 to 9 seconds a turn.</p>
+ <h3>One body alone, in two forms</h3>
+ <div class="scroll"><table><thead><tr><th>Player</th><th class="num">Easy<span class="n">level 20</span></th><th class="num">Medium<span class="n">level 21</span></th><th class="num">Hard<span class="n">level 22</span></th><th class="num">Crazy<span class="n">level 22.8</span></th></tr></thead><tbody><tr><th>Very careless</th><td class="num">6.9%<span class="all">24%</span></td><td class="num">0.3%<span class="all">2.9%</span></td><td class="num">0%<span class="all">0.2%</span></td><td class="num">0%<span class="all">0%</span></td></tr><tr><th>Careless</th><td class="num">5.7%<span class="all">21%</span></td><td class="num">0.1%<span class="all">1.1%</span></td><td class="num">0%<span class="all">0%</span></td><td class="num">0%<span class="all">0%</span></td></tr><tr><th>Attentive, careful</th><td class="num">100%<span class="all">100%</span></td><td class="num">39%<span class="all">69%</span></td><td class="num">0%<span class="all">0.1%</span></td><td class="num">0%<span class="all">0%</span></td></tr><tr><th>Attentive, bold</th><td class="num">99%<span class="all">100%</span></td><td class="num">16%<span class="all">54%</span></td><td class="num">0%<span class="all">0%</span></td><td class="num">0%<span class="all">0%</span></td></tr><tr><th>Focused, careful</th><td class="num">99%<span class="all">100%</span></td><td class="num">41%<span class="all">76%</span></td><td class="num">0.1%<span class="all">2.3%</span></td><td class="num">0%<span class="all">0%</span></td></tr><tr><th>Focused, bold</th><td class="num">94%<span class="all">100%</span></td><td class="num">25%<span class="all">63%</span></td><td class="num">0%<span class="all">0.7%</span></td><td class="num">0%<span class="all">0%</span></td></tr><tr><th>Expert, careful</th><td class="num">100%<span class="all">100%</span></td><td class="num">94%<span class="all">99%</span></td><td class="num">17%<span class="all">51%</span></td><td class="num">0%<span class="all">0.3%</span></td></tr><tr><th>Expert, bold</th><td class="num">100%<span class="all">100%</span></td><td class="num">81%<span class="all">98%</span></td><td class="num">3%<span class="all">31%</span></td><td class="num">0%<span class="all">0.3%</span></td></tr></tbody></table></div>
+ <p class="note">39 to 52 party turns in a win, so about 3 to 8 minutes at 4 to 9 seconds a turn.</p>
+</section>
+
+<footer>
+ <p>What these numbers are: 2,000 fights for every cell of the big tables and 1,000 for the rest, played by the eight pretend players through the approved fight rules, which are not changed. The helpers use the wraiths' numbers until the bramble foes have their own, and the finds are still to be tuned again for fights that carry HP and MP over.</p>
+ <p>Made by the Levelling session on November 15, 2026. In the repo: <code>game/plan/finalboss/</code> (<code>forms.js</code>, <code>forms_run.js</code>, <code>final-fight.json</code>, <code>forms.txt</code>, <code>picture-prompts.md</code>).</p>
+</footer>
+</main>
+<script>
+document.addEventListener('click', function (e) {
+  var b = e.target.closest('button[data-copy]'); if (!b) return;
+  var pre = document.getElementById(b.getAttribute('data-copy')), was = b.textContent;
+  function done(ok) { b.textContent = ok ? 'Copied' : 'Select the text below and copy it'; setTimeout(function () { b.textContent = was; }, 2500); }
+  function select() { var r = document.createRange(); r.selectNodeContents(pre); var s = getSelection(); s.removeAllRanges(); s.addRange(r); done(false); }
+  try { navigator.clipboard.writeText(pre.textContent).then(function () { done(true); }, select); } catch (err) { select(); }
+});
+</script>
+</body></html>

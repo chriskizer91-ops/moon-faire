@@ -1,0 +1,189 @@
+{
+ "n": 4000,
+ "gates": [
+  {
+   "gate": {
+    "ring": 5,
+    "code": "BK2w"
+   },
+   "kinds": [
+    {
+     "label": "nothing",
+     "finds": 0,
+     "r": {
+      "careless": {
+       "win": 0.1705,
+       "turns": 29.074780058651026,
+       "kos": 1.6070381231671553
+      },
+      "attentive": {
+       "win": 1,
+       "turns": 27,
+       "kos": 0
+      },
+      "expert": {
+       "win": 1,
+       "turns": 27.786,
+       "kos": 0.0215
+      }
+     }
+    },
+    {
+     "label": "what lies on the way",
+     "finds": 5,
+     "r": {
+      "careless": {
+       "win": 0.2185,
+       "turns": 29.95995423340961,
+       "kos": 1.597254004576659
+      },
+      "attentive": {
+       "win": 1,
+       "turns": 27,
+       "kos": 0
+      },
+      "expert": {
+       "win": 1,
+       "turns": 27.69475,
+       "kos": 0.019
+      }
+     }
+    },
+    {
+     "label": "and what is off the path",
+     "finds": 10,
+     "r": {
+      "careless": {
+       "win": 0.24225,
+       "turns": 30.123839009287927,
+       "kos": 1.6243550051599587
+      },
+      "attentive": {
+       "win": 1,
+       "turns": 27,
+       "kos": 0
+      },
+      "expert": {
+       "win": 1,
+       "turns": 27.55,
+       "kos": 0.0155
+      }
+     }
+    },
+    {
+     "label": "everything",
+     "finds": 15,
+     "r": {
+      "careless": {
+       "win": 0.26375,
+       "turns": 29.9781990521327,
+       "kos": 1.6227488151658769
+      },
+      "attentive": {
+       "win": 1,
+       "turns": 27,
+       "kos": 0
+      },
+      "expert": {
+       "win": 1,
+       "turns": 27.47625,
+       "kos": 0.01525
+      }
+     }
+    }
+   ]
+  },
+  {
+   "gate": {
+    "ring": 6,
+    "code": "B2K2w"
+   },
+   "kinds": [
+    {
+     "label": "nothing",
+     "finds": 0,
+     "r": {
+      "careless": {
+       "win": 0.059,
+       "turns": 28.6864406779661,
+       "kos": 2.0635593220338984
+      },
+      "attentive": {
+       "win": 0.807,
+       "turns": 26.176579925650557,
+       "kos": 0.5876703841387856
+      },
+      "expert": {
+       "win": 0.99425,
+       "turns": 28.442796077445312,
+       "kos": 0.1724918280110636
+      }
+     }
+    },
+    {
+     "label": "what lies on the way",
+     "finds": 6,
+     "r": {
+      "careless": {
+       "win": 0.08675,
+       "turns": 29.922190201729105,
+       "kos": 2.126801152737752
+      },
+      "attentive": {
+       "win": 0.8605,
+       "turns": 26.276873910517143,
+       "kos": 0.5868680999418943
+      },
+      "expert": {
+       "win": 0.99675,
+       "turns": 29.78229245046401,
+       "kos": 0.09430649611236519
+      }
+     }
+    },
+    {
+     "label": "and what is off the path",
+     "finds": 12,
+     "r": {
+      "careless": {
+       "win": 0.111,
+       "turns": 30.335585585585587,
+       "kos": 2.063063063063063
+      },
+      "attentive": {
+       "win": 0.90225,
+       "turns": 26.33610418398448,
+       "kos": 0.571626489332225
+      },
+      "expert": {
+       "win": 0.9975,
+       "turns": 29.777944862155387,
+       "kos": 0.07894736842105263
+      }
+     }
+    },
+    {
+     "label": "everything",
+     "finds": 18,
+     "r": {
+      "careless": {
+       "win": 0.13175,
+       "turns": 29.960151802656547,
+       "kos": 2.0189753320683113
+      },
+      "attentive": {
+       "win": 0.94375,
+       "turns": 26.411920529801325,
+       "kos": 0.479205298013245
+      },
+      "expert": {
+       "win": 0.99825,
+       "turns": 29.433007763586275,
+       "kos": 0.07237665915351865
+      }
+     }
+    }
+   ]
+  }
+ ]
+}

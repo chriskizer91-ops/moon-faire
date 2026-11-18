@@ -1,0 +1,8 @@
+Chosen: option B, full-size fights, top level 20 (Chris, November 14, 2026, 7:30 pm)
+  steady/careless      wins 175 / 182 / 188  lost 30.4  last gate tries 22.45  witch turns 3377  foe turns 1857  minutes 331-466-673  end level 20/20/20
+  steady/attentive     wins 174 / 180 / 186  lost 0.3  last gate tries 1.34  witch turns 1899  foe turns 722  minutes 181-256-369  end level 20/20/20
+  steady/expert        wins 174 / 180 / 186  lost 0  last gate tries 1.01  witch turns 1936  foe turns 718  minutes 183-259-374  end level 20/20/20
+  explorer/careless    wins 221 / 228 / 235  lost 28.3  last gate tries 21.63  witch turns 3704  foe turns 1913  minutes 361-509-734  end level 20/20/20
+  explorer/attentive   wins 219 / 227 / 234  lost 0.3  last gate tries 1.31  witch turns 2182  foe turns 798  minutes 209-296-426  end level 20/20/20
+  explorer/expert      wins 219 / 227 / 234  lost 0  last gate tries 1  witch turns 2224  foe turns 792  minutes 212-300-432  end level 20/20/20
+  levels arrive on win number (steady, attentive): L2:3 L3:8 L4:13 L5:19 L6:27 L7:34 L8:41 L9:50 L10:59 L11:68 L12:79 L13:89 L14:100 L15:112 L16:125 L17:137 L18:151 L19:165 L20:179

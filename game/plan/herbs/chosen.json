@@ -1,0 +1,651 @@
+{
+ "n": 200,
+ "herbs": {
+  "hp": 60,
+  "mp": 20,
+  "inFight": 1,
+  "standUp": 0.1
+ },
+ "steady": {
+  "hp": 1,
+  "mp": 2
+ },
+ "rings": {
+  "1": {
+   "careless": {
+    "never": {
+     "low": 10,
+     "mid": 16
+    },
+    "empty": {
+     "low": 40,
+     "mid": 40
+    },
+    "s1": {
+     "low": 40,
+     "mid": 40
+    },
+    "s2": {
+     "low": 40,
+     "mid": 40
+    },
+    "s3": {
+     "low": 40,
+     "mid": 40
+    },
+    "eats": {
+     "hp": 0.56,
+     "mp": 1.43
+    }
+   },
+   "attentive, careful": {
+    "never": {
+     "low": 40,
+     "mid": 40
+    },
+    "empty": {
+     "low": 40,
+     "mid": 40
+    },
+    "s1": {
+     "low": 40,
+     "mid": 40
+    },
+    "s2": {
+     "low": 40,
+     "mid": 40
+    },
+    "s3": {
+     "low": 40,
+     "mid": 40
+    },
+    "eats": {
+     "hp": 0.54,
+     "mp": 2.77
+    }
+   },
+   "focused, careful": {
+    "never": {
+     "low": 40,
+     "mid": 40
+    },
+    "empty": {
+     "low": 40,
+     "mid": 40
+    },
+    "s1": {
+     "low": 40,
+     "mid": 40
+    },
+    "s2": {
+     "low": 40,
+     "mid": 40
+    },
+    "s3": {
+     "low": 40,
+     "mid": 40
+    },
+    "eats": {
+     "hp": 0.54,
+     "mp": 2.77
+    }
+   },
+   "expert, careful": {
+    "never": {
+     "low": 40,
+     "mid": 40
+    },
+    "empty": {
+     "low": 40,
+     "mid": 40
+    },
+    "s1": {
+     "low": 40,
+     "mid": 40
+    },
+    "s2": {
+     "low": 40,
+     "mid": 40
+    },
+    "s3": {
+     "low": 40,
+     "mid": 40
+    },
+    "eats": {
+     "hp": 0.54,
+     "mp": 2.77
+    }
+   }
+  },
+  "2": {
+   "careless": {
+    "never": {
+     "low": 7,
+     "mid": 10
+    },
+    "empty": {
+     "low": 23,
+     "mid": 40
+    },
+    "s1": {
+     "low": 24,
+     "mid": 40
+    },
+    "s2": {
+     "low": 24,
+     "mid": 40
+    },
+    "s3": {
+     "low": 24,
+     "mid": 40
+    },
+    "eats": {
+     "hp": 1.23,
+     "mp": 1.67
+    }
+   },
+   "attentive, careful": {
+    "never": {
+     "low": 40,
+     "mid": 40
+    },
+    "empty": {
+     "low": 40,
+     "mid": 40
+    },
+    "s1": {
+     "low": 40,
+     "mid": 40
+    },
+    "s2": {
+     "low": 40,
+     "mid": 40
+    },
+    "s3": {
+     "low": 40,
+     "mid": 40
+    },
+    "eats": {
+     "hp": 1.38,
+     "mp": 3.07
+    }
+   },
+   "focused, careful": {
+    "never": {
+     "low": 40,
+     "mid": 40
+    },
+    "empty": {
+     "low": 40,
+     "mid": 40
+    },
+    "s1": {
+     "low": 40,
+     "mid": 40
+    },
+    "s2": {
+     "low": 40,
+     "mid": 40
+    },
+    "s3": {
+     "low": 40,
+     "mid": 40
+    },
+    "eats": {
+     "hp": 1.38,
+     "mp": 3.07
+    }
+   },
+   "expert, careful": {
+    "never": {
+     "low": 40,
+     "mid": 40
+    },
+    "empty": {
+     "low": 40,
+     "mid": 40
+    },
+    "s1": {
+     "low": 40,
+     "mid": 40
+    },
+    "s2": {
+     "low": 40,
+     "mid": 40
+    },
+    "s3": {
+     "low": 40,
+     "mid": 40
+    },
+    "eats": {
+     "hp": 1.38,
+     "mp": 3.11
+    }
+   }
+  },
+  "3": {
+   "careless": {
+    "never": {
+     "low": 4,
+     "mid": 6
+    },
+    "empty": {
+     "low": 5,
+     "mid": 12
+    },
+    "s1": {
+     "low": 5,
+     "mid": 13
+    },
+    "s2": {
+     "low": 5,
+     "mid": 14
+    },
+    "s3": {
+     "low": 5,
+     "mid": 15
+    },
+    "eats": {
+     "hp": 2.34,
+     "mp": 1.75
+    }
+   },
+   "attentive, careful": {
+    "never": {
+     "low": 9,
+     "mid": 20
+    },
+    "empty": {
+     "low": 40,
+     "mid": 40
+    },
+    "s1": {
+     "low": 40,
+     "mid": 40
+    },
+    "s2": {
+     "low": 40,
+     "mid": 40
+    },
+    "s3": {
+     "low": 40,
+     "mid": 40
+    },
+    "eats": {
+     "hp": 2.25,
+     "mp": 3.72
+    }
+   },
+   "focused, careful": {
+    "never": {
+     "low": 9,
+     "mid": 21
+    },
+    "empty": {
+     "low": 40,
+     "mid": 40
+    },
+    "s1": {
+     "low": 40,
+     "mid": 40
+    },
+    "s2": {
+     "low": 40,
+     "mid": 40
+    },
+    "s3": {
+     "low": 40,
+     "mid": 40
+    },
+    "eats": {
+     "hp": 2.25,
+     "mp": 3.72
+    }
+   },
+   "expert, careful": {
+    "never": {
+     "low": 9,
+     "mid": 18
+    },
+    "empty": {
+     "low": 40,
+     "mid": 40
+    },
+    "s1": {
+     "low": 40,
+     "mid": 40
+    },
+    "s2": {
+     "low": 40,
+     "mid": 40
+    },
+    "s3": {
+     "low": 40,
+     "mid": 40
+    },
+    "eats": {
+     "hp": 2.27,
+     "mp": 3.85
+    }
+   }
+  },
+  "4": {
+   "careless": {
+    "never": {
+     "low": 4,
+     "mid": 6
+    },
+    "empty": {
+     "low": 5,
+     "mid": 12
+    },
+    "s1": {
+     "low": 5,
+     "mid": 13
+    },
+    "s2": {
+     "low": 5,
+     "mid": 14
+    },
+    "s3": {
+     "low": 5,
+     "mid": 15
+    },
+    "eats": {
+     "hp": 2.34,
+     "mp": 1.75
+    }
+   },
+   "attentive, careful": {
+    "never": {
+     "low": 9,
+     "mid": 20
+    },
+    "empty": {
+     "low": 40,
+     "mid": 40
+    },
+    "s1": {
+     "low": 40,
+     "mid": 40
+    },
+    "s2": {
+     "low": 40,
+     "mid": 40
+    },
+    "s3": {
+     "low": 40,
+     "mid": 40
+    },
+    "eats": {
+     "hp": 2.25,
+     "mp": 3.72
+    }
+   },
+   "focused, careful": {
+    "never": {
+     "low": 9,
+     "mid": 21
+    },
+    "empty": {
+     "low": 40,
+     "mid": 40
+    },
+    "s1": {
+     "low": 40,
+     "mid": 40
+    },
+    "s2": {
+     "low": 40,
+     "mid": 40
+    },
+    "s3": {
+     "low": 40,
+     "mid": 40
+    },
+    "eats": {
+     "hp": 2.25,
+     "mp": 3.72
+    }
+   },
+   "expert, careful": {
+    "never": {
+     "low": 9,
+     "mid": 18
+    },
+    "empty": {
+     "low": 40,
+     "mid": 40
+    },
+    "s1": {
+     "low": 40,
+     "mid": 40
+    },
+    "s2": {
+     "low": 40,
+     "mid": 40
+    },
+    "s3": {
+     "low": 40,
+     "mid": 40
+    },
+    "eats": {
+     "hp": 2.27,
+     "mp": 3.85
+    }
+   }
+  },
+  "5": {
+   "careless": {
+    "never": {
+     "low": 2,
+     "mid": 4
+    },
+    "empty": {
+     "low": 3,
+     "mid": 6
+    },
+    "s1": {
+     "low": 2,
+     "mid": 6
+    },
+    "s2": {
+     "low": 2,
+     "mid": 6
+    },
+    "s3": {
+     "low": 2,
+     "mid": 6
+    },
+    "eats": {
+     "hp": 2.64,
+     "mp": 1.42
+    }
+   },
+   "attentive, careful": {
+    "never": {
+     "low": 5,
+     "mid": 9
+    },
+    "empty": {
+     "low": 10,
+     "mid": 33
+    },
+    "s1": {
+     "low": 21,
+     "mid": 40
+    },
+    "s2": {
+     "low": 29,
+     "mid": 40
+    },
+    "s3": {
+     "low": 40,
+     "mid": 40
+    },
+    "eats": {
+     "hp": 2.6,
+     "mp": 4.14
+    }
+   },
+   "focused, careful": {
+    "never": {
+     "low": 5,
+     "mid": 10
+    },
+    "empty": {
+     "low": 11,
+     "mid": 31
+    },
+    "s1": {
+     "low": 18,
+     "mid": 36
+    },
+    "s2": {
+     "low": 29,
+     "mid": 40
+    },
+    "s3": {
+     "low": 40,
+     "mid": 40
+    },
+    "eats": {
+     "hp": 2.6,
+     "mp": 4.14
+    }
+   },
+   "expert, careful": {
+    "never": {
+     "low": 4,
+     "mid": 9
+    },
+    "empty": {
+     "low": 11,
+     "mid": 32
+    },
+    "s1": {
+     "low": 20,
+     "mid": 40
+    },
+    "s2": {
+     "low": 28,
+     "mid": 40
+    },
+    "s3": {
+     "low": 40,
+     "mid": 40
+    },
+    "eats": {
+     "hp": 2.68,
+     "mp": 4.43
+    }
+   }
+  },
+  "6": {
+   "careless": {
+    "never": {
+     "low": 1,
+     "mid": 3
+    },
+    "empty": {
+     "low": 2,
+     "mid": 3
+    },
+    "s1": {
+     "low": 1,
+     "mid": 4
+    },
+    "s2": {
+     "low": 1,
+     "mid": 4
+    },
+    "s3": {
+     "low": 1,
+     "mid": 4
+    },
+    "eats": {
+     "hp": 3.29,
+     "mp": 1.07
+    }
+   },
+   "attentive, careful": {
+    "never": {
+     "low": 3,
+     "mid": 6
+    },
+    "empty": {
+     "low": 5,
+     "mid": 11
+    },
+    "s1": {
+     "low": 12,
+     "mid": 19
+    },
+    "s2": {
+     "low": 19,
+     "mid": 26
+    },
+    "s3": {
+     "low": 34,
+     "mid": 40
+    },
+    "eats": {
+     "hp": 3.15,
+     "mp": 4.69
+    }
+   },
+   "focused, careful": {
+    "never": {
+     "low": 3,
+     "mid": 5
+    },
+    "empty": {
+     "low": 5,
+     "mid": 11
+    },
+    "s1": {
+     "low": 12,
+     "mid": 18
+    },
+    "s2": {
+     "low": 19,
+     "mid": 25
+    },
+    "s3": {
+     "low": 34,
+     "mid": 40
+    },
+    "eats": {
+     "hp": 3.15,
+     "mp": 4.69
+    }
+   },
+   "expert, careful": {
+    "never": {
+     "low": 3,
+     "mid": 6
+    },
+    "empty": {
+     "low": 5,
+     "mid": 12
+    },
+    "s1": {
+     "low": 12,
+     "mid": 18
+    },
+    "s2": {
+     "low": 18,
+     "mid": 24
+    },
+    "s3": {
+     "low": 31,
+     "mid": 38
+    },
+    "eats": {
+     "hp": 3.38,
+     "mp": 4.99
+    }
+   }
+  }
+ }
+}

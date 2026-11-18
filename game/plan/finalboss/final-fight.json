@@ -1,0 +1,492 @@
+{
+ "what": "Moon Faire: the final fight, in two forms, as Chris chose it. For the fight piece and the open world to read.",
+ "chosen": "Chris, November 15, 2026 (1:58 pm, 3:23 pm and 4:18 pm). See the project note claude/final-boss-the-fire-that-would-not-end.md. Every name is a stand-in.",
+ "party": "Level 20, the top. It meets the fight fresh from a rest spot.",
+ "restSpot": "One just outside the place where the fight happens (Chris, 4:18 pm).",
+ "ifThePartyFalls": "In either form, the whole fight starts again from before form one (Chris, 4:18 pm). The rest spot is just outside.",
+ "settings": {
+  "note": "Before the fight the game offers four settings. Each sets the level of everything in both forms.",
+  "easy": 20,
+  "medium": 21,
+  "hard": 22,
+  "crazy": 22.8
+ },
+ "scale": "Numbers are on the fight rules' scale (the Jester has 1,000 HP), already worked out for each setting: 20% more Life and 20% bigger blows for every level above 20.",
+ "formOne": {
+  "name": "The fire, whole",
+  "lineUp": "B2K2w",
+  "body": {
+   "rulesAs": "the great wraith, under new names",
+   "life": {
+    "easy": 8000,
+    "medium": 9600,
+    "hard": 11520,
+    "crazy": 13329
+   },
+   "plainBlow": {
+    "easy": 130,
+    "medium": 156,
+    "hard": 187,
+    "crazy": 217
+   },
+   "markedBlowAtOne": {
+    "easy": 440,
+    "medium": 528,
+    "hard": 634,
+    "crazy": 733
+   },
+   "blowOnEveryone": {
+    "easy": 110,
+    "medium": 132,
+    "hard": 158,
+    "crazy": 183
+   },
+   "blowOnEveryoneGrowsBy": {
+    "easy": 25,
+    "medium": 30,
+    "hard": 36,
+    "crazy": 42
+   },
+   "actsEvery": 10,
+   "actsEveryOnceAlone": 5
+  },
+  "helpers": {
+   "who": "Wraiths and brambles it has called (Chris). Until the bramble foes have numbers of their own, all four use the wraiths' numbers.",
+   "twoBig": {
+    "rulesAs": "the Shadow Wraith",
+    "life": {
+     "easy": 1000,
+     "medium": 1200,
+     "hard": 1440,
+     "crazy": 1666
+    },
+    "blow": {
+     "easy": 100,
+     "medium": 120,
+     "hard": 144,
+     "crazy": 167
+    },
+    "heavy": {
+     "easy": 200,
+     "medium": 240,
+     "hard": 288,
+     "crazy": 333
+    },
+    "actsEvery": 11
+   },
+   "twoSmall": {
+    "rulesAs": "the wisp",
+    "life": {
+     "easy": 300,
+     "medium": 360,
+     "hard": 432,
+     "crazy": 500
+    },
+    "blow": {
+     "easy": 50,
+     "medium": 60,
+     "hard": 72,
+     "crazy": 83
+    },
+    "actsEvery": 12
+   }
+  },
+  "showsDamage": false,
+  "ends": "When its Life is gone or the Jester casts Sealed Fate on it. The Curtain Call falls and the fallen get up (Chris)."
+ },
+ "theChange": {
+  "partyGetsBack": "Everything: every witch up, full HP and MP, and every once-a-fight move ready again.",
+  "status": "Chosen by Chris (4:18 pm): \"Yes, the full refill is in.\"",
+  "storyReason": "Chris's direction (4:18 pm), the wording not written yet: it comes from the magic the Jester is doing and from what the boss is, a black orb inside light. The duality of life and death is the Jester's thing, so beating the first form tops everybody off."
+ },
+ "finalForm": {
+  "name": "The fire, broken open",
+  "lineUp": "B",
+  "against": "Form one's body: 20% more Life and blows 10% bigger. It is alone, so it acts twice as often, which is already the rule.",
+  "body": {
+   "rulesAs": "the great wraith, alone",
+   "life": {
+    "easy": 9600,
+    "medium": 11520,
+    "hard": 13824,
+    "crazy": 15995
+   },
+   "plainBlow": {
+    "easy": 143,
+    "medium": 172,
+    "hard": 206,
+    "crazy": 238
+   },
+   "markedBlowAtOne": {
+    "easy": 484,
+    "medium": 581,
+    "hard": 697,
+    "crazy": 806
+   },
+   "blowOnEveryone": {
+    "easy": 121,
+    "medium": 145,
+    "hard": 174,
+    "crazy": 202
+   },
+   "blowOnEveryoneGrowsBy": {
+    "easy": 28,
+    "medium": 33,
+    "hard": 40,
+    "crazy": 46
+   },
+   "actsEvery": 5
+  },
+  "startsWithFate": 0,
+  "ends": "For good, in the Curtain Call."
+ },
+ "measured": {
+  "fightsEachCell": 2000,
+  "percentOfFightsWon": {
+   "very careless": {
+    "easy": {
+     "noFinds": 0.7,
+     "allFinds": 5.1
+    },
+    "medium": {
+     "noFinds": 0,
+     "allFinds": 0.1
+    },
+    "hard": {
+     "noFinds": 0,
+     "allFinds": 0
+    },
+    "crazy": {
+     "noFinds": 0,
+     "allFinds": 0
+    }
+   },
+   "careless": {
+    "easy": {
+     "noFinds": 0.8,
+     "allFinds": 6.9
+    },
+    "medium": {
+     "noFinds": 0,
+     "allFinds": 0
+    },
+    "hard": {
+     "noFinds": 0,
+     "allFinds": 0
+    },
+    "crazy": {
+     "noFinds": 0,
+     "allFinds": 0
+    }
+   },
+   "attentive, careful": {
+    "easy": {
+     "noFinds": 79.9,
+     "allFinds": 98.5
+    },
+    "medium": {
+     "noFinds": 2.9,
+     "allFinds": 12.4
+    },
+    "hard": {
+     "noFinds": 0,
+     "allFinds": 0
+    },
+    "crazy": {
+     "noFinds": 0,
+     "allFinds": 0
+    }
+   },
+   "attentive, bold": {
+    "easy": {
+     "noFinds": 52,
+     "allFinds": 84.9
+    },
+    "medium": {
+     "noFinds": 2.1,
+     "allFinds": 8.2
+    },
+    "hard": {
+     "noFinds": 0,
+     "allFinds": 0
+    },
+    "crazy": {
+     "noFinds": 0,
+     "allFinds": 0
+    }
+   },
+   "focused, careful": {
+    "easy": {
+     "noFinds": 95.6,
+     "allFinds": 99.9
+    },
+    "medium": {
+     "noFinds": 34.5,
+     "allFinds": 64.8
+    },
+    "hard": {
+     "noFinds": 0.2,
+     "allFinds": 2.9
+    },
+    "crazy": {
+     "noFinds": 0,
+     "allFinds": 0
+    }
+   },
+   "focused, bold": {
+    "easy": {
+     "noFinds": 76.5,
+     "allFinds": 92.5
+    },
+    "medium": {
+     "noFinds": 13.4,
+     "allFinds": 36.3
+    },
+    "hard": {
+     "noFinds": 0,
+     "allFinds": 0
+    },
+    "crazy": {
+     "noFinds": 0,
+     "allFinds": 0
+    }
+   },
+   "expert, careful": {
+    "easy": {
+     "noFinds": 99.5,
+     "allFinds": 100
+    },
+    "medium": {
+     "noFinds": 91,
+     "allFinds": 97.5
+    },
+    "hard": {
+     "noFinds": 11.7,
+     "allFinds": 64.6
+    },
+    "crazy": {
+     "noFinds": 0,
+     "allFinds": 0.3
+    }
+   },
+   "expert, bold": {
+    "easy": {
+     "noFinds": 97.9,
+     "allFinds": 99.7
+    },
+    "medium": {
+     "noFinds": 67.3,
+     "allFinds": 84.2
+    },
+    "hard": {
+     "noFinds": 1.6,
+     "allFinds": 35.5
+    },
+    "crazy": {
+     "noFinds": 0,
+     "allFinds": 0
+    }
+   }
+  },
+  "partyTurnsInAWin": [
+   56,
+   58,
+   64,
+   67
+  ]
+ },
+ "ifThereIsNoRefill": {
+  "note": "Not chosen; kept for the record. The version first proposed: the fallen get up at a quarter HP, nothing else comes back, and the final form has a quarter of form one's Life with the same blows.",
+  "finalFormBody": {
+   "life": {
+    "easy": 2000,
+    "medium": 2400,
+    "hard": 2880,
+    "crazy": 3332
+   },
+   "plainBlow": {
+    "easy": 130,
+    "medium": 156,
+    "hard": 187,
+    "crazy": 217
+   },
+   "markedBlowAtOne": {
+    "easy": 440,
+    "medium": 528,
+    "hard": 634,
+    "crazy": 733
+   },
+   "blowOnEveryone": {
+    "easy": 110,
+    "medium": 132,
+    "hard": 158,
+    "crazy": 183
+   },
+   "blowOnEveryoneGrowsBy": {
+    "easy": 25,
+    "medium": 30,
+    "hard": 36,
+    "crazy": 42
+   }
+  },
+  "percentOfFightsWon": {
+   "very careless": {
+    "easy": {
+     "noFinds": 1.1,
+     "allFinds": 7.2
+    },
+    "medium": {
+     "noFinds": 0,
+     "allFinds": 0.1
+    },
+    "hard": {
+     "noFinds": 0,
+     "allFinds": 0
+    },
+    "crazy": {
+     "noFinds": 0,
+     "allFinds": 0
+    }
+   },
+   "careless": {
+    "easy": {
+     "noFinds": 3.5,
+     "allFinds": 13.3
+    },
+    "medium": {
+     "noFinds": 0.1,
+     "allFinds": 0.4
+    },
+    "hard": {
+     "noFinds": 0,
+     "allFinds": 0
+    },
+    "crazy": {
+     "noFinds": 0,
+     "allFinds": 0
+    }
+   },
+   "attentive, careful": {
+    "easy": {
+     "noFinds": 78.6,
+     "allFinds": 98.3
+    },
+    "medium": {
+     "noFinds": 1.6,
+     "allFinds": 11.2
+    },
+    "hard": {
+     "noFinds": 0,
+     "allFinds": 0
+    },
+    "crazy": {
+     "noFinds": 0,
+     "allFinds": 0
+    }
+   },
+   "attentive, bold": {
+    "easy": {
+     "noFinds": 47.5,
+     "allFinds": 81.1
+    },
+    "medium": {
+     "noFinds": 1.1,
+     "allFinds": 5.1
+    },
+    "hard": {
+     "noFinds": 0,
+     "allFinds": 0
+    },
+    "crazy": {
+     "noFinds": 0,
+     "allFinds": 0
+    }
+   },
+   "focused, careful": {
+    "easy": {
+     "noFinds": 93.2,
+     "allFinds": 99.9
+    },
+    "medium": {
+     "noFinds": 18.4,
+     "allFinds": 44.8
+    },
+    "hard": {
+     "noFinds": 0,
+     "allFinds": 4.6
+    },
+    "crazy": {
+     "noFinds": 0,
+     "allFinds": 0
+    }
+   },
+   "focused, bold": {
+    "easy": {
+     "noFinds": 72.5,
+     "allFinds": 91.3
+    },
+    "medium": {
+     "noFinds": 5.7,
+     "allFinds": 23.8
+    },
+    "hard": {
+     "noFinds": 0,
+     "allFinds": 0.1
+    },
+    "crazy": {
+     "noFinds": 0,
+     "allFinds": 0
+    }
+   },
+   "expert, careful": {
+    "easy": {
+     "noFinds": 99.4,
+     "allFinds": 100
+    },
+    "medium": {
+     "noFinds": 88.6,
+     "allFinds": 95.3
+    },
+    "hard": {
+     "noFinds": 13,
+     "allFinds": 63.2
+    },
+    "crazy": {
+     "noFinds": 0,
+     "allFinds": 0.5
+    }
+   },
+   "expert, bold": {
+    "easy": {
+     "noFinds": 96.3,
+     "allFinds": 99.3
+    },
+    "medium": {
+     "noFinds": 59.9,
+     "allFinds": 79.5
+    },
+    "hard": {
+     "noFinds": 3.4,
+     "allFinds": 30.6
+    },
+    "crazy": {
+     "noFinds": 0,
+     "allFinds": 0.1
+    }
+   }
+  },
+  "partyTurnsInAWin": [
+   41,
+   43,
+   45,
+   46
+  ]
+ },
+ "notDone": [
+  "The words and the picture for the refill (Chris gave the direction).",
+  "Names for both forms and their three blows.",
+  "The bramble foes' own numbers.",
+  "The final form's model, the fight's backdrop, and its place on the map.",
+  "The finds tuned again for fights that carry HP and MP over."
+ ]
+}

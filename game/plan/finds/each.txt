@@ -1,0 +1,27 @@
+as it is   B2K2w   5.9  80.7  99.4  |  BK2w   17.1 100.0 100.0  |  B      57.7 100.0 100.0  |  2K4w   23.5 100.0 100.0
+heal5      B2K2w   +0.1  +3.0  +0.1  |  BK2w    +0.9  +0.0  +0.0  |  B       +1.4  +0.0  +0.0  |  2K4w    +0.5  +0.0  +0.0   All healing is 5% stronger.
+hp2        B2K2w   +0.8  +3.3  +0.0  |  BK2w    +2.0  +0.0  +0.0  |  B       +4.1  +0.0  +0.0  |  2K4w    +1.4  +0.0  +0.0   All four have 2% more HP.
+hp3        B2K2w   +1.4  +4.6  +0.2  |  BK2w    +3.1  +0.0  +0.0  |  B       +6.3  +0.0  +0.0  |  2K4w    +2.3  +0.0  +0.0   All four have 3% more HP.
+hp5        B2K2w   +2.4  +6.8  +0.4  |  BK2w    +6.0  +0.0  +0.0  |  B      +10.5  +0.0  +0.0  |  2K4w    +3.8  +0.0  +0.0   All four have 5% more HP.
+mp5        B2K2w   +0.1  +0.3  +0.0  |  BK2w    +0.1  +0.0  +0.0  |  B       +0.1  +0.0  +0.0  |  2K4w    +0.2  +0.0  +0.0   All four have 5% more MP.
+mp10       B2K2w   +0.0  +1.6  +0.0  |  BK2w    +0.1  +0.0  +0.0  |  B       +0.2  +0.0  +0.0  |  2K4w    +0.3  +0.0  +0.0   All four have 10% more MP.
+foxmp5     B2K2w   +0.0  +0.1  +0.0  |  BK2w    -0.0  +0.0  +0.0  |  B       +0.0  +0.0  +0.0  |  2K4w    +0.0  +0.0  +0.0   The Fox's spells cost 5% less MP.
+iomp5      B2K2w   +0.1  +0.1  +0.0  |  BK2w    +0.1  +0.0  +0.0  |  B       +0.1  +0.0  +0.0  |  2K4w    +0.2  +0.0  +0.0   Io's spells cost 5% less MP.
+jhp5       B2K2w   +1.1  +6.4  +0.3  |  BK2w    +4.2  +0.0  +0.0  |  B       +8.3  +0.0  +0.0  |  2K4w    +2.4  +0.0  +0.0   The Jester has 5% more HP (stands in for "takes 5% less damage").
+ranger5    B2K2w   +0.5  +4.5  -0.0  |  BK2w    +0.9  +0.0  +0.0  |  B       +1.9  +0.0  +0.0  |  2K4w    +0.9  +0.0  +0.0   The Ranger's arrows and gem shots hit 5% harder.
+ranger10   B2K2w   +1.4  +8.6  +0.0  |  BK2w    +2.6  +0.0  +0.0  |  B       +3.9  +0.0  +0.0  |  2K4w    +1.8  +0.0  +0.0   The Ranger's arrows and gem shots hit 10% harder.
+fox5       B2K2w   +0.2  +1.7  +0.0  |  BK2w    +0.3  +0.0  +0.0  |  B       +0.7  +0.0  +0.0  |  2K4w    +0.3  +0.0  +0.0   The Fox's Stitch and Pins and Needles hit 5% harder.
+fox10      B2K2w   +0.5  +3.3  -0.0  |  BK2w    +0.6  +0.0  +0.0  |  B       +1.1  +0.0  +0.0  |  2K4w    +0.7  +0.0  +0.0   The Fox's Stitch and Pins and Needles hit 10% harder.
+io5        B2K2w   +0.1  +1.9  +0.0  |  BK2w    +0.1  +0.0  +0.0  |  B       +0.7  +0.0  +0.0  |  2K4w    +0.2  +0.0  +0.0   Io's Thorn and her Deity hit 5% harder.
+io10       B2K2w   +0.2  +3.9  +0.0  |  BK2w    +0.3  +0.0  +0.0  |  B       +1.0  +0.0  +0.0  |  2K4w    +0.4  +0.0  +0.0   Io's Thorn and her Deity hit 10% harder.
+fate5      B2K2w   +1.4  +3.7  +0.1  |  BK2w    +3.3  +0.0  +0.0  |  B       +4.0  +0.0  +0.0  |  2K4w    +1.1  +0.0  +0.0   Every blow the Jester takes lays 5% more Fate on the foe.
+fate10     B2K2w   +3.3  +7.9  +0.3  |  BK2w    +6.9  +0.0  +0.0  |  B       +8.2  +0.0  +0.0  |  2K4w    +2.1  +0.0  +0.0   Every blow the Jester takes lays 10% more Fate on the foe.
+splash     B2K2w   +1.0  +9.6  +0.0  |  BK2w    +0.7  +0.0  +0.0  |  B       +0.0  +0.0  +0.0  |  2K4w    +0.7  +0.0  +0.0   Sealed Fate takes 25% of their Life from the other foes, up from 20%.
+catch4     B2K2w   +0.9  +0.0  +0.0  |  BK2w    +0.5  +0.0  +0.0  |  B       +0.0  +0.0  +0.0  |  2K4w    -1.2  +0.0  +0.0   The Jester catches 4 blows a taunt, up from 3.
+jheal10    B2K2w   +0.1  +2.8  +0.0  |  BK2w    +0.5  +0.0  +0.0  |  B       +0.9  +0.0  +0.0  |  2K4w    +0.2  +0.0  +0.0   The Jester's own heal is 10% stronger.
+bloom4     B2K2w   +0.6  +0.0  +0.0  |  BK2w    +1.7  +0.0  +0.0  |  B       +1.9  +0.0  +0.0  |  2K4w    +0.3  +0.0  +0.0   Io's Bloom opens 4 times, up from 3.
+revive40   B2K2w   +1.9  +6.8  +0.1  |  BK2w    +4.8  +0.0  +0.0  |  B      +12.1  +0.0  +0.0  |  2K4w    +3.6  +0.0  +0.0   Io's Revive brings a friend back at 40% HP, up from 30%.
+decoy3     B2K2w   +1.1  +0.0  +0.2  |  BK2w    +3.1  +0.0  +0.0  |  B       +4.1  +0.0  +0.0  |  2K4w    +1.3  +0.0  +0.0   The Fox's ghost eats 3 blows, up from 2.
+cloth      B2K2w   +0.4  +0.0  +0.0  |  BK2w    +0.6  +0.0  +0.0  |  B       +0.2  +0.0  +0.0  |  2K4w    +0.3  +0.0  +0.0   A blow the Fox turns back lands at two and a half times, up from double.
+bow        B2K2w   +0.0  +0.0  +0.0  |  BK2w    +0.0  +0.0  +0.0  |  B       +0.0  +0.0  +0.0  |  2K4w    +0.0  +0.0  +0.0   The whole party gets up for the bow at 50% HP, up from 25%.
+gem1       B2K2w   +1.3 +12.6  +0.4  |  BK2w    +2.6  +0.0  +0.0  |  B       +4.3  +0.0  +0.0  |  2K4w    +1.3  +0.0  +0.0   The Ranger's gem is ready after 1 of her turns, down from 2.

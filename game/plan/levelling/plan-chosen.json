@@ -1,0 +1,268 @@
+{
+ "what": "Moon Faire: levels, XP and what is met where, for the open-world game. Made by game/plan/levelling/choose.js; do not edit by hand.",
+ "chosen": {
+  "option": "B",
+  "fights": "full-size",
+  "by": "Chris, November 14, 2026, 7:30 pm"
+ },
+ "top": 20,
+ "fightsToFinish": 180,
+ "xp": {
+  "wisp": 10,
+  "shadowWraith": 40,
+  "greatWraith": 400,
+  "perFoeLevel": 1.2,
+  "codes": {
+   "w": "wisp",
+   "K": "shadowWraith",
+   "B": "greatWraith"
+  }
+ },
+ "toReach": {
+  "1": 0,
+  "2": 80,
+  "3": 330,
+  "4": 610,
+  "5": 920,
+  "6": 1810,
+  "7": 2690,
+  "8": 3640,
+  "9": 6340,
+  "10": 9040,
+  "11": 11940,
+  "12": 17840,
+  "13": 23340,
+  "14": 29140,
+  "15": 46140,
+  "16": 60140,
+  "17": 74140,
+  "18": 115140,
+  "19": 149140,
+  "20": 184140
+ },
+ "fair": [
+  {
+   "id": "T1",
+   "foes": "2w",
+   "foeLevel": 1
+  },
+  {
+   "id": "T2",
+   "foes": "3w",
+   "foeLevel": 1
+  },
+  {
+   "id": "T3",
+   "foes": "3w",
+   "foeLevel": 2
+  }
+ ],
+ "rings": [
+  {
+   "ring": 1,
+   "partyEnters": 2,
+   "partyLeaves": 5,
+   "foeLevels": [
+    2,
+    6
+   ],
+   "meets": [
+    {
+     "foes": "2w",
+     "weight": 2
+    },
+    {
+     "foes": "3w",
+     "weight": 4
+    },
+    {
+     "foes": "4w",
+     "weight": 2
+    }
+   ],
+   "gate": {
+    "foes": "4w",
+    "foeLevel": 5,
+    "opensAtLevel": 5
+   }
+  },
+  {
+   "ring": 2,
+   "partyEnters": 5,
+   "partyLeaves": 8,
+   "foeLevels": [
+    5,
+    9
+   ],
+   "meets": [
+    {
+     "foes": "3w",
+     "weight": 3
+    },
+    {
+     "foes": "4w",
+     "weight": 2
+    },
+    {
+     "foes": "K",
+     "weight": 1
+    },
+    {
+     "foes": "K2w",
+     "weight": 2
+    }
+   ],
+   "gate": {
+    "foes": "K2w",
+    "foeLevel": 8,
+    "opensAtLevel": 8
+   }
+  },
+  {
+   "ring": 3,
+   "partyEnters": 8,
+   "partyLeaves": 11,
+   "foeLevels": [
+    8,
+    12
+   ],
+   "meets": [
+    {
+     "foes": "4w",
+     "weight": 2
+    },
+    {
+     "foes": "5w",
+     "weight": 1
+    },
+    {
+     "foes": "K2w",
+     "weight": 3
+    },
+    {
+     "foes": "2K",
+     "weight": 1
+    },
+    {
+     "foes": "K4w",
+     "weight": 1
+    }
+   ],
+   "gate": {
+    "foes": "2K2w",
+    "foeLevel": 11,
+    "opensAtLevel": 11
+   }
+  },
+  {
+   "ring": 4,
+   "partyEnters": 11,
+   "partyLeaves": 14,
+   "foeLevels": [
+    11,
+    15
+   ],
+   "meets": [
+    {
+     "foes": "4w",
+     "weight": 2
+    },
+    {
+     "foes": "5w",
+     "weight": 1
+    },
+    {
+     "foes": "K2w",
+     "weight": 3
+    },
+    {
+     "foes": "2K",
+     "weight": 1
+    },
+    {
+     "foes": "K4w",
+     "weight": 1
+    }
+   ],
+   "gate": {
+    "foes": "B",
+    "foeLevel": 14,
+    "opensAtLevel": 14
+   }
+  },
+  {
+   "ring": 5,
+   "partyEnters": 14,
+   "partyLeaves": 17,
+   "foeLevels": [
+    14,
+    18
+   ],
+   "meets": [
+    {
+     "foes": "5w",
+     "weight": 2
+    },
+    {
+     "foes": "K2w",
+     "weight": 2
+    },
+    {
+     "foes": "K4w",
+     "weight": 2
+    },
+    {
+     "foes": "2K2w",
+     "weight": 2
+    }
+   ],
+   "gate": {
+    "foes": "BK2w",
+    "foeLevel": 17,
+    "opensAtLevel": 17
+   }
+  },
+  {
+   "ring": 6,
+   "partyEnters": 17,
+   "partyLeaves": 20,
+   "foeLevels": [
+    17,
+    21
+   ],
+   "meets": [
+    {
+     "foes": "6w",
+     "weight": 2
+    },
+    {
+     "foes": "K4w",
+     "weight": 2
+    },
+    {
+     "foes": "2K2w",
+     "weight": 2
+    },
+    {
+     "foes": "3K",
+     "weight": 1
+    },
+    {
+     "foes": "2K4w",
+     "weight": 1
+    }
+   ],
+   "gate": {
+    "foes": "B2K2w",
+    "foeLevel": 20,
+    "opensAtLevel": 20
+   }
+  }
+ ],
+ "notes": [
+  "A line-up is written as in game/plan/sim: w wisp, K Shadow Wraith, B great wraith; \"K2w\" is one Shadow Wraith and two wisps.",
+  "XP for a won fight: each foe gives its kind's XP times perFoeLevel to the power (foe level - 1), rounded for the whole line-up.",
+  "The party shares XP and levels together. Losing costs nothing.",
+  "Which piece of the map each ring is, and what each gate fight is in the story, are not decided here (task board F5, S3). Gates other than 4w, K2w, 2K2w and B2K2w are stand-ins."
+ ]
+}

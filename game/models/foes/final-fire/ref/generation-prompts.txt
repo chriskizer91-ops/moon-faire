@@ -1,0 +1,73 @@
+# Moon Faire final boss — image prompts
+
+Generated with the built-in image generator. Form one was created from the supplied prompt; form two used form one as its design reference; the comparison used both completed sheets.
+
+## final-fire-form1-sheet.png
+
+Model sheet of a single towering fantasy boss for my role-playing game, Moon Faire, full figure, shown three times side by side on one sheet: front view, three-quarter view, back view. Each view is the same size and stands on the same ground line.
+
+WHAT IT IS. An ancient beacon fire that would not go out, grown into a black sun. This is its first form: whole, calm and perfectly kept, with no crack, chip or wound anywhere on it. A floating black sphere like an eclipse, about a quarter of the figure's height, perfectly round and smooth, with a thin glowing rose-white rim. Around the sphere, an even ring of thirty or so long flat flame-shaped blades, all the same length, glowing deep crimson at the root and pale rose-white at the tips, like a corona. Three unbroken engraved old-gold iron rings orbit the sphere at different tilts, like the rings of an old astronomer's globe. A curtain of twelve long ash-rose streamers hangs straight down from under the sphere into a low, wide, three-legged black iron brazier bowl on the ground. The bowl's rim is set with short iron thorns, and a dull crimson glow lies inside it. To either side of the streamers float two large open hands made of overlapping dark iron blades, with no arms, palms turned inward as if tending the fire. Four small old glass-and-iron fair lanterns, each with a small warm amber flame inside, hang on short chains from four hooked iron arms on the bowl's rim.
+
+SIZE. The whole thing is about eight metres tall and five wide; the brazier bowl would come up to a person's chest.
+
+COLOURS. Eclipse black, old gold iron, deep crimson, pale rose-white, ash rose. The only warm amber is the four small lanterns. Nothing green and nothing blue.
+
+STYLE. A realistic, richly painted picture with believable metal, cloth and fire, in a dark, beautiful fairy-tale mood. Elegant and solemn, not horror: no gore, no face, no eyes. Bold simple shapes with a strong silhouette and strong contrast of light and dark, and little fine surface texture.
+
+BACKDROP AND LIGHT. A flat dark plum-grey backdrop, colour #383043, with no scenery, no floor pattern and no cast shadows on the backdrop. Even, soft light, so every part can be seen; the glow is its own.
+
+LEAVE OUT. People, hands of people, creatures, lettering, labels, numbers, arrows, borders and frames.
+
+Production layout: exactly three full-body depictions of ONE identical boss, not three different designs. Front at left, three-quarter in middle, back at right. Landscape 3:2, 1536x1024 or larger; use a high resolution suitable for a detailed model sheet. Each full figure fits in its own third with clear space between silhouettes and around the sheet edges, and every lowest foot meets the same baseline. No titles or labels. Background uniformly dark plum-grey #383043.
+Design clarity: maintain the same number, shape and arrangement of components across the rotated views. The central black sphere is truly round and featureless in every view, with no face, eye, mouth, opening, cracks or damage. Three continuous metal orbit rings each form one complete closed loop. The two floating iron hands are unmistakable mechanical sculptural hands built of blade plates, with separated fingers; no flesh and no arms. Four small amber lanterns total on the brazier, carried around with the rotation of the same object; rear lanterns may be partially occluded naturally. Black bowl remains low and wide, not an ornate tall pedestal. Everything whole, elegant, calm, solemn.
+Save intended filename final-fire-form1-sheet.png.
+
+## final-fire-form2-sheet.png
+
+Model sheet of a single towering fantasy boss for my role-playing game, Moon Faire, full figure, shown three times side by side on one sheet: front view, three-quarter view, back view. Each view is the same size and stands on the same ground line.
+
+WHAT IT IS. An ancient beacon fire that would not go out, in its final form. It was a calm black sun with a corona of crimson blades, three gold rings, two iron hands and an iron brazier bowl. It has been ended once and would not end, and it has broken open. It is larger, wilder and far brighter than before, and everything that was whole is now in pieces held in the air around a blazing heart. The black eclipse sphere has burst into seven large curved shards of smooth black shell, hanging apart like the pieces of a broken egg with wide gaps between them. In the gaps blazes the heart: a ball of white-hot fire, pure white at the centre, hot rose around it, fierce crimson at its edge, far bigger and brighter than the thin rim of light it used to have. At the very centre of the white, one tiny ordinary candle flame of warm amber. The corona is uneven now: forty or so flat flame-shaped blades of very different lengths, the longest twice as long as the shortest, a few snapped off and drifting free, hot crimson at the root and white at the tips. The three old-gold iron rings are broken into six curved pieces of different lengths, turning at wild tilts, their snapped ends glowing white-hot rose. The streamers have caught fire: twelve ribbons of crimson flame whipping outward and upward instead of hanging down. The three-legged black iron brazier bowl is split into two halves, tipped apart and lifted a little off the ground, with crimson light pouring up between them. One of the two great iron hands has come apart into its separate dark iron blades, drifting loose; the other hand is whole and held close under the heart, as if still trying to hold it together. Four small old fair lanterns hang open and dark on their chains from the bowl's halves, their glass broken and no flame in them.
+
+SIZE. About twelve metres tall and nine wide: half as tall again as it was. The split brazier bowl is still only chest height to a person, so the growth shows.
+
+COLOURS. Eclipse black, old gold iron, hot crimson, bright rose, and pure white at the heart. Much more saturated and luminous than a calm fire: it should be the brightest thing in the game. The only warm amber is the one tiny flame at the very centre. Nothing green and nothing blue.
+
+STYLE. A realistic, richly painted picture with believable metal and fire, in a dark, beautiful fairy-tale mood. Terrible and beautiful, not horror: no gore, no face, no eyes. Bold simple shapes with a strong silhouette and strong contrast of light and dark, and little fine surface texture. Every piece is a clean, separate shape with clear air round it.
+
+BACKDROP AND LIGHT. A flat dark plum-grey backdrop, colour #383043, with no scenery, no floor pattern and no cast shadows on the backdrop. Even, soft light, so every part can be seen; the glow is its own.
+
+LEAVE OUT. People, hands of people, creatures, lettering, labels, numbers, arrows, borders and frames.
+
+REFERENCE: The attached image is the completed FIRST-FORM design of this exact boss. It is a design continuity reference, not the desired final output. Preserve its distinctive smooth eclipse shell, flat flame-shaped corona blades, slender old-gold orbit bands, blade-built iron hands, long twelve-streamer curtain, low thorn-rimmed three-legged brazier, and four small hooked fair lanterns. Transform those same components exactly as specified above. No unrelated redesign.
+Output exactly one 3:2 landscape model sheet, 1536x1024 or larger, showing the final form THREE times only: front at left, three-quarter in middle, back at right. Same size and common baseline, each entirely in its own third with clean negative space separating the silhouettes. Scale each view down enough that its WIDER wilder silhouette and all detached pieces fit inside its column, with generous safety margins; no clipping. No labels.
+CRITICAL FINAL FORM DIFFERENCES in every view: seven large curved BLACK SHELL SHARDS separated by wide visible gaps around the radiant heart; six clearly broken GOLD RING SEGMENTS, with disconnected snapped white-rose ends and air between them; blazing white/rose/crimson central fire with ONE very tiny warm AMBER candle-shaped flame at the exact heart (no candle or wick); long and short uneven corona blades; twelve fiery ribbons whip outward/upward; brazier split down the middle into TWO TIPPED APART halves hovering just above the common ground baseline, retaining the original bowl scale and three legs across the two halves; one iron hand remains assembled just BELOW the heart and the OTHER HAND is a drifting separated set of dark finger/palm blade plates. The four small lanterns are extinguished, open and broken, dark glass-and-iron frames. No amber light anywhere except the tiny flame in the heart.
+Make the heart unmistakably brighter and more saturated than the reference, while preserving visible black shards and gold ring pieces with clear air around every separate shape. Flat #383043 plum-grey backdrop, no scenery or floor texture. Mechanical iron hands, no flesh, no actual people.
+Save intended filename final-fire-form2-sheet.png.
+
+## final-fire-both-forms.png
+
+One sheet showing the two forms of a single towering fantasy boss for my role-playing game, Moon Faire, side by side, both seen from the front, standing on the same ground line and drawn to the same scale.
+
+ON THE LEFT, the first form, about eight metres tall: an ancient beacon fire grown into a calm black sun. A perfectly round floating black sphere like an eclipse with a thin rose-white rim, an even corona of thirty or so flat flame-shaped blades in deep crimson and pale rose-white, three unbroken old-gold iron rings orbiting it, a curtain of ash-rose streamers hanging down into a low three-legged black iron brazier bowl, two large open hands of dark iron blades floating either side, and four small fair lanterns with warm amber flames hanging from hooks on the bowl's rim. Whole and undamaged.
+
+ON THE RIGHT, the final form, about twelve metres tall: the same thing broken open. The black sphere burst into seven curved shards hanging apart round a blazing white-hot heart with one tiny amber candle flame at its centre; an uneven corona of forty or so blades, some very long, some snapped off and drifting, hot crimson to white; the gold rings broken into six curved pieces with white-hot ends; the streamers turned to ribbons of crimson flame whipping outward; the brazier bowl split in two halves and lifted off the ground; one iron hand come apart into loose blades and the other held close under the heart; the four lanterns open, dark and broken.
+
+The brazier bowl is the same size in both, chest height to a person, so the growth shows.
+
+COLOURS. Eclipse black, old gold iron, crimson, rose, white. The right-hand form is much brighter and more saturated than the left. Nothing green and nothing blue.
+
+STYLE. A realistic, richly painted picture in a dark, beautiful fairy-tale mood, not horror: no gore, no face, no eyes. Bold simple shapes with strong silhouettes.
+
+BACKDROP AND LIGHT. A flat dark plum-grey backdrop, colour #383043, with no scenery, no floor pattern and no cast shadows on the backdrop. Even, soft light.
+
+LEAVE OUT. People, hands of people, creatures, lettering, labels, numbers, arrows, borders and frames.
+
+REFERENCE IMAGES: image 1 is the approved intact first-form model sheet. Image 2 is the generated broken-open final-form model sheet. Use their LEFTMOST FRONT VIEWS as the exact design references for the two subjects below; retain the established component designs, material finish, colors, and overall rendering. This output is NOT another three-view sheet.
+Create exactly ONE landscape 3:2 image, 1536x1024 or larger, with exactly TWO complete full-body front-view figures, first form LEFT and final form RIGHT, on the same ground baseline with clear negative space between and around all floating pieces. No labels or size guides.
+SCALE IS THE PURPOSE OF THIS SHEET: the complete first form is EIGHT METRES tall and the final form TWELVE METRES tall. The first form must be exactly two-thirds as tall as the final form, while BOTH BRAZIER BOWLS remain the same original physical size. Do not simply enlarge the whole right figure: the low bowl halves are the same width and depth as the unbroken bowl when brought together. The final form's increased height and width come from the expanded heart, corona, spread fragments and longer wilder flaming streamers above the unchanged-size bowl.
+Practical composition: common ground line at about 91% image height; final form reaches about 7% from top, intact first form reaches about 35% from top. Top of the two bowls remains at nearly the same height above the baseline. Right final form broader and brighter, yet keep both silhouettes fully visible without clipping.
+The left form is whole and calm: featureless black sphere, approximately thirty equal-length flat corona blades, three complete closed golden orbit rings, straight ash-rose fabric streamers, two intact blade-built iron hands, intact thorn-rimmed brazier and four lit amber lanterns.
+The right form is broken-open and incandescent: seven separated black shell shards, six detached golden ring arcs with glowing broken ends, white-hot heart with the one TINY amber candle-flame at its center, uneven long and short fiery corona blades, twelve crimson fire ribbons whipping outward, one intact iron hand and the other disassembled into loose dark blades, two tilted hovering bowl halves, four open extinguished lanterns. Preserve separation and legibility of all these clean shapes against the flat plum-grey #383043 background.
+No actual people, no flesh hands, no scenery, floor patterns, labels, text, arrows, borders or frames. No green or blue. Solemn fairy-tale painted realism.
+Save intended filename final-fire-both-forms.png.
+

@@ -1,0 +1,362 @@
+{
+ "n": 4000,
+ "gates": [
+  {
+   "gate": {
+    "ring": 4,
+    "code": "B",
+    "name": "ring 4: the great wraith alone, level 14"
+   },
+   "kinds": [
+    {
+     "label": "nothing",
+     "finds": 0,
+     "r": {
+      "careless": {
+       "win": 0.57675,
+       "turns": 28.408322496749026,
+       "kos": 1.4542696142175986
+      },
+      "attentive": {
+       "win": 1,
+       "turns": 21.846,
+       "kos": 0
+      },
+      "expert": {
+       "win": 1,
+       "turns": 22.1205,
+       "kos": 0
+      }
+     }
+    },
+    {
+     "label": "what lies on the way",
+     "finds": 4,
+     "r": {
+      "careless": {
+       "win": 0.653,
+       "turns": 28.568912710566615,
+       "kos": 1.4092649310872893
+      },
+      "attentive": {
+       "win": 1,
+       "turns": 21.6885,
+       "kos": 0
+      },
+      "expert": {
+       "win": 1,
+       "turns": 22.101,
+       "kos": 0
+      }
+     }
+    },
+    {
+     "label": "and what is off the path",
+     "finds": 8,
+     "r": {
+      "careless": {
+       "win": 0.691,
+       "turns": 28.578871201157742,
+       "kos": 1.3657742402315485
+      },
+      "attentive": {
+       "win": 1,
+       "turns": 21.4965,
+       "kos": 0
+      },
+      "expert": {
+       "win": 1,
+       "turns": 21.816,
+       "kos": 0
+      }
+     }
+    },
+    {
+     "label": "everything",
+     "finds": 12,
+     "r": {
+      "careless": {
+       "win": 0.732,
+       "turns": 28.43818306010929,
+       "kos": 1.3627049180327868
+      },
+      "attentive": {
+       "win": 1,
+       "turns": 21.0825,
+       "kos": 0
+      },
+      "expert": {
+       "win": 1,
+       "turns": 21.1125,
+       "kos": 0
+      }
+     }
+    }
+   ]
+  },
+  {
+   "gate": {
+    "ring": 5,
+    "code": "BK2w",
+    "name": "ring 5: the great wraith, a Shadow Wraith and 2 wisps, level 17"
+   },
+   "kinds": [
+    {
+     "label": "nothing",
+     "finds": 0,
+     "r": {
+      "careless": {
+       "win": 0.1705,
+       "turns": 29.074780058651026,
+       "kos": 1.6070381231671553
+      },
+      "attentive": {
+       "win": 1,
+       "turns": 27,
+       "kos": 0
+      },
+      "expert": {
+       "win": 1,
+       "turns": 27.786,
+       "kos": 0.0215
+      }
+     }
+    },
+    {
+     "label": "what lies on the way",
+     "finds": 5,
+     "r": {
+      "careless": {
+       "win": 0.24025,
+       "turns": 30.168574401664934,
+       "kos": 1.6409989594172736
+      },
+      "attentive": {
+       "win": 1,
+       "turns": 27,
+       "kos": 0
+      },
+      "expert": {
+       "win": 1,
+       "turns": 27.5735,
+       "kos": 0.01375
+      }
+     }
+    },
+    {
+     "label": "and what is off the path",
+     "finds": 10,
+     "r": {
+      "careless": {
+       "win": 0.28175,
+       "turns": 30.1206743566992,
+       "kos": 1.5474711623779946
+      },
+      "attentive": {
+       "win": 1,
+       "turns": 27,
+       "kos": 0
+      },
+      "expert": {
+       "win": 1,
+       "turns": 27.32525,
+       "kos": 0.0095
+      }
+     }
+    },
+    {
+     "label": "everything",
+     "finds": 15,
+     "r": {
+      "careless": {
+       "win": 0.33525,
+       "turns": 29.711409395973153,
+       "kos": 1.541387024608501
+      },
+      "attentive": {
+       "win": 1,
+       "turns": 27,
+       "kos": 0
+      },
+      "expert": {
+       "win": 1,
+       "turns": 27.231,
+       "kos": 0.008
+      }
+     }
+    }
+   ]
+  },
+  {
+   "gate": {
+    "ring": 6,
+    "code": "B2K2w",
+    "name": "ring 6: the last gate, level 20"
+   },
+   "kinds": [
+    {
+     "label": "nothing",
+     "finds": 0,
+     "r": {
+      "careless": {
+       "win": 0.059,
+       "turns": 28.6864406779661,
+       "kos": 2.0635593220338984
+      },
+      "attentive": {
+       "win": 0.807,
+       "turns": 26.176579925650557,
+       "kos": 0.5876703841387856
+      },
+      "expert": {
+       "win": 0.99425,
+       "turns": 28.442796077445312,
+       "kos": 0.1724918280110636
+      }
+     }
+    },
+    {
+     "label": "what lies on the way",
+     "finds": 6,
+     "r": {
+      "careless": {
+       "win": 0.1045,
+       "turns": 30.36602870813397,
+       "kos": 2.148325358851675
+      },
+      "attentive": {
+       "win": 0.9045,
+       "turns": 26.33167495854063,
+       "kos": 0.5693753454947484
+      },
+      "expert": {
+       "win": 0.99775,
+       "turns": 29.896517163618142,
+       "kos": 0.0839388624404911
+      }
+     }
+    },
+    {
+     "label": "and what is off the path",
+     "finds": 12,
+     "r": {
+      "careless": {
+       "win": 0.15175,
+       "turns": 30.4332784184514,
+       "kos": 2.044481054365733
+      },
+      "attentive": {
+       "win": 0.9515,
+       "turns": 26.475302154492905,
+       "kos": 0.5036784025223332
+      },
+      "expert": {
+       "win": 0.99975,
+       "turns": 29.916979244811202,
+       "kos": 0.051512878219554886
+      }
+     }
+    },
+    {
+     "label": "everything",
+     "finds": 18,
+     "r": {
+      "careless": {
+       "win": 0.2015,
+       "turns": 29.8697270471464,
+       "kos": 1.9925558312655087
+      },
+      "attentive": {
+       "win": 0.9865,
+       "turns": 26.531677648251392,
+       "kos": 0.30917384693360367
+      },
+      "expert": {
+       "win": 1,
+       "turns": 29.2095,
+       "kos": 0.0495
+      }
+     }
+    }
+   ]
+  }
+ ],
+ "extra": [
+  {
+   "code": "2BKw",
+   "name": "two great wraiths, a Shadow Wraith and a wisp",
+   "none": {
+    "careless": {
+     "win": 0.00725,
+     "turns": 44.13793103448276,
+     "kos": 1.793103448275862
+    },
+    "attentive": {
+     "win": 0.5275,
+     "turns": 37.636018957345975,
+     "kos": 0.5881516587677725
+    },
+    "expert": {
+     "win": 0.991,
+     "turns": 39.45862764883955,
+     "kos": 0.008324924318869829
+    }
+   },
+   "all": {
+    "careless": {
+     "win": 0.033,
+     "turns": 47.43939393939394,
+     "kos": 1.9393939393939394
+    },
+    "attentive": {
+     "win": 0.7385,
+     "turns": 37.60324983073798,
+     "kos": 0.6492890995260664
+    },
+    "expert": {
+     "win": 1,
+     "turns": 37.804,
+     "kos": 0.00025
+    }
+   }
+  },
+  {
+   "code": "2B2K3w",
+   "name": "the hardest fight: two great wraiths, two Shadow Wraiths, three wisps",
+   "none": {
+    "careless": {
+     "win": 0.00125,
+     "turns": 41.6,
+     "kos": 2.2
+    },
+    "attentive": {
+     "win": 0.426,
+     "turns": 39.296361502347416,
+     "kos": 0.6508215962441315
+    },
+    "expert": {
+     "win": 0.87075,
+     "turns": 42.28739592305484,
+     "kos": 0.1840367499282228
+    }
+   },
+   "all": {
+    "careless": {
+     "win": 0.0075,
+     "turns": 46.56666666666667,
+     "kos": 2
+    },
+    "attentive": {
+     "win": 0.889,
+     "turns": 39.149887514060744,
+     "kos": 0.609673790776153
+    },
+    "expert": {
+     "win": 0.99325,
+     "turns": 41.8323684872892,
+     "kos": 0.04933299773470929
+    }
+   }
+  }
+ ]
+}

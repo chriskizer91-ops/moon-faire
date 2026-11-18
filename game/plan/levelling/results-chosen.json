@@ -1,0 +1,581 @@
+{
+ "steady/careless": {
+  "wins": [
+   175,
+   182,
+   188
+  ],
+  "meanWins": 181.5725,
+  "fights": 212,
+  "losses": 30.4,
+  "lastGateTries": 22.45,
+  "heroTurns": 3377,
+  "foeTurns": 1857,
+  "minutes": {
+   "quick": 331,
+   "middle": 466,
+   "slow": 673
+  },
+  "endLevel": [
+   20,
+   20,
+   20
+  ],
+  "ups": {
+   "2": 3,
+   "3": 8,
+   "4": 13,
+   "5": 19,
+   "6": 27,
+   "7": 34,
+   "8": 41,
+   "9": 51,
+   "10": 59,
+   "11": 68,
+   "12": 79,
+   "13": 90,
+   "14": 100,
+   "15": 113,
+   "16": 125,
+   "17": 137,
+   "18": 153,
+   "19": 166,
+   "20": 181
+  },
+  "marks": [
+   {
+    "name": "Leaving the fair",
+    "level": 2,
+    "wins": 3
+   },
+   {
+    "name": "Ring 1 gate (4w, level 5)",
+    "level": 5,
+    "wins": 20,
+    "tries": 1
+   },
+   {
+    "name": "Ring 2 gate (K2w, level 8)",
+    "level": 8,
+    "wins": 42,
+    "tries": 1
+   },
+   {
+    "name": "Ring 3 gate (2K2w, level 11)",
+    "level": 11,
+    "wins": 69,
+    "tries": 1
+   },
+   {
+    "name": "Ring 4 gate (B, level 14)",
+    "level": 14,
+    "wins": 101,
+    "tries": 1.94
+   },
+   {
+    "name": "Ring 5 gate (BK2w, level 17)",
+    "level": 17,
+    "wins": 138,
+    "tries": 6.55
+   },
+   {
+    "name": "Ring 6 gate (B2K2w, level 20)",
+    "level": 20,
+    "wins": 182,
+    "tries": 22.45
+   }
+  ],
+  "gaps": {
+   "0": 0.2,
+   "1": 0.201,
+   "2": 0.2,
+   "3": 0.132,
+   "4": 0.066,
+   "-1": 0.134,
+   "-2": 0.068
+  }
+ },
+ "steady/attentive": {
+  "wins": [
+   174,
+   180,
+   186
+  ],
+  "meanWins": 179.976,
+  "fights": 180.3,
+  "losses": 0.3,
+  "lastGateTries": 1.34,
+  "heroTurns": 1899,
+  "foeTurns": 722,
+  "minutes": {
+   "quick": 181,
+   "middle": 256,
+   "slow": 369
+  },
+  "endLevel": [
+   20,
+   20,
+   20
+  ],
+  "ups": {
+   "2": 3,
+   "3": 8,
+   "4": 13,
+   "5": 19,
+   "6": 27,
+   "7": 34,
+   "8": 41,
+   "9": 50,
+   "10": 59,
+   "11": 68,
+   "12": 79,
+   "13": 89,
+   "14": 100,
+   "15": 112,
+   "16": 125,
+   "17": 137,
+   "18": 151,
+   "19": 165,
+   "20": 179
+  },
+  "marks": [
+   {
+    "name": "Leaving the fair",
+    "level": 2,
+    "wins": 3
+   },
+   {
+    "name": "Ring 1 gate (4w, level 5)",
+    "level": 5,
+    "wins": 20,
+    "tries": 1
+   },
+   {
+    "name": "Ring 2 gate (K2w, level 8)",
+    "level": 8,
+    "wins": 42,
+    "tries": 1
+   },
+   {
+    "name": "Ring 3 gate (2K2w, level 11)",
+    "level": 11,
+    "wins": 69,
+    "tries": 1
+   },
+   {
+    "name": "Ring 4 gate (B, level 14)",
+    "level": 14,
+    "wins": 101,
+    "tries": 1
+   },
+   {
+    "name": "Ring 5 gate (BK2w, level 17)",
+    "level": 17,
+    "wins": 138,
+    "tries": 1
+   },
+   {
+    "name": "Ring 6 gate (B2K2w, level 20)",
+    "level": 20,
+    "wins": 180,
+    "tries": 1.34
+   }
+  ],
+  "gaps": {
+   "0": 0.2,
+   "1": 0.2,
+   "2": 0.2,
+   "3": 0.131,
+   "4": 0.064,
+   "-1": 0.136,
+   "-2": 0.069
+  }
+ },
+ "steady/expert": {
+  "wins": [
+   174,
+   180,
+   186
+  ],
+  "meanWins": 179.9745,
+  "fights": 180,
+  "losses": 0,
+  "lastGateTries": 1.01,
+  "heroTurns": 1936,
+  "foeTurns": 718,
+  "minutes": {
+   "quick": 183,
+   "middle": 259,
+   "slow": 374
+  },
+  "endLevel": [
+   20,
+   20,
+   20
+  ],
+  "ups": {
+   "2": 3,
+   "3": 8,
+   "4": 13,
+   "5": 19,
+   "6": 27,
+   "7": 34,
+   "8": 41,
+   "9": 50,
+   "10": 59,
+   "11": 68,
+   "12": 79,
+   "13": 89,
+   "14": 100,
+   "15": 112,
+   "16": 125,
+   "17": 137,
+   "18": 151,
+   "19": 165,
+   "20": 179
+  },
+  "marks": [
+   {
+    "name": "Leaving the fair",
+    "level": 2,
+    "wins": 3
+   },
+   {
+    "name": "Ring 1 gate (4w, level 5)",
+    "level": 5,
+    "wins": 20,
+    "tries": 1
+   },
+   {
+    "name": "Ring 2 gate (K2w, level 8)",
+    "level": 8,
+    "wins": 42,
+    "tries": 1
+   },
+   {
+    "name": "Ring 3 gate (2K2w, level 11)",
+    "level": 11,
+    "wins": 69,
+    "tries": 1
+   },
+   {
+    "name": "Ring 4 gate (B, level 14)",
+    "level": 14,
+    "wins": 101,
+    "tries": 1
+   },
+   {
+    "name": "Ring 5 gate (BK2w, level 17)",
+    "level": 17,
+    "wins": 138,
+    "tries": 1
+   },
+   {
+    "name": "Ring 6 gate (B2K2w, level 20)",
+    "level": 20,
+    "wins": 180,
+    "tries": 1.01
+   }
+  ],
+  "gaps": {
+   "0": 0.2,
+   "1": 0.2,
+   "2": 0.2,
+   "3": 0.131,
+   "4": 0.064,
+   "-1": 0.136,
+   "-2": 0.069
+  }
+ },
+ "explorer/careless": {
+  "wins": [
+   221,
+   228,
+   235
+  ],
+  "meanWins": 228.201,
+  "fights": 256.5,
+  "losses": 28.3,
+  "lastGateTries": 21.63,
+  "heroTurns": 3704,
+  "foeTurns": 1913,
+  "minutes": {
+   "quick": 361,
+   "middle": 509,
+   "slow": 734
+  },
+  "endLevel": [
+   20,
+   20,
+   20
+  ],
+  "ups": {
+   "2": 3,
+   "3": 8,
+   "4": 13,
+   "5": 19,
+   "6": 31,
+   "7": 38,
+   "8": 46,
+   "9": 61,
+   "10": 69,
+   "11": 78,
+   "12": 94,
+   "13": 105,
+   "14": 115,
+   "15": 134,
+   "16": 146,
+   "17": 159,
+   "18": 182,
+   "19": 196,
+   "20": 210
+  },
+  "marks": [
+   {
+    "name": "Leaving the fair",
+    "level": 2,
+    "wins": 3
+   },
+   {
+    "name": "Ring 1 gate (4w, level 5)",
+    "level": 5,
+    "wins": 28,
+    "tries": 1
+   },
+   {
+    "name": "Ring 2 gate (K2w, level 8)",
+    "level": 8,
+    "wins": 56,
+    "tries": 1
+   },
+   {
+    "name": "Ring 3 gate (2K2w, level 11)",
+    "level": 11,
+    "wins": 91,
+    "tries": 1
+   },
+   {
+    "name": "Ring 4 gate (B, level 14)",
+    "level": 14,
+    "wins": 129,
+    "tries": 1.93
+   },
+   {
+    "name": "Ring 5 gate (BK2w, level 17)",
+    "level": 17,
+    "wins": 175,
+    "tries": 6.36
+   },
+   {
+    "name": "Ring 6 gate (B2K2w, level 20)",
+    "level": 20,
+    "wins": 228,
+    "tries": 21.63
+   }
+  ],
+  "gaps": {
+   "0": 0.201,
+   "1": 0.2,
+   "2": 0.133,
+   "3": 0.079,
+   "4": 0.027,
+   "-1": 0.173,
+   "-2": 0.121,
+   "-3": 0.067
+  }
+ },
+ "explorer/attentive": {
+  "wins": [
+   219,
+   227,
+   234
+  ],
+  "meanWins": 226.9675,
+  "fights": 227.3,
+  "losses": 0.3,
+  "lastGateTries": 1.31,
+  "heroTurns": 2182,
+  "foeTurns": 798,
+  "minutes": {
+   "quick": 209,
+   "middle": 296,
+   "slow": 426
+  },
+  "endLevel": [
+   20,
+   20,
+   20
+  ],
+  "ups": {
+   "2": 3,
+   "3": 8,
+   "4": 13,
+   "5": 19,
+   "6": 31,
+   "7": 38,
+   "8": 46,
+   "9": 60,
+   "10": 69,
+   "11": 78,
+   "12": 94,
+   "13": 104,
+   "14": 115,
+   "15": 134,
+   "16": 146,
+   "17": 158,
+   "18": 181,
+   "19": 195,
+   "20": 209
+  },
+  "marks": [
+   {
+    "name": "Leaving the fair",
+    "level": 2,
+    "wins": 3
+   },
+   {
+    "name": "Ring 1 gate (4w, level 5)",
+    "level": 5,
+    "wins": 28,
+    "tries": 1
+   },
+   {
+    "name": "Ring 2 gate (K2w, level 8)",
+    "level": 8,
+    "wins": 56,
+    "tries": 1
+   },
+   {
+    "name": "Ring 3 gate (2K2w, level 11)",
+    "level": 11,
+    "wins": 91,
+    "tries": 1
+   },
+   {
+    "name": "Ring 4 gate (B, level 14)",
+    "level": 14,
+    "wins": 128,
+    "tries": 1
+   },
+   {
+    "name": "Ring 5 gate (BK2w, level 17)",
+    "level": 17,
+    "wins": 174,
+    "tries": 1
+   },
+   {
+    "name": "Ring 6 gate (B2K2w, level 20)",
+    "level": 20,
+    "wins": 227,
+    "tries": 1.31
+   }
+  ],
+  "gaps": {
+   "0": 0.201,
+   "1": 0.2,
+   "2": 0.132,
+   "3": 0.078,
+   "4": 0.026,
+   "-1": 0.174,
+   "-2": 0.122,
+   "-3": 0.068
+  }
+ },
+ "explorer/expert": {
+  "wins": [
+   219,
+   227,
+   234
+  ],
+  "meanWins": 226.9665,
+  "fights": 227,
+  "losses": 0,
+  "lastGateTries": 1,
+  "heroTurns": 2224,
+  "foeTurns": 792,
+  "minutes": {
+   "quick": 212,
+   "middle": 300,
+   "slow": 432
+  },
+  "endLevel": [
+   20,
+   20,
+   20
+  ],
+  "ups": {
+   "2": 3,
+   "3": 8,
+   "4": 13,
+   "5": 19,
+   "6": 31,
+   "7": 38,
+   "8": 46,
+   "9": 60,
+   "10": 69,
+   "11": 78,
+   "12": 94,
+   "13": 104,
+   "14": 115,
+   "15": 134,
+   "16": 146,
+   "17": 158,
+   "18": 181,
+   "19": 195,
+   "20": 209
+  },
+  "marks": [
+   {
+    "name": "Leaving the fair",
+    "level": 2,
+    "wins": 3
+   },
+   {
+    "name": "Ring 1 gate (4w, level 5)",
+    "level": 5,
+    "wins": 28,
+    "tries": 1
+   },
+   {
+    "name": "Ring 2 gate (K2w, level 8)",
+    "level": 8,
+    "wins": 56,
+    "tries": 1
+   },
+   {
+    "name": "Ring 3 gate (2K2w, level 11)",
+    "level": 11,
+    "wins": 91,
+    "tries": 1
+   },
+   {
+    "name": "Ring 4 gate (B, level 14)",
+    "level": 14,
+    "wins": 128,
+    "tries": 1
+   },
+   {
+    "name": "Ring 5 gate (BK2w, level 17)",
+    "level": 17,
+    "wins": 174,
+    "tries": 1
+   },
+   {
+    "name": "Ring 6 gate (B2K2w, level 20)",
+    "level": 20,
+    "wins": 227,
+    "tries": 1
+   }
+  ],
+  "gaps": {
+   "0": 0.201,
+   "1": 0.2,
+   "2": 0.132,
+   "3": 0.078,
+   "4": 0.026,
+   "-1": 0.174,
+   "-2": 0.122,
+   "-3": 0.068
+  }
+ }
+}
