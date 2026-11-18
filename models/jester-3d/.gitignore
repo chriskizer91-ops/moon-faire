@@ -1,0 +1,8 @@
+# build output and scratch stills: rebuilt by build.sh, build_site.sh, build_game.sh, build_purple.sh and build_single.py
+out/jester.js
+out/site/
+out/game/
+out/purple/
+deliver/
+shots/
+package-lock.json
