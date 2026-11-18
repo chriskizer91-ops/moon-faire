@@ -48,6 +48,7 @@ To look at a build without a graphics card: `python3 check.py '["name", x, z, fa
 | `src/ow-flora.js` | Flowers, grasses and shrubs sown round her; 144 trees across the map. |
 | `src/ow-dressing.js` | The bigger fairground (lanes, rows of tents and stalls, wagons, bunting) and what was added round each moor place. Everything is in tables at the top of the file. |
 | `src/ow-main.js` | The page: her, the camera, the controls, talking, the unseen encounters, the map, the Flipbook look. |
+| `src/ow-folk.js` | The fair folk's minds and talk joined on (`OW.folk`): what they do with themselves, what they say when she talks to them, what they call out, what two of them say to each other, and the menu's "The evening" rows. The minds, the picker and the written lines are in `game/people/talk/` (start with its `README.md`). |
 | `round1/`, `round2/`, `round3/` | Chris's 52 pictures as he sent them. |
 | `data/` | Everything a build reads, made by the `prep_*.py` scripts. |
 | `prompts/` | How the prompts page was made. Its two scripts still carry paths from the workspace they were written in (`/home/claude/...`). |
@@ -57,5 +58,6 @@ To look at a build without a graphics card: `python3 check.py '["name", x, z, fa
 - World axes: x east, z south, metres. 0.5 m to a pixel of the world map; the map's middle is 0, 0. Where each place stands is in the project note.
 - Every world surface writes 0 into the picture's see-through channel and the cast writes 1. The Flipbook look inks the cast by that, and inks the world where depth jumps, so cut-outs must use `discard`, never blending.
 - The witches in the world are the Jester at her Lightest weight. The Fox's, the Ranger's and Io's light versions were not saved as files when this was pushed.
+- What the fair folk say depends on the stage of the evening, lamps home, the party's level, a fight just won or lost, finds and errands. Until the story (S1) and the fights (F6) are joined on, the menu's "The evening" rows set these; the calls they will use are at the top of `src/ow-folk.js`. `check_folk.py` runs the minds and a few talks on the real page and takes stills (`look/f_*.png`).
 - An encounter shows a card with the painted fight place. The fight itself is another session's piece (task board, F1 and F6).
 - `src/ow-dressing.js` was written by a sub-agent that was cut off before it reported. What it left was rebuilt and checked afterwards: the pages start without errors, she can run the whole lane from the west road to beyond the gate, and no encounter can start inside the fairground. Its own notes on what is rough were lost.

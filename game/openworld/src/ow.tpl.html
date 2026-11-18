@@ -113,6 +113,14 @@ kbd { display: inline-block; min-width: 1.7em; text-align: center; font: 700 12p
 @keyframes bob { 50% { transform: translateY(3px); } }
 
 #prompt { padding: 0; }
+/* called out as she passes, or overheard between two of the fair folk: a smaller slip of the same paper, with its own little tail */
+#bark { max-width: min(250px, calc(100% - 16px)); padding: 7px 12px 8px; font-size: 14.5px; line-height: 1.3; pointer-events: none; border-width: 1.5px; box-shadow: 2px 3px 0 rgba(20, 10, 24, 0.45); }
+#bark.over { font-style: italic; background: linear-gradient(176deg, #f3e6cf, #e6d3b0); }
+#barktail { position: absolute; bottom: -8px; width: 12px; height: 12px; margin-left: -6px; background: var(--paper-2); border-right: 1.5px solid var(--paper-ink); border-bottom: 1.5px solid var(--paper-ink); transform: rotate(45deg); }
+#minds { position: absolute; left: 0; top: 0; pointer-events: none; }
+#minds span { position: absolute; left: 0; top: 0; white-space: nowrap; padding: 1px 7px 2px; font-size: 12px; color: var(--text); background: rgba(29, 18, 34, 0.82); border: 1px solid var(--gilt-line); border-radius: 9px; will-change: transform; }
+.mnote { margin: 2px 2px 6px; font-size: 13px; color: var(--muted); }
+.mrow.did { background: rgba(217, 167, 90, 0.18); }
 #use { min-width: 62px; height: 44px; display: inline-flex; align-items: center; justify-content: center; gap: 7px; padding: 0 12px; border: 0; background: none; cursor: pointer; color: var(--paper-ink); }
 #use .dots { display: inline-flex; gap: 5px; } #use .dots i { width: 7px; height: 7px; border-radius: 50%; background: var(--paper-ink); animation: dot 1.4s ease-in-out infinite; }
 #use .dots i:nth-child(2) { animation-delay: 0.2s; } #use .dots i:nth-child(3) { animation-delay: 0.4s; }
@@ -202,12 +210,14 @@ select option { background: var(--ink); color: var(--text); }
       <div id="toast" class="ink" role="status" hidden></div>
       <p id="meter"></p>
 
+      <div id="minds" aria-hidden="true"></div>
       <div id="prompt" class="bubble" hidden><button type="button" id="use"><span class="dots" aria-hidden="true"><i></i><i></i><i></i></span><kbd aria-hidden="true">E</kbd><span class="sr"></span></button></div>
       <div id="say" class="bubble" hidden>
         <b id="sayname"></b>
         <p id="sayline"></p>
         <button type="button" id="saynext" aria-label="Next"><svg viewBox="0 0 22 22" aria-hidden="true"><path class="cres" d="M14 4a7.5 7.5 0 1 0 0 14 6 6 0 1 1 0-14z" fill="#26172b"/><circle class="full" cx="11" cy="11" r="6.5" fill="#26172b"/></svg></button>
       </div>
+      <div id="bark" class="bubble" hidden><span id="barkline"></span><i id="barktail" aria-hidden="true"></i></div>
       <svg id="tail" viewBox="-12 -2 24 22" aria-hidden="true" hidden><path d="M-10 -2 L0 18 L10 -2 Z" fill="#f2dfbb"/><path d="M-10 0 L0 18 L10 0" fill="none" stroke="#26172b" stroke-width="2" stroke-linejoin="round"/></svg>
       <p id="saysr" class="sr" aria-live="polite"></p>
 
@@ -229,6 +239,15 @@ select option { background: var(--ink); color: var(--text); }
           <button type="button" class="mrow" id="looksw" aria-pressed="false"><span>Mouse look <kbd>C</kbd></span><span class="lamp"></span></button>
           <button type="button" class="mrow" id="speedsw" aria-pressed="true"><span>Show speed</span><span class="lamp"></span></button>
           <button type="button" class="mrow" id="full"><span>Full screen</span><svg class="ic" viewBox="0 0 20 20" aria-hidden="true"><path d="M3 8V3h5M12 3h5v5M17 12v5h-5M8 17H3v-5"/></svg></button>
+          <h2>The evening</h2>
+          <p class="mnote">For trying what the fair folk say and do. The story and the fights will set these themselves.</p>
+          <label class="mrow"><span>Where the night has got to</span><select id="evestage"></select></label>
+          <label class="mrow"><span class="k">Lamps home</span><input type="range" id="evelamps" min="1" max="11" step="1" value="1"><span id="evelampsv">0 of 12</span></label>
+          <label class="mrow"><span class="k">The party’s level</span><input type="range" id="evelevel" min="1" max="20" step="1" value="1"><span id="evelevelv">1</span></label>
+          <button type="button" class="mrow" id="evewon"><span>She has just won a fight</span><span class="k">tap</span></button>
+          <button type="button" class="mrow" id="evelost"><span>The four were knocked flat</span><span class="k">tap</span></button>
+          <button type="button" class="mrow" id="evehurt" aria-pressed="false"><span>One of the four is hurt</span><span class="lamp"></span></button>
+          <button type="button" class="mrow" id="mindsw" aria-pressed="false"><span>Show what people are doing</span><span class="lamp"></span></button>
           <h2>How to play</h2>
           <ul class="how">
             <li><span>Walk</span><span><kbd>W</kbd><kbd>A</kbd><kbd>S</kbd><kbd>D</kbd> or arrows; press twice to run. Or tap the ground.</span></li>

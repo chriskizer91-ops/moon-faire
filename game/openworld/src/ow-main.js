@@ -22,6 +22,12 @@
     for (const b of L) { const dx = x - b.x, dz = z - b.z; if (b.r) { if (dx * dx + dz * dz < (b.r + pad) * (b.r + pad)) return true; } else { const c = Math.cos(b.a || 0), s = Math.sin(b.a || 0), lx = dx * c - dz * s, lz = dx * s + dz * c; if (Math.abs(lx) < b.w + pad && Math.abs(lz) < b.d + pad) return true; } }
     return false;
   }
+  function ground(x, z, pad) {                                                                    // can a body stand here, people not counted (the fair folk find their way by this)
+    if (Math.abs(x) > 378 || Math.abs(z) > 250 || hits(x, z, pad == null ? 0.22 : pad)) return false;      // the cheap test first: this is asked for many spots at once
+    const h = land.height(x, z); if (h < land.WL + 0.25) return false;
+    for (const p of water.pools) { const dx = (x - p.x) / (p.rx * 1.15), dz = (z - p.z) / (p.rz * 1.15); if (dx * dx + dz * dz < 1) return false; }
+    const e = 0.45, s = Math.max(Math.abs(land.height(x + e, z) - land.height(x - e, z)), Math.abs(land.height(x, z + e) - land.height(x, z - e))) / (2 * e); return s <= 0.95;
+  }
   function free(x, z) {
     if (Math.abs(x) > 378 || Math.abs(z) > 250) return false;
     const h = land.height(x, z); if (h < land.WL + 0.25) return false;                            // the sea, the river, the marsh pools: too deep
@@ -78,10 +84,11 @@
   // ---- talking: the fair folk near her ----
   function stepPeople(dt) {
     near = null; let nd = 2.4;
+    if (OW.folk) OW.folk.step(dt, talk && talk.who);                    // the fair folk's minds and their small talk (ow-folk.js); a person with a mind turns and walks by it
     for (const p of places.people) {
       const d = Math.hypot(p.x - me.x, p.z - me.z);
       if (p.root) p.root.visible = d < 90;
-      if (p.npc) { if (d < 3.4 || (talk && talk.who === p)) p.npc.face(me.x, me.z); else p.npc.face(p.x + Math.sin(p.home) * 6, p.z + Math.cos(p.home) * 6); if (d < 60) p.npc.update(dt); }
+      if (p.npc) { if (!p.mind) { if (d < 3.4 || (talk && talk.who === p)) p.npc.face(me.x, me.z); else p.npc.face(p.x + Math.sin(p.home) * 6, p.z + Math.cos(p.home) * 6); } p.asleep = d >= 90; if (!p.asleep) p.npc.update(dt); }      // far out of sight they stand still, minds and all
       else if (p.standIn && p.root && d < 3.4) p.root.rotation.y = Math.atan2(me.x - p.x, me.z - p.z);
       if (d < nd) { nd = d; near = p; }
     }
@@ -89,12 +96,13 @@
   }
   function act() {
     if (!ready) return;
-    if (talk) { if (!bub.done) { revealAll(); return; } talk.i++; if (talk.i >= talk.who.says.length) endTalk(); else say(talk.who.name, talk.who.says[talk.i], talk.i, talk.who.says.length); return; }      // the first press shows the whole line, the next goes on
+    if (talk) { if (!bub.done) { revealAll(); return; } talk.i++; if (talk.i >= talk.says.length) endTalk(); else { say(talk.who.name, talk.says[talk.i], talk.i, talk.says.length); if (talk.lines) OW.folk.line(talk.who, talk.lines[talk.i]); } return; }      // the first press shows the whole line, the next goes on
     if (!near) return; me.goal = null; const w = near;
-    if (!w.says.length) return toast(w.name + ' has nothing to say yet.');
-    talk = { who: w, i: 0 }; if (w.npc) { w.npc.face(me.x, me.z); if (!w.met) w.npc.greet(); w.npc.talk(true); } w.met = true; say(w.name, w.says[0], 0, w.says.length);
+    const lines = OW.folk ? OW.folk.lines(w) : null, says = lines ? lines.map((l) => l.text) : w.says;      // from the written bank, chosen by what has happened (people/talk); the place's own few lines if the bank has none
+    if (!says.length) return toast(w.name + ' has nothing to say yet.');
+    talk = { who: w, i: 0, says, lines }; if (w.npc) { w.npc.face(me.x, me.z); if (!w.met) w.npc.greet(); w.npc.talk(true); } w.met = true; say(w.name, says[0], 0, says.length); if (lines && w.met2) OW.folk.line(w, lines[0]); w.met2 = true;
   }
-  function endTalk() { if (!talk) return; if (talk.who.npc) talk.who.npc.talk(false); talk = null; say(null); }
+  function endTalk() { if (!talk) return; if (talk.who.npc) talk.who.npc.talk(false); if (OW.folk) OW.folk.ended(talk.who); talk = null; say(null); }
   // a line arrives a few letters at a time: every letter is laid out at once (so the bubble keeps its size) and shown by its opacity, so typing never moves anything
   const CPS = 42, REDUCED = matchMedia('(prefers-reduced-motion: reduce)').matches;
   function say(name, line, i, n) {
@@ -310,7 +318,7 @@
     world.fog = null; cast.fog.color.copy(OW.U.uFogW.value).lerp(OW.U.uFogE.value, 0.5);
     OW.U.uCamPos.value.copy(camera.position);
     terrain.update(camera.position, 6); tufts.update(me); flora.update(me, time);
-    stepEnc(); stepPlace(dt); stepType(dt); placeBubble(dt);
+    stepEnc(); stepPlace(dt); stepType(dt); placeBubble(dt); if (OW.folk) OW.folk.place();
     const b = performance.now(); if (draw) render(); const c = performance.now();
     meter.n++; meter.t += dt; meter.upd += b - a; meter.drw += c - b;
     if (meter.t >= 0.5) { const i = renderer.info.render; $('meter').textContent = (TEST ? (1 + others.length) + ' witches at ' + weight + ', ' + places.people.filter((p) => p.npc).length + ' fair folk · ' : '') + Math.round(meter.n / (meter.real || meter.t)) + ' pictures a second · ' + Math.round(i.triangles / 1000) + 'k triangles · ' + renderer.info.render.calls + ' draws · moving ' + (meter.upd / meter.n).toFixed(1) + ' ms · drawing ' + (meter.drw / meter.n).toFixed(1) + ' ms'; meter.n = 0; meter.t = 0; meter.real = 0; meter.upd = 0; meter.drw = 0; }
@@ -352,6 +360,7 @@
       props = OW.makeProps(world, land, places.bushes); fires = OW.makeFires(world, places.fires);
       const mac = OW.tex(D.img.macro); await mac.ready; tufts = OW.makeTufts(world, land, mac.image, terrain.tuftMat); flora = OW.makeFlora(world, land, mac.image);
       allBlockers = places.blockers.concat(props.blockers, flora.blockers); indexBlockers();
+      if (OW.folk) OW.folk.start({ places, me, others, scene: world, canvas, camera: () => camera, ground, height: (x, z) => land.height(x, z), talking: () => !!talk, block: (b) => { allBlockers.push(b); indexBlockers(); } });
       makeCatcher(); makeFlip();
       setLoad('Building the Jester…');
       J = makeWitch(weight);
@@ -445,6 +454,6 @@
     if (Math.abs(x) < 375 && Math.abs(z) < 248 && land.height(x, z) > land.WL + 0.3) { placeAt(x, z, me.face); $('mapbox').hidden = true; } else toast('That is water. Pick somewhere on the land.');
   });
   // for checking: step the page by hand (?shot=1)
-  window.OWP = { enc, encounter, encDone, toggleFlip, toggleView, get paused() { return paused; }, setWeight, get others() { return others; }, get cast() { return cast; }, get me() { return me; }, get cam() { return cam; }, get keys() { return keys; }, get places() { return places; }, get terrain() { return terrain; }, get land() { return land; }, get renderer() { return renderer; }, get J() { return J; }, flip, placeAt, goPlace, act, toast, setMenu, bub,
+  window.OWP = { enc, encounter, encDone, toggleFlip, toggleView, get paused() { return paused; }, setWeight, get others() { return others; }, get cast() { return cast; }, get me() { return me; }, get cam() { return cam; }, get keys() { return keys; }, get places() { return places; }, ground: (x, z, pad) => ground(x, z, pad), get terrain() { return terrain; }, get land() { return land; }, get renderer() { return renderer; }, get J() { return J; }, flip, placeAt, goPlace, act, toast, setMenu, bub,
     step(dt, n) { for (let i = 0; i < (n || 1); i++) advance(dt, i === (n || 1) - 1); }, ready: false };
 })();
