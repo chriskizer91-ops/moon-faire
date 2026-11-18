@@ -1,0 +1,198 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Io 3D</title>
+<style>
+:root{--velvet:#15121c;--curtain:#211b2b;--stage:#383043;--blue:#d0567c;--blued:#7a2443;--silver:#f0dfc0;--teal:#49c9bc;--gold:#d9ad55;--ink:#f0ebf5;--muted:#a99db9;--line:#3a3049;
+  --serif:"Iowan Old Style","Palatino Linotype",Palatino,Georgia,serif;--body:system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;--mono:ui-monospace,Menlo,Consolas,monospace;color-scheme:dark}
+*,*::before,*::after{box-sizing:border-box}
+html,body{margin:0;background:var(--velvet);color:var(--ink)}
+body{font:15px/1.5 var(--body);padding:14px 14px 40px}
+.wrap{max-width:900px;margin:0 auto;display:flex;flex-direction:column;gap:14px}
+h1{font:400 clamp(36px,10vw,58px)/.95 var(--serif);margin:0;color:var(--silver)}
+h1 em{font-style:italic;color:var(--blue)}
+.eyebrow{font:600 11px var(--mono);letter-spacing:.16em;text-transform:uppercase;color:var(--gold);margin:0 0 4px}
+.sub{color:var(--muted);font-size:14.5px;margin:6px 0 0;max-width:62ch}
+.play{display:flex;flex-direction:column;gap:14px}
+.stagebox{position:sticky;top:0;z-index:5;background:var(--stage);border:1px solid var(--line);border-radius:8px;overflow:hidden;width:100%;height:min(66vh,128vw);min-height:340px;touch-action:none}
+canvas#stage{display:block;width:100%;height:100%;touch-action:none;cursor:grab}
+.hud{position:absolute;left:10px;top:8px;font:12px var(--mono);color:var(--muted);background:rgba(21,18,28,.72);padding:2px 8px;border-radius:4px;pointer-events:none}
+#ref{position:absolute;right:8px;top:8px;width:min(25%,190px);border:1px solid var(--gold);border-radius:4px;background:#3b2f43;box-shadow:0 4px 18px rgba(0,0,0,.45);pointer-events:none}
+#ref[hidden]{display:none}
+.reftag{position:absolute;right:14px;top:12px;font:600 10px var(--mono);letter-spacing:.1em;text-transform:uppercase;color:var(--gold);text-shadow:0 1px 2px #000;pointer-events:none}
+#ref[hidden]+.reftag{display:none}
+.err{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;padding:24px;text-align:center;background:var(--stage)}
+.err[hidden]{display:none}
+.label{font:600 11px var(--mono);letter-spacing:.12em;text-transform:uppercase;color:var(--muted);margin:0 0 6px}
+.chips{display:flex;flex-wrap:wrap;gap:8px}
+.chip{font:600 14px var(--body);color:var(--ink);background:var(--curtain);border:1px solid var(--line);border-radius:999px;padding:9px 15px;min-height:42px;cursor:pointer}
+.chip:focus-visible{outline:2px solid var(--teal);outline-offset:2px}
+.chip[aria-pressed="true"]{background:var(--blued);border-color:var(--silver);color:#fff}
+.notes{background:var(--curtain);border:1px solid var(--line);border-radius:8px;padding:12px 14px}
+.notes h2{font:600 15px var(--body);margin:0 0 6px;color:var(--silver)}
+.notes ul{margin:0;padding-left:18px;display:grid;gap:5px;color:var(--ink)}
+.notes li::marker{color:var(--blue)}
+.notes .m{color:var(--muted)}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <p class="eyebrow">Moon Faire · stage fourteen of her build</p>
+    <h1><em>Io</em>, the Herbal Witch</h1>
+    <p class="sub">New: Her reactions. Hit: she holds her hat on. Down: she sinks to the ground and her hat falls off. Win: she snaps her book shut and tips her hat. Drag to turn her, pinch to zoom.</p>
+  </header>
+  <div class="play">
+  <div class="stagebox" id="box">
+    <canvas id="stage"></canvas>
+    <div class="hud" id="hud">loading</div>
+    <img id="ref" alt="The painting for this view" hidden><span class="reftag">Painting</span>
+    <div class="err" id="err" hidden></div>
+  </div>
+  <div><p class="label">Moves</p><div class="chips" id="moves"></div></div>
+  <div><p class="label">Her spells</p><div class="chips" id="spells"></div></div>
+  <div><p class="label">Her reactions</p><div class="chips" id="reacts"></div></div>
+  <div><p class="label">View</p><div class="chips" id="views"></div></div>
+  <div><p class="label">Her feelings</p><div class="chips" id="feels"></div></div>
+  <div><p class="label">Her face</p><div class="chips" id="faces"></div></div>
+  <div><p class="label">Held still, to check her against the paintings</p><div class="chips" id="poses"></div></div>
+  <div><p class="label">Show</p><div class="chips" id="shows"></div></div>
+  </div>
+  <div class="notes">
+    <h2>New in this stage</h2>
+    <ul>
+      <li>Harvest Crescent, her plain attack (paintings H3, H4, I3). Her hand closes on the moon pendant and gold light leaks out; it unfolds into the sickle; she sets her feet, lifts it behind her shoulder and makes one wide cut that leaves a crescent of gold light. The light flies to the training dummy and bursts into sparks. The sickle folds back into the pendant.</li>
+      <li>Silverleaf Salve, her heal for one friend (H5, H6, I1). She lifts a pressed leaf from the page; it turns fresh and silver-green and stands in the air over her open palm, glowing; then it breaks into a ribbon of gold-green light and small leaves that goes to her friend and winds once round them from feet to shoulders, and soft light rises.</li>
+      <li>In both she holds her open book in her left hand, as painted. The dummy and the grey friend appear only while a spell needs them.</li>
+      <li>She wears her feelings from stage ten as she casts: her reading face over the pendant and the page, her concentrating face for the cut.</li>
+    </ul>
+    <h2 style="margin-top:12px">From the earlier stages</h2>
+    <ul>
+      <li>Her six feelings from C10, and the slower reading hand (stage ten). The pass on things passing through each other: book and hands, legs and cloth, arms and sleeves (stage nine). The party's moves, and the book that appears when she reads (stage eight). Her book, dagger and sickle (stage seven). Her ankles, her wrists and her coy wave (stage six). Her belt, pouch, crystal, necklaces and bracelets (stage five). Her cloak with the moss, and her painted hands (stage four). Her arms, her moving hair and skirt, and her first moves (stage three). Her face, glasses, hair and hat (stage two). Her body, bodice and skirt (stage one).</li>
+    </ul>
+    <h2 style="margin-top:12px">What is rough, and what is not here yet</h2>
+    <ul class="m">
+      <li>The cloak is a first build. Its cloth and trim are drawn by code in F6's colours, not cut from your swatches yet. It is not see-through.</li>
+      <li>Its body is fuller and rounder than in your picture, because it rides on the skirt. Its sleeves are narrower than the wide wings in your picture.</li>
+      <li>Still passing through: her hair and her sleeves at her shoulders; a sleeve and her skirt or her side when her arm is close to her body; a little sleeve cloth pinched in the crook of a tightly folded elbow; and in the hover a boot can show through the thin edge of the skirt.</li>
+      <li>I tuned the moves from still pictures and cannot watch them play.</li>
+      <li>The thin edge of each hand (thumb side, little-finger side) is soft paint with no detail: the paintings do not show it.</li>
+      <li>The new pieces are plain shapes: the belt has no gold vine or holes yet, the pouch has no flap, studs or filigree, and the necklace pendant does not swing.</li>
+      <li>Her fingers do not wrap the sickle exactly, the dagger cannot be drawn yet, and the sickle simply appears in her hand.</li>
+      <li>Her feelings are painted on: the shape of her head does not change, so from the side they show less than from the front. She blinks only in Concentrating and Stern; the others hold their own eyes.</li>
+      <li>The spells are first builds, timed from still pictures. The sickle appears and goes in a flash of light; it does not unfold piece by piece. The crescent of light flying to the dummy is my addition, so the attack reaches a foe who is not beside her.</li>
+      <li>Not here yet: Elderwood Guardian (her stag of living wood), Moonflower Garden, Rootbound Return, Thornwake, Bramble Cradle; being hit, falling and winning.</li>
+    </ul>
+  </div>
+</div>
+<script>/*THREE*/</script>
+<script>/*PAL*/</script>
+<script>/*STAGE*/</script>
+<script>/*TEX*/</script>
+<script>/*MODEL*/</script>
+<script>
+(function () {
+  'use strict';
+  const $ = (id) => document.getElementById(id), canvas = $('stage'), box = $('box');
+  const REFS = /*REFS*/{};
+  let stage, R;
+  try {
+    stage = makeStage(canvas, { shadow: 2048 });
+    if ('square' in stage) stage.square = false;
+    if ('glow' in stage) stage.glow = false;
+    R = makeIo({});
+    stage.scene.add(R.root);
+  } catch (e) { $('err').hidden = false; $('err').textContent = 'She could not be drawn on this device: ' + (e && e.message ? e.message : e); return; }
+  const orbit = stage.orbit; orbit.az = 0.35; orbit.el = 0.08; orbit.dist = 6.3; orbit.fov = 20; orbit.target.set(0, 0.92, 0);
+  let want = { az: orbit.az, el: orbit.el, dist: orbit.dist, ty: 0.92 }, easing = true, spin = false;
+  const VIEWS = [['Front', 0, 0.05, 6.3, 0.92, 'front'], ['Three-quarter', 0.7, 0.08, 6.3, 0.92, 'front'], ['Side', -Math.PI / 2, 0.05, 6.3, 0.92, 'side'], ['Back', Math.PI, 0.05, 6.3, 0.92, 'back'],
+    ['Face', 0, 0, 1.9, 1.50, 'face'], ['Face, turned', -0.75, 0, 1.9, 1.50, 'face34'], ['Profile', -Math.PI / 2, 0, 2.3, 1.50, 'profile'], ['Hat', 0.3, 0.42, 2.7, 1.60, 'hat'], ['Hair from behind', Math.PI, 0.05, 4.2, 1.16, 'hairback'],
+    ['Bodice', 0.25, 0.05, 2.6, 1.2, 'bodice'], ['Skirt and leg', 0.42, 0.05, 3.9, 0.58, 'skirt'], ['Boots', 0.6, 0.18, 1.9, 0.2, 'boot']];
+  const POSES = [['At rest', { arm: 15, leg: 0 }], ['As painted', { arm: 28, leg: 5.5 }], ['Arms out', { arm: 90, leg: 0 }]];
+  let refKey = 'front', showRef = true;
+  function chips(host, items, onPick, first) {
+    items.forEach((it, i) => { const b = document.createElement('button'); b.className = 'chip'; b.type = 'button'; b.textContent = it[0]; b.setAttribute('aria-pressed', i === first ? 'true' : 'false');
+      b.addEventListener('click', () => { [...host.children].forEach((c) => c.setAttribute('aria-pressed', 'false')); b.setAttribute('aria-pressed', 'true'); onPick(it); }); host.appendChild(b); });
+  }
+  function setRef() { const im = $('ref'), src = REFS[refKey]; im.hidden = !(showRef && src); if (src && im.getAttribute('src') !== src) im.src = src; }
+  chips($('views'), VIEWS, (v) => { camFree = true; want = { az: v[1], el: v[2], dist: v[3], ty: v[4] }; easing = true; spin = false; refKey = v[5]; setRef(); $('spinB').setAttribute('aria-pressed', 'false'); }, -1);
+  const FACES = [['Blinking', null, null, false], ['Talking', null, null, true], ['Eyes shut', 1, null, false], ['Mouth open', null, 'open', false], ['Oo', null, 'oo', false], ['Smile', null, 'smile', false]];
+  // her emotions, from painting C10 (stage ten): she holds the one that is picked, in whatever move she is doing
+  const FEELS = [['None', null], ['Reading', 'reading'], ['Concentrating', 'casting'], ['Surprised', 'surprised'], ['Hit', 'hit'], ['Stern', 'stern'], ['Delighted', 'delighted']];
+  chips($('feels'), FEELS, (f) => { R.setFeel(f[1]); }, 0);
+  chips($('faces'), FACES, (f) => { R.talk(f[3]); if (f[1] == null && !f[2]) R.setFace(); else R.setFace(f[1] == null ? undefined : f[1], f[2]); }, 0);
+  // her moves: 'pose' holds her still; the short ones end by themselves and she goes back to standing
+  const MOVES = [['Stand still', 'pose'], ['Standing', 'idle'], ['Walk', 'walk'], ['Talk', 'talk'], ['Push up glasses', 'glasses'], ['Tip her hat', 'hat'], ['Curtsey', 'curtsey'], ['Twirl', 'twirl'], ['Pick a herb', 'herb'], ['Wave', 'wave'], ['Look round', 'look'], ['Read her book', 'read'], ['Hold her sickle', 'sickle'], ['Jog', 'jog'], ['Squat', 'squat'], ['Kneel', 'kneel'], ['Hover', 'hover']];
+  const press = (host, i) => [...host.children].forEach((c, j) => c.setAttribute('aria-pressed', j === i ? 'true' : 'false'));
+  let shown = 'idle';
+  chips($('moves'), MOVES, (m) => { press($('spells'), -1); press($('reacts'), -1); if (m[1] === 'pose') { R.pose(POSES[0][1]); shown = 'pose'; press($('poses'), 0); } else { shown = R.play(m[1]); press($('poses'), -1); } }, 1);
+  chips($('poses'), POSES, (p) => { R.pose(p[1]); shown = 'pose'; press($('moves'), 0); press($('spells'), -1); press($('reacts'), -1); }, -1);
+  // her spells (stage eleven): each brings what it is cast at (a training dummy, or a friend to heal) and turns the camera to her side,
+  // pulled back, so she casts toward the right as in her paintings and the whole spell is in view
+  const SPELLS = [['Harvest Crescent', 'crescent'], ['Silverleaf Salve', 'salve'], ['Elderwood Guardian', 'guardian'], ['Moonflower Garden', 'garden'], ['Thornwake', 'thorn'], ['Rootbound Return', 'revive'], ['Bramble Cradle', 'cradle']], SPELL_VIEW = { az: -1.02, el: 0.07, dist: 8.3, ty: 0.92, tz: 0.60 };
+  // stage twelve: a long spell has more than one camera place, each taken at a given second of the spell: the Guardian is planted at
+  // her side, stands behind her, and leaps past her at the foe, and a phone is too narrow to hold all three at once. A drag or a
+  // pinch takes the camera away from the spell until another spell is picked.
+  const SPELL_CAM = { guardian: [[0, { az: -1.02, el: 0.07, dist: 8.3, ty: 0.92, tz: -0.39 }], [8.3, { az: -1.02, el: 0.07, dist: 11.3, ty: 1.15, tz: -1.03 }], [12.05, { az: -1.02, el: 0.07, dist: 10.0, ty: 0.97, tz: 0.74 }]],
+    garden: [[0, { az: 0.10, el: 0.20, dist: 11.2, ty: 0.76 }]], revive: [[0, { az: -1.02, el: 0.14, dist: 8.2, ty: 0.62, tz: -0.42 }]], cradle: [[0, { az: -0.6, el: 0.08, dist: 9.4, ty: 1.12 }]] };
+  let camSpell = null, camKey = -1, camFree = false;
+  chips($('spells'), SPELLS, (m) => { shown = R.play(m[1]); press($('moves'), -1); press($('poses'), -1); press($('reacts'), -1); camSpell = m[1]; camKey = 0; camFree = false; want = Object.assign({}, SPELL_CAM[m[1]] ? SPELL_CAM[m[1]][0][1] : SPELL_VIEW); easing = true; spin = false; refKey = ''; setRef(); $('spinB').setAttribute('aria-pressed', 'false'); [...$('views').children].forEach((c) => c.setAttribute('aria-pressed', 'false')); }, -1);
+  // stage fourteen: her reactions (hit, down, win), seen from a little to her right
+  const REACTS = [['Hit', 'hit'], ['Down', 'down'], ['Win', 'win']];
+  chips($('reacts'), REACTS, (m) => { shown = R.play(m[1]); press($('moves'), -1); press($('poses'), -1); press($('spells'), -1); camSpell = null; camFree = false; want = m[1] === 'down' ? { az: -0.45, el: 0.16, dist: 7.6, ty: 0.72 } : { az: -0.45, el: 0.08, dist: 7.4, ty: 0.98 }; easing = true; spin = false; refKey = ''; setRef(); $('spinB').setAttribute('aria-pressed', 'false'); [...$('views').children].forEach((c) => c.setAttribute('aria-pressed', 'false')); }, -1);
+  R.pose(POSES[0][1]); R.play('idle');
+  const toggle = (host, id, label, on, fn) => { const b = document.createElement('button'); b.className = 'chip'; b.type = 'button'; b.id = id; b.textContent = label; b.setAttribute('aria-pressed', on ? 'true' : 'false');
+    b.addEventListener('click', () => { const v = b.getAttribute('aria-pressed') !== 'true'; b.setAttribute('aria-pressed', v ? 'true' : 'false'); fn(v); }); host.appendChild(b); };
+  toggle($('shows'), 'refB', 'Painting beside her', true, (v) => { showRef = v; setRef(); });
+  toggle($('shows'), 'spinB', 'Turn slowly', false, (v) => { spin = v; easing = false; });
+  // Chris, November 13: the Flipbook look is a switch on every witch's page, and the page opens in the smooth look (claude/HOW-TO-flipbook-look.md)
+  // The finer Flipbook look (claude/HOW-TO-flipbook-look.md, section 11): two sliders that show while the look is on. They open at the setting
+  // Chris liked for the witches: 1.2 mm of her to a pixel, full flipbook colours. Pixel size at chunky is the look as it first was (4.75 mm).
+  const flipBox = document.createElement('div'); flipBox.id = 'flipset'; flipBox.style.cssText = 'display:none; margin-top:8px; font-size:13px; opacity:.9';
+  flipBox.innerHTML = '<label style="display:flex; align-items:center; gap:8px; flex-wrap:wrap">Pixel size: chunky <input type="range" id="pix" min="0" max="100" step="1" value="77" style="width:150px; accent-color:#d9b24c" aria-label="Pixel size, from chunky to fine"> fine <output id="pixout"></output></label>' +
+    '<label style="display:flex; align-items:center; gap:8px; flex-wrap:wrap; margin-top:6px">Colours: smooth <input type="range" id="snap" min="0" max="100" step="5" value="100" style="width:150px; accent-color:#d9b24c" aria-label="Colours, from smooth to the flipbook\'s own"> flipbook <output id="snapout"></output></label>';
+  $('shows').parentNode.appendChild(flipBox);
+  const flipSet = () => { const on = stage.look === 'flipbook', pix = +$('pix').value, mm = 4.75 * Math.pow(0.8 / 4.75, pix / 100); stage.pixelWhole = pix === 0; stage.mmPerPixel = mm; stage.snap = +$('snap').value / 100;
+    $('pixout').textContent = mm.toFixed(1) + ' mm of her to a pixel'; $('snapout').textContent = $('snap').value + '%'; flipBox.style.display = on ? 'block' : 'none'; };
+  $('pix').addEventListener('input', flipSet); $('snap').addEventListener('input', flipSet);
+  toggle($('shows'), 'flipB', 'Flipbook look', false, (v) => { stage.look = v ? 'flipbook' : 'smooth'; flipSet(); });
+  const show = (keys) => (v) => { for (const k of keys) if (R.meshes[k]) R.meshes[k].visible = v; };
+  toggle($('shows'), 'hatB', 'Hat', true, show(['felt', 'brim', 'hatband', 'silver', 'gold', 'horn']));
+  toggle($('shows'), 'glassB', 'Glasses', true, show(['wire', 'lens', 'pad']));
+  toggle($('shows'), 'hairB', 'Hair', true, show(['tress', 'tressIn', 'wisp', 'lock', 'hairmass']));
+  toggle($('shows'), 'skirtB', 'Skirt', true, show(['skirt', 'tulle', 'band']));
+  toggle($('shows'), 'robeB', 'Cloak', true, show(['robe', 'moss', 'fern']));
+  toggle($('shows'), 'propB', 'Book and blades', true, (v) => { R.setProps(v); for (const k of ['propLeather', 'propGold', 'propWood']) if (R.meshes[k]) R.meshes[k].visible = v; });
+  toggle($('shows'), 'gearB', 'Belt and jewellery', true, show(['leather', 'bead', 'wood', 'crystal', 'gearGold', 'gearSilver']));
+  setRef();
+  // drag to turn, pinch or wheel to zoom
+  const pts = new Map(); let pinch0 = 0, dist0 = 0;
+  canvas.addEventListener('pointerdown', (e) => { canvas.setPointerCapture(e.pointerId); pts.set(e.pointerId, [e.clientX, e.clientY]); easing = false; camFree = true; if (pts.size === 2) { const a = [...pts.values()]; pinch0 = Math.hypot(a[0][0] - a[1][0], a[0][1] - a[1][1]); dist0 = orbit.dist; } });
+  canvas.addEventListener('pointermove', (e) => { const p = pts.get(e.pointerId); if (!p) return; const dx = e.clientX - p[0], dy = e.clientY - p[1]; pts.set(e.pointerId, [e.clientX, e.clientY]);
+    if (pts.size === 1) { orbit.az -= dx * 0.008; orbit.el = Math.max(-0.3, Math.min(1.3, orbit.el + dy * 0.006)); }
+    else if (pts.size === 2 && pinch0 > 0) { const a = [...pts.values()], d = Math.hypot(a[0][0] - a[1][0], a[0][1] - a[1][1]); orbit.dist = Math.max(1.2, Math.min(9, dist0 * pinch0 / d)); orbit.target.y = Math.max(0.1, Math.min(1.7, orbit.target.y + dy * 0.0012)); } });
+  const up = (e) => { pts.delete(e.pointerId); pinch0 = 0; };
+  canvas.addEventListener('pointerup', up); canvas.addEventListener('pointercancel', up);
+  canvas.addEventListener('wheel', (e) => { e.preventDefault(); easing = false; camFree = true; orbit.dist = Math.max(1.2, Math.min(9, orbit.dist * Math.exp(e.deltaY * 0.001))); }, { passive: false });
+  let sized = '';
+  function fit() { const w = box.clientWidth, h = box.clientHeight, pr = Math.min(window.devicePixelRatio || 1, 2), k = w + 'x' + h + 'x' + pr; if (k !== sized && w > 0 && h > 0) { sized = k; stage.resize(w, h, pr); } }
+  let last = 0;
+  function frame(now) {
+    requestAnimationFrame(frame); const dt = Math.min(0.05, (now - last) / 1000 || 0.016); last = now; fit();
+    R.animate(dt);
+    if (R.move !== shown) { shown = R.move; press($('moves'), MOVES.findIndex((m) => m[1] === shown)); press($('spells'), SPELLS.findIndex((m) => m[1] === shown)); press($('reacts'), REACTS.findIndex((m) => m[1] === shown)); }       // a short move or a spell has ended
+    if (camSpell && !camFree && R.move === camSpell && SPELL_CAM[camSpell]) { const K = SPELL_CAM[camSpell]; let i = 0; while (i < K.length - 1 && K[i + 1][0] <= R.moveT) i++; if (i !== camKey) { camKey = i; want = Object.assign({}, K[i][1]); easing = true; } }
+    R.spellFx.view.set(Math.sin(orbit.az) * Math.cos(orbit.el), Math.sin(orbit.el), Math.cos(orbit.az) * Math.cos(orbit.el));
+    if (spin) orbit.az += dt * 0.5;
+    if (easing) { let d = want.az - orbit.az; d = Math.atan2(Math.sin(d), Math.cos(d)); const k = Math.min(1, dt * 5); orbit.az += d * k; orbit.el += (want.el - orbit.el) * k; orbit.dist += (want.dist - orbit.dist) * k; orbit.target.y += (want.ty - orbit.target.y) * k; orbit.target.z += ((want.tz || 0) - orbit.target.z) * k; orbit.target.x += ((want.tx || 0) - orbit.target.x) * k; }
+    stage.render();
+  }
+  $('hud').textContent = 'Stage fourteen · ' + Math.round(R.triangles / 1000) + 'k triangles';
+  window.IO = { stage, R, step() { fit(); stage.render(); } };
+  requestAnimationFrame(frame);
+})();
+</script>
+</body>
+</html>
