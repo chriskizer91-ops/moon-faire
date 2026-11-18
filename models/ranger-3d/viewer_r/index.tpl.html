@@ -1,0 +1,363 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>The Ranger 3D</title>
+<style>
+:root{--velvet:#15121c;--curtain:#211b2b;--stage:#383043;--blue:#5b8cf0;--blued:#2b4da3;--silver:#cfd8ec;--teal:#49c9bc;--gold:#d9ad55;--ink:#f0ebf5;--muted:#a99db9;--line:#3a3049;
+  --serif:"Iowan Old Style","Palatino Linotype",Palatino,Georgia,serif;--body:system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;--mono:ui-monospace,Menlo,Consolas,monospace;color-scheme:dark}
+*,*::before,*::after{box-sizing:border-box}
+html,body{margin:0;background:var(--velvet);color:var(--ink)}
+body{font:15px/1.5 var(--body);padding:14px 14px 40px}
+.wrap{max-width:900px;margin:0 auto;display:flex;flex-direction:column;gap:14px}
+h1{font:400 clamp(36px,10vw,58px)/.95 var(--serif);margin:0;color:var(--silver)}
+h1 em{font-style:italic;color:var(--blue)}
+.eyebrow{font:600 11px var(--mono);letter-spacing:.16em;text-transform:uppercase;color:var(--gold);margin:0 0 4px}
+.sub{color:var(--muted);font-size:14.5px;margin:6px 0 0;max-width:62ch}
+.stagebox{position:relative;background:var(--stage);border:1px solid var(--line);border-radius:8px;overflow:hidden;width:100%;height:min(74vh,128vw);min-height:340px;touch-action:none}
+canvas#stage{display:block;width:100%;height:100%;touch-action:none;cursor:grab}
+.hud{position:absolute;left:10px;top:8px;font:12px var(--mono);color:var(--muted);background:rgba(21,18,28,.72);padding:2px 8px;border-radius:4px;pointer-events:none}
+#ref{position:absolute;right:8px;top:8px;width:min(25%,190px);border:1px solid var(--gold);border-radius:4px;background:#3b2f43;box-shadow:0 4px 18px rgba(0,0,0,.45);pointer-events:none}
+#ref[hidden]{display:none}
+.reftag{position:absolute;right:14px;top:12px;font:600 10px var(--mono);letter-spacing:.1em;text-transform:uppercase;color:var(--gold);text-shadow:0 1px 2px #000;pointer-events:none}
+#ref[hidden]+.reftag{display:none}
+.err{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;padding:24px;text-align:center;background:var(--stage)}
+.err[hidden]{display:none}
+.label{font:600 11px var(--mono);letter-spacing:.12em;text-transform:uppercase;color:var(--muted);margin:0 0 6px}
+.chips{display:flex;flex-wrap:wrap;gap:8px}
+.chip{font:600 14px var(--body);color:var(--ink);background:var(--curtain);border:1px solid var(--line);border-radius:999px;padding:9px 15px;min-height:42px;cursor:pointer}
+.chip:focus-visible{outline:2px solid var(--teal);outline-offset:2px}
+.chip[aria-pressed="true"]{background:var(--blued);border-color:var(--silver);color:#fff}
+.notes{background:var(--curtain);border:1px solid var(--line);border-radius:8px;padding:12px 14px}
+.notes h2{font:600 15px var(--body);margin:0 0 6px;color:var(--silver)}
+.notes ul{margin:0;padding-left:18px;display:grid;gap:5px;color:var(--ink)}
+.notes li::marker{color:var(--blue)}
+.notes .m{color:var(--muted)}
+details.more{margin-top:14px;border-top:1px solid var(--line);padding-top:10px}
+details.more>summary{cursor:pointer;font:600 12px var(--mono);letter-spacing:.06em;color:var(--gold);padding:6px 0}
+details.more>div{margin-top:10px}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <p class="eyebrow">Moon Faire · Stage seven: soft sleeves, tails and hair</p>
+    <h1>The <em>Ranger</em></h1>
+    <p class="sub">Pick a move, pick a camera. "Half speed" slows everything so you can watch it; the short moves play again by themselves. Drag to turn her, pinch or scroll to zoom.</p>
+  </header>
+  <div class="stagebox" id="box">
+    <canvas id="stage"></canvas>
+    <div class="hud" id="hud">loading</div>
+    <img id="ref" alt="The painting for this view" hidden><span class="reftag">Painting</span>
+    <div class="err" id="err" hidden></div>
+  </div>
+  <div><p class="label">Her moves</p><div class="chips" id="moves"></div>
+    <p class="label" style="margin-top:8px">In a fight</p><div class="chips" id="fight"></div>
+    <p class="label" style="margin-top:8px">Emotes</p><div class="chips" id="emotes"></div>
+    <div class="chips" id="extra" style="margin-top:8px"></div>
+    <div id="flipset" style="display:none; margin-top:8px; font-size:13px; opacity:.9">
+      <label style="display:flex; align-items:center; gap:8px; flex-wrap:wrap">Pixel size: chunky <input type="range" id="pix" min="0" max="100" step="1" value="77" style="width:150px; accent-color:#d9b24c" aria-label="Pixel size, from chunky to fine"> fine <output id="pixout"></output></label>
+      <label style="display:flex; align-items:center; gap:8px; flex-wrap:wrap; margin-top:6px">Colours: smooth <input type="range" id="snap" min="0" max="100" step="5" value="100" style="width:150px; accent-color:#d9b24c" aria-label="Colours, from smooth to the flipbook's own"> flipbook <output id="snapout"></output></label>
+    </div></div>
+  <div><p class="label">Camera</p><div class="chips" id="cam"></div></div>
+  <details class="more"><summary>More views and switches (for checking her against the paintings)</summary>
+  <div><p class="label">Belts, bags and hooks</p><div class="chips" id="gear"></div></div>
+  <div><p class="label">Head</p><div class="chips" id="hviews"></div></div>
+  <div><p class="label">Her face: younger, as you chose</p><div class="chips" id="looks"></div></div>
+  <div><p class="label">Her face</p><div class="chips" id="faces"></div></div>
+  <div><p class="label">Boots</p><div class="chips" id="boots"></div></div>
+  <div><p class="label">Hands and arms</p><div class="chips" id="hands"></div></div>
+  <div><p class="label">Body</p><div class="chips" id="views"></div></div>
+  <div><p class="label">Arms and legs</p><div class="chips" id="poses"></div></div>
+  <div><p class="label">Show</p><div class="chips" id="shows"></div></div>
+  </details>
+  <details class="more"><summary>Notes on this build</summary>
+  <div class="notes">
+    <h2>Changed in this pass</h2>
+    <ul>
+      <li>New move, "The gem's two shots", in the fight row. She touches her gem, takes the bow from her back and draws. The first arrow of light goes. Her hand comes forward to the string again as the bow arm bends in to meet it, she draws a second time, and the second arrow goes. Then the bow is rolled up and put away.</li>
+      <li>These two arrows are thicker and longer than the one in Moonsteel Draw. Her gem and the light on her arms stay lit from the touch until after the second arrow, and the gem flares as each one goes.</li>
+      <li>"The gem" on its own is still there: the touch without the shots.</li>
+      <li>The Flipbook look now has the finer version from the updated instructions. Turn it on and two sliders appear: "Pixel size" and "Colours". They open where you said looks good on the witches: 1.2 mm of her to a pixel, with full flipbook colours. Slide Pixel size all the way to chunky for the look as it was.</li>
+      <li>The Flipbook look still starts off when the page opens.</li>
+    </ul>
+    <h2 style="margin-top:12px">Earlier: nothing passes through</h2>
+    <ul>
+      <li>Her hands and forearms no longer pass through her satchel, her pouch or her legs. This holds in every move, and on the way from one move to the next.</li>
+      <li>Standing, walking and jogging, her arms hang and swing a little wider than before. The satchel and the pouch sit just where her hands used to hang, so her hands now go round them.</li>
+      <li>"Hover" now reads as meditation: the backs of her hands rest on her thighs just above her knees, palms up, with finger and thumb together.</li>
+      <li>"Sit": both hands now hold her raised knee. Her right hand used to lie where the satchel is.</li>
+      <li>"Hard hit", "Court bow", "Win" and "Wave": a hand on its way to her middle, her heart or her hip goes round her hip and bag, not through them.</li>
+      <li>"Sword": between the cut and putting the sword away, her left hand goes round her hip. It used to pass through her.</li>
+      <li>"Fall" stays as it is, as you said.</li>
+    </ul>
+    <h2 style="margin-top:12px">Earlier: fight reactions and emotes</h2>
+    <ul>
+      <li>Her moves are now in three rows: everyday moves, "In a fight", and "Emotes". Picking one move lets go of the others.</li>
+      <li>"Hit": a blow from screen right. She rocks away from it with her eyes shut, her left arm comes up, and she rolls her shoulder and is ready again. Her feet stay where they are.</li>
+      <li>"Hard hit": she is knocked two steps back, turns from the blow and folds over it with an arm across her middle. Then she straightens and steps back into place.</li>
+      <li>"Dodge": she drops low and slips away from screen right on a bent leg, one fist up as a guard, and springs back.</li>
+      <li>"Win": a low pump of both fists, a hop with one fist thrown up, then her weight on one hip, a hand on it, and a two-finger salute flicked from her brow.</li>
+      <li>"Fall": she staggers, drops to her knees and slumps forward with her head and arms hanging. She stays down until you pick another move, and then gets up.</li>
+      <li>"Court bow": her right foot drawn back, her right hand to her heart, her left arm swept out, and she bends from the hips.</li>
+      <li>"Wave": up on her toes, her right hand high and going from side to side, her left hand on her hip.</li>
+      <li>"Kneel", "Squat" and "Sit": she slides down into each and stays there. On one knee her hand rests on the raised knee. In the squat her heels stay down and her hands are on her knees. Sitting, one leg is out straight and one knee is up.</li>
+      <li>"Hover": she floats cross-legged with her eyes shut and her hands open on her thighs. A round of pale light turns on the ground under her, her gem glows, and a few sparks hang round her. You told Io's page that all four witches hover this way, so she has it too.</li>
+      <li>She slides from any of these to any other, and back up to standing, without a jump.</li>
+      <li>When she is low her scabbard lies back along the ground instead of going through it.</li>
+    </ul>
+    <h2 style="margin-top:12px">Earlier: her wrists, the gem, Silverglass</h2>
+    <ul>
+      <li>Her wrists in "Knives". Her hand now keeps to her forearm: cocked back a little in the wind-up, snapped forward at the throw, and after the knife has gone her open hand points where it went. The knife turns with her hand.</li>
+      <li>New move, "The gem". Two fingers of her right hand touch the gem on her headband. It flares, a ring of light opens from it, and light runs down both her arms to her knuckles. Her eyes close and she smiles. For one breath the sparks round her, her sleeves, her hair and her charms all hang still. Then everything lets go at once.</li>
+      <li>New move, "Silverglass". She hops her feet wide, draws her left hand back and pushes her palm out flat. A round window of silver-blue glass a metre across opens in front of it, with a crescent moon at its centre and loose shards floating at its rim. She holds it, then it breaks into shards that scatter and fade.</li>
+      <li>All of this light is light only: in the Flipbook look it stays soft and gets no ink line.</li>
+    </ul>
+    <h2 style="margin-top:12px">Earlier: her knives</h2>
+    <ul>
+      <li>Her two throwing knives are built from your knife painting: each one piece of moonsteel, 20 cm long, with a ring holding a crescent moon, a handle bound in dark blue cord and a leaf-shaped blade.</li>
+      <li>They sit handles up in a black double sheath with a blue stud, at the small of her back just under her belts. The folded bow rides 2 cm higher than before to make room.</li>
+      <li>New move, "Knives". Both hands go behind her and take a knife each. She hops her feet wide with her chest to us, right hand up by her head and left hand low in front, as in your painting. She coils, throws the first with her right hand as her body turns toward screen right, and the second is already coming up: she throws it with her left as her body turns back. Each knife flies point first with a thin trail of light.</li>
+      <li>After the throw the knives come back to the sheath in a small glint of light, so the move can be played again. You said yes to this.</li>
+      <li>New switch: "Knives", under "More views and switches".</li>
+    </ul>
+    <h2 style="margin-top:12px">Earlier: her sword</h2>
+    <ul>
+      <li>Her sword is built from your sword painting: a slim moonsteel blade, a crescent guard with its horns toward the blade, a dark blue grip bound with silver wire, and an oval blue gem in gold with a ring of gold beads for a pommel. 74 cm long.</li>
+      <li>It hangs in a black scabbard with a silver mouth and tip at the front of her left hip, tip down and back, as in your carry painting. The scabbard swings as she moves, and her thigh pushes it aside instead of passing through it.</li>
+      <li>New move, "Sword". Her left hand tips the scabbard, her right hand crosses and draws. She hops round to face screen right and lands on guard, right foot leading. The blade goes back over her shoulder, then comes over the top in one full cut with a long step, leaving a crescent of light. She holds the lunge, comes back to guard, turns to the front and puts the sword away.</li>
+      <li>Her feet are planted in this move: each foot is put on a spot on the ground and her legs are worked out from it, the same way as her arms.</li>
+      <li>New switch: "Sword", under "More views and switches".</li>
+    </ul>
+    <h2 style="margin-top:12px">Earlier: fingers, the bow, Moonsteel Draw</h2>
+    <ul>
+      <li>Her fingers curl. Her hands hang relaxed, close round what she holds, open when she talks and make a fist when she cheers.</li>
+      <li>Her bow is built from your bow paintings: moonsteel, a dark blue leather grip, a crescent holding a blue gem at each end of the grip, and open limbs of two rails with a vine and leaves between them. It is 96 cm from tip to tip.</li>
+      <li>Folded, each limb rolls up toward its tip like a fern, and the bow rides upright on the middle of her back, 37 cm long. It stays there while she walks, jogs, talks and cheers.</li>
+      <li>"Take aim" is now "Moonsteel Draw". She pulls the bow from her back with her right hand, brings it round her side, takes the grip in her left, and the limbs unroll. Sparks show where the string will be, then the string of light. She hooks it with three fingers, pushes the bow out and pulls back to the corner of her jaw, holds with her eyes narrowed, and lets go. The arrow of light flies toward screen right, her hand springs back with the fingers open, the bow dips, rolls up and goes back on her back.</li>
+      <li>Her arms are now worked out from where her hands need to be, so her left hand stays on the grip and her right on the string all the way through.</li>
+      <li>The string, the sparks and the arrow are light only. In the Flipbook look they stay soft and get no ink line.</li>
+      <li>New buttons: "Back" in the camera row, and a "Bow" switch under "More views and switches".</li>
+    </ul>
+    <h2 style="margin-top:12px">Earlier: sleeves, soft things, feet, the page</h2>
+    <ul>
+      <li>Sleeves, a different way altogether: the lace keeps its painted length and shape in every pose. Her forearms and hands are simply always drawn in front of the lace, so wherever they cross you see her whole arm with the lace behind it.</li>
+      <li>Sleeves, a different way: as soon as her elbow bends, the lace is pushed up her arm, shorter and closer, so its hem ends well above her elbow and her forearm has nothing to pass through. With her arm straight it hangs to her elbow as painted.</li>
+      <li>"Flipbook look" is a new switch beside "Half speed". It redraws her at her sprites' pixel size, in the 56 colours all four witches share, with an inked outline. It starts off.</li>
+      <li>Sleeves again: a folded elbow now gathers the lace small and close round her upper arm, short of her forearm, and the loop rides a little above her arm instead of lying on it.</li>
+      <li>Sleeves, done again: each is now a loop of cloth round her arm. It rests on the top of her arm and hangs below it, her forearm pushes it aside and gathers it toward her shoulder when her elbow folds, and her arm always stays inside it. It follows on a spring, so it sways.</li>
+      <li>Soft things: her lace sleeves, the two tails of her headband and her sixteen loose locks now hang and swing. Each lags when she moves and settles when she stops. A sleeve hangs further down the more her elbow folds, so in "Take aim" her forearm no longer passes through it.</li>
+      <li>Her shoulders: each arm now turns in her shoulder like a ball in a socket, so nothing pinches or steps where arm meets body when she raises it. Her armpit opens a little as it lifts. Her shape standing still is unchanged.</li>
+      <li>Her feet: the ankle now bends only as far as an ankle can, the foot hangs loose while it is in the air, and her stiff boots no longer fold at the toe.</li>
+      <li>Less stiff: each part of her body moves a beat behind the one below it, her arms hang loose, her head drifts a little.</li>
+      <li>The jog is lighter and more upright, with softer arms.</li>
+      <li>The short moves are slower and repeat; "Half speed" slows everything.</li>
+      <li>The page: moves and camera on top, everything else folded under "More".</li>
+    </ul>
+    <h2 style="margin-top:12px">Her own first moves</h2>
+    <ul>
+      <li>Written for her as the quick, sporty one. The Jester's set was the reference for what a set should hold, not copied.</li>
+      <li><b>Ready:</b> she breathes, shifts her weight, and every few seconds bounces twice on her toes. She blinks.</li>
+      <li><b>Walk:</b> rebuilt. She lands on her heel and pushes off her toes, her knee gives as each foot lands, her hips turn and dip with each stride, her shoulders turn against her hips and her head stays on where she is going.</li>
+      <li><b>Jog:</b> the same stride made quick: leaning in, heels kicking up, elbows bent and pumping.</li>
+      <li><b>Talk:</b> her own. Weight on one hip, one quick hand at chest height, small nods, her mouth moving through her painted mouths.</li>
+      <li><b>Moonsteel Draw:</b> the bow from her back, the full draw, the arrow loosed, the bow put away. It replaces "Take aim".</li>
+      <li><b>Sword:</b> drawn from her left hip, a guard, one full cut with a long step, and away.</li>
+      <li><b>Knives:</b> both from the back of her belt, the first thrown with her right hand and the second with her left.</li>
+      <li><b>The gem:</b> two fingers to her headband, light down her arms, one still breath.</li>
+      <li><b>Silverglass:</b> her palm pushed out, the round pane of glass, then shards.</li>
+      <li><b>Cheer:</b> a dip, a jump with one arm thrown up, a soft landing, a smile. <b>Limber up:</b> bouncing on her toes, rolling her shoulders, shaking out her arms.</li>
+      <li>Her bags and charms move with all of it.</li>
+    </ul>
+    <h2 style="margin-top:12px">Her hair and face</h2>
+    <ul>
+      <li>The younger face, with her hair left grey, as you chose. The top of her head slopes back from the band and the bun sits on the back of her head.</li>
+    </ul>
+    <h2 style="margin-top:12px">The faces</h2>
+    <ul>
+      <li>"Try a face" swaps the face painted on her head. Her head shape, hair, band and glasses do not change. Blink, talk and smile work on all three.</li>
+      <li><b>Younger</b> is her own painted face with the lines of age taken out: forehead lines, crow's feet, the shade under her eyes and the folds beside her mouth are lifted toward the skin round them. Eyes, brows, lashes, lips and her mole are kept. Her hair is still grey.</li>
+      <li><b>The Fox's</b> is the Fox's painted face laid on the same head: hazel eyes, freckles, red lips. Her skin is toned to the Ranger's so face and neck agree, and her eyes are moved 3 mm apart to sit in the Ranger's eye sockets.</li>
+      <li>Rough: only the front of the face changes. The sides of her cheeks and her ears keep the paint of her own face, so a seam of tone can show at three-quarter.</li>
+    </ul>
+    <h2 style="margin-top:12px">New: charms, swinging bags, shoulders</h2>
+    <ul>
+      <li>Six charms, built from your charm sheet: three turquoise crystals under the satchel, the bead string from the ring buckle, the cluster of gold balls from the square buckle, and the amber string under the pouch. Each has its clasp, chain, beads and cut stone, at the lengths in your front painting.</li>
+      <li>The bags are no longer glued on. Each hangs from its belt on a hinge, and each charm from its clasp. "Give them a swing" pushes them; they swing and settle back against her.</li>
+      <li>Her thigh now pushes a bag outward instead of passing through it. The new pose "Legs apart" shows it.</li>
+      <li>The strap hooks now move with her skin, so the outer curls ride her shoulder when she lifts her arms.</li>
+      <li>The straps are redrawn cleanly over the top of each shoulder, front to back, where they used to blur.</li>
+    </ul>
+    <h2 style="margin-top:12px">Her belts, bags and strap hooks</h2>
+    <ul>
+      <li>Two studded belts, each a real loop tilted round her hips, crossing front and back. The ring buckle is at her front right; the square buckle and blue keeper at her front left. 2.4 cm wide, with tucked ends and punched holes.</li>
+      <li>The satchel hangs by two loops on her right hip, built to its own painting. 20 cm across, 19 tall. The pouch hangs behind her left hip. 9 cm across, 14 tall.</li>
+      <li>Four strap hooks, front and back: a brass buckle with a black iron curl either side.</li>
+      <li>A choice I made: your paintings draw each bag face-on in every view, which one bag cannot do. The satchel hangs on the side of her right hip turned a little forward, so it shows from the front, the side and the back. Say if you would rather have it further round to the front.</li>
+    </ul>
+    <h2 style="margin-top:12px">Her hair</h2>
+    <ul>
+      <li>The swell over her forehead stood 2.5 to 4.6 cm too high just behind the band. It is lowered to the slope in your side painting (within 3 mm). Her crown, bun, band and face are untouched.</li>
+    </ul>
+    <h2 style="margin-top:12px">Her boots</h2>
+    <ul>
+      <li>Laid over your side, front, back and sole paintings at one scale and corrected until the outlines agreed to within a few millimetres.</li>
+      <li>Slimmer: the sole is 9.6 cm across at the ball, where it was 12 cm, and the shaft and toe are narrower to match.</li>
+      <li>The sock is lower and smaller: three soft rolls ending 29 cm up, where it stood 32 cm.</li>
+      <li>The lacing follows your painting: nine pairs of brass eyelets set back from the front edge and running down onto the instep, laces crossing over the tongue, a bow with hanging tips.</li>
+      <li>Seams as painted: the toe cap, the piece the eyelets sit in, the seam down to the welt, a domed heel counter, a strap up the back with a pull loop.</li>
+      <li>Worn charcoal-brown leather, a dark warm-grey sole with bold tan stitching round the welt, eight lugs a side.</li>
+    </ul>
+    <h2 style="margin-top:12px">Rough, or not here yet</h2>
+    <ul class="m">
+      <li>The leather is one worn texture all over. Your paintings rub paler on the toe cap and heel; hers does not yet.</li>
+      <li>The shaft is smooth: the soft creases at the ankle are missing.</li>
+      <li>Under the sole the tread is simple bars, not the crosses in E7.</li>
+      <li>From earlier stages: the paint on her fingers is drawn out a little; the edge of the hand is soft paint; a step where her arm meets her shoulder; her hair is still painted from the old pictures.</li>
+      <li>Rings, bracelets, earrings and necklaces.</li>
+      <li>Each charm is one stiff piece on a hinge: its chain does not bend, and charms can pass through each other.</li>
+      <li>The gold caps on the stones are plain, without the leaf work in your charm sheet.</li>
+      <li>These moves are first drafts, tuned from still pictures. I cannot watch them play, so the timing needs your eye.</li>
+      <li>Sleeves, tails and locks swing as single pieces that bend near the root. They do not fold or ripple yet, and a lock can pass through her neck or shoulder when she turns her head far.</li>
+      <li>With her arms straight out the iron curls bend a little with her skin, as if soft.</li>
+      <li>Moonsteel Draw is tuned from still pictures, like the other moves. Its timing needs your eye.</li>
+      <li>In Moonsteel Draw her feet still slide out to the wide stance instead of stepping.</li>
+      <li>The sword move is one cut for now. More cuts and a thrust can follow.</li>
+      <li>The vine engraved along the blade and the leaf work on the guard are not there yet. The scabbard's straps are plain.</li>
+      <li>When she walks or jogs her left arm can swing through the sword's hilt.</li>
+      <li>As the blade leaves the scabbard it turns a little early, so its point passes through the scabbard's side for a moment.</li>
+      <li>Nothing holds the folded bow to her back yet: no clip or loop.</li>
+      <li>Seen from behind, her fingers go a little way into the bow's curl as she takes hold of it.</li>
+      <li>In the Flipbook look the bow's thin silver is mostly ink line, so it reads dark.</li>
+      <li>The knives have no vine engraved on their blades, and the sheath has no silver leaf work.</li>
+      <li>From behind, her hands lie over the knife handles more than they close round them.</li>
+      <li>In "The gem's two shots" both arrows fly the same way. Aiming each at a different foe is for the game to do.</li>
+      <li>After the first arrow her bow does not dip. It dips after the second.</li>
+      <li>Silverglass only stands and breaks. What it does to a blow, or to her next attacks, is not shown.</li>
+      <li>The light on her arms runs down the front of each arm. It does not branch over her neck or face as in your painting.</li>
+      <li>The new fight moves and emotes are first drafts made from still pictures. Their timing needs your eye.</li>
+      <li>Going down to kneel, squat or sit, her feet slide along the ground to their new places. They do not step.</li>
+      <li>Only her hands and forearms are kept out of things, and only out of her bags and legs. Her elbows and upper arms, her weapons, her charms and her hair can still pass through her or each other.</li>
+      <li>While a hand holds the bow, the sword or a knife it is left exactly where the weapon needs it.</li>
+      <li>"Stand still" is left as posed, to compare with your paintings, so there her right hand still touches the satchel.</li>
+      <li>Sitting or down, her bags and charms can sink a little into the ground.</li>
+      <li>The hard hit and the dodge both go toward screen left, away from where her foes stand.</li>
+      <li>Still to come: jewellery.</li>
+    </ul>
+  </div>
+  </details>
+</div>
+<script>/*THREE*/</script>
+<script>/*PAL*/</script>
+<script>/*STAGE*/</script>
+<script>/*TEX*/</script>
+<script>/*MODEL*/</script>
+<script>
+(function () {
+  'use strict';
+  const $ = (id) => document.getElementById(id), canvas = $('stage'), box = $('box');
+  const REFS = /*REFS*/{};
+  let stage, R;
+  try {
+    stage = makeStage(canvas, { shadow: 2048 });
+    if ('square' in stage) stage.square = false;
+    if ('glow' in stage) stage.glow = false;
+    R = makeRanger({});
+    stage.scene.add(R.root);
+  } catch (e) { $('err').hidden = false; $('err').textContent = 'She could not be drawn on this device: ' + (e && e.message ? e.message : e); return; }
+  const orbit = stage.orbit; orbit.az = 0.6; orbit.el = 0.06; orbit.dist = 5.4; orbit.fov = 20; orbit.target.set(0, 0.88, 0);
+  let want = { az: orbit.az, el: orbit.el, dist: orbit.dist, ty: 0.88, tx: 0, tz: 0 }, easing = true, spin = false, speed = 1;
+  const VIEWS = [['Front', 0, 0.05, 5.6, 0.86, 'front'], ['Three-quarter', 0.7, 0.08, 5.6, 0.86, 'front'], ['Side', Math.PI / 2, 0.05, 5.6, 0.86, 'side'], ['Back', Math.PI, 0.05, 5.6, 0.86, 'back'],
+    ['Corset', 0.25, 0.05, 2.6, 1.16, 'front'], ['Legs', 0.3, 0.05, 3.6, 0.48, 'legs'], ['Boots', 0.6, 0.18, 1.9, 0.17, 'boot']];
+  const HVIEWS = [['Face', 0, 0.02, 1.5, 1.512, 'face'], ['Three-quarter', 0.7, 0.03, 1.5, 1.512, 'faceq'], ['Profile', -Math.PI / 2, 0.02, 1.6, 1.53, 'prof'], ['Back of head', Math.PI, 0.05, 1.6, 1.53, 'hback'], ['From above', 0.25, 0.78, 1.7, 1.56, 'top'], ['From below', 0.2, -0.28, 1.5, 1.49, 'below'], ['Head and shoulders', 0.5, 0.04, 2.1, 1.47, 'faceq'], ['Hair from the side', -Math.PI / 2, 0.06, 1.7, 1.56, 'hairS']];
+  // hands: seen with her arms out, the back from above and the palm from below, so the fingers point up the screen as in the paintings
+  const HANDS = [['Left hand', -Math.PI / 2, 1.2, 0.95, 1.30, 'handLb', 0.705, 2], ['Left palm', Math.PI / 2, -1.2, 0.95, 1.30, 'handLp', 0.705, 2], ['Right hand', Math.PI / 2, 1.2, 0.95, 1.30, 'handRb', -0.705, 2], ['Right palm', -Math.PI / 2, -1.2, 0.95, 1.30, 'handRp', -0.705, 2],
+    ['Left arm', 1.25, 0.10, 2.7, 1.02, 'armL', 0.27, 1], ['Right arm', -1.25, 0.10, 2.7, 1.02, 'armR', -0.27, 1]];
+  // boots: name, azimuth, elevation, distance, target height, painting, target x, pose, target z
+  const BOOTS = [['Three-quarter', -0.72, 0.36, 1.5, 0.16, 'bootQ', -0.081, 1, 0.05], ['Outer side', -Math.PI / 2, 0.05, 1.6, 0.16, 'bootS', -0.081, 1, 0.05], ['Front', 0, 0.10, 1.6, 0.17, 'bootF', 0, 1, 0.05], ['Back', Math.PI, 0.10, 1.6, 0.17, 'bootB', 0, 1, 0.0], ['From above', -0.35, 1.05, 1.5, 0.14, 'bootT', -0.081, 1, 0.05]];
+  // belts, bags and hooks: name, azimuth, elevation, distance, target height, painting, target x, pose, target z
+  const GEAR = [['Belts', 0, 0.05, 2.3, 0.92, 'gearF', 0, 1, 0], ['Satchel', -1.2, 0.10, 1.25, 0.885, 'gearSat', -0.13, 1, 0.04], ['Pouch', 2.03, 0.10, 1.05, 0.90, 'gearPou', 0.14, 1, -0.05], ['From behind', Math.PI, 0.05, 2.3, 0.92, 'gearB', 0, 1, 0],
+    ['Buckles', 0, 0.06, 0.85, 0.975, 'gearBk', 0, 1, 0.08], ['Strap hook', -0.3, 0.10, 0.72, 1.322, 'hookF', -0.115, 1, 0.07], ['Hook, behind', Math.PI - 0.3, 0.12, 0.72, 1.335, 'hookB', 0.112, 1, -0.07],
+    ['Charms', 0, 0.02, 1.8, 0.83, 'charmF', 0, 1, 0.03], ['Under the satchel', -1.1, 0.03, 0.95, 0.74, 'charmS', -0.17, 1, 0.03]];
+  const POSES = [['At rest', { arm: 15, leg: 0 }], ['As painted', { arm: 24, leg: 3 }], ['Arms out', { arm: 90, leg: 0 }], ['Legs apart', { arm: 40, leg: 20 }]];
+  let refKey = 'front', showRef = false;
+  function chips(host, items, onPick, first) {
+    items.forEach((it, i) => { const b = document.createElement('button'); b.className = 'chip'; b.type = 'button'; b.textContent = it[0]; b.setAttribute('aria-pressed', i === first ? 'true' : 'false');
+      b.addEventListener('click', () => { [...host.children].forEach((c) => c.setAttribute('aria-pressed', 'false')); b.setAttribute('aria-pressed', 'true'); onPick(it); }); host.appendChild(b); });
+  }
+  function setRef() { const im = $('ref'), src = REFS[refKey]; im.hidden = !(showRef && src); if (src && im.getAttribute('src') !== src) im.src = src; }
+  const setPose = (i) => { R.pose(POSES[i][1]); [...$('poses').children].forEach((c, k) => c.setAttribute('aria-pressed', k === i ? 'true' : 'false')); };
+  const pickView = (v, host) => { want = { az: v[1], el: v[2], dist: v[3], ty: v[4], tx: v[6] || 0, tz: v[8] != null ? v[8] : (v[6] ? -0.014 : 0), low: host === 'hands' && v[7] === 2 }; easing = true; spin = false; refKey = v[5]; setRef(); $('spinB').setAttribute('aria-pressed', 'false');
+    for (const id of ['cam', 'gear', 'hviews', 'views', 'hands', 'boots']) if (id !== host) [...$(id).children].forEach((c) => c.setAttribute('aria-pressed', 'false'));
+    if (v[7] != null) setPose(v[7]); };
+  chips($('gear'), GEAR, (v) => pickView(v, 'gear'), -1);
+  chips($('cam'), [['Whole body', 0.6, 0.06, 5.4, 0.88, 'front'], ['Front', 0, 0.05, 5.6, 0.86, 'front'], ['Side', Math.PI / 2, 0.05, 5.6, 0.86, 'side'], ['Back', Math.PI, 0.05, 5.6, 0.86, 'back'], ['Head', 0.5, 0.04, 2.1, 1.47, 'faceq'], ['Hips', 0, 0.05, 2.3, 0.92, 'gearF']], (v) => pickView(v, 'cam'), 0);
+  { const b = document.createElement('button'); b.className = 'chip'; b.type = 'button'; b.id = 'swingB'; b.textContent = 'Give them a swing'; b.addEventListener('click', () => R.swing()); $('extra').appendChild(b); }
+  chips($('hviews'), HVIEWS, (v) => pickView(v, 'hviews'), -1);
+  chips($('views'), VIEWS, (v) => pickView(v, 'views'), -1);
+  chips($('hands'), HANDS, (v) => pickView(v, 'hands'), -1);
+  chips($('boots'), BOOTS, (v) => pickView(v, 'boots'), -1);
+  chips($('faces'), [['At rest', 0, 'rest'], ['Blink', 1, 'rest'], ['Half shut', 0.5, 'rest'], ['Talking', 0, 'open'], ['Oo', 0, 'oo'], ['Smile', 0, 'smile']], (v) => R.setFace(v[1], v[2]), 0);
+  chips($('looks'), [['Younger (your pick)', 'young'], ['As first painted', 'own'], ["The Fox's", 'fox']], (v) => { R.setLook(v[1]); pickView(HVIEWS[0], 'hviews'); $('hviews').children[0].setAttribute('aria-pressed', 'true'); }, 0);
+  chips($('poses'), POSES, (p) => R.pose(p[1]), 1);
+  R.pose(POSES[1][1]); R.play('idle');
+  const toggle = (host, id, label, on, fn) => { const b = document.createElement('button'); b.className = 'chip'; b.type = 'button'; b.id = id; b.textContent = label; b.setAttribute('aria-pressed', on ? 'true' : 'false');
+    b.addEventListener('click', () => { const v = b.getAttribute('aria-pressed') !== 'true'; b.setAttribute('aria-pressed', v ? 'true' : 'false'); fn(v); }); host.appendChild(b); };
+  toggle($('shows'), 'refB', 'Painting beside her', false, (v) => { showRef = v; setRef(); });
+  toggle($('shows'), 'spinB', 'Turn slowly', false, (v) => { spin = v; easing = false; });
+  const vis = { glasses: true, sleeves: true, boots: false, gear: true, hooks: true, charms: true, bow: true, sword: true, knives: true }, BOWKEYS = ['moon', 'bowWrap', 'bowGem'], SWORDKEYS = ['blade', 'swordSteel', 'swordGrip', 'swordGold', 'swordGem', 'scab', 'scabStrap'], KNIFEKEYS = ['knifeBlade', 'knifeSteel', 'knifeCord', 'sheath', 'knifeGem'], BOOTK = ['boot', 'sole', 'stitch', 'eyelet', 'lace', 'aglet', 'sock', 'hole'], GEARK = ['belt', 'gear', 'steel', 'keeperB', 'gearBrass', 'beltHole'], HOOKK = ['iron', 'hookBrass'], CHARMK = ['charmGold', 'teal', 'pearl', 'amber', 'crystal'];
+  const applyVis = () => { for (const k in R.meshes) { let v = true; if (['wire', 'lens', 'pad'].includes(k)) v = vis.glasses; if (['lacesl', 'laceband'].includes(k)) v = vis.sleeves; if (GEARK.includes(k)) v = vis.gear; if (HOOKK.includes(k)) v = vis.hooks; if (CHARMK.includes(k)) v = vis.charms; if (BOWKEYS.includes(k)) v = vis.bow; if (SWORDKEYS.includes(k)) v = vis.sword; if (KNIFEKEYS.includes(k)) v = vis.knives; if (vis.boots && !BOOTK.includes(k)) v = false; R.meshes[k].visible = v; } if (R.light) R.light.visible = vis.bow && !vis.boots; };
+  toggle($('shows'), 'glassB', 'Glasses', true, (v) => { vis.glasses = v; applyVis(); });
+  toggle($('shows'), 'sleeveB', 'Lace sleeves', true, (v) => { vis.sleeves = v; applyVis(); });
+  // Her moves are in three rows that act as one set: picking one unpresses the others. Fight moves and emotes bring the camera in closer.
+  const CAMS = { draw: { az: 0.1, el: 0.05, dist: 5.9, ty: 0.98, tx: 0.2, tz: 0 }, sword: { az: 0.1, el: 0.06, dist: 7.4, ty: 0.95, tx: 0.5, tz: 0 }, knives: { az: 0.1, el: 0.06, dist: 6.2, ty: 0.95, tx: 0.25, tz: 0 }, gem: { az: 0.2, el: 0.04, dist: 5.2, ty: 0.98, tx: 0, tz: 0 }, shots: { az: 0.1, el: 0.05, dist: 5.9, ty: 0.98, tx: 0.2, tz: 0 }, glass: { az: 0.1, el: 0.05, dist: 6.4, ty: 0.98, tx: 0.3, tz: 0 },
+    hit: { az: 0.1, el: 0.05, dist: 5.0, ty: 0.95, tx: -0.03, tz: 0 }, hard: { az: 0.1, el: 0.05, dist: 5.6, ty: 0.90, tx: -0.15, tz: 0 }, dodge: { az: 0.1, el: 0.05, dist: 5.6, ty: 0.86, tx: -0.18, tz: 0 }, win: { az: 0.15, el: 0.05, dist: 6.1, ty: 1.10, tx: 0, tz: 0 }, fall: { az: 0.7, el: 0.10, dist: 5.2, ty: 0.62, tx: 0, tz: 0 },
+    bow: { az: 0.55, el: 0.06, dist: 5.2, ty: 0.86, tx: 0, tz: 0 }, wave: { az: 0.1, el: 0.05, dist: 5.2, ty: 1.02, tx: -0.05, tz: 0 }, kneel: { az: 0.7, el: 0.10, dist: 4.9, ty: 0.62, tx: 0, tz: 0 }, squat: { az: 0.6, el: 0.10, dist: 4.7, ty: 0.50, tx: 0, tz: 0 }, sit: { az: 0.7, el: 0.12, dist: 4.9, ty: 0.42, tx: 0, tz: 0.15 }, hover: { az: 0.45, el: 0.08, dist: 5.2, ty: 0.72, tx: 0, tz: 0.05 } };
+  const MOVEHOSTS = ['moves', 'fight', 'emotes'];
+  const pickMove = (host) => (v) => { for (const id of MOVEHOSTS) if (id !== host) [...$(id).children].forEach((c) => c.setAttribute('aria-pressed', 'false')); if (v[1] === 'pose') setPose(1); else R.play(v[1]);
+    if (CAMS[v[1]]) { want = CAMS[v[1]]; easing = true; spin = false; $('spinB').setAttribute('aria-pressed', 'false'); [...$('cam').children].forEach((c) => c.setAttribute('aria-pressed', 'false')); } };
+  chips($('moves'), [['Stand still', 'pose'], ['Ready', 'idle'], ['Walk', 'walk'], ['Jog', 'jog'], ['Talk', 'talk'], ['Cheer', 'cheer'], ['Limber up', 'limber']], pickMove('moves'), 1);
+  chips($('fight'), [['Moonsteel Draw', 'draw'], ['Sword', 'sword'], ['Knives', 'knives'], ['The gem', 'gem'], ["The gem's two shots", 'shots'], ['Silverglass', 'glass'], ['Hit', 'hit'], ['Hard hit', 'hard'], ['Dodge', 'dodge'], ['Win', 'win'], ['Fall', 'fall']], pickMove('fight'), -1);
+  chips($('emotes'), [['Court bow', 'bow'], ['Wave', 'wave'], ['Kneel', 'kneel'], ['Squat', 'squat'], ['Sit', 'sit'], ['Hover', 'hover']], pickMove('emotes'), -1);
+  toggle($('extra'), 'slowB', 'Half speed', false, (v) => { speed = v ? 0.45 : 1; });
+  // The finer Flipbook look (claude/HOW-TO-flipbook-look.md, section 11): two sliders that show while the look is on. They open at the
+  // setting Chris liked for the witches: 1.2 mm of her to a pixel, full flipbook colours. Pixel size 0 is the look as it first was (4.75 mm).
+  const flipSet = () => { const on = stage.look === 'flipbook', pix = +$('pix').value, mm = 4.75 * Math.pow(0.8 / 4.75, pix / 100); stage.pixelWhole = pix === 0; stage.mmPerPixel = mm; stage.snap = +$('snap').value / 100;
+    $('pixout').textContent = mm.toFixed(1) + ' mm of her to a pixel'; $('snapout').textContent = $('snap').value + '%'; $('flipset').style.display = on ? 'block' : 'none'; };
+  toggle($('extra'), 'flipB', 'Flipbook look', false, (v) => { stage.look = v ? 'flipbook' : 'smooth'; flipSet(); });
+  $('pix').addEventListener('input', flipSet); $('snap').addEventListener('input', flipSet);       // claude/HOW-TO-flipbook-look.md: a switch, off when the page opens
+  toggle($('shows'), 'gearB', 'Belts and bags', true, (v) => { vis.gear = v; applyVis(); });
+  toggle($('shows'), 'hooksB', 'Strap hooks', true, (v) => { vis.hooks = v; applyVis(); });
+  toggle($('shows'), 'charmsB', 'Charms', true, (v) => { vis.charms = v; applyVis(); });
+  toggle($('shows'), 'bowB', 'Bow', true, (v) => { vis.bow = v; applyVis(); });
+  toggle($('shows'), 'swordB', 'Sword', true, (v) => { vis.sword = v; applyVis(); });
+  toggle($('shows'), 'knivesB', 'Knives', true, (v) => { vis.knives = v; applyVis(); });
+  toggle($('shows'), 'bootsB', 'Boots only', false, (v) => { vis.boots = v; applyVis(); });
+  setRef();
+  // drag to turn, pinch or wheel to zoom
+  const pts = new Map(); let pinch0 = 0, dist0 = 0;
+  canvas.addEventListener('pointerdown', (e) => { canvas.setPointerCapture(e.pointerId); pts.set(e.pointerId, [e.clientX, e.clientY]); easing = false; if (pts.size === 2) { const a = [...pts.values()]; pinch0 = Math.hypot(a[0][0] - a[1][0], a[0][1] - a[1][1]); dist0 = orbit.dist; } });
+  canvas.addEventListener('pointermove', (e) => { const p = pts.get(e.pointerId); if (!p) return; const dx = e.clientX - p[0], dy = e.clientY - p[1]; pts.set(e.pointerId, [e.clientX, e.clientY]);
+    if (pts.size === 1) { orbit.az -= dx * 0.008; orbit.el = Math.max(want.low ? -1.35 : -0.45, Math.min(1.35, orbit.el + dy * 0.006)); }
+    else if (pts.size === 2 && pinch0 > 0) { const a = [...pts.values()], d = Math.hypot(a[0][0] - a[1][0], a[0][1] - a[1][1]); orbit.dist = Math.max(0.6, Math.min(9, dist0 * pinch0 / d)); orbit.target.y = Math.max(0.1, Math.min(1.62, orbit.target.y + dy * 0.0012)); } });
+  const up = (e) => { pts.delete(e.pointerId); pinch0 = 0; };
+  canvas.addEventListener('pointerup', up); canvas.addEventListener('pointercancel', up);
+  canvas.addEventListener('wheel', (e) => { e.preventDefault(); easing = false; orbit.dist = Math.max(0.6, Math.min(9, orbit.dist * Math.exp(e.deltaY * 0.001))); }, { passive: false });
+  let sized = '';
+  function fit() { const w = box.clientWidth, h = box.clientHeight, pr = Math.min(window.devicePixelRatio || 1, 2), k = w + 'x' + h + 'x' + pr; if (k !== sized && w > 0 && h > 0) { sized = k; stage.resize(w, h, pr); } }
+  let last = 0;
+  function frame(now) {
+    requestAnimationFrame(frame); const dt = Math.min(0.05, (now - last) / 1000 || 0.016); last = now; fit();
+    R.animate(dt * speed);
+    if (spin) orbit.az += dt * 0.5;
+    if (easing) { let d = want.az - orbit.az; d = Math.atan2(Math.sin(d), Math.cos(d)); const k = Math.min(1, dt * 5); orbit.az += d * k; orbit.el += (want.el - orbit.el) * k; orbit.dist += (want.dist - orbit.dist) * k; orbit.target.y += (want.ty - orbit.target.y) * k; orbit.target.x += ((want.tx || 0) - orbit.target.x) * k; orbit.target.z += ((want.tz || 0) - orbit.target.z) * k; }
+    stage.render();
+  }
+  $('hud').textContent = 'Her moves · ' + Math.round(R.triangles / 1000) + 'k triangles';
+  window.RANGER = { stage, R, step() { fit(); stage.render(); } };
+  requestAnimationFrame(frame);
+})();
+</script>
+</body>
+</html>
