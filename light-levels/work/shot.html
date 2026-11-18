@@ -1,0 +1,16 @@
+<!DOCTYPE html><html><body style="margin:0;background:#222"><canvas id="c" style="width:600px;height:800px"></canvas>
+<script src="three.js"></script><script src="meshopt.js"></script><script src="palette.js"></script><script src="tex.js"></script><script src="jester_lod.js"></script><script src="stage.js"></script><script src="lod.js"></script>
+<script>
+window.setup = async function(opts, o){
+  o=o||{};
+  const stage = window.stage = makeStage(document.getElementById('c'), {shadow:(o&&o.shadow)||2048, preserve:true});
+  stage.resize(o.w||600,o.h||800,1);
+  if (window.MeshoptSimplifier) await MeshoptSimplifier.ready;
+  const J = window.J = (typeof opts==='string') ? WITCH_LOD.make(opts) : makeJester(opts);
+  stage.scene.add(J.root, J.fx); J.camera = stage.camera;
+  window.T=0;
+  return {tris:J.triangles};
+};
+window.adv = function(n, dt){ dt=dt||1/60; for(let i=0;i<n;i++){ T+=dt; J.animate(0,0,T,dt,0);} };
+window.view = function(az, el, dist, ty){ const ob=stage.orbit; ob.az=az; ob.el=el; ob.dist=dist; ob.target.y=ty==null?0.93:ty; stage.renderer.info.autoReset=false; stage.renderer.info.reset(); stage.render(); const i=stage.renderer.info.render; return {calls:i.calls, tris:i.triangles}; };
+</script></body></html>
