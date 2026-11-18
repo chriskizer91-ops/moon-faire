@@ -1,0 +1,15 @@
+Jester Witch — Set F: Spell Effects
+
+Generated November 11, 2026.
+PNG filenames follow the codes in the supplied prompt file.
+Created using built-in image generation.
+
+F1.png — the magic circle — 1254 × 1254 pixels
+F2.png — sparkles — 1254 × 1254 pixels
+F3.png — the swirling ring — 1254 × 1254 pixels
+F4.png — hand glow — 1254 × 1254 pixels
+F5.png — the gold bell chain — 1536 × 1024 pixels
+
+Landscape sheets retain their native 1536 × 1024 resolution.
+Square spell effects retain their native 1254 × 1254 resolution.
+Images are supplied as modeling/art references; cloth cutout outlines are interpreted from the visible costume.

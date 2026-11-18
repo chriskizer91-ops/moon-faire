@@ -1,0 +1,15 @@
+Jester Witch — Set A: Full Outfit
+
+Generated November 11, 2026.
+PNG filenames follow the codes in the supplied prompt file.
+Created using built-in image generation.
+
+A1.png — front and back — 1536 × 1024 pixels
+A2.png — both sides — 1536 × 1024 pixels
+A3.png — three-quarter views — 1536 × 1024 pixels
+A4.png — arms straight out — 1536 × 1024 pixels
+A5.png — arms straight up — 1536 × 1024 pixels
+
+Landscape sheets retain their native 1536 × 1024 resolution.
+Square spell effects retain their native 1254 × 1254 resolution.
+Images are supplied as modeling/art references; cloth cutout outlines are interpreted from the visible costume.

@@ -1,0 +1,13 @@
+Jester Witch — Set D: Cloth and Fabrics
+
+Generated November 11, 2026.
+PNG filenames follow the codes in the supplied prompt file.
+Created using built-in image generation.
+
+D1.png — the veil — 1536 × 1024 pixels
+D2.png — the skirt layers — 1536 × 1024 pixels
+D3.png — fabric squares — 1536 × 1024 pixels
+
+Landscape sheets retain their native 1536 × 1024 resolution.
+Square spell effects retain their native 1254 × 1254 resolution.
+Images are supplied as modeling/art references; cloth cutout outlines are interpreted from the visible costume.

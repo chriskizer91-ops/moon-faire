@@ -1,0 +1,18 @@
+Jester Witch — Set C: Detail Sheets
+
+Generated November 11, 2026.
+PNG filenames follow the codes in the supplied prompt file.
+Created using built-in image generation.
+
+C1.png — legs and boots — 1536 × 1024 pixels
+C2.png — one boot — 1536 × 1024 pixels
+C3.png — head, front and side — 1536 × 1024 pixels
+C4.png — head, three-quarter and back — 1536 × 1024 pixels
+C5.png — head with the veil on — 1536 × 1024 pixels
+C6.png — faces — 1536 × 1024 pixels
+C7.png — hands — 1536 × 1024 pixels
+C8.png — small details — 1536 × 1024 pixels
+
+Landscape sheets retain their native 1536 × 1024 resolution.
+Square spell effects retain their native 1254 × 1254 resolution.
+Images are supplied as modeling/art references; cloth cutout outlines are interpreted from the visible costume.
