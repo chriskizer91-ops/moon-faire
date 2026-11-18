@@ -15,6 +15,7 @@ A 2D game about four witch performers on the Moon Faire, a festival airship tour
 | `docs/stories/` | The films' stories, in plain words. |
 | `tools/` | `pack_assets.py` builds `game-assets/`. `build_demo.py` builds `dist/moon-faire-demo.html`, a single-file demo with everything embedded. `pack_audio.py` brings in songs and sound effects: trimmed, levelled and small, with their key and tempo. |
 | `art-pipeline/` | Everything that makes the art: cut frames and their anchors, scripts, the original sheets, and `smoothing-pack/` (the strips for ChatGPT that smooth the Ranger's, Witch's and Fox's moves). |
+| `flipbook-art-source/` | What came over from the Flip Book Art project on claude.ai: the flipbook page with all 474 HD frames and the pixel sheet, *Night of No Moon* (the Jester's FF9-style mini game, with pixel sizes from 128 down to 32), and the Lore Bible, Spellbook and animation plans. Its `README.md` says how to open each one. |
 | `docs/` | `START-HERE-sprite-animation-method.md`: how the animations are made, and what didn't work. |
 
 To try the example player, serve the asset folder and open the player:
