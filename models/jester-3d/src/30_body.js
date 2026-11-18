@@ -1,0 +1,147 @@
+
+  // ---------- skin weights by region ----------
+  const SPINE_W = [['hips', 0.885], ['spine1', 1.03], ['spine2', 1.14], ['spine3', 1.255]];
+  function wSpine(y) {
+    if (y <= SPINE_W[0][1]) return [BI.hips, 1];
+    for (let i = 1; i < SPINE_W.length; i++) if (y < SPINE_W[i][1]) {
+      const u = sm(SPINE_W[i - 1][1], SPINE_W[i][1], y);
+      return [BI[SPINE_W[i - 1][0]], 1 - u, BI[SPINE_W[i][0]], u];
+    }
+    return [BI.spine3, 1];
+  }
+  function wTorso(x, y, z) {
+    const w = wSpine(y), ax = Math.abs(x), S = x < 0 ? 'R' : 'L';
+    const k = 0.75 * sm(0.085, 0.15, ax) * sm(1.19, 1.27, y);       // the shoulder girdle follows the collarbone
+    if (k > 0.001) { for (let i = 1; i < w.length; i += 2) w[i] *= 1 - k; w.push(BI['clav' + S], k); }
+    if (y > 1.30) { const n = sm(1.30, 1.355, y) * (1 - sm(0.05, 0.1, ax)); if (n > 0.001) { for (let i = 1; i < w.length; i += 2) w[i] *= 1 - n; w.push(BI.neck, n); } }
+    return w;
+  }
+
+  // ---------- torso: purple lace bodice with a V neck, black corset, painted in one atlas ----------
+  const TY0 = 0.79, TY1 = 1.352;
+  const TORSO = [[0.79, [0.150, 0.095, 0.110, 0]], [0.87, [0.165, 0.100, 0.118, 0]], [0.95, [0.148, 0.095, 0.106, 0]], [1.04, [0.106, 0.082, 0.082, 0.002]],
+    [1.095, [0.110, 0.088, 0.084, 0.003]], [1.14, [0.120, 0.095, 0.088, 0.004]], [1.215, [0.134, 0.106, 0.094, 0.004]], [1.255, [0.140, 0.100, 0.097, 0]],
+    [1.29, [0.146, 0.088, 0.096, -0.004]], [1.315, [0.138, 0.074, 0.088, -0.008]], [1.337, [0.094, 0.058, 0.070, -0.010]], [1.352, [0.052, 0.046, 0.050, -0.012]]];
+  const WAIST = 1.04, PROJ = !!(BAKED && BAKED.body);      // PROJ: the bodice is the painting, projected from the front and from the back
+  const TPW = 2.3;
+  function torsoTex() {
+    const W = Math.round(1024 * TEXS), H = Math.round(1024 * TEXS), c = cvs(W, H), g = c.getContext('2d');
+    const ty = (y) => (1 - (y - TY0) / (TY1 - TY0)) * H, mm = H / (TY1 - TY0) / 1000;   // pixels per millimeter, vertically
+    const xOf = (u, y) => { const a = (u - 0.5) * TAU, s = Math.sin(a), rx = prof(TORSO, y, true)[0]; return rx * Math.sign(s) * Math.pow(Math.abs(s), 2 / TPW); };
+    const uOf = (x, y) => { const rx = prof(TORSO, y, true)[0], q = cl(x / rx, -1, 1); return 0.5 + Math.asin(Math.sign(q) * Math.pow(Math.abs(q), TPW / 2)) / TAU; };
+    // purple lace everywhere first
+    g.fillStyle = PAL.lace; g.fillRect(0, 0, W, H);
+    blobs(g, W, H, 200, [PAL.laceHi], W * 0.02, W * 0.07, 0.10, 0.3);
+    blobs(g, W, H, 120, ['#3a1838'], W * 0.02, W * 0.08, 0.15, 0.4);
+    for (let i = 0; i < 900; i++) {                // lace flowers and scrolls
+      const x = rnd() * W, y = rnd() * H, s = rr(5, 13) * TEXS, col = rnd() < 0.5 ? rgba('#a868a0', 0.5) : rgba('#2a1030', 0.55);
+      g.strokeStyle = col; g.lineWidth = 1.4 * TEXS; g.beginPath();
+      if (rnd() < 0.5) { for (let p = 0; p < 5; p++) { const a = p * TAU / 5; g.moveTo(x, y); g.quadraticCurveTo(x + Math.cos(a - 0.5) * s, y + Math.sin(a - 0.5) * s, x + Math.cos(a) * s, y + Math.sin(a) * s); } }
+      else g.arc(x, y, s, rnd() * TAU, rnd() * TAU);
+      g.stroke();
+    }
+    // skin above the neckline, column by column (front V, straight across the back)
+    const neck = (u) => {
+      const a = (u - 0.5) * TAU, front = Math.cos(a) > 0, x = xOf(u, 1.2);
+      if (!front) return 1.262;
+      const ax = Math.abs(x); if (ax > 0.090) return 1.36;
+      return 1.176 + 0.150 * Math.pow(ax / 0.090, 0.85);
+    };
+    for (let X = 0; X < W; X++) {
+      const u = (X + 0.5) / W, yn = neck(u); if (yn > 1.355) continue;
+      const Y = ty(yn), sg = g.createLinearGradient(0, 0, 0, Y);
+      sg.addColorStop(0, PAL.skin); sg.addColorStop(0.75, PAL.skin); sg.addColorStop(1, '#e4b49a');
+      g.fillStyle = sg; g.fillRect(X, 0, 1, Y);
+    }
+    // soft shading on the chest: collarbones and the hollow between
+    const shade = (x0, y0, x1, y1, w, a) => { g.strokeStyle = rgba(PAL.skinSh, a); g.lineWidth = w * mm; g.lineCap = 'round'; g.beginPath(); g.moveTo(uOf(x0, y0) * W, ty(y0)); g.lineTo(uOf(x1, y1) * W, ty(y1)); g.stroke(); };
+    g.save(); g.filter = 'blur(' + (3 * TEXS) + 'px)';
+    shade(0.012, 1.318, 0.075, 1.330, 5, 0.5); shade(-0.012, 1.318, -0.075, 1.330, 5, 0.5); shade(0, 1.20, 0, 1.25, 6, 0.42);
+    g.restore();
+    // gold beaded trim along the neckline
+    for (let X = 0; X < W; X += 2) {
+      const u = (X + 0.5) / W, yn = neck(u); if (yn > 1.355) continue;
+      const Y = ty(yn); g.fillStyle = '#2a1242'; g.fillRect(X, Y, 2, 5 * mm); g.fillStyle = PAL.gold; g.fillRect(X, Y - 1.2 * mm, 2, 2.6 * mm);
+      if (X % Math.round(7 * TEXS) < 2) dot(g, X, Y + 0.2 * mm, 1.9 * mm, PAL.goldHi);
+    }
+    // black corset under the bust, the waist and everything below
+    const cTop = (u) => { const x = xOf(u, 1.1), f = Math.cos((u - 0.5) * TAU) > 0; return f ? 1.098 + 0.012 * Math.cos(cl(Math.abs(x) / 0.12, 0, 1) * PI) : 1.105; };
+    for (let X = 0; X < W; X++) {
+      const u = (X + 0.5) / W, Y = ty(cTop(u));
+      const sg = g.createLinearGradient(0, Y, 0, H); sg.addColorStop(0, '#221a26'); sg.addColorStop(0.3, '#17121a'); sg.addColorStop(1, '#0e0a10');
+      g.fillStyle = sg; g.fillRect(X, Y, 1, H - Y);
+      if (X % 2 === 0) { g.fillStyle = PAL.goldDk; g.fillRect(X, Y - 1 * mm, 2, 1.6 * mm); }
+    }
+    for (let i = -6; i <= 6; i++) {                // boning
+      if (i === 0) continue; const x = i * 0.021;
+      g.strokeStyle = 'rgba(86,72,96,0.55)'; g.lineWidth = 1.2 * mm; g.beginPath(); g.moveTo(uOf(x, 1.095) * W, ty(1.098)); g.lineTo(uOf(x * 0.9, 0.99) * W, ty(0.985)); g.stroke();
+    }
+    for (let k = 0; k < 7; k++) {                  // front lacing with gold eyelets
+      const y0 = 1.004 + k * 0.0135, y1 = y0 + 0.0135, xl = uOf(-0.013, y0) * W, xr = uOf(0.013, y0) * W;
+      g.strokeStyle = '#8d82a0'; g.lineWidth = 1.5 * mm; g.beginPath(); g.moveTo(xl, ty(y0)); g.lineTo(xr, ty(y1)); g.moveTo(xr, ty(y0)); g.lineTo(xl, ty(y1)); g.stroke();
+      dot(g, xl, ty(y0), 2.1 * mm, PAL.gold); dot(g, xr, ty(y0), 2.1 * mm, PAL.gold);
+    }
+    for (const sx of [-1, 1]) { dot(g, uOf(sx * 0.016, 1.105) * W, ty(1.107), 2.6 * mm, PAL.goldHi); dot(g, uOf(sx * 0.07, 1.1) * W, ty(1.101), 2.2 * mm, PAL.gold); }
+    return ctex(c);
+  }
+  (function buildTorso() {
+    const rings = [], vs = [], NR = Q(40, 20), NU = Q(56, 28);
+    for (let i = 0; i <= NR; i++) {
+      const y = lerp(TY0, TY1, i / NR), [rx, rzF, rzB, cz] = prof(TORSO, y, true), ring = [], e = 2 / TPW;
+      for (let j = 0; j < NU; j++) {
+        const a = (PROJ ? 1.5 * PI : PI) + (j / NU) * TAU, s = Math.sin(a), c = Math.cos(a);     // seam at the back and u = 0.5 the front; projected, the seam is at her right side
+        const x = rx * Math.sign(s) * Math.pow(Math.abs(s), e); let z = cz + (c >= 0 ? rzF : rzB) * Math.sign(c) * Math.pow(Math.abs(c), e);
+        if (c > 0) {
+          const ax = Math.abs(x);
+          z += c * 0.031 * Math.exp(-Math.pow((ax - 0.056) / 0.040, 2) - Math.pow((y - 1.215) / 0.046, 2));
+          z -= c * 0.004 * Math.exp(-Math.pow(x / 0.014, 2) - Math.pow((y - 1.240) / 0.04, 2));
+        }
+        ring.push([x, y, z]);
+      }
+      rings.push(ring); vs.push(i / NR);
+    }
+    const part = loft(rings, { v: vs, capA: true });
+    if (PROJ) for (let i = 0; i <= NR; i++) {             // atlas: front view in the left half, back view in the right, each row spanning the torso's width
+      const rx = prof(TORSO, lerp(TY0, TY1, i / NR), true)[0];
+      for (let j = 0; j <= NU; j++) { const k = i * (NU + 1) + j, f = 0.5 + 0.5 * cl(part.pos[k * 3] / rx, -1, 1); part.uv[k * 2] = j <= NU / 2 ? 0.5 * f : 0.5 + 0.5 * (1 - f); }
+    }
+    addPart('torso', part, wTorso, { out: V3(0, 1.1, 0) });
+  })();
+
+  // ---------- arms: wine velvet sleeves to the elbow, black sleeves beneath the cuffs ----------
+  const ARM_R = [[-0.035, 0.030], [0, 0.050], [0.04, 0.056], [0.11, 0.054], [0.19, 0.051], [0.245, 0.047], [0.30, 0.040], [0.39, 0.033], [0.455, 0.027], [0.475, 0.0255]];
+  function wArm(S, sLen) {
+    if (sLen < 0.05) { const u = sm(-0.035, 0.05, sLen); return [BI['clav' + S], (1 - u) * 0.6, BI.spine3, (1 - u) * 0.4, BI['uarm' + S], u]; }
+    if (sLen < L_UARM + 0.05) { const u = sm(L_UARM - 0.05, L_UARM + 0.05, sLen); return [BI['uarm' + S], 1 - u, BI['farm' + S], u]; }
+    const u = sm(L_UARM + L_FARM - 0.02, L_UARM + L_FARM + 0.012, sLen); return [BI['farm' + S], 1 - u, BI['hand' + S], u];
+  }
+  for (const [S, s] of SIDES) {
+    const d = armDir[S], sh = restPts['sh' + S], NS = Q(30, 14), NU = Q(24, 12);
+    const mk = (s0, s1, n) => {
+      const pts = [], rad = [], ss = [];
+      for (let i = 0; i <= n; i++) { const sl = lerp(s0, s1, i / n); pts.push(sh.clone().addScaledVector(d, sl)); rad.push(prof(ARM_R, sl, true)); ss.push(sl); }
+      const rings = tubeRings(pts, rad, NU, V3(0, 0, 1)), part = loft(rings, { capA: s0 < 0, vS: 3 });
+      const cols = NU + 1;
+      return [part, (x, y, z, i) => wArm(S, i < ss.length * cols ? ss[Math.floor(i / cols)] : ss[0]), centroidOf(rings)];
+    };
+    const [pa, wa, ca] = mk(-0.035, 0.285, Math.round(NS * 0.62)); addPart('wine', pa, wa, { out: ca });
+    const [pb, wb, cb] = mk(0.27, 0.475, Math.round(NS * 0.4)); addPart('cloth', pb, wb, { out: cb });
+  }
+
+  // ---------- legs in the flocked leggings ----------
+  const LEG = [[0.875, [0.080, 0.090, 0.094, 0.086, 0]], [0.80, [0.072, 0.080, 0.084, 0.086, 0]], [0.70, [0.060, 0.066, 0.070, 0.085, 0.002]], [0.58, [0.050, 0.054, 0.057, 0.084, 0.004]],
+    [0.47, [0.043, 0.046, 0.045, 0.083, 0.008]], [0.40, [0.041, 0.042, 0.052, 0.082, 0.002]], [0.33, [0.038, 0.039, 0.047, 0.082, -0.004]], [0.26, [0.035, 0.037, 0.041, 0.081, -0.008]]];
+  function wLeg(S, y) {
+    if (y > 0.78) { const u = sm(0.78, 0.87, y); return [BI['thigh' + S], 1 - u, BI.hips, u]; }
+    const u = sm(0.42, 0.52, y); return [BI['shin' + S], 1 - u, BI['thigh' + S], u];
+  }
+  for (const [S, s] of SIDES) {
+    const rings = [], vs = [], NR = Q(34, 16), NU = Q(28, 14);
+    for (let i = 0; i <= NR; i++) {
+      const y = lerp(0.875, 0.26, i / NR), [rx, rzF, rzB, cx, cz] = prof(LEG, y, true), ring = [];
+      for (let j = 0; j < NU; j++) { const a = PI + (j / NU) * TAU; ring.push([s * cx + rx * 1.07 * Math.sin(a), y, cz + (Math.cos(a) >= 0 ? rzF : rzB) * 1.07 * Math.cos(a)]); }
+      rings.push(ring); vs.push(1 - (0.875 - y) / (0.875 - 0.26));
+    }
+    addPart('leggings', loft(rings, { v: vs, uS: 2 }), (x, y) => wLeg(S, y), { out: V3(s * 0.085, 0.55, 0) });
+  }
+
