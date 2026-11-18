@@ -359,6 +359,15 @@ Chris said yes to walking the whole demo next, and that he is tracing the walkin
 
 Chris decided on November 14 that walking and exploring happen in a 3D open world built by another session (`claude/moon-faire-open-world-map.md`), with fights still painted. **`HANDOFF-to-the-open-world.md`** in this folder is the index of everything this branch holds and what it is good for now: the story and `world/world.json`, the fair folk, the five fight places and their camera, the story pictures and item cards, the world map, the places laid out in metres, and what the painted walk-through can lend (talking, the flight picture, light by zone). The painted walking places stop being the game's map: the traced walking shapes and the map editor's tracing are set aside, and nothing was ever sent from the editor.
 
+## The fight as one piece: the party of four, the two wraiths, one call (November 14, evening) — task board rows F1 and F2
+
+`fight/README.md` tells it whole. The party of four against wisps, Shadow Wraiths and the great wraith on the five painted fight
+places, with the approved engine unchanged. Another page starts a fight with `await MF_FIGHT.start({ place, foes, ... })` and gets
+back who won, the XP, and each witch's HP and MP. Build: `python3 fight/build_fight.py` (writes `out/mf-fight.js` and
+`out/moon-faire-fight.html`). Published at https://claude.ai/artifact/6KjWrHpztUDZsCu15fkYpi. The pilot's own files (`src/`) are
+not changed. Chris's first answer: the party faces the foes and the camera stands behind them, swinging round each move; that is
+the default camera now.
+
 ## Next
 
 Step 5, and the two-person fair-folk test if Chris wants it: the remaining twelve prompts (with the lane lesson built in), every scene traced, the

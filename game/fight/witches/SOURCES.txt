@@ -1,0 +1,4 @@
+Built by fight/tools/build_witches.py. Do not edit by hand.
+fox: branch claude/fox-3d-model, commit 0a21ddc3d1d1904c058ef85309bd95a7f1f21b4b
+ranger: branch claude/ranger-3d-model, commit 3e6706ed62187bed7d129d10473bfe724b30c386
+io: branch claude/io-3d-model, commit 3bc17a38fb05ba95154e0f5752635429db0e5ef0
