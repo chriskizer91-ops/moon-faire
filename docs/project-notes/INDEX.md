@@ -118,6 +118,21 @@ Four more pages are named only in the repo's own `CLAUDE.md`, not in these notes
 | `artifacts/moon-faire-lore-bible.html` | 2026-11-18 | The Lore Bible doc's first tab, exported as HTML. | [Moon Faire: Lore Bible (a claude.ai doc, with a Spellbook tab)](https://claude.ai/artifact/FjzmuJiuSkf5xrDuggkNmx): no, saved in `artifacts/` |
 | `artifacts/moon-faire-lore-bible-spellbook.html` | 2026-11-18 | The Lore Bible doc's Spellbook tab, exported as HTML. | [Moon Faire: Lore Bible (a claude.ai doc, with a Spellbook tab)](https://claude.ai/artifact/FjzmuJiuSkf5xrDuggkNmx): no, saved in `artifacts/` |
 
+## `sessions/`: wrap-up notes from each session (added on main)
+
+Written by the work sessions on November 18, before the merge, each on its own branch. They are not part of the claude.ai project, so the counts above do not include them.
+
+| File | Date | What it is | Came from |
+|---|---|---|---|
+| `sessions/base-doll-outfits-and-light-models.md` | 2026-11-18 | Session: the base doll, her 21 outfits and their light models (November 14 to 18, 2026) | branch `claude/moon-faire-base-doll-light` |
+| `sessions/fair-folk-minds-and-talk.md` | 2026-11-18 | Fair folk minds and talk (task board S4) | branch `claude/moon-faire-fair-folk-minds` |
+| `sessions/fights-the-fight-piece.md` | 2026-11-18 | Session "Fights": the fight as its own piece | branch `claude/moon-faire-fights` |
+| `sessions/grey-hat-captain-3d-model.md` | 2026-11-18 | Session: the Grey Hat captain's 3D model (November 2026) | branch `claude/grey-hat-3d-model` |
+| `sessions/io-3d-spells-and-reactions.md` | 2026-11-18 | Io 3D: her spells and her reactions (stages nine to fourteen) | branch `claude/io-3d-model` |
+| `sessions/levelling-balance-and-foes.md` | 2026-11-18 | The "Levelling" session: levelling, finds, testers, herbs, the final boss and the bramble foes | branch `claude/moon-faire-levelling` |
+| `sessions/light-levels-flipbook-cameras-map-editor.md` | 2026-11-18 | Session: light levels, the finer Flipbook look, fight cameras, the map editor | branch `claude/moon-faire-light-levels` |
+| `sessions/open-world-map.md` | 2026-11-18 | Session note: the open-world map | branch `claude/moon-faire-open-world` |
+
 ## `lore/`: the lore folder
 
 | File | Date | What it is | Pages it names |

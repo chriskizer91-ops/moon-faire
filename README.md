@@ -1,3 +1,5 @@
+> **Start here: `docs/project-notes/INDEX.md`.** Most of this file dates from October and describes the old lore (moon phases, Aethermoor). The current lore, Chris's decisions and every session's notes are in `docs/project-notes/`, and they outrank what follows.
+
 # Moon Faire
 
 A 2D game about four witch performers on the Moon Faire, a festival airship touring Aethermoor.
