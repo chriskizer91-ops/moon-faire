@@ -1,0 +1,19 @@
+<!DOCTYPE html><html><body style="margin:0;background:#222"><canvas id="c" style="width:600px;height:800px"></canvas>
+<script src="three.js"></script><script src="meshopt.js"></script><script src="palette.js"></script><script src="fox_tex.js"></script>
+<script>document.write('<script src="'+(new URLSearchParams(location.search).get('m')||'fox_lod')+'.js"><\/script>')</script>
+<script src="stage_lod.js"></script><script src="lod_fox.js"></script>
+<script>
+window.setup = async function(opts){
+  const stage = window.stage = makeStage(document.getElementById('c'), {shadow:2048, preserve:true, palette:(window.JESTER_PALETTE||[]).concat([[84,122,116],[51,82,82],[22,45,47]])});
+  stage.resize(600,800,1);
+  await MeshoptSimplifier.ready;
+  const t0=performance.now();
+  const J = window.J = (typeof opts==='string') ? WITCH_LOD.make(opts) : makeFox(opts);
+  stage.scene.add(J.root, J.fx); J.camera = stage.camera; window.T=0;
+  const parts={}; let tr=0, pts=0; for (const k in J.debug.meshes){ const n=J.debug.meshes[k].geometry.index.count/3; parts[k]=n; tr+=n; } for (const c of J.debug.cloths){ tr+=c.tris; pts+=c.n; }
+  return {tris:tr, skin:J.triangles, cloth:pts, build:Math.round(performance.now()-t0), parts};
+};
+window.adv = function(n, dt){ dt=dt||1/60; for(let i=0;i<n;i++){ T+=dt; J.animate(0,0,T,dt,0);} };
+window.time = function(n){ const a=performance.now(); adv(n); return +((performance.now()-a)/n).toFixed(2); };
+window.view = function(az, el, dist, ty){ const ob=stage.orbit; ob.az=az; ob.el=el; ob.dist=dist; ob.target.y=ty==null?0.93:ty; stage.renderer.info.autoReset=false; stage.renderer.info.reset(); stage.render(); const i=stage.renderer.info.render; return {calls:i.calls, tris:i.triangles}; };
+</script></body></html>
